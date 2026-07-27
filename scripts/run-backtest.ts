@@ -1,7 +1,7 @@
 /**
  * Phase 5.8 — backtest runner.
  *
- *   npm run backtest:run                # all seeded cases
+ *   npm run backtest:run                # one bounded seeded case
  *   npm run backtest:run -- --case <id> # single case
  */
 import { config } from "dotenv";

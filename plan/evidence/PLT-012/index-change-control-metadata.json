@@ -1,0 +1,32 @@
+{
+  "id": "closed-route-io-presentation-contract",
+  "toVersion": "civica-index-route-io-contract-v31",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/PLT-012/index-change-control.md",
+      "plan/evidence/PLT-012/source-review.md"
+    ],
+    "registry": [
+      "src/lib/api/route-io-policy/registry.ts",
+      "src/lib/api/request-contract.ts"
+    ],
+    "release_note": ["plan/evidence/PLT-012/release-note.md"],
+    "migration_plan": ["plan/evidence/PLT-012/migration-plan.md"],
+    "golden_test": [
+      "src/lib/api/request-body.test.ts",
+      "src/lib/net/public-http.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/api/route-io-policy/route-io-policy.test.ts",
+      "scripts/validate-route-io-policy.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:route-io-policy"
+  ]
+}

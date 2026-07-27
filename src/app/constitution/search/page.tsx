@@ -17,8 +17,12 @@ import {
   type ConstitutionSearchInput,
   type ConstitutionSearchResponse,
 } from "@/lib/constitution/search-contract";
+import { shapeConstitutionSearchError } from "@/lib/constitution/search-error-response";
 import { withOg } from "@/lib/og";
-import { getRequestIp } from "@/lib/api/request-ip";
+import { checkRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Search constitutional text",
@@ -32,6 +36,8 @@ export const metadata: Metadata = {
     url: "https://civicaatlas.org/constitution/search",
   }),
 };
+
+const RATE_LIMIT_POLICY = getRequestRateLimitPolicy("constitution-search");
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -72,22 +78,33 @@ export default async function ConstitutionSearchPage({
       headers: requestHeaders,
     });
     try {
-      response = await searchConstitutionPassages(input, {
-        scope: "constitution-search",
-        key: getRequestIp(request),
-        limit: 30,
-        windowMs: 60_000,
-      });
+      const rateLimit = await checkRequestRateLimit(request, RATE_LIMIT_POLICY);
+      if (rateLimit.status !== "allowed") {
+        error = {
+          schemaVersion: CONSTITUTION_SEARCH_SCHEMA_VERSION,
+          error:
+            rateLimit.status === "limited"
+              ? "rate_limited"
+              : "data_unavailable",
+          code:
+            rateLimit.status === "limited"
+              ? "RATE_LIMITED"
+              : "RATE_LIMIT_UNAVAILABLE",
+          message:
+            rateLimit.status === "limited"
+              ? "Rate limit exceeded. Try again shortly."
+              : "Request protection is temporarily unavailable.",
+        };
+      } else {
+        response = await searchConstitutionPassages(input);
+      }
     } catch (caught) {
       const known =
         caught instanceof ConstitutionSearchQueryError ? caught : null;
-      error = {
-        schemaVersion: CONSTITUTION_SEARCH_SCHEMA_VERSION,
-        error: known?.code ?? "data_unavailable",
-        message:
-          known?.message ??
-          "The constitution search index could not be reached. Please try again later.",
-      };
+      error = shapeConstitutionSearchError(
+        known?.code ?? "data_unavailable",
+        known?.details,
+      ).body;
     }
   }
 

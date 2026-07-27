@@ -1,8 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, and, sql as dsql } from "drizzle-orm";
 import { pulseEvents } from "../db/schema";
+import { createServerlessSql } from "../db";
 
 export type ClassificationCategory =
   | "armed_conflict"
@@ -74,7 +74,7 @@ Respond with a JSON array where each element corresponds to the input event at t
 Only output the JSON array, no other text.`;
 
 export function createDb() {
-  const sqlClient = neon(process.env.DATABASE_URL!);
+  const sqlClient = createServerlessSql(process.env.DATABASE_URL!);
   return drizzle({ client: sqlClient });
 }
 
@@ -151,7 +151,7 @@ async function classifyBatch(
   try {
     parsed = JSON.parse(text);
   } catch {
-    console.warn(`[classify] Failed to parse JSON response: ${text.slice(0, 200)}`);
+    console.warn("[pulse-v1] provider_parse_failed");
     return events.map(() => null);
   }
 
@@ -198,69 +198,10 @@ export async function classifyPulseEvents(
   db: Db,
   options: { batchSize?: number; batchDelayMs?: number } = {}
 ): Promise<ClassificationSummary> {
-  const { batchSize = 20, batchDelayMs = 1000 } = options;
-
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_PULSE_CLASSIFIER });
-  const events = await fetchUnclassifiedEvents(db, 500);
-
-  if (events.length === 0) {
-    console.log("[classify] No unclassified events found.");
-    return { total: 0, succeeded: 0, failed: 0 };
-  }
-
-  console.log(`[classify] Found ${events.length} unclassified events. Processing in batches of ${batchSize}...`);
-
-  let succeeded = 0;
-  let failed = 0;
-
-  for (let i = 0; i < events.length; i += batchSize) {
-    const batch = events.slice(i, i + batchSize);
-    const batchNum = Math.floor(i / batchSize) + 1;
-    const totalBatches = Math.ceil(events.length / batchSize);
-    console.log(`[classify] Batch ${batchNum}/${totalBatches} (${batch.length} events)...`);
-
-    let results: (ClassificationResult | null)[];
-    try {
-      results = await classifyBatch(client, batch);
-    } catch (err) {
-      console.error(`[classify] Batch ${batchNum} API error:`, err);
-      failed += batch.length;
-      continue;
-    }
-
-    for (let j = 0; j < batch.length; j++) {
-      const event = batch[j];
-      const result = results[j] as (ClassificationResult & { _responseId?: string }) | null;
-
-      if (!result) {
-        console.warn(`[classify] Skipping event ${event.id} (classification failed)`);
-        failed++;
-        continue;
-      }
-
-      try {
-        await db
-          .update(pulseEvents)
-          .set({
-            category: result.category,
-            severity: result.severity,
-            confidence: result.confidence,
-            justification: result.justification,
-            llmModel: "claude-sonnet-4-6",
-            llmRequestId: result._responseId ?? null,
-          })
-          .where(eq(pulseEvents.id, event.id));
-        succeeded++;
-      } catch (err) {
-        console.error(`[classify] Failed to update event ${event.id}:`, err);
-        failed++;
-      }
-    }
-
-    if (i + batchSize < events.length) {
-      await new Promise((resolve) => setTimeout(resolve, batchDelayMs));
-    }
-  }
-
-  return { total: events.length, succeeded, failed };
+  // Pulse v1 is retired by PUL-035. Keep the export as a harmless migration
+  // seam for older callers, but it must not create a paid request.
+  void db;
+  void options;
+  console.warn("[pulse-v1] retired_no_model_call");
+  return { total: 0, succeeded: 0, failed: 0 };
 }

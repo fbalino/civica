@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless";
+import { createServerlessSql } from "@/lib/db";
 import { isKnownConstitutionTopic } from "@/lib/constitute/topic-keys";
 import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 import {
@@ -49,52 +49,16 @@ type SearchCursor = {
   passageId: string;
 };
 
-type SearchRateLimitOptions = {
-  scope: string;
-  key: string;
-  limit: number;
-  windowMs: number;
-};
+let searchSql: ReturnType<typeof createServerlessSql> | null = null;
 
-type SearchRateLimitWindow = {
-  bucketKey: string;
-  expiresAtIso: string;
-};
-
-let searchSql: ReturnType<typeof neon> | null = null;
-
-function getSearchSql(): ReturnType<typeof neon> {
+function getSearchSql(): ReturnType<typeof createServerlessSql> {
   if (!searchSql) {
     if (!process.env.DATABASE_URL) {
       throw new Error("DATABASE_URL is not set");
     }
-    searchSql = neon(process.env.DATABASE_URL);
+    searchSql = createServerlessSql(process.env.DATABASE_URL);
   }
   return searchSql;
-}
-
-function getSearchRateLimitWindow({
-  scope,
-  key,
-  windowMs,
-}: SearchRateLimitOptions): SearchRateLimitWindow {
-  const now = Date.now();
-  const windowStart = Math.floor(now / windowMs) * windowMs;
-  return {
-    bucketKey: `${scope}:${key}:${windowStart}`,
-    expiresAtIso: new Date(windowStart + windowMs).toISOString(),
-  };
-}
-
-async function incrementSearchRateLimit(
-  window: SearchRateLimitWindow,
-): Promise<void> {
-  const query = getSearchSql();
-  await query`
-    INSERT INTO rate_limits (key, count, expires_at)
-    VALUES (${window.bucketKey}, 1, ${window.expiresAtIso}::timestamptz)
-    ON CONFLICT (key) DO UPDATE SET count = rate_limits.count + 1
-  `;
 }
 
 async function fingerprint(value: unknown): Promise<string> {
@@ -234,7 +198,6 @@ async function withSearchTimeout<T>(promise: Promise<T>): Promise<T> {
  */
 export async function searchConstitutionPassages(
   rawInput: ConstitutionSearchInput,
-  rateLimit: SearchRateLimitOptions,
 ): Promise<ConstitutionSearchResponse> {
   const parsed = constitutionSearchInputSchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -267,10 +230,9 @@ export async function searchConstitutionPassages(
 
   try {
     const cursor = decodeCursor(input.cursor);
-    const rateWindow = getSearchRateLimitWindow(rateLimit);
     const query = getSearchSql();
 
-    const [, rateResult, metadataResult, result] = await withSearchTimeout(
+    const [, metadataResult, result] = await withSearchTimeout(
       query.transaction((txn) => {
         const jurisdictionCondition =
           input.jurisdictions.length === 0
@@ -286,12 +248,6 @@ export async function searchConstitutionPassages(
 
         return [
           txn`SET LOCAL statement_timeout = '1000ms'`,
-          txn`
-            INSERT INTO rate_limits (key, count, expires_at)
-            VALUES (${rateWindow.bucketKey}, 1, ${rateWindow.expiresAtIso}::timestamptz)
-            ON CONFLICT (key) DO UPDATE SET count = rate_limits.count + 1
-            RETURNING count
-          `,
           txn`
           SELECT
             (SELECT last_sync_at FROM sources WHERE id = ${SOURCE_ID}) AS last_sync_at,
@@ -354,11 +310,6 @@ export async function searchConstitutionPassages(
           CROSS JOIN q
           WHERE p.is_current = true
             AND p.search_vector @@ q.query
-            AND (
-              SELECT count <= ${rateLimit.limit}
-              FROM rate_limits
-              WHERE key = ${rateWindow.bucketKey}
-            )
             AND ${jurisdictionCondition}
             AND ${topicCondition}
         ), page AS (
@@ -381,15 +332,6 @@ export async function searchConstitutionPassages(
         ];
       }),
     );
-
-    const rateCount = Number(rows(rateResult)[0]?.count ?? rateLimit.limit + 1);
-    if (rateCount > rateLimit.limit) {
-      throw new ConstitutionSearchQueryError(
-        "rate_limited",
-        "Rate limit exceeded. Try again shortly.",
-        429,
-      );
-    }
 
     const metadata = rows(metadataResult)[0];
     const sourceLastSyncedAt = iso(metadata?.last_sync_at);
@@ -584,9 +526,6 @@ export async function searchConstitutionPassages(
     };
   } catch (error) {
     if (error instanceof ConstitutionSearchQueryError) {
-      if (error.code === "query_timeout") {
-        await incrementSearchRateLimit(getSearchRateLimitWindow(rateLimit));
-      }
       throw error;
     }
     const dbError = error as { code?: string; message?: string };
@@ -594,10 +533,6 @@ export async function searchConstitutionPassages(
       dbError.code === "57014" ||
       /statement timeout/i.test(dbError.message ?? "")
     ) {
-      // The batched transaction rolls its rate-limit increment back when the
-      // search statement times out. Persist one replacement increment before
-      // returning so deliberately expensive requests cannot evade throttling.
-      await incrementSearchRateLimit(getSearchRateLimitWindow(rateLimit));
       throw new ConstitutionSearchQueryError(
         "query_timeout",
         "The constitution search exceeded its one-second database limit.",

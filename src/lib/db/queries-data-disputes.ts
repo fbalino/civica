@@ -29,6 +29,7 @@ import {
   type SeverityBucket,
   type SeverityScore,
 } from "@/lib/factbook/reconcile/dispute-severity";
+import { FACT_KEYS } from "@/lib/factbook/reconcile/fact-keys";
 
 const KIND_RANK: Record<string, number> = {
   material_error: 0,
@@ -652,37 +653,68 @@ export interface PublicDisputeFilters {
 }
 
 export interface PublicDisputeFeedResult {
-  rows: PublicDisputeRow[];
+  /** Only the requested, consolidated conflict cards — never the full feed. */
+  groups: DisputeFactGroup<PublicDisputeRow>[];
+  /** Raw pairwise rows matching the current filter set. */
   totalMatching: number;
+  /** Consolidated fact conflicts matching the current filter set. */
+  totalGroups: number;
   totalAll: number;
 }
 
-/** Map raw resolution status → human-readable label (for resolved bucket). */
-const RESOLUTION_LABELS: Record<string, string> = {
-  resolved_a_wins: "A wins",
-  resolved_b_wins: "B wins",
-  resolved_held: "Held",
-  resolved_auto_stale: "Auto-resolved (stale)",
-  rejected_invalid: "Rejected as invalid",
+type PublicSeverityRule = {
+  factKey: string;
+  ppThreshold: number | null;
+  pctThreshold: number | null;
 };
 
 /**
- * Public-facing dispute feed for `/factbook/methodology/reconciliation/disputes`.
- *
- * Mirrors `getDataDisputeQueue` but:
- *   - returns BOTH open and closed rows (filterable via statusBucket)
- *   - strips reviewer identity
- *   - strips submitter email + affiliation
- *   - maps raw status → 3 public buckets
- *   - exposes systemAction label for auto-resolve transparency
+ * SQL-readable mirror of `computeSeverity`. The source registry remains
+ * canonical; this narrow projection lets the reader query filter/sort before
+ * it serializes a page rather than hydrating the entire dispute table in JS.
  */
-export async function getPublicDisputeFeed(
-  opts: PublicDisputeFilters = {},
-): Promise<PublicDisputeFeedResult> {
-  const limit = Math.min(Math.max(opts.limit ?? 50, 1), 2000);
-  const offset = Math.max(opts.offset ?? 0, 0);
-  const sort: DisputeSortKey = opts.sort ?? "severity";
+const PUBLIC_SEVERITY_RULES: PublicSeverityRule[] = Object.values(FACT_KEYS)
+  .filter(
+    (definition) =>
+      definition.materialErrorPpThreshold != null ||
+      definition.materialErrorPctThreshold != null,
+  )
+  .map((definition) => ({
+    factKey: definition.key,
+    ppThreshold: definition.materialErrorPpThreshold ?? null,
+    pctThreshold: definition.materialErrorPctThreshold ?? null,
+  }));
 
+function publicSeverityRuleValues(): ReturnType<typeof sql> {
+  return sql.join(
+    PUBLIC_SEVERITY_RULES.map(
+      (rule) =>
+        sql`(${rule.factKey}::text, ${rule.ppThreshold}::double precision, ${rule.pctThreshold}::double precision)`,
+    ),
+    sql`, `,
+  );
+}
+
+function publicDisputeSeverityWhere(
+  bucket: SeverityBucket | undefined,
+): ReturnType<typeof sql> {
+  switch (bucket) {
+    case "lo":
+      return sql`WHERE severity_value >= 0 AND severity_value < 0.5`;
+    case "mid":
+      return sql`WHERE severity_value >= 0.5 AND severity_value < 1.5`;
+    case "hi":
+      return sql`WHERE severity_value >= 1.5 AND severity_value < 3`;
+    case "xhi":
+      return sql`WHERE severity_value >= 3`;
+    default:
+      return sql``;
+  }
+}
+
+function publicDisputeFeedCtes(
+  opts: PublicDisputeFilters,
+): ReturnType<typeof sql> {
   const wheres: ReturnType<typeof sql>[] = [];
 
   if (opts.statusBucket) {
@@ -734,177 +766,323 @@ export async function getPublicDisputeFeed(
 
   const whereClause =
     wheres.length > 0 ? sql`WHERE ${sql.join(wheres, sql` AND `)}` : sql``;
+  const severityWhere = publicDisputeSeverityWhere(opts.severityBucket);
 
-  const rowsResult = await db.execute(sql`
-    SELECT
-      d.id,
-      d.fact_key,
-      d.fact_group,
-      d.dispute_kind,
-      d.status,
-      d.description,
-      d.fact_id_a,
-      d.fact_id_b,
-      d.submitter_name,
-      d.is_public,
-      d.created_at,
-      d.resolved_at,
-      d.resolution_action,
-      d.reviewer_id,
-      d.reviewer_notes,
-      j.id  AS jurisdiction_id,
-      j.slug AS country_slug,
-      j.name AS country_name,
-      a.source_id          AS a_source_id,
-      a.fact_value         AS a_fact_value,
-      a.fact_value_numeric AS a_fact_value_numeric,
-      a.fact_unit          AS a_fact_unit,
-      a.fact_year          AS a_fact_year,
-      a.as_of              AS a_as_of,
-      b.source_id          AS b_source_id,
-      b.fact_value         AS b_fact_value,
-      b.fact_value_numeric AS b_fact_value_numeric,
-      b.fact_unit          AS b_fact_unit,
-      b.fact_year          AS b_fact_year,
-      b.as_of              AS b_as_of
-    FROM data_disputes d
-    JOIN jurisdictions j ON j.id = d.jurisdiction_id
-    LEFT JOIN country_facts a ON a.id = d.fact_id_a
-    LEFT JOIN country_facts b ON b.id = d.fact_id_b
-    ${whereClause}
-  `);
+  return sql`
+    WITH severity_rules(fact_key, pp_threshold, pct_threshold) AS (
+      VALUES ${publicSeverityRuleValues()}
+    ),
+    scored AS (
+      SELECT
+        d.id,
+        d.fact_key,
+        d.fact_group,
+        d.dispute_kind,
+        d.status,
+        d.description,
+        d.fact_id_a,
+        d.fact_id_b,
+        d.submitter_name,
+        d.is_public,
+        d.created_at,
+        d.resolved_at,
+        d.resolution_action,
+        d.reviewer_id,
+        d.reviewer_notes,
+        j.id AS jurisdiction_id,
+        j.slug AS country_slug,
+        j.name AS country_name,
+        a.source_id AS a_source_id,
+        a.fact_value AS a_fact_value,
+        a.fact_value_numeric AS a_fact_value_numeric,
+        a.fact_unit AS a_fact_unit,
+        a.fact_year AS a_fact_year,
+        a.as_of AS a_as_of,
+        b.source_id AS b_source_id,
+        b.fact_value AS b_fact_value,
+        b.fact_value_numeric AS b_fact_value_numeric,
+        b.fact_unit AS b_fact_unit,
+        b.fact_year AS b_fact_year,
+        b.as_of AS b_as_of,
+        CASE
+          WHEN d.dispute_kind <> 'material_error'
+            OR a.fact_value_numeric IS NULL
+            OR b.fact_value_numeric IS NULL
+            THEN NULL
+          WHEN rules.pp_threshold IS NOT NULL AND rules.pp_threshold > 0
+            THEN ABS(a.fact_value_numeric::double precision - b.fact_value_numeric::double precision)
+              / rules.pp_threshold
+          WHEN rules.pct_threshold IS NOT NULL
+            AND rules.pct_threshold > 0
+            AND GREATEST(
+              ABS(a.fact_value_numeric::double precision),
+              ABS(b.fact_value_numeric::double precision)
+            ) > 0
+            THEN ABS(a.fact_value_numeric::double precision - b.fact_value_numeric::double precision)
+              / (rules.pct_threshold * GREATEST(
+                ABS(a.fact_value_numeric::double precision),
+                ABS(b.fact_value_numeric::double precision)
+              ))
+          ELSE NULL
+        END AS severity_value,
+        CASE
+          WHEN a.fact_value_numeric IS NULL OR b.fact_value_numeric IS NULL
+            THEN NULL
+          ELSE ABS(a.fact_value_numeric::double precision - b.fact_value_numeric::double precision)
+        END AS severity_gap,
+        CASE
+          WHEN d.dispute_kind = 'material_error' AND rules.pp_threshold IS NOT NULL
+            THEN rules.pp_threshold
+          WHEN d.dispute_kind = 'material_error' AND rules.pct_threshold IS NOT NULL
+            THEN rules.pct_threshold
+          ELSE NULL
+        END AS severity_threshold_value,
+        CASE
+          WHEN d.dispute_kind = 'material_error' AND rules.pp_threshold IS NOT NULL THEN 'pp'
+          WHEN d.dispute_kind = 'material_error' AND rules.pct_threshold IS NOT NULL THEN 'pct'
+          ELSE NULL
+        END AS severity_threshold_kind
+      FROM data_disputes d
+      JOIN jurisdictions j ON j.id = d.jurisdiction_id
+      LEFT JOIN country_facts a ON a.id = d.fact_id_a
+      LEFT JOIN country_facts b ON b.id = d.fact_id_b
+      LEFT JOIN severity_rules rules ON rules.fact_key = d.fact_key
+      ${whereClause}
+    ),
+    matching AS (
+      SELECT *
+      FROM scored
+      ${severityWhere}
+    )
+  `;
+}
 
-  const raw = ((rowsResult as unknown as { rows?: unknown[] }).rows ??
-    rowsResult) as Array<Record<string, unknown>>;
-
-  type Hydrated = {
-    raw: Record<string, unknown>;
-    severity: SeverityScore;
+function toPublicDisputeRow(r: Record<string, unknown>): PublicDisputeRow {
+  const status = String(r.status);
+  const statusBucket = mapStatusToPublicBucket(status);
+  const reviewerId = r.reviewer_id ? String(r.reviewer_id) : null;
+  const isSystemAction = reviewerId === AUTO_RESOLVE_ACTOR_ID;
+  const severityValue =
+    r.severity_value != null ? Number(r.severity_value) : null;
+  const severity: SeverityScore = {
+    severity: severityValue,
+    bucket:
+      severityValue == null
+        ? null
+        : severityValue >= 3
+          ? "xhi"
+          : severityValue >= 1.5
+            ? "hi"
+            : severityValue >= 0.5
+              ? "mid"
+              : "lo",
+    gap: r.severity_gap != null ? Number(r.severity_gap) : null,
+    thresholdValue:
+      r.severity_threshold_value != null
+        ? Number(r.severity_threshold_value)
+        : null,
+    thresholdKind:
+      r.severity_threshold_kind === "pp" || r.severity_threshold_kind === "pct"
+        ? r.severity_threshold_kind
+        : null,
   };
-  const hydrated: Hydrated[] = raw.map((r) => {
-    const aNum =
-      r.a_fact_value_numeric != null ? Number(r.a_fact_value_numeric) : null;
-    const bNum =
-      r.b_fact_value_numeric != null ? Number(r.b_fact_value_numeric) : null;
-    const score =
-      r.dispute_kind === "material_error"
-        ? computeSeverity(String(r.fact_key), aNum, bNum)
-        : ({
-            severity: null,
-            bucket: null,
-            gap: null,
-            thresholdValue: null,
-            thresholdKind: null,
-          } as SeverityScore);
-    return { raw: r, severity: score };
-  });
 
-  const matchingBucket = opts.severityBucket
-    ? hydrated.filter((h) => h.severity.bucket === opts.severityBucket)
-    : hydrated;
+  return {
+    id: String(r.id),
+    factKey: String(r.fact_key),
+    factGroup: String(r.fact_group),
+    disputeKind: String(r.dispute_kind),
+    status,
+    statusBucket,
+    description: r.description ? String(r.description) : null,
+    country: {
+      id: String(r.jurisdiction_id),
+      slug: String(r.country_slug),
+      name: String(r.country_name),
+    },
+    factA: r.fact_id_a
+      ? {
+          id: String(r.fact_id_a),
+          sourceId: String(r.a_source_id),
+          factValue: r.a_fact_value !== null ? String(r.a_fact_value) : null,
+          factValueNumeric:
+            r.a_fact_value_numeric !== null
+              ? Number(r.a_fact_value_numeric)
+              : null,
+          factUnit: r.a_fact_unit ? String(r.a_fact_unit) : null,
+          factYear: r.a_fact_year !== null ? Number(r.a_fact_year) : null,
+          asOf: r.a_as_of ? String(r.a_as_of) : null,
+        }
+      : null,
+    factB: r.fact_id_b
+      ? {
+          id: String(r.fact_id_b),
+          sourceId: String(r.b_source_id),
+          factValue: r.b_fact_value !== null ? String(r.b_fact_value) : null,
+          factValueNumeric:
+            r.b_fact_value_numeric !== null
+              ? Number(r.b_fact_value_numeric)
+              : null,
+          factUnit: r.b_fact_unit ? String(r.b_fact_unit) : null,
+          factYear: r.b_fact_year !== null ? Number(r.b_fact_year) : null,
+          asOf: r.b_as_of ? String(r.b_as_of) : null,
+        }
+      : null,
+    submitterName:
+      r.is_public === true && r.submitter_name ? String(r.submitter_name) : null,
+    createdAt:
+      r.created_at instanceof Date
+        ? r.created_at.toISOString()
+        : String(r.created_at),
+    resolvedAt: r.resolved_at
+      ? r.resolved_at instanceof Date
+        ? r.resolved_at.toISOString()
+        : String(r.resolved_at)
+      : null,
+    resolutionLabel:
+      statusBucket === "open"
+        ? null
+        : (RESOLUTION_LABELS[status] ?? status.replaceAll("_", " ")),
+    systemAction: isSystemAction ? "auto_resolve_stale" : null,
+    reviewerNotes: r.reviewer_notes ? String(r.reviewer_notes) : null,
+    severity,
+  };
+}
 
-  matchingBucket.sort((x, y) => {
-    if (sort === "age") {
-      return String(y.raw.created_at).localeCompare(String(x.raw.created_at));
-    }
-    if (sort === "oldest") {
-      return String(x.raw.created_at).localeCompare(String(y.raw.created_at));
-    }
-    // severity desc with kind/group tiebreakers
-    const sx = x.severity.severity ?? -1;
-    const sy = y.severity.severity ?? -1;
-    if (sx !== sy) return sy - sx;
-    const kx = KIND_RANK[String(x.raw.dispute_kind)] ?? 99;
-    const ky = KIND_RANK[String(y.raw.dispute_kind)] ?? 99;
-    if (kx !== ky) return kx - ky;
-    const gx = GROUP_RANK[String(x.raw.fact_group)] ?? 99;
-    const gy = GROUP_RANK[String(y.raw.fact_group)] ?? 99;
-    if (gx !== gy) return gx - gy;
-    return String(y.raw.created_at).localeCompare(String(x.raw.created_at));
-  });
+/** Map raw resolution status → human-readable label (for resolved bucket). */
+const RESOLUTION_LABELS: Record<string, string> = {
+  resolved_a_wins: "A wins",
+  resolved_b_wins: "B wins",
+  resolved_held: "Held",
+  resolved_auto_stale: "Auto-resolved (stale)",
+  rejected_invalid: "Rejected as invalid",
+};
 
-  const totalMatching = matchingBucket.length;
-  const paged = matchingBucket.slice(offset, offset + limit);
+/**
+ * Public-facing dispute feed for `/factbook/methodology/reconciliation/disputes`.
+ *
+ * Mirrors `getDataDisputeQueue` but:
+ *   - returns BOTH open and closed rows (filterable via statusBucket)
+ *   - strips reviewer identity
+ *   - strips submitter email + affiliation
+ *   - maps raw status → 3 public buckets
+ *   - exposes systemAction label for auto-resolve transparency
+ */
+export async function getPublicDisputeFeed(
+  opts: PublicDisputeFilters = {},
+): Promise<PublicDisputeFeedResult> {
+  const limit = Math.min(Math.max(opts.limit ?? 50, 1), 50);
+  const offset = Math.max(opts.offset ?? 0, 0);
+  const sort: DisputeSortKey = opts.sort ?? "severity";
+  const ctes = publicDisputeFeedCtes(opts);
+  const memberOrder = sql`
+    severity_value DESC NULLS LAST,
+    CASE dispute_kind
+      WHEN 'material_error' THEN 0
+      WHEN 'plausibility_envelope' THEN 1
+      WHEN 'group_a_override' THEN 2
+      WHEN 'group_c_override' THEN 3
+      WHEN 'rank_demoted' THEN 4
+      WHEN 'public_correction' THEN 5
+      ELSE 99
+    END ASC,
+    CASE fact_group WHEN 'A' THEN 0 WHEN 'B' THEN 1 WHEN 'C' THEN 2 ELSE 99 END ASC,
+    created_at DESC,
+    id ASC
+  `;
+  const groupOrder =
+    sort === "age"
+      ? sql`summary.newest_created_at DESC, summary.jurisdiction_id ASC, summary.fact_key ASC`
+      : sort === "oldest"
+        ? sql`summary.oldest_created_at ASC, summary.jurisdiction_id ASC, summary.fact_key ASC`
+        : sql`
+            lead.severity_value DESC NULLS LAST,
+            CASE lead.dispute_kind
+              WHEN 'material_error' THEN 0
+              WHEN 'plausibility_envelope' THEN 1
+              WHEN 'group_a_override' THEN 2
+              WHEN 'group_c_override' THEN 3
+              WHEN 'rank_demoted' THEN 4
+              WHEN 'public_correction' THEN 5
+              ELSE 99
+            END ASC,
+            CASE lead.fact_group WHEN 'A' THEN 0 WHEN 'B' THEN 1 WHEN 'C' THEN 2 ELSE 99 END ASC,
+            lead.created_at DESC,
+            summary.jurisdiction_id ASC,
+            summary.fact_key ASC
+          `;
 
-  const rows: PublicDisputeRow[] = paged.map(({ raw: r, severity }) => {
-    const status = String(r.status);
-    const statusBucket = mapStatusToPublicBucket(status);
-    const reviewerId = r.reviewer_id ? String(r.reviewer_id) : null;
-    const isSystemAction = reviewerId === AUTO_RESOLVE_ACTOR_ID;
-    const isPublicSubmitter = r.is_public === true;
+  const [metadataResult, pageResult, allCountResult] = await Promise.all([
+    db.execute(sql`
+      ${ctes}
+      SELECT
+        COUNT(*)::int AS total_matching,
+        COUNT(DISTINCT (jurisdiction_id, fact_key))::int AS total_groups
+      FROM matching
+    `),
+    db.execute(sql`
+      ${ctes},
+      member_ranked AS (
+        SELECT
+          matching.*,
+          ROW_NUMBER() OVER (
+            PARTITION BY jurisdiction_id, fact_key
+            ORDER BY ${memberOrder}
+          ) AS member_rank
+        FROM matching
+      ),
+      group_summary AS (
+        SELECT
+          jurisdiction_id,
+          fact_key,
+          MAX(created_at) AS newest_created_at,
+          MIN(created_at) AS oldest_created_at
+        FROM member_ranked
+        GROUP BY jurisdiction_id, fact_key
+      ),
+      ranked_groups AS (
+        SELECT
+          summary.jurisdiction_id,
+          summary.fact_key,
+          ROW_NUMBER() OVER (ORDER BY ${groupOrder}) AS group_position
+        FROM group_summary summary
+        JOIN member_ranked lead
+          ON lead.jurisdiction_id = summary.jurisdiction_id
+          AND lead.fact_key = summary.fact_key
+          AND lead.member_rank = 1
+      ),
+      selected_groups AS (
+        SELECT *
+        FROM ranked_groups
+        WHERE group_position > ${offset}
+          AND group_position <= ${offset + limit}
+      )
+      SELECT member_ranked.*
+      FROM member_ranked
+      JOIN selected_groups
+        ON selected_groups.jurisdiction_id = member_ranked.jurisdiction_id
+        AND selected_groups.fact_key = member_ranked.fact_key
+      ORDER BY selected_groups.group_position ASC, member_ranked.member_rank ASC
+    `),
+    db.execute(sql`SELECT COUNT(*)::int AS total FROM data_disputes`),
+  ]);
 
-    return {
-      id: String(r.id),
-      factKey: String(r.fact_key),
-      factGroup: String(r.fact_group),
-      disputeKind: String(r.dispute_kind),
-      status,
-      statusBucket,
-      description: r.description ? String(r.description) : null,
-      country: {
-        id: String(r.jurisdiction_id),
-        slug: String(r.country_slug),
-        name: String(r.country_name),
-      },
-      factA: r.fact_id_a
-        ? {
-            id: String(r.fact_id_a),
-            sourceId: String(r.a_source_id),
-            factValue: r.a_fact_value !== null ? String(r.a_fact_value) : null,
-            factValueNumeric:
-              r.a_fact_value_numeric !== null
-                ? Number(r.a_fact_value_numeric)
-                : null,
-            factUnit: r.a_fact_unit ? String(r.a_fact_unit) : null,
-            factYear: r.a_fact_year !== null ? Number(r.a_fact_year) : null,
-            asOf: r.a_as_of ? String(r.a_as_of) : null,
-          }
-        : null,
-      factB: r.fact_id_b
-        ? {
-            id: String(r.fact_id_b),
-            sourceId: String(r.b_source_id),
-            factValue: r.b_fact_value !== null ? String(r.b_fact_value) : null,
-            factValueNumeric:
-              r.b_fact_value_numeric !== null
-                ? Number(r.b_fact_value_numeric)
-                : null,
-            factUnit: r.b_fact_unit ? String(r.b_fact_unit) : null,
-            factYear: r.b_fact_year !== null ? Number(r.b_fact_year) : null,
-            asOf: r.b_as_of ? String(r.b_as_of) : null,
-          }
-        : null,
-      submitterName:
-        isPublicSubmitter && r.submitter_name ? String(r.submitter_name) : null,
-      createdAt:
-        r.created_at instanceof Date
-          ? r.created_at.toISOString()
-          : String(r.created_at),
-      resolvedAt: r.resolved_at
-        ? r.resolved_at instanceof Date
-          ? r.resolved_at.toISOString()
-          : String(r.resolved_at)
-        : null,
-      resolutionLabel:
-        statusBucket === "open"
-          ? null
-          : (RESOLUTION_LABELS[status] ?? status.replaceAll("_", " ")),
-      systemAction: isSystemAction ? "auto_resolve_stale" : null,
-      reviewerNotes: r.reviewer_notes ? String(r.reviewer_notes) : null,
-      severity,
-    };
-  });
-
-  // Total count of all dispute rows across the table (for header context).
-  const allCountResult = await db.execute(sql`
-    SELECT COUNT(*)::int AS total FROM data_disputes
-  `);
+  const metadataRows =
+    ((metadataResult as unknown as { rows?: unknown[] }).rows ??
+      metadataResult) as Array<Record<string, unknown>>;
+  const pageRows = ((pageResult as unknown as { rows?: unknown[] }).rows ??
+    pageResult) as Array<Record<string, unknown>>;
   const allCountRows =
     ((allCountResult as unknown as { rows?: unknown[] }).rows ??
       allCountResult) as Array<Record<string, unknown>>;
-  const totalAll = Number(allCountRows[0]?.total ?? 0);
+  const groups = groupDisputesByFact(pageRows.map(toPublicDisputeRow));
 
-  return { rows, totalMatching, totalAll };
+  return {
+    groups,
+    totalMatching: Number(metadataRows[0]?.total_matching ?? 0),
+    totalGroups: Number(metadataRows[0]?.total_groups ?? 0),
+    totalAll: Number(allCountRows[0]?.total ?? 0),
+  };
 }
 
 /**

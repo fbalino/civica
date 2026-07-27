@@ -1,0 +1,4228 @@
+{
+  "schemaVersion": "civica-atlas-case-studies/v1",
+  "generatedAt": "2026-07-11T00:00:00.000Z",
+  "release": {
+    "id": "atlas-2026-07-11",
+    "date": "2026-07-11",
+    "exportSchemaVersion": "civica-atlas-export/v3",
+    "semanticSha256": "60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc",
+    "sourceArtifact": "data/releases/atlas-2026-07-11/atlas-export.v1.json.gz",
+    "rightsManifest": "/api/rights-manifest"
+  },
+  "reproduction": {
+    "generator": "scripts/generate-atlas-case-studies.ts",
+    "validator": "scripts/validate-atlas-case-studies.ts",
+    "command": "npm run reproduce:atlas-case-studies",
+    "tolerance": "byte_exact",
+    "endpoint": "/api/v1/atlas/query"
+  },
+  "cases": [
+    {
+      "id": "jurisdiction-status-denominator",
+      "title": "Where the sovereign-state denominator begins",
+      "researchQuestion": "How does the frozen Atlas separate sovereign states from territories, associated states, disputed entities, and aggregate areas?",
+      "answer": "The release contains 253 jurisdiction rows across five closed status classes. 194 rows are sovereign_state and therefore enter Civica's sovereign-state totals; the other rows remain separately typed.",
+      "methods": "Select every frozen jurisdiction with its closed jurisdiction-status/v1 type, review fields, and source identifiers; aggregate only after preserving the row-level classifications.",
+      "decisionTrail": [
+        "Use the release row's type field rather than inferring sovereignty from ISO codes, names, map presence, or a country count.",
+        "Count sovereign_state separately; every other closed type remains visible rather than being silently discarded.",
+        "Report reviewed and disputed flags alongside category totals so the denominator cannot imply stronger certainty than the source rows support."
+      ],
+      "recipes": [
+        {
+          "id": "all-jurisdictions",
+          "label": "All frozen jurisdiction-status rows",
+          "path": "/api/v1/atlas/query?table=jurisdictions&fields=id,slug,name,iso3,type,status_source_ids,status_reviewed_at,status_note,status_disputed&limit=1000",
+          "releaseId": "atlas-2026-07-11",
+          "releaseSemanticSha256": "60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc",
+          "exportSchemaVersion": "civica-atlas-export/v3",
+          "inputRowCount": 253,
+          "pagesRead": 1,
+          "fields": [
+            "id",
+            "slug",
+            "name",
+            "iso3",
+            "type",
+            "status_source_ids",
+            "status_reviewed_at",
+            "status_note",
+            "status_disputed"
+          ],
+          "inputRows": [
+            {
+              "id": "b93c53da-82ad-448d-9967-2f7be9e290bf",
+              "slug": "afghanistan",
+              "name": "Afghanistan",
+              "iso3": "AFG",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f6e4b667-4d5d-4f19-9510-c48751ed2335",
+              "slug": "akrotiri",
+              "name": "Akrotiri",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "18c69ab4-bc7f-4f04-93e0-f479410328a2",
+              "slug": "albania",
+              "name": "Albania",
+              "iso3": "ALB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "8ecdc8d5-dd04-492e-8524-0e325787aa1c",
+              "slug": "algeria",
+              "name": "Algeria",
+              "iso3": "DZA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "7ce81278-4c5e-4b14-86d4-e2556112271f",
+              "slug": "american-samoa",
+              "name": "American Samoa",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "e34f9cca-a1d0-4539-a19b-1a55572d1262",
+              "slug": "andorra",
+              "name": "Andorra",
+              "iso3": "AND",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "d2e90315-0281-449d-b08e-7a117e259a2f",
+              "slug": "angola",
+              "name": "Angola",
+              "iso3": "AGO",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "10da05ef-9adc-433c-b48f-7eb6006c0c36",
+              "slug": "anguilla",
+              "name": "Anguilla",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "c5a293c5-b0ab-4778-92cc-b3a15031644b",
+              "slug": "antarctica",
+              "name": "Antarctica",
+              "iso3": null,
+              "type": "aggregate_or_special_area",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Special treaty area retained as an Atlas reference entry and excluded from sovereign-state counts.",
+              "status_disputed": false
+            },
+            {
+              "id": "780e09af-5e9c-45f1-9cca-73536a13884c",
+              "slug": "antigua-and-barbuda",
+              "name": "Antigua and Barbuda",
+              "iso3": "ATG",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "aea55724-d7ab-43b6-810b-9db2ad9aabb6",
+              "slug": "argentina",
+              "name": "Argentina",
+              "iso3": "ARG",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "89b64a33-ab1b-4164-84e6-5ee5aa44d0ac",
+              "slug": "armenia",
+              "name": "Armenia",
+              "iso3": "ARM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "e32b13bf-2e29-47f9-86b4-916182672e5d",
+              "slug": "aruba",
+              "name": "Aruba",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "b8c23ff6-e86b-448c-9e0a-a94fd74a325c",
+              "slug": "ashmore-and-cartier-islands",
+              "name": "Ashmore and Cartier Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "a399a025-0a2f-4b64-9f82-2d0158cfda38",
+              "slug": "australia",
+              "name": "Australia",
+              "iso3": "AUS",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "9c925bca-e849-4975-8595-801fc54dea16",
+              "slug": "austria",
+              "name": "Austria",
+              "iso3": "AUT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "52edb906-859e-419e-af20-1825f1b9d21e",
+              "slug": "azerbaijan",
+              "name": "Azerbaijan",
+              "iso3": "AZE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "2c231215-aa78-4f07-b609-1586aeaa2178",
+              "slug": "bahrain",
+              "name": "Bahrain",
+              "iso3": "BHR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "aef832a5-e6c0-4d9b-a27d-2808fda15d9e",
+              "slug": "baker-island-howland-island-jarvis-island-johnston-atoll-kingman-reef-midway-islands-palmyra-atoll",
+              "name": "Baker Island, Howland Island, Jarvis Island, Johnston Atoll, Kingman Reef, Midway Islands, Palmyra Atoll",
+              "iso3": null,
+              "type": "aggregate_or_special_area",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "One Atlas row groups several United States island areas and is excluded from sovereign-state counts.",
+              "status_disputed": false
+            },
+            {
+              "id": "059041d2-0ada-4803-a5a2-09440b14c115",
+              "slug": "bangladesh",
+              "name": "Bangladesh",
+              "iso3": "BGD",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "039f808c-0257-4e5c-a7c0-718d6456623b",
+              "slug": "barbados",
+              "name": "Barbados",
+              "iso3": "BRB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "12eeaac4-f4bd-47c8-8ecb-0e7f8c04d81d",
+              "slug": "belarus",
+              "name": "Belarus",
+              "iso3": "BLR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "5861ed74-decb-4b6c-bc01-b9be2e1ab024",
+              "slug": "belgium",
+              "name": "Belgium",
+              "iso3": "BEL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "e84e711e-34c9-4b69-a3b5-8218a3b2b6cd",
+              "slug": "belize",
+              "name": "Belize",
+              "iso3": "BLZ",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a3a484b3-d5fe-4b3a-9583-c95967d18c6d",
+              "slug": "benin",
+              "name": "Benin",
+              "iso3": "BEN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "1a8e4832-f645-4231-a7cd-f7ca7ba51814",
+              "slug": "bermuda",
+              "name": "Bermuda",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "5a27e111-33da-4ac5-80f4-1aae148ebb76",
+              "slug": "bhutan",
+              "name": "Bhutan",
+              "iso3": "BTN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "849e394e-dc19-40bc-a67a-a73b6af3c5ad",
+              "slug": "bolivia",
+              "name": "Bolivia",
+              "iso3": "BOL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "677129d3-9bc5-4bb9-a042-c51d42cca2e7",
+              "slug": "bosnia-and-herzegovina",
+              "name": "Bosnia and Herzegovina",
+              "iso3": "BIH",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "0b326eea-4447-4e6b-90b5-684e5408c8b3",
+              "slug": "botswana",
+              "name": "Botswana",
+              "iso3": "BWA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "b414d4ac-5573-458f-9bf1-2ee7f8de0844",
+              "slug": "bouvet-island",
+              "name": "Bouvet Island",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "202a18ac-00cb-4084-a6d1-4ab306692ee6",
+              "slug": "brazil",
+              "name": "Brazil",
+              "iso3": "BRA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ed864f90-6fb9-4240-a099-244a118641d3",
+              "slug": "british-virgin-islands",
+              "name": "British Virgin Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "a20a5929-239b-47cd-926a-1c09a046c31a",
+              "slug": "brunei",
+              "name": "Brunei",
+              "iso3": "BRN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "92514c81-fb8c-4d97-b7d6-8d2dac98b4ab",
+              "slug": "bulgaria",
+              "name": "Bulgaria",
+              "iso3": "BGR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "cc046464-fb6b-4363-b05d-4f9c3d32b182",
+              "slug": "burkina-faso",
+              "name": "Burkina Faso",
+              "iso3": "BFA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "7022b2a5-0e85-4efa-8fd8-b850ffab3a60",
+              "slug": "burma",
+              "name": "Burma",
+              "iso3": "MMR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "060a79f0-7036-4d36-8bc5-a9a1087c280e",
+              "slug": "burundi",
+              "name": "Burundi",
+              "iso3": "BDI",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "02a6f78b-661c-4e1e-ae78-7a69380e26b9",
+              "slug": "c-te-d-ivoire",
+              "name": "Côte d'Ivoire",
+              "iso3": "CIV",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "10466afc-517e-4dce-a08d-37a63b63dc74",
+              "slug": "cabo-verde",
+              "name": "Cabo Verde",
+              "iso3": "CPV",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "6c1cfab7-7ace-460a-af2f-9e8c8711b8b3",
+              "slug": "cambodia",
+              "name": "Cambodia",
+              "iso3": "KHM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a2752ebd-8924-45ef-ab84-f7e1a3acaead",
+              "slug": "cameroon",
+              "name": "Cameroon",
+              "iso3": "CMR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "0f9b8054-2d9e-42b1-a482-bf5416caa73f",
+              "slug": "canada",
+              "name": "Canada",
+              "iso3": "CAN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "8585ecfd-ab21-4a98-a398-a39821c1e01b",
+              "slug": "cayman-islands",
+              "name": "Cayman Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "910ae095-c381-4dcc-929f-8c2ecb65ffc3",
+              "slug": "central-african-republic",
+              "name": "Central African Republic",
+              "iso3": "CAF",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "76e0b74e-e7da-42e7-abe7-aae253b6fd29",
+              "slug": "chad",
+              "name": "Chad",
+              "iso3": "TCD",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "c5fa19f3-2d53-4c40-8125-344d61c537b9",
+              "slug": "chile",
+              "name": "Chile",
+              "iso3": "CHL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ba7b5022-7b36-4797-af79-5bc86313d8c0",
+              "slug": "china",
+              "name": "China",
+              "iso3": "CHN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "d2b3cda7-e5d7-4151-8ea2-a249bf2d2398",
+              "slug": "christmas-island",
+              "name": "Christmas Island",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "4b28f011-042a-4044-ae83-c8778cd3afeb",
+              "slug": "clipperton-island",
+              "name": "Clipperton Island",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "1c0cbb94-60f9-46f5-a13f-3ee9e677b971",
+              "slug": "cocos-keeling-islands",
+              "name": "Cocos (Keeling) Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "9e813a43-0739-481b-8b7b-9d98872b1be1",
+              "slug": "colombia",
+              "name": "Colombia",
+              "iso3": "COL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "af6c7328-1c90-40b0-8b86-9ec13b65e056",
+              "slug": "comoros",
+              "name": "Comoros",
+              "iso3": "COM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "c12d5919-b649-4450-b004-9424ede06a35",
+              "slug": "congo-brazzaville",
+              "name": "Congo (Brazzaville)",
+              "iso3": "COG",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "2e94ebfc-0e3f-47ad-89ca-0993d4408462",
+              "slug": "cook-islands",
+              "name": "Cook Islands",
+              "iso3": null,
+              "type": "associated_state",
+              "status_source_ids": [
+                "nz_mfat_cook_islands",
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Self-governing in free association with New Zealand; not flattened into the sovereign-state or dependency categories.",
+              "status_disputed": false
+            },
+            {
+              "id": "9cff6204-e55d-4aa5-bf78-8a36330a867c",
+              "slug": "coral-sea-islands",
+              "name": "Coral Sea Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "0d30a513-5ebc-4103-acf7-1d9f980d1e34",
+              "slug": "costa-rica",
+              "name": "Costa Rica",
+              "iso3": "CRI",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "c8632ef6-eff8-4a02-a8bb-afb795c3f58a",
+              "slug": "croatia",
+              "name": "Croatia",
+              "iso3": "HRV",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "d2f951ce-1373-40b0-9462-708f6eefdd3b",
+              "slug": "cuba",
+              "name": "Cuba",
+              "iso3": "CUB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "9521b102-c359-421f-b528-bc3318af0b2b",
+              "slug": "curacao",
+              "name": "Curacao",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "877e3567-6569-4dc7-bf8f-66026a930258",
+              "slug": "cyprus",
+              "name": "Cyprus",
+              "iso3": "CYP",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "67e5d7f4-7164-4e3f-b692-a9726fe4af56",
+              "slug": "czechia",
+              "name": "Czechia",
+              "iso3": "CZE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f52a43d8-a272-433e-9dbd-34d7a83c05f3",
+              "slug": "denmark",
+              "name": "Denmark",
+              "iso3": "DNK",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "472e9c8f-0e6b-4006-9150-db2e0cfbded5",
+              "slug": "dhekelia",
+              "name": "Dhekelia",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "b7b790d6-e980-49df-a17d-3dcb6135ac28",
+              "slug": "djibouti",
+              "name": "Djibouti",
+              "iso3": "DJI",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "5babfd4b-1b3b-4e45-a547-a6310ec74e43",
+              "slug": "dominica",
+              "name": "Dominica",
+              "iso3": "DMA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "48af4e4b-3d3d-49a0-bfe7-7224698963b2",
+              "slug": "drc",
+              "name": "DRC",
+              "iso3": "COD",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "bfbbf7ca-5a25-47ce-b8d3-60581eca8ef5",
+              "slug": "ecuador",
+              "name": "Ecuador",
+              "iso3": "ECU",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "60214ed5-4a4a-4ee1-9913-a938b0460916",
+              "slug": "egypt",
+              "name": "Egypt",
+              "iso3": "EGY",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "61fd3c12-b3df-4afb-a6d4-5ed32c5afc97",
+              "slug": "el-salvador",
+              "name": "El Salvador",
+              "iso3": "SLV",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ae3f1f8a-f1f7-423a-9957-9bf2cfca60cd",
+              "slug": "equatorial-guinea",
+              "name": "Equatorial Guinea",
+              "iso3": "GNQ",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "9048da3d-3f79-4ecd-bc73-eb9a57f0260d",
+              "slug": "eritrea",
+              "name": "Eritrea",
+              "iso3": "ERI",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "5e7cdf87-b8af-4635-878a-432282082680",
+              "slug": "estonia",
+              "name": "Estonia",
+              "iso3": "EST",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "63206c7b-300a-4e23-aeb4-b5c79b23171c",
+              "slug": "eswatini",
+              "name": "Eswatini",
+              "iso3": "SWZ",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "405b444d-694a-4fc7-8d6c-359ae54d3022",
+              "slug": "ethiopia",
+              "name": "Ethiopia",
+              "iso3": "ETH",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "eb96c2de-7241-4e9b-b1a6-fe4e4869e1b3",
+              "slug": "falkland-islands-islas-malvinas",
+              "name": "Falkland Islands (Islas Malvinas)",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": true
+            },
+            {
+              "id": "b13279e9-fd50-4c9b-b1e2-4b4df8816972",
+              "slug": "faroe-islands",
+              "name": "Faroe Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "a1138117-1861-4ba5-93c5-8d8de8706476",
+              "slug": "fiji",
+              "name": "Fiji",
+              "iso3": "FJI",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ca6ecb7d-272e-4f0d-9335-08dbb323d920",
+              "slug": "finland",
+              "name": "Finland",
+              "iso3": "FIN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "932e404a-ac19-4bda-947f-e3594b65a6f9",
+              "slug": "france",
+              "name": "France",
+              "iso3": "FRA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "d408f8b4-bc14-42f3-a086-2acff3692541",
+              "slug": "french-polynesia",
+              "name": "French Polynesia",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "1c3bcb87-09f8-4c04-bad7-f3cc0b8a38c7",
+              "slug": "french-southern-and-antarctic-lands",
+              "name": "French Southern and Antarctic Lands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "3e97771c-da96-4e65-840c-b3a0603ec1d7",
+              "slug": "gabon",
+              "name": "Gabon",
+              "iso3": "GAB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "8b530c0a-df89-452c-90e0-8e897e257ba7",
+              "slug": "gaza-gaza-strip",
+              "name": "Gaza, Gaza Strip",
+              "iso3": null,
+              "type": "disputed_or_limited_recognition",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled without claiming that Atlas inclusion, ISO/M49 coding, or this label settles recognition or sovereignty.",
+              "status_disputed": true
+            },
+            {
+              "id": "b6cfac01-16ca-412a-9229-316a5aafc92f",
+              "slug": "georgia",
+              "name": "Georgia",
+              "iso3": "GEO",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a5515483-8619-4297-96e0-cefa0241fd6f",
+              "slug": "germany",
+              "name": "Germany",
+              "iso3": "DEU",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "15fe2c88-7141-4b3f-a68e-cc1161b83e0b",
+              "slug": "ghana",
+              "name": "Ghana",
+              "iso3": "GHA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "d0705df2-779c-43aa-a374-9f00450f4f78",
+              "slug": "gibraltar",
+              "name": "Gibraltar",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "9e917cf2-98b5-457f-a8ad-e995fbb427b2",
+              "slug": "greece",
+              "name": "Greece",
+              "iso3": "GRC",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "b7118a46-f810-45b4-9417-7fb613fe56c7",
+              "slug": "greenland",
+              "name": "Greenland",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "176ae894-6945-4e3d-b9e4-9de772adbca4",
+              "slug": "grenada",
+              "name": "Grenada",
+              "iso3": "GRD",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "d61ea04e-cc06-4ca2-bb91-fd813add03f8",
+              "slug": "guam",
+              "name": "Guam",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "78e9b188-f57c-4e09-946c-acb077b7f056",
+              "slug": "guatemala",
+              "name": "Guatemala",
+              "iso3": "GTM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "368335f3-7ee3-43b1-a6ae-5ab6eac048ee",
+              "slug": "guernsey",
+              "name": "Guernsey",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "8fe0f2e5-1848-4ff4-b3e4-532b08eb7435",
+              "slug": "guinea",
+              "name": "Guinea",
+              "iso3": "GIN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "47bb17e7-b3a5-4fac-8a70-c0e258c07092",
+              "slug": "guinea-bissau",
+              "name": "Guinea-Bissau",
+              "iso3": "GNB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "aec83742-3ad4-4cef-a1f9-af999468e536",
+              "slug": "guyana",
+              "name": "Guyana",
+              "iso3": "GUY",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "370450ff-136a-46c8-bcb5-0f034dbe8aff",
+              "slug": "haiti",
+              "name": "Haiti",
+              "iso3": "HTI",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "e0f1384b-e21c-4167-9584-4be552f7b8f0",
+              "slug": "heard-island-and-mcdonald-islands",
+              "name": "Heard Island and McDonald Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "03941967-a4f1-4c80-8619-a7b6557aa4e8",
+              "slug": "holy-see-vatican-city",
+              "name": "Holy See (Vatican City)",
+              "iso3": "VAT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_non_member_states",
+                "un_m49",
+                "cia_factbook"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "The Holy See is a UN non-member observer state and is separately classified as sovereign; observer or M49 status alone is not a general sovereignty rule.",
+              "status_disputed": false
+            },
+            {
+              "id": "b74b278c-e9c5-4a94-bfd3-c7fada723618",
+              "slug": "honduras",
+              "name": "Honduras",
+              "iso3": "HND",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "4c6b4639-aeeb-41d4-8994-513899e361a4",
+              "slug": "hong-kong",
+              "name": "Hong Kong",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "4f56720e-2b04-4a69-880d-1d2531387a08",
+              "slug": "hungary",
+              "name": "Hungary",
+              "iso3": "HUN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "9c2f422a-b1d6-4b8e-afc9-1d284b0d34de",
+              "slug": "iceland",
+              "name": "Iceland",
+              "iso3": "ISL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "4041713a-780b-42f3-ad88-05efc621d3e3",
+              "slug": "india",
+              "name": "India",
+              "iso3": "IND",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "3c99238a-6485-4ead-8b67-0f0858447bda",
+              "slug": "indonesia",
+              "name": "Indonesia",
+              "iso3": "IDN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "65e3b2b3-9a51-40ad-8496-c09bd0478e25",
+              "slug": "iran",
+              "name": "Iran",
+              "iso3": "IRN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "03629789-9315-4e26-b5c3-530d96fe2368",
+              "slug": "iraq",
+              "name": "Iraq",
+              "iso3": "IRQ",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f7613acc-c756-46b8-b501-3a9e736c5135",
+              "slug": "ireland",
+              "name": "Ireland",
+              "iso3": "IRL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "1d966c2d-dd55-46fb-a12e-260a314f6142",
+              "slug": "isle-of-man",
+              "name": "Isle of Man",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "3b1f82eb-305d-4827-b523-0ed9d46ca120",
+              "slug": "israel",
+              "name": "Israel",
+              "iso3": "ISR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ee4ded84-31f1-4092-8f76-05a85d599850",
+              "slug": "italy",
+              "name": "Italy",
+              "iso3": "ITA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "814d0606-4ee0-41c6-bee4-b87b46748502",
+              "slug": "jamaica",
+              "name": "Jamaica",
+              "iso3": "JAM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "3d098eae-3e62-4bda-ab4d-5ba8aa767142",
+              "slug": "jan-mayen",
+              "name": "Jan Mayen",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "20395c9e-d663-4df5-8b51-d12582532080",
+              "slug": "japan",
+              "name": "Japan",
+              "iso3": "JPN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "4989a771-d140-46ef-9525-06caa9ac9270",
+              "slug": "jersey",
+              "name": "Jersey",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "aad572b8-5690-4a9b-bf16-2a7644807f2b",
+              "slug": "jordan",
+              "name": "Jordan",
+              "iso3": "JOR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ffe087d4-5683-42ad-8c5d-72e5fd4029f9",
+              "slug": "kazakhstan",
+              "name": "Kazakhstan",
+              "iso3": "KAZ",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a99dce03-01f4-4608-9bec-14fe1dc8c896",
+              "slug": "kenya",
+              "name": "Kenya",
+              "iso3": "KEN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "4252d2fb-724e-4727-8ac3-776ce45f9064",
+              "slug": "kiribati",
+              "name": "Kiribati",
+              "iso3": "KIR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "8d7bf555-6d2a-438d-8911-6d48d8b6dd3b",
+              "slug": "kosovo",
+              "name": "Kosovo",
+              "iso3": "XKS",
+              "type": "disputed_or_limited_recognition",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled without claiming that Atlas inclusion, ISO/M49 coding, or this label settles recognition or sovereignty.",
+              "status_disputed": true
+            },
+            {
+              "id": "2dd6b308-c481-4a70-8b9c-fba9ea632240",
+              "slug": "kuwait",
+              "name": "Kuwait",
+              "iso3": "KWT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "616cff18-d3f5-4321-b361-5cb994c2895a",
+              "slug": "kyrgyzstan",
+              "name": "Kyrgyzstan",
+              "iso3": "KGZ",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "41a1e4b5-7463-4d1e-8725-e63d8b4ababf",
+              "slug": "laos",
+              "name": "Laos",
+              "iso3": "LAO",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "8cd425da-de5d-40fe-9d43-b7f8e5e97bdc",
+              "slug": "latvia",
+              "name": "Latvia",
+              "iso3": "LVA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "41c0731d-52af-4959-86bc-0ddad61bcffd",
+              "slug": "lebanon",
+              "name": "Lebanon",
+              "iso3": "LBN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "8666ace6-cbdd-436a-b35f-a508862618eb",
+              "slug": "lesotho",
+              "name": "Lesotho",
+              "iso3": "LSO",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f703e0c5-6bcc-4d02-8899-9e8258ec9bb3",
+              "slug": "liberia",
+              "name": "Liberia",
+              "iso3": "LBR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "eb0ac269-6a6a-4cec-b339-8c19aa8495e4",
+              "slug": "libya",
+              "name": "Libya",
+              "iso3": "LBY",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "fe3a996a-7227-42cf-afb1-f5ec72116708",
+              "slug": "liechtenstein",
+              "name": "Liechtenstein",
+              "iso3": "LIE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a9a44214-d705-46db-8089-e15c1d22fa72",
+              "slug": "lithuania",
+              "name": "Lithuania",
+              "iso3": "LTU",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "e82f9c28-2087-404e-8918-acc589f2da7c",
+              "slug": "luxembourg",
+              "name": "Luxembourg",
+              "iso3": "LUX",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "20f0308e-10d1-4d88-bb56-301fa5374297",
+              "slug": "macau",
+              "name": "Macau",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "5724fd2b-2587-44b3-bec0-ae623455d91d",
+              "slug": "madagascar",
+              "name": "Madagascar",
+              "iso3": "MDG",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "18cf4762-cf61-4f56-9f03-ddd8fc1a6a02",
+              "slug": "malawi",
+              "name": "Malawi",
+              "iso3": "MWI",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "351797db-11f0-433c-bd02-06ad082185eb",
+              "slug": "malaysia",
+              "name": "Malaysia",
+              "iso3": "MYS",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "6754f1f0-2c3a-4ecd-953a-02a2a5160e32",
+              "slug": "maldives",
+              "name": "Maldives",
+              "iso3": "MDV",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "9e0a42fe-e40c-4db4-af84-d29ef961fc22",
+              "slug": "mali",
+              "name": "Mali",
+              "iso3": "MLI",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "4826d17e-c306-47df-9555-195038ebbb5c",
+              "slug": "malta",
+              "name": "Malta",
+              "iso3": "MLT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "9577051f-bb09-4ad8-97b0-c2e4a42531ec",
+              "slug": "marshall-islands",
+              "name": "Marshall Islands",
+              "iso3": "MHL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ebbc37f7-db65-479f-9022-c47d86ce4434",
+              "slug": "mauritania",
+              "name": "Mauritania",
+              "iso3": "MRT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "19524df0-99ed-43fc-907e-790bf2feabb7",
+              "slug": "mauritius",
+              "name": "Mauritius",
+              "iso3": "MUS",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "3fd0e066-ead4-4a41-b69b-9a9c53d1d92e",
+              "slug": "mexico",
+              "name": "Mexico",
+              "iso3": "MEX",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "2143e2d4-f909-4ef2-bd60-202de408e6fd",
+              "slug": "micronesia",
+              "name": "Micronesia",
+              "iso3": "FSM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "340a9ee0-bf35-4a58-a0b6-17a28b3a3761",
+              "slug": "moldova",
+              "name": "Moldova",
+              "iso3": "MDA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "cdba8964-6bae-4369-8971-112e7a767895",
+              "slug": "monaco",
+              "name": "Monaco",
+              "iso3": "MCO",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ad20f7bd-db6b-4822-8e5e-50fe5cdbe7c3",
+              "slug": "mongolia",
+              "name": "Mongolia",
+              "iso3": "MNG",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "dd93d174-17c4-4184-8204-7c21c7f2f644",
+              "slug": "montenegro",
+              "name": "Montenegro",
+              "iso3": "MNE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "7d43fd47-6758-4fd8-b95f-a51eda0b900d",
+              "slug": "montserrat",
+              "name": "Montserrat",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "fb047297-68a3-44f2-b167-674c56ab1be0",
+              "slug": "morocco",
+              "name": "Morocco",
+              "iso3": "MAR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "02fa2a39-5e14-4257-b023-3b20a7134708",
+              "slug": "mozambique",
+              "name": "Mozambique",
+              "iso3": "MOZ",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "3ced9362-faa0-4ef6-abce-d42c76132edf",
+              "slug": "namibia",
+              "name": "Namibia",
+              "iso3": "NAM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "3eab09e2-d171-43e3-91af-f02ca0427fb2",
+              "slug": "nauru",
+              "name": "Nauru",
+              "iso3": "NRU",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "be697db3-656c-4c42-9cad-1bbfd65d9a14",
+              "slug": "navassa-island",
+              "name": "Navassa Island",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": true
+            },
+            {
+              "id": "02b530fb-4280-403b-bae6-847c2cc60133",
+              "slug": "nepal",
+              "name": "Nepal",
+              "iso3": "NPL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "7a071cfc-1663-44bb-a775-171394a87c3b",
+              "slug": "netherlands",
+              "name": "Netherlands",
+              "iso3": "NLD",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "b079482e-0dec-4019-8fde-9cce31b999c9",
+              "slug": "new-caledonia",
+              "name": "New Caledonia",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "d2555f7e-46b7-4e87-b6e4-16c629d5d7ee",
+              "slug": "new-zealand",
+              "name": "New Zealand",
+              "iso3": "NZL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "5761a41c-f05b-4bfa-a119-be268df15df4",
+              "slug": "nicaragua",
+              "name": "Nicaragua",
+              "iso3": "NIC",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "087f7d26-7677-4b0f-b35c-84239c3d54ca",
+              "slug": "niger",
+              "name": "Niger",
+              "iso3": "NER",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f5075046-150b-41a8-ac1a-0c7e84a61719",
+              "slug": "nigeria",
+              "name": "Nigeria",
+              "iso3": "NGA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "5d5ab58d-12b4-4425-9f44-a434337a5f5f",
+              "slug": "niue",
+              "name": "Niue",
+              "iso3": null,
+              "type": "associated_state",
+              "status_source_ids": [
+                "nz_mfat_niue",
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Self-governing in free association with New Zealand; not flattened into the sovereign-state or dependency categories.",
+              "status_disputed": false
+            },
+            {
+              "id": "b1cc8d78-e089-444b-a1ae-43ad4c036aa8",
+              "slug": "norfolk-island",
+              "name": "Norfolk Island",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "3023b475-8992-4a20-b9af-fa918747a58f",
+              "slug": "north-korea",
+              "name": "North Korea",
+              "iso3": "PRK",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "59d1ada1-607d-4ad2-a1f8-a1fd5cd4a0fd",
+              "slug": "north-macedonia",
+              "name": "North Macedonia",
+              "iso3": "MKD",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "58efed20-0bc5-47bc-ac66-46b0e69a0d1a",
+              "slug": "northern-mariana-islands",
+              "name": "Northern Mariana Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "6f8693aa-7066-4056-a214-ce77695e28c2",
+              "slug": "norway",
+              "name": "Norway",
+              "iso3": "NOR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "b980e91f-07e8-485e-ab99-a8d45264dddd",
+              "slug": "oman",
+              "name": "Oman",
+              "iso3": "OMN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "161bb66a-e013-4aef-a0fe-5ef2a612972e",
+              "slug": "pakistan",
+              "name": "Pakistan",
+              "iso3": "PAK",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "46532785-da05-4911-a262-2009ae84bc77",
+              "slug": "palau",
+              "name": "Palau",
+              "iso3": "PLW",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "c8315f38-f311-46e8-93e0-fbd7a92f6287",
+              "slug": "palestine",
+              "name": "Palestine",
+              "iso3": "PSE",
+              "type": "disputed_or_limited_recognition",
+              "status_source_ids": [
+                "un_non_member_states",
+                "un_m49",
+                "cia_factbook"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled without claiming that Atlas inclusion, ISO/M49 coding, or this label settles recognition or sovereignty.",
+              "status_disputed": true
+            },
+            {
+              "id": "19ba1f29-dadf-4256-b851-7a5dab150a1c",
+              "slug": "panama",
+              "name": "Panama",
+              "iso3": "PAN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "cb087a83-3778-4227-868b-0624e0968d7f",
+              "slug": "papua-new-guinea",
+              "name": "Papua New Guinea",
+              "iso3": "PNG",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "1b146d32-342b-47aa-82b3-74e427248e2f",
+              "slug": "paracel-islands",
+              "name": "Paracel Islands",
+              "iso3": null,
+              "type": "disputed_or_limited_recognition",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled without claiming that Atlas inclusion, ISO/M49 coding, or this label settles recognition or sovereignty.",
+              "status_disputed": true
+            },
+            {
+              "id": "74d94315-0680-4e4b-956d-03e4a9288339",
+              "slug": "paraguay",
+              "name": "Paraguay",
+              "iso3": "PRY",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "93b78ccd-e7ff-488b-b65c-64bf8d112740",
+              "slug": "peru",
+              "name": "Peru",
+              "iso3": "PER",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "92b5fd08-c80a-4d2a-b616-5afaf7e5d99e",
+              "slug": "philippines",
+              "name": "Philippines",
+              "iso3": "PHL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f1136ae1-08eb-4c2e-98dd-c44103625502",
+              "slug": "pitcairn-islands",
+              "name": "Pitcairn Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "4ac6d1c1-dc0b-4bc2-9bee-1e00def96aa1",
+              "slug": "poland",
+              "name": "Poland",
+              "iso3": "POL",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "bd57dd2a-1f4f-4328-84c1-06a7a1890249",
+              "slug": "portugal",
+              "name": "Portugal",
+              "iso3": "PRT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "69fda721-7d87-4fd7-a9b8-038f162c88cc",
+              "slug": "puerto-rico",
+              "name": "Puerto Rico",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "accb6f68-3bd9-47d4-899b-2d2e5e62fb4a",
+              "slug": "qatar",
+              "name": "Qatar",
+              "iso3": "QAT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "e1645f1f-95e8-4278-93f6-fe437d0e1d21",
+              "slug": "romania",
+              "name": "Romania",
+              "iso3": "ROU",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "4e322f58-e65d-4286-9875-7feeb8165bd8",
+              "slug": "russia",
+              "name": "Russia",
+              "iso3": "RUS",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "4bdb038f-2398-4c09-a836-608b0111cce7",
+              "slug": "rwanda",
+              "name": "Rwanda",
+              "iso3": "RWA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "db9d612c-86c6-487d-90a3-6597eb1200ee",
+              "slug": "saint-barthelemy",
+              "name": "Saint Barthelemy",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "13fc74ad-8762-49a1-a7cb-75acba2fc32e",
+              "slug": "saint-kitts-and-nevis",
+              "name": "Saint Kitts and Nevis",
+              "iso3": "KNA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "27afbd9b-1a7b-4145-a18d-994793d8dcdc",
+              "slug": "saint-lucia",
+              "name": "Saint Lucia",
+              "iso3": "LCA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "c3024416-edcd-4a15-bc6d-167aaab9e9fd",
+              "slug": "saint-martin",
+              "name": "Saint Martin",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "560a261e-1aaf-4120-92ff-a6931f60ce7b",
+              "slug": "saint-pierre-and-miquelon",
+              "name": "Saint Pierre and Miquelon",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "225cbc11-ac71-48b6-945f-1c79e40022fe",
+              "slug": "saint-vincent-and-the-grenadines",
+              "name": "Saint Vincent and the Grenadines",
+              "iso3": "VCT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "7fe16caf-66ec-4381-8991-f6804c226d6a",
+              "slug": "samoa",
+              "name": "Samoa",
+              "iso3": "WSM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "7e52460d-1b13-4ac4-a301-5319d24dfa32",
+              "slug": "san-marino",
+              "name": "San Marino",
+              "iso3": "SMR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "eda6bd71-1a5c-497c-a7fe-6a11a0e21ab4",
+              "slug": "sao-tome-and-principe",
+              "name": "Sao Tome and Principe",
+              "iso3": "STP",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "187ffbf8-8659-4ffd-b044-6fc8dc6b4c9e",
+              "slug": "saudi-arabia",
+              "name": "Saudi Arabia",
+              "iso3": "SAU",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "5b3cc546-a9ca-4ddc-bffb-0afc4bebccd1",
+              "slug": "senegal",
+              "name": "Senegal",
+              "iso3": "SEN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "43948ffe-f2d9-4285-9474-c5fe7942f99c",
+              "slug": "serbia",
+              "name": "Serbia",
+              "iso3": "SRB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a283c9e0-6a65-4161-ae41-5943f3334f3e",
+              "slug": "seychelles",
+              "name": "Seychelles",
+              "iso3": "SYC",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "372f07ef-ec09-4c27-bcbd-ef3c06af5e8e",
+              "slug": "sierra-leone",
+              "name": "Sierra Leone",
+              "iso3": "SLE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "954b191a-c50c-4a48-ae57-64b800216ebb",
+              "slug": "singapore",
+              "name": "Singapore",
+              "iso3": "SGP",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "14e1237f-c524-42cb-a424-255a9a7dedb6",
+              "slug": "sint-maarten",
+              "name": "Sint Maarten",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "9aeac939-5966-47c2-aa4a-d8dfd642720f",
+              "slug": "slovakia",
+              "name": "Slovakia",
+              "iso3": "SVK",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "b5d866fc-de76-4280-a50b-589f0bfc49ba",
+              "slug": "slovenia",
+              "name": "Slovenia",
+              "iso3": "SVN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "61792890-03c9-449a-83d6-4fe41760d441",
+              "slug": "solomon-islands",
+              "name": "Solomon Islands",
+              "iso3": "SLB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "6a7fadf6-89d6-44e7-aed3-67c6d0796487",
+              "slug": "somalia",
+              "name": "Somalia",
+              "iso3": "SOM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "9de109ff-a588-466a-b8c6-3be5ac88ccb1",
+              "slug": "south-africa",
+              "name": "South Africa",
+              "iso3": "ZAF",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "b2628bcb-bca4-4691-9f3b-b27efbf57ea2",
+              "slug": "south-georgia-and-south-sandwich-islands",
+              "name": "South Georgia and South Sandwich Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": true
+            },
+            {
+              "id": "24837cbe-e04a-436e-8352-af87491e0b13",
+              "slug": "south-korea",
+              "name": "South Korea",
+              "iso3": "KOR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f3be77e5-1afa-4fb9-8385-8ddb4306a812",
+              "slug": "south-sudan",
+              "name": "South Sudan",
+              "iso3": "SSD",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "286e22e5-75c2-4c76-b6d7-0643323ce6ca",
+              "slug": "spain",
+              "name": "Spain",
+              "iso3": "ESP",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f2695cb0-9007-4c75-8cbf-e25a08cc6982",
+              "slug": "spratly-islands",
+              "name": "Spratly Islands",
+              "iso3": null,
+              "type": "disputed_or_limited_recognition",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled without claiming that Atlas inclusion, ISO/M49 coding, or this label settles recognition or sovereignty.",
+              "status_disputed": true
+            },
+            {
+              "id": "cc698d97-a4bc-45e1-9994-65389f610b15",
+              "slug": "sri-lanka",
+              "name": "Sri Lanka",
+              "iso3": "LKA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "13233464-0f98-48a9-a14a-ca59507681ac",
+              "slug": "sudan",
+              "name": "Sudan",
+              "iso3": "SDN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "61b01aa8-357a-4522-9c79-e699b5acbed4",
+              "slug": "suriname",
+              "name": "Suriname",
+              "iso3": "SUR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a5eb96e0-b083-4620-ac2a-c2dcc2ff2e32",
+              "slug": "svalbard-sometimes-referred-to-as-spitsbergen-the-largest-island-in-the-archipelago",
+              "name": "Svalbard (sometimes referred to as Spitsbergen, the largest island in the archipelago)",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "1f132416-4af7-42b6-a9b6-ba3c8c639ac2",
+              "slug": "sweden",
+              "name": "Sweden",
+              "iso3": "SWE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "c4ac0a08-e1ba-4093-bcf2-8c264fbec5c6",
+              "slug": "switzerland",
+              "name": "Switzerland",
+              "iso3": "CHE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "86b893bd-39f4-4d35-bb1d-0e612fca4694",
+              "slug": "syria",
+              "name": "Syria",
+              "iso3": "SYR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "b56c2d3b-8f8f-46ef-a4de-3503947a15e8",
+              "slug": "taiwan",
+              "name": "Taiwan",
+              "iso3": "TWN",
+              "type": "disputed_or_limited_recognition",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled without claiming that Atlas inclusion, ISO/M49 coding, or this label settles recognition or sovereignty.",
+              "status_disputed": true
+            },
+            {
+              "id": "7b3bb4d9-f3a6-42fc-a466-e4c41c9bdabc",
+              "slug": "tajikistan",
+              "name": "Tajikistan",
+              "iso3": "TJK",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "e3bb3eb4-4f67-4b88-b4bc-df029cc6b96e",
+              "slug": "tanzania",
+              "name": "Tanzania",
+              "iso3": "TZA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "662d0f4e-b33f-48c9-b1ad-7c01c2b6c848",
+              "slug": "thailand",
+              "name": "Thailand",
+              "iso3": "THA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ddc544e3-1a5d-42b3-a925-3f7d20b53491",
+              "slug": "the-bahamas",
+              "name": "The Bahamas",
+              "iso3": "BHS",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "3250a102-1a2e-45ea-a2cd-b5a9ed844495",
+              "slug": "the-dominican",
+              "name": "The Dominican",
+              "iso3": "DOM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f4d156a1-2909-433f-81a3-ae2cdf8a520a",
+              "slug": "the-gambia",
+              "name": "The Gambia",
+              "iso3": "GMB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "39a67927-9a5b-4759-b24a-5ba352f4bf5c",
+              "slug": "timor-leste",
+              "name": "Timor-Leste",
+              "iso3": "TLS",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "2edcf9a9-b3cc-49c1-9158-742c43c5bfce",
+              "slug": "togo",
+              "name": "Togo",
+              "iso3": "TGO",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "7af9a9bf-fde8-482f-8e5e-1a81b9d04203",
+              "slug": "tokelau",
+              "name": "Tokelau",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "f49ebdc1-0545-4e9b-ae22-aafb9f656016",
+              "slug": "tonga",
+              "name": "Tonga",
+              "iso3": "TON",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "79d1c497-fafe-49f0-83fb-eb43b08fe80b",
+              "slug": "trinidad-and-tobago",
+              "name": "Trinidad and Tobago",
+              "iso3": "TTO",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "934c424e-affd-4054-8e72-8770f7f9b621",
+              "slug": "tunisia",
+              "name": "Tunisia",
+              "iso3": "TUN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "e0f16461-9dde-4c70-b301-0ed9dfbb2cc4",
+              "slug": "turkey",
+              "name": "Turkey",
+              "iso3": "TUR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "9fc42f30-9c17-4207-9852-386f6b19f6f5",
+              "slug": "turkmenistan",
+              "name": "Turkmenistan",
+              "iso3": "TKM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a21925d4-fc79-4285-aeb5-8c807d557bae",
+              "slug": "turks-and-caicos-islands",
+              "name": "Turks and Caicos Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "71371492-09bb-4e81-93a4-3039f6d525f6",
+              "slug": "tuvalu",
+              "name": "Tuvalu",
+              "iso3": "TUV",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a6c17fd9-87f9-46b7-a6af-5f645d1d7387",
+              "slug": "uganda",
+              "name": "Uganda",
+              "iso3": "UGA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "621bee57-c8a7-415a-aa22-091cf12634aa",
+              "slug": "ukraine",
+              "name": "Ukraine",
+              "iso3": "UKR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "f17ba1ca-7d8c-46ae-b5aa-428e2f48c8ca",
+              "slug": "united-arab-emirates",
+              "name": "United Arab Emirates",
+              "iso3": "ARE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "aa6c15e6-53f3-46ef-bbe6-c859156a0f54",
+              "slug": "united-kingdom",
+              "name": "United Kingdom",
+              "iso3": "GBR",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "fa6a5eea-ba47-4ab6-a1ac-cd18f0cfe08a",
+              "slug": "united-states",
+              "name": "United States",
+              "iso3": "USA",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "4b1f2a13-406c-42c7-9907-23a4906c568d",
+              "slug": "uruguay",
+              "name": "Uruguay",
+              "iso3": "URY",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "6a06af90-aa76-461a-9e40-9a432646a44c",
+              "slug": "uzbekistan",
+              "name": "Uzbekistan",
+              "iso3": "UZB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "0d5d3612-d1a2-4367-b9ea-a14bb7305be2",
+              "slug": "vanuatu",
+              "name": "Vanuatu",
+              "iso3": "VUT",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "d170dc38-4d6c-4971-8822-7eadd25edca1",
+              "slug": "venezuela",
+              "name": "Venezuela",
+              "iso3": "VEN",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "e8541668-7ce4-454a-99f7-c8f9ecf7b3f0",
+              "slug": "vietnam",
+              "name": "Vietnam",
+              "iso3": "VNM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "a427d694-10e0-4647-878b-e4d466cc97d9",
+              "slug": "virgin-islands",
+              "name": "Virgin Islands",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "ad0ba029-a0cc-41f5-912a-1b60ff9a0d9f",
+              "slug": "wake-island",
+              "name": "Wake Island",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "4f55d791-bb05-4b49-aa74-19fd6d81d341",
+              "slug": "wallis-and-futuna",
+              "name": "Wallis and Futuna",
+              "iso3": null,
+              "type": "dependency_or_territory",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled dependency or territory; the administering relationship is descriptive and does not resolve a competing claim.",
+              "status_disputed": false
+            },
+            {
+              "id": "8f1ccadc-db63-4f3b-a7e9-09d96d4685e7",
+              "slug": "west-bank",
+              "name": "West Bank",
+              "iso3": null,
+              "type": "disputed_or_limited_recognition",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled without claiming that Atlas inclusion, ISO/M49 coding, or this label settles recognition or sovereignty.",
+              "status_disputed": true
+            },
+            {
+              "id": "d1acca70-9db1-4ad7-90cb-cb1594662658",
+              "slug": "western-sahara",
+              "name": "Western Sahara",
+              "iso3": null,
+              "type": "disputed_or_limited_recognition",
+              "status_source_ids": [
+                "cia_factbook",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Separately profiled without claiming that Atlas inclusion, ISO/M49 coding, or this label settles recognition or sovereignty.",
+              "status_disputed": true
+            },
+            {
+              "id": "4b8b6a42-e2cc-49c1-bf00-f9b765af4389",
+              "slug": "yemen",
+              "name": "Yemen",
+              "iso3": "YEM",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "78e7574f-454e-4562-8b26-4eda831c26a2",
+              "slug": "zambia",
+              "name": "Zambia",
+              "iso3": "ZMB",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            },
+            {
+              "id": "ea16ec55-2d45-4bcc-8fa5-5bd15a060203",
+              "slug": "zimbabwe",
+              "name": "Zimbabwe",
+              "iso3": "ZWE",
+              "type": "sovereign_state",
+              "status_source_ids": [
+                "un_member_states",
+                "un_m49"
+              ],
+              "status_reviewed_at": "2026-07-10",
+              "status_note": "Listed by Civica as a sovereign state because it is in the closed UN member-state inventory.",
+              "status_disputed": false
+            }
+          ]
+        }
+      ],
+      "table": {
+        "caption": "Frozen jurisdiction rows by jurisdiction-status/v1 class, with review and dispute flags.",
+        "columns": [
+          {
+            "key": "status",
+            "label": "Status class"
+          },
+          {
+            "key": "jurisdictions",
+            "label": "Jurisdictions"
+          },
+          {
+            "key": "reviewed",
+            "label": "Reviewed rows"
+          },
+          {
+            "key": "disputed",
+            "label": "Disputed rows"
+          }
+        ],
+        "rows": [
+          {
+            "status": "sovereign_state",
+            "jurisdictions": 194,
+            "reviewed": 194,
+            "disputed": 0
+          },
+          {
+            "status": "associated_state",
+            "jurisdictions": 2,
+            "reviewed": 2,
+            "disputed": 0
+          },
+          {
+            "status": "dependency_or_territory",
+            "jurisdictions": 47,
+            "reviewed": 47,
+            "disputed": 3
+          },
+          {
+            "status": "disputed_or_limited_recognition",
+            "jurisdictions": 8,
+            "reviewed": 8,
+            "disputed": 8
+          },
+          {
+            "status": "aggregate_or_special_area",
+            "jurisdictions": 2,
+            "reviewed": 2,
+            "disputed": 0
+          }
+        ]
+      },
+      "sourceRights": [],
+      "rightsNote": "The query redistributes only Civica's normalized status rows and their source identifiers. Consult the rights manifest and cited publishers before reusing underlying source materials.",
+      "limitations": [
+        "This is Civica's release-bound jurisdiction-status contract, not a new legal determination of statehood.",
+        "The case reproduces the checked classification rows and their cited source identifiers; it does not redistribute the underlying UN materials.",
+        "Later status reviews require a new Atlas release and must not rewrite this frozen result."
+      ],
+      "citation": "Civica Atlas. \"Where the sovereign-state denominator begins.\" Atlas case studies, release atlas-2026-07-11, civica-atlas-case-studies/v1. https://civicaatlas.org/methodology/case-studies#jurisdiction-status-denominator.",
+      "stableUrl": "https://civicaatlas.org/methodology/case-studies#jurisdiction-status-denominator"
+    },
+    {
+      "id": "france-population-selection",
+      "title": "Reading one reconciled population observation",
+      "researchQuestion": "Which population observation does the frozen Atlas release expose for France, and which metadata is required to interpret that choice?",
+      "answer": "The frozen release exposes one France population row from cia_factbook, describing reference year 2024. Its display text, numeric value, unit, source release, method, vintage, content hash, and dispute-at-cut state travel together.",
+      "methods": "Select France's canonical population row with its displayed and numeric forms, unit, source, observation year, upstream release, method, content hash, and dispute flag.",
+      "decisionTrail": [
+        "Resolve France by its release-bound ISO alpha-3 identifier rather than a display-name match.",
+        "Treat fact_value and fact_value_numeric as two representations of one selected observation, not as independent estimates.",
+        "Bind the interpretation to source_id, observation_reference_year, upstream_dataset_release, methodology_version, vintage_label, and content_hash.",
+        "Keep is_disputed_at_cut visible; a false value means no dispute was open at the release cut, not independent verification."
+      ],
+      "recipes": [
+        {
+          "id": "france-population",
+          "label": "France canonical population row",
+          "path": "/api/v1/atlas/query?table=facts&jurisdiction=FRA&fact_key=population&fields=fact_key,fact_value,fact_value_numeric,fact_unit,value_status,source_id,source_url,observation_reference_year,upstream_dataset_release,source_retrieved_at,methodology_version,vintage_label,content_hash,is_disputed_at_cut&limit=100",
+          "releaseId": "atlas-2026-07-11",
+          "releaseSemanticSha256": "60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc",
+          "exportSchemaVersion": "civica-atlas-export/v3",
+          "inputRowCount": 1,
+          "pagesRead": 1,
+          "fields": [
+            "fact_key",
+            "fact_value",
+            "fact_value_numeric",
+            "fact_unit",
+            "value_status",
+            "source_id",
+            "source_url",
+            "observation_reference_year",
+            "upstream_dataset_release",
+            "source_retrieved_at",
+            "methodology_version",
+            "vintage_label",
+            "content_hash",
+            "is_disputed_at_cut"
+          ],
+          "inputRows": [
+            {
+              "fact_key": "population",
+              "fact_value": "68,512,806 (2025 est.)",
+              "fact_value_numeric": 68512810,
+              "fact_unit": "persons",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "source_url": null,
+              "observation_reference_year": 2024,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "source_retrieved_at": "2026-05-02 18:51:17.633981",
+              "methodology_version": "v0.2-beta",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "5a41e0a1e803c2cae714a94b7a9f58c9e63deb2bc86c4e6d3b6c6aeb11f52408",
+              "is_disputed_at_cut": false
+            }
+          ]
+        }
+      ],
+      "table": {
+        "caption": "The single canonical France population observation exposed by atlas-2026-07-11.",
+        "columns": [
+          {
+            "key": "fact",
+            "label": "Fact"
+          },
+          {
+            "key": "displayValue",
+            "label": "Released value"
+          },
+          {
+            "key": "numericValue",
+            "label": "Numeric value"
+          },
+          {
+            "key": "unit",
+            "label": "Unit"
+          },
+          {
+            "key": "source",
+            "label": "Source"
+          },
+          {
+            "key": "referenceYear",
+            "label": "Reference year"
+          },
+          {
+            "key": "upstreamRelease",
+            "label": "Upstream release"
+          },
+          {
+            "key": "method",
+            "label": "Method"
+          },
+          {
+            "key": "disputedAtCut",
+            "label": "Disputed at cut"
+          }
+        ],
+        "rows": [
+          {
+            "fact": "population",
+            "displayValue": "68,512,806 (2025 est.)",
+            "numericValue": 68512810,
+            "unit": "persons",
+            "source": "cia_factbook",
+            "referenceYear": 2024,
+            "upstreamRelease": "CIA Factbook 2026-01-frozen",
+            "method": "v0.2-beta",
+            "disputedAtCut": false
+          }
+        ]
+      },
+      "sourceRights": [
+        {
+          "sourceId": "cia_factbook",
+          "licenseId": "US-PUBLIC-DOMAIN",
+          "termsUrl": "https://www.cia.gov/site-policies/",
+          "reviewStatus": "verified",
+          "reviewedAt": "2026-07-10",
+          "publicExport": "allowed",
+          "commercialUse": true,
+          "derivatives": true,
+          "attributionRequired": true,
+          "shareAlikeRequired": false,
+          "restrictions": [
+            "Credit CIA as the source",
+            "Do not imply CIA endorsement",
+            "CIA marks and seal remain restricted"
+          ]
+        }
+      ],
+      "rightsNote": "The embedded source-rights row is part of the result. Reuse must follow that source's terms, attribution requirements, and restrictions.",
+      "limitations": [
+        "The frozen public package contains the selected canonical row only; alternate, projected, rejected, or later observations are not reconstructed here.",
+        "The case demonstrates traceability of the released choice. It does not claim that the selected value is uniquely correct or current after the release cut.",
+        "The source-specific rights row governs reuse of the observation."
+      ],
+      "citation": "Civica Atlas. \"Reading one reconciled population observation.\" Atlas case studies, release atlas-2026-07-11, civica-atlas-case-studies/v1. https://civicaatlas.org/methodology/case-studies#france-population-selection.",
+      "stableUrl": "https://civicaatlas.org/methodology/case-studies#france-population-selection"
+    },
+    {
+      "id": "institutional-context-without-taxonomy-collapse",
+      "title": "Comparing institutions without collapsing taxonomies",
+      "researchQuestion": "How can a small cross-regional comparison keep government form, monarchy status, World Bank region, and income group as separate sourced dimensions?",
+      "answer": "All 5 selected jurisdictions have four separately sourced rows in the frozen release. The resulting table preserves institutional description, monarchy status, region, and income group as distinct fields rather than combining them into a score or single taxonomy.",
+      "methods": "Join five frozen sovereign-jurisdiction rows to four selected fact keys, then pivot the source-native values without creating a composite or treating region and income as government classifications.",
+      "decisionTrail": [
+        "Use one explicit, named five-jurisdiction teaching sample: France, Ghana, Japan, Samoa, and Uruguay.",
+        "Join facts to jurisdictions only through the documented jurisdiction_id = id relation.",
+        "Keep government_form_description and monarchy_status separate from world_bank_region and world_bank_income_group.",
+        "Retain the source and reference-year rows in the frozen inputs even though the compact output table shows the values."
+      ],
+      "recipes": [
+        {
+          "id": "comparison-jurisdictions",
+          "label": "Five selected sovereign jurisdictions",
+          "path": "/api/v1/atlas/query?table=jurisdictions&jurisdiction=FRA,GHA,JPN,WSM,URY&status=sovereign_state&fields=id,name,iso3,type&limit=100",
+          "releaseId": "atlas-2026-07-11",
+          "releaseSemanticSha256": "60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc",
+          "exportSchemaVersion": "civica-atlas-export/v3",
+          "inputRowCount": 5,
+          "pagesRead": 1,
+          "fields": [
+            "id",
+            "name",
+            "iso3",
+            "type"
+          ],
+          "inputRows": [
+            {
+              "id": "932e404a-ac19-4bda-947f-e3594b65a6f9",
+              "name": "France",
+              "iso3": "FRA",
+              "type": "sovereign_state"
+            },
+            {
+              "id": "15fe2c88-7141-4b3f-a68e-cc1161b83e0b",
+              "name": "Ghana",
+              "iso3": "GHA",
+              "type": "sovereign_state"
+            },
+            {
+              "id": "20395c9e-d663-4df5-8b51-d12582532080",
+              "name": "Japan",
+              "iso3": "JPN",
+              "type": "sovereign_state"
+            },
+            {
+              "id": "7fe16caf-66ec-4381-8991-f6804c226d6a",
+              "name": "Samoa",
+              "iso3": "WSM",
+              "type": "sovereign_state"
+            },
+            {
+              "id": "4b1f2a13-406c-42c7-9907-23a4906c568d",
+              "name": "Uruguay",
+              "iso3": "URY",
+              "type": "sovereign_state"
+            }
+          ]
+        },
+        {
+          "id": "comparison-facts",
+          "label": "Four separate institutional and peer-context dimensions",
+          "path": "/api/v1/atlas/query?table=facts&jurisdiction=FRA,GHA,JPN,WSM,URY&fact_key=government_form_description,monarchy_status,world_bank_region,world_bank_income_group&fields=jurisdiction_id,fact_key,fact_value,value_status,source_id,observation_reference_year,upstream_dataset_release,vintage_label,content_hash&limit=100",
+          "releaseId": "atlas-2026-07-11",
+          "releaseSemanticSha256": "60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc",
+          "exportSchemaVersion": "civica-atlas-export/v3",
+          "inputRowCount": 20,
+          "pagesRead": 1,
+          "fields": [
+            "jurisdiction_id",
+            "fact_key",
+            "fact_value",
+            "value_status",
+            "source_id",
+            "observation_reference_year",
+            "upstream_dataset_release",
+            "vintage_label",
+            "content_hash"
+          ],
+          "inputRows": [
+            {
+              "jurisdiction_id": "15fe2c88-7141-4b3f-a68e-cc1161b83e0b",
+              "fact_key": "government_form_description",
+              "fact_value": "presidential republic",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "649b6dbaa3dd5cd68c019fcab9c2f840e48d691fb62d8e5a2351796b47ef2d72"
+            },
+            {
+              "jurisdiction_id": "15fe2c88-7141-4b3f-a68e-cc1161b83e0b",
+              "fact_key": "monarchy_status",
+              "fact_value": "none",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "831854e0c91f8958eb1fad9130f5fd9596435e9647a0847fb602485c99caefdc"
+            },
+            {
+              "jurisdiction_id": "15fe2c88-7141-4b3f-a68e-cc1161b83e0b",
+              "fact_key": "world_bank_income_group",
+              "fact_value": "Lower middle income",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "4a0561945ef8d428569cf80e27fb03646425192fac3364a7d7d3d078a1d80f1d"
+            },
+            {
+              "jurisdiction_id": "15fe2c88-7141-4b3f-a68e-cc1161b83e0b",
+              "fact_key": "world_bank_region",
+              "fact_value": "Sub-Saharan Africa",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "20d8c5316ca60e1b8bbdb0fa3380301b3d86d849a6153ffe57754cac8c93d348"
+            },
+            {
+              "jurisdiction_id": "20395c9e-d663-4df5-8b51-d12582532080",
+              "fact_key": "government_form_description",
+              "fact_value": "parliamentary constitutional monarchy",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "cdb0819b16d6d191be465767a9ea7897f39c2896daeab70f9945ccee8dfd314b"
+            },
+            {
+              "jurisdiction_id": "20395c9e-d663-4df5-8b51-d12582532080",
+              "fact_key": "monarchy_status",
+              "fact_value": "ceremonial",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "18ddcf47daca07fe554bc7baf6d1dff930f74bc7cefb45db41bdefb7ca246060"
+            },
+            {
+              "jurisdiction_id": "20395c9e-d663-4df5-8b51-d12582532080",
+              "fact_key": "world_bank_income_group",
+              "fact_value": "High income",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "93f258490839a7e7c4c93ec13ca3ecd8c3469f86d9c6171127546d3e24049549"
+            },
+            {
+              "jurisdiction_id": "20395c9e-d663-4df5-8b51-d12582532080",
+              "fact_key": "world_bank_region",
+              "fact_value": "East Asia & Pacific",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "b0972f344418d82122b5e0ef1cf07aeedd0c46cbc53469324f7272dbb4271493"
+            },
+            {
+              "jurisdiction_id": "4b1f2a13-406c-42c7-9907-23a4906c568d",
+              "fact_key": "government_form_description",
+              "fact_value": "presidential republic",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "649b6dbaa3dd5cd68c019fcab9c2f840e48d691fb62d8e5a2351796b47ef2d72"
+            },
+            {
+              "jurisdiction_id": "4b1f2a13-406c-42c7-9907-23a4906c568d",
+              "fact_key": "monarchy_status",
+              "fact_value": "none",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "831854e0c91f8958eb1fad9130f5fd9596435e9647a0847fb602485c99caefdc"
+            },
+            {
+              "jurisdiction_id": "4b1f2a13-406c-42c7-9907-23a4906c568d",
+              "fact_key": "world_bank_income_group",
+              "fact_value": "High income",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "93f258490839a7e7c4c93ec13ca3ecd8c3469f86d9c6171127546d3e24049549"
+            },
+            {
+              "jurisdiction_id": "4b1f2a13-406c-42c7-9907-23a4906c568d",
+              "fact_key": "world_bank_region",
+              "fact_value": "Latin America & Caribbean",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "851afce160cfeb9a1976a1939ce8bf377cda6b919f393e4e0b9ad43bbc25ddcc"
+            },
+            {
+              "jurisdiction_id": "7fe16caf-66ec-4381-8991-f6804c226d6a",
+              "fact_key": "government_form_description",
+              "fact_value": "parliamentary republic",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "d1d69f3699345809d5dbfee509c2f3f965f2c1c0d120f8b5a3891124dadc6523"
+            },
+            {
+              "jurisdiction_id": "7fe16caf-66ec-4381-8991-f6804c226d6a",
+              "fact_key": "monarchy_status",
+              "fact_value": "none",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "831854e0c91f8958eb1fad9130f5fd9596435e9647a0847fb602485c99caefdc"
+            },
+            {
+              "jurisdiction_id": "7fe16caf-66ec-4381-8991-f6804c226d6a",
+              "fact_key": "world_bank_income_group",
+              "fact_value": "Upper middle income",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "bfd27883ea55dbe36a047aa002ca7eab1e0bbd2202df56c2536d2c0f8ac98baa"
+            },
+            {
+              "jurisdiction_id": "7fe16caf-66ec-4381-8991-f6804c226d6a",
+              "fact_key": "world_bank_region",
+              "fact_value": "East Asia & Pacific",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "b0972f344418d82122b5e0ef1cf07aeedd0c46cbc53469324f7272dbb4271493"
+            },
+            {
+              "jurisdiction_id": "932e404a-ac19-4bda-947f-e3594b65a6f9",
+              "fact_key": "government_form_description",
+              "fact_value": "semi-presidential republic",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "ec20f7d4e1fb3bdf73b1cb55a4e45516a21924c78d20e09ba85701e1c7599f4b"
+            },
+            {
+              "jurisdiction_id": "932e404a-ac19-4bda-947f-e3594b65a6f9",
+              "fact_key": "monarchy_status",
+              "fact_value": "none",
+              "value_status": "observed",
+              "source_id": "cia_factbook",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "CIA Factbook 2026-01-frozen",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "831854e0c91f8958eb1fad9130f5fd9596435e9647a0847fb602485c99caefdc"
+            },
+            {
+              "jurisdiction_id": "932e404a-ac19-4bda-947f-e3594b65a6f9",
+              "fact_key": "world_bank_income_group",
+              "fact_value": "High income",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "93f258490839a7e7c4c93ec13ca3ecd8c3469f86d9c6171127546d3e24049549"
+            },
+            {
+              "jurisdiction_id": "932e404a-ac19-4bda-947f-e3594b65a6f9",
+              "fact_key": "world_bank_region",
+              "fact_value": "Europe & Central Asia",
+              "value_status": "observed",
+              "source_id": "world_bank",
+              "observation_reference_year": 2026,
+              "upstream_dataset_release": "WB Country Classifications FY2026",
+              "vintage_label": "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+              "content_hash": "94962d9483f7e34d34ceee23eafbcd62fe1d5ab7282d5f15468a0ab62312cc8e"
+            }
+          ]
+        }
+      ],
+      "table": {
+        "caption": "Five-jurisdiction teaching sample with four source-native dimensions kept separate.",
+        "columns": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction"
+          },
+          {
+            "key": "iso3",
+            "label": "ISO3"
+          },
+          {
+            "key": "governmentForm",
+            "label": "Government form"
+          },
+          {
+            "key": "monarchyStatus",
+            "label": "Monarchy status"
+          },
+          {
+            "key": "worldBankRegion",
+            "label": "World Bank region"
+          },
+          {
+            "key": "worldBankIncome",
+            "label": "World Bank income group"
+          }
+        ],
+        "rows": [
+          {
+            "jurisdiction": "France",
+            "iso3": "FRA",
+            "governmentForm": "semi-presidential republic",
+            "monarchyStatus": "none",
+            "worldBankRegion": "Europe & Central Asia",
+            "worldBankIncome": "High income"
+          },
+          {
+            "jurisdiction": "Ghana",
+            "iso3": "GHA",
+            "governmentForm": "presidential republic",
+            "monarchyStatus": "none",
+            "worldBankRegion": "Sub-Saharan Africa",
+            "worldBankIncome": "Lower middle income"
+          },
+          {
+            "jurisdiction": "Japan",
+            "iso3": "JPN",
+            "governmentForm": "parliamentary constitutional monarchy",
+            "monarchyStatus": "ceremonial",
+            "worldBankRegion": "East Asia & Pacific",
+            "worldBankIncome": "High income"
+          },
+          {
+            "jurisdiction": "Samoa",
+            "iso3": "WSM",
+            "governmentForm": "parliamentary republic",
+            "monarchyStatus": "none",
+            "worldBankRegion": "East Asia & Pacific",
+            "worldBankIncome": "Upper middle income"
+          },
+          {
+            "jurisdiction": "Uruguay",
+            "iso3": "URY",
+            "governmentForm": "presidential republic",
+            "monarchyStatus": "none",
+            "worldBankRegion": "Latin America & Caribbean",
+            "worldBankIncome": "High income"
+          }
+        ]
+      },
+      "sourceRights": [
+        {
+          "sourceId": "cia_factbook",
+          "licenseId": "US-PUBLIC-DOMAIN",
+          "termsUrl": "https://www.cia.gov/site-policies/",
+          "reviewStatus": "verified",
+          "reviewedAt": "2026-07-10",
+          "publicExport": "allowed",
+          "commercialUse": true,
+          "derivatives": true,
+          "attributionRequired": true,
+          "shareAlikeRequired": false,
+          "restrictions": [
+            "Credit CIA as the source",
+            "Do not imply CIA endorsement",
+            "CIA marks and seal remain restricted"
+          ]
+        },
+        {
+          "sourceId": "world_bank",
+          "licenseId": "CC-BY-4.0",
+          "termsUrl": "https://datacatalog.worldbank.org/public-licenses",
+          "reviewStatus": "verified",
+          "reviewedAt": "2026-07-10",
+          "publicExport": "allowed",
+          "commercialUse": true,
+          "derivatives": true,
+          "attributionRequired": true,
+          "shareAlikeRequired": false,
+          "restrictions": [
+            "Dataset-specific catalog terms override the default license",
+            "Indicate changes",
+            "Do not imply World Bank endorsement"
+          ]
+        }
+      ],
+      "rightsNote": "The compact table combines only rights-allowed released rows. CIA and World Bank source-rights records remain attached to the frozen inputs and govern downstream reuse.",
+      "limitations": [
+        "The five jurisdictions are a transparent teaching sample, not a statistically representative sample.",
+        "Publisher labels are reproduced as source-native categories and are not harmonized into a single Civica scale.",
+        "The table is descriptive; it supports no causal, quality, ranking, or cultural inference."
+      ],
+      "citation": "Civica Atlas. \"Comparing institutions without collapsing taxonomies.\" Atlas case studies, release atlas-2026-07-11, civica-atlas-case-studies/v1. https://civicaatlas.org/methodology/case-studies#institutional-context-without-taxonomy-collapse.",
+      "stableUrl": "https://civicaatlas.org/methodology/case-studies#institutional-context-without-taxonomy-collapse"
+    }
+  ],
+  "semanticSha256": "e26d60b94a3f5c9b5d26e5ff6699ffc5f6a4a9f0cb3083402350e5124d1e2369"
+}

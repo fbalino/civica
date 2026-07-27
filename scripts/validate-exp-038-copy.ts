@@ -46,6 +46,12 @@ const expectations: Expectation[] = [
     ],
   },
   {
+    path: "src/app/(reader)/country/[slug]/page.tsx",
+    present: [
+      "This is a loading error, not a zero-data state for {jurisdiction.name}.",
+    ],
+  },
+  {
     path: "src/app/(reader)/country/[slug]/constitution/page.tsx",
     present: [
       "Civica indexes constitution texts supplied by the Constitute Project.",

@@ -43,11 +43,19 @@ test("current contract states the non-negotiable publication boundaries", () => 
   assert.equal(method.observability.approximatePressFreedomEligible, false);
   assert.equal(method.observability.absentNumericEffect, "withheld");
   assert.equal(method.observability.countryQualityInference, "prohibited");
-  assert.equal(method.numericDeltas.trailingWindowDays, 365);
+  assert.equal(method.numericDeltas.trailingWindowDays, 730);
   assert.equal(
     method.numericDeltas.windowBoundary,
-    "inclusive_365_days_future_excluded",
+    "inclusive_maximum_configured_half_life_days_future_excluded",
   );
+  assert.deepEqual(method.numericDeltas.eventLifecycle, {
+    version: "pulse-event-lifecycle/v1",
+    supersession: "current_projection_only_with_retained_superseded_history",
+    persistence:
+      "never_inferred_from_an_earlier_event_or_extended_without_new_evidence",
+    recurrence:
+      "separately_accepted_later_event_with_its_own_date_and_incident",
+  });
   assert.equal(
     method.numericDeltas.noEventState,
     "zero_tombstone_internal_public_null",
@@ -154,7 +162,7 @@ test("current contract states the non-negotiable publication boundaries", () => 
 test("the runtime snapshot distinguishes observed evidence from operating state", () => {
   assert.equal(
     CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.observedThrough,
-    "2026-07-11",
+    "2026-07-26",
   );
   assert.deepEqual(
     CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.sourceIds,

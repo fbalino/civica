@@ -1,0 +1,26 @@
+{
+  "task": "PLT-023",
+  "contract": "civica-serverless-db-http/v1",
+  "status": "implemented-and-locally-validated",
+  "implementedAt": "2026-07-18",
+  "scope": {
+    "transport": "Every request-serving Neon client is created by the shared HTTP factory, which adds a fresh 10-second timeout and preserves caller cancellation.",
+    "retrySafety": "The HTTP transport makes one attempt only. Uncertain writes never retry at transport level; durable cron replay remains behind the existing idempotency, lease, and fence boundary.",
+    "atomicity": "Server routes use one-shot HTTP operations. Coupled writes must be one statement, a database function, or a Neon non-interactive transaction batch; interactive sessions are not used.",
+    "failureInjection": "Focused unit tests inject timeout, transient transport failure, and caller cancellation without connecting to Neon."
+  },
+  "primarySources": [
+    {
+      "title": "Neon serverless driver",
+      "url": "https://neon.com/docs/serverless/serverless-driver",
+      "retrievedAt": "2026-07-18",
+      "usedFor": "HTTP versus WebSocket transaction semantics and fetch cancellation."
+    },
+    {
+      "title": "Neon serverless driver configuration",
+      "url": "https://github.com/neondatabase/serverless/blob/main/CONFIG.md",
+      "retrievedAt": "2026-07-18",
+      "usedFor": "Global fetch transport hook and non-interactive transaction API constraints."
+    }
+  ]
+}

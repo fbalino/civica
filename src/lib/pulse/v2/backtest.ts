@@ -56,6 +56,10 @@ import {
   type ClassifierProvider,
   type ResolvedProviderConfig,
 } from "./provider";
+import {
+  modelOperationControl,
+  modelOperationVersion,
+} from "@/lib/model-operations/contract";
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
 /** Diagnostic engine: Anthropic by default,
@@ -65,11 +69,15 @@ const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 function resolveBacktestConfig(): ResolvedProviderConfig {
   const raw = (process.env.PULSE_BACKTEST_PROVIDER ?? "").trim().toLowerCase();
   const provider: ClassifierProvider =
-    raw === "deepseek" || raw === "glm" || raw === "anthropic"
+    !raw
+      ? "anthropic"
+      : raw === "deepseek" || raw === "glm" || raw === "anthropic"
       ? (raw as ClassifierProvider)
       : raw === "zhipu"
         ? "glm"
-        : "anthropic";
+        : (() => {
+            throw new Error("PULSE_BACKTEST_PROVIDER is not an approved provider");
+          })();
   const model =
     (process.env.PULSE_BACKTEST_MODEL ?? "").trim() ||
     PROVIDER_DEFAULT_MODEL[provider];
@@ -78,6 +86,15 @@ function resolveBacktestConfig(): ResolvedProviderConfig {
 
 const BACKTEST_CONFIG = resolveBacktestConfig();
 const MODEL = BACKTEST_CONFIG.model;
+const BACKTEST_MODEL_VERSION = modelOperationVersion(
+  "pulse-backtest",
+  BACKTEST_CONFIG.provider,
+  BACKTEST_CONFIG.model,
+);
+const MAX_BACKTEST_EVENTS_PER_EXECUTION = Math.floor(
+  modelOperationControl("pulse-backtest").maxCallsPerExecution / 2,
+);
+const MAX_BACKTEST_CASES_PER_EXECUTION = 1;
 
 interface ClassifiedBacktestEvent {
   eventDate: string;
@@ -110,14 +127,19 @@ async function classifyEvent(
   // Pass 1 — classify.
   let classifyResp;
   try {
-    classifyResp = await callClassifier(BACKTEST_CONFIG, {
-      system: SYSTEM_PROMPT,
-      user: userContent,
-      maxTokens: 800,
-      expectJson: true,
-    });
-  } catch (err) {
-    console.error(`[backtest:classify] classify call failed:`, err);
+    classifyResp = await callClassifier(
+      BACKTEST_CONFIG,
+      {
+        system: SYSTEM_PROMPT,
+        user: userContent,
+        maxTokens: 800,
+        expectJson: true,
+      },
+      {},
+      "pulse-backtest",
+    );
+  } catch {
+    console.error("[pulse-backtest] classify_call_failed");
     return null;
   }
   const first = parseClassify(classifyResp.text);
@@ -142,14 +164,19 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
 - rationale: ${first.rationale}`;
   let verifyResp;
   try {
-    verifyResp = await callClassifier(BACKTEST_CONFIG, {
-      system: VERIFY_SYSTEM_PROMPT,
-      user: verifyContent,
-      maxTokens: 500,
-      expectJson: true,
-    });
-  } catch (err) {
-    console.error(`[backtest:classify] verify call failed:`, err);
+    verifyResp = await callClassifier(
+      BACKTEST_CONFIG,
+      {
+        system: VERIFY_SYSTEM_PROMPT,
+        user: verifyContent,
+        maxTokens: 500,
+        expectJson: true,
+      },
+      {},
+      "pulse-backtest",
+    );
+  } catch {
+    console.error("[pulse-backtest] verify_call_failed");
     verifyResp = null;
   }
   const verifyText = verifyResp?.text ?? "";
@@ -334,7 +361,8 @@ export async function runBacktest(
   const events = await db
     .select()
     .from(backtestEvents)
-    .where(eq(backtestEvents.caseId, caseId));
+    .where(eq(backtestEvents.caseId, caseId))
+    .limit(MAX_BACKTEST_EVENTS_PER_EXECUTION);
 
   const classified: Array<ClassifiedBacktestEvent & { eventDate: string }> = [];
   for (const ev of events) {
@@ -356,7 +384,9 @@ export async function runBacktest(
 
   // Snapshot: the parameters that produced this run.
   const paramSnapshot = {
+    provider: BACKTEST_CONFIG.provider,
     model: MODEL,
+    modelVersion: BACKTEST_MODEL_VERSION,
     classifier: "classify-then-verify",
     halfLifeSamples: Object.fromEntries(
       ["coup", "judicial_purge", "journalist_arrest"].map((k) => [
@@ -395,12 +425,17 @@ export async function runBacktest(
   };
 }
 
-/** Wrapper to run every case in DB, used by `npm run backtest:run`. */
+/**
+ * Run one case per invocation. A broad historical diagnostic must be resumed
+ * deliberately with `--case`, rather than turning one shell command into an
+ * unbounded paid batch.
+ */
 export async function runAllBacktests(db: Db): Promise<BacktestRunResult[]> {
   const cases = await db
     .select({ id: backtestCases.id })
     .from(backtestCases)
-    .orderBy(sql`${backtestCases.id}`);
+    .orderBy(sql`${backtestCases.id}`)
+    .limit(MAX_BACKTEST_CASES_PER_EXECUTION);
   const results: BacktestRunResult[] = [];
   for (const c of cases) {
     console.log(`\n── ${c.id} ──`);

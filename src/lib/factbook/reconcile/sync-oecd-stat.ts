@@ -66,26 +66,32 @@
  */
 import { sql } from "drizzle-orm";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
 const OECD_BASE_URL = "https://sdmx.oecd.org/public/rest";
 const OECD_USER_AGENT =
   "Civica/0.1 (https://civicaatlas.org; fbalino@gmail.com)";
-const OECD_ACCEPT =
-  "application/vnd.sdmx.data+json;charset=utf-8;version=1.0";
+const OECD_ACCEPT = "application/vnd.sdmx.data+json;charset=utf-8;version=1.0";
 /**
  * The OECD Data Explorer SDMX endpoint requires an Accept-Language
  * header for content negotiation. Without it, requests with the
@@ -133,11 +139,44 @@ const OECD_STAT_LICENSE = "OECD Terms and Conditions";
  * grows from 37 → 38 per indicator with no R.7 code change.
  */
 export const OECD_MEMBER_ISO3: readonly string[] = [
-  "AUS", "AUT", "BEL", "CAN", "CHL", "COL", "CRI", "CZE",
-  "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "ISL",
-  "IRL", "ISR", "ITA", "JPN", "KOR", "LVA", "LTU", "LUX",
-  "MEX", "NLD", "NZL", "NOR", "POL", "PRT", "SVK", "SVN",
-  "ESP", "SWE", "CHE", "TUR", "GBR", "USA",
+  "AUS",
+  "AUT",
+  "BEL",
+  "CAN",
+  "CHL",
+  "COL",
+  "CRI",
+  "CZE",
+  "DNK",
+  "EST",
+  "FIN",
+  "FRA",
+  "DEU",
+  "GRC",
+  "HUN",
+  "ISL",
+  "IRL",
+  "ISR",
+  "ITA",
+  "JPN",
+  "KOR",
+  "LVA",
+  "LTU",
+  "LUX",
+  "MEX",
+  "NLD",
+  "NZL",
+  "NOR",
+  "POL",
+  "PRT",
+  "SVK",
+  "SVN",
+  "ESP",
+  "SWE",
+  "CHE",
+  "TUR",
+  "GBR",
+  "USA",
 ];
 const OECD_MEMBER_SET = new Set(OECD_MEMBER_ISO3);
 
@@ -229,8 +268,7 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
     dimensionFilter: "A..GNLB.PT_B1GQ.S13..",
     factKey: "fiscal_balance_pct_gdp",
     label: "Government fiscal balance (% of GDP)",
-    docUrl:
-      "https://www.oecd.org/governance/government-at-a-glance/",
+    docUrl: "https://www.oecd.org/governance/government-at-a-glance/",
     civicaRole: "canonical",
   },
   {
@@ -240,8 +278,7 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
     dimensionFilter: "A..GGD.PT_B1GQ.S13..",
     factKey: "public_debt_pct_gdp",
     label: "Government gross debt (% of GDP)",
-    docUrl:
-      "https://www.oecd.org/governance/government-at-a-glance/",
+    docUrl: "https://www.oecd.org/governance/government-at-a-glance/",
     civicaRole: "canonical",
   },
 
@@ -271,7 +308,8 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
     dimensionFilter: ".A.G.PT_B1GQ.._Z",
     factKey: "gerd_pct_gdp",
     label: "Gross domestic expenditure on R&D (GERD) as % of GDP",
-    docUrl: "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CInnovation%20and%20Technology%23INT%23&pg=0&fc=Topic&bp=true&snb=27&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_MSTI%40DF_MSTI&df[ag]=OECD.STI.STP",
+    docUrl:
+      "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CInnovation%20and%20Technology%23INT%23&pg=0&fc=Topic&bp=true&snb=27&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_MSTI%40DF_MSTI&df[ag]=OECD.STI.STP",
     civicaRole: "canonical",
     oecdMemberOnly: false,
   },
@@ -304,7 +342,8 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
     dimensionFilter: ".TAX_REV.S13._T._T.PT_B1GQ.A",
     factKey: "tax_revenue_pct_gdp",
     label: "Total tax revenue, general government (% of GDP)",
-    docUrl: "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CGovernment%23GOV%23&pg=0&fc=Topic&bp=true&snb=12&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_REV_COMP_OECD%40DF_RSOECD&df[ag]=OECD.CTP.TPS",
+    docUrl:
+      "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CGovernment%23GOV%23&pg=0&fc=Topic&bp=true&snb=12&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_REV_COMP_OECD%40DF_RSOECD&df[ag]=OECD.CTP.TPS",
     civicaRole: "canonical",
   },
   {
@@ -342,7 +381,8 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
     dimensionFilter: ".A.EXP_HEALTH.PT_B1GQ._T.._T._T._T...",
     factKey: "health_expenditure_pct_gdp",
     label: "Current health expenditure (% of GDP), SHA-2011",
-    docUrl: "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CHealth%23HEA%23&pg=0&fc=Topic&bp=true&snb=27&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_SHA%40DF_SHA&df[ag]=OECD.ELS.HD",
+    docUrl:
+      "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CHealth%23HEA%23&pg=0&fc=Topic&bp=true&snb=27&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_SHA%40DF_SHA&df[ag]=OECD.ELS.HD",
     civicaRole: "canonical",
     oecdMemberOnly: false,
   },
@@ -362,7 +402,7 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
  * Only the first element is the numeric value; the rest are
  * attribute references we don't use today.
  */
-  interface OecdSdmxResponse {
+interface OecdSdmxResponse {
   data: {
     dataSets: Array<{
       observations?: Record<string, Array<number | null>>;
@@ -438,6 +478,8 @@ export interface OecdStatSyncOptions {
   jurisdictions?: OecdStatJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface OecdStatJurisdiction {
@@ -529,9 +571,7 @@ async function fetchIndicator(
 
   const structure = body.data?.structure ?? body.structure;
   if (!structure) {
-    throw new Error(
-      `OECD ${config.factKey}: missing structure in response`,
-    );
+    throw new Error(`OECD ${config.factKey}: missing structure in response`);
   }
   const obsDims = structure.dimensions.observation;
   if (!obsDims || obsDims.length === 0) {
@@ -559,7 +599,8 @@ async function fetchIndicator(
     if (!Array.isArray(valueArr) || valueArr.length === 0) continue;
     const numericValue = valueArr[0];
     if (numericValue === null || numericValue === undefined) continue;
-    if (typeof numericValue !== "number" || !Number.isFinite(numericValue)) continue;
+    if (typeof numericValue !== "number" || !Number.isFinite(numericValue))
+      continue;
 
     const positions = tupleKey.split(":").map((n) => parseInt(n, 10));
     const refAreaIdx = positions[refAreaPos];
@@ -641,19 +682,25 @@ export async function syncOecdStat(
       dryRun: options.dryRun ?? false,
     };
   }
+  const atlasReleaseId = options.dryRun
+    ? undefined
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   // Build iso3 → jurisdictionId map once; reused across all
   // indicators. Filter to OECD members up-front so the iso3 lookup
   // misses cleanly count as `skipped_no_jurisdiction` (which Israel
   // will trigger in v1 until R.7.0 lands).
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -661,9 +708,7 @@ export async function syncOecdStat(
   for (const j of allJurisdictions) {
     if (j.iso3) iso3ToJurisdiction.set(j.iso3.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`);
 
   // OECD member coverage check — log how many OECD members exist
   // in the jurisdictions table. Helps surface the Israel gap.
@@ -684,10 +729,7 @@ export async function syncOecdStat(
 
   const counters = new Map<string, PerOecdStatCounters>();
   for (const c of targets) {
-    counters.set(
-      c.factKey,
-      freshCounters(c.factKey, c.agency, c.dataflowId),
-    );
+    counters.set(c.factKey, freshCounters(c.factKey, c.agency, c.dataflowId));
   }
 
   // Government at a Glance 2023 edition exposes years 2018–2022.
@@ -723,7 +765,11 @@ export async function syncOecdStat(
     let observationCount = 0;
     let nonMemberCount = 0;
     try {
-      const result = await (options.fetchIndicator ?? fetchIndicator)(config, startYear, endYear);
+      const result = await (options.fetchIndicator ?? fetchIndicator)(
+        config,
+        startYear,
+        endYear,
+      );
       latestByIso3 = result.latestByIso3;
       observationCount = result.observationCount;
       nonMemberCount = result.nonMemberCount;
@@ -868,56 +914,33 @@ export async function syncOecdStat(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "oecd_stat",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: OECD_STAT_VINTAGE,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: OECD_STAT_VINTAGE,
-              snapshotId,
-              updatedAt: new Date(),
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "oecd_stat",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: OECD_STAT_VINTAGE,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written++;
         totalWritten++;
         touchedPairs.add(`${j.id}|${config.factKey}`);
@@ -935,13 +958,13 @@ export async function syncOecdStat(
         `unmatched ISO3: ${counter.skipped_no_jurisdiction}, ` +
         `envelope rejects: ${counter.rejected_envelope})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "OECD.Stat",
+      target: `${config.factKey} (${config.dataflowId})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("oecd_stat", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -956,13 +979,17 @@ export async function syncOecdStat(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -972,6 +999,15 @@ export async function syncOecdStat(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "oecd_stat",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerOecdStatCounters> = {};

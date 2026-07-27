@@ -27,6 +27,7 @@ function fixture() {
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: null,
       },
     },
     lastComputedAt: null,

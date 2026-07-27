@@ -9,6 +9,7 @@ export interface ProductionAdapterEntrypoint {
   id: string;
   product: "atlas" | "index" | "conditions";
   sources: readonly string[];
+  canonicalNpmScript: string;
   entrypoint: string;
   implementationPaths: readonly string[];
 }
@@ -20,6 +21,9 @@ export interface ScheduledProductionAdapter {
   sources: readonly string[];
   implementationPaths: readonly string[];
 }
+
+export const CONDITIONS_PRODUCTION_COMMAND =
+  "npm run run:production-pipeline -- --pipeline=conditions.current-beta -- tsx scripts/ingest-conditions-all.ts" as const;
 
 /**
  * Source ownership for every deployed cron route. `vercel.json` remains the
@@ -76,7 +80,10 @@ export const SCHEDULED_PRODUCTION_ADAPTERS: readonly ScheduledProductionAdapter[
       route: "/api/cron/factbook/sync-wikidata",
       inputKind: "external",
       sources: ["wikidata"],
-      implementationPaths: ["src/lib/factbook/reconcile/wikidata-client.ts"],
+      implementationPaths: [
+        "src/lib/factbook/reconcile/wikidata-client.ts",
+        "src/lib/factbook/reconcile/wikidata-sync.ts",
+      ],
     },
     {
       id: "factbook.officeholders",
@@ -292,6 +299,36 @@ export const SCHEDULED_PRODUCTION_ADAPTERS: readonly ScheduledProductionAdapter[
         "src/lib/pulse/v2/review-sla-store.ts",
       ],
     },
+    {
+      id: "operations.error-alerts",
+      route: "/api/cron/operations/error-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/error-alerts/route.ts",
+        "src/lib/platform/error-monitoring.ts",
+      ],
+    },
+    {
+      id: "operations.pipeline-alerts",
+      route: "/api/cron/operations/pipeline-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/pipeline-alerts/route.ts",
+        "src/lib/platform/pipeline-observability.ts",
+      ],
+    },
+    {
+      id: "operations.health-alerts",
+      route: "/api/cron/operations/health-alerts",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/health-alerts/route.ts",
+        "src/lib/platform/health-status.ts",
+      ],
+    },
   ] as const;
 
 export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] =
@@ -300,6 +337,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "atlas.cia-factbook",
       product: "atlas",
       sources: ["cia_factbook"],
+      canonicalNpmScript: "seed:factbook",
       entrypoint: "scripts/seed-from-factbook.ts",
       implementationPaths: ["scripts/seed-from-factbook.ts"],
     },
@@ -307,6 +345,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "atlas.organization-memberships",
       product: "atlas",
       sources: ["civica_organization_roster_v1"],
+      canonicalNpmScript: "sync:organization-memberships",
       entrypoint: "scripts/sync-organization-memberships.ts",
       implementationPaths: [
         "scripts/sync-organization-memberships.ts",
@@ -317,6 +356,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "atlas.constitutions",
       product: "atlas",
       sources: ["constitute_project"],
+      canonicalNpmScript: "sync:constitutions",
       entrypoint: "scripts/sync-constitutions.ts",
       implementationPaths: [
         "scripts/sync-constitutions.ts",
@@ -327,6 +367,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "atlas.elections",
       product: "atlas",
       sources: ["ipu_parline", "international_idea", "wikidata"],
+      canonicalNpmScript: "sync:elections-ipu",
       entrypoint: "scripts/sync-elections-ipu.ts",
       implementationPaths: [
         "scripts/sync-elections-ipu.ts",
@@ -338,6 +379,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "atlas.legislatures-parties",
       product: "atlas",
       sources: ["ipu_parline", "wikidata"],
+      canonicalNpmScript: "sync:ipu",
       entrypoint: "scripts/sync-ipu-parline.ts",
       implementationPaths: [
         "scripts/sync-ipu-parline.ts",
@@ -348,6 +390,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "atlas.party-positions",
       product: "atlas",
       sources: ["vparty"],
+      canonicalNpmScript: "ingest:vparty",
       entrypoint: "scripts/ingest-vparty-positions.ts",
       implementationPaths: ["scripts/ingest-vparty-positions.ts"],
     },
@@ -355,6 +398,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "atlas.government-taxonomy",
       product: "atlas",
       sources: ["bjornskov_rode", "cia_factbook", "wikidata"],
+      canonicalNpmScript: "sync:government-taxonomy",
       entrypoint: "scripts/ingest-government-taxonomy-br.ts",
       implementationPaths: [
         "scripts/ingest-government-taxonomy-br.ts",
@@ -367,6 +411,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "atlas.country-metrics",
       product: "atlas",
       sources: ["world_bank", "undp_hdi", "transparency_intl"],
+      canonicalNpmScript: "sync:country-metrics",
       entrypoint: "scripts/sync-world-bank-metrics.ts",
       implementationPaths: [
         "scripts/sync-world-bank-metrics.ts",
@@ -384,6 +429,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
         "transparency_intl",
         "undp_hdi",
       ],
+      canonicalNpmScript: "ingest:indicator-history",
       entrypoint: "scripts/ingest-indicator-history.ts",
       implementationPaths: [
         "scripts/ingest-indicator-history.ts",
@@ -394,6 +440,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "index.current-beta",
       product: "index",
       sources: ["vdem", "worldbank_wgi", "freedom_house", "transparency_intl"],
+      canonicalNpmScript: "ingest:ci",
       entrypoint: "scripts/ingest-ci-all.ts",
       implementationPaths: [
         "scripts/ingest-ci-all.ts",
@@ -412,11 +459,12 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       id: "conditions.current-beta",
       product: "conditions",
       sources: ["undp_hdi", "global_peace_index", "worldbank_economic"],
-      entrypoint: "scripts/ingest-conditions-hdi.ts",
+      canonicalNpmScript: "ingest:conditions:all",
+      entrypoint: "scripts/ingest-conditions-all.ts",
       implementationPaths: [
-        "scripts/ingest-conditions-hdi.ts",
-        "scripts/ingest-conditions-gpi.ts",
-        "scripts/ingest-conditions-economic.ts",
+        "scripts/ingest-conditions-all.ts",
+        "src/lib/conditions/production-workflow.ts",
+        "src/lib/conditions/ingest.ts",
       ],
     },
   ] as const;

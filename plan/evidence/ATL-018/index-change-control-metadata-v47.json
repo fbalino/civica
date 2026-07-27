@@ -1,0 +1,13 @@
+{
+  "id": "atl-018-comparison-and-reader-data-state-presentation",
+  "toVersion": "civica-index-atlas-reader-states-v47",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["plan/ATL-018-atlas-data-states-2026-07-18.md"],
+    "registry": ["src/lib/atlas/surface-data-matrix.ts"],
+    "release_note": ["plan/evidence/ATL-018/index-change-control-release-note-v47.md"],
+    "migration_plan": ["plan/evidence/ATL-018/index-change-control-migration-plan-v47.md"],
+    "golden_test": ["src/lib/atlas/atl-018-country-reader.test.ts"],
+    "contract_test": ["src/lib/bills/__tests__/atl-013-bills-coverage.test.ts"]
+  }
+}

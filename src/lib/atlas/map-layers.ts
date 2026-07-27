@@ -1,20 +1,14 @@
 /**
  * Atlas map choropleth LAYER SWITCHER definitions (Wave 6).
  *
- * The /atlas world map can color countries by one of four categorical data
- * layers. This module is the single source of truth for:
+ * The /atlas world map can color countries by one of two publisher-native
+ * categorical layers. This module is the single source of truth for:
  *   - the valid layer keys + URL-param validation
  *   - each layer's fill color per country (design-token only)
  *   - each layer's legend classes (swatch + label)
  *   - the human-readable value shown in the hover tooltip
  *
  * Color-token mapping (all tokens exist in BOTH light + dark themes):
- *   - government → `govColor()` (src/lib/data/government-category.ts): the
- *     existing canonical classifier → `--color-gov-*` (+ a couple of literal
- *     hues for communist/military/one-party that predate this feature).
- *   - ci        → neutral sequential-blue numeric bins (`--ramp-indicator-*`),
- *     pinned to methodology_version='beta' upstream. Color encodes magnitude,
- *     not a qualitative country verdict.
  *   - regime    → `VDEM_ROW_META[value].colorVar` → `--tier-*` family
  *     (already the documented tone for V-Dem RoW in lens-metadata.ts).
  *   - income    → `WORLD_BANK_INCOME_GROUP_META[value].colorVar` →
@@ -24,7 +18,6 @@
  * never a wrong category.
  */
 
-import { govColor, govLabel } from "@/lib/data/government-category";
 import {
   VDEM_ROW_META,
   WORLD_BANK_INCOME_GROUP_META,
@@ -37,31 +30,49 @@ import type { AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
 export const NO_DATA_FILL = "var(--ramp-no-data)";
 export const NO_DATA_LABEL = "No data";
 
-export type AtlasLayerKey = "government" | "regime" | "income";
+/**
+ * The map is deliberately limited to publisher-native categorical variables.
+ * Civica Index and Pulse do not appear here, and the former government
+ * classifier has been retired from this switcher because it was a Civica
+ * grouping rather than an upstream variable.
+ */
+export type AtlasLayerKey = "regime" | "income";
 
 export const ATLAS_LAYER_KEYS: readonly AtlasLayerKey[] = [
-  "government",
   "regime",
   "income",
 ];
 
-export const DEFAULT_LAYER: AtlasLayerKey = "government";
+export const DEFAULT_LAYER: AtlasLayerKey = "regime";
 
 /** SegmentedControl options (short labels for the compact control). */
 export const ATLAS_LAYER_OPTIONS: ReadonlyArray<{
   value: AtlasLayerKey;
   label: string;
 }> = [
-  { value: "government", label: "Government" },
-  { value: "regime", label: "Regime" },
-  { value: "income", label: "Income" },
+  { value: "regime", label: "Regime (V-Dem)" },
+  { value: "income", label: "Income (World Bank)" },
 ];
 
 /** Legend / eyebrow title for each layer. */
 export const ATLAS_LAYER_TITLE: Record<AtlasLayerKey, string> = {
-  government: "Government type",
   regime: "Regime type (V-Dem)",
   income: "Income group (World Bank)",
+};
+
+/** Plain-language definitions displayed with both the map and table. */
+export const ATLAS_LAYER_DESCRIPTION: Record<AtlasLayerKey, string> = {
+  regime:
+    "V-Dem Regimes of the World is a categorical source variable. It is not a Civica score, country ranking, or verdict.",
+  income:
+    "World Bank income group is a categorical source variable. It is not ordered as a governance ranking or Civica score.",
+};
+
+export const ATLAS_LAYER_MISSINGNESS: Record<AtlasLayerKey, string> = {
+  regime:
+    "No data means no active V-Dem regime observation is retained for that map-eligible country; it does not assign a regime category.",
+  income:
+    "No data means no active World Bank income-group observation is retained for that map-eligible country; it does not assign an income group.",
 };
 
 /** Validate + normalize an arbitrary `?layer=` param. */
@@ -83,21 +94,6 @@ export interface LegendEntry {
  */
 export function legendFor(layer: AtlasLayerKey): LegendEntry[] {
   switch (layer) {
-    case "government":
-      // The classifier folds several raw labels into a fixed set of public
-      // categories; list the canonical public buckets in a stable order.
-      return [
-        { label: "Presidential", fill: "var(--color-gov-presidential)" },
-        { label: "Parliamentary / Federal", fill: "var(--color-gov-parliamentary)" },
-        { label: "Semi-presidential", fill: "var(--color-gov-semi-presidential)" },
-        { label: "Constitutional monarchy", fill: "var(--color-gov-parliamentary)" },
-        { label: "Absolute monarchy", fill: "var(--color-gov-absolute)" },
-        { label: "Theocratic", fill: "var(--color-gov-theocratic)" },
-        { label: "Communist", fill: "#E44040" },
-        { label: "Military", fill: "#9B6DC6" },
-        { label: "One-party", fill: "#C4764E" },
-        { label: "Other", fill: "var(--color-gov-other)" },
-      ];
     case "regime":
       return (Object.keys(VDEM_ROW_META) as VDemRowKey[])
         .sort((a, b) => VDEM_ROW_META[a].order - VDEM_ROW_META[b].order)
@@ -127,10 +123,6 @@ export function fillForLayer(
 ): string {
   if (!country) return NO_DATA_FILL;
   switch (layer) {
-    case "government":
-      // `country.gov` is the CIA display label; classifyGovernment always
-      // returns a category (falls back to "Other"), so this is never no-data.
-      return govColor(country.govDetail || country.gov);
     case "regime": {
       const v = values?.regimeType;
       const meta = v ? VDEM_ROW_META[v as VDemRowKey] : undefined;
@@ -154,8 +146,6 @@ export function tooltipValueForLayer(
 ): string {
   if (!country) return NO_DATA_LABEL;
   switch (layer) {
-    case "government":
-      return govLabel(country.govDetail || country.gov);
     case "regime":
       return values?.regimeType ?? NO_DATA_LABEL;
     case "income":

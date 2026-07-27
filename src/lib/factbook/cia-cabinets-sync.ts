@@ -48,19 +48,24 @@
  * the section boundary by `parseCountryHtml`.
  */
 import dns from "node:dns";
+import { randomUUID } from "node:crypto";
 
-import { and, eq, ilike, inArray, isNull, sql } from "drizzle-orm";
+import { and, eq, ilike, isNull, sql } from "drizzle-orm";
 
 import { db as sharedDb } from "@/lib/db";
 import {
   jurisdictions,
-  governmentBodies,
-  offices,
   persons,
   terms,
   statements,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "@/lib/factbook/country-fact-history-writer";
+import {
+  governmentEntityHistoryWriters,
+  type GovernmentEntityHistoryContext,
+  type GovernmentEntityHistoryWriters,
+} from "@/lib/factbook/government-entity-history-writer";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -233,6 +238,12 @@ export const CIA_WORLD_LEADERS_SOURCE_ID = "cia_world_leaders";
 
 export type CabinetSyncDb = typeof sharedDb;
 
+export interface CabinetCountryFetchResult {
+  ok: boolean;
+  status: number;
+  html: string;
+}
+
 export interface CabinetSyncOptions {
   db?: CabinetSyncDb;
   onProgress?: (line: string) => void;
@@ -247,6 +258,12 @@ export interface CabinetSyncOptions {
   dryRun?: boolean;
   plan?: CabinetPlan;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  entityWriters?: GovernmentEntityHistoryWriters;
+  /** Database-free fixture seam for HTTP/status/schema regression tests. */
+  fetchCountryPage?: (slug: string) => Promise<CabinetCountryFetchResult>;
+  /** Fixture seam that avoids real retry backoff waits. */
+  retryWait?: (delayMs: number) => Promise<void>;
 }
 
 // ─── Position category classification ────────────────────────────────────────
@@ -358,7 +375,7 @@ function decodeEntities(s: string): string {
     .replace(/&#x27;/g, "'")
     .replace(/&nbsp;/g, " ")
     .replace(/&rsquo;/g, "’")
-    .replace(/&#8217;/g, "’")
+    .replace(/&#x2019;/g, "’")
     .replace(/&eacute;/g, "é")
     .replace(/&aacute;/g, "á")
     .replace(/&iacute;/g, "í")
@@ -448,7 +465,7 @@ export function parseCountryHtml(slug: string, html: string): ParsedCountry {
  */
 async function fetchCountry(
   slug: string,
-): Promise<{ ok: boolean; status: number; html: string }> {
+): Promise<CabinetCountryFetchResult> {
   const url = `${CIA_BASE}/${slug}/`;
   const dispatcher = await getCiaDispatcher();
   const res = await fetch(url, {
@@ -469,10 +486,10 @@ async function fetchCountry(
 /**
  * Resilient single-country fetch: retries a transient network/timeout failure
  * up to `maxAttempts` times with exponential backoff, so ONE flaky host never
- * aborts the ~194-country crawl. A non-2xx HTTP response (e.g. a 404) is NOT
- * retried — it's returned as `{ ok:false }` for the caller to treat as an
- * expected skip. Only genuine network/timeout errors are retried; a persistent
- * one after all attempts is re-thrown for the caller to record as a skip.
+ * aborts the ~194-country crawl. Expected 404s are returned immediately.
+ * Retryable HTTP statuses (408/425/429/5xx) and genuine network/timeout errors
+ * use the same bounded retry ladder. Exhausted/non-retryable non-2xx responses
+ * are returned for the aggregate planner to record as explicit failures.
  *
  * The backoff waits are ADDITIONAL to the inter-country crawl-delay applied by
  * the loop — retries stay polite.
@@ -480,23 +497,46 @@ async function fetchCountry(
 async function fetchCountryResilient(
   slug: string,
   log: (line: string) => void,
-  maxAttempts = 3,
-): Promise<{ ok: boolean; status: number; html: string }> {
+  options: {
+    maxAttempts?: number;
+    fetcher?: (slug: string) => Promise<CabinetCountryFetchResult>;
+    wait?: (delayMs: number) => Promise<void>;
+  } = {},
+): Promise<CabinetCountryFetchResult> {
+  const maxAttempts = options.maxAttempts ?? 3;
+  const fetcher = options.fetcher ?? fetchCountry;
+  const waitForRetry =
+    options.wait ??
+    ((delayMs: number) =>
+      new Promise<void>((resolve) => setTimeout(resolve, delayMs)));
   // Exponential-ish backoff between retries (ms): 3s, 8s, 20s.
   const BACKOFFS_MS = [3_000, 8_000, 20_000];
   let lastErr: unknown;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      return await fetchCountry(slug);
+      const result = await fetcher(slug);
+      const retryableStatus =
+        result.status === 408 ||
+        result.status === 425 ||
+        result.status === 429 ||
+        (result.status >= 500 && result.status <= 599);
+      if (result.ok || !retryableStatus || attempt === maxAttempts) {
+        return result;
+      }
+      const delay = BACKOFFS_MS[Math.min(attempt - 1, BACKOFFS_MS.length - 1)];
+      log(
+        `  ↻ ${slug}: HTTP ${result.status}; retry ${attempt}/${maxAttempts - 1} in ${Math.round(delay / 1000)}s`,
+      );
+      await waitForRetry(delay);
     } catch (err) {
       lastErr = err;
       if (!isRetryableNetworkError(err) || attempt === maxAttempts) break;
-      const wait = BACKOFFS_MS[Math.min(attempt - 1, BACKOFFS_MS.length - 1)];
+      const delay = BACKOFFS_MS[Math.min(attempt - 1, BACKOFFS_MS.length - 1)];
       const reason = (err as Error)?.message ?? String(err);
       log(
-        `  ↻ ${slug}: network error (${reason}); retry ${attempt}/${maxAttempts - 1} in ${Math.round(wait / 1000)}s`,
+        `  ↻ ${slug}: network error (${reason}); retry ${attempt}/${maxAttempts - 1} in ${Math.round(delay / 1000)}s`,
       );
-      await new Promise((r) => setTimeout(r, wait));
+      await waitForRetry(delay);
     }
   }
   throw lastErr;
@@ -713,6 +753,8 @@ export interface PlannedPosition {
    * jurisdiction/person resolution already ran once in `computeCabinetPlan`).
    */
   personId: string | null;
+  /** Stable office UUID when the read plan matched an existing exact title. */
+  officeId?: string | null;
 }
 
 export interface PlannedCountry {
@@ -727,10 +769,10 @@ export interface PlannedCountry {
   positions: PlannedPosition[];
 }
 
-/** A country skipped because its fetch failed after all retries (or an
- * unexpected parse-time throw). Distinct from a clean 404, which is not a
- * failure — see `computeCabinetPlan`. Surfaced so a targeted re-run can pick up
- * the stragglers without redoing the whole crawl. */
+/** A country skipped because its fetch failed after all retries, its HTTP 200
+ * page failed the expected schema, or another country-scoped read/parse step
+ * threw. Distinct from a clean 404, which is not a failure — see
+ * `computeCabinetPlan`. */
 export interface FailedCountry {
   slug: string;
   reason: string;
@@ -738,7 +780,7 @@ export interface FailedCountry {
 
 export interface CabinetPlan {
   countries: PlannedCountry[];
-  /** Countries whose fetch/parse errored after retries and were SKIPPED (the
+  /** Countries whose fetch/schema/parse/read step failed and were SKIPPED (the
    * crawl continued). Empty on a fully-clean run. */
   failed: FailedCountry[];
   stats: {
@@ -746,8 +788,8 @@ export interface CabinetPlan {
     countriesParsed: number;
     countriesUnmatched: number;
     countriesFetchFailed: number;
-    /** Countries SKIPPED after exhausting retries on a network/timeout error
-     * (the crawl continued). Counted separately from an expected 404. */
+    /** Countries SKIPPED after an upstream/schema/country-read failure (the
+     * crawl continued). Counted separately from an expected 404. */
     countriesSkipped: number;
     /** Positions the CIA lists, total across the sample. */
     positionsTotal: number;
@@ -819,7 +861,11 @@ export async function computeCabinetPlan(
 
   // Dedup person proposals across the whole sample (a human held once, many
   // offices). Keyed by lowercased normalized name.
-  const seenNewNames = new Set<string>();
+  const stableIdByNewName = new Map<string, string>();
+  const recordCountryFailure = (slug: string, reason: string) => {
+    plan.stats.countriesSkipped++;
+    plan.failed.push({ slug, reason });
+  };
 
   for (let i = 0; i < slugs.length; i++) {
     const slug = slugs[i];
@@ -844,44 +890,61 @@ export async function computeCabinetPlan(
       // Resilient fetch: a network/timeout error retries (backoff) internally.
       // A clean 404 is an expected skip (handled below via `ok === false`), NOT
       // a failure; a persistent network error re-throws into the catch below.
-      const { ok, status, html } = await fetchCountryResilient(slug, log);
+      const { ok, status, html } = await fetchCountryResilient(slug, log, {
+        fetcher: options.fetchCountryPage,
+        wait: options.retryWait,
+      });
       plan.stats.countriesFetched++;
       countedFetched = true;
+
+      const country: PlannedCountry = {
+        slug,
+        countryName: null,
+        jurisdictionId: null,
+        jurisdictionName: null,
+        lastUpdated: null,
+        fetchStatus: status,
+        parseFailed: false,
+        jurisdictionMatched: false,
+        positions: [],
+      };
+
+      if (!ok) {
+        country.parseFailed = true;
+        plan.stats.countriesFetchFailed++;
+        if (status === 404) {
+          // The directory intentionally omits countries that are not foreign
+          // governments from the CIA's perspective (notably the United States).
+          // This absence is expected and must not poison aggregate success.
+          log(`  · ${slug}: not present in CIA World Leaders (HTTP 404)`);
+          plan.countries.push(country);
+          continue;
+        }
+        const reason = `CIA World Leaders returned HTTP ${status}`;
+        recordCountryFailure(slug, reason);
+        log(`! ${slug}: ${reason}`);
+        plan.countries.push(country);
+        continue;
+      }
 
       const juris = await withDbRetry(
         () => findJurisdictionBySlug(db, slug),
         { log, label: `findJurisdiction(${slug})` },
       );
-      const country: PlannedCountry = {
-        slug,
-        countryName: null,
-        jurisdictionId: juris?.id ?? null,
-        jurisdictionName: juris?.name ?? null,
-        lastUpdated: null,
-        fetchStatus: status,
-        parseFailed: false,
-        jurisdictionMatched: !!juris,
-        positions: [],
-      };
+      country.jurisdictionId = juris?.id ?? null;
+      country.jurisdictionName = juris?.name ?? null;
+      country.jurisdictionMatched = !!juris;
       if (!juris) plan.stats.countriesUnmatched++;
-
-      if (!ok) {
-        country.parseFailed = true;
-        plan.stats.countriesFetchFailed++;
-        // A 404 is expected (foreign-governments-only directory; e.g.
-        // united-states) — an ordinary skip, not a failure. Other non-2xx codes
-        // (e.g. 5xx) also land here after the retry loop couldn't get a 2xx.
-        log(`! ${slug}: fetch failed (HTTP ${status})`);
-        plan.countries.push(country);
-        continue;
-      }
 
       const parsed = parseCountryHtml(slug, html);
       country.countryName = parsed.countryName;
       country.lastUpdated = parsed.lastUpdated;
       country.parseFailed = parsed.parseFailed;
       if (parsed.parseFailed) {
-        log(`! ${slug}: parse failed (no leaders section)`);
+        const reason =
+          "CIA World Leaders HTTP 200 page failed the leaders-section schema";
+        recordCountryFailure(slug, reason);
+        log(`! ${slug}: ${reason}`);
         plan.countries.push(country);
         continue;
       }
@@ -933,10 +996,13 @@ export async function computeCabinetPlan(
         else {
           plan.stats.personNew++;
           const key = resolution.name.toLowerCase();
-          if (!seenNewNames.has(key)) {
-            seenNewNames.add(key);
+          let stableId = stableIdByNewName.get(key);
+          if (!stableId) {
+            stableId = randomUUID();
+            stableIdByNewName.set(key, stableId);
             plan.stats.distinctNewPersons++;
           }
+          planned.personId = stableId;
         }
 
         country.positions.push(planned);
@@ -951,9 +1017,8 @@ export async function computeCabinetPlan(
       // timeout in findJurisdictionBySlug / resolvePerson, a parse throw) skips
       // THIS country and records it — the crawl runs to completion.
       if (!countedFetched) plan.stats.countriesFetched++;
-      plan.stats.countriesSkipped++;
       const reason = (err as Error)?.message ?? String(err);
-      plan.failed.push({ slug, reason });
+      recordCountryFailure(slug, reason);
       log(`⚠ skipped ${slug}: ${reason}`);
       continue;
     }
@@ -986,10 +1051,10 @@ export function reportCabinetPlan(
   log(`  Countries fetched:            ${s.countriesFetched}`);
   log(`  → parsed OK:                  ${s.countriesParsed}`);
   log(`  → HTTP non-2xx (e.g. 404):    ${s.countriesFetchFailed}`);
-  log(`  → skipped (network, retried): ${s.countriesSkipped}`);
+  log(`  → skipped (aggregate failure): ${s.countriesSkipped}`);
   log(`  → no jurisdiction match:      ${s.countriesUnmatched}`);
   if (plan.failed.length > 0) {
-    log(`\n  SKIPPED after retries (targeted re-run needed):`);
+    log(`\n  SKIPPED after failures (targeted re-run needed):`);
     for (const f of plan.failed) log(`    ⚠ ${f.slug}: ${f.reason}`);
   }
 
@@ -1212,27 +1277,17 @@ async function upsertExecutiveBody(
   db: CabinetSyncDb,
   jurisdictionId: string,
   countryName: string,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: governmentBodies.id })
-    .from(governmentBodies)
-    .where(
-      sql`${governmentBodies.jurisdictionId} = ${jurisdictionId} AND ${governmentBodies.branch} = ${"executive"}`,
-    )
-    .limit(1);
-  if (existing.length > 0) return existing[0].id;
-
-  const inserted = await db
-    .insert(governmentBodies)
-    .values({
-      jurisdictionId,
-      name: `Executive of ${countryName}`,
-      bodyType: "cabinet",
-      branch: "executive",
-      hierarchyLevel: 0,
-    })
-    .returning({ id: governmentBodies.id });
-  return inserted[0].id;
+  return writers.upsertBody(db, {
+    jurisdictionId,
+    name: `Executive of ${countryName}`,
+    bodyType: "cabinet",
+    branch: "executive",
+    hierarchyLevel: 0,
+    history,
+  });
 }
 
 /**
@@ -1248,32 +1303,20 @@ async function upsertCabinetOffice(
   name: string,
   officeType: string,
   displayOrder: number,
+  stableId: string | null | undefined,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: offices.id })
-    .from(offices)
-    .where(sql`${offices.bodyId} = ${bodyId} AND ${offices.name} = ${name}`)
-    .limit(1);
-
-  if (existing.length > 0) {
-    await db
-      .update(offices)
-      .set({ officeType, displayOrder })
-      .where(eq(offices.id, existing[0].id));
-    return existing[0].id;
-  }
-
-  const inserted = await db
-    .insert(offices)
-    .values({
-      bodyId,
-      name,
-      officeType,
-      isElected: false,
-      displayOrder,
-    })
-    .returning({ id: offices.id });
-  return inserted[0].id;
+  return writers.upsertOffice(db, {
+    bodyId,
+    stableId,
+    name,
+    officeType,
+    isElected: false,
+    displayOrder,
+    identityMode: "exact_title",
+    history,
+  });
 }
 
 /**
@@ -1287,39 +1330,33 @@ async function upsertCabinetOffice(
 async function persistPerson(
   db: CabinetSyncDb,
   resolution: PersonResolution,
+  stableId: string,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
   if (resolution.path === "existing" && resolution.personId) {
     return resolution.personId;
   }
 
   if (resolution.path === "qid" && resolution.qid) {
-    const byQid = await db
-      .select({ id: persons.id })
-      .from(persons)
-      .where(eq(persons.wikidataQid, resolution.qid))
-      .limit(1);
-    if (byQid.length > 0) return byQid[0].id;
-    const inserted = await db
-      .insert(persons)
-      .values({ name: resolution.name, wikidataQid: resolution.qid })
-      .returning({ id: persons.id });
-    return inserted[0].id;
+    return writers.mutatePerson(db, {
+      stableId,
+      identityQid: resolution.qid,
+      insertName: resolution.name,
+      values: { name: resolution.name, wikidataQid: resolution.qid },
+      history,
+    });
   }
 
-  // path 'new' — create ID-less. Guard against a same-run duplicate by an
-  // exact-name re-check (two offices can list the same unmatched person).
-  const byName = await db
-    .select({ id: persons.id })
-    .from(persons)
-    .where(ilike(persons.name, resolution.name))
-    .limit(1);
-  if (byName.length > 0) return byName[0].id;
-
-  const inserted = await db
-    .insert(persons)
-    .values({ name: resolution.name, wikidataQid: null })
-    .returning({ id: persons.id });
-  return inserted[0].id;
+  // QID-less names are mutable display text, never an identity key. The plan
+  // must carry/reuse an explicit UUID (or this apply allocates one once per
+  // normalized name) before the atomic mutation boundary is entered.
+  return writers.mutatePerson(db, {
+    stableId,
+    insertName: resolution.name,
+    values: { name: resolution.name, wikidataQid: null },
+    history,
+  });
 }
 
 /**
@@ -1450,7 +1487,7 @@ export interface CiaCabinetSyncSummary {
   countriesCrawled: number;
   countriesApplied: number;
   countriesFetchFailed: number;
-  /** Countries skipped after exhausting network retries (crawl continued). */
+  /** Countries skipped after an upstream/schema/read/write failure. */
   countriesSkipped: number;
   /** The skipped slugs + reasons, so a targeted re-run can pick up stragglers. */
   skipped: FailedCountry[];
@@ -1484,6 +1521,7 @@ export async function syncCiaCabinets(
 ): Promise<CiaCabinetSyncSummary> {
   const db = options.db ?? sharedDb;
   const log = options.onProgress ?? (() => {});
+  const writers = options.entityWriters ?? governmentEntityHistoryWriters;
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
 
@@ -1551,6 +1589,14 @@ export async function syncCiaCabinets(
     summary.durationMs = finishedAtMs - startedAtMs;
     return summary;
   }
+  const atlasReleaseId = resolveAtlasReleaseId(options.atlasReleaseId);
+  const history: GovernmentEntityHistoryContext = {
+    changeKind: "routine_refresh",
+    reason: "CIA World Leaders government roster refresh",
+    methodologyVersion: "cia-world-leaders-sync/v1",
+    releaseId: atlasReleaseId,
+  };
+  const qidlessStableIds = new Map<string, string>();
 
   log(`=== Applying — persisting offices / persons / terms / statements ===`);
   for (const country of plan.countries) {
@@ -1572,6 +1618,8 @@ export async function syncCiaCabinets(
             db,
             country.jurisdictionId as string,
             country.jurisdictionName ?? country.countryName ?? country.slug,
+            writers,
+            history,
           ),
         { log, label: `upsertBody(${country.slug})` },
       );
@@ -1587,7 +1635,16 @@ export async function syncCiaCabinets(
 
         const officeId = await withDbRetry(
           () =>
-            upsertCabinetOffice(db, bodyId, pos.title, pos.officeType, pos.order),
+            upsertCabinetOffice(
+              db,
+              bodyId,
+              pos.title,
+              pos.officeType,
+              pos.order,
+              pos.officeId,
+              writers,
+              history,
+            ),
           { log, label: `upsertOffice(${country.slug})` },
         );
         summary.officesWritten++;
@@ -1602,13 +1659,20 @@ export async function syncCiaCabinets(
         // Reuse the plan's already-computed person resolution (jurisdiction +
         // person resolution ran once in computeCabinetPlan) — no re-query.
         const personId = await withDbRetry(
-          () =>
-            persistPerson(db, {
+          () => {
+            const normalizedKey = (pos.normalizedName as string).toLowerCase();
+            const stableId =
+              pos.personId ??
+              qidlessStableIds.get(normalizedKey) ??
+              randomUUID();
+            qidlessStableIds.set(normalizedKey, stableId);
+            return persistPerson(db, {
               path: pos.personPath as PersonPath,
               personId: pos.personId,
               qid: pos.qid,
               name: pos.normalizedName as string,
-            }),
+            }, stableId, writers, history);
+          },
           { log, label: `persistPerson(${country.slug})` },
         );
         if (pos.personPath === "existing") summary.personsExisting++;
@@ -1669,7 +1733,7 @@ export async function syncCiaCabinets(
   log(`=== CIA Cabinet Sync Complete ===`);
   log(`Countries crawled:        ${summary.countriesCrawled}`);
   log(`Countries applied:        ${summary.countriesApplied}`);
-  log(`Countries skipped (net):  ${summary.countriesSkipped}`);
+  log(`Countries skipped (fail): ${summary.countriesSkipped}`);
   log(`HTTP non-2xx (e.g. 404):  ${summary.countriesFetchFailed}`);
   log(`Offices written:          ${summary.officesWritten}`);
   log(`  · vacant (no term):     ${summary.vacantOffices}`);
@@ -1683,7 +1747,7 @@ export async function syncCiaCabinets(
   log(`Freshness stamped:        ${summary.freshnessStamped}`);
   if (summary.skipped.length > 0) {
     log(
-      `\n⚠ ${summary.skipped.length} country(ies) skipped after retries — the crawl still completed:`,
+      `\n⚠ ${summary.skipped.length} country(ies) skipped after failures — the crawl still completed:`,
     );
     for (const f of summary.skipped) log(`    ${f.slug}: ${f.reason}`);
     log(
@@ -1730,6 +1794,8 @@ export interface BackfillQidsOptions {
    * When true, resolve QIDs and report what WOULD attach, but write nothing.
    */
   dryRun?: boolean;
+  atlasReleaseId?: string;
+  entityWriters?: GovernmentEntityHistoryWriters;
 }
 
 export interface BackfillQidsSummary {
@@ -1824,6 +1890,18 @@ export async function backfillCabinetQids(
   const limit = options.limit ?? BACKFILL_DEFAULT_BATCH;
   const throttle = options.throttleMs ?? BACKFILL_THROTTLE_MS;
   const dryRun = options.dryRun ?? false;
+  const writers = options.entityWriters ?? governmentEntityHistoryWriters;
+  const atlasReleaseId = dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const history: GovernmentEntityHistoryContext | null = atlasReleaseId
+    ? {
+        changeKind: "routine_refresh",
+        reason: "CIA cabinet person Wikidata identity backfill",
+        methodologyVersion: "cia-person-qid-backfill/v1",
+        releaseId: atlasReleaseId,
+      }
+    : null;
 
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
@@ -1881,10 +1959,13 @@ export async function backfillCabinetQids(
       continue;
     }
 
-    await db
-      .update(persons)
-      .set({ wikidataQid: qid })
-      .where(inArray(persons.id, [person.id]));
+    await writers.mutatePerson(db, {
+      stableId: person.id,
+      identityQid: qid,
+      insertName: person.name,
+      values: { wikidataQid: qid },
+      history: history!,
+    });
     summary.attached++;
     log(`  ✓ ${person.name}: attached ${qid}`);
   }

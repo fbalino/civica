@@ -1,0 +1,13 @@
+{
+  "id": "atl-018-atlas-reader-data-state-presentation",
+  "toVersion": "civica-index-atlas-reader-states-v45",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["plan/ATL-018-atlas-data-states-2026-07-18.md"],
+    "registry": ["src/lib/atlas/surface-data-matrix.ts"],
+    "release_note": ["plan/evidence/ATL-018/index-change-control-release-note.md"],
+    "migration_plan": ["plan/evidence/ATL-018/index-change-control-migration-plan.md"],
+    "golden_test": ["src/lib/atlas/atl-018-country-reader.test.ts"],
+    "contract_test": ["e2e/atl-018-data-states.spec.ts"]
+  }
+}

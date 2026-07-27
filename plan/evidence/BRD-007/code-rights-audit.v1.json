@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "civica-code-rights-audit/v1",
+  "reviewedOn": "2026-07-23",
+  "taskId": "BRD-007",
+  "posture": {
+    "classification": "source_visible_non_open",
+    "rootLicense": "LICENSE",
+    "rootNotice": "NOTICE",
+    "openSourceGrant": false,
+    "generalReuseGrant": false,
+    "responsibleHuman": "Fernando Baliño",
+    "otherContributorRightsPreserved": true,
+    "aiGeneratedCopyrightabilityClaimedUniversally": false
+  },
+  "repositoryEvidence": {
+    "authorshipRecord": "data/research/authorship-and-contributions-v1.json",
+    "aiUseRecord": "data/research/ai-use-disclosure-v1.json",
+    "gitAuthorSummary": [
+      {
+        "identity": "Fernando Balino <fernando@theharmonycgroup.com>",
+        "commitCount": 974
+      },
+      {
+        "identity": "Frontend Engineer <frontend@paperclip.local>",
+        "commitCount": 1
+      }
+    ],
+    "contributorAssignmentFound": false,
+    "contributorAgreementFound": false
+  },
+  "directDependencies": {
+    "productionCount": 25,
+    "developmentCount": 19,
+    "packageLockResolvedCount": 791,
+    "licenseCounts": {
+      "MIT": 30,
+      "Apache-2.0": 5,
+      "BSD-3-Clause": 3,
+      "ISC": 3,
+      "BSD-2-Clause": 1,
+      "MPL-2.0": 1,
+      "SEE LICENSE IN LICENSE.txt": 1
+    },
+    "restrictedOrSpecialReview": [
+      {
+        "package": "mapbox-gl",
+        "installedVersion": "3.25.0",
+        "licenseField": "SEE LICENSE IN LICENSE.txt",
+        "finding": "The supplied notice contains Mapbox product/account terms and retained third-party notices. Civica loads this package only for its token-gated Mapbox 3D view.",
+        "disposition": "Not relicensed by the Civica root LICENSE; product terms and bundled notices remain controlling."
+      },
+      {
+        "package": "next-mdx-remote",
+        "licenseField": "MPL-2.0",
+        "finding": "File-level copyleft terms remain package-specific.",
+        "disposition": "Not relicensed by the Civica root LICENSE; preserve applicable package/file terms."
+      }
+    ],
+    "gplAgplLgplDirectPackages": 0,
+    "compatibilityConclusion": "No direct package requires Civica to publish the entire repository under an open-source license. The non-open root posture does not override or replace package-specific rights or obligations."
+  },
+  "generatedMaterial": {
+    "classesReviewed": [
+      "generated source and registries",
+      "database migrations and schemas",
+      "reports and release artifacts",
+      "AI-assisted source and documentation"
+    ],
+    "rule": "Generation does not erase upstream notices or create rights in third-party inputs. A more specific file, package, source, asset, or release notice controls its covered material.",
+    "universalCopyrightClaim": false
+  },
+  "publicSurfaces": [
+    "README.md",
+    "README.template.md",
+    "CITATION.cff",
+    "content/about.md",
+    "src/app/licensing/page.tsx",
+    "src/lib/claims/reuse-rights.ts",
+    "src/lib/claims/public-claims.ts"
+  ],
+  "officialContext": [
+    {
+      "publisher": "GitHub Docs",
+      "url": "https://docs.github.com/articles/licensing-a-repository",
+      "checkedOn": "2026-07-23",
+      "relevance": "Without a license, default copyright law applies; repository visibility does not itself create broad reuse permission."
+    },
+    {
+      "publisher": "GitHub",
+      "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+      "checkedOn": "2026-07-23",
+      "relevance": "Hosting-platform rights, including public-repository viewing and forking, are distinct from a project-level reuse license."
+    }
+  ],
+  "manualReview": {
+    "queue": "plan/MANUAL-CHECKS.md#legal-and-brand",
+    "required": true,
+    "topics": [
+      "legal copyright holder and year wording",
+      "the differently named Git contributor and any assignment",
+      "contributor agreement need",
+      "AI-assisted and generated-code treatment by launch jurisdiction",
+      "Mapbox, MPL, and other deployed/distributed package obligations",
+      "any future open or source-available license"
+    ],
+    "legalClearanceClaimed": false
+  }
+}

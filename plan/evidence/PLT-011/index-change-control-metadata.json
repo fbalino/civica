@@ -1,0 +1,29 @@
+{
+  "id": "distributed-rate-limit-presentation-contract",
+  "toVersion": "civica-index-distributed-rate-limit-v30",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": [
+      "data/RATE-LIMITING.md",
+      "plan/evidence/PLT-011/index-change-control.md"
+    ],
+    "registry": [
+      "src/lib/api/rate-limit-policy.ts",
+      "src/lib/api/contract/registry.ts"
+    ],
+    "release_note": ["plan/evidence/PLT-011/release-note.md"],
+    "migration_plan": ["plan/evidence/PLT-011/migration-plan.md"],
+    "golden_test": ["src/lib/api/rate-limit-postgres.test.ts"],
+    "contract_test": [
+      "src/lib/api/rate-limit-policy.test.ts",
+      "scripts/validate-rate-limit-policy.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:rate-limit-policy"
+  ]
+}

@@ -1,217 +1,237 @@
-import { sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { sql, type SQL } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { getRequestIp } from "./request-ip";
 
-export { getRequestIp } from "./request-ip";
-
-type RateLimitEntry = {
-  count: number;
-  resetAt: number;
-};
-
-type RateLimitOptions = {
+export type DurableRateLimitOptions = {
   scope: string;
-  key: string;
-  max: number;
-  windowMs: number;
-};
-
-type RateLimitResult = {
-  allowed: boolean;
-  remaining: number;
-  retryAfterSeconds: number;
-};
-
-type DurableRateLimitOptions = {
-  scope: string;
-  key: string;
+  /**
+   * A lowercase, 64-character hexadecimal digest. Callers must derive this
+   * from the trusted request identity before invoking the shared limiter;
+   * raw IP addresses must never cross the durable-store boundary.
+   */
+  subjectHash: string;
   limit: number;
   windowMs: number;
 };
 
-type DurableRateLimitResult = {
-  allowed: boolean;
-  remaining: number;
+export type DurableRateLimitResult =
+  | {
+      status: "allowed";
+      allowed: true;
+      remaining: number;
+      retryAfterMs: 0;
+    }
+  | {
+      status: "limited";
+      allowed: false;
+      remaining: 0;
+      retryAfterMs: number;
+    }
+  | {
+      status: "store_unavailable";
+      allowed: false;
+      remaining: 0;
+      retryAfterMs: null;
+    };
+
+export type DurableRateLimitIncrementResult = {
+  count: number;
   retryAfterMs: number;
 };
 
-const stores = new Map<string, Map<string, RateLimitEntry>>();
-const SWEEP_INTERVAL_MS = 60_000;
-const MAX_KEYS_PER_SCOPE = 10_000;
-let lastSweepAt = 0;
-
-function sweepExpired(now: number) {
-  if (now - lastSweepAt < SWEEP_INTERVAL_MS) return;
-  lastSweepAt = now;
-
-  for (const [scope, store] of stores) {
-    for (const [key, entry] of store) {
-      if (now > entry.resetAt) store.delete(key);
-    }
-    if (store.size === 0) stores.delete(scope);
-  }
+export interface DurableRateLimitStore {
+  increment(
+    input: DurableRateLimitOptions,
+  ): Promise<DurableRateLimitIncrementResult>;
 }
 
-function trimScope(store: Map<string, RateLimitEntry>) {
-  if (store.size <= MAX_KEYS_PER_SCOPE) return;
-  const overflow = store.size - MAX_KEYS_PER_SCOPE;
-  let deleted = 0;
-  for (const key of store.keys()) {
-    store.delete(key);
-    deleted++;
-    if (deleted >= overflow) break;
-  }
-}
-
-export function checkInMemoryRateLimit({
-  scope,
-  key,
-  max,
-  windowMs,
-}: RateLimitOptions): RateLimitResult {
-  const now = Date.now();
-  sweepExpired(now);
-
-  let store = stores.get(scope);
-  if (!store) {
-    store = new Map();
-    stores.set(scope, store);
-  }
-  trimScope(store);
-
-  const entry = store.get(key);
-  if (!entry || now > entry.resetAt) {
-    store.set(key, { count: 1, resetAt: now + windowMs });
-    return {
-      allowed: true,
-      remaining: Math.max(0, max - 1),
-      retryAfterSeconds: Math.ceil(windowMs / 1000),
-    };
-  }
-
-  entry.count++;
-  const remaining = Math.max(0, max - entry.count);
-  return {
-    allowed: entry.count <= max,
-    remaining,
-    retryAfterSeconds: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
-  };
-}
-
-/**
- * Convenience wrapper: enforce a per-IP in-memory limit for a public GET
- * route and, when exceeded, return the standard 429 JSON `NextResponse`
- * (with `Retry-After` + `X-RateLimit-Remaining: 0`). Returns null when
- * the request is allowed, so callers do:
- *
- *   const limited = enforceInMemoryRateLimit(req, { scope: "countries-bills" });
- *   if (limited) return limited;
- *
- * This is the shared control the public per-country DB sub-routes use so
- * they match the hardened `/export` sibling. Defaults to 60/min/IP.
- */
-export function enforceInMemoryRateLimit(
-  request: Request,
-  {
-    scope,
-    max = 60,
-    windowMs = 60_000,
-  }: { scope: string; max?: number; windowMs?: number },
-): NextResponse | null {
-  const { allowed, retryAfterSeconds } = checkInMemoryRateLimit({
-    scope,
-    key: getRequestIp(request),
-    max,
-    windowMs,
-  });
-  if (allowed) return null;
-  return NextResponse.json(
-    { error: "Rate limit exceeded. Try again shortly." },
-    {
-      status: 429,
-      headers: {
-        "Retry-After": String(retryAfterSeconds),
-        "X-RateLimit-Remaining": "0",
-      },
-    },
-  );
+export interface DurableRateLimitDependencies {
+  /** Stable test seam; production uses the shared Neon PostgreSQL store. */
+  store?: DurableRateLimitStore;
 }
 
 // ── Durable (cross-instance) fixed-window limiter ──────────────────────────
 //
-// The in-memory limiter above is per-serverless-instance: it resets on cold
-// start and a flood spread across instances evades it (audit 2026-06-07
-// Security #9). This variant backs the counter with the existing Neon
-// Postgres (`rate_limits` table) so a per-IP window holds across instances
-// and restarts — the control we want on the cost-sensitive /api/chat (paid
-// LLM) endpoint.
-//
-// Design:
-//   • Fixed window. windowStart = floor(now / windowMs) * windowMs; the
-//     window is encoded in the row key, so a new window = a fresh row at
-//     count 1. No read-modify-write race: a single INSERT … ON CONFLICT DO
-//     UPDATE … RETURNING count increments and reads the live count atomically
-//     under Postgres' row lock.
-//   • allowed = count <= limit (so request #(limit+1) in a window is denied).
-//   • Lazy cleanup: stale rows are reaped opportunistically (~1 in N calls)
-//     via the expires_at index, not on every request.
-//   • Graceful degradation: ANY DB error falls back to the in-memory limiter
-//     so a database blip never fails an otherwise-valid request.
+// Production protection uses the existing `rate_limits` PostgreSQL table and one atomic
+// INSERT … ON CONFLICT DO UPDATE … RETURNING statement. PostgreSQL chooses
+// the fixed window from its own clock, so separate serverless instances with
+// skewed application clocks still contend on the same row.
 
-/** Run the expired-row sweep on ~1 in N calls (amortised cleanup). */
-const DURABLE_CLEANUP_PROBABILITY = 0.02;
+const OPAQUE_SUBJECT_PATTERN = /^[a-f0-9]{64}$/;
+const SCOPE_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
+const MAX_POSTGRES_COUNTER = 2_147_483_646;
+const MAX_DURABLE_WINDOW_MS = 365 * 24 * 60 * 60 * 1000;
 
-export async function checkDurableRateLimit({
+export type DurableRateLimitSqlExecutor = (query: SQL) => Promise<unknown>;
+
+function assertDurableRateLimitOptions(options: DurableRateLimitOptions): void {
+  if (!SCOPE_PATTERN.test(options.scope)) {
+    throw new TypeError(
+      "Durable rate-limit scope must start with a lowercase letter and contain only lowercase letters, digits, or hyphens (64 characters maximum).",
+    );
+  }
+  if (!OPAQUE_SUBJECT_PATTERN.test(options.subjectHash)) {
+    throw new TypeError(
+      "Durable rate-limit subjectHash must be a lowercase 64-character hexadecimal digest; raw request identifiers are forbidden.",
+    );
+  }
+  if (
+    !Number.isInteger(options.limit) ||
+    options.limit < 1 ||
+    options.limit > MAX_POSTGRES_COUNTER
+  ) {
+    throw new TypeError(
+      `Durable rate-limit limit must be an integer from 1 through ${MAX_POSTGRES_COUNTER}.`,
+    );
+  }
+  if (
+    !Number.isSafeInteger(options.windowMs) ||
+    options.windowMs < 1 ||
+    options.windowMs > MAX_DURABLE_WINDOW_MS
+  ) {
+    throw new TypeError(
+      `Durable rate-limit windowMs must be an integer from 1 through ${MAX_DURABLE_WINDOW_MS}.`,
+    );
+  }
+}
+
+function rowsFromResult(result: unknown): Record<string, unknown>[] {
+  if (Array.isArray(result)) return result as Record<string, unknown>[];
+  const rows = (result as { rows?: unknown } | null)?.rows;
+  return Array.isArray(rows) ? (rows as Record<string, unknown>[]) : [];
+}
+
+function finiteInteger(value: unknown, label: string): number {
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed) || parsed < 0) {
+    throw new Error(`Durable rate-limit store returned an invalid ${label}.`);
+  }
+  return parsed;
+}
+
+function incrementStatement({
   scope,
-  key,
+  subjectHash,
   limit,
   windowMs,
-}: DurableRateLimitOptions): Promise<DurableRateLimitResult> {
-  const now = Date.now();
-  const windowStart = Math.floor(now / windowMs) * windowMs;
-  const windowEnd = windowStart + windowMs;
-  const bucketKey = `${scope}:${key}:${windowStart}`;
-  const expiresAtIso = new Date(windowEnd).toISOString();
+}: DurableRateLimitOptions): SQL {
+  return sql`
+    WITH expired_cleanup AS (
+      DELETE FROM rate_limits
+      WHERE expires_at <= statement_timestamp()
+      RETURNING 1
+    ), clock AS (
+      SELECT
+        floor(extract(epoch FROM statement_timestamp()) * 1000)::bigint
+          AS observed_at_ms
+    ), bucket AS (
+      SELECT
+        (observed_at_ms / ${windowMs}::bigint) * ${windowMs}::bigint
+          AS window_start_ms
+      FROM clock
+    ), incremented AS (
+      INSERT INTO rate_limits AS current_bucket (key, count, expires_at)
+      SELECT
+        ${scope} || ':' || ${subjectHash} || ':' || window_start_ms::text,
+        1,
+        to_timestamp(
+          (window_start_ms + ${windowMs}::bigint)::double precision / 1000.0
+        )
+      FROM bucket
+      ON CONFLICT (key) DO UPDATE SET
+        count = LEAST(
+          current_bucket.count::bigint + 1,
+          ${limit}::bigint + 1
+        )::integer
+      RETURNING count, expires_at
+    )
+    SELECT
+      incremented.count,
+      greatest(
+        0,
+        ceil(extract(epoch FROM (incremented.expires_at - clock_timestamp())) * 1000)
+      )::bigint AS retry_after_ms
+    FROM incremented
+    CROSS JOIN (SELECT count(*) FROM expired_cleanup) AS cleanup_summary
+  `;
+}
 
-  try {
-    // Atomic increment-and-read. INSERT seeds the window at 1; a concurrent
-    // request on the same key conflicts and bumps the existing count by 1.
-    const result = await db.execute(sql`
-      INSERT INTO rate_limits (key, count, expires_at)
-      VALUES (${bucketKey}, 1, ${expiresAtIso}::timestamptz)
-      ON CONFLICT (key) DO UPDATE SET count = rate_limits.count + 1
-      RETURNING count
-    `);
-    const row = result.rows[0] as { count: number | string } | undefined;
-    const count = row ? Number(row.count) : 1;
-
-    // Opportunistic reap of expired windows — cheap (indexed) and rare.
-    // Wrapped so a cleanup failure can never disturb the decision above.
-    if (Math.random() < DURABLE_CLEANUP_PROBABILITY) {
-      try {
-        await db.execute(
-          sql`DELETE FROM rate_limits WHERE expires_at < now()`
+/**
+ * Build the durable store around a SQL executor. Production passes the shared
+ * Neon/Drizzle executor; PostgreSQL-compatible tests can pass an independent
+ * executor while exercising this exact statement.
+ */
+export function createPostgresDurableRateLimitStore(
+  execute: DurableRateLimitSqlExecutor,
+): DurableRateLimitStore {
+  return {
+    async increment(options) {
+      // Validate again at the storage boundary so direct store use can never
+      // persist a raw request identifier either.
+      assertDurableRateLimitOptions(options);
+      const result = await execute(incrementStatement(options));
+      const row = rowsFromResult(result)[0];
+      if (!row) {
+        throw new Error(
+          "Durable rate-limit increment returned no PostgreSQL row.",
         );
-      } catch {
-        // best-effort housekeeping only
       }
-    }
+      const count = finiteInteger(row.count, "count");
+      const retryAfterMs = finiteInteger(row.retry_after_ms, "retry interval");
+      if (count < 1 || count > options.limit + 1) {
+        throw new Error(
+          "Durable rate-limit count violated the bounded counter contract.",
+        );
+      }
+      return { count, retryAfterMs };
+    },
+  };
+}
 
-    const allowed = count <= limit;
-    return {
-      allowed,
-      remaining: Math.max(0, limit - count),
-      retryAfterMs: allowed ? 0 : Math.max(0, windowEnd - now),
-    };
+const postgresDurableRateLimitStore = createPostgresDurableRateLimitStore(
+  (query) => db.execute(query),
+);
+
+export async function checkDurableRateLimit(
+  options: DurableRateLimitOptions,
+  dependencies: DurableRateLimitDependencies = {},
+): Promise<DurableRateLimitResult> {
+  assertDurableRateLimitOptions(options);
+  const store = dependencies.store ?? postgresDurableRateLimitStore;
+
+  let incremented: DurableRateLimitIncrementResult;
+  try {
+    incremented = await store.increment(options);
+    if (
+      !Number.isSafeInteger(incremented.count) ||
+      incremented.count < 1 ||
+      incremented.count > options.limit + 1 ||
+      !Number.isSafeInteger(incremented.retryAfterMs) ||
+      incremented.retryAfterMs < 0
+    ) {
+      throw new Error("Durable rate-limit store result is invalid.");
+    }
   } catch {
-    // DB unreachable / transient error → degrade to the per-instance limiter
-    // rather than failing the request. Best-effort cross-instance coverage.
-    const fallback = checkInMemoryRateLimit({ scope, key, max: limit, windowMs });
     return {
-      allowed: fallback.allowed,
-      remaining: fallback.remaining,
-      retryAfterMs: fallback.retryAfterSeconds * 1000,
+      status: "store_unavailable",
+      allowed: false,
+      remaining: 0,
+      retryAfterMs: null,
     };
   }
+
+  if (incremented.count > options.limit) {
+    return {
+      status: "limited",
+      allowed: false,
+      remaining: 0,
+      retryAfterMs: incremented.retryAfterMs,
+    };
+  }
+
+  return {
+    status: "allowed",
+    allowed: true,
+    remaining: options.limit - incremented.count,
+    retryAfterMs: 0,
+  };
 }

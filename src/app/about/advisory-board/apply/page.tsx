@@ -3,7 +3,7 @@ import ApplyClient from "./ApplyClient";
 import { withOg } from "@/lib/og";
 import "../../../contact/contact.css";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Apply to the Advisory Board",

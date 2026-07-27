@@ -12,7 +12,7 @@
  *     password; returns false (so callers skip) when creds are absent, so
  *     the harness never depends on committing a secret.
  */
-import { test as base, expect, type Page } from "@playwright/test";
+import { test as base, expect, type Locator, type Page } from "@playwright/test";
 
 export type ViewportSpec = { name: string; width: number; height: number };
 
@@ -90,29 +90,52 @@ function attachErrorCapture(page: Page): CapturedErrors {
 }
 
 export const test = base.extend<{ errors: CapturedErrors }>({
-  errors: async ({ page }, use) => {
+  errors: async ({ page }, applyFixture) => {
     const captured = attachErrorCapture(page);
-    await use(captured);
+    await applyFixture(captured);
   },
 });
 
 export { expect };
 
-/** Emulate the given theme. The app reads `prefers-color-scheme` and a
- *  `data-theme` attribute on <html>; set both so the theme is stable
- *  regardless of which the surface consults. */
+/**
+ * A server-rendered control has its HTML before React attaches the event
+ * listener that gives it its interactive contract. Wait for that attachment
+ * before a keyboard journey sends its first key, rather than racing hydration
+ * and treating a no-op keypress as a product failure.
+ */
+export async function waitForReactHydration(locator: Locator) {
+  await expect
+    .poll(
+      () =>
+        locator.evaluate((element) =>
+          Object.keys(element).some((key) => key.startsWith("__reactProps$")),
+        ),
+    )
+    .toBe(true);
+}
+
+/** Emulate and persist the given theme through the same contract as the real
+ * toggle. ThemeProvider reads localStorage and may otherwise overwrite a
+ * test-only `data-theme` stamp after hydration. */
 export async function setTheme(page: Page, theme: Theme): Promise<void> {
   await page.emulateMedia({ colorScheme: theme });
   await page.evaluate((t) => {
+    window.localStorage.setItem("theme", t);
     document.documentElement.dataset.theme = t;
+    window.dispatchEvent(new Event("civica-theme-change"));
   }, theme);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
 }
 
 /** Measure horizontal overflow of the root scroller at the current
  *  viewport. `overflow` is scrollWidth - clientWidth (px). */
-export async function measureHorizontalOverflow(
-  page: Page,
-): Promise<{ scrollWidth: number; clientWidth: number; overflow: number; offenders: string[] }> {
+export async function measureHorizontalOverflow(page: Page): Promise<{
+  scrollWidth: number;
+  clientWidth: number;
+  overflow: number;
+  offenders: string[];
+}> {
   return page.evaluate(() => {
     const de = document.documentElement;
     const clientWidth = de.clientWidth;
@@ -136,7 +159,12 @@ export async function measureHorizontalOverflow(
         }
       }
     }
-    return { scrollWidth, clientWidth, overflow: scrollWidth - clientWidth, offenders };
+    return {
+      scrollWidth,
+      clientWidth,
+      overflow: scrollWidth - clientWidth,
+      offenders,
+    };
   });
 }
 

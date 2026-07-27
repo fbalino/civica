@@ -15,6 +15,7 @@ const DECISION_LABELS: Record<DecisionReason, string> = {
   incumbent_held: "Existing canonical observation retained",
   cia_default_group_a: "Identity rule retained the CIA observation",
   cia_default_group_c: "Narrative rule retained the CIA observation",
+  canonical_only_legacy: "Canonical-only legacy selection",
   no_active_rows: "No eligible observation",
 };
 
@@ -80,6 +81,19 @@ export function buildFactEvidenceSummary(
     };
   }
 
+  if (output.decisionReason === "canonical_only_legacy") {
+    return {
+      posture: "resolver_selected",
+      heading: "Canonical-only legacy selection",
+      explanation:
+        "The published historical winner is retained. Its complete candidate set and cut-time decision reason were not retained, so source agreement and replayability are not claimed.",
+      sourceRecordCount,
+      verifiedFamilyCount,
+      unverifiedLineageCount,
+      rationale,
+    };
+  }
+
   if (sourceRecordCount === 1) {
     return {
       posture: "single_source",
@@ -116,4 +130,3 @@ export function buildFactEvidenceSummary(
     rationale,
   };
 }
-

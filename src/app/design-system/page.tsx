@@ -16,10 +16,12 @@ import { IdeologyCompassDemo } from "./IdeologyCompassDemo";
 import { ExploreMenuDemo } from "./ExploreMenuDemo";
 import { CountryDirectory } from "@/components/country/CountryDirectory";
 import { MobileNav } from "@/components/MobileNav";
+import { SearchField } from "@/components/editorial/SearchField";
+import { SourceText } from "@/components/editorial/SourceText";
 
 import "./design-system.css";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 type DesignTokenGroup = {
   id: string;
@@ -204,6 +206,19 @@ const DESIGN_TOKEN_GROUPS: DesignTokenGroup[] = [
     },
   ),
 ];
+
+const STACKING_LAYERS = [
+  { token: "--z-base", purpose: "Document content and local artwork" },
+  { token: "--z-rule", purpose: "Local rules and anchored controls" },
+  { token: "--z-sticky", purpose: "Persistent headers and sticky rails" },
+  { token: "--z-popover", purpose: "Menus, selects, and transient drawers" },
+  { token: "--z-tooltip", purpose: "Focused or pointer-following detail" },
+  { token: "--z-overlay-backdrop", purpose: "Non-modal overlay backdrops" },
+  { token: "--z-overlay", purpose: "Non-modal overlay panels" },
+  { token: "--z-modal-backdrop", purpose: "Modal backdrops" },
+  { token: "--z-modal", purpose: "Modal dialogs and lightboxes" },
+  { token: "--z-toast", purpose: "System-wide transient notices" },
+] as const;
 
 const groupById = (id: string): DesignTokenGroup | undefined =>
   DESIGN_TOKEN_GROUPS.find((group) => group.id === id);
@@ -455,6 +470,7 @@ export default function DesignSystemPage() {
                     key={t.cssVar}
                     className="ds-ramp-cell-tip"
                     content={t.cssVar}
+                    ariaLabel={`Indicator ramp swatch ${t.cssVar}`}
                   >
                     <div
                       className="ds-ramp-cell"
@@ -576,6 +592,21 @@ export default function DesignSystemPage() {
               </div>
             ))}
           </div>
+
+          <h3 className="ds-sub">Layer order</h3>
+          <p className="ds-layer-dek">
+            Lower layers cannot cover a higher layer. Use local artwork ordering
+            only inside a component; every document-level floating surface uses
+            this shared scale.
+          </p>
+          <ol className="ds-layer-scale" aria-label="Document layer order">
+            {STACKING_LAYERS.map((layer) => (
+              <li key={layer.token} className="ds-layer-row">
+                <code>{layer.token}</code>
+                <span>{layer.purpose}</span>
+              </li>
+            ))}
+          </ol>
 
           <h3 className="ds-sub">Motion</h3>
           <div
@@ -708,6 +739,10 @@ export default function DesignSystemPage() {
                 showShortcut
                 showFilterIcon
               />
+              <SearchField
+                label="Directory search demonstration"
+                placeholder="Search a research directory…"
+              />
             </div>
 
             <div className="ds-comp">
@@ -770,11 +805,29 @@ export default function DesignSystemPage() {
                 }}
               >
                 <span>
-                  Live <SourceDot source="wikidata" retrievedAt="2026-06-01" />
+                  Live{" "}
+                  <SourceDot
+                    source="wikidata"
+                    retrievedAt="2026-06-01T12:34:56Z"
+                    upstreamVintage="Wikidata revision at retrieval"
+                  />
                 </span>
                 <span>
                   Frozen{" "}
-                  <SourceDot source="cia_factbook" retrievedAt="2026-01-15" />
+                  <SourceDot
+                    source="cia_factbook"
+                    retrievedAt="2026-01-15"
+                    upstreamVintage="CIA World Factbook 2026 archive"
+                  />
+                </span>
+                <span>
+                  Experimental{" "}
+                  <SourceDot
+                    source="wikidata"
+                    retrievedAt={null}
+                    state="experimental"
+                    upstreamVintage={null}
+                  />
                 </span>
               </div>
             </div>
@@ -820,7 +873,7 @@ export default function DesignSystemPage() {
                       fontFamily: "var(--font-body)",
                       fontSize: "var(--text-12)",
                       fontWeight: 600,
-                      color: `var(${v})`,
+                      color: "var(--color-text-primary)",
                       background: `color-mix(in oklab, var(${v}) 14%, transparent)`,
                       border: `1px solid color-mix(in oklab, var(${v}) 34%, transparent)`,
                       padding: "2px 8px",
@@ -878,21 +931,66 @@ export default function DesignSystemPage() {
               </div>
             </div>
 
+            <div className="ds-comp ds-comp--wide" id="atlas-data-states">
+              <h4>Atlas reader data states</h4>
+              <p className="ds-component-note">
+                A fulfilled empty result, an unavailable query, partial data,
+                freshness, disputes, and missing provenance each keep their own
+                reader meaning. These examples reuse the canonical Banner,
+                DataValueState, and SourceDot primitives.
+              </p>
+              <div style={{ display: "grid", gap: "var(--space-3)" }}>
+                <div data-atlas-surface-state="loading" aria-busy="true">
+                  <Banner variant="info">
+                    Loading current source records…
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="empty">
+                  <Banner variant="info">
+                    No source-backed records are currently compiled. This is a
+                    coverage state, not a claim that the underlying institution
+                    or activity does not exist.
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="error">
+                  <Banner variant="warn">
+                    Source records are temporarily unavailable. Civica keeps
+                    the module visible rather than presenting an outage as an
+                    empty result.
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="partial">
+                  <Banner variant="warn">
+                    Some source records are available; the unavailable input is
+                    identified rather than omitted from the interpretation.
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="stale">
+                  <Banner variant="info">
+                    Frozen source vintage <SourceDot source="cia_factbook" retrievedAt="2026-01-23" />
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="disputed">
+                  <Banner variant="warn">
+                    Reported value <DataValueState status="disputed" reason="Source records conflict." />
+                  </Banner>
+                </div>
+                <div data-atlas-surface-state="no-source">
+                  <Banner variant="warn">
+                    Provenance <DataValueState status="unknown" reason="No usable source metadata is available." />
+                  </Banner>
+                </div>
+              </div>
+            </div>
+
             <div className="ds-comp ds-comp--wide">
-              <h4>Explore megamenu (real .explore-menu)</h4>
-              <p
-                style={{
-                  margin: "0 0 var(--space-4)",
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-13)",
-                  color: "var(--color-text-muted)",
-                  maxWidth: "48ch",
-                }}
-              >
-                The header&rsquo;s &ldquo;Explore&rdquo; panel, shown open.
-                Ivory paper, a terracotta hairline top rule, and destination
-                rows that pair a spot engraving with a serif name and a one-line
-                description. Rows warm on hover and keyboard focus.
+              <h4 id="explore-concepts">Explore megamenu</h4>
+              <p className="ds-component-note">
+                The current near-page-width EXP-015 candidate: two explicit
+                registers and eight destination-specific editorial
+                illustrations. The artwork is decorative; each serif
+                destination name and description carries the accessible
+                identity.
               </p>
               <ExploreMenuDemo />
             </div>
@@ -1138,6 +1236,41 @@ export default function DesignSystemPage() {
                 landscape, where dual executives share the stage in an exciting
                 political dance!&rdquo;
               </p>
+            </div>
+          </div>
+          <div className="ds-comp ds-comp--wide">
+            <h4>Source-form text and bidirectional stress fixture</h4>
+            <p>
+              The interface is English. Recorded source text keeps its language
+              and automatic direction; the adjacent label states what is known
+              without implying a Civica translation.
+            </p>
+            <div className="ds-row">
+              <SourceText
+                languageTag="ar"
+                label="Official source form · Arabic · not translated"
+              >
+                الجمهورية التونسية
+              </SourceText>
+              <SourceText
+                languageTag="he"
+                label="Official source form · Hebrew · not translated"
+              >
+                מדינת ישראל
+              </SourceText>
+              <SourceText
+                languageTag="ja"
+                label="Official source form · Japanese · not translated"
+              >
+                日本国
+              </SourceText>
+              <SourceText
+                languageTag="es-UY"
+                label="Official source form · Spanish · not translated"
+              >
+                República Oriental del Uruguay — denominación oficial
+                conservada exactamente como fue publicada por la fuente
+              </SourceText>
             </div>
           </div>
         </section>

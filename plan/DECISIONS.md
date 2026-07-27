@@ -213,7 +213,7 @@ This is the durable decision log for the active master plan. New entries append;
 
 ### APR-D042 — Source freshness is evidence of a successful committed write
 
-**Decision:** `markSourcesSynced()` is the only sanctioned path for changing `sources.last_sync_at`. It stamps only after a non-dry run reports a positive safe-integer row count, at least one normalized source ID, and a valid timestamp. It issues one update for the deduplicated source set and returns stamped IDs only after that update succeeds. Dry, empty, invalid-count, blank-source, invalid-time, and failed-executor paths cannot report freshness. The repository validator scans every production source file and self-tests its detection rules against seeded direct-set, upsert, and raw-SQL violations plus safe read/insert/comment controls.
+**Decision:** The `markSourcesSynced*` API family in `src/lib/db/source-freshness.ts` is the only sanctioned path for changing `sources.last_sync_at`. `markSourcesSynced()` stamps after a non-dry committed write reports a positive safe-integer row count, normalized source IDs, and a valid timestamp. `markSourcesSyncedTransactionQuery()` and `markSourcesSyncedFromInsertedRowsCte()` are the atomic forms: they commit freshness in the same database transaction or statement as the domain rows and derive eligibility from actual inserted rows, so later failure, empty input, and duplicate-only work stamp nothing. No caller may emit its own freshness update. The repository validator scans every production source file and self-tests direct-set, upsert, and raw-SQL detection plus safe controls.
 **Why:** Freshness is a claim about data actually written, not that a job started, reached an upstream endpoint, or attempted an update. One fail-closed helper and a self-testing whole-source scanner prevent empty, partial, dry, or failed runs from making stale inputs appear current.
 
 ### APR-D043 — The schema dictionary is generated, reviewed policy plus exact structure
@@ -852,6 +852,28 @@ the current state while the public null preserves the distinction between no
 eligible event, low observation, and stability. Immutable per-run outputs make
 later method comparisons and exact historical replay possible.
 
+### APR-D169 — Pulse decay retains the longest declared half-life
+
+**Decision:** The active Pulse scorer derives its trailing lookback from the
+largest taxonomy half-life (currently 730 days) and records that value on each
+current and append-only history row. The former 365-day rows remain immutable
+historical outputs. The score algorithm advances to
+`pulse-delta/decay-window-v2.5+incident-resolution-v1+output-history-v1+absorption-evidence-v1`;
+the outer classifier/runtime version does not change because the classifier,
+taxonomy identity, and pipeline method do not change.
+
+Only a current, published, approved or edited event projection can score. A
+correction supersedes its prior projection while retaining it; persistence is
+not inferred from an earlier event; and a later recurrence must be represented
+by a separately accepted event with its own date and incident.
+
+**Why:** A 365-day inclusion window silently truncated the second half of a
+declared 730-day decay curve. Retaining both window values preserves exact
+interpretation of older output history while a fresh, algorithm-versioned
+recompute produces the new current projection. Treating persistence or
+recurrence as an inference would turn a bounded event ledger into an
+unreviewed state model.
+
 ### APR-D151 — Pulse agreement is a stored-evidence derivation
 
 **Decision:** Adopt `pulse-stored-ensemble/v1` under runtime method
@@ -1024,3 +1046,212 @@ rights remain outside public bulk export.
 stored row would turn estimates, collisions, imprecise dates, and unsupported
 fields into apparent facts. A checked qualification layer keeps the evidence
 available for repair and gives readers a narrower, reproducible corpus.
+
+### APR-D162 — Brand preference follows evidence and clearance
+
+**Decision:** Adopt `brand-name-decision-criteria/v1` before assessing the
+current name or any replacement. The rubric applies one scoring scale and
+evidence standard to legal/confusion risk, domain and handle availability,
+pronunciation/searchability, mission fit, geographic and cultural neutrality,
+distinctiveness, migration cost, evidence quality, and owner preference.
+Owner preference is capped at five percent and cannot clear a veto, replace
+evidence, or supply the evidence-based advantage required for a rename.
+Unknown, stale, scope-incomplete, or professionally uncleared evidence records
+no decision.
+
+**Why:** Naming can carry legal, continuity, international-meaning, and reader-
+confusion consequences that personal taste does not measure. Precommitting the
+criteria prevents a disliked comparison, a convenient available domain, or an
+unsupported impression from deciding the outcome after candidates are seen.
+The contract does not assess or clear Civica Atlas or any alternative; BRD-001
+through BRD-003 remain the evidence and professional-review gates.
+
+### APR-D163 — Frozen Pulse packets validate from retained inputs
+
+**Decision:** Treat the checked Pulse evaluation packet manifest and its new
+`pulse-evaluation-packet-frozen-inputs/v1` artifact as one immutable release.
+Normal build validation reconstructs the manifest only from those retained,
+rights-safe inputs and the frozen population reference; it never queries the
+mutable production candidate pool. `--write` verifies the existing release but
+does not refresh it. Current production differences are measured by a separate
+read-only live audit and cannot change packet membership, strata, weights, or
+hashes.
+
+**Why:** A preregistered evaluation sample must not change merely because later
+classification work updates rows whose retrieval times predate the cutoff. The
+retained inputs make the historical calculation reproducible without Neon,
+while the separate live audit keeps real operational drift visible. A mismatch
+in the disabled private coding workspace remains a fail-closed repair task
+(PUL-043), not permission to reseed or weaken the checked release.
+
+### APR-D164 — Admin identity and expiry live inside the signed session
+
+**Decision:** Use `civica-admin-session/v1` for every admin session. Its HMAC-
+protected payload carries the server-configured reviewer identity, issued-at,
+expiry, and a random session ID; every request verifies the exact payload,
+signature, current configured identity, lifetime, and server time. Legacy
+unsigned reviewer state is cleared and never trusted. Password login consumes
+a durable cross-instance attempt budget before body parsing or password work,
+and this admin-only path denies access when the shared store is unavailable.
+
+**Why:** Cookie `Max-Age` is a browser instruction, not server-side expiry, and
+an unsigned cookie cannot establish an audit actor. A per-instance fallback
+also cannot preserve one login-attempt budget across serverless instances.
+Failing closed is appropriate at this authentication boundary while the shared
+limiter's historical memory fallback remains unchanged for other callers.
+
+### APR-D165 — CI validates immutable evidence without production credentials
+
+**Decision:** Use one fork-safe Node 22 `verify` job for pull requests and
+`main`. It contains no repository secrets or database URL and executes the same
+hash-bound build core as production. A normal build validates immutable,
+checked evidence for historical release contracts; comparison with mutable
+production state is an explicit read-only `:live` audit. Routes that need Neon
+at render time use documented Next.js request boundaries rather than fake build
+credentials or weakened validation. Requiring the job in GitHub repository
+settings remains an owner/platform operation.
+
+**Why:** Forked pull requests cannot safely receive production credentials,
+while a public project still needs deterministic evidence that release and
+method contracts have not drifted. Separating immutable reproduction from live
+observation keeps both claims honest. Sharing one production build body avoids
+a weaker CI-only product, and explicit external enforcement avoids pretending
+local source code can configure branch protection.
+
+### APR-D166 — Cron recovery is leased, fenced, and explicitly at-least-once
+
+**Decision:** Put every `/api/cron/**` route behind one `withCronJob()`
+boundary. Authenticate before database access; identify scheduled work by its
+registered UTC slot and manual work by a durable hashed `Idempotency-Key`;
+serialize all invocations of one job with a database-time lease; retain every
+attempt; fence expired workers; and permit at most three attempts for one
+logical delivery. Record the handler's real terminal HTTP outcome before
+returning success. Aggregate multi-stage freshness and advance it only after
+all required stages succeed. Keep the existing DAT-012 convergent-writer
+contract as the recovery backstop rather than claiming exactly-once execution.
+
+**Why:** Vercel documents best-effort delivery, possible duplicate or
+overlapping invocations, and no automatic failure retry. A durable application
+boundary makes known duplicates and concurrency safe across serverless
+instances, while database clock and fencing prevent a timed-out worker from
+closing newer work. No ledger can atomically cover every upstream call or
+business write separated from final bookkeeping, so honest at-least-once
+recovery plus idempotent reconciliation is stronger and more accurate than an
+unsupported exactly-once claim.
+
+### APR-D167 — Production rate limits are shared, opaque, and fail closed
+
+**Decision:** Adopt `rate-limit-policy/v1` as the closed disposition for every
+registered route-method. Exact public, paid, credential, form, export, and
+unauthenticated-mutation budgets use one database-time PostgreSQL fixed-window
+statement across instances. Canonical client identity comes only from singular
+deployment-trusted headers, is scoped and HMAC-SHA-256 signed with an
+independent production secret, and is never stored raw. Counter exhaustion is
+a stable `429`; missing identity configuration or shared-store failure is a
+noncacheable `503`, never a process-local allowance. Deterministically remove
+expired legacy rows before every increment. Use the verified all-path Vercel
+rule as broad regional flood control for static downloads and the retired
+embed, and keep exact-origin sign-out available under that platform layer so an
+application-counter outage cannot trap a session cookie. This supersedes only
+APR-D164's temporary statement that non-admin callers retained a memory
+fallback.
+
+**Why:** Serverless instances do not share memory, client-controlled proxy
+chains are not trustworthy identity, and raw network addresses are unnecessary
+counter data. One atomic shared boundary makes the declared budget enforceable
+under concurrency, while distinct limited/unavailable responses avoid both
+silent overuse and misleading availability. The platform rule adds useful
+outer protection without pretending a regional WAF counter supplies exact
+application quotas.
+
+### APR-D168 — Route data crosses closed, versioned trust boundaries
+
+**Decision:** Adopt `route-io-policy/v1` as the exact request, response, error,
+and active-content contract for every registered route-method. Read request
+bodies through byte-capped JSON or form parsers and strict schemas; reject
+unknown or duplicate query/path input through named contracts before database
+or expensive work. Project sensitive and research exports through closed
+versioned output shapes instead of whole-row selection or response spreading.
+Return only fixed, noncacheable problem families for unknown failures. Treat
+stored constitution markup as untrusted until it passes the server-only
+`constitution-html/v1` allowlist. Treat provider article URLs as public-network
+inputs: validate and pin public DNS addresses, revalidate bounded manual
+redirects, and cap the decoded body before allocation. Neutralize spreadsheet
+formula prefixes in every CSV export while retaining genuine numeric values.
+
+**Why:** TypeScript types and database schemas do not constrain hostile bytes,
+future table columns, stored HTML, provider redirects, or exception text at
+runtime. Closed boundaries make those trust transitions reviewable and turn a
+new route, field, parser bypass, HTML sink, or response spread into a failing
+build instead of a silent expansion of the public contract.
+
+### APR-D169 — Public source visibility grants no general code-reuse permission
+
+**Decision:** Adopt a root `LICENSE` and `NOTICE` that record Civica's current
+source-code posture as non-open and all rights reserved. Fernando Baliño is
+identified for his original contributions; other contributors retain rights in
+their respective work unless separately assigned. Public repository access
+does not grant permission to copy, modify, redistribute, sublicense, sell, or
+build derivative services beyond hosting-platform terms or applicable law.
+Third-party packages, data, fonts, assets, trademarks, file-level notices, and
+generated material remain separately governed. `CITATION.cff` deliberately
+omits an SPDX `license` field because one identifier would misstate the mixed
+scope. No claim is made that every AI-assisted or generated output is
+independently copyrightable.
+
+**Why:** The previous absence of a root file accurately denied an open-source
+grant but forced readers to infer the operational posture. An explicit
+non-open notice makes permissions and exclusions legible without inventing
+ownership over other contributors or upstream materials. It is compatible with
+the current direct dependency inventory because Civica does not relicense
+packages and preserves their package/file terms, including Mapbox product terms
+and MPL file-level obligations. Professional review remains queued for
+contributor ownership, generated-material treatment, and any future reuse
+license; this decision is an accurate interim posture, not legal clearance.
+
+### APR-D170 — Privacy claims follow a closed current-behavior inventory
+
+**Decision:** Adopt `civica-privacy-data-handling/v1` as the canonical inventory
+for browser preferences, voluntary submissions, Ask Civica, remote reader
+resources, hosting logs, content-free telemetry, HMAC rate limits, owner-admin
+security evidence, reviewer workflows, and scrubbed error monitoring. Public
+notice rows render from that registry. New contact and advisory submissions do
+not retain raw IP addresses; authenticated deletion exists for both submission
+types. A guarded maintenance command reports aggregate legacy-IP counts by
+default and may mutate production only with explicit owner authority and two
+confirmation flags. Provider-controlled retention and currently unbounded
+internal retention are disclosed as such rather than converted into invented
+guarantees.
+
+**Why:** Privacy alignment is a behavior contract, not a prose-only legal
+exercise. One typed inventory makes data, purpose, destination, access,
+retention, deletion, safeguards, providers, and source paths testable together.
+Removing unnecessary raw identifiers prevents future accumulation, while the
+separate production authorization preserves control over legacy data. Account
+settings and legal sufficiency still require owner and professional review;
+the repository can prepare and enforce the facts but cannot fabricate those
+external outcomes.
+
+### APR-D171 — Editorial imagery fails closed on rights and provenance
+
+**Decision:** Adopt `civica-editorial-illustration-rights/v1` for every
+AI-assisted, generated, edited, or photographic-treatment image released by
+Civica. Human selection, arrangement, captions, edits, and release decisions
+are distinguished from provider technology, upstream references, landmarks,
+marks, likenesses, and machine-generated elements Civica may not own. Every
+new or materially replaced asset must retain provider terms, generation and
+reference records, transformations, five-domain subject screening, exact file
+identity, review, release, and correction history before release. Historical
+unknowns remain unknown. The manifest and frozen releases preserve superseded
+or withdrawn history. Civica authorizes site display but grants no separate
+third-party reuse license; complaints use BRD-015's evidence-preserving
+containment and decision process.
+
+**Why:** A visible AI-assisted disclosure and complete file inventory do not
+answer whether a reference was authorized, a modern building can be depicted
+in a launch jurisdiction, a logo or likeness implies endorsement, or the human
+contribution is protectable. A forward-only fail-closed record prevents new
+provenance debt without inventing historical facts. Professional review still
+decides the legal sufficiency of the historical corpus, provider terms,
+screening rules, and public rights language; the repository can enforce the
+questions and evidence but cannot supply that legal judgment.

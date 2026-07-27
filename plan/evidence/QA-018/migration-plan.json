@@ -1,0 +1,1596 @@
+{
+  "generatedAt": "2026-07-26T15:02:24.484Z",
+  "appliedAuthoritativeMigrationIds": [
+    "0000_authoritative_baseline",
+    "0001_aspiring_bloodaxe",
+    "0002_quarantine_numeric_outliers",
+    "0003_mixed_mockingbird",
+    "0004_naive_dust",
+    "0005_freeze_reconciliation_candidates",
+    "0006_staged_candidate_publication",
+    "0007_slippery_warhawk",
+    "0008_material_wildside",
+    "0009_ambiguous_maverick",
+    "0010_early_hawkeye",
+    "0011_freeze_ci_research_panel",
+    "0012_fix_panel_release_staging_delete",
+    "0013_real_bromley",
+    "0014_boring_tana_nile",
+    "0015_steep_cyclops",
+    "0016_loving_maggott",
+    "0017_validate_decision_supersession",
+    "0018_rich_phalanx",
+    "0019_careless_avengers",
+    "0020_attach_candidate_retention_trigger",
+    "0021_steep_brood",
+    "0022_puzzling_killraven",
+    "0023_wide_gorilla_man",
+    "0024_dark_maginty",
+    "0025_careful_the_professor",
+    "0026_magenta_xavin",
+    "0027_smart_tempest",
+    "0028_complex_carlie_cooper",
+    "0029_whole_dazzler",
+    "0030_cute_namora",
+    "0031_hot_saracen",
+    "0032_sparkling_genesis"
+  ],
+  "plans": [
+    {
+      "id": "0000_smooth_kylun",
+      "artifact": "drizzle/migrations/0000_smooth_kylun.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "2b328d03dd59e4fe451641ec598d03ced73b67fc6191cd12d92f26e5764266a5",
+      "affectedRelations": [
+        "constitutions",
+        "country_factbook_sections",
+        "country_facts",
+        "elections",
+        "government_bodies",
+        "jurisdictions",
+        "legislature_parties",
+        "offices",
+        "persons",
+        "sources",
+        "statements",
+        "terms"
+      ],
+      "statementCount": 27,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0000_smooth_kylun-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0000_smooth_kylun --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "constitutions": 186,
+        "country_factbook_sections": 2889,
+        "country_facts": 25829,
+        "elections": 915,
+        "government_bodies": 483,
+        "jurisdictions": 253,
+        "legislature_parties": 1548,
+        "offices": 5326,
+        "persons": 4985,
+        "sources": 57,
+        "statements": 7154,
+        "terms": 5590
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0001_contact_submissions",
+      "artifact": "drizzle/migrations/0001_contact_submissions.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "cd6849a345728bd73c878cc743809121372ad513bb0233f9ab5324327984c79a",
+      "affectedRelations": [
+        "contact_submissions"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0001_contact_submissions-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0001_contact_submissions --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "contact_submissions": 1
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0002_pulse_events",
+      "artifact": "drizzle/migrations/0002_pulse_events.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "8079ffe68ce8e76ecd50435dae527df8a40743ab21e6f5d439d1f3a2da560cbf",
+      "affectedRelations": [
+        "pulse_events"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0002_pulse_events-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0002_pulse_events --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events": 462
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0002_purple_rachel_grey",
+      "artifact": "drizzle/migrations/0002_purple_rachel_grey.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_sequence_collision",
+      "sha256": "c062601c0e22ec40b45701af7ff1070f8c161f7e1339f8753535d9b740e25412",
+      "affectedRelations": [
+        "bill_summary_cache",
+        "contact_submissions",
+        "country_metrics",
+        "election_results",
+        "elections",
+        "government_bodies",
+        "metric_definitions",
+        "offices"
+      ],
+      "statementCount": 21,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0002_purple_rachel_grey-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0002_purple_rachel_grey --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "bill_summary_cache": 7193,
+        "contact_submissions": 1,
+        "country_metrics": 7449,
+        "election_results": 1351,
+        "elections": 915,
+        "government_bodies": 483,
+        "metric_definitions": 10,
+        "offices": 5326
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0003_international_organizations",
+      "artifact": "drizzle/migrations/0003_international_organizations.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_sequence_collision",
+      "sha256": "83ea10be45c1c2cac01d877b9e650dd058b45d4ce4120e55153c05a30e6ac2b1",
+      "affectedRelations": [
+        "organization_memberships",
+        "organizations"
+      ],
+      "statementCount": 11,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0003_international_organizations-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0003_international_organizations --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "organization_memberships": 1880,
+        "organizations": 24
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0003_soft_shinko_yamashiro",
+      "artifact": "drizzle/migrations/0003_soft_shinko_yamashiro.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "d804f3c3f067e24a2993b48563204ac5d498dff5d7a36710de7b3710d9c48dde",
+      "affectedRelations": [
+        "government_taxonomies"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0003_soft_shinko_yamashiro-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0003_soft_shinko_yamashiro --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "government_taxonomies": 249
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0004_gray_mojo",
+      "artifact": "drizzle/migrations/0004_gray_mojo.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "39705601d287c6ddf3cf5c8516c6434a63b75ae00f136473008ee532dec4b43a",
+      "affectedRelations": [
+        "bills"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0004_gray_mojo-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0004_gray_mojo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "bills": 7885
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0005_wet_longshot",
+      "artifact": "drizzle/migrations/0005_wet_longshot.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "7f6be64d25a0aeec6752d34d859d33abb6db8d00c9fae94e7820eb8fa9e3b83f",
+      "affectedRelations": [
+        "advisory_board_members",
+        "correction_log"
+      ],
+      "statementCount": 3,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0005_wet_longshot-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0005_wet_longshot --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "advisory_board_members": 0,
+        "correction_log": 1
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0006_gigantic_quasimodo",
+      "artifact": "drizzle/migrations/0006_gigantic_quasimodo.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "35834a95e09b12d3117d10ae7879319fa7474dfa58d8adfd4a2f2957b5697e8f",
+      "affectedRelations": [
+        "ci_composite_scores"
+      ],
+      "statementCount": 5,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0006_gigantic_quasimodo-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0006_gigantic_quasimodo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_composite_scores": 1236
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0007_stiff_hobgoblin",
+      "artifact": "drizzle/migrations/0007_stiff_hobgoblin.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "91c31812803ff6c5c2dc4c22de528ee542aff9e46bc94fe03dbb443e20e8268f",
+      "affectedRelations": [
+        "civica_conditions_scores"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0007_stiff_hobgoblin-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0007_stiff_hobgoblin --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "civica_conditions_scores": 331
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0008_violet_robin_chapel",
+      "artifact": "drizzle/migrations/0008_violet_robin_chapel.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "dc09bb9f32119cd7f73c5602db0083008bb1314fac5c42964f9849bb16e71ca5",
+      "affectedRelations": [
+        "pulse_corrections",
+        "pulse_dimensional_deltas",
+        "pulse_events_v2",
+        "pulse_sources",
+        "raw_events"
+      ],
+      "statementCount": 25,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0008_violet_robin_chapel-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0008_violet_robin_chapel --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_corrections": 0,
+        "pulse_dimensional_deltas": 325,
+        "pulse_events_v2": 384,
+        "pulse_sources": 529,
+        "raw_events": 1595
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0009_colossal_zaladane",
+      "artifact": "drizzle/migrations/0009_colossal_zaladane.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "8605fd52d787eb4e389bf6f8ada0dcefbf3770089266b8618938925bf59f6811",
+      "affectedRelations": [
+        "pulse_review_audit_log"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0009_colossal_zaladane-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0009_colossal_zaladane --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_review_audit_log": 13
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0010_careless_dakota_north",
+      "artifact": "drizzle/migrations/0010_careless_dakota_north.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "87c7e466261189c3e25ce10ce2f846c24194c2708c0fa23383a49137f80089ea",
+      "affectedRelations": [
+        "backtest_cases",
+        "backtest_events",
+        "backtest_runs"
+      ],
+      "statementCount": 7,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0010_careless_dakota_north-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0010_careless_dakota_north --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "backtest_cases": 10,
+        "backtest_events": 59,
+        "backtest_runs": 52
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0011_tidy_mordo",
+      "artifact": "drizzle/migrations/0011_tidy_mordo.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "0cd6bb8befddc58c341bcdeec7d955fbb655f5fc8d84c48f472b548f47697496",
+      "affectedRelations": [
+        "pulse_events_v2"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0011_tidy_mordo-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0011_tidy_mordo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0012_bug1_value_type",
+      "artifact": "drizzle/migrations/0012_bug1_value_type.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "ca6942842a96c974bcf01d90e17d6d8dd62da57ee921d2c67a49fe5ed00dd5a7",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 3,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0012_bug1_value_type-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0012_bug1_value_type --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25829
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0013_electoral_systems",
+      "artifact": "drizzle/migrations/0013_electoral_systems.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "3aff49bc77ec6a2d3168b0626d3625202564041042d0174e8e4004772ead9087",
+      "affectedRelations": [
+        "government_bodies"
+      ],
+      "statementCount": 2,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0013_electoral_systems-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0013_electoral_systems --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "government_bodies": 483
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0014_advisory_applications",
+      "artifact": "drizzle/migrations/0014_advisory_applications.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "38fe8a36b34e87e471289b7e82b2fa9d9cf6fbc7c37d3e8f6064a83424724ef4",
+      "affectedRelations": [
+        "advisory_applications"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0014_advisory_applications-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0014_advisory_applications --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "advisory_applications": 0
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0015_contact_messages_status",
+      "artifact": "drizzle/migrations/0015_contact_messages_status.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "49273715e61acf842cf9fefcda5877189cb80b458b9aace683bf147328a516dd",
+      "affectedRelations": [
+        "contact_submissions"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0015_contact_messages_status-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0015_contact_messages_status --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "contact_submissions": 1
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0016_indicator_history",
+      "artifact": "drizzle/migrations/0016_indicator_history.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "d1ac2490c5e780efb53e456ab3bffb25b87865631068cd9196356689135ef073",
+      "affectedRelations": [
+        "indicator_history",
+        "jurisdictions",
+        "sources"
+      ],
+      "statementCount": 10,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0016_indicator_history-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0016_indicator_history --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "indicator_history": 46215,
+        "jurisdictions": 253,
+        "sources": 57
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0017_party_positions",
+      "artifact": "drizzle/migrations/0017_party_positions.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "e50c060700e51f9f789e79354de11a8e7ed6c6b970ba59b2d0c5375f123669f2",
+      "affectedRelations": [
+        "legislature_parties",
+        "party_positions",
+        "sources"
+      ],
+      "statementCount": 12,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0017_party_positions-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0017_party_positions --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "legislature_parties": 1548,
+        "party_positions": 656,
+        "sources": 57
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0018_data_vintage_year",
+      "artifact": "drizzle/migrations/0018_data_vintage_year.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "d10031561687a54f856e5f2925539908c3d96c5a824dbe17de69f3411da4e22e",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0018_data_vintage_year-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0018_data_vintage_year --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25829
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0019_growth_methodology",
+      "artifact": "drizzle/migrations/0019_growth_methodology.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "296a269cb37bfc4032da59682ff3ff201d76329919eec88d9e835cec05361ac9",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0019_growth_methodology-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0019_growth_methodology --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25829
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0020_jurisdiction_status_taxonomy",
+      "artifact": "drizzle/migrations/0020_jurisdiction_status_taxonomy.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "7ce4e64cd22694f1d1390e07bf90217044288415dc8efe727b5b1299ba2f1f51",
+      "affectedRelations": [
+        "jurisdictions"
+      ],
+      "statementCount": 15,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0020_jurisdiction_status_taxonomy-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0020_jurisdiction_status_taxonomy --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0021_derivation_version_envelopes",
+      "artifact": "drizzle/migrations/0021_derivation_version_envelopes.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "1715f1beb9d4c26bb89078942aa1abd26ae00449012fb9cc6492d7cd29688c6c",
+      "affectedRelations": [
+        "ci_composite_scores",
+        "ci_dimension_scores",
+        "country_fact_vintages",
+        "government_taxonomies",
+        "pulse_dimensional_deltas",
+        "pulse_events_v2"
+      ],
+      "statementCount": 36,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0021_derivation_version_envelopes-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0021_derivation_version_envelopes --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_composite_scores": 1236,
+        "ci_dimension_scores": 4867,
+        "country_fact_vintages": 35021,
+        "government_taxonomies": 249,
+        "pulse_dimensional_deltas": 325,
+        "pulse_events_v2": 384
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0022_pulse_event_idempotency",
+      "artifact": "drizzle/migrations/0022_pulse_event_idempotency.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "5b920f980e48b9dfa1160859d4a8ed51fb7249325b78d275524cdba998786d23",
+      "affectedRelations": [
+        "pulse_events_v2",
+        "pulse_sources"
+      ],
+      "statementCount": 5,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0022_pulse_event_idempotency-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0022_pulse_event_idempotency --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384,
+        "pulse_sources": 529
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0023_data_value_states",
+      "artifact": "drizzle/migrations/0023_data_value_states.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "817b80e86b4806ebec728fe4be507c3b22975e70120a23ab30ecddf1c45701c6",
+      "affectedRelations": [
+        "country_facts",
+        "country_metrics",
+        "indicator_history"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0023_data_value_states-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0023_data_value_states --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25829,
+        "country_metrics": 7449,
+        "indicator_history": 46215
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0024_research_evidence_retention",
+      "artifact": "drizzle/migrations/0024_research_evidence_retention.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "3c2861b6b527dfe5e73731db7910d8bd23f744674c59876da64e3fbc43e327d5",
+      "affectedRelations": [
+        "backtest_cases",
+        "backtest_events",
+        "backtest_runs",
+        "ci_composite_scores",
+        "ci_dimension_scores",
+        "civica_conditions_scores",
+        "constitution_topic_excerpts",
+        "constitutions",
+        "correction_log",
+        "country_facts",
+        "country_metrics",
+        "data_disputes",
+        "data_facts_audit_log",
+        "election_results",
+        "elections",
+        "government_bodies",
+        "government_taxonomies",
+        "indicator_history",
+        "legislature_parties",
+        "offices",
+        "organization_memberships",
+        "persons",
+        "pulse_dimensional_deltas",
+        "pulse_events_v2",
+        "pulse_review_audit_log",
+        "pulse_sources",
+        "raw_events",
+        "research_evidence_history",
+        "statements",
+        "terms"
+      ],
+      "statementCount": 36,
+      "destructiveStatementCount": 1,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0024_research_evidence_retention-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0024_research_evidence_retention --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "backtest_cases": 10,
+        "backtest_events": 59,
+        "backtest_runs": 52,
+        "ci_composite_scores": 1236,
+        "ci_dimension_scores": 4867,
+        "civica_conditions_scores": 331,
+        "constitution_topic_excerpts": 30537,
+        "constitutions": 186,
+        "correction_log": 1,
+        "country_facts": 25829,
+        "country_metrics": 7449,
+        "data_disputes": 33,
+        "data_facts_audit_log": 35,
+        "election_results": 1351,
+        "elections": 915,
+        "government_bodies": 483,
+        "government_taxonomies": 249,
+        "indicator_history": 46215,
+        "legislature_parties": 1548,
+        "offices": 5326,
+        "organization_memberships": 1880,
+        "persons": 4985,
+        "pulse_dimensional_deltas": 325,
+        "pulse_events_v2": 384,
+        "pulse_review_audit_log": 13,
+        "pulse_sources": 529,
+        "raw_events": 1595,
+        "research_evidence_history": 85723,
+        "statements": 7154,
+        "terms": 5590
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0025_immutable_frozen_vintages",
+      "artifact": "drizzle/migrations/0025_immutable_frozen_vintages.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "0a80449b022401a290b7165af79596a64384cefdee3de61548a936d035808147",
+      "affectedRelations": [
+        "ci_composite_scores",
+        "country_fact_vintages"
+      ],
+      "statementCount": 42,
+      "destructiveStatementCount": 4,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0025_immutable_frozen_vintages-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0025_immutable_frozen_vintages --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_composite_scores": 1236,
+        "country_fact_vintages": 35021
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0026_temporal_metadata",
+      "artifact": "drizzle/migrations/0026_temporal_metadata.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "1d76406bc21805bdafb42f85612bd1c23c347ba6126fb3722f83bdb03dd52197",
+      "affectedRelations": [
+        "country_fact_vintages",
+        "country_facts",
+        "government_taxonomies",
+        "sources"
+      ],
+      "statementCount": 10,
+      "destructiveStatementCount": 1,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0026_temporal_metadata-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0026_temporal_metadata --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_fact_vintages": 35021,
+        "country_facts": 25829,
+        "government_taxonomies": 249,
+        "sources": 57
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0023_wide_gorilla_man",
+      "artifact": "drizzle/authoritative/0023_wide_gorilla_man.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "3e561cffdaaeb6ed1a1c42527f97e8775012ba00a87c26d5e2b68ddfcf2efef8",
+      "affectedRelations": [
+        "pulse_events_v2",
+        "pulse_incident_assignments",
+        "pulse_incident_resolutions",
+        "pulse_incidents",
+        "pulse_pipeline_runs",
+        "pulse_sources",
+        "raw_events",
+        "research_evidence_history"
+      ],
+      "statementCount": 55,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0023_wide_gorilla_man-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0023_wide_gorilla_man --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384,
+        "pulse_incident_assignments": 1507,
+        "pulse_incident_resolutions": 479,
+        "pulse_incidents": 1224,
+        "pulse_pipeline_runs": 99,
+        "pulse_sources": 529,
+        "raw_events": 1595,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0024_dark_maginty",
+      "artifact": "drizzle/authoritative/0024_dark_maginty.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "5bf4ce195a3927b0712c87d7407645a2e57426b9131e20a837af83ca335523f7",
+      "affectedRelations": [
+        "pulse_classification_attempts",
+        "pulse_cluster_classification_states",
+        "pulse_event_decisions",
+        "pulse_events_v2",
+        "pulse_pipeline_runs",
+        "raw_events",
+        "research_evidence_history"
+      ],
+      "statementCount": 33,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0024_dark_maginty-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0024_dark_maginty --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_classification_attempts": 385,
+        "pulse_cluster_classification_states": 385,
+        "pulse_event_decisions": 10163,
+        "pulse_events_v2": 384,
+        "pulse_pipeline_runs": 99,
+        "raw_events": 1595,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0025_careful_the_professor",
+      "artifact": "drizzle/authoritative/0025_careful_the_professor.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "fee307170e6a8df46fbdc0b59887ebb22547353093d90341d6d87291ae2f3289",
+      "affectedRelations": [
+        "pulse_events_v2",
+        "pulse_incidents",
+        "pulse_review_obligations",
+        "pulse_review_sla_events",
+        "research_evidence_history"
+      ],
+      "statementCount": 42,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0025_careful_the_professor-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0025_careful_the_professor --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384,
+        "pulse_incidents": 1224,
+        "pulse_review_obligations": 175,
+        "pulse_review_sla_events": 175,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0026_magenta_xavin",
+      "artifact": "drizzle/authoritative/0026_magenta_xavin.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "c85245fbd9d0f48568ac7588a5d42a5649c71d4704e213647f2b30d9b3a4f61e",
+      "affectedRelations": [
+        "pulse_changelog",
+        "pulse_daily_scores"
+      ],
+      "statementCount": 14,
+      "destructiveStatementCount": 2,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0026_magenta_xavin-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0026_magenta_xavin --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_changelog": "missing",
+        "pulse_daily_scores": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0027_smart_tempest",
+      "artifact": "drizzle/authoritative/0027_smart_tempest.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "0952f3e56354b8152192a233465ac29b04d4943836067cc29a6a1df6009bf846",
+      "affectedRelations": [
+        "pulse_dimensional_delta_history",
+        "pulse_dimensional_deltas",
+        "research_evidence_history"
+      ],
+      "statementCount": 21,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0027_smart_tempest-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0027_smart_tempest --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_dimensional_delta_history": 1625,
+        "pulse_dimensional_deltas": 325,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0028_complex_carlie_cooper",
+      "artifact": "drizzle/authoritative/0028_complex_carlie_cooper.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "fbef51106cc6765704a9dc6994c0c3ca6479ddd8e1667419bd1e7817f5541c1a",
+      "affectedRelations": [
+        "ci_dimension_scores",
+        "pulse_event_absorptions",
+        "pulse_events_v2",
+        "research_evidence_history"
+      ],
+      "statementCount": 10,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0028_complex_carlie_cooper-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0028_complex_carlie_cooper --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_dimension_scores": 4867,
+        "pulse_event_absorptions": 0,
+        "pulse_events_v2": 384,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0029_whole_dazzler",
+      "artifact": "drizzle/authoritative/0029_whole_dazzler.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "ed1bc1179ddec1fe7ed40cf91629c6f5fcd0498eee8f0df4376c468aa53591a0",
+      "affectedRelations": [
+        "jurisdictions",
+        "pulse_event_information_environment_pins",
+        "pulse_events_v2",
+        "pulse_information_environment_releases",
+        "pulse_information_environment_values",
+        "pulse_pipeline_runs",
+        "research_evidence_history"
+      ],
+      "statementCount": 33,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0029_whole_dazzler-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0029_whole_dazzler --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253,
+        "pulse_event_information_environment_pins": 384,
+        "pulse_events_v2": 384,
+        "pulse_information_environment_releases": 1,
+        "pulse_information_environment_values": 251,
+        "pulse_pipeline_runs": 99,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0030_cute_namora",
+      "artifact": "drizzle/authoritative/0030_cute_namora.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "e46264cd7c4925b38adab616703c59e3a82fa458d42536fc73f72a8e2257ee13",
+      "affectedRelations": [
+        "constitution_passages"
+      ],
+      "statementCount": 20,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0030_cute_namora-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0030_cute_namora --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "constitution_passages": 96126
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0031_hot_saracen",
+      "artifact": "drizzle/authoritative/0031_hot_saracen.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "2b0bad9dfb6b7a7693a44cc2b29c8329d9e0b24566ac762acbde7156517700c4",
+      "affectedRelations": [
+        "government_bodies",
+        "jurisdictions",
+        "legislature_parties",
+        "party_composition_runs",
+        "party_identity_events",
+        "political_parties",
+        "research_evidence_history",
+        "sources",
+        "statements"
+      ],
+      "statementCount": 40,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0031_hot_saracen-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0031_hot_saracen --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "government_bodies": 483,
+        "jurisdictions": 253,
+        "legislature_parties": 1548,
+        "party_composition_runs": 194,
+        "party_identity_events": 1548,
+        "political_parties": 1548,
+        "research_evidence_history": 85723,
+        "sources": 57,
+        "statements": 7154
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0032_sparkling_genesis",
+      "artifact": "drizzle/authoritative/0032_sparkling_genesis.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "8792a833ae6b38470f6f6bc18566f4998ec87822aaa1aec726592467a5bfb8db",
+      "affectedRelations": [
+        "jurisdictions",
+        "organization_memberships",
+        "organizations",
+        "research_evidence_history",
+        "sources"
+      ],
+      "statementCount": 27,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0032_sparkling_genesis-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0032_sparkling_genesis --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253,
+        "organization_memberships": 1880,
+        "organizations": 24,
+        "research_evidence_history": 85723,
+        "sources": 57
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0033_flat_hardball",
+      "artifact": "drizzle/authoritative/0033_flat_hardball.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "314ccb9d48c00e6f242b91dcb70d6d5ccf6da0d260e44c39982c822e98395ebc",
+      "affectedRelations": [
+        "admin_mutation_audit_log",
+        "admin_session_revocations"
+      ],
+      "statementCount": 14,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0033_flat_hardball-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0033_flat_hardball --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "admin_mutation_audit_log": "missing",
+        "admin_session_revocations": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0034_superb_the_fallen",
+      "artifact": "drizzle/authoritative/0034_superb_the_fallen.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "51ac043cd187d0f00e3b60d6cfa56b08231de8911a5a65f0d353a8df01563a86",
+      "affectedRelations": [
+        "cron_job_attempts",
+        "cron_job_executions",
+        "cron_job_leases"
+      ],
+      "statementCount": 148,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0034_superb_the_fallen-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0034_superb_the_fallen --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "cron_job_attempts": "missing",
+        "cron_job_executions": "missing",
+        "cron_job_leases": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0035_equal_marvex",
+      "artifact": "drizzle/authoritative/0035_equal_marvex.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "e10d60be954a5be888934db76218a36dd177981909d689610665fbd4ac645913",
+      "affectedRelations": [
+        "pulse_classification_delivery_bindings"
+      ],
+      "statementCount": 15,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0035_equal_marvex-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0035_equal_marvex --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_classification_delivery_bindings": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0036_moaning_toad_men",
+      "artifact": "drizzle/authoritative/0036_moaning_toad_men.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "8706eedb27c8d074b934e3941d394ba0bb01cc3d1db3ea40e062f86c8363b20a",
+      "affectedRelations": [
+        "ci_composite_scores",
+        "ci_dimension_scores",
+        "ci_index_release_pointers",
+        "ci_index_releases",
+        "ci_methodology_versions",
+        "country_fact_vintage_candidates",
+        "country_fact_vintage_releases",
+        "country_fact_vintages",
+        "pulse_dimensional_delta_history",
+        "pulse_pipeline_runs",
+        "pulse_score_publication_pointers"
+      ],
+      "statementCount": 218,
+      "destructiveStatementCount": 2,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0036_moaning_toad_men-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0036_moaning_toad_men --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_composite_scores": 1236,
+        "ci_dimension_scores": 4867,
+        "ci_index_release_pointers": "missing",
+        "ci_index_releases": "missing",
+        "ci_methodology_versions": 7,
+        "country_fact_vintage_candidates": 25827,
+        "country_fact_vintage_releases": 2,
+        "country_fact_vintages": 35021,
+        "pulse_dimensional_delta_history": 1625,
+        "pulse_pipeline_runs": 99,
+        "pulse_score_publication_pointers": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0037_minor_sharon_carter",
+      "artifact": "drizzle/authoritative/0037_minor_sharon_carter.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "1d59f76489a1feefcc9ca869d2068a2d1bb96be0999c96759d9fce2ba7b8771c",
+      "affectedRelations": [
+        "route_performance_observations"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0037_minor_sharon_carter-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0037_minor_sharon_carter --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "route_performance_observations": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0038_heavy_slyde",
+      "artifact": "drizzle/authoritative/0038_heavy_slyde.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "b18764101e764902f203e1cd537b7a6291c82e68b1ebcc2611118850669ddd87",
+      "affectedRelations": [
+        "production_pipeline_runs"
+      ],
+      "statementCount": 5,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0038_heavy_slyde-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0038_heavy_slyde --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "production_pipeline_runs": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0039_living_clea",
+      "artifact": "drizzle/authoritative/0039_living_clea.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "f2ecbcbbf24aee761968c9c7751d0d537f426450d3c3c69cb611715c2d1e8f1c",
+      "affectedRelations": [
+        "error_monitoring_events",
+        "error_monitoring_issue_links"
+      ],
+      "statementCount": 8,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0039_living_clea-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0039_living_clea --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "error_monitoring_events": "missing",
+        "error_monitoring_issue_links": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0040_closed_young_avengers",
+      "artifact": "drizzle/authoritative/0040_closed_young_avengers.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "467fbe0f8e9d7b4e4149fcaf60e730db9e5a2d54f65d6782294ad2bf5cab51a9",
+      "affectedRelations": [
+        "civica_conditions_calculations",
+        "civica_conditions_components",
+        "civica_conditions_scores",
+        "research_evidence_history"
+      ],
+      "statementCount": 13,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0040_closed_young_avengers-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0040_closed_young_avengers --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "civica_conditions_calculations": "missing",
+        "civica_conditions_components": "missing",
+        "civica_conditions_scores": 331,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0042_grey_sally_floyd",
+      "artifact": "drizzle/authoritative/0042_grey_sally_floyd.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "047a8c5f483927b033651c7b2e3ea3c928b5960b3ece623d6e9893fd0cbe8d52",
+      "affectedRelations": [
+        "civica_conditions_calculations",
+        "civica_conditions_normalization_parameters",
+        "civica_conditions_reference_sets",
+        "civica_conditions_releases",
+        "civica_conditions_scores",
+        "research_evidence_history"
+      ],
+      "statementCount": 17,
+      "destructiveStatementCount": 2,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0042_grey_sally_floyd-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0042_grey_sally_floyd --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "civica_conditions_calculations": "missing",
+        "civica_conditions_normalization_parameters": "missing",
+        "civica_conditions_reference_sets": "missing",
+        "civica_conditions_releases": "missing",
+        "civica_conditions_scores": 331,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0043_pulse_decay_lifecycle",
+      "artifact": "drizzle/authoritative/0043_pulse_decay_lifecycle.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "7c8bbe2d0a71a14f72fe6602feaf25bab66bfa06a7f034e0488f4b23f8853892",
+      "affectedRelations": [
+        "pulse_dimensional_delta_history",
+        "pulse_dimensional_deltas"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0043_pulse_decay_lifecycle-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0043_pulse_decay_lifecycle --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_dimensional_delta_history": 1625,
+        "pulse_dimensional_deltas": 325
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0044_pulse_drift_monitoring",
+      "artifact": "drizzle/authoritative/0044_pulse_drift_monitoring.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "d1b3b5b47ff1de45ef2854756d6834aee16b057272093b730add8e618fab7469",
+      "affectedRelations": [
+        "pulse_drift_alerts",
+        "pulse_drift_baselines",
+        "pulse_drift_observations"
+      ],
+      "statementCount": 14,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0044_pulse_drift_monitoring-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0044_pulse_drift_monitoring --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_drift_alerts": "missing",
+        "pulse_drift_baselines": "missing",
+        "pulse_drift_observations": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0045_pulse_evaluation_workspace_reconciliation",
+      "artifact": "drizzle/authoritative/0045_pulse_evaluation_workspace_reconciliation.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "78deee17328f6931c5cc0aaf1cb7885b85047eeefc1e8968efb33f4013ed1caf",
+      "affectedRelations": [
+        "pulse_coding_studies"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0045_pulse_evaluation_workspace_reconciliation-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0045_pulse_evaluation_workspace_reconciliation --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_coding_studies": 4
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0046_little_mulholland_black",
+      "artifact": "drizzle/authoritative/0046_little_mulholland_black.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "78c86331e815fbd799fdcfc51e6d2f569bf66f06ac97c771edde226365eb75cb",
+      "affectedRelations": [
+        "atlas_entity_change_history",
+        "correction_log"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0046_little_mulholland_black-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0046_little_mulholland_black --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "atlas_entity_change_history": "missing",
+        "correction_log": 1
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0047_atlas_data_error_reports",
+      "artifact": "drizzle/authoritative/0047_atlas_data_error_reports.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "e36e87c298ac19a50e9a65c7438e51e33b1f849b424c796a3e362a893cd86dfc",
+      "affectedRelations": [
+        "atlas_entity_change_history",
+        "correction_log",
+        "research_evidence_history"
+      ],
+      "statementCount": 22,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0047_atlas_data_error_reports-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0047_atlas_data_error_reports --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "atlas_entity_change_history": "missing",
+        "correction_log": 1,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0048_entity_name_forms",
+      "artifact": "drizzle/authoritative/0048_entity_name_forms.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "9eafb5c92efbe965a6289f31ac67ae7df55f37b7716ba1cd99cd7c69868364e0",
+      "affectedRelations": [
+        "entity_name_forms"
+      ],
+      "statementCount": 5,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0048_entity_name_forms-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0048_entity_name_forms --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "entity_name_forms": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-cia-vintage",
+      "artifact": "scripts/backfill-cia-vintage.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "511c281bfcc8f7953d75c7d5ed08ed6e49f570147f33ff0a5a2858b676ba7554",
+      "affectedRelations": [
+        "sources"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-cia-vintage-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-cia-vintage --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "sources": 57
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-election-results",
+      "artifact": "scripts/backfill-election-results.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "9921f9741eca756a5a159e5eaaa70c0b8f7a540422d8c3479660d24e35884c5e",
+      "affectedRelations": [
+        "election_results",
+        "elections",
+        "jurisdictions"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-election-results-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-election-results --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "election_results": 1351,
+        "elections": 915,
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-growth-methodology",
+      "artifact": "scripts/backfill-growth-methodology.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "4d9ddaad870dc96f5c44a4c9e8d3a84e3f3cf01c42a464486c100dbefdd19b13",
+      "affectedRelations": [
+        "sources"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-growth-methodology-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-growth-methodology --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "sources": 57
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-methodology-version",
+      "artifact": "scripts/backfill-methodology-version.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "42b4a35de3d1d22d49357d39c86698f25d722fd614704118e8a4d8dbf6036b60",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-methodology-version-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-methodology-version --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25829
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-territory-iso2",
+      "artifact": "scripts/backfill-territory-iso2.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "3853c9beef48bda239bde3ee45d1f9b92aecbfa00d2e57967338f69d76e3f641",
+      "affectedRelations": [
+        "jurisdictions"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-territory-iso2-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-territory-iso2 --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-upstream-vintage-labels",
+      "artifact": "scripts/backfill-upstream-vintage-labels.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "3dd754d3489d44884fae6ec44cc8d03cfede98eb916e79fd7fcd55f5c6fb2e89",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-upstream-vintage-labels-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-upstream-vintage-labels --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25829
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-bridge-cia-legacy-to-canonical",
+      "artifact": "scripts/bridge-cia-legacy-to-canonical.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "df174fdad5b52df2252cc68a28367703f28564e9f63c9a42bf07a7a417a4529d",
+      "affectedRelations": [
+        "country_facts",
+        "jurisdictions",
+        "sources"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-bridge-cia-legacy-to-canonical-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-bridge-cia-legacy-to-canonical --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25829,
+        "jurisdictions": 253,
+        "sources": 57
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-cleanup-bad-offices",
+      "artifact": "scripts/cleanup-bad-offices.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "2f1bc629b5592669e9a27cd439d99030c910eb998ed67ecd4e8b0c303ac73268",
+      "affectedRelations": [
+        "offices",
+        "persons",
+        "terms"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-cleanup-bad-offices-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-cleanup-bad-offices --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "offices": 5326,
+        "persons": 4985,
+        "terms": 5590
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-create-rate-limits-table",
+      "artifact": "scripts/create-rate-limits-table.ts",
+      "kind": "mixed",
+      "historyStatus": "operational_data_change",
+      "sha256": "b322c8656f77cef0123139596a0449c2286b6596686c0418613fa528cffe0c88",
+      "affectedRelations": [
+        "rate_limits"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-create-rate-limits-table-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-create-rate-limits-table --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "rate_limits": 1
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-repair-pulse-agreement",
+      "artifact": "scripts/repair-pulse-agreement.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "0b4bd4cb499e45689dd8852693239f7e9b611b78e6bd6e2866287ac8cc39f191",
+      "affectedRelations": [
+        "pulse_events_v2",
+        "research_evidence_history"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-repair-pulse-agreement-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-repair-pulse-agreement --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384,
+        "research_evidence_history": 85723
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-reseed-bug3-corrupted",
+      "artifact": "scripts/reseed-bug3-corrupted.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "bb544183552844ebe0ca648790ac3b9a1033b9f29172d5987c98873d25c3c690",
+      "affectedRelations": [
+        "country_factbook_sections",
+        "country_facts",
+        "data_disputes",
+        "jurisdictions"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-reseed-bug3-corrupted-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-reseed-bug3-corrupted --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_factbook_sections": 2889,
+        "country_facts": 25829,
+        "data_disputes": 33,
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-restore-overdemoted-disputes",
+      "artifact": "scripts/restore-overdemoted-disputes.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "9de4ff1c02b00d2f851a7bf0a826dccafa07c0a5981ccda1c03451ce19ea4581",
+      "affectedRelations": [
+        "jurisdictions",
+        "sources"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-restore-overdemoted-disputes-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-restore-overdemoted-disputes --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253,
+        "sources": 57
+      },
+      "writesPerformed": 0
+    }
+  ]
+}

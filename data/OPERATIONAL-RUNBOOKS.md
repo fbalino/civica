@@ -11,10 +11,12 @@ at the end.
 ## 1. Upstream data-source breakage
 
 - **Detection:** a scheduled sync fails, returns zero rows, or an anomalous
-  delta. Job observability (PLT-017 target) and `markSourcesSynced()` — which
-  stamps `last_sync_at` only on a successful row-writing run — mean a broken
-  sync does **not** advance freshness. `SourceDot` shows the stale/frozen state
-  to readers.
+  delta. `civica-pipeline-observability/v1` records the closed outcome and
+  `operations.pipeline-alerts` evaluates missed, failed, empty, and anomalous
+  runs. The `markSourcesSynced*` API
+  family — whose atomic variants stamp `last_sync_at` only with eligible
+  committed rows — mean a broken sync does **not** advance freshness.
+  `SourceDot` shows the stale/frozen state to readers.
 - **Containment:** the adapter fails closed (DAT-012) and leaves the prior
   canonical values intact; nothing partial is published. No action degrades
   the rest of the atlas.
@@ -27,7 +29,8 @@ at the end.
   domain is affected.
 - **Evidence preservation:** the failed run's error summary and the unchanged
   `last_sync_at` are the record; do not fake freshness.
-- **Recovery verification:** `npm run validate:sync-freshness`; confirm the
+- **Recovery verification:** run `npm run report:pipeline-observability` until
+  the alert closes, then run `npm run validate:sync-freshness`; confirm the
   source's `last_sync_at` advanced and row counts are plausible
   (`validate:release-quality`).
 
@@ -36,12 +39,16 @@ at the end.
 - **Detection:** post-deploy smoke/browser checks fail, a release-quality
   anomaly appears, or a reader/owner reports broken output.
 - **Containment:** frozen vintages are immutable (DAT-023), so a bad recompute
-  cannot overwrite a published vintage. Code: Vercel keeps prior deployments.
+  cannot overwrite a published vintage. Manually disable Cron Jobs first, then
+  preserve the failed deployment and current database state for review.
 - **Owner:** Fernando.
-- **Rollback/correction:** `vercel redeploy <prior-good-prod-url>` (or promote
-  the previous deployment). For data, publish a new superseding vintage
-  (never mutate the old one); the migrator runs before build so schema is
-  compatible.
+- **Rollback/correction:** follow the code/data separation in
+  [`DEPLOYMENT-REHEARSAL.md`](./DEPLOYMENT-REHEARSAL.md): use Vercel Instant
+  Rollback for a known reader-compatible deployment, keep the additive schema,
+  and keep Cron Jobs manually disabled until the selected code is safe to
+  write. For data, publish a new superseding vintage (never mutate the old
+  one); schema/data defects are reviewed forward fixes, not implicit reverse
+  DDL.
 - **User communication:** a correction/retraction follows the `/policies`
   contract (CLM-016) with a changelog entry and supersession marker.
 - **Evidence preservation:** keep the bad deployment URL, the diff, and the
@@ -142,6 +149,56 @@ at the end.
 - **Recovery verification:** the fact resolves to the corrected value on the
   country page and export; `validate:release-quality` clean.
 
+## 8. Rate-limit counter or edge-control incident
+
+- **Detection:** protected routes return `503` with
+  `RATE_LIMIT_UNAVAILABLE`, 429s change unexpectedly, the `rate_limits` table
+  accumulates expired rows, or Vercel reports that the checked all-path
+  firewall rule is inactive or has unpublished changes.
+- **Containment:** keep the verified Vercel WAF rule active and leave dynamic
+  paid/auth/form/export routes fail-closed. Do not restore the legacy
+  process-local limiter and do not bypass the shared counter merely to turn a
+  503 into a 200.
+- **Owner:** Fernando.
+- **Rollback/correction:** restore Neon connectivity or the production
+  `RATE_LIMIT_KEY_SECRET` (minimum 32 bytes, independent of admin/provider
+  secrets), then redeploy. If the key may have leaked, rotate it with
+  `openssl rand -hex 32`; rotation intentionally gives clients fresh budgets.
+  Restore the checked WAF state through Vercel and publish any pending draft.
+- **User communication:** if the database counter outage is sustained, mark
+  affected dynamic APIs/forms unavailable on the status page. Describe it as a
+  protection dependency outage, not as clients exhausting their quotas.
+- **Evidence preservation:** retain deployment IDs, bounded timestamps, Neon
+  error categories, Firewall rule metadata, and the checked evidence at
+  `plan/evidence/PLT-011/vercel-firewall-live.json`. Never retain raw client
+  IPs, counter-key secrets, or complete credentials.
+- **Recovery verification:** follow the spoofing, multi-instance, 429/503, and
+  WAF checks in [`data/RATE-LIMITING.md`](./RATE-LIMITING.md), then run
+  `npm run validate:rate-limit-policy`.
+
+## 9. Exception / error-monitoring incident
+
+- **Detection:** the daily `operations.error-alerts` cron emits a structured
+  `[error-monitoring-alert]` line in the Civica Atlas Vercel Runtime Logs, or
+  `npm run report:error-monitoring` reports an open event.
+- **Containment:** use only the closed release, route, job, and error-code
+  context to find the deployed source-map frame. Do not add a raw exception,
+  stack, request URL, user data, or provider payload to the ledger or logs.
+- **Owner:** Fernando, as owner of the Civica Atlas Vercel project and its
+  Runtime Logs channel.
+- **Rollback/correction:** correct or roll back the affected release, then
+  link its correction-log/status record with `npm run manage:error-monitoring`.
+  Resolve only after the fixed release is deployed and the matching route/job
+  is verified. A repeated signature reopens automatically.
+- **User communication:** PLT-020 owns whether a public status update is
+  warranted; internal error monitoring is not itself a public incident.
+- **Evidence preservation:** retain the event ID, release ID, closed route/job
+  context, source-map identity, correction/status record ID, and verification
+  result. Never retain the raw stack or request content.
+- **Recovery verification:** reproduce the affected route/job safely, confirm
+  the alert has resolved through `npm run report:error-monitoring`, and verify
+  Vercel Protected Source Maps remains enabled before any browser maps ship.
+
 ---
 
 ## Tabletop review (2026-07-12) — recorded gaps
@@ -151,15 +208,17 @@ Each runbook was walked through against the current implementation.
 - **#3 compromised key — LIVE GAP:** a real leaked Neon credential is in git
   history and **not yet rotated** (queued in `plan/MANUAL-CHECKS.md`). This is
   the one runbook with an open, unresolved incident.
-- **Detection depends on unbuilt monitoring:** #1/#4/#5 detection references
-  job/error observability and alerts owned by PLT-017/018/020, which are not
-  yet built — today detection is manual (a failed run, a reader report). Until
-  then, add a manual weekly check of the status page and source freshness.
+- **PLT-020 health/status contract:** `data/HEALTH-STATUS.md` now makes the
+  public `/api/health` component probes, 15-minute owner monitor, fixed
+  Incident.io publication thresholds, and Fernando’s status-page responsibility
+  the canonical path. The provider-side component-label confirmation remains in
+  `plan/MANUAL-CHECKS.md`; it is not claimed by the repository.
 - **User communication is single-channel:** the status page and the `/policies`
   correction flow exist; there is no subscriber notification system (by design,
   APR-D031). Communication is pull, not push.
-- **No automated rollback:** rollback is a manual `vercel redeploy` /
-  supersede-vintage; no one-click rollback exists. Acceptable for a single-owner
-  project; revisit if contributors are added.
+- **No automated data rollback:** application rollback is a manual Vercel
+  Instant Rollback, while data and schema recovery remain a reviewed
+  forward-fix/superseding-release decision. Cron Jobs must be manually disabled
+  because Vercel documents that active jobs can continue after rollback.
 - **Legal (#6):** substantive steps depend on counsel (BRD-003/010), which is a
   manual/external gate not yet engaged.

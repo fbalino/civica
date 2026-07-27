@@ -8,16 +8,9 @@
  * callers.
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { buildAdminClearCookieHeaders } from "@/lib/admin/session";
+import { withAdminLogout } from "@/lib/admin/logout";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const res = NextResponse.redirect(
-    new URL("/admin/sign-in", request.url),
-    303
-  );
-  for (const [name, value] of buildAdminClearCookieHeaders()) {
-    res.headers.append(name, value);
-  }
-  return res;
+  return withAdminLogout(request, "/api/admin/sign-out");
 }

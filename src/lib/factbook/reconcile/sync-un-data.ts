@@ -59,25 +59,31 @@
 import { sql } from "drizzle-orm";
 import AdmZip from "adm-zip";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
 const UNDATA_BASE_URL = "http://data.un.org/Handlers/DownloadHandler.ashx";
 const UN_DATA_PORTAL_DOC_URL = "https://population.un.org/wpp/";
-const UN_USER_AGENT =
-  "Civica/0.1 (https://civicaatlas.org; fbalino@gmail.com)";
+const UN_USER_AGENT = "Civica/0.1 (https://civicaatlas.org; fbalino@gmail.com)";
 
 /**
  * Vintage label for the current WPP revision. WPP releases biennially
@@ -247,46 +253,246 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
  * module; for now, importing from sync-un-data is zero-conflict.
  */
 export const M49_TO_ISO3: Record<number, string> = {
-  4: "AFG", 8: "ALB", 12: "DZA", 16: "ASM", 20: "AND", 24: "AGO",
-  28: "ATG", 31: "AZE", 32: "ARG", 36: "AUS", 40: "AUT", 44: "BHS",
-  48: "BHR", 50: "BGD", 51: "ARM", 52: "BRB", 56: "BEL", 60: "BMU",
-  64: "BTN", 68: "BOL", 70: "BIH", 72: "BWA", 76: "BRA", 84: "BLZ",
-  90: "SLB", 92: "VGB", 96: "BRN", 100: "BGR", 104: "MMR", 108: "BDI",
-  112: "BLR", 116: "KHM", 120: "CMR", 124: "CAN", 132: "CPV", 136: "CYM",
-  140: "CAF", 144: "LKA", 148: "TCD", 152: "CHL", 156: "CHN", 158: "TWN",
-  170: "COL", 174: "COM", 175: "MYT", 178: "COG", 180: "COD", 184: "COK",
-  188: "CRI", 191: "HRV", 192: "CUB", 196: "CYP", 203: "CZE", 204: "BEN",
-  208: "DNK", 212: "DMA", 214: "DOM", 218: "ECU", 222: "SLV", 226: "GNQ",
-  231: "ETH", 232: "ERI", 233: "EST", 234: "FRO", 238: "FLK", 242: "FJI",
-  246: "FIN", 250: "FRA", 254: "GUF", 258: "PYF", 262: "DJI", 266: "GAB",
-  268: "GEO", 270: "GMB", 275: "PSE", 276: "DEU", 288: "GHA", 292: "GIB",
-  296: "KIR", 300: "GRC", 304: "GRL", 308: "GRD", 312: "GLP", 316: "GUM",
-  320: "GTM", 324: "GIN", 328: "GUY", 332: "HTI", 336: "VAT", 340: "HND",
-  344: "HKG", 348: "HUN", 352: "ISL", 356: "IND", 360: "IDN", 364: "IRN",
-  368: "IRQ", 372: "IRL", 376: "ISR", 380: "ITA", 384: "CIV", 388: "JAM",
-  392: "JPN", 398: "KAZ", 400: "JOR", 404: "KEN", 408: "PRK", 410: "KOR",
-  414: "KWT", 417: "KGZ", 418: "LAO", 422: "LBN", 426: "LSO", 428: "LVA",
-  430: "LBR", 434: "LBY", 438: "LIE", 440: "LTU", 442: "LUX", 446: "MAC",
-  450: "MDG", 454: "MWI", 458: "MYS", 462: "MDV", 466: "MLI", 470: "MLT",
-  474: "MTQ", 478: "MRT", 480: "MUS", 484: "MEX", 492: "MCO", 496: "MNG",
-  498: "MDA", 499: "MNE", 500: "MSR", 504: "MAR", 508: "MOZ", 512: "OMN",
-  516: "NAM", 520: "NRU", 524: "NPL", 528: "NLD", 530: "ANT", 531: "CUW",
-  533: "ABW", 534: "SXM", 535: "BES", 540: "NCL", 548: "VUT", 554: "NZL",
-  558: "NIC", 562: "NER", 566: "NGA", 570: "NIU", 574: "NFK", 578: "NOR",
-  580: "MNP", 581: "UMI", 583: "FSM", 584: "MHL", 585: "PLW", 586: "PAK",
-  591: "PAN", 598: "PNG", 600: "PRY", 604: "PER", 608: "PHL", 612: "PCN",
-  616: "POL", 620: "PRT", 624: "GNB", 626: "TLS", 630: "PRI", 634: "QAT",
-  638: "REU", 642: "ROU", 643: "RUS", 646: "RWA", 652: "BLM", 654: "SHN",
-  659: "KNA", 660: "AIA", 662: "LCA", 663: "MAF", 666: "SPM", 670: "VCT",
-  674: "SMR", 678: "STP", 682: "SAU", 686: "SEN", 688: "SRB", 690: "SYC",
-  694: "SLE", 702: "SGP", 703: "SVK", 704: "VNM", 705: "SVN", 706: "SOM",
-  710: "ZAF", 716: "ZWE", 724: "ESP", 728: "SSD", 729: "SDN", 732: "ESH",
-  740: "SUR", 744: "SJM", 748: "SWZ", 752: "SWE", 756: "CHE", 760: "SYR",
-  762: "TJK", 764: "THA", 768: "TGO", 772: "TKL", 776: "TON", 780: "TTO",
-  784: "ARE", 788: "TUN", 792: "TUR", 795: "TKM", 796: "TCA", 798: "TUV",
-  800: "UGA", 804: "UKR", 807: "MKD", 818: "EGY", 826: "GBR", 831: "GGY",
-  832: "JEY", 833: "IMN", 834: "TZA", 840: "USA", 850: "VIR", 854: "BFA",
-  858: "URY", 860: "UZB", 862: "VEN", 876: "WLF", 882: "WSM", 887: "YEM",
+  4: "AFG",
+  8: "ALB",
+  12: "DZA",
+  16: "ASM",
+  20: "AND",
+  24: "AGO",
+  28: "ATG",
+  31: "AZE",
+  32: "ARG",
+  36: "AUS",
+  40: "AUT",
+  44: "BHS",
+  48: "BHR",
+  50: "BGD",
+  51: "ARM",
+  52: "BRB",
+  56: "BEL",
+  60: "BMU",
+  64: "BTN",
+  68: "BOL",
+  70: "BIH",
+  72: "BWA",
+  76: "BRA",
+  84: "BLZ",
+  90: "SLB",
+  92: "VGB",
+  96: "BRN",
+  100: "BGR",
+  104: "MMR",
+  108: "BDI",
+  112: "BLR",
+  116: "KHM",
+  120: "CMR",
+  124: "CAN",
+  132: "CPV",
+  136: "CYM",
+  140: "CAF",
+  144: "LKA",
+  148: "TCD",
+  152: "CHL",
+  156: "CHN",
+  158: "TWN",
+  170: "COL",
+  174: "COM",
+  175: "MYT",
+  178: "COG",
+  180: "COD",
+  184: "COK",
+  188: "CRI",
+  191: "HRV",
+  192: "CUB",
+  196: "CYP",
+  203: "CZE",
+  204: "BEN",
+  208: "DNK",
+  212: "DMA",
+  214: "DOM",
+  218: "ECU",
+  222: "SLV",
+  226: "GNQ",
+  231: "ETH",
+  232: "ERI",
+  233: "EST",
+  234: "FRO",
+  238: "FLK",
+  242: "FJI",
+  246: "FIN",
+  250: "FRA",
+  254: "GUF",
+  258: "PYF",
+  262: "DJI",
+  266: "GAB",
+  268: "GEO",
+  270: "GMB",
+  275: "PSE",
+  276: "DEU",
+  288: "GHA",
+  292: "GIB",
+  296: "KIR",
+  300: "GRC",
+  304: "GRL",
+  308: "GRD",
+  312: "GLP",
+  316: "GUM",
+  320: "GTM",
+  324: "GIN",
+  328: "GUY",
+  332: "HTI",
+  336: "VAT",
+  340: "HND",
+  344: "HKG",
+  348: "HUN",
+  352: "ISL",
+  356: "IND",
+  360: "IDN",
+  364: "IRN",
+  368: "IRQ",
+  372: "IRL",
+  376: "ISR",
+  380: "ITA",
+  384: "CIV",
+  388: "JAM",
+  392: "JPN",
+  398: "KAZ",
+  400: "JOR",
+  404: "KEN",
+  408: "PRK",
+  410: "KOR",
+  414: "KWT",
+  417: "KGZ",
+  418: "LAO",
+  422: "LBN",
+  426: "LSO",
+  428: "LVA",
+  430: "LBR",
+  434: "LBY",
+  438: "LIE",
+  440: "LTU",
+  442: "LUX",
+  446: "MAC",
+  450: "MDG",
+  454: "MWI",
+  458: "MYS",
+  462: "MDV",
+  466: "MLI",
+  470: "MLT",
+  474: "MTQ",
+  478: "MRT",
+  480: "MUS",
+  484: "MEX",
+  492: "MCO",
+  496: "MNG",
+  498: "MDA",
+  499: "MNE",
+  500: "MSR",
+  504: "MAR",
+  508: "MOZ",
+  512: "OMN",
+  516: "NAM",
+  520: "NRU",
+  524: "NPL",
+  528: "NLD",
+  530: "ANT",
+  531: "CUW",
+  533: "ABW",
+  534: "SXM",
+  535: "BES",
+  540: "NCL",
+  548: "VUT",
+  554: "NZL",
+  558: "NIC",
+  562: "NER",
+  566: "NGA",
+  570: "NIU",
+  574: "NFK",
+  578: "NOR",
+  580: "MNP",
+  581: "UMI",
+  583: "FSM",
+  584: "MHL",
+  585: "PLW",
+  586: "PAK",
+  591: "PAN",
+  598: "PNG",
+  600: "PRY",
+  604: "PER",
+  608: "PHL",
+  612: "PCN",
+  616: "POL",
+  620: "PRT",
+  624: "GNB",
+  626: "TLS",
+  630: "PRI",
+  634: "QAT",
+  638: "REU",
+  642: "ROU",
+  643: "RUS",
+  646: "RWA",
+  652: "BLM",
+  654: "SHN",
+  659: "KNA",
+  660: "AIA",
+  662: "LCA",
+  663: "MAF",
+  666: "SPM",
+  670: "VCT",
+  674: "SMR",
+  678: "STP",
+  682: "SAU",
+  686: "SEN",
+  688: "SRB",
+  690: "SYC",
+  694: "SLE",
+  702: "SGP",
+  703: "SVK",
+  704: "VNM",
+  705: "SVN",
+  706: "SOM",
+  710: "ZAF",
+  716: "ZWE",
+  724: "ESP",
+  728: "SSD",
+  729: "SDN",
+  732: "ESH",
+  740: "SUR",
+  744: "SJM",
+  748: "SWZ",
+  752: "SWE",
+  756: "CHE",
+  760: "SYR",
+  762: "TJK",
+  764: "THA",
+  768: "TGO",
+  772: "TKL",
+  776: "TON",
+  780: "TTO",
+  784: "ARE",
+  788: "TUN",
+  792: "TUR",
+  795: "TKM",
+  796: "TCA",
+  798: "TUV",
+  800: "UGA",
+  804: "UKR",
+  807: "MKD",
+  818: "EGY",
+  826: "GBR",
+  831: "GGY",
+  832: "JEY",
+  833: "IMN",
+  834: "TZA",
+  840: "USA",
+  850: "VIR",
+  854: "BFA",
+  858: "URY",
+  860: "UZB",
+  862: "VEN",
+  876: "WLF",
+  882: "WSM",
+  887: "YEM",
   894: "ZMB",
 };
 
@@ -351,6 +557,8 @@ export interface UnDataSyncOptions {
   jurisdictions?: UnDataJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface UnDataJurisdiction {
@@ -359,10 +567,7 @@ export interface UnDataJurisdiction {
   iso3: string | null;
 }
 
-function freshCounters(
-  factKey: string,
-  unVarId: number,
-): PerUnDataCounters {
+function freshCounters(factKey: string, unVarId: number): PerUnDataCounters {
   return {
     factKey,
     unVarId,
@@ -427,9 +632,7 @@ async function fetchIndicatorYear(
   const zip = new AdmZip(buffer);
   const entries = zip.getEntries();
   if (entries.length === 0) {
-    throw new Error(
-      `UN PopDiv variableID ${unVarId}: ZIP archive empty`,
-    );
+    throw new Error(`UN PopDiv variableID ${unVarId}: ZIP archive empty`);
   }
   const csvEntry = entries[0];
   const csvText = csvEntry.getData().toString("utf-8");
@@ -475,9 +678,7 @@ async function fetchIndicatorYear(
  * are filtered out — they correspond to regions/unions/BRICS not
  * to sovereign states.
  */
-function pickMediumPerCountry(
-  rows: UnDataRow[],
-): Map<string, UnDataRow> {
+function pickMediumPerCountry(rows: UnDataRow[]): Map<string, UnDataRow> {
   const out = new Map<string, UnDataRow>();
   for (const r of rows) {
     if (r.variant !== "Medium") continue;
@@ -520,17 +721,23 @@ export async function syncUnData(
       dryRun: options.dryRun ?? false,
     };
   }
+  const atlasReleaseId = options.dryRun
+    ? undefined
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   // Build iso3 → jurisdictionId map once; reused across all
   // indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -538,9 +745,7 @@ export async function syncUnData(
   for (const j of allJurisdictions) {
     if (j.iso3) iso3ToJurisdiction.set(j.iso3.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`);
 
   const counters = new Map<string, PerUnDataCounters>();
   for (const c of targets) {
@@ -569,7 +774,10 @@ export async function syncUnData(
 
     let rows: UnDataRow[];
     try {
-      rows = await (options.fetchIndicator ?? fetchIndicatorYear)(config.unVarId, UN_WPP_TIME_ID);
+      rows = await (options.fetchIndicator ?? fetchIndicatorYear)(
+        config.unVarId,
+        UN_WPP_TIME_ID,
+      );
     } catch (err) {
       errors.push(
         `UN vid ${config.unVarId} fetch failed: ${
@@ -588,9 +796,7 @@ export async function syncUnData(
 
     const mediumByIso3 = pickMediumPerCountry(rows);
     counter.jurisdictions_with_value = mediumByIso3.size;
-    log(
-      `  ${mediumByIso3.size} sovereign-state ISO3 codes mapped from M49`,
-    );
+    log(`  ${mediumByIso3.size} sovereign-state ISO3 codes mapped from M49`);
 
     for (const [iso3, dp] of mediumByIso3) {
       const j = iso3ToJurisdiction.get(iso3);
@@ -616,10 +822,14 @@ export async function syncUnData(
       const env = factKeyDef.envelope;
       if (env) {
         const min = env.isPercent
-          ? (env.min !== undefined ? env.min : -1)
+          ? env.min !== undefined
+            ? env.min
+            : -1
           : env.min;
         const max = env.isPercent
-          ? (env.max !== undefined ? env.max : 101)
+          ? env.max !== undefined
+            ? env.max
+            : 101
           : env.max;
         if (
           (min !== undefined && numericValue < min) ||
@@ -696,56 +906,33 @@ export async function syncUnData(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "un_data",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: UN_WPP_VINTAGE,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: UN_WPP_VINTAGE,
-              snapshotId,
-              updatedAt: new Date(),
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "un_data",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: UN_WPP_VINTAGE,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written++;
         totalWritten++;
         touchedPairs.add(`${j.id}|${config.factKey}`);
@@ -762,13 +949,13 @@ export async function syncUnData(
         `(envelope rejects: ${counter.rejected_envelope}, ` +
         `unmatched ISO3: ${counter.skipped_no_jurisdiction})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "UN Data",
+      target: `${config.factKey} (variable ${config.unVarId})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("un_data", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -783,13 +970,17 @@ export async function syncUnData(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -799,6 +990,15 @@ export async function syncUnData(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "un_data",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerUnDataCounters> = {};

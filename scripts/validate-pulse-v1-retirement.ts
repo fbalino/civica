@@ -1,10 +1,5 @@
 import { config } from "dotenv";
-import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-} from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { neon } from "@neondatabase/serverless";
 
@@ -12,7 +7,11 @@ config({ path: ".env.local", override: true });
 
 const RETIRED_RELATIONS = ["pulse_daily_scores", "pulse_changelog"] as const;
 const RETIRED_SCHEMA_EXPORTS = ["pulseDailyScores", "pulseChangelog"] as const;
-const RETIRED_RUNTIME_TOKENS = ["pulse_daily_scores", "pulse_changelog", "pulseDailyScores"] as const;
+const RETIRED_RUNTIME_TOKENS = [
+  "pulse_daily_scores",
+  "pulse_changelog",
+  "pulseDailyScores",
+] as const;
 
 function fail(message: string): never {
   throw new Error(`PUL-034 Pulse v1 retirement validation failed: ${message}`);
@@ -56,7 +55,8 @@ for (const marker of [
   'DROP TABLE "pulse_daily_scores"',
   "civica-affected-relations: pulse_changelog,pulse_daily_scores",
 ]) {
-  if (!migration.includes(marker)) fail(`retirement migration is missing ${marker}`);
+  if (!migration.includes(marker))
+    fail(`retirement migration is missing ${marker}`);
 }
 if (/DROP TABLE[^;]+CASCADE/i.test(migration)) {
   fail("retirement migration must not cascade into unreviewed objects");
@@ -97,15 +97,21 @@ if (packageJson.includes('"ingest:pulse:events"')) {
   fail("package.json still advertises the legacy Pulse v1 ingest command");
 }
 for (const cron of vercel.crons ?? []) {
-  if (cron.path?.startsWith("/api/cron/pulse/") && !cron.path.includes("/v2/")) {
+  if (
+    cron.path?.startsWith("/api/cron/pulse/") &&
+    !cron.path.includes("/v2/")
+  ) {
     fail(`vercel.json schedules retired route ${cron.path}`);
   }
 }
 
 const rankings = read("src/app/api/v1/index/rankings/route.ts");
+const requestContracts = read("src/lib/api/request-contract.ts");
 if (
-  !rankings.includes('.trim().toLowerCase() === "cp"') ||
-  !rankings.includes("retiredPulseScalarResponse")
+  !rankings.includes('query.data.sort === "cp"') ||
+  !rankings.includes("retiredPulseScalarResponse") ||
+  !rankings.includes('"v1-index-rankings-query/v1"') ||
+  !requestContracts.includes('.pipe(z.enum(["ci", "cp"]))')
 ) {
   fail("rankings does not distinguish retired CP from unknown sort values");
 }

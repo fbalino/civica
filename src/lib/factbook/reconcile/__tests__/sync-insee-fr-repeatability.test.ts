@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
 import type { InseeSeries } from "../sync-insee-fr";
 import { syncInseeFr } from "../sync-insee-fr";
@@ -29,7 +30,10 @@ function harness() {
     }) }),
     select: () => ({ from: (table: unknown) => ({ where: () => ({ limit: async () => table === factSnapshots ? [{ id: [...snapshots.values()][0]?.id }] : [] }) }) }),
   };
-  return { db: db as never, facts, writes: () => writes };
+  const writeFact: CountryFactHistoryWriter = async (_database, { values }) => {
+    await db.insert(countryFacts).values(values as unknown as Record<string, unknown>).onConflictDoUpdate();
+  };
+  return { db: db as never, facts, writeFact, writes: () => writes };
 }
 
 const noDisputes = async () => ({ jurisdictionsScanned: 1, pairsScanned: 1, proposedTotal: 0, inserted: 0, skippedDuplicate: 0, skippedNoFactGroup: 0, errors: [] });
@@ -46,7 +50,7 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
 
 test("INSEE fixture applications converge on one canonical fact", async () => {
   const state = harness();
-  const options = { factKey: "population_total", idbank: series.idbank, jurisdiction, fetchIndicator: fetchIndicator as never, persistDisputes: noDisputes as never, markSynced: (async () => ["insee_fr"]) as never };
+  const options = { factKey: "population_total", idbank: series.idbank, jurisdiction, fetchIndicator: fetchIndicator as never, persistDisputes: noDisputes as never, markSynced: (async () => ["insee_fr"]) as never, atlasReleaseId: "atlas-test", writeFact: state.writeFact };
   await syncInseeFr(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
   await syncInseeFr(state.db, options);
@@ -73,8 +77,10 @@ test("INSEE upstream failure cannot stamp freshness", async () => {
     fetchIndicator: (async () => { throw new Error("upstream schema changed"); }) as never,
     persistDisputes: noDisputes as never,
     markSynced: (async (_ids: unknown, options: { rowsWritten: number }) => { stampedRows.push(options.rowsWritten); return []; }) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact,
   });
   assert.match(result.errors.join(" "), /upstream schema changed/);
-  assert.deepEqual(stampedRows, [0]);
+  assert.deepEqual(stampedRows, []);
   assert.equal(state.writes(), 0);
 });

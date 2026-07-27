@@ -199,4 +199,117 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "8792a833ae6b38470f6f6bc18566f4998ec87822aaa1aec726592467a5bfb8db",
     baseline: false,
   },
+  {
+    id: "0033_flat_hardball",
+    path: "drizzle/authoritative/0033_flat_hardball.sql",
+    sha256: "314ccb9d48c00e6f242b91dcb70d6d5ccf6da0d260e44c39982c822e98395ebc",
+    baseline: false,
+  },
+  {
+    id: "0034_superb_the_fallen",
+    path: "drizzle/authoritative/0034_superb_the_fallen.sql",
+    sha256: "51ac043cd187d0f00e3b60d6cfa56b08231de8911a5a65f0d353a8df01563a86",
+    baseline: false,
+  },
+  {
+    id: "0035_equal_marvex",
+    path: "drizzle/authoritative/0035_equal_marvex.sql",
+    sha256: "e10d60be954a5be888934db76218a36dd177981909d689610665fbd4ac645913",
+    baseline: false,
+  },
+  {
+    id: "0036_moaning_toad_men",
+    path: "drizzle/authoritative/0036_moaning_toad_men.sql",
+    sha256: "8706eedb27c8d074b934e3941d394ba0bb01cc3d1db3ea40e062f86c8363b20a",
+    baseline: false,
+  },
+  {
+    id: "0037_minor_sharon_carter",
+    path: "drizzle/authoritative/0037_minor_sharon_carter.sql",
+    sha256: "1d59f76489a1feefcc9ca869d2068a2d1bb96be0999c96759d9fce2ba7b8771c",
+    baseline: false,
+  },
+  {
+    id: "0038_heavy_slyde",
+    path: "drizzle/authoritative/0038_heavy_slyde.sql",
+    sha256: "b18764101e764902f203e1cd537b7a6291c82e68b1ebcc2611118850669ddd87",
+    baseline: false,
+  },
+  {
+    id: "0039_living_clea",
+    path: "drizzle/authoritative/0039_living_clea.sql",
+    sha256: "f2ecbcbbf24aee761968c9c7751d0d537f426450d3c3c69cb611715c2d1e8f1c",
+    baseline: false,
+  },
+  {
+    id: "0040_closed_young_avengers",
+    path: "drizzle/authoritative/0040_closed_young_avengers.sql",
+    sha256: "467fbe0f8e9d7b4e4149fcaf60e730db9e5a2d54f65d6782294ad2bf5cab51a9",
+    baseline: false,
+  },
+  {
+    id: "0042_grey_sally_floyd",
+    path: "drizzle/authoritative/0042_grey_sally_floyd.sql",
+    sha256: "3661572663a1fdb881892b345b3a508f8be1fb4a590d3c1ed5979e85e356a769",
+    baseline: false,
+  },
+  {
+    id: "0043_pulse_decay_lifecycle",
+    path: "drizzle/authoritative/0043_pulse_decay_lifecycle.sql",
+    sha256: "7c8bbe2d0a71a14f72fe6602feaf25bab66bfa06a7f034e0488f4b23f8853892",
+    baseline: false,
+  },
+  {
+    id: "0044_pulse_drift_monitoring",
+    path: "drizzle/authoritative/0044_pulse_drift_monitoring.sql",
+    sha256: "d1b3b5b47ff1de45ef2854756d6834aee16b057272093b730add8e618fab7469",
+    baseline: false,
+  },
+  {
+    id: "0045_pulse_evaluation_workspace_reconciliation",
+    path: "drizzle/authoritative/0045_pulse_evaluation_workspace_reconciliation.sql",
+    sha256: "78deee17328f6931c5cc0aaf1cb7885b85047eeefc1e8968efb33f4013ed1caf",
+    baseline: false,
+  },
+  {
+    id: "0046_little_mulholland_black",
+    path: "drizzle/authoritative/0046_little_mulholland_black.sql",
+    sha256: "78c86331e815fbd799fdcfc51e6d2f569bf66f06ac97c771edde226365eb75cb",
+    baseline: false,
+  },
+  {
+    id: "0047_atlas_data_error_reports",
+    path: "drizzle/authoritative/0047_atlas_data_error_reports.sql",
+    sha256:
+      "e36e87c298ac19a50e9a65c7438e51e33b1f849b424c796a3e362a893cd86dfc",
+    baseline: false,
+  },
+  {
+    id: "0048_entity_name_forms",
+    path: "drizzle/authoritative/0048_entity_name_forms.sql",
+    sha256:
+      "9eafb5c92efbe965a6289f31ac67ae7df55f37b7716ba1cd99cd7c69868364e0",
+    baseline: false,
+  },
+  {
+    id: "0049_curvy_shen",
+    path: "drizzle/authoritative/0049_curvy_shen.sql",
+    sha256:
+      "364cb122250cc55921dee2050cc33030b9536b8c1f2605891779084e6d8a9b3b",
+    baseline: false,
+  },
+  {
+    id: "0050_index_release_header_contract",
+    path: "drizzle/authoritative/0050_index_release_header_contract.sql",
+    sha256:
+      "b8eba1a6a10a7b5e74d7ad34244290ea52d26ca36ab775a0dbb13fa051ee7b75",
+    baseline: false,
+  },
+  {
+    id: "0051_eminent_jocasta",
+    path: "drizzle/authoritative/0051_eminent_jocasta.sql",
+    sha256:
+      "ab936e48585ed6e5facd3588fcbbeddc8e7c815df86661aaf7202769de008ca6",
+    baseline: false,
+  },
 ] as const;

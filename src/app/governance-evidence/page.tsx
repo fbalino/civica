@@ -12,7 +12,7 @@ import {
   getGovernanceEvidenceCountries,
 } from "@/lib/db/queries-governance-evidence";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 export const metadata: Metadata = {
   title: "Governance Evidence Dashboard",
   description:

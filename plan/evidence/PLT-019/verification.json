@@ -1,0 +1,57 @@
+{
+  "task": "PLT-019",
+  "date": "2026-07-16",
+  "contract": "civica-deployment-rehearsal/v1",
+  "configuredDatabasePreflight": {
+    "source": "plan/evidence/DAT-013/preflight.json",
+    "authoritativeLedgerEndsAt": "0032_sparkling_genesis",
+    "stagedMigrations": [
+      "0033_flat_hardball",
+      "0034_superb_the_fallen",
+      "0035_equal_marvex",
+      "0036_moaning_toad_men",
+      "0037_minor_sharon_carter",
+      "0038_heavy_slyde",
+      "0039_living_clea"
+    ],
+    "liveWritesPerformed": 0
+  },
+  "localRehearsal": {
+    "result": "passed",
+    "coverage": [
+      "compatible-schema",
+      "jobs",
+      "caches",
+      "static-assets",
+      "release-metadata",
+      "smoke-tests",
+      "abort-points",
+      "rollback",
+      "forward-fix",
+      "old-reader-compatibility"
+    ],
+    "negativeFixtures": [
+      "reordered migration/deploy sequence",
+      "missing smoke coverage",
+      "destructive rollback wording",
+      "table drop",
+      "legacy release_id made non-null"
+    ],
+    "deploymentBuild": "validation-only; no automatic db:migrate"
+  },
+  "validation": {
+    "typecheck": "passed",
+    "deploymentRehearsalTests": "4 passed",
+    "releaseAndDeploymentTests": "40 passed",
+    "authoritativeMigrationGate": "passed",
+    "migrationDisciplineGate": "passed",
+    "migrationPreflightGate": "58/58 passed with zero writes",
+    "cronSafetyTests": "271 passed",
+    "documentationReferences": "passed",
+    "fullProductionBuild": "PLT-019 gates passed; build then stopped at the unrelated user-owned Index change-control diff in src/components/factbook/FactbookHeaderStrip.tsx"
+  },
+  "externalStagingRehearsal": {
+    "result": "pending_owner_platform_action",
+    "details": "Create a disposable Neon child branch and a separate Vercel staging environment, then execute the bounded procedure in data/DEPLOYMENT-REHEARSAL.md. No production migration, deployment, release publication, cron invocation, or provider credential was used locally."
+  }
+}

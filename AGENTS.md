@@ -64,7 +64,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 
 ## Database
 
-- Schema: `src/lib/db/schema.ts` — **80 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **103 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
@@ -77,6 +77,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 - `npm run validate:release-quality` is the strict live release gate. It writes `data/release-quality-report.v1.json` and fails on identifier, coverage, range, unit/vintage, provenance-orphan, canonical-duplicate, required-field, row-delta, or source-age anomalies. `npm run validate:release-quality-report` is the DB-free checked-report integrity gate used by builds.
 - `src/lib/data/value-state.ts` owns the closed data-availability contract. Country facts, indicator history, and country metrics store `value_status` plus `value_status_reason`; observed/disputed rows carry values and every absence state carries no value plus a reason. Run `npm run validate:data-value-states` after DB/API/UI/export changes and `npm run validate:data-value-states:live` after applying its migration.
 - Party identity is separate from chamber participation: `political_parties` is the canonical entity, `legislature_parties` rows are retained and soft-retired, and immutable composition runs plus sourced identity events preserve the evidence trail. Composition syncs must supply publisher party identifiers and must never infer split/merge lineage from names. Run `npm run validate:party-identity` after party schema/writer/query/UI changes and `npm run validate:party-identity:live` after applying a party migration.
+- Every `/api/cron/*` route uses `withCronJob()` for bearer authentication, durable schedule/manual idempotency, a job-wide database lease, fenced retries, and terminal outcome recording. Manual `POST` requests and parameterized `GET` requests require a stable `Idempotency-Key`. Follow `data/CRON-OPERATIONS.md` and run `npm run validate:cron-safety` after any cron route, schedule, adapter, duration, or outcome change.
 
 ## Design System (authoritative)
 
@@ -124,9 +125,10 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   `/licensing#rights-manifest` is the reader view. Pending source terms never
   permit public bulk export.
 - `src/lib/claims/reuse-rights.ts` remains the public policy/summary registry.
-- The repository has no root `LICENSE` file. Do not call the code open-source,
-  MIT-licensed, or reusable under a repository license until BRD-007/008 makes
-  and implements that decision.
+- The root `LICENSE` documents a non-open, all-rights-reserved code posture;
+  `NOTICE` records its scope and third-party boundaries. Do not call the code
+  open-source, MIT-licensed, or generally reusable. Dependency, data, font,
+  asset, contributor, and generated-material rights remain separate.
 - Run both `npm run validate:rights-manifest` and
   `npm run validate:rights-claims` after changing public rights, licensing,
   downloads, citation, embeds, code-license, or release-manifest language.
@@ -225,5 +227,5 @@ These links MUST survive any header/footer refactor:
 
 - Civica currently tolerates a pre-existing repo-wide lint failure unrelated to normal work (old React effect/hook warnings). Do not fix unrelated lint just to make a commit green; focus on what you touched.
 - Do NOT ship `npm run sync:*` changes that drop `last_sync_at` updates. If you add a new sync script, stamp the source.
-- `sources.last_sync_at` must be stamped ONLY via `markSourcesSynced()` from `src/lib/db/source-freshness.ts` — the single sanctioned path. It stamps exclusively when a run actually wrote rows (`!dryRun && rowsWritten > 0`), so a failed or empty sync never fakes freshness. Never write `last_sync_at` directly (no inline `.set({ lastSyncAt })`, `onConflictDoUpdate` set blocks, or raw `SET last_sync_at` UPDATEs). Enforced by `npm run validate:sync-freshness`.
+- `sources.last_sync_at` must be stamped ONLY through the `markSourcesSynced*` API family in `src/lib/db/source-freshness.ts` — the single sanctioned path. Use `markSourcesSynced()` after a committed write, or `markSourcesSyncedTransactionQuery()` / `markSourcesSyncedFromInsertedRowsCte()` when freshness must commit atomically with the domain rows. Every variant requires actual inserted rows, so failed, empty, dry-run, and duplicate-only work never fakes freshness. Never write `last_sync_at` directly elsewhere (no inline `.set({ lastSyncAt })`, `onConflictDoUpdate` set blocks, or raw `SET last_sync_at` UPDATEs). Enforced by `npm run validate:sync-freshness`.
 - Before pushing any change that touches public claims, numbers, methodology prose, routes/anchors, API examples, or research terminology, run `npm run validate:claims-docs` — the single aggregate gate covering registry coverage, numeric templates, routes/anchors, API examples, methodology fixtures (incl. the full unit suite), experimental labels, and terminology/policy overclaims. It runs in CI on every push/PR (`.github/workflows/claims-docs.yml`) and is part of `npm run build`.

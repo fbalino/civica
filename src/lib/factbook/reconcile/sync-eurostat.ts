@@ -82,17 +82,24 @@
 import { sql } from "drizzle-orm";
 
 import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -147,12 +154,38 @@ const EUROSTAT_LICENSE = "CC-BY-4.0";
  */
 export const EU_EFTA_ISO3: readonly string[] = [
   // EU-27
-  "AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST",
-  "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA",
-  "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK",
-  "SVN", "ESP", "SWE",
+  "AUT",
+  "BEL",
+  "BGR",
+  "HRV",
+  "CYP",
+  "CZE",
+  "DNK",
+  "EST",
+  "FIN",
+  "FRA",
+  "DEU",
+  "GRC",
+  "HUN",
+  "IRL",
+  "ITA",
+  "LVA",
+  "LTU",
+  "LUX",
+  "MLT",
+  "NLD",
+  "POL",
+  "PRT",
+  "ROU",
+  "SVK",
+  "SVN",
+  "ESP",
+  "SWE",
   // EFTA-4
-  "ISL", "LIE", "NOR", "CHE",
+  "ISL",
+  "LIE",
+  "NOR",
+  "CHE",
 ];
 
 /**
@@ -285,8 +318,7 @@ export const EUROSTAT_INDICATORS: readonly EurostatIndicatorConfig[] = [
     dataset: "tec00127",
     dimensionFilter: "A.PC_GDP.S13.B9.",
     factKey: "fiscal_balance_pct_gdp",
-    label:
-      "General government deficit / surplus, % of GDP (EDP / Maastricht)",
+    label: "General government deficit / surplus, % of GDP (EDP / Maastricht)",
     docUrl:
       "https://ec.europa.eu/eurostat/databrowser/view/tec00127/default/table",
     civicaRole: "canonical",
@@ -408,6 +440,8 @@ export interface EurostatSyncOptions {
   jurisdictions?: EurostatJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface EurostatJurisdiction {
@@ -417,10 +451,7 @@ export interface EurostatJurisdiction {
   iso3: string | null;
 }
 
-function freshCounters(
-  factKey: string,
-  dataset: string,
-): PerEurostatCounters {
+function freshCounters(factKey: string, dataset: string): PerEurostatCounters {
   return {
     factKey,
     dataset,
@@ -459,9 +490,7 @@ function buildDataUrl(config: EurostatIndicatorConfig): string {
  * doesn't (for single-value dims). When absent, we infer from the
  * key order in `category.label`.
  */
-function buildIndexToCode(
-  dim: EurostatJsonStatDimension,
-): string[] {
+function buildIndexToCode(dim: EurostatJsonStatDimension): string[] {
   const labels = dim.category.label;
   const index = dim.category.index;
   const codes = Object.keys(labels);
@@ -512,9 +541,7 @@ function computeStrides(size: number[]): number[] {
  * (EL→GR, UK→GB) so the caller can lookup directly against
  * `jurisdictions.iso2`.
  */
-async function fetchIndicator(
-  config: EurostatIndicatorConfig,
-): Promise<{
+async function fetchIndicator(config: EurostatIndicatorConfig): Promise<{
   latestByIso2: Map<string, { year: number; value: number }>;
   observationCount: number;
   nonMemberCount: number;
@@ -588,8 +615,7 @@ async function fetchIndicator(
   for (const [keyStr, rawValue] of Object.entries(values)) {
     observationCount++;
     if (rawValue === null || rawValue === undefined) continue;
-    if (typeof rawValue !== "number" || !Number.isFinite(rawValue))
-      continue;
+    if (typeof rawValue !== "number" || !Number.isFinite(rawValue)) continue;
 
     let k = parseInt(keyStr, 10);
     if (!Number.isFinite(k) || k < 0) continue;
@@ -668,12 +694,38 @@ async function fetchIndicator(
  */
 const EU_EFTA_ISO2_SET: Set<string> = new Set([
   // EU-27 ISO2 (matches Eurostat verbatim except EL→GR / no UK):
-  "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE",
-  "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV",
-  "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK",
-  "SI", "ES", "SE",
+  "AT",
+  "BE",
+  "BG",
+  "HR",
+  "CY",
+  "CZ",
+  "DK",
+  "EE",
+  "FI",
+  "FR",
+  "DE",
+  "GR",
+  "HU",
+  "IE",
+  "IT",
+  "LV",
+  "LT",
+  "LU",
+  "MT",
+  "NL",
+  "PL",
+  "PT",
+  "RO",
+  "SK",
+  "SI",
+  "ES",
+  "SE",
   // EFTA-4 ISO2:
-  "IS", "LI", "NO", "CH",
+  "IS",
+  "LI",
+  "NO",
+  "CH",
 ]);
 function isEuEftaIso2(iso2: string): boolean {
   return EU_EFTA_ISO2_SET.has(iso2);
@@ -691,6 +743,10 @@ export async function syncEurostat(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const targets = EUROSTAT_INDICATORS.filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
@@ -717,15 +773,17 @@ export async function syncEurostat(
   // Eurostat sync uses ISO2 (not ISO3) lookup because Eurostat's
   // geo codes are ISO2 with two well-documented anomalies handled
   // at the fetcher layer.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso2: jurisdictions.iso2,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso2} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso2: jurisdictions.iso2,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso2} IS NOT NULL`));
   const iso2ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso2: string | null; iso3: string | null }
@@ -733,9 +791,7 @@ export async function syncEurostat(
   for (const j of allJurisdictions) {
     if (j.iso2) iso2ToJurisdiction.set(j.iso2.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO2 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO2 codes loaded.`);
 
   // EU+EFTA coverage check — log how many target ISO3s exist in the
   // jurisdictions table. Should be 31/31 per resolution §2g.
@@ -743,8 +799,7 @@ export async function syncEurostat(
     [...iso2ToJurisdiction.values()].some((j) => j.iso3 === iso3),
   );
   const euEftaIso3sMissing = EU_EFTA_ISO3.filter(
-    (iso3) =>
-      ![...iso2ToJurisdiction.values()].some((j) => j.iso3 === iso3),
+    (iso3) => ![...iso2ToJurisdiction.values()].some((j) => j.iso3 === iso3),
   );
   log(
     `EU+EFTA member coverage: ${euEftaIso3sFound.length}/${EU_EFTA_ISO3.length} present in jurisdictions table.`,
@@ -933,63 +988,34 @@ export async function syncEurostat(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "eurostat",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: EUROSTAT_VINTAGE,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-            valueType,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            //
-            // Bug 1 — `valueType` IS included in the set clause so
-            // per-row tag updates land on subsequent syncs (e.g. a
-            // year that was projected in 2026 becomes measured when
-            // 2027 rolls over).
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: EUROSTAT_VINTAGE,
-              snapshotId,
-              valueType,
-              updatedAt: new Date(),
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "eurostat",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: EUROSTAT_VINTAGE,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+          valueType,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written++;
         totalWritten++;
         touchedPairs.add(`${j.id}|${config.factKey}`);
@@ -1008,13 +1034,13 @@ export async function syncEurostat(
         `envelope rejects: ${counter.rejected_envelope}, ` +
         `projections: ${counter.projection_rows})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "Eurostat",
+      target: `${config.factKey} (${config.dataset})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("eurostat", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -1029,13 +1055,17 @@ export async function syncEurostat(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return;
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return;
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -1045,6 +1075,15 @@ export async function syncEurostat(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "eurostat",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerEurostatCounters> = {};

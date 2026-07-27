@@ -17,6 +17,9 @@ import { markSourcesSynced } from "../src/lib/db/source-freshness";
 // approve the enrichment before a real apply pass.
 const DRY_RUN =
   process.argv.includes("--dry-run") || process.env.DRY_RUN === "1";
+const ATLAS_RELEASE_ID = process.argv
+  .find((arg) => arg.startsWith("--release-id="))
+  ?.slice("--release-id=".length);
 
 async function main() {
   if (DRY_RUN) {
@@ -29,6 +32,7 @@ async function main() {
   }
 
   await syncFactbookOfficeholders({
+    atlasReleaseId: ATLAS_RELEASE_ID,
     onProgress: (line) => {
       if (line.startsWith("!")) console.error(line);
       else console.log(line);

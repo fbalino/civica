@@ -111,20 +111,49 @@ export function derivationVersionErrors(
   options: { allowLegacy: boolean } = { allowLegacy: true },
 ): string[] {
   const errors: string[] = [];
-  if (!value || typeof value !== "object") return ["version envelope must be an object"];
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return ["version envelope must be an object"];
+  }
   const envelope = value as Partial<DerivationVersionEnvelope>;
+  const allowedEnvelopeFields = new Set([
+    "schemaVersion",
+    "methodology",
+    "algorithm",
+    "prompt",
+    "taxonomy",
+    "sourceBasket",
+    "sourceIds",
+  ]);
+  for (const field of Object.keys(value)) {
+    if (!allowedEnvelopeFields.has(field)) {
+      errors.push(`version envelope has unsupported field ${field}`);
+    }
+  }
   if (envelope.schemaVersion !== DERIVATION_VERSION_SCHEMA) errors.push(`schemaVersion must be ${DERIVATION_VERSION_SCHEMA}`);
   for (const axis of ["methodology", "algorithm", "prompt", "taxonomy", "sourceBasket"] as const) {
     const ref = envelope[axis];
-    if (!ref || typeof ref !== "object" || !ref.state) {
+    if (!ref || typeof ref !== "object" || Array.isArray(ref)) {
       errors.push(`${axis} is missing a version state`);
       continue;
     }
-    if (ref.state === "versioned") {
-      if (!("id" in ref) || typeof ref.id !== "string" || !ref.id.trim()) errors.push(`${axis} has a blank version id`);
-    } else if (ref.state === "not_applicable" || ref.state === "legacy_unversioned") {
-      if (!("reason" in ref) || typeof ref.reason !== "string" || !ref.reason.trim()) errors.push(`${axis} is missing its reason`);
-      if (!options.allowLegacy && ref.state === "legacy_unversioned") errors.push(`${axis} cannot be legacy_unversioned on a new row`);
+    const record = ref as unknown as Record<string, unknown>;
+    const state = record.state;
+    const allowedRefFields =
+      state === "versioned"
+        ? new Set(["state", "id"])
+        : state === "not_applicable" || state === "legacy_unversioned"
+          ? new Set(["state", "reason"])
+          : new Set(["state"]);
+    for (const field of Object.keys(record)) {
+      if (!allowedRefFields.has(field)) {
+        errors.push(`${axis} has unsupported field ${field}`);
+      }
+    }
+    if (state === "versioned") {
+      if (typeof record.id !== "string" || !record.id.trim()) errors.push(`${axis} has a blank version id`);
+    } else if (state === "not_applicable" || state === "legacy_unversioned") {
+      if (typeof record.reason !== "string" || !record.reason.trim()) errors.push(`${axis} is missing its reason`);
+      if (!options.allowLegacy && state === "legacy_unversioned") errors.push(`${axis} cannot be legacy_unversioned on a new row`);
     } else {
       errors.push(`${axis} has an unsupported version state`);
     }
@@ -150,5 +179,22 @@ export function matchesVersion(
 export function derivationVersionKey(envelope: DerivationVersionEnvelope): string {
   const errors = derivationVersionErrors(envelope);
   if (errors.length) throw new Error(errors.join("; "));
-  return contentVersion("derivation", JSON.stringify(envelope));
+  // PostgreSQL jsonb does not preserve object-key insertion order. Rebuild the
+  // exact field/ref order used by the original envelope writer so retained
+  // keys verify after a database round trip without changing any legitimate
+  // pre-existing hash.
+  const orderedRef = (ref: VersionRef): VersionRef =>
+    ref.state === "versioned"
+      ? { state: "versioned", id: ref.id }
+      : { state: ref.state, reason: ref.reason };
+  const ordered: DerivationVersionEnvelope = {
+    schemaVersion: envelope.schemaVersion,
+    methodology: orderedRef(envelope.methodology),
+    algorithm: orderedRef(envelope.algorithm),
+    prompt: orderedRef(envelope.prompt),
+    taxonomy: orderedRef(envelope.taxonomy),
+    sourceBasket: orderedRef(envelope.sourceBasket),
+    sourceIds: [...envelope.sourceIds],
+  };
+  return contentVersion("derivation", JSON.stringify(ordered));
 }

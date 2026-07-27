@@ -119,7 +119,7 @@ A frozen release whose bytes or interpretation change receives a new version and
 
 ### Notices, reports, and appeals
 
-Material actions are recorded on this policy page, the [public corrections log](/civica-index/corrections), the affected artifact's release notes or changelog, the release/DOI landing page after registration, and affected API metadata or deprecation headers where applicable. Reports may use the [corrections route](/civica-index/corrections) or [contact form](/contact).
+Material actions are recorded on this policy page, the [public corrections log](/civica-index/corrections), the affected artifact's release notes or changelog, the release/DOI landing page after registration, and affected API metadata or deprecation headers where applicable. Precise Atlas record issues use the [data-report route](/report-data-issue); Index and Pulse issues use the [corrections route](/civica-index/corrections), and general questions may use the [contact form](/contact).
 
 A reporter or affected contributor may request one reconsideration by supplying new evidence or identifying a process error. Civica retains the appeal, response, and final disposition. A material conflict held by the original decision-maker requires a named independent appeal decision-maker. Critical findings, appeals, reviewer disagreement, and recommendations to retract or retire do not reduce an agreed honorarium or access to the response.
 

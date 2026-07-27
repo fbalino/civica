@@ -2,7 +2,7 @@
  * Phase R.21 — auto-resolve stale `material_error` disputes.
  *
  * Runs daily at 02:30 UTC (per `vercel.json`). Authenticated via
- * `requireCronAuth` against `CRON_SECRET`. Idempotent: stale disputes
+ * the shared cron boundary against `CRON_SECRET`. Idempotent: stale disputes
  * are flipped to `resolved_auto_stale` and skipped on next run; live
  * disputes are left untouched.
  *
@@ -17,7 +17,7 @@
  * Methodology: ~/civica/plan/disputes-triage-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { autoResolveStaleDisputes } from "@/lib/factbook/reconcile/auto-resolve-disputes";
 
@@ -28,55 +28,53 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
   const url = new URL(request.url);
   const dryRun = url.searchParams.get("dryRun") === "1";
   const limitParam = url.searchParams.get("limit");
-  const limit = limitParam ? Math.max(1, parseInt(limitParam, 10) || 0) : undefined;
+  const limit = limitParam
+    ? Math.max(1, parseInt(limitParam, 10) || 0)
+    : undefined;
 
-  try {
-    const summary = await autoResolveStaleDisputes(db, {
-      dryRun,
-      limit,
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-        else console.log(line);
-      },
-    });
+  const summary = await autoResolveStaleDisputes(db, {
+    dryRun,
+    limit,
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+      else console.log(line);
+    },
+  });
 
-    if (summary.errors.length > 0) {
-      return NextResponse.json({ ok: false, step: "factbook.auto-resolve-disputes", dryRun, errors: summary.errors }, { status: 500 });
-    }
-
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.auto-resolve-disputes",
-      started: startedAt,
-      finished: new Date().toISOString(),
-      dryRun,
-      scanned: summary.scanned,
-      stillProposed: summary.stillProposed,
-      autoResolved: summary.autoResolved,
-      skipped: summary.skipped,
-      errors: summary.errors,
-      // Per-dispute outcomes are useful for log-only verification at
-      // small scale; capped to 200 for response size sanity.
-      outcomes: summary.outcomes.slice(0, 200),
-    });
-  } catch (err) {
-    console.error("[cron factbook.auto-resolve-disputes] failed:", err);
+  if (summary.errors.length > 0) {
     return NextResponse.json(
       {
         ok: false,
+        outcome: "partial",
         step: "factbook.auto-resolve-disputes",
-        error: err instanceof Error ? err.message : String(err),
+        dryRun,
+        errorCount: summary.errors.length,
       },
       { status: 500 },
     );
   }
+
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.auto-resolve-disputes",
+    started: startedAt,
+    finished: new Date().toISOString(),
+    dryRun,
+    scanned: summary.scanned,
+    stillProposed: summary.stillProposed,
+    autoResolved: summary.autoResolved,
+    skipped: summary.skipped,
+    errorCount: summary.errors.length,
+    // Per-dispute outcomes are useful for log-only verification at
+    // small scale; capped to 200 for response size sanity.
+    outcomes: summary.outcomes.slice(0, 200),
+  });
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.auto-resolve", handler);
+
+export { cronHandler as GET, cronHandler as POST };

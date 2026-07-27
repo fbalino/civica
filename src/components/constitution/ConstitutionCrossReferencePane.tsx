@@ -8,7 +8,6 @@ import { Banner } from "@/components/editorial/Banner";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { getTopicLabel } from "@/lib/constitute/topics";
 import { constitutionSectionDomId } from "@/lib/constitution/article-nav";
-import { sanitizeConstitutionHtml } from "@/lib/constitution/sanitize-html";
 import type { TopicExcerptCountry } from "@/lib/db/queries-constitution";
 import { ConstitutionTopicPicker } from "./ConstitutionTopicPicker";
 import type { TopicCategory, TopicLeaf } from "@/lib/constitute/topics";
@@ -144,12 +143,7 @@ export function ConstitutionCrossReferencePane({
     }
     const controller = new AbortController();
     let active = true;
-    void fetchExcerpts(
-      selectedTopic,
-      slugs,
-      controller.signal,
-      () => active,
-    );
+    void fetchExcerpts(selectedTopic, slugs, controller.signal, () => active);
     return () => {
       active = false;
       controller.abort();
@@ -169,16 +163,16 @@ export function ConstitutionCrossReferencePane({
       <div className="constitution-xref-head">
         <h2 className="constitution-xref-title">Compare by topic</h2>
         <p className="constitution-xref-sub">
-          Pick a constitutional topic to see how {hasPeers ? "your selected countries" : "other constitutions"} address it.
+          Pick a constitutional topic to see how{" "}
+          {hasPeers ? "your selected countries" : "other constitutions"} address
+          it.
         </p>
       </div>
 
       {/* One-click chips for the topics of the article currently in view. */}
       {activeChips.length > 0 ? (
         <div className="constitution-xref-active">
-          <div className="constitution-xref-active-label">
-            In this article
-          </div>
+          <div className="constitution-xref-active-label">In this article</div>
           <div className="constitution-xref-chips">
             {activeChips.map((key) => (
               <button
@@ -254,9 +248,14 @@ export function ConstitutionCrossReferencePane({
                 }
                 // Country selected but no excerpt for this topic.
                 return (
-                  <div key={slug} className="constitution-xref-card constitution-xref-card--empty">
+                  <div
+                    key={slug}
+                    className="constitution-xref-card constitution-xref-card--empty"
+                  >
                     <div className="constitution-xref-card-head">
-                      <span className="constitution-xref-card-country">{slug}</span>
+                      <span className="constitution-xref-card-country">
+                        {slug}
+                      </span>
                     </div>
                     <p className="constitution-xref-empty-note">
                       No provision tagged with this topic in this constitution.
@@ -286,7 +285,8 @@ export function ConstitutionCrossReferencePane({
 
               {!hasPeers ? (
                 <p className="constitution-xref-add-hint">
-                  Add another country from the picker to compare passages side by side.
+                  Add another country from the picker to compare passages side
+                  by side.
                 </p>
               ) : null}
             </>
@@ -396,39 +396,42 @@ function ExcerptCard({
           }`;
           const citationUrl = `https://civicaatlas.org${readerPath}`;
           return (
-          <div key={`${ex.sectionId}-${i}`} className="constitution-xref-excerpt">
-            {showLabel ? (
-              <div className="constitution-xref-excerpt-label">
-                {ex.articleLabel}
-              </div>
-            ) : null}
             <div
-              className="constitution-xref-excerpt-text"
-              // Constitute-derived excerpt HTML, passed through the allowlist
-              // sanitizer at this render seam (preserves ids/classes/data-*,
-              // drops scripts/handlers) as defense-in-depth.
-              dangerouslySetInnerHTML={{
-                __html: sanitizeConstitutionHtml(ex.excerptHtml),
-              }}
-            />
-            <div className="constitution-xref-excerpt-meta">
-              <span className="constitution-xref-excerpt-source">
-                <SourceDot
-                  source="constitute_project"
-                  retrievedAt={sourceRetrievedAt}
-                />
-                Constitute Project · CC BY-NC 3.0
-              </span>
-              <Link href={readerPath}>Open passage</Link>
+              key={`${ex.sectionId}-${i}`}
+              className="constitution-xref-excerpt"
+            >
+              {showLabel ? (
+                <div className="constitution-xref-excerpt-label">
+                  {ex.articleLabel}
+                </div>
+              ) : null}
+              <div
+                className="constitution-xref-excerpt-text"
+                // The excerpts API establishes the server-side
+                // constitution-html/v1 trust boundary before returning this
+                // fragment to the client.
+                dangerouslySetInnerHTML={{
+                  __html: ex.excerptHtml,
+                }}
+              />
+              <div className="constitution-xref-excerpt-meta">
+                <span className="constitution-xref-excerpt-source">
+                  <SourceDot
+                    source="constitute_project"
+                    retrievedAt={sourceRetrievedAt}
+                  />
+                  Constitute Project · CC BY-NC 3.0
+                </span>
+                <Link href={readerPath}>Open passage</Link>
+              </div>
+              <CiteAccordion
+                subject={entry.name}
+                pageTitle={ex.articleLabel ?? "Constitutional provision"}
+                url={citationUrl}
+                dataVintage={sourceRetrievedAt}
+                sourceNames={["Constitute Project"]}
+              />
             </div>
-            <CiteAccordion
-              subject={entry.name}
-              pageTitle={ex.articleLabel ?? "Constitutional provision"}
-              url={citationUrl}
-              dataVintage={sourceRetrievedAt}
-              sourceNames={["Constitute Project"]}
-            />
-          </div>
           );
         })}
       </div>

@@ -53,6 +53,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
     title: "Explore",
     links: [
       { label: "Evidence Dashboard", href: "/governance-evidence" },
+      { label: "Governance Change", href: "/governance-change" },
       { label: "Countries", href: "/country" },
       { label: "Parties", href: "/parties" },
       { label: "World Atlas", href: "/atlas" },
@@ -75,6 +76,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Pulse Changelog", href: "/civica-index/pulse-changelog" },
       { label: "Replication", href: "/civica-index/replication" },
       { label: "Corrections", href: "/civica-index/corrections" },
+      { label: "Report a Data Issue", href: "/report-data-issue" },
     ],
   },
   {
@@ -86,6 +88,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
         label: "Data Reconciliation",
         href: "/country/methodology/reconciliation",
       },
+      { label: "Atlas Case Studies", href: "/methodology/case-studies" },
       {
         label: "Peer Grouping",
         href: "/civica-index/methodology/peer-grouping",
@@ -102,6 +105,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Advisory Board", href: "/about/advisory-board" },
       { label: "Contact", href: "/contact" },
       { label: "Accessibility", href: "/accessibility" },
+      { label: "Language", href: "/about#language" },
       { label: "Licensing", href: "/licensing" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },

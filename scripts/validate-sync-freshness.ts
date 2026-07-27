@@ -8,9 +8,9 @@
  *
  * Provenance is load-bearing in Civica: a failed or empty sync must
  * never look fresh (AGENTS.md provenance invariant). The ONLY allowed
- * way to write `sources.last_sync_at` is `markSourcesSynced()` in
- * `src/lib/db/source-freshness.ts`, which stamps exclusively when a run
- * actually wrote rows.
+ * way to write `sources.last_sync_at` is the `markSourcesSynced*` API in
+ * `src/lib/db/source-freshness.ts`, including its atomic transaction/CTE
+ * members, which stamp exclusively when a run actually inserted rows.
  *
  * This script scans every `.ts`/`.tsx` file under `src/` and `scripts/`
  * and flags any WRITE to `last_sync_at` that lives outside the helper
@@ -394,7 +394,7 @@ async function main(): Promise<void> {
   if (totalOffenders > 0) {
     console.error(
       "\n✗ Validation failed: every write to sources.last_sync_at must go\n" +
-        "  through markSourcesSynced() in src/lib/db/source-freshness.ts.\n" +
+        "  through the markSourcesSynced* API in src/lib/db/source-freshness.ts.\n" +
         "  Migrate the offenders above (or, if a file is legitimately owned\n" +
         "  elsewhere, add it to the ALLOWLIST in this script).",
     );

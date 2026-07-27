@@ -52,6 +52,22 @@ const partyIdentityMigration = readFileSync(
   "drizzle/authoritative/0031_hot_saracen.sql",
   "utf8",
 );
+const conditionsComponentsMigration = readFileSync(
+  "drizzle/authoritative/0040_closed_young_avengers.sql",
+  "utf8",
+);
+const conditionsReleaseMigration = readFileSync(
+  "drizzle/authoritative/0042_grey_sally_floyd.sql",
+  "utf8",
+);
+const pulseDriftMigration = readFileSync(
+  "drizzle/authoritative/0044_pulse_drift_monitoring.sql",
+  "utf8",
+);
+const entityNameFormsMigration = readFileSync(
+  "drizzle/authoritative/0048_entity_name_forms.sql",
+  "utf8",
+);
 const classify = readFileSync("src/lib/pulse/v2/classify.ts", "utf8");
 const subscriptionApply = readFileSync(
   "scripts/pulse-apply-classifications.ts",
@@ -73,9 +89,12 @@ test("every protected relation receives a synchronous retention trigger", () => 
         reviewSlaMigration.includes(`ON ${relation}`) ||
         absorptionMigration.includes(`ON ${relation}`) ||
         informationEnvironmentMigration.includes(`ON ${relation}`) ||
+        conditionsComponentsMigration.includes(`ON "${relation}"`) ||
+        conditionsReleaseMigration.includes(`ON "${relation}"`) ||
         // Drizzle emits the quoted identifier form in 0030.
         constitutionPassageMigration.includes(`ON "${relation}"`) ||
-        partyIdentityMigration.includes(`ON ${relation}`),
+        partyIdentityMigration.includes(`ON ${relation}`) ||
+        entityNameFormsMigration.includes(`ON ${relation}`),
     );
   }
   assert.match(migration, /BEFORE UPDATE OR DELETE/);
@@ -96,6 +115,7 @@ test("Pulse evidence ledgers are append-only", () => {
         absorptionMigration,
         informationEnvironmentMigration,
         partyIdentityMigration,
+        pulseDriftMigration,
       ].some((source) =>
         new RegExp(
           `CREATE\\s+TRIGGER\\s+[a-z0-9_]+_append_only[\\s\\S]{0,160}BEFORE\\s+UPDATE\\s+OR\\s+DELETE\\s+ON\\s+"?${relation}"?[\\s\\S]{0,160}EXECUTE\\s+FUNCTION`,
@@ -166,16 +186,19 @@ test("reconciliation evaluation view retains non-active facts and disputes", () 
   assert.match(migration, /FROM data_disputes dd/);
 });
 
-test("every registered destructive evidence path is protected or explicitly ephemeral", () => {
+test("every registered destructive evidence path is protected or explicitly short-lived", () => {
   for (const path of DESTRUCTIVE_WRITE_PATHS) {
     for (const relation of path.relations) {
-      if (relation === "rate_limits") {
-        assert.match("exemption" in path ? path.exemption : "", /ephemeral/);
+      if (
+        RETAINED_EVIDENCE_RELATIONS.includes(
+          relation as (typeof RETAINED_EVIDENCE_RELATIONS)[number],
+        )
+      ) {
+        continue;
       } else {
-        assert.ok(
-          RETAINED_EVIDENCE_RELATIONS.includes(
-            relation as (typeof RETAINED_EVIDENCE_RELATIONS)[number],
-          ),
+        assert.match(
+          "exemption" in path ? path.exemption : "",
+          /short-lived|ephemeral/i,
           `${path.path}: ${relation}`,
         );
       }

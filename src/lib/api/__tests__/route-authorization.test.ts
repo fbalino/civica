@@ -42,8 +42,16 @@ async function readSource(entry: RouteInventoryEntry): Promise<string> {
 
 // Guard markers require an actual invocation (open paren), not merely an
 // import line, so a guard imported-but-never-called is caught.
-const ADMIN_SESSION_CALL = /\bgetAdminSession\s*\(/;
-const CRON_AUTH_CALL = /\brequireCronAuth\s*\(/;
+const ADMIN_SESSION_CALL =
+  /\b(?:getAdminSession|withAdminMutation|withAdminLogout)\s*\(/;
+const SAME_ORIGIN_MUTATION_CALL =
+  /\b(?:guardAdminMutationRequest|withAdminMutation|withAdminLogout)\s*\(/;
+const ADMIN_AUDIT_CALL =
+  /\b(?:withAdminMutation|withAdminLogout|recordAdminLoginAudit)\s*\(/;
+// Cron routes may call the low-level bearer-token guard directly or, preferably,
+// use the common execution boundary that performs that check before acquiring a
+// lease. Imports and bare CRON_SECRET references deliberately do not match.
+const CRON_CONTROL_CALL = /\b(?:requireCronAuth|withCronJob)\s*\(/;
 const PULSE_CODING_SESSION_CALL =
   /\bgetPulseCodingSession\s*\(|\bgetPulseCodingParticipantSession\s*\(/;
 const ADMIN_USERNAME_CHECK_CALL = /\bverifyAdminUsername\s*\(/;
@@ -59,14 +67,31 @@ const pulseCodingRoutes = ROUTE_INVENTORY.filter(
   (e) => e.exposure === "pulse-coding",
 );
 
+function handlerSlice(source: string, method: string): string {
+  const direct =
+    /\bexport\s+(?:async\s+)?function\s+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/g;
+  const matches = [...source.matchAll(direct)];
+  const index = matches.findIndex((match) => match[1] === method);
+  if (index < 0) return "";
+  const start = matches[index].index ?? 0;
+  const end = matches[index + 1]?.index ?? source.length;
+  return source.slice(start, end);
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Sanity: the filtered route classes aren't accidentally empty (would
 // make every "for every entry" test below vacuously pass).
 // ─────────────────────────────────────────────────────────────────────
 
 test("admin/cron/pulse-coding route classes are non-empty (guards against a vacuous sweep)", () => {
-  assert.ok(adminRoutes.length >= 10, `expected >=10 admin routes, got ${adminRoutes.length}`);
-  assert.ok(cronRoutes.length >= 30, `expected >=30 cron routes, got ${cronRoutes.length}`);
+  assert.ok(
+    adminRoutes.length >= 10,
+    `expected >=10 admin routes, got ${adminRoutes.length}`,
+  );
+  assert.ok(
+    cronRoutes.length >= 30,
+    `expected >=30 cron routes, got ${cronRoutes.length}`,
+  );
   assert.ok(
     pulseCodingRoutes.length >= 5,
     `expected >=5 pulse-coding routes, got ${pulseCodingRoutes.length}`,
@@ -74,27 +99,32 @@ test("admin/cron/pulse-coding route classes are non-empty (guards against a vacu
 });
 
 // ─────────────────────────────────────────────────────────────────────
-// cron-secret — every cron route.ts must declare AND call requireCronAuth()
+// cron-secret — every cron route.ts must declare AND call the common cron
+// control boundary (or the retained low-level auth guard)
 // ─────────────────────────────────────────────────────────────────────
 
 test("every cron-exposure registry entry declares the cron-secret control", () => {
   const missing = cronRoutes
     .filter((e) => !e.controls.includes("cron-secret"))
     .map((e) => e.filePath);
-  assert.deepEqual(missing, [], `cron route(s) missing cron-secret in the registry: ${missing.join(", ")}`);
+  assert.deepEqual(
+    missing,
+    [],
+    `cron route(s) missing cron-secret in the registry: ${missing.join(", ")}`,
+  );
 });
 
-test("every declared cron-secret route.ts source actually calls requireCronAuth()", async () => {
+test("every declared cron-secret route.ts source calls the sanctioned cron control boundary", async () => {
   const missing: string[] = [];
   for (const entry of cronRoutes) {
     if (!entry.controls.includes("cron-secret")) continue;
     const source = await readSource(entry);
-    if (!CRON_AUTH_CALL.test(source)) missing.push(entry.filePath);
+    if (!CRON_CONTROL_CALL.test(source)) missing.push(entry.filePath);
   }
   assert.deepEqual(
     missing,
     [],
-    `cron route(s) declaring cron-secret but never calling requireCronAuth(): ${missing.join(", ")}`,
+    `cron route(s) declaring cron-secret but never calling withCronJob() or requireCronAuth(): ${missing.join(", ")}`,
   );
 });
 
@@ -103,7 +133,7 @@ test("every declared cron-secret route.ts source actually calls requireCronAuth(
 // declares admin-session must actually call getAdminSession()
 // ─────────────────────────────────────────────────────────────────────
 
-test("every declared admin-session route.ts source actually calls getAdminSession()", async () => {
+test("every declared admin-session route.ts source calls the direct or shared owner-session boundary", async () => {
   const missing: string[] = [];
   for (const entry of [...adminRoutes, ...pulseCodingRoutes]) {
     if (!entry.controls.includes("admin-session")) continue;
@@ -113,7 +143,49 @@ test("every declared admin-session route.ts source actually calls getAdminSessio
   assert.deepEqual(
     missing,
     [],
-    `route(s) declaring admin-session but never calling getAdminSession(): ${missing.join(", ")}`,
+    `route(s) declaring admin-session but never calling the owner-session boundary: ${missing.join(", ")}`,
+  );
+});
+
+test("every declared same-origin mutation control is enforced inside each unsafe handler", async () => {
+  const missing: string[] = [];
+  for (const entry of ROUTE_INVENTORY) {
+    if (!entry.controls.includes("same-origin-mutation")) continue;
+    const source = await readSource(entry);
+    for (const method of entry.methods.filter((value) =>
+      ["POST", "PUT", "PATCH", "DELETE"].includes(value),
+    )) {
+      const body = handlerSlice(source, method);
+      if (!SAME_ORIGIN_MUTATION_CALL.test(body)) {
+        missing.push(`${entry.filePath}#${method}`);
+      }
+    }
+  }
+  assert.deepEqual(
+    missing,
+    [],
+    `unsafe handler(s) declare same-origin-mutation without enforcing the shared guard: ${missing.join(", ")}`,
+  );
+});
+
+test("every declared admin-audit control is wired inside each unsafe handler", async () => {
+  const missing: string[] = [];
+  for (const entry of ROUTE_INVENTORY) {
+    if (!entry.controls.includes("admin-audit")) continue;
+    const source = await readSource(entry);
+    for (const method of entry.methods.filter((value) =>
+      ["POST", "PUT", "PATCH", "DELETE"].includes(value),
+    )) {
+      const body = handlerSlice(source, method);
+      if (!ADMIN_AUDIT_CALL.test(body)) {
+        missing.push(`${entry.filePath}#${method}`);
+      }
+    }
+  }
+  assert.deepEqual(
+    missing,
+    [],
+    `unsafe handler(s) declare admin-audit without using the common ledger: ${missing.join(", ")}`,
   );
 });
 
@@ -142,7 +214,9 @@ test("every declared pulse-coding-session route.ts source actually calls the pul
 // ─────────────────────────────────────────────────────────────────────
 
 test("the admin credential-check login route verifies both username and password", async () => {
-  const entry = adminRoutes.find((e) => e.filePath === "api/admin/session/route.ts");
+  const entry = adminRoutes.find(
+    (e) => e.filePath === "api/admin/session/route.ts",
+  );
   assert.ok(entry, "expected api/admin/session/route.ts in the registry");
   assert.ok(entry!.controls.includes("credential-check"));
   const source = await readSource(entry!);
@@ -154,7 +228,10 @@ test("the pulse-coding credential-check login route verifies the access code", a
   const entry = pulseCodingRoutes.find(
     (e) => e.filePath === "api/pulse-coding/session/route.ts",
   );
-  assert.ok(entry, "expected api/pulse-coding/session/route.ts in the registry");
+  assert.ok(
+    entry,
+    "expected api/pulse-coding/session/route.ts in the registry",
+  );
   assert.ok(entry!.controls.includes("credential-check"));
   const source = await readSource(entry!);
   assert.match(source, PULSE_CODING_ACCESS_CODE_CALL);
@@ -171,15 +248,26 @@ test("the oauth-bootstrap start/callback routes set and verify the CSRF state co
   const callbackEntry = adminRoutes.find(
     (e) => e.filePath === "api/admin/google/callback/route.ts",
   );
-  assert.ok(startEntry && callbackEntry, "expected both google/start and google/callback in the registry");
+  assert.ok(
+    startEntry && callbackEntry,
+    "expected both google/start and google/callback in the registry",
+  );
   assert.ok(startEntry!.controls.includes("oauth-bootstrap"));
   assert.ok(callbackEntry!.controls.includes("oauth-bootstrap"));
 
   const startSource = await readSource(startEntry!);
   const callbackSource = await readSource(callbackEntry!);
 
-  assert.match(startSource, OAUTH_STATE_COOKIE_MARKER, "start route must set the CSRF state cookie");
-  assert.match(callbackSource, OAUTH_STATE_COOKIE_MARKER, "callback route must read/verify the CSRF state cookie");
+  assert.match(
+    startSource,
+    OAUTH_STATE_COOKIE_MARKER,
+    "start route must set the CSRF state cookie",
+  );
+  assert.match(
+    callbackSource,
+    OAUTH_STATE_COOKIE_MARKER,
+    "callback route must read/verify the CSRF state cookie",
+  );
   assert.match(
     callbackSource,
     OAUTH_ALLOWLIST_CHECK_CALL,
@@ -192,19 +280,26 @@ test("the oauth-bootstrap start/callback routes set and verify the CSRF state co
 // file to the registry's honesty, not just its declared controls)
 // ─────────────────────────────────────────────────────────────────────
 
-test("documented uncontrolled sign-out routes have zero controls AND a non-empty explanatory note", () => {
-  for (const filePath of [
-    "api/admin/sign-out/route.ts",
-    "api/pulse-coding/sign-out/route.ts",
-  ]) {
-    const entry = ROUTE_INVENTORY.find((e) => e.filePath === filePath);
-    assert.ok(entry, `expected ${filePath} in the registry`);
-    assert.equal(entry!.controls.length, 0);
-    assert.ok(
-      entry!.note.trim().length > 0,
-      `${filePath} is documented as uncontrolled but carries no explanatory note`,
-    );
-  }
+test("admin logout is controlled and the narrower pulse-coding revocation gap stays explicit", () => {
+  const admin = ROUTE_INVENTORY.find(
+    (entry) => entry.filePath === "api/admin/sign-out/route.ts",
+  );
+  assert.ok(admin);
+  assert.deepEqual(admin.controls, [
+    "admin-session",
+    "same-origin-mutation",
+    "admin-audit",
+  ]);
+
+  const coding = ROUTE_INVENTORY.find(
+    (entry) => entry.filePath === "api/pulse-coding/sign-out/route.ts",
+  );
+  assert.ok(coding);
+  assert.deepEqual(coding.controls, [
+    "platform-rate-limit",
+    "same-origin-mutation",
+  ]);
+  assert.match(coding.note, /OPEN FINDING \(bounded\)/);
 });
 
 // ─────────────────────────────────────────────────────────────────────
@@ -212,7 +307,7 @@ test("documented uncontrolled sign-out routes have zero controls AND a non-empty
 // than trivially matching any source
 // ─────────────────────────────────────────────────────────────────────
 
-test("negative fixture: a route that imports getAdminSession but never calls it is caught", () => {
+test("negative fixture: importing an owner-session helper without calling a boundary is caught", () => {
   const source = `
     import { getAdminSession } from "@/lib/admin/session";
     export async function GET() {
@@ -233,11 +328,52 @@ test("negative fixture: a route that actually calls getAdminSession() passes the
   assert.equal(ADMIN_SESSION_CALL.test(source), true);
 });
 
-test("negative fixture: a route that only checks CRON_SECRET as a bare string (no requireCronAuth call) fails the stricter call-based marker", () => {
-  // requireCronAuth is the sanctioned single path; a hand-rolled
-  // CRON_SECRET comparison without going through it would not satisfy
-  // this test's call-based marker, which is the intended behavior: it
-  // should fail loudly rather than silently accept a bespoke reimplementation.
+test("negative fixture: a POST guard cannot satisfy the DELETE handler in the same route", () => {
+  const source = `
+    export async function POST(request: Request) {
+      const guard = guardAdminMutationRequest(request);
+      if (!guard.ok) return guard.response;
+      return new Response("ok");
+    }
+    export async function DELETE(request: Request) {
+      return new Response("cleared");
+    }
+  `;
+  assert.equal(
+    SAME_ORIGIN_MUTATION_CALL.test(handlerSlice(source, "POST")),
+    true,
+  );
+  assert.equal(
+    SAME_ORIGIN_MUTATION_CALL.test(handlerSlice(source, "DELETE")),
+    false,
+  );
+});
+
+test("positive fixture: withCronJob() satisfies the cron control marker", () => {
+  const source = `
+    import { withCronJob } from "@/lib/api/cron-job";
+    async function handler() {
+      return new Response("ok");
+    }
+    const cronHandler = withCronJob("fixture.job", handler);
+    export { cronHandler as GET };
+  `;
+  assert.equal(CRON_CONTROL_CALL.test(source), true);
+});
+
+test("negative fixture: importing withCronJob without calling it does not satisfy the cron control marker", () => {
+  const source = `
+    import { withCronJob } from "@/lib/api/cron-job";
+    export async function GET() {
+      return new Response("ok");
+    }
+  `;
+  assert.equal(CRON_CONTROL_CALL.test(source), false);
+});
+
+test("negative fixture: a route that only checks CRON_SECRET as a bare string fails the call-based cron control marker", () => {
+  // A hand-rolled CRON_SECRET comparison without the common boundary should
+  // fail loudly rather than silently accept a bespoke reimplementation.
   const source = `
     export async function GET(request: Request) {
       if (request.headers.get("authorization") !== \`Bearer \${process.env.CRON_SECRET}\`) {
@@ -246,5 +382,14 @@ test("negative fixture: a route that only checks CRON_SECRET as a bare string (n
       return new Response("ok");
     }
   `;
-  assert.equal(CRON_AUTH_CALL.test(source), false);
+  assert.equal(CRON_CONTROL_CALL.test(source), false);
+});
+
+test("negative fixture: an unguarded cron handler fails the cron control marker", () => {
+  const source = `
+    export async function GET() {
+      return new Response("ok");
+    }
+  `;
+  assert.equal(CRON_CONTROL_CALL.test(source), false);
 });

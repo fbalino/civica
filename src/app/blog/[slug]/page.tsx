@@ -21,7 +21,7 @@ import { withOg } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildArticle } from "@/lib/seo/jsonld";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 const SITE_URL = "https://civicaatlas.org";
 
@@ -240,8 +240,8 @@ function escapeMdxText(value: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/{/g, "&#123;")
-    .replace(/}/g, "&#125;");
+    .replace(/{/g, "&#x7B;")
+    .replace(/}/g, "&#x7D;");
 }
 
 function renderBlogTable(lines: string[]): string {

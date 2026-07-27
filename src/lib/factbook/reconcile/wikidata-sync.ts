@@ -15,11 +15,16 @@ import { createHash } from "node:crypto";
 import { isNotNull, sql } from "drizzle-orm";
 
 import {
-  countryFacts,
   factSnapshots,
   jurisdictions,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import {
   getClaimsForEntity,
   groupClaimsByStatement,
@@ -31,6 +36,7 @@ import {
   type WikidataFactConfig,
 } from "./wikidata-fact-mapping";
 import { getFactKey } from "./fact-keys";
+import { parseWikidataPublisherDate } from "./publisher-date";
 import {
   isAllowedReference,
   findAllowlistEntry,
@@ -39,6 +45,7 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
+import { markExternalSourceSyncedAfterAggregateSuccess } from "./_sync-common";
 
 export interface WikidataSyncOptions {
   jurisdictionSlug?: string;
@@ -52,6 +59,10 @@ export interface WikidataSyncOptions {
   getClaims?: typeof getClaimsForEntity;
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  /** Registry-drift fixture seam; production uses the canonical mapping. */
+  factMappings?: readonly WikidataFactConfig[];
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface WikidataJurisdiction {
@@ -281,25 +292,6 @@ function pickAdmissibleClaim(
   return newest;
 }
 
-function isoYearFromPit(pit: string | undefined): {
-  asOf: string | null;
-  factYear: number | null;
-} {
-  if (!pit) return { asOf: null, factYear: null };
-  const cleaned = pit.startsWith("+") ? pit.slice(1) : pit;
-  const yearMatch = cleaned.match(/^(\d{4})/);
-  const yearNum = yearMatch ? parseInt(yearMatch[1], 10) : null;
-  let asOf: string | null = null;
-  if (yearMatch) {
-    asOf = `${yearMatch[1]}-01-01`;
-    const fullMatch = cleaned.match(/^(\d{4}-\d{2}-\d{2})/);
-    if (fullMatch && !cleaned.startsWith(`${yearMatch[1]}-00-00`)) {
-      asOf = fullMatch[1];
-    }
-  }
-  return { asOf, factYear: yearNum };
-}
-
 function payloadHash(payload: object): string {
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
@@ -312,6 +304,10 @@ export async function syncFactbookWikidata(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const allJurisdictions = options.jurisdictions ?? await db
     .select({
@@ -332,9 +328,18 @@ export async function syncFactbookWikidata(
     `${allJurisdictions.length} jurisdictions with wikidata_qid in scope.`
   );
 
+  const mappings = options.factMappings ?? WIKIDATA_FACT_MAPPING;
   const targetConfigs = options.factKey
-    ? WIKIDATA_FACT_MAPPING.filter((c) => c.factKey === options.factKey)
-    : WIKIDATA_FACT_MAPPING;
+    ? mappings.filter((c) => c.factKey === options.factKey)
+    : mappings;
+  const factDefinitions = new Map(
+    targetConfigs.map((config) => [config.factKey, getFactKey(config.factKey)]),
+  );
+  for (const [factKey, definition] of factDefinitions) {
+    if (!definition) {
+      errors.push(`Configured Wikidata fact key is not registered: ${factKey}`);
+    }
+  }
 
   const factCounters = new Map<string, PerFactCounters>();
   for (const c of targetConfigs) {
@@ -352,7 +357,7 @@ export async function syncFactbookWikidata(
 
     for (const config of targetConfigs) {
       const counters = factCounters.get(config.factKey)!;
-      const factKeyDef = getFactKey(config.factKey);
+      const factKeyDef = factDefinitions.get(config.factKey);
       if (!factKeyDef) continue;
 
       let groupedClaims: GroupedClaim[] = [];
@@ -379,7 +384,10 @@ export async function syncFactbookWikidata(
       if (!chosen) continue;
 
       const numericValue = applyUnitConversion(config, chosen.valueRaw)!;
-      const { asOf, factYear } = isoYearFromPit(chosen.pointInTime);
+      const { asOf, factYear, valueJson } = parseWikidataPublisherDate(
+        chosen.pointInTime,
+        chosen.pointInTimePrecision,
+      );
 
       const allowedRefsPayload = chosen.references
         .filter((ref) =>
@@ -407,6 +415,7 @@ export async function syncFactbookWikidata(
         valueRaw: chosen.valueRaw,
         valueUnitQid: chosen.valueUnitQid,
         pointInTime: chosen.pointInTime,
+        pointInTimePrecision: chosen.pointInTimePrecision,
         references: chosen.references,
       };
       const hash = payloadHash(upstreamPayload);
@@ -438,10 +447,12 @@ export async function syncFactbookWikidata(
           })
           .returning({ id: factSnapshots.id });
       } catch (err) {
+        const message = `${j.slug} ${config.factKey}: snapshot insert failed — ${
+          err instanceof Error ? err.message : err
+        }`;
+        errors.push(message);
         log(
-          `! ${j.slug} ${config.factKey}: snapshot insert failed — ${
-            err instanceof Error ? err.message : err
-          }`
+          `! ${message}`
         );
         continue;
       }
@@ -474,7 +485,7 @@ export async function syncFactbookWikidata(
         factValueNumeric: numericValue,
         factUnit: factKeyDef.unit ?? null,
         factYear,
-        valueJson: null,
+        valueJson,
         asOf,
         retrievedAt: new Date(),
         upstreamVintageLabel: null,
@@ -485,47 +496,15 @@ export async function syncFactbookWikidata(
         sourceNote: null,
       };
 
-      await db
-        .insert(countryFacts)
-        .values(factRow)
-        .onConflictDoUpdate({
-          target: [
-            countryFacts.jurisdictionId,
-            countryFacts.factKey,
-            countryFacts.sourceId,
-          ],
-          set: {
-            factValue: factRow.factValue,
-            factValueNumeric: factRow.factValueNumeric,
-            factUnit: factRow.factUnit,
-            factYear: factRow.factYear,
-            asOf: factRow.asOf,
-            sourceUrl: factRow.sourceUrl,
-            wikidataPid: factRow.wikidataPid,
-            wikidataRank: factRow.wikidataRank,
-            references: factRow.references,
-            sourceHash: factRow.sourceHash,
-            retrievedAt: factRow.retrievedAt,
-            snapshotId: factRow.snapshotId,
-            updatedAt: new Date(),
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision. The same invariant applies to every
-            // country_facts upsert in this codebase.
-          },
-        });
+      await writeFact(db, {
+        values: factRow,
+        history: routineCountryFactHistory(factRow, atlasReleaseId!),
+      });
 
       counters.admitted++;
       touchedPairs.add(`${j.id}|${config.factKey}`);
     }
   }
-
-  await (options.markSynced ?? markSourcesSynced)("wikidata", {
-    rowsWritten: errors.length === 0 ? touchedPairs.size : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — persist resolver-proposed disputes for every pair
   // we touched. Same dedup contract as the WB WDI sync.
@@ -546,6 +525,9 @@ export async function syncFactbookWikidata(
           log(`  ${line}`);
         },
       });
+      for (const error of disputes.errors) {
+        errors.push(`disputes: ${error}`);
+      }
     } catch (err) {
       const message = `dispute persistence failed: ${
         err instanceof Error ? err.message : err
@@ -554,6 +536,15 @@ export async function syncFactbookWikidata(
       log(`! ${message}`);
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "wikidata",
+    rowsWritten: touchedPairs.size,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const factCountersByKey: Record<string, PerFactCounters> = {};

@@ -1,0 +1,18 @@
+{
+  "contract": "civica-privacy-browser-check/v1",
+  "checkedAt": "2026-07-23T06:41:00Z",
+  "route": "/privacy",
+  "browser": "installed Google Chrome via Playwright",
+  "httpStatus": 200,
+  "title": "Privacy Policy · Civica Atlas",
+  "heading": "Privacy Policy",
+  "tableCount": 2,
+  "tableCaptions": [
+    "Reader and voluntary-submission data flows",
+    "Internal operational and reviewer data flows"
+  ],
+  "renderedFlowRows": 11,
+  "rawIpNoticePresent": true,
+  "remoteProviderBoundaryPresent": true,
+  "consoleOrPageErrors": []
+}

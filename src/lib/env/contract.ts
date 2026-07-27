@@ -14,6 +14,7 @@
 
 export type EnvContext =
   | "build"
+  | "ci"
   | "dev"
   | "test"
   | "scripts"
@@ -24,6 +25,7 @@ export type EnvContext =
 
 export const ENV_CONTEXTS: EnvContext[] = [
   "build",
+  "ci",
   "dev",
   "test",
   "scripts",
@@ -46,7 +48,9 @@ export type EnvVarSpec = {
 };
 
 const isPostgresUrl = (v: string): string | null =>
-  /^postgres(ql)?:\/\/.+/.test(v) ? null : "must be a postgres:// connection string";
+  /^postgres(ql)?:\/\/.+/.test(v)
+    ? null
+    : "must be a postgres:// connection string";
 const nonEmpty = (v: string): string | null =>
   v.trim().length > 0 ? null : "must not be empty";
 const isScryptHash = (v: string): string | null =>
@@ -55,15 +59,24 @@ const isScryptHash = (v: string): string | null =>
     : "must be a scrypt hash (npm run admin:set-password)";
 
 /**
- * DB access underlies build (validators), dev, DB tests, scripts, crons,
- * admin, chat, and production. Admin/cron/chat secrets fail their context
- * closed. Model-provider keys are `degrades` (feature off) rather than
- * required, per `.env.example`.
+ * DB access underlies production builds, dev, DB tests, scripts, crons, admin,
+ * chat, and production. The `ci` context deliberately has no database: it
+ * verifies the credential-free build/fallback contract while `build` remains
+ * strict. Admin/cron/chat secrets fail their context closed. Model-provider
+ * keys are `degrades` (feature off) rather than required, per `.env.example`.
  */
 export const ENV_CONTRACT: EnvVarSpec[] = [
   {
     name: "DATABASE_URL",
-    requiredIn: ["build", "dev", "scripts", "cron", "admin", "chat", "production"],
+    requiredIn: [
+      "build",
+      "dev",
+      "scripts",
+      "cron",
+      "admin",
+      "chat",
+      "production",
+    ],
     secret: true,
     note: "Neon Postgres connection. Underlies every DB-touching context.",
     validate: isPostgresUrl,
@@ -96,30 +109,103 @@ export const ENV_CONTRACT: EnvVarSpec[] = [
     validate: nonEmpty,
   },
   {
+    name: "RATE_LIMIT_KEY_SECRET",
+    requiredIn: ["production"],
+    secret: true,
+    note: "Independent HMAC key that obscures client identities in distributed rate-limit counters.",
+    validate: (value) =>
+      new TextEncoder().encode(value.trim()).byteLength >= 32
+        ? null
+        : "must be at least 32 bytes",
+  },
+  {
+    name: "VERCEL_PROTECTED_SOURCEMAPS",
+    requiredIn: [],
+    note: "Explicit production opt-in for browser maps only after Vercel Protected Source Maps is enabled; absent keeps browser maps off.",
+    validate: (value) =>
+      value === "true" || value === "false"
+        ? null
+        : "must be exactly true or false when set",
+  },
+  {
+    name: "CIVICA_ATLAS_RELEASE_ID",
+    requiredIn: [],
+    note: "Explicit opt-in naming the Atlas data release for writers that append public release-to-release history.",
+    validate: (value) =>
+      /^[A-Za-z0-9._-]{1,96}$/.test(value.trim())
+        ? null
+        : "must be a 1-96 character release identifier",
+  },
+  {
     name: "ANTHROPIC_API_KEY_CHAT",
     requiredIn: ["chat"],
     secret: true,
-    note: "Powers /api/chat (Ask Civica). Chat is disabled without it.",
+    note: "Powers /api/chat (Ask Civica). Runtime environment drift still returns a fixed unavailable response.",
     validate: nonEmpty,
   },
 ];
 
 /** Variables that enable a feature and degrade gracefully when absent. */
-export const ENV_DEGRADES: Array<{ name: string; secret?: boolean; note: string }> = [
-  { name: "ANTHROPIC_API_KEY_PULSE_CLASSIFIER", secret: true, note: "Pulse ensemble voter/verifier; classify cron no-ops without it." },
-  { name: "ANTHROPIC_API_KEY_PULSE_SUMMARIZE", secret: true, note: "Pulse review summariser." },
-  { name: "ANTHROPIC_API_KEY_BILLS_SUMMARIZE", secret: true, note: "Bills summariser." },
-  { name: "ANTHROPIC_API_KEY_RECONCILIATION", secret: true, note: "Stats SA reconciliation extraction." },
-  { name: "DEEPSEEK_API_KEY", secret: true, note: "Default Pulse voter; classify cron no-ops without it." },
+export const ENV_DEGRADES: Array<{
+  name: string;
+  secret?: boolean;
+  note: string;
+}> = [
+  {
+    name: "ANTHROPIC_API_KEY_PULSE_CLASSIFIER",
+    secret: true,
+    note: "Pulse ensemble voter/verifier; classify cron no-ops without it.",
+  },
+  {
+    name: "ANTHROPIC_API_KEY_PULSE_SUMMARIZE",
+    secret: true,
+    note: "Pulse review summariser.",
+  },
+  {
+    name: "ANTHROPIC_API_KEY_BILLS_SUMMARIZE",
+    secret: true,
+    note: "Bills summariser.",
+  },
+  {
+    name: "ANTHROPIC_API_KEY_RECONCILIATION",
+    secret: true,
+    note: "Stats SA reconciliation extraction.",
+  },
+  {
+    name: "DEEPSEEK_API_KEY",
+    secret: true,
+    note: "Default Pulse voter; classify cron no-ops without it.",
+  },
   { name: "GLM_API_KEY", secret: true, note: "Pulse voter when provider=glm." },
   { name: "OPENAI_API_KEY", secret: true, note: "Optional 4th Pulse voter." },
-  { name: "PULSE_CODING_SESSION_SECRET", secret: true, note: "Independent-coder session HMAC; coding workspace off without it." },
-  { name: "GOOGLE_CLIENT_ID", note: "Google admin sign-in (with SECRET + ADMIN_GOOGLE_EMAIL)." },
+  {
+    name: "PULSE_CODING_SESSION_SECRET",
+    secret: true,
+    note: "Independent-coder session HMAC; coding workspace off without it.",
+  },
+  {
+    name: "GOOGLE_CLIENT_ID",
+    note: "Google admin sign-in (with SECRET + ADMIN_GOOGLE_EMAIL).",
+  },
   { name: "GOOGLE_CLIENT_SECRET", secret: true, note: "Google admin sign-in." },
-  { name: "CONGRESS_API_KEY", secret: true, note: "US legislative sync; falls back to DEMO_KEY." },
-  { name: "BUNDESTAG_API_KEY", secret: true, note: "German legislative sync; falls back to anonymous." },
-  { name: "NEXT_PUBLIC_MAPBOX_TOKEN", note: "Optional 3D globe; 2D map is keyless." },
-  { name: "NEXT_PUBLIC_BASEMAP_PMTILES_URL", note: "Self-hosted basemap; falls back to OpenFreeMap." },
+  {
+    name: "CONGRESS_API_KEY",
+    secret: true,
+    note: "US legislative sync; falls back to DEMO_KEY.",
+  },
+  {
+    name: "BUNDESTAG_API_KEY",
+    secret: true,
+    note: "German legislative sync; falls back to anonymous.",
+  },
+  {
+    name: "NEXT_PUBLIC_MAPBOX_TOKEN",
+    note: "Optional 3D globe; 2D map is keyless.",
+  },
+  {
+    name: "NEXT_PUBLIC_BASEMAP_PMTILES_URL",
+    note: "Self-hosted basemap; falls back to OpenFreeMap.",
+  },
 ];
 
 export type EnvCheckResult = {
@@ -150,6 +236,18 @@ export function checkEnv(
       const reason = spec.validate(value);
       if (reason) invalid.push(`${spec.name} (${reason})`);
     }
+  }
+  const rateLimitKeySecret = env.RATE_LIMIT_KEY_SECRET?.trim();
+  const adminSessionSecret = env.ADMIN_SESSION_SECRET?.trim();
+  if (
+    context === "production" &&
+    rateLimitKeySecret &&
+    adminSessionSecret &&
+    rateLimitKeySecret === adminSessionSecret
+  ) {
+    invalid.push(
+      "RATE_LIMIT_KEY_SECRET (must differ from ADMIN_SESSION_SECRET)",
+    );
   }
   const degradedOff = ENV_DEGRADES.filter(
     (d) => !env[d.name] || env[d.name]!.trim() === "",

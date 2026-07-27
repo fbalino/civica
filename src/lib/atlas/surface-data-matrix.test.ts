@@ -70,6 +70,7 @@ test("every declared country module and core data route is registered", () => {
     "evidence-coverage",
     "governance-evidence",
     "longitudinal",
+    "conditions",
     "government",
     "legislature",
     "leaders",

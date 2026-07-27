@@ -47,3 +47,38 @@ export interface BillIngest {
 export type BillIngestDraft = Omit<BillIngest, "summary"> & {
   summary?: string | null;
 };
+
+export type BillSourceEmptyReason =
+  "upstream_returned_no_rows" | "no_bill_records_in_period";
+
+/**
+ * Per-upstream evidence returned by adapters that aggregate more than one
+ * publisher feed. An empty successful feed is different from a failed feed:
+ * the former may be a legitimate quiet period, while the latter must make the
+ * whole scheduled sync fail before any rows or freshness are written.
+ */
+export type BillSourceFetchOutcome =
+  | {
+      sourceId: string;
+      status: "success";
+      /** Structured rows returned by the publisher before bill mapping. */
+      fetched: number;
+      /** Canonical drafts retained for this source after mapping/deduplication. */
+      mapped: number;
+      /** Required when a successful source maps no drafts. */
+      emptyReason?: BillSourceEmptyReason;
+    }
+  | {
+      sourceId: string;
+      status: "failed";
+      fetched: number;
+      mapped: 0;
+      error: string;
+    };
+
+export interface BillFetchBatch {
+  drafts: BillIngestDraft[];
+  sourceOutcomes: BillSourceFetchOutcome[];
+}
+
+export type BillFetchResult = BillIngestDraft[] | BillFetchBatch;

@@ -4,7 +4,7 @@ import report from "@/lib/pulse/v2/cluster-coverage.generated.json";
 
 // PUBLIC_CLAIM: pulse.cluster-coverage-release
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return rateLimited;
   return apiResponse({
     data: zPulseClusterCoverageReport.strict().parse(report),

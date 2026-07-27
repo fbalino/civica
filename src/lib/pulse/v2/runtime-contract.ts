@@ -31,6 +31,10 @@ import {
   SCORE_WINDOW_DAYS,
 } from "./taxonomy";
 import {
+  PULSE_SCORE_EVENT_LIFECYCLE_POLICY,
+  PULSE_SCORE_WINDOW_BOUNDARY,
+} from "./event-lifecycle";
+import {
   PULSE_DIMENSIONS,
   type PulseDimension,
   type SeverityTier,
@@ -102,7 +106,7 @@ import {
 export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.14.0" as const;
 export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.15-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
-export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
+export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-26" as const;
 
 export type PulseMethodStatus = "experimental";
 export type PulseSourceRole = "specialist" | "news";
@@ -498,7 +502,8 @@ export interface PulseRuntimeMethodContract {
     includedEvents: "published_only";
     inputMethodCoverage: "row_level_versioned_with_explicit_legacy";
     trailingWindowDays: number;
-    windowBoundary: "inclusive_365_days_future_excluded";
+    windowBoundary: typeof PULSE_SCORE_WINDOW_BOUNDARY;
+    eventLifecycle: typeof PULSE_SCORE_EVENT_LIFECYCLE_POLICY;
     currentProjection: "one_row_per_jurisdiction_dimension";
     noEventState: "zero_tombstone_internal_public_null";
     outputHistory: "append_only_per_score_run_jurisdiction_dimension";
@@ -915,7 +920,8 @@ export function buildPulseRuntimeMethod(
       includedEvents: "published_only",
       inputMethodCoverage: "row_level_versioned_with_explicit_legacy",
       trailingWindowDays: facts.scoreWindowDays,
-      windowBoundary: "inclusive_365_days_future_excluded",
+      windowBoundary: PULSE_SCORE_WINDOW_BOUNDARY,
+      eventLifecycle: PULSE_SCORE_EVENT_LIFECYCLE_POLICY,
       currentProjection: "one_row_per_jurisdiction_dimension",
       noEventState: "zero_tombstone_internal_public_null",
       outputHistory: "append_only_per_score_run_jurisdiction_dimension",

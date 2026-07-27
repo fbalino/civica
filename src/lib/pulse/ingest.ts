@@ -1,4 +1,3 @@
-import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { and, eq } from "drizzle-orm";
 import { jurisdictions, pulseEvents } from "../db/schema";
@@ -9,9 +8,10 @@ import {
   type GdeltArticle,
 } from "./gdelt";
 import { markSourcesSynced } from "../db/source-freshness";
+import { createServerlessSql } from "../db";
 
 export function createDb() {
-  const sql = neon(process.env.DATABASE_URL!);
+  const sql = createServerlessSql(process.env.DATABASE_URL!);
   return drizzle({ client: sql });
 }
 export type Db = ReturnType<typeof createDb>;

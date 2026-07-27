@@ -12,9 +12,9 @@
  * fails a test instead of silently rotting.
  *
  * Consumers:
- *  - `src/components/factbook/FactbookBills.tsx` — supported-country
- *    coverage note + chamber/source chips on the Civica Data → Bills
- *    section.
+ *  - `src/components/factbook/FactbookBills.tsx` — explicit unsupported and
+ *    supported-zero-row coverage states, plus chamber/source details when
+ *    tracked rows exist on the Civica Data → Bills section.
  *  - `src/app/api/countries/[slug]/bills/route.ts` — the public bills API;
  *    returns an explicit `coverage` object (not a bare empty array) for
  *    jurisdictions outside this list.
@@ -104,7 +104,8 @@ export const BILLS_STAGE_LABELS: readonly string[] = [
 
 /**
  * For an UNSUPPORTED jurisdiction: explains the gap instead of leaving a
- * bare empty bills list. Used by the public API route's `coverage.message`.
+ * bare empty bills list. Used by both the public API route's
+ * `coverage.message` and the Civica Data Bills section.
  */
 export function billsCoverageMessage(countryName?: string): string {
   const names = BILLS_SUPPORTED_JURISDICTION_NAMES.join(", ");
@@ -113,10 +114,9 @@ export function billsCoverageMessage(countryName?: string): string {
 }
 
 /**
- * For a SUPPORTED jurisdiction whose bills ARE rendering: states the same
- * six-jurisdiction scope without implying the current country is missing
- * from it. Used by `FactbookBills.tsx`, which only ever renders for a
- * supported country (see the Bills done-when note in that file).
+ * For a SUPPORTED jurisdiction: states the same six-jurisdiction scope
+ * without implying the current country is missing from it. Used by
+ * `FactbookBills.tsx` for both populated and valid zero-row states.
  */
 export function billsSupportedCoverageNote(): string {
   const names = BILLS_SUPPORTED_JURISDICTION_NAMES.join(", ");

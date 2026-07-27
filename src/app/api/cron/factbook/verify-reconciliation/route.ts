@@ -1,8 +1,8 @@
 /**
  * v1.0 follow-up §1.1 — nightly verification cron.
  *
- * Runs daily at 03:00 UTC (per `vercel.json`). Authenticated via
- * `requireCronAuth` against `CRON_SECRET`. Idempotent: pure read-only
+ * Runs daily at 03:45 UTC (per `vercel.json`). Authenticated via
+ * the shared cron boundary against `CRON_SECRET`. Idempotent: pure read-only
  * suite, no DB writes.
  *
  * The cron's job is drift detection. It hits ~14 metric queries
@@ -30,8 +30,9 @@
  * Methodology: ~/civica/plan/v1-verification-suite-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
+import { reconciliationVerificationCronOutcome } from "@/lib/factbook/cron-outcomes";
 import {
   runVerificationSuite,
   formatReport,
@@ -66,47 +67,41 @@ function notifyAdmin(report: VerificationReport): void {
 }
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
   const url = new URL(request.url);
   const dryRun = url.searchParams.get("dryRun") === "1";
   const verbose = url.searchParams.get("verbose") === "1";
   const metricId = url.searchParams.get("metric") ?? undefined;
 
-  try {
-    const report = await runVerificationSuite(db, { verbose, metricId });
+  const report = await runVerificationSuite(db, { verbose, metricId });
 
-    // Always log the full plain-text report so operators can grep
-    // Vercel logs without parsing JSON. The report header includes
-    // overallStatus + pass/warn/fail counts in one block.
-    console.log(formatReport(report));
+  // Always log the full plain-text report so operators can grep
+  // Vercel logs without parsing JSON. The report header includes
+  // overallStatus + pass/warn/fail counts in one block.
+  console.log(formatReport(report));
 
-    // Alert path: anything other than `pass` → notify. Skip on dryRun.
-    if (report.overallStatus !== "pass" && !dryRun) {
-      notifyAdmin(report);
-    }
+  // Alert path: anything other than `pass` → notify. Skip on dryRun.
+  if (report.overallStatus !== "pass" && !dryRun) {
+    notifyAdmin(report);
+  }
 
-    return NextResponse.json({
-      ok: true,
+  const outcome = reconciliationVerificationCronOutcome(report);
+
+  return NextResponse.json(
+    {
+      ok: outcome.ok,
+      outcome: outcome.outcome,
+      healthOk: outcome.healthOk,
       step: "factbook.verify-reconciliation",
       started: startedAt,
       finished: new Date().toISOString(),
       dryRun,
       report,
-    });
-  } catch (err) {
-    console.error("[cron factbook.verify-reconciliation] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.verify-reconciliation",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+    },
+    { status: outcome.httpStatus },
+  );
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.verify-reconciliation", handler);
+
+export { cronHandler as GET, cronHandler as POST };

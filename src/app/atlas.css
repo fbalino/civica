@@ -139,13 +139,119 @@
 .atlas-standalone {
   position: relative;
   width: 100%;
-  height: calc(100vh - var(--header-height));
-  height: calc(100dvh - var(--header-height));
-  overflow: hidden;
+  min-height: calc(100dvh - var(--header-height));
+  overflow: visible;
+  display: grid;
+  grid-template-rows: auto minmax(0, calc(100dvh - var(--header-height))) auto;
+}
+
+.atlas-accessible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface-primary);
+  border-bottom: var(--border-hairline) solid var(--color-border-default);
+}
+
+.atlas-accessible-header__intro {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.atlas-accessible-header h1 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: var(--text-56);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--tracking-tight);
+  white-space: nowrap;
+}
+
+.atlas-accessible-header__intro p,
+.atlas-country-controls__status,
+.atlas-country-controls__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+}
+
+.atlas-country-controls {
+  position: relative;
+  flex: 0 0 auto;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+}
+
+.atlas-country-controls summary {
+  cursor: pointer;
+  color: var(--color-text-primary);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-medium);
+}
+
+.atlas-country-controls__body {
+  display: grid;
+  gap: var(--space-3);
+  width: fit-content;
+  max-width: calc(100vw - var(--space-7));
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface-primary);
+  border: var(--border-hairline) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
+}
+
+.atlas-country-controls label {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.atlas-country-controls select {
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-primary);
+  background: var(--color-surface-elevated);
+  border: var(--border-hairline) solid var(--color-border-default);
+  border-radius: var(--radius-control);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+}
+
+.atlas-country-controls__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@media (max-width: 768px) {
+  .atlas-accessible-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .atlas-accessible-header__intro {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
 }
 
 /* ===== ATLAS VIEW (world map) ===== */
-.atlas-view { background: var(--atlas-ocean); position: relative; width: 100%; height: 100%; }
+.atlas-view { background: var(--atlas-ocean); position: relative; width: 100%; height: 100%; min-height: 0; }
 
 .atlas-view svg.world-map { width: 100%; height: 100%; display: block; cursor: grab; }
 .atlas-view svg.world-map:active { cursor: grabbing; }
@@ -188,6 +294,10 @@
   gap: 8px;
   align-items: flex-start;
   font-family: var(--font-body);
+  /* The legend can cover much of the narrow map. Its explanatory surface
+     must not consume map taps; restore hit testing only for its controls and
+     source links below. */
+  pointer-events: none;
 }
 
 /* Map-furniture treatment for the canonical .segmented control — same
@@ -196,6 +306,7 @@
   box-shadow: var(--shadow-hard-md);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
 }
 
 .atlas-indicator-legend {
@@ -257,6 +368,7 @@
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: var(--space-1);
+  pointer-events: auto;
 }
 
 /* Slim hint bar at the bottom of the Atlas map. Replaced the larger
@@ -309,7 +421,7 @@
 
 /* ===== HOVER CARD ===== */
 .atlas-hover-card {
-  position: fixed; z-index: 50; pointer-events: none;
+  position: fixed; z-index: var(--z-tooltip); pointer-events: none;
   background: var(--atlas-paper); border: 1px solid var(--atlas-ink);
   padding: 10px 12px; box-shadow: var(--shadow-hard-md); min-width: 240px;
 }
@@ -1002,7 +1114,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 
 /* ===== SEAT TOOLTIP ===== */
 .atlas-seat-tip {
-  position: fixed; z-index: 60; pointer-events: none;
+  position: fixed; z-index: var(--z-tooltip); pointer-events: none;
   background: var(--atlas-ink); color: var(--atlas-paper);
   padding: 8px 12px; font-family: var(--font-body); font-size: var(--text-13);
   min-width: 180px; line-height: 1.3;
@@ -1223,7 +1335,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     position: fixed;
     right: var(--space-4);
     bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
-    z-index: 10;
+    z-index: var(--z-sticky);
   }
   .atlas-zoombar button { width: 48px; height: 48px; font-size: var(--text-20); }
 
@@ -1318,11 +1430,11 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
    three-pane .atlas-root wrapper. */
 .atlas-root,
 .org-standalone {
-  --cat-security: #C25D3A;   /* Terracotta */
-  --cat-regional: #2D6CDF;   /* Azure */
-  --cat-trade:    #4C9F6E;   /* Leaf */
-  --cat-un:       #7C59C9;   /* Violet */
-  --cat-cultural: #64748B;   /* Stone */
+  --cat-security: var(--gov-pres);
+  --cat-regional: var(--gov-parl);
+  --cat-trade: var(--color-success);
+  --cat-un: var(--gov-semi);
+  --cat-cultural: var(--color-text-secondary);
 }
 
 /* ============================================
@@ -1468,6 +1580,10 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .org-mini-map { width: 100%; max-height: 420px; display: block; }
 .org-mini-map path { transition: opacity 120ms; }
 .org-mini-map path.member:hover { opacity: 1 !important; }
+.org-mini-map a:focus-visible path {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
 
 /* Grouped memberships */
 .intl-mem-list { display: grid; gap: 22px; margin-top: 12px; }

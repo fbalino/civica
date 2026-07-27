@@ -19,12 +19,14 @@
  * Plan:        ~/civica/plan/phase-f-implementation-plan.md F.2.1
  * Resolution:  ~/Downloads/resolution\ \(2\).md
  */
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { getFactKey } from "./fact-keys";
 import { payloadHash } from "./_sync-common";
 
@@ -107,12 +109,18 @@ export async function syncWorldBankClassifications(
     fetchCountries?: typeof fetchWbCountries;
     jurisdictions?: ClassificationJurisdiction[];
     markSynced?: typeof markSourcesSynced;
+    atlasReleaseId?: string;
+    writeFact?: CountryFactHistoryWriter;
   } = {}
 ): Promise<WbClassificationsSummary> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   let wbCountries: WbCountry[] = [];
   try {
@@ -210,47 +218,30 @@ export async function syncWorldBankClassifications(
       } else {
         try {
           await upsertSnapshot(db, "world_bank", payload, hash, WB_VINTAGE);
-          await db
-            .insert(countryFacts)
-            .values({
-              jurisdictionId: j.id,
-              factKey: "world_bank_region",
-              factGroup: regionDef.group,
-              category: regionDef.category,
-              sourceId: "world_bank",
-              sourceUrl: `https://api.worldbank.org/v2/country/${j.iso3}?format=json`,
-              references: referencesPayload,
-              sourceHash: hash,
-              factValue: regionValue,
-              factValueNumeric: null,
-              factUnit: null,
-              factYear: new Date().getFullYear(),
-              valueJson: { regionId, regionValue },
-              asOf: `${new Date().getFullYear()}-07-01`,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: WB_VINTAGE,
-              methodologyVersion: "v0.1-beta",
-              status: "active",
-            })
-            .onConflictDoUpdate({
-              target: [
-                countryFacts.jurisdictionId,
-                countryFacts.factKey,
-                countryFacts.sourceId,
-              ],
-              // F.5.1 invariant: do NOT add `status` or
-              // `statusReason` here — reviewer-demoted rows must
-              // survive a re-sync.
-              set: {
-                factValue: regionValue,
-                valueJson: { regionId, regionValue },
-                references: referencesPayload,
-                sourceHash: hash,
-                upstreamVintageLabel: WB_VINTAGE,
-                retrievedAt: new Date(),
-                updatedAt: new Date(),
-              },
-            });
+          const values = {
+            jurisdictionId: j.id,
+            factKey: "world_bank_region",
+            factGroup: regionDef.group,
+            category: regionDef.category,
+            sourceId: "world_bank",
+            sourceUrl: `https://api.worldbank.org/v2/country/${j.iso3}?format=json`,
+            references: referencesPayload,
+            sourceHash: hash,
+            factValue: regionValue,
+            factValueNumeric: null,
+            factUnit: null,
+            factYear: new Date().getFullYear(),
+            valueJson: { regionId, regionValue },
+            asOf: `${new Date().getFullYear()}-07-01`,
+            retrievedAt: new Date(),
+            upstreamVintageLabel: WB_VINTAGE,
+            methodologyVersion: "v0.1-beta",
+            status: "active",
+          };
+          await writeFact(db, {
+            values,
+            history: routineCountryFactHistory(values, atlasReleaseId!),
+          });
           regionWritten++;
         } catch (err) {
           errors.push(
@@ -299,46 +290,30 @@ export async function syncWorldBankClassifications(
           incomeHash,
           WB_VINTAGE
         );
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: "world_bank_income_group",
-            factGroup: incomeDef.group,
-            category: incomeDef.category,
-            sourceId: "world_bank",
-            sourceUrl: `https://api.worldbank.org/v2/country/${j.iso3}?format=json`,
-            references: incomeRefs,
-            sourceHash: incomeHash,
-            factValue: incomeValue,
-            factValueNumeric: null,
-            factUnit: null,
-            factYear: new Date().getFullYear(),
-            valueJson: { incomeId, incomeValue },
-            asOf: `${new Date().getFullYear()}-07-01`,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: WB_VINTAGE,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // here — reviewer-demoted rows must survive a re-sync.
-            set: {
-              factValue: incomeValue,
-              valueJson: { incomeId, incomeValue },
-              references: incomeRefs,
-              sourceHash: incomeHash,
-              upstreamVintageLabel: WB_VINTAGE,
-              retrievedAt: new Date(),
-              updatedAt: new Date(),
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: "world_bank_income_group",
+          factGroup: incomeDef.group,
+          category: incomeDef.category,
+          sourceId: "world_bank",
+          sourceUrl: `https://api.worldbank.org/v2/country/${j.iso3}?format=json`,
+          references: incomeRefs,
+          sourceHash: incomeHash,
+          factValue: incomeValue,
+          factValueNumeric: null,
+          factUnit: null,
+          factYear: new Date().getFullYear(),
+          valueJson: { incomeId, incomeValue },
+          asOf: `${new Date().getFullYear()}-07-01`,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: WB_VINTAGE,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         incomeWritten++;
       } catch (err) {
         errors.push(
@@ -534,12 +509,18 @@ export async function syncVdemRow(
     fetchRows?: typeof fetchVdemRowFromQog;
     jurisdictions?: ClassificationJurisdiction[];
     markSynced?: typeof markSourcesSynced;
+    atlasReleaseId?: string;
+    writeFact?: CountryFactHistoryWriter;
   } = {}
 ): Promise<VdemRowSummary> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   let qogByIso3 = new Map<string, VdemRowCsvRow>();
   try {
@@ -633,47 +614,30 @@ export async function syncVdemRow(
 
     try {
       await upsertSnapshot(db, "vdem", payload, hash, VDEM_VINTAGE);
-      await db
-        .insert(countryFacts)
-        .values({
-          jurisdictionId: j.id,
-          factKey: "vdem_row",
-          factGroup: def.group,
-          category: def.category,
-          sourceId: "vdem",
-          sourceUrl: "https://www.v-dem.net/data/the-v-dem-dataset/",
-          references: refs,
-          sourceHash: hash,
-          factValue: label,
-          factValueNumeric: row.v2xRegime,
-          factUnit: null,
-          factYear: 2024,
-          valueJson: { v2xRegime: row.v2xRegime, label },
-          asOf: "2024-03-01",
-          retrievedAt: new Date(),
-          upstreamVintageLabel: VDEM_VINTAGE,
-          methodologyVersion: "v0.1-beta",
-          status: "active",
-        })
-        .onConflictDoUpdate({
-          target: [
-            countryFacts.jurisdictionId,
-            countryFacts.factKey,
-            countryFacts.sourceId,
-          ],
-          // F.5.1 invariant: do NOT add `status` or `statusReason`
-          // here — reviewer-demoted rows must survive a re-sync.
-          set: {
-            factValue: label,
-            factValueNumeric: row.v2xRegime,
-            valueJson: { v2xRegime: row.v2xRegime, label },
-            references: refs,
-            sourceHash: hash,
-            upstreamVintageLabel: VDEM_VINTAGE,
-            retrievedAt: new Date(),
-            updatedAt: new Date(),
-          },
-        });
+      const values = {
+        jurisdictionId: j.id,
+        factKey: "vdem_row",
+        factGroup: def.group,
+        category: def.category,
+        sourceId: "vdem",
+        sourceUrl: "https://www.v-dem.net/data/the-v-dem-dataset/",
+        references: refs,
+        sourceHash: hash,
+        factValue: label,
+        factValueNumeric: row.v2xRegime,
+        factUnit: null,
+        factYear: 2024,
+        valueJson: { v2xRegime: row.v2xRegime, label },
+        asOf: "2024-03-01",
+        retrievedAt: new Date(),
+        upstreamVintageLabel: VDEM_VINTAGE,
+        methodologyVersion: "v0.1-beta",
+        status: "active",
+      };
+      await writeFact(db, {
+        values,
+        history: routineCountryFactHistory(values, atlasReleaseId!),
+      });
       written++;
     } catch (err) {
       errors.push(`${j.slug} vdem_row: ${err instanceof Error ? err.message : err}`);
@@ -857,12 +821,18 @@ export async function syncMonarchyAndGovernmentForm(
     onProgress?: (line: string) => void;
     jurisdictions?: GovernmentFormJurisdiction[];
     markSynced?: typeof markSourcesSynced;
+    atlasReleaseId?: string;
+    writeFact?: CountryFactHistoryWriter;
   } = {}
 ): Promise<MonarchySummary> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const monarchyDef = getFactKey("monarchy_status");
   const formDef = getFactKey("government_form_description");
@@ -925,41 +895,28 @@ export async function syncMonarchyAndGovernmentForm(
       monarchyWritten++;
     } else {
       try {
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: "monarchy_status",
-            factGroup: monarchyDef.group,
-            category: monarchyDef.category,
-            sourceId: "cia_factbook",
-            sourceUrl: `https://www.cia.gov/the-world-factbook/countries/${j.slug}/`,
-            sourceHash: monarchyHash,
-            factValue: monarchy,
-            factUnit: null,
-            asOf: "2026-01-23",
-            retrievedAt: new Date(),
-            upstreamVintageLabel: "CIA Factbook 2026-01-frozen",
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            sourceNote:
-              "Derived from CIA government_type_detail prose (regex)",
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // here — reviewer-demoted rows must survive a re-sync.
-            set: {
-              factValue: monarchy,
-              sourceHash: monarchyHash,
-              retrievedAt: new Date(),
-              updatedAt: new Date(),
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: "monarchy_status",
+          factGroup: monarchyDef.group,
+          category: monarchyDef.category,
+          sourceId: "cia_factbook",
+          sourceUrl: `https://www.cia.gov/the-world-factbook/countries/${j.slug}/`,
+          sourceHash: monarchyHash,
+          factValue: monarchy,
+          factUnit: null,
+          asOf: "2026-01-23",
+          retrievedAt: new Date(),
+          upstreamVintageLabel: "CIA Factbook 2026-01-frozen",
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          sourceNote:
+            "Derived from CIA government_type_detail prose (regex)",
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         monarchyWritten++;
       } catch (err) {
         errors.push(
@@ -983,40 +940,27 @@ export async function syncMonarchyAndGovernmentForm(
       formWritten++;
     } else {
       try {
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: "government_form_description",
-            factGroup: formDef.group,
-            category: formDef.category,
-            sourceId: "cia_factbook",
-            sourceUrl: `https://www.cia.gov/the-world-factbook/countries/${j.slug}/`,
-            sourceHash: formHash,
-            factValue: prose,
-            factUnit: null,
-            asOf: "2026-01-23",
-            retrievedAt: new Date(),
-            upstreamVintageLabel: "CIA Factbook 2026-01-frozen",
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            sourceNote: "CIA government_type_detail prose, verbatim",
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // here — reviewer-demoted rows must survive a re-sync.
-            set: {
-              factValue: prose,
-              sourceHash: formHash,
-              retrievedAt: new Date(),
-              updatedAt: new Date(),
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: "government_form_description",
+          factGroup: formDef.group,
+          category: formDef.category,
+          sourceId: "cia_factbook",
+          sourceUrl: `https://www.cia.gov/the-world-factbook/countries/${j.slug}/`,
+          sourceHash: formHash,
+          factValue: prose,
+          factUnit: null,
+          asOf: "2026-01-23",
+          retrievedAt: new Date(),
+          upstreamVintageLabel: "CIA Factbook 2026-01-frozen",
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          sourceNote: "CIA government_type_detail prose, verbatim",
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         formWritten++;
       } catch (err) {
         errors.push(

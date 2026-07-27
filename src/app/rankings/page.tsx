@@ -6,8 +6,12 @@ import { withOg } from "@/lib/og";
 import { Reveal } from "@/components/motion/Reveal";
 import { PageHero } from "@/components/PageHero";
 import { Banner } from "@/components/editorial/Banner";
+import {
+  atlasSurfaceQueryValue,
+  captureAtlasSurfaceQuery,
+} from "@/lib/atlas/surface-query-state";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Country Rankings — Population, Development & Reference Facts",
@@ -23,12 +27,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RankingsPage() {
-  let rows: Awaited<ReturnType<typeof getRankingsMatrix>> = [];
-  try {
-    rows = await getRankingsMatrix();
-  } catch {
-    // DB not yet seeded / unreachable — render the empty state below.
-  }
+  const rankingsResult = await captureAtlasSurfaceQuery(getRankingsMatrix);
+  const rows = atlasSurfaceQueryValue(rankingsResult) ?? [];
 
   return (
     <>
@@ -73,13 +73,20 @@ export default async function RankingsPage() {
           explains how this table compares with compact surfaces that do not
           yet provide the same linkage.
         </Banner>
-        {rows.length > 0 ? (
+        {rankingsResult.status === "unavailable" ? (
+          <Banner variant="warn">
+            Ranking data is temporarily unavailable. Civica is not treating
+            this as evidence that no source-reported reference measures exist.
+          </Banner>
+        ) : rows.length > 0 ? (
           <Reveal as="section" amount={0.1}>
             <RankingsMatrix rows={rows} />
           </Reveal>
         ) : (
           <p className="editorial-empty">
-            No ranking data available. Run the seed scripts to populate.
+            No source-reported ranking rows are currently compiled. This is a
+            coverage state, not a claim that the underlying measures do not
+            exist.
           </p>
         )}
       </div>

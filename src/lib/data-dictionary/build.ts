@@ -182,6 +182,21 @@ const FIELD_DEFINITIONS: Readonly<Record<string, string>> = {
     "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
   value_status_reason:
     "Required explanation for every non-observed data-availability state; null only for observed values.",
+  calculation_key:
+    "Content-addressed Conditions input-bundle identity linking a score to its retained calculation and components.",
+  component_id:
+    "Stable identifier of one declared native input within a Conditions dimension.",
+  native_value:
+    "Native-scale component observation; never a normalized or combined Conditions score.",
+  native_unit: "Unit or scale declared for the native Conditions component value.",
+  reference_year:
+    "Observation/reference year. Calculation-level values exist only when all included components share this year.",
+  alignment_policy:
+    "Versioned rule governing whether component reference years may be combined.",
+  alignment_status:
+    "Closed outcome of the Conditions year-alignment check.",
+  inclusion_decision:
+    "Whether the component was included, excluded for absence, or refused because reference years differ.",
   references: "Structured upstream references captured with the source claim.",
   event_date: "Date on which the represented event occurred.",
   published_at: "Publisher timestamp for the source item.",
@@ -234,10 +249,11 @@ function nullableMeaningFor(table: string, column: string) {
     "country_facts",
     "indicator_history",
     "country_metrics",
+    "civica_conditions_components",
   ]);
   if (
     stateful.has(table) &&
-    ["fact_value", "fact_value_numeric", "value_json", "value"].includes(column)
+    ["fact_value", "fact_value_numeric", "value_json", "value", "native_value"].includes(column)
   ) {
     return "Null is interpreted through value_status and value_status_reason; it is never a substitute for zero or an unlabeled unknown value.";
   }

@@ -306,7 +306,7 @@ The declared thresholds and multipliers are available only as a sensitivity scen
 
 ## Decay — different events fade at different rates {#decay}
 
-Pulse Beta assigns event-type-specific half-lives instead of a single uniform decay constant. The production scorer nevertheless includes events only in a trailing {{ctx.scoreWindowDays}}-day window, so any longer half-life parameter is truncated when the event leaves that window.
+Pulse Beta assigns event-type-specific half-lives instead of a single uniform decay constant. The production scorer uses a trailing {{ctx.scoreWindowDays}}-day window, derived from the longest configured half-life, so every declared decay curve is represented in full.
 
 | Category                            | Half-life (days) |
 | ----------------------------------- | ---------------: |
@@ -329,7 +329,9 @@ Decay is exponential: `impact = severity × corroboration_weight × absorption_m
 
 ## Bounds, scoring window, and structural overlap {#bounds}
 
-Each dimensional delta is clamped to **[{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}]**. The asymmetric bounds are a design choice under evaluation; they do not estimate sampling or model uncertainty. Only events in the trailing {{ctx.scoreWindowDays}}-day window are included, even when a category has a longer configured half-life.
+Each dimensional delta is clamped to **[{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}]**. The asymmetric bounds are a design choice under evaluation; they do not estimate sampling or model uncertainty. Only events in the trailing {{ctx.scoreWindowDays}}-day window are included. The score record retains its exact window, so historic 365-day runs remain distinguishable from newer 730-day runs.
+
+Only a current, published, approved or edited event projection is scoreable. A correction supersedes the prior projection while retaining it for audit; the scorer never infers that an old event persists, and a later recurrence must be accepted as a separately dated event.
 
 Absorption is recorded separately under `pulse-event-absorption/v1`; it never changes the event's corroboration weight. An absorbed decision requires two sequential Index releases using the same declared fixed scale and dimension source identity, a movement large enough and in the same direction as the event, and an explicit confirmed link to that event with a method, as-of date, rationale, and evidence references. A model-only candidate cannot confirm the link. Later corroboration runs cannot erase the decision, and a reversal is another append-only decision.
 

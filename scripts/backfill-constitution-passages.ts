@@ -9,11 +9,20 @@ import {
   prepareConstitutionPassages,
   type ConstitutionPassageSourceArticle,
 } from "../src/lib/constitution/passage-index";
+import { routineConstitutionPassageHistory } from "../src/lib/constitute/constitution-passage-history-writer";
 import { replaceCurrentConstitutionPassages } from "../src/lib/constitute/sync-constitutions";
 
 const dryRun = process.argv.includes("--dry-run");
+const explicitReleaseId =
+  process.argv
+    .find((argument) => argument.startsWith("--release-id="))
+    ?.slice("--release-id=".length)
+    .trim() || null;
 
 async function main() {
+  const passageHistory = dryRun
+    ? null
+    : routineConstitutionPassageHistory(explicitReleaseId);
   const directory = await db
     .select({
       constitutionId: constitutions.id,
@@ -58,6 +67,7 @@ async function main() {
         sourceDocumentId: item.sourceDocumentId,
         retrievedAt: item.retrievedAt,
         articles,
+        history: passageHistory!,
       });
       current += result.current;
       written += result.written;

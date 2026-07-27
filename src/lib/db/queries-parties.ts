@@ -26,9 +26,9 @@ import {
 // seat-holding rows and the page decides how to present them; they simply never
 // carry a `position` (the ingest never matches them).
 //
-// Soft-fail: like the other reader queries, a DB error yields an empty result
-// rather than throwing, so /parties renders coherently when the DB is
-// unreachable.
+// Default callers can retain the historical soft-fail behavior. The public
+// Party Explorer requests `throwOnError` so it can render an outage separately
+// from a successful query with no party rows.
 // ---------------------------------------------------------------------------
 
 /** A V-Party v2 compass position attached to a party (source id `vparty`). */
@@ -72,6 +72,10 @@ export interface PartyPosition {
  * a future curation pass.
  */
 const DISPLAYABLE_CONFIDENCE = "high";
+
+export interface PartyBrowserQueryOptions {
+  throwOnError?: boolean;
+}
 
 /**
  * Raw fields needed to resolve a party's DISPLAYABLE V-Party position — the
@@ -240,9 +244,12 @@ export interface BrowserParty {
  * position. Ordered by country then descending seats so the browser can group
  * by country and lead with the largest parties.
  *
- * Soft-fails to `[]` on any error.
+ * Soft-fails to `[]` by default; `throwOnError` lets the reader distinguish an
+ * outage from a fulfilled empty result.
  */
-export async function getPartiesForBrowser(): Promise<BrowserParty[]> {
+export async function getPartiesForBrowser(
+  options: PartyBrowserQueryOptions = {},
+): Promise<BrowserParty[]> {
   try {
     // Per-body seat totals, so each party's chamber seat-share is exact.
     const bodyTotals = db
@@ -346,7 +353,8 @@ export async function getPartiesForBrowser(): Promise<BrowserParty[]> {
         seatsSource,
       };
     });
-  } catch {
+  } catch (error) {
+    if (options.throwOnError) throw error;
     return [];
   }
 }
@@ -371,9 +379,12 @@ export interface PartyBrowserFacets {
  * Aggregates the browser needs for its filters and honest coverage caption
  * (e.g. "Plotting N of M parties with a V-Party position (≈X% of seats)").
  *
- * Soft-fails to a zeroed, empty-list shape on any error.
+ * Soft-fails to a zeroed, empty-list shape by default; `throwOnError` lets the
+ * reader distinguish an outage from an empty party catalog.
  */
-export async function getPartyBrowserFacets(): Promise<PartyBrowserFacets> {
+export async function getPartyBrowserFacets(
+  options: PartyBrowserQueryOptions = {},
+): Promise<PartyBrowserFacets> {
   const empty: PartyBrowserFacets = {
     countries: [],
     regions: [],
@@ -445,7 +456,8 @@ export async function getPartyBrowserFacets(): Promise<PartyBrowserFacets> {
       totalSeats: t ? Number(t.totalSeats) : 0,
       seatsWithPosition: t ? Number(t.seatsWithPosition) : 0,
     };
-  } catch {
+  } catch (error) {
+    if (options.throwOnError) throw error;
     return empty;
   }
 }

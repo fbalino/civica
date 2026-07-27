@@ -11,7 +11,7 @@
  * Schema doc:  ~/civica/plan/phase-f-schema-v0.1.md §11
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { refreshJurisdictionCache } from "@/lib/factbook/reconcile/cache";
 
@@ -22,46 +22,43 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
-  try {
-    const summary = await refreshJurisdictionCache(db, {
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-      dryRun,
-    });
+  const summary = await refreshJurisdictionCache(db, {
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+    dryRun,
+  });
 
-    if (summary.errors.length > 0 || summary.jurisdictionsRefreshed === 0) {
-      return NextResponse.json({ ok: false, step: "factbook.refresh-cache", dryRun, errors: summary.errors.length ? summary.errors : ["No jurisdictions refreshed"] }, { status: 500 });
-    }
-
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.refresh-cache",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsRefreshed: summary.jurisdictionsRefreshed,
-      fieldsWritten: summary.fieldsWritten,
-      errorCount: summary.errors.length,
-      dryRun,
-    });
-  } catch (err) {
-    console.error("[cron factbook.refresh-cache] failed:", err);
+  if (summary.errors.length > 0 || summary.jurisdictionsRefreshed === 0) {
     return NextResponse.json(
       {
         ok: false,
+        outcome: summary.errors.length > 0 ? "partial" : "empty_result",
         step: "factbook.refresh-cache",
-        error: err instanceof Error ? err.message : String(err),
+        dryRun,
+        errorCount: Math.max(1, summary.errors.length),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
+
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.refresh-cache",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsRefreshed: summary.jurisdictionsRefreshed,
+    fieldsWritten: summary.fieldsWritten,
+    fieldsCleared: summary.fieldsCleared,
+    errorCount: summary.errors.length,
+    dryRun,
+  });
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.refresh-cache", handler);
+
+export { cronHandler as GET, cronHandler as POST };

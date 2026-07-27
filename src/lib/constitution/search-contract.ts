@@ -22,6 +22,22 @@ export type ConstitutionSearchErrorCode =
   | "data_unavailable"
   | "query_timeout";
 
+export type ConstitutionSearchProblemCode =
+  | "INVALID_REQUEST"
+  | "QUERY_NOT_SEARCHABLE"
+  | "JURISDICTION_NOT_COVERED"
+  | "CURSOR_STALE"
+  | "RATE_LIMITED"
+  | "RATE_LIMIT_UNAVAILABLE"
+  | "RIGHTS_NOT_READY"
+  | "DATA_UNAVAILABLE"
+  | "QUERY_TIMEOUT";
+
+export type ConstitutionSearchProtectionCode = Extract<
+  ConstitutionSearchProblemCode,
+  "RATE_LIMITED" | "RATE_LIMIT_UNAVAILABLE"
+>;
+
 export interface ConstitutionSearchInput {
   query: string;
   jurisdictions: string[];
@@ -121,6 +137,8 @@ export interface ConstitutionSearchResponse {
 export interface ConstitutionSearchErrorResponse {
   schemaVersion: typeof CONSTITUTION_SEARCH_SCHEMA_VERSION;
   error: ConstitutionSearchErrorCode;
+  /** Stable machine discriminator for every failed search response. */
+  code: ConstitutionSearchProblemCode;
   message: string;
   details?: { uncoveredJurisdictions: string[] };
 }
@@ -158,7 +176,7 @@ export const constitutionSearchInputSchema = z
   .strict()
   .superRefine((value, context) => {
     if (
-      Buffer.byteLength(value.query, "utf8") >
+      new TextEncoder().encode(value.query).byteLength >
       CONSTITUTION_SEARCH_MAX_QUERY_BYTES
     ) {
       context.addIssue({

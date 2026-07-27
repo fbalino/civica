@@ -1,0 +1,2225 @@
+{
+  "schemaVersion": "civica-leader-directory-release/v1",
+  "releaseId": "leaders-2026-07-23",
+  "generatedAt": "2026-07-23T08:33:02.661Z",
+  "publicationStatus": "blocked_source_refresh",
+  "queryContract": "current principal offices joined to current terms, people, jurisdictions, and retained Wikidata term statements",
+  "scope": "Verified current heads of state and heads of government. Missing records, dates, portraits, or capacity labels remain explicit noncoverage and are never converted to absence claims.",
+  "provenance": {
+    "sourceId": "wikidata",
+    "license": "CC0",
+    "upstreamVintage": null,
+    "retrievedFrom": "2026-07-08T02:00:58.631Z",
+    "retrievedThrough": "2026-07-08T02:01:11.819Z",
+    "sourceLastSyncAt": "2026-07-08T02:02:32.520Z"
+  },
+  "counts": {
+    "rows": 314,
+    "people": 314,
+    "jurisdictions": 191,
+    "ambiguousCapacity": 0,
+    "coLeadershipRows": 0,
+    "dualOfficeRows": 0
+  },
+  "rowIdentities": [
+    {
+      "termId": "c6f9fd15-d279-4668-bd43-4f70aaa17465",
+      "personId": "e7ece6aa-15c5-4e14-a2b6-5a41388fb12f",
+      "jurisdictionId": "02a6f78b-661c-4e1e-ae78-7a69380e26b9",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.710Z"
+    },
+    {
+      "termId": "77fe574c-e298-49d5-9dbf-758126b13e62",
+      "personId": "d8e78c01-cee9-4e71-a9cc-cc007972a7c0",
+      "jurisdictionId": "02a6f78b-661c-4e1e-ae78-7a69380e26b9",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.682Z"
+    },
+    {
+      "termId": "172a7559-e885-4b30-b9ce-4a6b5ce09478",
+      "personId": "f0e02c9f-b383-4950-965b-ba119d611b9f",
+      "jurisdictionId": "02b530fb-4280-403b-bae6-847c2cc60133",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.671Z"
+    },
+    {
+      "termId": "cd8dcb98-69cc-46cb-a7e3-55a05c589ad2",
+      "personId": "865607e4-3326-4e02-9769-619527497576",
+      "jurisdictionId": "02b530fb-4280-403b-bae6-847c2cc60133",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.647Z"
+    },
+    {
+      "termId": "48bd7cae-475d-4819-a5ef-b2b6a29eeae2",
+      "personId": "a2415260-f065-4063-80d2-c91554dc3239",
+      "jurisdictionId": "02fa2a39-5e14-4257-b023-3b20a7134708",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.465Z"
+    },
+    {
+      "termId": "5e818f68-a9ae-420f-a390-4d719033d6e7",
+      "personId": "ae933942-ea25-42fc-a83b-aaf7778c12a6",
+      "jurisdictionId": "02fa2a39-5e14-4257-b023-3b20a7134708",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.441Z"
+    },
+    {
+      "termId": "c0a09446-bf0a-425e-af4e-fdd3a73e0a9e",
+      "personId": "6820d828-63cc-454e-8ed0-d56677dd4ac0",
+      "jurisdictionId": "03629789-9315-4e26-b5c3-530d96fe2368",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.969Z"
+    },
+    {
+      "termId": "5a8a378c-8616-413a-9a22-4e94aac1df57",
+      "personId": "49aa5ea8-7514-4203-b8ef-c97cb72ad1c1",
+      "jurisdictionId": "03629789-9315-4e26-b5c3-530d96fe2368",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.943Z"
+    },
+    {
+      "termId": "f850fabe-874d-4fb8-9d4a-73316913ede0",
+      "personId": "948b1493-9ec8-45de-9daa-73a3665aa7e0",
+      "jurisdictionId": "03941967-a4f1-4c80-8619-a7b6557aa4e8",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.520Z"
+    },
+    {
+      "termId": "7952d8a5-d3a4-4fbd-95c6-01762c7efe82",
+      "personId": "7ca41b84-98fc-408d-93cb-017bc1060d2a",
+      "jurisdictionId": "03941967-a4f1-4c80-8619-a7b6557aa4e8",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.490Z"
+    },
+    {
+      "termId": "6c475f7e-3ecb-41e4-b6ae-e548e15311d8",
+      "personId": "a0252925-ab11-46cf-bf93-75c2d21205fa",
+      "jurisdictionId": "039f808c-0257-4e5c-a7c0-718d6456623b",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.776Z"
+    },
+    {
+      "termId": "60be78ec-de52-4164-8ca0-f4b9d196b8b8",
+      "personId": "5a2598ee-f013-458f-b520-1e7ef238bb15",
+      "jurisdictionId": "039f808c-0257-4e5c-a7c0-718d6456623b",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.747Z"
+    },
+    {
+      "termId": "ab829525-1a7d-4684-b9fe-767a8c83cd67",
+      "personId": "690247c8-1b5b-4619-a8e3-9ab9087de8c4",
+      "jurisdictionId": "059041d2-0ada-4803-a5a2-09440b14c115",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.032Z"
+    },
+    {
+      "termId": "81ee5f0d-d507-45a1-b06d-67c9337b5514",
+      "personId": "23fc1c4e-6a63-455b-b763-a28f7c14148d",
+      "jurisdictionId": "059041d2-0ada-4803-a5a2-09440b14c115",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.004Z"
+    },
+    {
+      "termId": "b6fcacb9-cc9f-4c4d-a515-0799a1a927b5",
+      "personId": "bd464484-3730-4c7a-9bfd-b7da465b0d83",
+      "jurisdictionId": "060a79f0-7036-4d36-8bc5-a9a1087c280e",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.942Z"
+    },
+    {
+      "termId": "3bc71a54-4db0-4256-ac94-2037de960546",
+      "personId": "04cb76ca-6cd7-4daa-bc9e-1c4e4a587bc2",
+      "jurisdictionId": "060a79f0-7036-4d36-8bc5-a9a1087c280e",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.912Z"
+    },
+    {
+      "termId": "f0a5a3fd-da75-4514-95d6-4c2ba3572305",
+      "personId": "ca63df2c-1065-46ea-85e8-b66b05d169bf",
+      "jurisdictionId": "087f7d26-7677-4b0f-b35c-84239c3d54ca",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.535Z"
+    },
+    {
+      "termId": "44ac0a53-3cd4-41d8-8bf1-5bcad2f28ea3",
+      "personId": "43606fe2-a2db-47b9-b490-458b9d961822",
+      "jurisdictionId": "087f7d26-7677-4b0f-b35c-84239c3d54ca",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.508Z"
+    },
+    {
+      "termId": "89e439fc-489a-4301-a8d5-7dcdd0843c58",
+      "personId": "2f1826f3-7c84-42fb-997e-d6aeb81d43c1",
+      "jurisdictionId": "0b326eea-4447-4e6b-90b5-684e5408c8b3",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.142Z"
+    },
+    {
+      "termId": "44f295a2-5dd5-4856-81b1-f7962580a2c0",
+      "personId": "5ff4cf04-6703-48e4-8e4f-8cbe2ea69bd0",
+      "jurisdictionId": "0d30a513-5ebc-4103-acf7-1d9f980d1e34",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.226Z"
+    },
+    {
+      "termId": "4adeadbd-5b57-4ba8-9151-b2f494f57ab8",
+      "personId": "60edaa35-1976-49f3-8052-5d517aef6b85",
+      "jurisdictionId": "0d5d3612-d1a2-4367-b9ea-a14bb7305be2",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.315Z"
+    },
+    {
+      "termId": "42c97aa1-ba4a-47d9-a94a-738855efc4d5",
+      "personId": "c302ff9f-9427-471b-8593-2a19f5c8f38b",
+      "jurisdictionId": "0d5d3612-d1a2-4367-b9ea-a14bb7305be2",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.291Z"
+    },
+    {
+      "termId": "1b69edaa-03b8-4f78-acb8-030352f1a53a",
+      "personId": "aea3638c-4187-40cb-a5ae-c0418b25b25b",
+      "jurisdictionId": "0f9b8054-2d9e-42b1-a482-bf5416caa73f",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.292Z"
+    },
+    {
+      "termId": "df7fa433-ce81-4617-a9d6-8688fd7aff3f",
+      "personId": "b766f018-b220-48ff-91c1-ed8ffbc5805e",
+      "jurisdictionId": "10466afc-517e-4dce-a08d-37a63b63dc74",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.470Z"
+    },
+    {
+      "termId": "7cc37aef-2563-488c-bd36-8fff8884f671",
+      "personId": "f3aec544-9e84-4e44-b323-cbf2552e722d",
+      "jurisdictionId": "10466afc-517e-4dce-a08d-37a63b63dc74",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.432Z"
+    },
+    {
+      "termId": "236fd8de-54dd-4dbe-a643-5a6fa9b70819",
+      "personId": "c9ef1cc1-2a30-4908-85bf-efb6b38b4bc2",
+      "jurisdictionId": "12eeaac4-f4bd-47c8-8ecb-0e7f8c04d81d",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.256Z"
+    },
+    {
+      "termId": "76708383-455d-4101-a732-9269a1a6c612",
+      "personId": "6d23e1e9-fe1a-4dc9-b820-a99680616aee",
+      "jurisdictionId": "12eeaac4-f4bd-47c8-8ecb-0e7f8c04d81d",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.229Z"
+    },
+    {
+      "termId": "ce08fd1b-fea4-4aa3-9af4-b91f10c2a067",
+      "personId": "72088aec-940a-4120-804c-e8a405a65308",
+      "jurisdictionId": "13233464-0f98-48a9-a14a-ca59507681ac",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.158Z"
+    },
+    {
+      "termId": "18c79c49-89a7-4a93-a7d2-9058fa14c5a6",
+      "personId": "9e746665-8552-47e3-9ea1-8694c9d2db4b",
+      "jurisdictionId": "13233464-0f98-48a9-a14a-ca59507681ac",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.127Z"
+    },
+    {
+      "termId": "7bdd8be1-6ed9-43b2-9c27-63197426a348",
+      "personId": "21aad0bf-ba04-4581-b019-1a50d36d6b75",
+      "jurisdictionId": "13fc74ad-8762-49a1-a7cb-75acba2fc32e",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.246Z"
+    },
+    {
+      "termId": "ee62e0e2-cd3f-4b9e-a14f-81c9d4517be8",
+      "personId": "e1890ec9-ee63-4c16-bebf-829e5f77d5f6",
+      "jurisdictionId": "15fe2c88-7141-4b3f-a68e-cc1161b83e0b",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.825Z"
+    },
+    {
+      "termId": "1fb8c090-cd8c-4122-a7c3-1b3314b42f00",
+      "personId": "6cd3b322-4a5e-4453-81d1-4bca4db8db84",
+      "jurisdictionId": "15fe2c88-7141-4b3f-a68e-cc1161b83e0b",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.800Z"
+    },
+    {
+      "termId": "c29499a4-5ddc-4bcd-86db-8abd805ea442",
+      "personId": "0dac4483-69fe-4d6b-898b-dd37696759ce",
+      "jurisdictionId": "161bb66a-e013-4aef-a0fe-5ef2a612972e",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.798Z"
+    },
+    {
+      "termId": "9b6c5702-d17d-4488-95fc-d109f58096c1",
+      "personId": "fe9d5944-3c9c-491c-8b96-cb60d6e962ee",
+      "jurisdictionId": "161bb66a-e013-4aef-a0fe-5ef2a612972e",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.773Z"
+    },
+    {
+      "termId": "97fc9964-59d0-4703-9cc4-771d5f94d809",
+      "personId": "597f5a7a-7743-4bea-8b69-e722f9379671",
+      "jurisdictionId": "187ffbf8-8659-4ffd-b044-6fc8dc6b4c9e",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.931Z"
+    },
+    {
+      "termId": "445e91c2-c1fa-48aa-802c-c5c1205ac26d",
+      "personId": "6ffc5af8-9a4c-475f-915b-5e58f1599f69",
+      "jurisdictionId": "18c69ab4-bc7f-4f04-93e0-f479410328a2",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.669Z"
+    },
+    {
+      "termId": "9d9eb97a-cf8e-4039-8963-aa26279606ce",
+      "personId": "d686a8b0-61ec-44d1-93ed-153a1377941b",
+      "jurisdictionId": "18c69ab4-bc7f-4f04-93e0-f479410328a2",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.644Z"
+    },
+    {
+      "termId": "18ff4e4d-7e4b-47ca-9934-a36cf96a6f67",
+      "personId": "22da3b6e-c87b-4c92-ba03-679cff05abc4",
+      "jurisdictionId": "18cf4762-cf61-4f56-9f03-ddd8fc1a6a02",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.123Z"
+    },
+    {
+      "termId": "831b58e5-716d-4192-b585-68df50f92279",
+      "personId": "09908e21-0122-42a2-9ad8-86a48d486c36",
+      "jurisdictionId": "18cf4762-cf61-4f56-9f03-ddd8fc1a6a02",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.096Z"
+    },
+    {
+      "termId": "6d566956-9c63-467c-b7cb-a7ba0a1fcd40",
+      "personId": "beb18ae2-6031-4bf9-a94e-b776d2737826",
+      "jurisdictionId": "19524df0-99ed-43fc-907e-790bf2feabb7",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.196Z"
+    },
+    {
+      "termId": "d6b68a36-26ae-404c-9a0b-8dfe2fadecf5",
+      "personId": "ebf68298-cf94-4956-baf0-58304949da7c",
+      "jurisdictionId": "19524df0-99ed-43fc-907e-790bf2feabb7",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.169Z"
+    },
+    {
+      "termId": "6c027c0f-ab16-43ce-9741-0480f2046cd0",
+      "personId": "136d5285-7a2c-400e-88e3-51a77028a8a5",
+      "jurisdictionId": "19ba1f29-dadf-4256-b851-7a5dab150a1c",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.073Z"
+    },
+    {
+      "termId": "21700fed-1c39-47a0-acd0-4611d3eaa4a9",
+      "personId": "21df6cb3-fbc8-47d2-a0a5-d6a4ec3cf855",
+      "jurisdictionId": "1f132416-4af7-42b6-a9b6-ba3c8c639ac2",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.164Z"
+    },
+    {
+      "termId": "3394bc2f-9994-42d7-bd91-844fbdfbad8c",
+      "personId": "b9236b07-e05b-4cb6-9b5a-ac4f48529f8e",
+      "jurisdictionId": "1f132416-4af7-42b6-a9b6-ba3c8c639ac2",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.136Z"
+    },
+    {
+      "termId": "889ec3cd-fbfd-4372-8151-7a189f926a02",
+      "personId": "8bb9c8f7-4e5e-48b4-9fbd-4eff235d289c",
+      "jurisdictionId": "202a18ac-00cb-4084-a6d1-4ab306692ee6",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.038Z"
+    },
+    {
+      "termId": "5fc1e454-b86c-4811-b6ce-b36a37296113",
+      "personId": "f548fe54-5b10-47ba-9ec4-c7a358785cc6",
+      "jurisdictionId": "20395c9e-d663-4df5-8b51-d12582532080",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.722Z"
+    },
+    {
+      "termId": "cfe11417-2d4f-4e12-b0e8-239612a3099b",
+      "personId": "de37038d-af4c-483f-b319-0272ceeb398f",
+      "jurisdictionId": "20395c9e-d663-4df5-8b51-d12582532080",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.697Z"
+    },
+    {
+      "termId": "674de029-afef-47c3-9d22-e261323b31b2",
+      "personId": "98b4ded0-607c-4ba9-8bb9-f51bed9af0cb",
+      "jurisdictionId": "2143e2d4-f909-4ef2-bd60-202de408e6fd",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.555Z"
+    },
+    {
+      "termId": "ea0a2cbb-e4b0-4001-8fe0-bc7f79b19bae",
+      "personId": "c2c234d8-0fcb-4ea8-95bc-b60f4f0848b0",
+      "jurisdictionId": "225cbc11-ac71-48b6-945f-1c79e40022fe",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.181Z"
+    },
+    {
+      "termId": "356989fb-7e34-4b38-aa8d-64c6466c51e6",
+      "personId": "e2c99b33-5149-4607-9a98-5bdc7652a3a8",
+      "jurisdictionId": "24837cbe-e04a-436e-8352-af87491e0b13",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.848Z"
+    },
+    {
+      "termId": "4bf56dd5-53e7-46e2-9eff-8979d93ed2a9",
+      "personId": "22271bd1-7524-40f2-bd3d-aabe6f5236d4",
+      "jurisdictionId": "27afbd9b-1a7b-4145-a18d-994793d8dcdc",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.110Z"
+    },
+    {
+      "termId": "95d3f7f7-e3c9-48be-88d3-96cc758516c5",
+      "personId": "5a6226a3-4d0d-4d2b-8298-ecdb1899a7ce",
+      "jurisdictionId": "286e22e5-75c2-4c76-b6d7-0643323ce6ca",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.622Z"
+    },
+    {
+      "termId": "0d178226-5e48-403a-9469-6581718582f3",
+      "personId": "04210ba5-929a-465d-a6fa-05970223bedc",
+      "jurisdictionId": "286e22e5-75c2-4c76-b6d7-0643323ce6ca",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.595Z"
+    },
+    {
+      "termId": "d647fdcf-a2b7-44eb-be31-74c14751752f",
+      "personId": "d46afbfe-ba0f-4e09-82a6-ffefc16891f5",
+      "jurisdictionId": "2c231215-aa78-4f07-b609-1586aeaa2178",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.518Z"
+    },
+    {
+      "termId": "146b105a-42c1-4923-bc3b-f6b6df4d8706",
+      "personId": "bf7a76bc-2e36-4b8b-93de-6a57afbf3eaa",
+      "jurisdictionId": "2c231215-aa78-4f07-b609-1586aeaa2178",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.495Z"
+    },
+    {
+      "termId": "c123f06e-9a77-49ab-a8ab-9a8681eac197",
+      "personId": "0252a19b-9dc5-4f16-8a13-a01373a7d896",
+      "jurisdictionId": "2dd6b308-c481-4a70-8b9c-fba9ea632240",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.355Z"
+    },
+    {
+      "termId": "b748a3f5-368a-463d-aa36-b979201a3329",
+      "personId": "f9adf679-9406-4dc8-bc5e-09ca23803f1b",
+      "jurisdictionId": "2dd6b308-c481-4a70-8b9c-fba9ea632240",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.324Z"
+    },
+    {
+      "termId": "013cb1a0-ba1c-4925-ace6-c1f7670c733d",
+      "personId": "b1358322-b729-4a1a-a55c-c7728902c3f0",
+      "jurisdictionId": "2edcf9a9-b3cc-49c1-9158-742c43c5bfce",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.551Z"
+    },
+    {
+      "termId": "d98b7ee3-8201-4b27-96c4-de05a1e8b372",
+      "personId": "6d9c71c2-7d25-4eb8-a52f-3a23e32ef5b4",
+      "jurisdictionId": "2edcf9a9-b3cc-49c1-9158-742c43c5bfce",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.528Z"
+    },
+    {
+      "termId": "021d3776-893a-4a70-8024-8bb9e845a640",
+      "personId": "dfa783be-e201-41f8-91ee-ea3dc8f90370",
+      "jurisdictionId": "3023b475-8992-4a20-b9af-fa918747a58f",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.876Z"
+    },
+    {
+      "termId": "029c1a36-fe1f-4bb7-b455-842ba51a0e62",
+      "personId": "a92b0057-0a0f-4751-9592-d135d1644142",
+      "jurisdictionId": "3023b475-8992-4a20-b9af-fa918747a58f",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.850Z"
+    },
+    {
+      "termId": "9df27f2d-4569-4052-86ef-fc89cab76a8b",
+      "personId": "7f09326d-3bea-47cb-939b-50205e9d064b",
+      "jurisdictionId": "3250a102-1a2e-45ea-a2cd-b5a9ed844495",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.607Z"
+    },
+    {
+      "termId": "77c2b2d5-78ca-4c68-a48f-d1d99af0b5c8",
+      "personId": "53a610ff-b99d-403a-be60-45f026b640d1",
+      "jurisdictionId": "340a9ee0-bf35-4a58-a0b6-17a28b3a3761",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.282Z"
+    },
+    {
+      "termId": "1f41fbac-ac1b-426d-b3fc-d547f56745a5",
+      "personId": "417a18a2-7cee-4db8-af1b-b68f4060f355",
+      "jurisdictionId": "340a9ee0-bf35-4a58-a0b6-17a28b3a3761",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.257Z"
+    },
+    {
+      "termId": "ec40413e-d550-4e69-acc8-f3b8003a5674",
+      "personId": "06b109cc-4457-4331-9038-739cedd72d18",
+      "jurisdictionId": "351797db-11f0-433c-bd02-06ad082185eb",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.520Z"
+    },
+    {
+      "termId": "e1c7dc2b-2900-4c53-af7e-3fb9e7c81e55",
+      "personId": "ac7300da-4a36-4fab-835b-1e64634eb58e",
+      "jurisdictionId": "370450ff-136a-46c8-bcb5-0f034dbe8aff",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.767Z"
+    },
+    {
+      "termId": "dd0c4a15-3a64-44b4-9058-5e5d694f1eac",
+      "personId": "9102cca3-2201-42f0-afd4-bc5e117d6843",
+      "jurisdictionId": "370450ff-136a-46c8-bcb5-0f034dbe8aff",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.742Z"
+    },
+    {
+      "termId": "da1a4b64-e85b-4b85-b9c0-eac303bb6b74",
+      "personId": "7dcdbcdd-5b82-4573-bee7-d4547bf11729",
+      "jurisdictionId": "372f07ef-ec09-4c27-bcbd-ef3c06af5e8e",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.871Z"
+    },
+    {
+      "termId": "5a6a7889-ec57-4204-b526-dcfddbf83aeb",
+      "personId": "a363a78b-dc8f-4961-9163-5e7d41738d2d",
+      "jurisdictionId": "372f07ef-ec09-4c27-bcbd-ef3c06af5e8e",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.846Z"
+    },
+    {
+      "termId": "99c9bb12-4288-4934-a7c7-848e14cdfdc5",
+      "personId": "2560942a-f20b-4f5d-a255-d77706506b57",
+      "jurisdictionId": "39a67927-9a5b-4759-b24a-5ba352f4bf5c",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.011Z"
+    },
+    {
+      "termId": "99d5b5c5-c1e6-49d7-a703-af234b0db49e",
+      "personId": "9ebac854-1d7f-4772-ba3f-f4e643858d13",
+      "jurisdictionId": "39a67927-9a5b-4759-b24a-5ba352f4bf5c",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.987Z"
+    },
+    {
+      "termId": "950a8689-24c4-4096-b507-759e678fe6e9",
+      "personId": "1786247e-e444-4ec1-b964-c418706c96ba",
+      "jurisdictionId": "3b1f82eb-305d-4827-b523-0ed9d46ca120",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.035Z"
+    },
+    {
+      "termId": "7b402e4d-2395-4bab-b87c-69fe475f3bad",
+      "personId": "383a007f-9d55-4ed5-b743-78e99f0e7f90",
+      "jurisdictionId": "3b1f82eb-305d-4827-b523-0ed9d46ca120",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.008Z"
+    },
+    {
+      "termId": "f85fe42a-2400-4006-97f8-45e04b8f8363",
+      "personId": "4b318b4f-5915-452d-8942-ceaeb216f16d",
+      "jurisdictionId": "3c99238a-6485-4ead-8b67-0f0858447bda",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.819Z"
+    },
+    {
+      "termId": "1c6b11d4-5233-4e10-abed-7d591c7ecf28",
+      "personId": "95ad50fa-dd17-4f80-b27b-393193dc8ad0",
+      "jurisdictionId": "3ced9362-faa0-4ef6-abce-d42c76132edf",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.339Z"
+    },
+    {
+      "termId": "1762c971-07ea-44fc-9cb5-967bd62c1243",
+      "personId": "42914660-78e5-44cb-a46b-6c9c0ae583a2",
+      "jurisdictionId": "3ced9362-faa0-4ef6-abce-d42c76132edf",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.312Z"
+    },
+    {
+      "termId": "463b415d-758e-44a6-bfdc-816c540939ad",
+      "personId": "f0da6ac7-ed50-4cfb-ae9e-7fec9746d27a",
+      "jurisdictionId": "3e97771c-da96-4e65-840c-b3a0603ec1d7",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.474Z"
+    },
+    {
+      "termId": "e5f29f22-4a8d-432c-8d5b-e301b0e3eb11",
+      "personId": "980e0bbe-5669-454a-b7e5-b5523476890c",
+      "jurisdictionId": "3e97771c-da96-4e65-840c-b3a0603ec1d7",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.447Z"
+    },
+    {
+      "termId": "8d9c2043-a8e0-451f-8e30-16a0f7b8eea6",
+      "personId": "d48ffb6a-1f90-46c8-a14f-87f662fb0f6a",
+      "jurisdictionId": "3eab09e2-d171-43e3-91af-f02ca0427fb2",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.897Z"
+    },
+    {
+      "termId": "82c67baa-67d9-43cc-a8b3-7c0928998129",
+      "personId": "29005c68-9b3c-4fa2-bbf1-893ce23f29f2",
+      "jurisdictionId": "3eab09e2-d171-43e3-91af-f02ca0427fb2",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.866Z"
+    },
+    {
+      "termId": "c4e21476-0093-40aa-aef5-2522e5776e37",
+      "personId": "4f6b854d-85f1-4fb5-b89c-64ea7bfa3575",
+      "jurisdictionId": "3fd0e066-ead4-4a41-b69b-9a9c53d1d92e",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.887Z"
+    },
+    {
+      "termId": "e8bcd13b-c37a-4dbf-82ad-cf189f00cfc5",
+      "personId": "9a182081-f4a5-4276-aef1-bb25698482e5",
+      "jurisdictionId": "4041713a-780b-42f3-ad88-05efc621d3e3",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.107Z"
+    },
+    {
+      "termId": "bfb5928c-5f45-4665-96bc-980b93907c8b",
+      "personId": "25b05ad9-369d-4339-b997-ca7c449561c5",
+      "jurisdictionId": "405b444d-694a-4fc7-8d6c-359ae54d3022",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.757Z"
+    },
+    {
+      "termId": "45a013e4-d6c2-48b4-a9f6-84f2feedc12c",
+      "personId": "955688ee-4a0b-4565-988b-c23ff0e849c9",
+      "jurisdictionId": "405b444d-694a-4fc7-8d6c-359ae54d3022",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.731Z"
+    },
+    {
+      "termId": "2b54c291-61e1-4cc9-a067-36cd8ad6e14c",
+      "personId": "184b3cd5-c33d-4cae-9747-5d01d41bf614",
+      "jurisdictionId": "41a1e4b5-7463-4d1e-8725-e63d8b4ababf",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.472Z"
+    },
+    {
+      "termId": "65d97787-31f4-48b2-823d-32cc749f10c5",
+      "personId": "a09b7d0f-e748-4473-ba9c-e696eb17cc06",
+      "jurisdictionId": "41a1e4b5-7463-4d1e-8725-e63d8b4ababf",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.423Z"
+    },
+    {
+      "termId": "1c274c6b-169f-4821-92e6-1e26c38b92c0",
+      "personId": "16bd6b3c-2bf7-4979-821e-758e094f8662",
+      "jurisdictionId": "41c0731d-52af-4959-86bc-0ddad61bcffd",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.419Z"
+    },
+    {
+      "termId": "f0cdab0e-dd32-4b1a-8ce6-f16b272f5837",
+      "personId": "5c081a31-e220-4dfc-b373-90861ca03420",
+      "jurisdictionId": "41c0731d-52af-4959-86bc-0ddad61bcffd",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.394Z"
+    },
+    {
+      "termId": "1049bc7e-a459-4c03-8fb9-6cf3b3cd8799",
+      "personId": "833012b8-4019-46b4-928a-d5b0c4113f86",
+      "jurisdictionId": "43948ffe-f2d9-4285-9474-c5fe7942f99c",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.638Z"
+    },
+    {
+      "termId": "66d4e423-305c-424d-b361-4a277ebce6ad",
+      "personId": "9c0cd3f0-8dd0-4b1a-8e5e-7e421ed80f7f",
+      "jurisdictionId": "43948ffe-f2d9-4285-9474-c5fe7942f99c",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.613Z"
+    },
+    {
+      "termId": "1f6ea8f1-6766-4980-a811-aab5ad065c83",
+      "personId": "61b90c2a-ef7d-4b00-a7cc-6ffc87108893",
+      "jurisdictionId": "46532785-da05-4911-a262-2009ae84bc77",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.469Z"
+    },
+    {
+      "termId": "8427092a-1c1f-4900-a517-a15957d5beeb",
+      "personId": "f381103a-9fd9-48dc-b5c2-f9c82b59cc12",
+      "jurisdictionId": "47bb17e7-b3a5-4fac-8a70-c0e258c07092",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.574Z"
+    },
+    {
+      "termId": "410be330-f6fe-4cae-bb7d-ddbbdea4155b",
+      "personId": "d29a8862-5fc4-4046-906b-269e53f118b7",
+      "jurisdictionId": "4826d17e-c306-47df-9555-195038ebbb5c",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.364Z"
+    },
+    {
+      "termId": "c4d74a6a-695f-4433-a2a0-5eb0edf1b3cb",
+      "personId": "f6dd0080-e0d2-4fdf-90c1-cc7d60b61169",
+      "jurisdictionId": "4826d17e-c306-47df-9555-195038ebbb5c",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.334Z"
+    },
+    {
+      "termId": "45af63d2-ddc8-4180-83a3-b7973efb4ef9",
+      "personId": "a8f0bcec-7220-4bd8-b2d2-44d21c341799",
+      "jurisdictionId": "48af4e4b-3d3d-49a0-bfe7-7224698963b2",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.193Z"
+    },
+    {
+      "termId": "09b43cb4-8e23-40e8-8cd6-c96e46750c37",
+      "personId": "fb990ec1-edb6-4c02-84b7-b109e75b2fcb",
+      "jurisdictionId": "48af4e4b-3d3d-49a0-bfe7-7224698963b2",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.171Z"
+    },
+    {
+      "termId": "716ee709-55b4-44c8-aef5-944252a01996",
+      "personId": "863c00e5-7c2a-4ebe-a800-9748b455ec88",
+      "jurisdictionId": "4ac6d1c1-dc0b-4bc2-9bee-1e00def96aa1",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.526Z"
+    },
+    {
+      "termId": "778a7eff-1750-4735-b941-4079b94de864",
+      "personId": "89fd5110-ce40-4341-a28e-75b1e52e2ac0",
+      "jurisdictionId": "4ac6d1c1-dc0b-4bc2-9bee-1e00def96aa1",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.501Z"
+    },
+    {
+      "termId": "058e8c8d-b04b-4600-8133-f3187e8c09c7",
+      "personId": "72c54c5f-2d20-449f-91a7-18cd39b3b8b6",
+      "jurisdictionId": "4b1f2a13-406c-42c7-9907-23a4906c568d",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.923Z"
+    },
+    {
+      "termId": "1735b16e-e27b-4b0e-8a54-0cb2b0569a57",
+      "personId": "ea94da26-d482-48b8-b992-16e4d534162b",
+      "jurisdictionId": "4b8b6a42-e2cc-49c1-bf00-f9b765af4389",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.317Z"
+    },
+    {
+      "termId": "faa1ed51-aee3-4c0b-a7ba-864ab5657f70",
+      "personId": "0ccf4389-e56a-449e-8a31-5f272dd3809d",
+      "jurisdictionId": "4b8b6a42-e2cc-49c1-bf00-f9b765af4389",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.291Z"
+    },
+    {
+      "termId": "d34072ce-1519-4330-8251-7bd2050332de",
+      "personId": "79f57a93-7bc1-4cc0-80fd-cf477b8bee98",
+      "jurisdictionId": "4bdb038f-2398-4c09-a836-608b0111cce7",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.538Z"
+    },
+    {
+      "termId": "a29260d0-f161-4e44-b512-b3a14f05f33c",
+      "personId": "f27b7a67-9b5c-42b7-a9f6-d0829f791087",
+      "jurisdictionId": "4bdb038f-2398-4c09-a836-608b0111cce7",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.514Z"
+    },
+    {
+      "termId": "7e506a50-aeca-4bed-be39-81749bf0d610",
+      "personId": "149dbaff-e193-4c9b-8ed9-12930506c52b",
+      "jurisdictionId": "4e322f58-e65d-4286-9875-7feeb8165bd8",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.128Z"
+    },
+    {
+      "termId": "0aa38767-93d9-4eac-8c81-35069e812b6a",
+      "personId": "239c5457-e8c8-404c-aba5-07e12ce6d002",
+      "jurisdictionId": "4e322f58-e65d-4286-9875-7feeb8165bd8",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.102Z"
+    },
+    {
+      "termId": "1f8bfcb4-a836-40b9-ba31-d7bc478c5e7a",
+      "personId": "2119fee7-55d5-40f5-9511-ba4bfcbfc453",
+      "jurisdictionId": "4f56720e-2b04-4a69-880d-1d2531387a08",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.785Z"
+    },
+    {
+      "termId": "dcef2c1c-aa4e-4af0-bc6d-f331919c80d4",
+      "personId": "74e3f76c-1f51-40da-ab28-0c233908debd",
+      "jurisdictionId": "4f56720e-2b04-4a69-880d-1d2531387a08",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.759Z"
+    },
+    {
+      "termId": "fe795411-7a46-410b-9d5f-0ff6f743af28",
+      "personId": "94e27f3f-ce62-485b-8c97-482bfa8778a8",
+      "jurisdictionId": "52edb906-859e-419e-af20-1825f1b9d21e",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.798Z"
+    },
+    {
+      "termId": "ffa40366-efdc-4e80-a170-8bb58fd6a327",
+      "personId": "c0c46dff-1b32-4756-9f4d-75b2b687e80f",
+      "jurisdictionId": "52edb906-859e-419e-af20-1825f1b9d21e",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.773Z"
+    },
+    {
+      "termId": "cbd27055-2386-4482-a57a-948983d74374",
+      "personId": "6a34bf34-ca7e-43d7-8313-c9e2f6e28d67",
+      "jurisdictionId": "5724fd2b-2587-44b3-bec0-ae623455d91d",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.993Z"
+    },
+    {
+      "termId": "040c7953-1a25-43cc-a1a9-8334fd32180b",
+      "personId": "59cd3b73-63aa-448c-be2b-95569e7bdba5",
+      "jurisdictionId": "5724fd2b-2587-44b3-bec0-ae623455d91d",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.962Z"
+    },
+    {
+      "termId": "88f20ded-0524-43f6-8ee5-60cb729a7046",
+      "personId": "a1ecde30-fccd-49f5-9fe3-06a4d46c7a1d",
+      "jurisdictionId": "5761a41c-f05b-4bfa-a119-be268df15df4",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.178Z"
+    },
+    {
+      "termId": "74fc73e5-cbc2-4920-a23e-a38f113e143b",
+      "personId": "5a4bb185-2389-49c0-bdff-6d16d6ff790c",
+      "jurisdictionId": "5861ed74-decb-4b6c-bc01-b9be2e1ab024",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.557Z"
+    },
+    {
+      "termId": "2852e61d-6608-4f85-9477-245635fca624",
+      "personId": "a076fa8b-2d02-4951-a41b-9a86b896db9e",
+      "jurisdictionId": "5861ed74-decb-4b6c-bc01-b9be2e1ab024",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.531Z"
+    },
+    {
+      "termId": "c2a2eaa1-2d1f-48d1-9f80-2e744090d928",
+      "personId": "98b57b49-b95b-4681-85b3-7259f472c99a",
+      "jurisdictionId": "59d1ada1-607d-4ad2-a1f8-a1fd5cd4a0fd",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.735Z"
+    },
+    {
+      "termId": "06f24d34-deb4-4102-83a6-3b6e9009cfe8",
+      "personId": "50a0138e-2896-48ad-aaa7-a20d4358d873",
+      "jurisdictionId": "59d1ada1-607d-4ad2-a1f8-a1fd5cd4a0fd",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.710Z"
+    },
+    {
+      "termId": "b9ef71c4-bf9e-412f-b3e3-f427c621d4be",
+      "personId": "5ba29718-c60f-4777-a1de-5798bf37d174",
+      "jurisdictionId": "5a27e111-33da-4ac5-80f4-1aae148ebb76",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.252Z"
+    },
+    {
+      "termId": "0cac4add-910f-4ef6-ba63-eef5d1578341",
+      "personId": "8e2ee3d1-068d-4441-80d4-98ab0291233e",
+      "jurisdictionId": "5a27e111-33da-4ac5-80f4-1aae148ebb76",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.229Z"
+    },
+    {
+      "termId": "004fb7aa-a66e-4487-8349-4d8e950d5cf1",
+      "personId": "03eadf17-4fec-4ff8-8a0d-a24557b430a2",
+      "jurisdictionId": "5b3cc546-a9ca-4ddc-bffb-0afc4bebccd1",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.781Z"
+    },
+    {
+      "termId": "eb103aef-070c-472a-8a92-064bfb6899ef",
+      "personId": "9a433706-3457-44df-8d77-680f581904e3",
+      "jurisdictionId": "5babfd4b-1b3b-4e45-a547-a6310ec74e43",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.695Z"
+    },
+    {
+      "termId": "738e7a4f-5281-4d0e-a275-cca189fea3c2",
+      "personId": "1f5d748e-aa06-4af0-8fbb-558b542f5f76",
+      "jurisdictionId": "5babfd4b-1b3b-4e45-a547-a6310ec74e43",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.671Z"
+    },
+    {
+      "termId": "f1f184de-cfc5-40dd-a28b-2b5def77d9e4",
+      "personId": "4f6f3526-c6a5-43db-9ab0-d105f6e2f0ce",
+      "jurisdictionId": "5e7cdf87-b8af-4635-878a-432282082680",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.330Z"
+    },
+    {
+      "termId": "c11c2310-5531-4113-97db-172cba68e260",
+      "personId": "977efcee-78be-4b48-8e19-f02518892e1a",
+      "jurisdictionId": "5e7cdf87-b8af-4635-878a-432282082680",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.302Z"
+    },
+    {
+      "termId": "c1d54607-3900-4cce-aa15-d48383b45dd5",
+      "personId": "d73ce622-3bf2-4734-9d8b-0e7ed17d3390",
+      "jurisdictionId": "60214ed5-4a4a-4ee1-9913-a938b0460916",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.881Z"
+    },
+    {
+      "termId": "8167eeb8-faa3-4651-81dd-c3971a367aa2",
+      "personId": "cbce3966-f5c4-4d9a-acc3-4569cace0277",
+      "jurisdictionId": "60214ed5-4a4a-4ee1-9913-a938b0460916",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.851Z"
+    },
+    {
+      "termId": "0e97bad8-2cd7-4353-ba16-6de4e917e791",
+      "personId": "16f40b8b-a534-4636-a9b0-3f53bbbd198b",
+      "jurisdictionId": "616cff18-d3f5-4321-b361-5cb994c2895a",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.220Z"
+    },
+    {
+      "termId": "502028dd-254d-4950-9527-345ae6986872",
+      "personId": "ccbe62d2-7500-4bff-b2c2-d0e3237ffa1a",
+      "jurisdictionId": "61792890-03c9-449a-83d6-4fe41760d441",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.377Z"
+    },
+    {
+      "termId": "0cda8875-9c93-44bf-a2dc-caafc155d171",
+      "personId": "5966e5b1-227b-4a12-94b9-d216fd275d47",
+      "jurisdictionId": "61b01aa8-357a-4522-9c79-e699b5acbed4",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.793Z"
+    },
+    {
+      "termId": "7562042b-d1fc-4319-b710-f8bd31c39ae7",
+      "personId": "14dd4845-c7f3-4717-972c-b1701a70b9a3",
+      "jurisdictionId": "61fd3c12-b3df-4afb-a6d4-5ed32c5afc97",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.906Z"
+    },
+    {
+      "termId": "a08a48aa-5665-40f7-a226-61c72d214e86",
+      "personId": "d57528b0-c27f-4220-9b1d-78dbf972b612",
+      "jurisdictionId": "621bee57-c8a7-415a-aa22-091cf12634aa",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.086Z"
+    },
+    {
+      "termId": "e460bb08-52cd-4d18-9186-1315e951a7dc",
+      "personId": "bc35c08e-a6be-4876-a23e-379639f0a015",
+      "jurisdictionId": "621bee57-c8a7-415a-aa22-091cf12634aa",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.063Z"
+    },
+    {
+      "termId": "0df298cf-466b-44fa-85b0-1e7e3afbe053",
+      "personId": "49ebb165-2ee8-4b05-a9ce-7db69f3084ba",
+      "jurisdictionId": "63206c7b-300a-4e23-aeb4-b5c79b23171c",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.027Z"
+    },
+    {
+      "termId": "2cd43ab1-856a-4829-9a12-32de4153dcc4",
+      "personId": "adf95dd6-864a-481e-8216-1b7868fc124e",
+      "jurisdictionId": "63206c7b-300a-4e23-aeb4-b5c79b23171c",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.989Z"
+    },
+    {
+      "termId": "8e117f15-aae5-4a58-90b9-3bb955d51da9",
+      "personId": "e2cde5e7-efa2-48e8-bd20-622ae80965d5",
+      "jurisdictionId": "65e3b2b3-9a51-40ad-8496-c09bd0478e25",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.831Z"
+    },
+    {
+      "termId": "31814db5-454b-444b-ad8d-176ec179a87f",
+      "personId": "ace6b123-4318-46dc-b434-9efed5bdf6f7",
+      "jurisdictionId": "65e3b2b3-9a51-40ad-8496-c09bd0478e25",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.807Z"
+    },
+    {
+      "termId": "30d1d5ed-e7fe-4dec-9ccc-4b11436c8f55",
+      "personId": "471716bc-ca5d-49ef-8ea6-c1de9eb3c3e3",
+      "jurisdictionId": "662d0f4e-b33f-48c9-b1ad-7c01c2b6c848",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.603Z"
+    },
+    {
+      "termId": "d4175059-768e-4891-8a68-0735b17c8129",
+      "personId": "79c1a77a-2035-4843-9828-ff4a17377907",
+      "jurisdictionId": "662d0f4e-b33f-48c9-b1ad-7c01c2b6c848",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.577Z"
+    },
+    {
+      "termId": "075990e5-a9b4-4dbd-bd24-a6229755b55b",
+      "personId": "006c3be4-81e1-4466-acd0-d11483a5d070",
+      "jurisdictionId": "6754f1f0-2c3a-4ecd-953a-02a2a5160e32",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.454Z"
+    },
+    {
+      "termId": "88fb5907-2a94-4e95-8cc7-cc9cd9485be1",
+      "personId": "0bf47868-88f9-4c88-9576-63cd673f5ca0",
+      "jurisdictionId": "677129d3-9bc5-4bb9-a042-c51d42cca2e7",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.928Z"
+    },
+    {
+      "termId": "38614a4e-ccf1-49e8-8df9-912086232b46",
+      "personId": "93ce205f-6a29-4ace-adea-8d479ea4c07e",
+      "jurisdictionId": "677129d3-9bc5-4bb9-a042-c51d42cca2e7",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.902Z"
+    },
+    {
+      "termId": "9d2be4ed-be5c-4941-8338-b73686afdbc8",
+      "personId": "a4cf50a5-dcca-44d0-a368-0a8570ac08a3",
+      "jurisdictionId": "67e5d7f4-7164-4e3f-b692-a9726fe4af56",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.154Z"
+    },
+    {
+      "termId": "e7aa53f0-9e67-4bcc-bd31-1c4f7e1a486a",
+      "personId": "1583f389-9d0d-47aa-9aad-d96b5e5a9cfc",
+      "jurisdictionId": "67e5d7f4-7164-4e3f-b692-a9726fe4af56",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.126Z"
+    },
+    {
+      "termId": "d5514d5c-6173-4863-8c96-e6d9ead17ef8",
+      "personId": "6ad1fd18-eb8c-48ad-a5e5-f808f6708643",
+      "jurisdictionId": "6a06af90-aa76-461a-9e40-9a432646a44c",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.346Z"
+    },
+    {
+      "termId": "dfc91090-d9d3-41df-8396-d48964b611c1",
+      "personId": "f162aec2-c21c-4ec6-b5e6-3eed2d842227",
+      "jurisdictionId": "6a06af90-aa76-461a-9e40-9a432646a44c",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.320Z"
+    },
+    {
+      "termId": "68e1b7d6-24ac-4adb-8deb-e68b5d749c4b",
+      "personId": "09e13681-c091-4d4f-8724-e747cb16fb41",
+      "jurisdictionId": "6a7fadf6-89d6-44e7-aed3-67c6d0796487",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.941Z"
+    },
+    {
+      "termId": "5200eb5d-e5a3-47a7-a564-37e2cb44af16",
+      "personId": "f03ebafc-5a4a-428b-8354-83d60cf5285c",
+      "jurisdictionId": "6a7fadf6-89d6-44e7-aed3-67c6d0796487",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.911Z"
+    },
+    {
+      "termId": "a1998fab-58ea-456d-8d86-9e9943887189",
+      "personId": "1f9ad9af-1a30-4588-8518-04a2989f07e5",
+      "jurisdictionId": "6c1cfab7-7ace-460a-af2f-9e8c8711b8b3",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.946Z"
+    },
+    {
+      "termId": "46f9b33f-65ee-40f7-8abd-4b56d2761f76",
+      "personId": "6573f05f-deaf-4ca5-9d65-c0b8ee7cb840",
+      "jurisdictionId": "6c1cfab7-7ace-460a-af2f-9e8c8711b8b3",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.921Z"
+    },
+    {
+      "termId": "7ddcd034-524c-4e50-a70b-d1da456ef2eb",
+      "personId": "3d07cbb0-2d92-4626-bc72-e3b534437f2c",
+      "jurisdictionId": "6f8693aa-7066-4056-a214-ce77695e28c2",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.359Z"
+    },
+    {
+      "termId": "15c8386f-2333-40e0-b8d3-30d870bcbd5e",
+      "personId": "a4015fa7-e063-4621-8296-058dffb1c70d",
+      "jurisdictionId": "6f8693aa-7066-4056-a214-ce77695e28c2",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.334Z"
+    },
+    {
+      "termId": "0b5adad2-844d-460b-a143-11fffbcb8826",
+      "personId": "a7e07451-61d0-4f80-8299-9e00155b7612",
+      "jurisdictionId": "7022b2a5-0e85-4efa-8fd8-b850ffab3a60",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.610Z"
+    },
+    {
+      "termId": "86548d07-26f2-43ae-91e6-7820f9bff3ed",
+      "personId": "679506c4-48b6-4e26-b695-85793661b1fd",
+      "jurisdictionId": "7022b2a5-0e85-4efa-8fd8-b850ffab3a60",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.585Z"
+    },
+    {
+      "termId": "cac9c0ad-b05b-419e-8010-a27142524919",
+      "personId": "153abc0a-59c6-404e-ae42-da4b2b533e03",
+      "jurisdictionId": "71371492-09bb-4e81-93a4-3039f6d525f6",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.190Z"
+    },
+    {
+      "termId": "4b8170b5-4f77-4b4d-9678-9e941eb17c87",
+      "personId": "5ea7071f-1732-48c7-b2b3-9ca5ff1afadd",
+      "jurisdictionId": "74d94315-0680-4e4b-956d-03e4a9288339",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.912Z"
+    },
+    {
+      "termId": "655491fe-6fcb-46bc-a4ea-d9ecb22d0815",
+      "personId": "a3096fc7-71cf-4b0f-8cc9-b8c8890bd408",
+      "jurisdictionId": "76e0b74e-e7da-42e7-abe7-aae253b6fd29",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.010Z"
+    },
+    {
+      "termId": "70f89712-1db5-429f-91c4-dab746bf0e72",
+      "personId": "64e44cd2-0d2f-4179-a734-f6260b8efe9b",
+      "jurisdictionId": "78e7574f-454e-4562-8b26-4eda831c26a2",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.737Z"
+    },
+    {
+      "termId": "70a921a3-94a1-4630-92d3-6f67663574b4",
+      "personId": "3c85ff24-e449-4adf-b528-cbde5f4fc132",
+      "jurisdictionId": "78e7574f-454e-4562-8b26-4eda831c26a2",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.712Z"
+    },
+    {
+      "termId": "4d825b8a-ad9f-4f93-b1bb-11290e0142f0",
+      "personId": "f9f06d11-98ce-4ccb-bc8e-fef282426184",
+      "jurisdictionId": "78e9b188-f57c-4e09-946c-acb077b7f056",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.443Z"
+    },
+    {
+      "termId": "3a3c2657-2931-4164-9074-89734142cae1",
+      "personId": "673fdfa1-c805-43e2-885a-ec65819bafa1",
+      "jurisdictionId": "79d1c497-fafe-49f0-83fb-eb43b08fe80b",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.118Z"
+    },
+    {
+      "termId": "b099234a-be4e-456c-a683-52a0a8388e80",
+      "personId": "095d032e-53ed-4b20-971f-569d3e4f4090",
+      "jurisdictionId": "79d1c497-fafe-49f0-83fb-eb43b08fe80b",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.095Z"
+    },
+    {
+      "termId": "2f954967-e66f-4b24-bb75-48666413e366",
+      "personId": "23b89b49-8f96-475f-bdb1-f5410350a701",
+      "jurisdictionId": "7a071cfc-1663-44bb-a775-171394a87c3b",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.659Z"
+    },
+    {
+      "termId": "4a553388-fc19-4eb9-9a11-7964af44653c",
+      "personId": "58738859-dca0-465b-9eba-074fb999c7b6",
+      "jurisdictionId": "7a071cfc-1663-44bb-a775-171394a87c3b",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.634Z"
+    },
+    {
+      "termId": "9361339a-3330-46b3-9cc3-65e1d88249f8",
+      "personId": "3393f5e4-4c69-4957-9cb7-806340d27ccc",
+      "jurisdictionId": "7b3bb4d9-f3a6-42fc-a466-e4c41c9bdabc",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.088Z"
+    },
+    {
+      "termId": "14a1f867-e641-4b4e-99a5-c6c628afe312",
+      "personId": "2f741651-1a5c-4d5d-a3fc-6b154ab96b5d",
+      "jurisdictionId": "7b3bb4d9-f3a6-42fc-a466-e4c41c9bdabc",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.052Z"
+    },
+    {
+      "termId": "f5bf6a84-b667-4b6d-8c9d-92094d48c46e",
+      "personId": "3a83fa3b-ec69-41a2-8a1c-2d0b5c198cf4",
+      "jurisdictionId": "7e52460d-1b13-4ac4-a301-5319d24dfa32",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.184Z"
+    },
+    {
+      "termId": "054c42b3-3daa-4bdb-8f30-536073db19e1",
+      "personId": "ba926eea-7529-4ddf-9adc-4ae342d008ff",
+      "jurisdictionId": "7fe16caf-66ec-4381-8991-f6804c226d6a",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.253Z"
+    },
+    {
+      "termId": "204284ac-ec49-4061-94c2-12a66d702c1c",
+      "personId": "ce919253-0ecb-45c5-a424-522d83433584",
+      "jurisdictionId": "7fe16caf-66ec-4381-8991-f6804c226d6a",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.228Z"
+    },
+    {
+      "termId": "0b58bd71-0158-4b65-891f-b568353d4ccc",
+      "personId": "6b151966-525b-4914-b0d2-f0770d9c8725",
+      "jurisdictionId": "814d0606-4ee0-41c6-bee4-b87b46748502",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.313Z"
+    },
+    {
+      "termId": "681472ee-2780-429b-beb0-9e6a9c6b0acb",
+      "personId": "0e058158-6a3d-421d-a8d4-89c3a585ce05",
+      "jurisdictionId": "849e394e-dc19-40bc-a67a-a73b6af3c5ad",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.015Z"
+    },
+    {
+      "termId": "0ed1b2ee-d45d-4e49-a8c5-980bdc8d96cf",
+      "personId": "825334e8-dfc0-4be5-ba8a-dea4681abd2f",
+      "jurisdictionId": "8666ace6-cbdd-436a-b35f-a508862618eb",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.913Z"
+    },
+    {
+      "termId": "5ca1d5f8-3fed-4c0b-aa6b-4632215d8682",
+      "personId": "30b1b7e5-379d-4ce0-a612-f1aa019d4f16",
+      "jurisdictionId": "8666ace6-cbdd-436a-b35f-a508862618eb",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.884Z"
+    },
+    {
+      "termId": "daa0bdf0-aea1-418c-9e9a-377b2a614fcf",
+      "personId": "9f8d614c-ea99-46f8-ae23-1d767c78fb65",
+      "jurisdictionId": "86b893bd-39f4-4d35-bb1d-0e612fca4694",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.100Z"
+    },
+    {
+      "termId": "c564f395-9f66-4da7-bb85-c5f036c8dc79",
+      "personId": "02018619-97bd-4dd4-b863-fe760680d65f",
+      "jurisdictionId": "877e3567-6569-4dc7-bf8f-66026a930258",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.151Z"
+    },
+    {
+      "termId": "b23f096c-c5be-4478-9bed-1d2d2c089eef",
+      "personId": "94e4f0cc-7f67-46a3-baf5-eeed01f79355",
+      "jurisdictionId": "877e3567-6569-4dc7-bf8f-66026a930258",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.124Z"
+    },
+    {
+      "termId": "a4220ef4-8a05-4d74-9685-5514f1206617",
+      "personId": "88153452-3905-445f-b7f6-be6fa299adf3",
+      "jurisdictionId": "89b64a33-ab1b-4164-84e6-5ee5aa44d0ac",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.577Z"
+    },
+    {
+      "termId": "26343ba0-db99-40b8-9627-ab09fe3f4808",
+      "personId": "dcc182bc-c97e-4b27-a153-8b546b6854b4",
+      "jurisdictionId": "89b64a33-ab1b-4164-84e6-5ee5aa44d0ac",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.554Z"
+    },
+    {
+      "termId": "0dd33f09-579b-4c6f-af70-8532d434e1c3",
+      "personId": "f862a3a7-57ad-4f15-bd9c-93b3b181ae19",
+      "jurisdictionId": "8cd425da-de5d-40fe-9d43-b7f8e5e97bdc",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.471Z"
+    },
+    {
+      "termId": "3676befd-3bcb-419d-806c-d5ab5a2414cf",
+      "personId": "a3a94d24-20c0-44d9-8d05-c4efa979d424",
+      "jurisdictionId": "8cd425da-de5d-40fe-9d43-b7f8e5e97bdc",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.446Z"
+    },
+    {
+      "termId": "e04f3fa9-5644-46a6-bf72-56d3c083c7b8",
+      "personId": "48d92d57-bbf4-4a77-8846-10fef9014593",
+      "jurisdictionId": "8d7bf555-6d2a-438d-8911-6d48d8b6dd3b",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.220Z"
+    },
+    {
+      "termId": "7ef1f2fe-57d0-44e1-867c-66b81f071672",
+      "personId": "b3f5cdd4-8e3d-432f-a5c9-e25a126609b0",
+      "jurisdictionId": "8d7bf555-6d2a-438d-8911-6d48d8b6dd3b",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.196Z"
+    },
+    {
+      "termId": "2604c402-a220-4e26-b0a2-e6b94926e547",
+      "personId": "d2a12bd7-f7dd-49e6-b283-aed1f05b627b",
+      "jurisdictionId": "8ecdc8d5-dd04-492e-8524-0e325787aa1c",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.746Z"
+    },
+    {
+      "termId": "5a90051e-4f1c-4c81-94c5-0e7f35904295",
+      "personId": "55876746-e36f-4d02-81d9-6340408228ff",
+      "jurisdictionId": "8fe0f2e5-1848-4ff4-b3e4-532b08eb7435",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.538Z"
+    },
+    {
+      "termId": "bf5b874b-4d8d-40af-b74d-af58a727c200",
+      "personId": "4755f707-5892-4cad-a6dc-8423d95651f4",
+      "jurisdictionId": "8fe0f2e5-1848-4ff4-b3e4-532b08eb7435",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.511Z"
+    },
+    {
+      "termId": "ea8ec1c5-7eb3-4577-be63-ed22c589bae8",
+      "personId": "cd4a4cac-49c9-49b8-8a8a-3455c104daa4",
+      "jurisdictionId": "9048da3d-3f79-4ecd-bc73-eb9a57f0260d",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.399Z"
+    },
+    {
+      "termId": "169ae47d-f3de-4c4e-9cb2-76c434a7cada",
+      "personId": "54b21af4-f688-45b5-93ab-89e21a230987",
+      "jurisdictionId": "910ae095-c381-4dcc-929f-8c2ecb65ffc3",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.492Z"
+    },
+    {
+      "termId": "22fa64cf-7efe-410f-8b9e-62456dc2c95e",
+      "personId": "f5305868-c562-4c29-a22d-b1a2c7cf5256",
+      "jurisdictionId": "910ae095-c381-4dcc-929f-8c2ecb65ffc3",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.466Z"
+    },
+    {
+      "termId": "4c7d4ca1-627a-440a-bd0b-fdf39832663f",
+      "personId": "c0d4cc7b-9e4e-4b3b-ad2b-2c389a9f73b9",
+      "jurisdictionId": "92514c81-fb8c-4d97-b7d6-8d2dac98b4ab",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.221Z"
+    },
+    {
+      "termId": "c4c6e000-f083-49b1-a542-5d2e8e96c409",
+      "personId": "c27a520a-a02f-4d6c-a47a-81edcc0b3646",
+      "jurisdictionId": "92514c81-fb8c-4d97-b7d6-8d2dac98b4ab",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.191Z"
+    },
+    {
+      "termId": "53e9606a-eef4-44fd-ae33-2e3a791cd529",
+      "personId": "98822b11-9b41-49ee-83d9-d360bdce802c",
+      "jurisdictionId": "92b5fd08-c80a-4d2a-b616-5afaf7e5d99e",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.405Z"
+    },
+    {
+      "termId": "3ecf8de8-601d-4289-8644-686c775271d5",
+      "personId": "b0ce26d5-1572-4717-9933-066910d74701",
+      "jurisdictionId": "932e404a-ac19-4bda-947f-e3594b65a6f9",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.971Z"
+    },
+    {
+      "termId": "5774f658-67a4-4982-a669-457670aef46a",
+      "personId": "07b1b82c-4e1e-48cc-9f5b-22ef9106390f",
+      "jurisdictionId": "932e404a-ac19-4bda-947f-e3594b65a6f9",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.040Z"
+    },
+    {
+      "termId": "933eab5e-8b37-42a9-b0ff-eecd8a7b1261",
+      "personId": "8f92c3f3-2fbb-45be-b2e2-f6cdb5736a4c",
+      "jurisdictionId": "934c424e-affd-4054-8e72-8770f7f9b621",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.612Z"
+    },
+    {
+      "termId": "39ca7943-f335-4566-a8d8-48f489e0e4e4",
+      "personId": "79ca568c-230d-4244-8b5f-60369da8721a",
+      "jurisdictionId": "934c424e-affd-4054-8e72-8770f7f9b621",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.588Z"
+    },
+    {
+      "termId": "4934e23f-36bc-45e1-96a0-e587704e02bd",
+      "personId": "ee0d7a4b-62c8-4bce-b10c-4abeb8966708",
+      "jurisdictionId": "93b78ccd-e7ff-488b-b65c-64bf8d112740",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.814Z"
+    },
+    {
+      "termId": "3dbfd63d-0ceb-4f66-ae93-9b633b647fcb",
+      "personId": "76c82548-64f2-4193-9433-326c7611483b",
+      "jurisdictionId": "954b191a-c50c-4a48-ae57-64b800216ebb",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.378Z"
+    },
+    {
+      "termId": "24550e12-ab0a-439a-8a6e-07738e2888cd",
+      "personId": "1d63814d-049e-4d3f-bb5a-b60580d90e91",
+      "jurisdictionId": "9577051f-bb09-4ad8-97b0-c2e4a42531ec",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.648Z"
+    },
+    {
+      "termId": "cedc2427-ecf2-4904-a481-cbfdb72d3d32",
+      "personId": "32a04929-8548-4f53-82c1-cbb884dd2a30",
+      "jurisdictionId": "9aeac939-5966-47c2-aa4a-d8dfd642720f",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.541Z"
+    },
+    {
+      "termId": "8437466f-bab2-4ea5-a723-9b17e11d2adc",
+      "personId": "7cfc55e7-8e27-4ddb-83e2-21d630d8b1e3",
+      "jurisdictionId": "9aeac939-5966-47c2-aa4a-d8dfd642720f",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.515Z"
+    },
+    {
+      "termId": "1a48c18e-a03a-48c4-a8c8-f2822a87d418",
+      "personId": "ebdd07ac-3105-4203-97b2-bb116af70b0a",
+      "jurisdictionId": "9c2f422a-b1d6-4b8e-afc9-1d284b0d34de",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.407Z"
+    },
+    {
+      "termId": "41429b01-785d-4a29-a03d-861e7e81c3e8",
+      "personId": "d4593ffa-001d-496e-a7d2-c56351e5e9cd",
+      "jurisdictionId": "9c2f422a-b1d6-4b8e-afc9-1d284b0d34de",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.378Z"
+    },
+    {
+      "termId": "a3f53f2d-3a08-4688-bbac-8d3329fbc9a4",
+      "personId": "ddcac85d-cd2f-4648-8c3d-ba1f35357531",
+      "jurisdictionId": "9c925bca-e849-4975-8595-801fc54dea16",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.671Z"
+    },
+    {
+      "termId": "1949086f-c499-475f-a148-89f63d04a8ab",
+      "personId": "3de353a7-33df-49c6-a078-0bd18e980d03",
+      "jurisdictionId": "9c925bca-e849-4975-8595-801fc54dea16",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.645Z"
+    },
+    {
+      "termId": "a545b1fe-9968-4a30-b6bb-29751e0a82ed",
+      "personId": "facfb6f0-b3a1-4da5-ada5-e3ab5d18e5a5",
+      "jurisdictionId": "9de109ff-a588-466a-b8c6-3be5ac88ccb1",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.242Z"
+    },
+    {
+      "termId": "2153bb84-a6c0-448f-92b0-d38b4d7f0f99",
+      "personId": "b1a91056-23f8-464e-af68-a49b10facd49",
+      "jurisdictionId": "9e0a42fe-e40c-4db4-af84-d29ef961fc22",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.128Z"
+    },
+    {
+      "termId": "faaefd06-0532-49e8-b7cb-1a0aa574b959",
+      "personId": "d179281d-641f-4fc5-8c06-92e49992b525",
+      "jurisdictionId": "9e0a42fe-e40c-4db4-af84-d29ef961fc22",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.087Z"
+    },
+    {
+      "termId": "5bae90b2-0ae0-44bd-804c-e9576d170ec0",
+      "personId": "cb1305f3-be8a-48bb-9aec-20368ee20f90",
+      "jurisdictionId": "9e813a43-0739-481b-8b7b-9d98872b1be1",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.976Z"
+    },
+    {
+      "termId": "584c2a1c-d4bb-48a1-9833-947b6deb25e8",
+      "personId": "976ce87a-6664-4722-bd90-8e79fba7a192",
+      "jurisdictionId": "9e917cf2-98b5-457f-a8ad-e995fbb427b2",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.734Z"
+    },
+    {
+      "termId": "d76fa18c-c317-40e9-bfef-aa13d6239fdb",
+      "personId": "7b845d2e-542d-404f-8027-c94f52974a4a",
+      "jurisdictionId": "9e917cf2-98b5-457f-a8ad-e995fbb427b2",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.707Z"
+    },
+    {
+      "termId": "23fb50db-23d0-4d4b-b650-66aba1a6784e",
+      "personId": "7c8794c9-27af-4184-a957-cbcf3f567589",
+      "jurisdictionId": "9fc42f30-9c17-4207-9852-386f6b19f6f5",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.641Z"
+    },
+    {
+      "termId": "20e8a8f7-ab54-4074-95d8-a292ae07b78d",
+      "personId": "8bcd0ad4-dc32-4182-9c36-c10f1eabb1bc",
+      "jurisdictionId": "a1138117-1861-4ba5-93c5-8d8de8706476",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.729Z"
+    },
+    {
+      "termId": "e40540e5-5946-49b2-bcdf-4a34d847b32d",
+      "personId": "30577bc3-f7a8-46eb-bd62-4ec006ccb68c",
+      "jurisdictionId": "a1138117-1861-4ba5-93c5-8d8de8706476",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.707Z"
+    },
+    {
+      "termId": "8caf7dc1-beaf-4873-976c-a604646fd10d",
+      "personId": "4a1dcaa0-830b-4cba-a03f-2ef7acef4fb9",
+      "jurisdictionId": "a20a5929-239b-47cd-926a-1c09a046c31a",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.312Z"
+    },
+    {
+      "termId": "a3df0c52-2186-43eb-a95e-35a815a5d3c5",
+      "personId": "7440b4ce-4179-4c6d-bcd0-ef9d37055165",
+      "jurisdictionId": "a2752ebd-8924-45ef-ab84-f7e1a3acaead",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.780Z"
+    },
+    {
+      "termId": "a7fbfe66-3490-4e5f-b450-ac1686528b45",
+      "personId": "da26f8ec-27f8-4db6-8294-edc6514e9631",
+      "jurisdictionId": "a2752ebd-8924-45ef-ab84-f7e1a3acaead",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.749Z"
+    },
+    {
+      "termId": "d37203cf-5b11-434f-bd20-b77d9808e1b9",
+      "personId": "02d74be1-09fb-4177-959e-111bba2d9186",
+      "jurisdictionId": "a283c9e0-6a65-4161-ae41-5943f3334f3e",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.595Z"
+    },
+    {
+      "termId": "500827a0-b5cd-4802-ab47-5fe4ffabb3e7",
+      "personId": "5e6f36a4-c082-41c0-a85c-96b93e6ec28d",
+      "jurisdictionId": "a399a025-0a2f-4b64-9f82-2d0158cfda38",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.698Z"
+    },
+    {
+      "termId": "eea30efd-e6d1-4b56-b925-0e3e7c843209",
+      "personId": "00288204-3288-45dd-a538-a4cf63da706c",
+      "jurisdictionId": "a399a025-0a2f-4b64-9f82-2d0158cfda38",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.673Z"
+    },
+    {
+      "termId": "354f2472-3d10-4911-8f65-63243ef72c29",
+      "personId": "dba237b0-bf19-4032-aaa7-26c73f5a62ba",
+      "jurisdictionId": "a3a484b3-d5fe-4b3a-9583-c95967d18c6d",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.877Z"
+    },
+    {
+      "termId": "87953fcf-6347-4f89-acf8-f25ca78d59e3",
+      "personId": "ad8cebc7-3c17-44cd-81c2-8d3096dbf78e",
+      "jurisdictionId": "a3a484b3-d5fe-4b3a-9583-c95967d18c6d",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.853Z"
+    },
+    {
+      "termId": "2ac57a61-3ae6-4aed-bfa0-7c606d3f2da9",
+      "personId": "b253075c-3aa5-4ac6-9a69-b144618365a5",
+      "jurisdictionId": "a5515483-8619-4297-96e0-cefa0241fd6f",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.190Z"
+    },
+    {
+      "termId": "484cf66e-d7ff-4236-b05d-4e01d3686c0d",
+      "personId": "8977bb22-f677-4b86-a9b4-d77d0254d5c8",
+      "jurisdictionId": "a5515483-8619-4297-96e0-cefa0241fd6f",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.165Z"
+    },
+    {
+      "termId": "ffde7eb9-47f8-4fd1-a689-ea32e36026b1",
+      "personId": "1931623d-279f-482c-baec-224e78bc806c",
+      "jurisdictionId": "a6c17fd9-87f9-46b7-a6af-5f645d1d7387",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.743Z"
+    },
+    {
+      "termId": "2dc5f508-1c3c-406e-8964-546a67a186e1",
+      "personId": "850e9dec-a956-4b6d-a975-efb46a6131c3",
+      "jurisdictionId": "a6c17fd9-87f9-46b7-a6af-5f645d1d7387",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.717Z"
+    },
+    {
+      "termId": "7011d0de-8da6-49a9-9527-ce829bf35b4e",
+      "personId": "2b3f1e33-7284-4932-881d-eb446fc35377",
+      "jurisdictionId": "a99dce03-01f4-4608-9bec-14fe1dc8c896",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.686Z"
+    },
+    {
+      "termId": "14ac07e6-71e6-4d11-97e6-71aeeaaf734b",
+      "personId": "7b1a9502-278b-45d4-aba2-9476289411e4",
+      "jurisdictionId": "a9a44214-d705-46db-8089-e15c1d22fa72",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.850Z"
+    },
+    {
+      "termId": "572408ef-9d07-4e3d-a3eb-355c020fc1a8",
+      "personId": "74e1c3b3-6899-4d78-9952-e41f2ea56e2c",
+      "jurisdictionId": "a9a44214-d705-46db-8089-e15c1d22fa72",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.826Z"
+    },
+    {
+      "termId": "b736216b-dfa4-4a6d-bff8-b0a237b15cbb",
+      "personId": "508a9efb-9c21-4171-bda9-161619d0cfaa",
+      "jurisdictionId": "aad572b8-5690-4a9b-bf16-2a7644807f2b",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.381Z"
+    },
+    {
+      "termId": "a39fa9db-ff7a-46b3-9e5c-f88f3b4e74e0",
+      "personId": "913115ca-3d95-4177-b78d-f149d3147b46",
+      "jurisdictionId": "aad572b8-5690-4a9b-bf16-2a7644807f2b",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.356Z"
+    },
+    {
+      "termId": "57bca911-23bd-48dc-b502-fbba389f4691",
+      "personId": "fbb229e3-15d0-480f-9c38-9e101de5e459",
+      "jurisdictionId": "accb6f68-3bd9-47d4-899b-2d2e5e62fb4a",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.865Z"
+    },
+    {
+      "termId": "350f5020-d3ce-471b-b94d-6feb8ca2eb69",
+      "personId": "7eebd694-cf6b-41f5-a360-69153535d64b",
+      "jurisdictionId": "accb6f68-3bd9-47d4-899b-2d2e5e62fb4a",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.839Z"
+    },
+    {
+      "termId": "0d7c2568-e5cf-425f-9b67-52682b26c056",
+      "personId": "86164662-9dc4-4b7f-9674-bdc8a4a71f15",
+      "jurisdictionId": "ad20f7bd-db6b-4822-8e5e-50fe5cdbe7c3",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.970Z"
+    },
+    {
+      "termId": "8c3855f9-a258-417c-b193-243885a273dc",
+      "personId": "ddf3f6f5-6477-4b44-8f3e-caf1217f1f04",
+      "jurisdictionId": "ad20f7bd-db6b-4822-8e5e-50fe5cdbe7c3",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.939Z"
+    },
+    {
+      "termId": "36c1585d-f5ca-4fb5-b373-d48f5abe98a0",
+      "personId": "e67f2723-de8c-4dc7-9880-c9684dc83920",
+      "jurisdictionId": "ae3f1f8a-f1f7-423a-9957-9bf2cfca60cd",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.337Z"
+    },
+    {
+      "termId": "ff57c94e-2035-46ac-8bb5-e90c6098c6bd",
+      "personId": "c3b260e9-8364-435b-b424-700091049e5b",
+      "jurisdictionId": "ae3f1f8a-f1f7-423a-9957-9bf2cfca60cd",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.313Z"
+    },
+    {
+      "termId": "486041ab-aa58-46cb-b104-4c4d5722505b",
+      "personId": "f3a8faec-c444-4cee-a4f2-6c1035a571aa",
+      "jurisdictionId": "aea55724-d7ab-43b6-810b-9db2ad9aabb6",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.756Z"
+    },
+    {
+      "termId": "f279319f-9d75-4c72-8e34-36d8d258eabb",
+      "personId": "32775187-84c5-4f20-9ce6-705a0a98a1a9",
+      "jurisdictionId": "aec83742-3ad4-4cef-a1f9-af999468e536",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.863Z"
+    },
+    {
+      "termId": "f6c99638-b0a0-4994-a829-aa1c44a36677",
+      "personId": "8682af96-2205-4f9c-be87-3e1385140697",
+      "jurisdictionId": "aec83742-3ad4-4cef-a1f9-af999468e536",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:03.839Z"
+    },
+    {
+      "termId": "bd1892a0-4fa1-4bf1-b5b1-fbfa83a90624",
+      "personId": "f329f734-c13d-4af7-bf14-e993ba30bb74",
+      "jurisdictionId": "af6c7328-1c90-40b0-8b86-9ec13b65e056",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.079Z"
+    },
+    {
+      "termId": "27605fe2-0ae5-4dc0-81b5-6d09b82ebfa2",
+      "personId": "6e791e8e-8dfd-4a84-b094-e465e81127d3",
+      "jurisdictionId": "b56c2d3b-8f8f-46ef-a4de-3503947a15e8",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.540Z"
+    },
+    {
+      "termId": "d873dc83-36c1-4020-a06f-442e494e9077",
+      "personId": "6d5fab3e-2a36-4348-8208-b94d202996b4",
+      "jurisdictionId": "b56c2d3b-8f8f-46ef-a4de-3503947a15e8",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.513Z"
+    },
+    {
+      "termId": "0b62129f-4844-4403-aade-bd100cc8d5cd",
+      "personId": "8129cc3f-9efb-4bc2-a98b-85053aa436eb",
+      "jurisdictionId": "b5d866fc-de76-4280-a50b-589f0bfc49ba",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.027Z"
+    },
+    {
+      "termId": "4b6bae95-7367-4efc-824b-79e9b90f5d14",
+      "personId": "ff46ee2f-9ee7-4317-8b52-159d5e6613a9",
+      "jurisdictionId": "b5d866fc-de76-4280-a50b-589f0bfc49ba",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.005Z"
+    },
+    {
+      "termId": "ea215ef4-a780-4eef-a9c1-f2073ae46610",
+      "personId": "5b3d10d9-1f15-4758-9f2a-75e2bf37deee",
+      "jurisdictionId": "b6cfac01-16ca-412a-9229-316a5aafc92f",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.000Z"
+    },
+    {
+      "termId": "9507029e-d393-4f9b-994a-894d95021455",
+      "personId": "1e6eede7-9702-47c6-a630-fda6c58fa852",
+      "jurisdictionId": "b6cfac01-16ca-412a-9229-316a5aafc92f",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.968Z"
+    },
+    {
+      "termId": "654f0645-c03f-4daa-bfc5-5f9de687c702",
+      "personId": "fffab8e1-d79d-4469-b5cc-6670423e87e5",
+      "jurisdictionId": "b74b278c-e9c5-4a94-bfd3-c7fada723618",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.162Z"
+    },
+    {
+      "termId": "bcde66aa-f1a0-408a-918a-24626bbaa3ea",
+      "personId": "ac585af9-1b50-44e5-91b4-7f91d10b9df1",
+      "jurisdictionId": "b7b790d6-e980-49df-a17d-3dcb6135ac28",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.254Z"
+    },
+    {
+      "termId": "675c8d4c-cfb8-4dbd-b4dd-0e350f597868",
+      "personId": "6f3cb643-dbff-441f-9edc-84f065d5f6de",
+      "jurisdictionId": "b7b790d6-e980-49df-a17d-3dcb6135ac28",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.226Z"
+    },
+    {
+      "termId": "ad6d27bd-906e-4ebf-ae89-b473d3e6d5d3",
+      "personId": "3ed641b1-cfac-4ae5-a8e2-751b2917e8fc",
+      "jurisdictionId": "b93c53da-82ad-448d-9967-2f7be9e290bf",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.961Z"
+    },
+    {
+      "termId": "24e38602-5267-42c3-9052-905651729b81",
+      "personId": "e14882f4-e4b7-4512-89a2-86f6f2109c79",
+      "jurisdictionId": "b93c53da-82ad-448d-9967-2f7be9e290bf",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.915Z"
+    },
+    {
+      "termId": "cd62e436-75f5-488e-8bbf-f3a80b5ce9e9",
+      "personId": "52d38e16-d986-42c1-a47c-2e0d064fb8b4",
+      "jurisdictionId": "b980e91f-07e8-485e-ab99-a8d45264dddd",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:05.708Z"
+    },
+    {
+      "termId": "78329e14-516e-4d6f-a911-cb54d46d863f",
+      "personId": "4d0fbd22-570b-4205-b382-054916f74f22",
+      "jurisdictionId": "ba7b5022-7b36-4797-af79-5bc86313d8c0",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.999Z"
+    },
+    {
+      "termId": "c3cb2e6b-980d-4d48-9951-668c760ea1f1",
+      "personId": "da3b6211-ca78-40a4-a778-3b0d61e5081b",
+      "jurisdictionId": "bd57dd2a-1f4f-4328-84c1-06a7a1890249",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.804Z"
+    },
+    {
+      "termId": "b0931286-6f3f-450f-93cc-bb4a4f7e068f",
+      "personId": "8b03bfb8-34a9-4ed7-913d-304aacfd4073",
+      "jurisdictionId": "bd57dd2a-1f4f-4328-84c1-06a7a1890249",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.775Z"
+    },
+    {
+      "termId": "0031c5e4-e56c-4ff2-a28e-5e9043780ebb",
+      "personId": "92f455a9-c270-4adb-90f5-016073b02909",
+      "jurisdictionId": "bfbbf7ca-5a25-47ce-b8d3-60581eca8ef5",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.060Z"
+    },
+    {
+      "termId": "82e56804-ae46-48be-b433-391a23ca336e",
+      "personId": "ee36252e-4de7-43d7-a29e-c3fb4ff157e8",
+      "jurisdictionId": "c12d5919-b649-4450-b004-9424ede06a35",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.137Z"
+    },
+    {
+      "termId": "fb5ee4fb-5e7d-4c25-8ada-c51515f5f5a9",
+      "personId": "ddff0598-0521-4a45-8d04-fd339c481792",
+      "jurisdictionId": "c12d5919-b649-4450-b004-9424ede06a35",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.113Z"
+    },
+    {
+      "termId": "039fa78d-c572-4b12-ab46-7e94f78064e0",
+      "personId": "5d515d62-acd1-419d-83dc-22818aa24173",
+      "jurisdictionId": "c4ac0a08-e1ba-4093-bcf2-8c264fbec5c6",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.467Z"
+    },
+    {
+      "termId": "1a738a0a-f50f-4f99-bef7-f4d79b7df771",
+      "personId": "4087a451-11dd-4e93-ab2f-3ee395064cf0",
+      "jurisdictionId": "c5fa19f3-2d53-4c40-8125-344d61c537b9",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.383Z"
+    },
+    {
+      "termId": "97630471-38d7-48f8-8ffc-bf84302d2ae2",
+      "personId": "5963cf53-f6a6-4f58-b48e-fc1070422bab",
+      "jurisdictionId": "c8315f38-f311-46e8-93e0-fbd7a92f6287",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.667Z"
+    },
+    {
+      "termId": "3fbe87c2-2b3a-469a-9ac9-4ac728aa5765",
+      "personId": "6490aef3-c214-4647-a373-2593b0b1f1ca",
+      "jurisdictionId": "c8315f38-f311-46e8-93e0-fbd7a92f6287",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.631Z"
+    },
+    {
+      "termId": "b448fb17-8db1-4c44-90fc-b2fb9036d15e",
+      "personId": "b74c0a43-1d8e-4f82-9ca4-5f4289de7dfd",
+      "jurisdictionId": "c8632ef6-eff8-4a02-a8bb-afb795c3f58a",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.863Z"
+    },
+    {
+      "termId": "a6adeeaf-b052-4759-a9e8-8b4269d7934c",
+      "personId": "539c7ef7-212b-4750-bdaa-92604311a0f0",
+      "jurisdictionId": "c8632ef6-eff8-4a02-a8bb-afb795c3f58a",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.835Z"
+    },
+    {
+      "termId": "13f37d7f-2058-4c5a-8fc1-ffd2163ccf70",
+      "personId": "f9a00915-c731-4814-9680-d371172985eb",
+      "jurisdictionId": "ca6ecb7d-272e-4f0d-9335-08dbb323d920",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.327Z"
+    },
+    {
+      "termId": "a92814dc-f247-4ba7-9776-57ac78ae57fd",
+      "personId": "b2fc0f41-59de-4221-aaaa-fef67983e810",
+      "jurisdictionId": "ca6ecb7d-272e-4f0d-9335-08dbb323d920",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.297Z"
+    },
+    {
+      "termId": "087c5982-3fde-4d3d-a4b1-5daf0dd6c791",
+      "personId": "12796158-d659-4ec5-b7cf-b911e5ff854d",
+      "jurisdictionId": "cb087a83-3778-4227-868b-0624e0968d7f",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.571Z"
+    },
+    {
+      "termId": "36a6d8d5-5a14-4eb6-9e9a-30ab32381ba7",
+      "personId": "da04619c-0830-4e96-9c0e-0a72f1ecb192",
+      "jurisdictionId": "cc046464-fb6b-4363-b05d-4f9c3d32b182",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:01.022Z"
+    },
+    {
+      "termId": "7fcbff6c-f4f5-4ce3-9c9b-308bcff8480f",
+      "personId": "a7b01d5f-cc42-4817-b409-6f4dbf82ed3e",
+      "jurisdictionId": "cc046464-fb6b-4363-b05d-4f9c3d32b182",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.999Z"
+    },
+    {
+      "termId": "91c6c89d-ca9f-4c3c-aeb9-55fd45483148",
+      "personId": "89fb9094-d5f2-4e8b-aba9-57a883f0c72c",
+      "jurisdictionId": "cc698d97-a4bc-45e1-9994-65389f610b15",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.011Z"
+    },
+    {
+      "termId": "8ebdcbd6-0634-4426-ba48-c6a2827ab4ac",
+      "personId": "dfd92a99-b774-4051-b973-e891124fd102",
+      "jurisdictionId": "cdba8964-6bae-4369-8971-112e7a767895",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.224Z"
+    },
+    {
+      "termId": "b14976cf-1a0f-4aeb-8a81-9af7dde29880",
+      "personId": "5097c962-b786-4b10-bc1a-8dac9e80b532",
+      "jurisdictionId": "cdba8964-6bae-4369-8971-112e7a767895",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.194Z"
+    },
+    {
+      "termId": "28a498a5-c7ac-408c-8bc6-f3fa22b40553",
+      "personId": "e0f9bfe9-facc-4098-83e0-ac8dbf577f26",
+      "jurisdictionId": "d170dc38-4d6c-4971-8822-7eadd25edca1",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.053Z"
+    },
+    {
+      "termId": "48ed7809-605a-477f-900d-60f054b98158",
+      "personId": "b5027eef-e5c1-4345-920c-f6fa9b54bf32",
+      "jurisdictionId": "d2e90315-0281-449d-b08e-7a117e259a2f",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.193Z"
+    },
+    {
+      "termId": "c8c43e8a-ff8e-45b5-b207-fc478774544f",
+      "personId": "4b94d0cf-40de-4cba-b580-fb91c41ed821",
+      "jurisdictionId": "d2f951ce-1373-40b0-9462-708f6eefdd3b",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.698Z"
+    },
+    {
+      "termId": "5de879de-edc8-4e1c-bdc0-8a31e2fe9422",
+      "personId": "f3d52d53-43be-44d0-aa4e-8aa0bec73066",
+      "jurisdictionId": "d2f951ce-1373-40b0-9462-708f6eefdd3b",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.669Z"
+    },
+    {
+      "termId": "2e219dad-54f6-4291-8a4e-8dc23b5a15d1",
+      "personId": "de8df2c2-ca5e-4c9b-b8d5-fba464e55e3b",
+      "jurisdictionId": "dd93d174-17c4-4184-8204-7c21c7f2f644",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.438Z"
+    },
+    {
+      "termId": "722477c8-275f-4c13-9440-e6130647a5fd",
+      "personId": "81a8c928-8875-405b-b47f-d566b1b0bbbd",
+      "jurisdictionId": "dd93d174-17c4-4184-8204-7c21c7f2f644",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.403Z"
+    },
+    {
+      "termId": "85229cce-1b60-4e8f-9540-ca11ee8a2c65",
+      "personId": "16649d5f-6500-4e2e-8dc3-b1425554213c",
+      "jurisdictionId": "ddc544e3-1a5d-42b3-a925-3f7d20b53491",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:04.503Z"
+    },
+    {
+      "termId": "a2581f59-17a5-4cce-978e-72557af5ed43",
+      "personId": "8694da80-2870-487d-9f73-de8416ea98b7",
+      "jurisdictionId": "e0f16461-9dde-4c70-b301-0ed9dfbb2cc4",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.601Z"
+    },
+    {
+      "termId": "222a0489-833b-491f-a908-419774e25ee9",
+      "personId": "a0984575-7f5e-415d-809c-77b3315b63d3",
+      "jurisdictionId": "e0f16461-9dde-4c70-b301-0ed9dfbb2cc4",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.566Z"
+    },
+    {
+      "termId": "679f3d2b-5775-4d74-a45b-12c8d5e33517",
+      "personId": "679a03de-28bc-4086-a6f8-03f35239c09b",
+      "jurisdictionId": "e1645f1f-95e8-4278-93f6-fe437d0e1d21",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.606Z"
+    },
+    {
+      "termId": "52988037-410d-4407-908e-eb38f04b7e6e",
+      "personId": "5bf897ad-8733-4c2e-a0e8-af3678b417df",
+      "jurisdictionId": "e1645f1f-95e8-4278-93f6-fe437d0e1d21",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:10.581Z"
+    },
+    {
+      "termId": "52b90f38-576a-4ecf-9193-a26fe9c2f4f2",
+      "personId": "e0fffe39-8aca-4e01-9b6a-2a129a7065a0",
+      "jurisdictionId": "e3bb3eb4-4f67-4b88-b4bc-df029cc6b96e",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.348Z"
+    },
+    {
+      "termId": "52825a37-60c6-4436-b86c-1284636d2e55",
+      "personId": "aeae1690-9aa0-4bde-978e-2451770d2be3",
+      "jurisdictionId": "e82f9c28-2087-404e-8918-acc589f2da7c",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.250Z"
+    },
+    {
+      "termId": "4e51f830-590c-43cc-a358-209101c1efa4",
+      "personId": "251daf08-ccbf-4f42-9a29-4156e00d26fb",
+      "jurisdictionId": "e82f9c28-2087-404e-8918-acc589f2da7c",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.206Z"
+    },
+    {
+      "termId": "822405ee-8487-4f81-9cc3-b32188368ffd",
+      "personId": "86b12c48-11e0-4b85-a643-92fb2c0ef0ca",
+      "jurisdictionId": "e84e711e-34c9-4b69-a3b5-8218a3b2b6cd",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.614Z"
+    },
+    {
+      "termId": "9529f156-e752-426f-bf83-591b881df1c3",
+      "personId": "fc309377-a2f2-4026-861b-d8d434685d54",
+      "jurisdictionId": "e8541668-7ce4-454a-99f7-c8f9ecf7b3f0",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.809Z"
+    },
+    {
+      "termId": "fe362365-3638-4881-9933-88502cafe9ee",
+      "personId": "a7ef74f9-6c8a-4530-905d-dec32ab1a4b3",
+      "jurisdictionId": "e8541668-7ce4-454a-99f7-c8f9ecf7b3f0",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.777Z"
+    },
+    {
+      "termId": "2474cc13-d5f9-4592-977a-b24f96615885",
+      "personId": "82f3bdb6-80be-4425-8c67-5f94628e15d8",
+      "jurisdictionId": "ea16ec55-2d45-4bcc-8fa5-5bd15a060203",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.649Z"
+    },
+    {
+      "termId": "674d762d-97d1-4d89-8bc6-f1c8b522317b",
+      "personId": "1021e11c-6d27-4f57-8564-afc76afb27d2",
+      "jurisdictionId": "eb0ac269-6a6a-4cec-b339-8c19aa8495e4",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.056Z"
+    },
+    {
+      "termId": "0b44ec55-0d31-4382-ab11-b46fe0692e11",
+      "personId": "4aeb85f8-fdc1-427e-8d87-d76b062d6b9d",
+      "jurisdictionId": "eb0ac269-6a6a-4cec-b339-8c19aa8495e4",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.030Z"
+    },
+    {
+      "termId": "9f34fa4f-a84f-48c9-a003-86b2618edb68",
+      "personId": "b61a6a44-ef88-4222-b3e0-2d94e73409c4",
+      "jurisdictionId": "ebbc37f7-db65-479f-9022-c47d86ce4434",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.264Z"
+    },
+    {
+      "termId": "7729e83e-f612-44f3-ae8a-4bc4ec1e7db8",
+      "personId": "18e159bb-92c4-44b1-b1b9-4b2e950c3ec6",
+      "jurisdictionId": "ebbc37f7-db65-479f-9022-c47d86ce4434",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.239Z"
+    },
+    {
+      "termId": "942ca012-abdf-4b81-a7f4-ae8276caa2ff",
+      "personId": "1d0f963e-951f-4c4c-9586-b0554a5d85c5",
+      "jurisdictionId": "eda6bd71-1a5c-497c-a7fe-6a11a0e21ab4",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.679Z"
+    },
+    {
+      "termId": "541530fb-8e88-410f-9675-b6acf8360aac",
+      "personId": "b8dc6340-81df-4776-b0f6-334b104051b1",
+      "jurisdictionId": "eda6bd71-1a5c-497c-a7fe-6a11a0e21ab4",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.652Z"
+    },
+    {
+      "termId": "b131b0c3-6834-4ca4-964b-fcb7efdde279",
+      "personId": "2f84a9be-b061-4141-bec0-5f56c9f8270a",
+      "jurisdictionId": "ee4ded84-31f1-4092-8f76-05a85d599850",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.398Z"
+    },
+    {
+      "termId": "c0db4ef9-ca72-4787-bffb-a58968ecf28b",
+      "personId": "a47743a9-10ea-4853-a386-d06ecfde29a5",
+      "jurisdictionId": "ee4ded84-31f1-4092-8f76-05a85d599850",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:06.374Z"
+    },
+    {
+      "termId": "e8053370-3998-434e-9504-870bc18807f9",
+      "personId": "633df44b-7c2d-4335-b3c9-4660defd0ddf",
+      "jurisdictionId": "f17ba1ca-7d8c-46ae-b5aa-428e2f48c8ca",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.735Z"
+    },
+    {
+      "termId": "d38737fe-d35d-4bf6-a294-d262773c30a3",
+      "personId": "34b9d7b4-c230-42a0-bac9-1456f084412c",
+      "jurisdictionId": "f17ba1ca-7d8c-46ae-b5aa-428e2f48c8ca",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:59.707Z"
+    },
+    {
+      "termId": "487faf0c-e8fe-4421-b8a6-c10791a3d8c2",
+      "personId": "3db300de-b42a-4536-a1a3-d20adc66056f",
+      "jurisdictionId": "f3be77e5-1afa-4fb9-8385-8ddb4306a812",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:00.775Z"
+    },
+    {
+      "termId": "eb3b414c-0906-4731-bc6a-4d38245c0c34",
+      "personId": "933f78d0-2072-49a0-8f5c-2c7e6b5d4788",
+      "jurisdictionId": "f49ebdc1-0545-4e9b-ae22-aafb9f656016",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.817Z"
+    },
+    {
+      "termId": "178a9d82-b0f7-4446-bedb-4e5462fad33d",
+      "personId": "b859ecb8-f32d-4cec-829e-95adfd07d7f0",
+      "jurisdictionId": "f49ebdc1-0545-4e9b-ae22-aafb9f656016",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:00:58.788Z"
+    },
+    {
+      "termId": "a6a6f962-8a63-4019-955c-46d1f95558b3",
+      "personId": "5ee7577a-dfbe-4e9a-b415-bb75bc9587af",
+      "jurisdictionId": "f4d156a1-2909-433f-81a3-ae2cdf8a520a",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.614Z"
+    },
+    {
+      "termId": "8553374d-af38-454f-8b37-62a24b2b8b0a",
+      "personId": "3df4830b-d939-42bb-a525-e2f663f1ff2f",
+      "jurisdictionId": "f5075046-150b-41a8-ac1a-0c7e84a61719",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.614Z"
+    },
+    {
+      "termId": "4848172a-3f36-4e01-885b-72b5cc6627c9",
+      "personId": "0c44b01a-c5ba-4aa5-8c8d-a195db3423e3",
+      "jurisdictionId": "f52a43d8-a272-433e-9dbd-34d7a83c05f3",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.342Z"
+    },
+    {
+      "termId": "f9560d0e-6e28-451c-8c1b-d6c40175ce1e",
+      "personId": "3ccf291c-b4c6-413d-9625-6469cd1febe2",
+      "jurisdictionId": "f52a43d8-a272-433e-9dbd-34d7a83c05f3",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.319Z"
+    },
+    {
+      "termId": "74ac9491-6194-49cc-ab45-1e34236183a5",
+      "personId": "aaf35bf9-02ce-4fe7-b2df-32d66519a8ec",
+      "jurisdictionId": "f703e0c5-6bcc-4d02-8899-9e8258ec9bb3",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:07.846Z"
+    },
+    {
+      "termId": "e2dc6a05-5553-4712-beab-d58fcbcb264f",
+      "personId": "f8d35ac8-f7cf-4370-b139-c8752be2cf73",
+      "jurisdictionId": "f7613acc-c756-46b8-b501-3a9e736c5135",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.423Z"
+    },
+    {
+      "termId": "b85225d2-6067-4603-8b32-6c8c3b4f134c",
+      "personId": "107e3a6b-bcc8-4906-a714-1aaaf2090bfa",
+      "jurisdictionId": "f7613acc-c756-46b8-b501-3a9e736c5135",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.397Z"
+    },
+    {
+      "termId": "32a98134-6a53-4a6a-970b-0934dd43a4cf",
+      "personId": "e4d7bc36-b90a-48bb-bc51-b1678ad68704",
+      "jurisdictionId": "fa6a5eea-ba47-4ab6-a1ac-cd18f0cfe08a",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:09.489Z"
+    },
+    {
+      "termId": "8674b8d3-d4f8-4cfb-bdd5-c43c847e079a",
+      "personId": "e3b1d9c9-9440-4004-96ba-1b81621adaeb",
+      "jurisdictionId": "fb047297-68a3-44f2-b167-674c56ab1be0",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.403Z"
+    },
+    {
+      "termId": "90490d37-fa51-4ad0-b41d-5b6bd400f71b",
+      "personId": "387e5226-d930-4527-9542-a75615857d67",
+      "jurisdictionId": "fb047297-68a3-44f2-b167-674c56ab1be0",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:08.376Z"
+    },
+    {
+      "termId": "7a6590b6-c161-4458-92b6-42d2321f894f",
+      "personId": "f3f3a343-c283-451b-be91-2e8d71913a65",
+      "jurisdictionId": "fe3a996a-7227-42cf-afb1-f5ec72116708",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:02.437Z"
+    },
+    {
+      "termId": "b645089e-2604-45b9-a7ac-5d6a3e2cc7d1",
+      "personId": "a621efe5-4519-42ce-8966-12e12a156a47",
+      "jurisdictionId": "ffe087d4-5683-42ad-8c5d-72e5fd4029f9",
+      "officeType": "head_of_government",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.295Z"
+    },
+    {
+      "termId": "9f5e0236-a3ea-4ae9-9de9-ab4f79b58d61",
+      "personId": "346b7056-6aad-4f6b-adc9-88f307a850a4",
+      "jurisdictionId": "ffe087d4-5683-42ad-8c5d-72e5fd4029f9",
+      "officeType": "head_of_state",
+      "sourceRetrievedAt": "2026-07-08T02:01:11.266Z"
+    }
+  ],
+  "rowIdentitySha256": "6ce2b3b0117d9eb605b4380283ea393995c45560c1f21243ad58226549f76d9b"
+}

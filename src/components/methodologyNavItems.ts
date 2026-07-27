@@ -28,6 +28,11 @@ export const METHODOLOGY_NAV_ITEMS: MethodologyNavItem[] = [
     descriptor: "Multi-source resolver",
   },
   {
+    href: "/methodology/case-studies",
+    label: "Case Studies",
+    descriptor: "Frozen API reproductions",
+  },
+  {
     href: "/methodology/provenance-coverage",
     label: "Provenance Coverage",
     descriptor: "Fact-level audit",

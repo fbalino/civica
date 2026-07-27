@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
 import {
   syncMonarchyAndGovernmentForm,
@@ -33,7 +34,10 @@ function harness() {
       },
     }) }),
   };
-  return { db: db as never, facts, writes: () => writes };
+  const writeFact: CountryFactHistoryWriter = async (_database, { values }) => {
+    await db.insert(countryFacts).values(values as unknown as Record<string, unknown>).onConflictDoUpdate();
+  };
+  return { db: db as never, facts, writeFact, writes: () => writes };
 }
 
 function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
@@ -48,9 +52,9 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
 test("classification fixtures converge on canonical rows", async () => {
   const state = harness();
   const markSynced = (async () => []) as never;
-  const wb = { jurisdictions: [jurisdiction], fetchCountries: async () => [wbCountry], markSynced };
-  const vdem = { jurisdictions: [jurisdiction], fetchRows: async () => new Map([["CAN", { iso3: "CAN", v2xRegime: 3 }]]), markSynced };
-  const monarchy = { jurisdictions: [governmentJurisdiction], markSynced };
+  const wb = { jurisdictions: [jurisdiction], fetchCountries: async () => [wbCountry], markSynced, atlasReleaseId: "atlas-test", writeFact: state.writeFact };
+  const vdem = { jurisdictions: [jurisdiction], fetchRows: async () => new Map([["CAN", { iso3: "CAN", v2xRegime: 3 }]]), markSynced, atlasReleaseId: "atlas-test", writeFact: state.writeFact };
+  const monarchy = { jurisdictions: [governmentJurisdiction], markSynced, atlasReleaseId: "atlas-test", writeFact: state.writeFact };
   await syncWorldBankClassifications(state.db, wb);
   await syncVdemRow(state.db, vdem);
   await syncMonarchyAndGovernmentForm(state.db, monarchy);
@@ -90,8 +94,8 @@ test("classification upstream failures cannot stamp freshness", async () => {
   const state = harness();
   const stamped: number[] = [];
   const markSynced = (async (_ids: unknown, options: { rowsWritten: number }) => { stamped.push(options.rowsWritten); return []; }) as never;
-  const wb = await syncWorldBankClassifications(state.db, { jurisdictions: [jurisdiction], fetchCountries: async () => { throw new Error("WB schema changed"); }, markSynced });
-  const vdem = await syncVdemRow(state.db, { jurisdictions: [jurisdiction], fetchRows: async () => { throw new Error("QoG schema changed"); }, markSynced });
+  const wb = await syncWorldBankClassifications(state.db, { jurisdictions: [jurisdiction], fetchCountries: async () => { throw new Error("WB schema changed"); }, markSynced, atlasReleaseId: "atlas-test", writeFact: state.writeFact });
+  const vdem = await syncVdemRow(state.db, { jurisdictions: [jurisdiction], fetchRows: async () => { throw new Error("QoG schema changed"); }, markSynced, atlasReleaseId: "atlas-test", writeFact: state.writeFact });
   assert.match(wb.errors.join(" "), /WB schema changed/);
   assert.match(vdem.errors.join(" "), /QoG schema changed/);
   assert.deepEqual(stamped, []);

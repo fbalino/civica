@@ -1,0 +1,46 @@
+{
+  "contract": "civica-plt-018-verification/v1",
+  "taskId": "PLT-018",
+  "verifiedAt": "2026-07-16",
+  "commands": [
+    {
+      "command": "npm run typecheck && node --import tsx --test src/lib/platform/error-monitoring.test.ts src/lib/api/problem-response.test.ts src/lib/api/cron-job.test.ts",
+      "result": "passed",
+      "details": "TypeScript and 35 focused tests passed. Fixtures cover every surface's closed context, rejection of dynamic/content-bearing identifiers, a seeded error appearing, correction/status links, resolution, and deterministic reopening on recurrence."
+    },
+    {
+      "command": "node --import tsx scripts/validate-error-monitoring.ts && node --import tsx scripts/validate-route-inventory.ts && node --import tsx scripts/validate-rate-limit-policy.ts && node --import tsx scripts/validate-cron-safety.ts && node --import tsx scripts/validate-source-input-manifest.ts && node --import tsx scripts/validate-pipeline-observability.ts",
+      "result": "passed",
+      "details": "The scrub contract, 103-route inventory, 164 route-method policies, 38 scheduled routes, error-alert cron, and 49 production-pipeline contracts are closed."
+    },
+    {
+      "command": "node --import tsx scripts/run-cron-safety-tests.ts",
+      "result": "passed",
+      "details": "All 271 focused cron, adapter, freshness, retry, and partial-failure tests passed with content-free exception recording in the shared boundary."
+    },
+    {
+      "command": "node --import tsx scripts/validate-authoritative-migrations.ts && node --import tsx scripts/validate-migrations.ts && node --import tsx scripts/validate-schema-data-dictionary.ts && node --import tsx scripts/plan-migration.ts --all --live --out=plan/evidence/DAT-013/preflight.json && node --import tsx scripts/validate-migration-preflight.ts",
+      "result": "passed",
+      "details": "The authoritative manifest/journal, 93-table/1,293-column dictionary, 58 registered migration artifacts, and configured-Neon zero-write preflight are exact. Both PLT-018 relations are recorded as missing on the unapplied configured database."
+    },
+    {
+      "command": "node --import tsx scripts/validate-ci-workflow.ts && node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && node --import tsx scripts/validate-route-performance-telemetry.ts && node --import tsx scripts/validate-doc-references.ts",
+      "result": "passed",
+      "details": "The CI graph transitively runs the new monitoring gate, telemetry behavior remains closed, and AGENTS.md now reports the current 93-table schema."
+    },
+    {
+      "command": "local development server plus in-app browser smoke at http://localhost:3000/",
+      "result": "passed",
+      "details": "The homepage rendered with the expected Civica Atlas title and no browser console errors. The temporary browser tab was closed after the read-only smoke; no artificial event was sent to the configured database."
+    }
+  ],
+  "scopedBuildBoundary": {
+    "command": "node /tmp/run-civica-build-core.cjs",
+    "result": "blocked_by_unrelated_worktree_change",
+    "details": "The full gate passed the PLT-018 migration/preflight, Atlas review packet, and all preceding validators, then stopped at validate:index-change-control because the concurrent user-owned src/components/factbook/FactbookHeaderStrip.tsx presentation change has no new Index change-control record. That file is outside PLT-018 and was not modified or authorized by this task."
+  },
+  "externalVerification": {
+    "result": "pending_owner_platform_action",
+    "details": "Enable Vercel Protected Source Maps, set VERCEL_PROTECTED_SOURCEMAPS=true only on the protected deployment, and verify a post-migration Preview/staging event and alert without retaining source-map or error content. The exact check is in plan/MANUAL-CHECKS.md."
+  }
+}

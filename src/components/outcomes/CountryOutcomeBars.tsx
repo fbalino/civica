@@ -601,7 +601,7 @@ export function CountryOutcomeBars({
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: 13,
+            fontSize: "var(--text-13)",
             color: "var(--color-text-40)",
           }}
         >
@@ -622,7 +622,7 @@ export function CountryOutcomeBars({
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: 13,
+            fontSize: "var(--text-13)",
             color: "var(--color-text-40)",
           }}
         >

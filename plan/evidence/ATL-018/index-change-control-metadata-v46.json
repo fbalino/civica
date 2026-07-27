@@ -1,0 +1,13 @@
+{
+  "id": "atl-018-source-native-score-state-presentation",
+  "toVersion": "civica-index-atlas-reader-states-v46",
+  "recordKind": "evidence",
+  "evidence": {
+    "documentation": ["plan/evidence/ATL-018/README.md"],
+    "registry": ["src/lib/atlas/surface-query-state.ts"],
+    "release_note": ["plan/evidence/ATL-018/index-change-control-release-note-v46.md"],
+    "migration_plan": ["plan/evidence/ATL-018/index-change-control-migration-plan-v46.md"],
+    "golden_test": ["src/lib/atlas/surface-query-state.test.ts"],
+    "contract_test": ["src/lib/atlas/surface-data-matrix.test.ts"]
+  }
+}

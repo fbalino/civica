@@ -1,0 +1,26 @@
+{
+  "id": "dat-035-frozen-input-identity-reconciliation",
+  "toVersion": "civica-index-pulse-stored-ensemble-v38-input-identity",
+  "categories": ["input"],
+  "evidence": {
+    "documentation": ["plan/evidence/DAT-035/release-identity-reconciliation.md"],
+    "registry": [
+      "src/lib/ci/release-selection.ts",
+      "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",
+      "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json"
+    ],
+    "release_note": ["plan/evidence/DAT-035/release-note.md"],
+    "migration_plan": ["plan/evidence/DAT-035/migration-plan.md"],
+    "golden_test": ["scripts/validate-release-consistency.test.ts"],
+    "contract_test": ["src/lib/ci/release-publication.test.ts"]
+  },
+  "validations": [
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-series-provenance",
+    "validate:ci-research-panel",
+    "validate:release-consistency"
+  ]
+}

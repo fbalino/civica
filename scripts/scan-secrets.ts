@@ -33,6 +33,15 @@ type Allowlist = {
     hostHint?: string;
     status: string;
   }>;
+  // Exact hashes of non-secret values that older commits used to exercise
+  // redaction/configuration tests. These suppress only those historical bytes;
+  // they cannot mask a new value and are never applied to the working tree.
+  knownHistoryFixtures?: Array<{
+    sha256: string;
+    patternId: string;
+    sourcePaths: string[];
+    reason: string;
+  }>;
 };
 
 const allowlistPath = resolve("scripts/secret-scan-allowlist.json");
@@ -104,7 +113,10 @@ function scanHistory(): Report {
     { encoding: "utf8", maxBuffer: 512 * 1024 * 1024 },
   );
   const known = new Set(
-    (allowlist.knownHistoryExposed ?? []).map((entry) => entry.sha256),
+    [
+      ...(allowlist.knownHistoryExposed ?? []),
+      ...(allowlist.knownHistoryFixtures ?? []),
+    ].map((entry) => entry.sha256),
   );
   const findings = findSecrets(diff, new Set(), known);
   return findings.length > 0 ? [{ file: "<git history>", findings }] : [];
@@ -121,6 +133,12 @@ if (mode === "history") {
   for (const entry of allowlist.knownHistoryExposed ?? []) {
     console.log(
       `NOTICE: known historical exposure (${entry.hostHint ?? entry.sha256.slice(0, 8)}) — ${entry.status}`,
+    );
+  }
+  const fixtureCount = allowlist.knownHistoryFixtures?.length ?? 0;
+  if (fixtureCount > 0) {
+    console.log(
+      `NOTICE: ${fixtureCount} exact historical non-secret fixture hash(es) are documented separately from real exposures.`,
     );
   }
   const report = scanHistory();

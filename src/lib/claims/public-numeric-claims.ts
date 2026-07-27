@@ -655,6 +655,25 @@ function exemptClaim(
   return { id, file, surface, fragment, disposition: "exempt", source };
 }
 
+function frozenClaim(
+  id: string,
+  file: string,
+  surface: string,
+  fragment: string,
+  source: string,
+  release: string,
+): PublicNumericClaimRegistration {
+  return {
+    id,
+    file,
+    surface,
+    fragment,
+    disposition: "frozen",
+    source,
+    release,
+  };
+}
+
 export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
   [
     runtimeClaim(
@@ -944,6 +963,21 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
       'Illustrative Example Response: {"schemaVersion":"election-research-export/v1"',
       "EndpointSection visibly labels every generated example response illustrative",
     ),
+    exemptClaim(
+      "api-docs.atlas-query-example",
+      "src/lib/api/contract/examples.ts",
+      "/api-docs",
+      'Illustrative Example Response: {"schemaVersion":"civica-atlas-query/v1"',
+      "EndpointSection visibly labels every generated example response illustrative",
+    ),
+    frozenClaim(
+      "atlas-case-studies.recipe-input-rows",
+      "src/app/(reader)/methodology/case-studies/page.tsx",
+      "/methodology/case-studies",
+      "{recipe.inputRowCount.toLocaleString()} input rows frozen in release {report.release.id}",
+      "checked case-studies.v1.json generated from the frozen Atlas release",
+      "atlas-2026-07-11",
+    ),
     runtimeClaim(
       "rankings.live-row-count",
       "src/app/rankings/page.tsx",
@@ -1062,5 +1096,19 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] =
       "component:compare/CompareIndicatorHistory",
       "{Math.min(...years)} – {Math.max(...years)} · {years.length} observations {runtime}",
       "getIndicatorHistoryForCountry observed-value years for each selected country and source series",
+    ),
+    runtimeClaim(
+      "leaders.live-directory-counts",
+      "src/app/(reader)/leaders/page.tsx",
+      "/leaders",
+      '${counts.people.toLocaleString("en")} people · ${counts.jurisdictions.toLocaleString("en")} countries and areas · live verified records',
+      "release-bound verified leader-directory people and jurisdiction counts; page remains publication-blocked while its checked release is blocked",
+    ),
+    runtimeClaim(
+      "governance-change.exact-window-coverage",
+      "src/app/(reader)/governance-change/page.tsx",
+      "/governance-change",
+      "{result.comparableJurisdictions} of {result.eligibleJurisdictions} sovereign-state records",
+      "live source-native indicator-history query with exact selected endpoints and explicit source-unavailable state",
     ),
   ];

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "civica-vercel-firewall-evidence/v1",
+  "capturedAt": "2026-07-14T09:39:26Z",
+  "projectName": "civica",
+  "projectId": "prj_R9vTWWG1suzmXS0uh1MOcFm1rqLW",
+  "commands": [
+    "vercel firewall overview --non-interactive",
+    "vercel firewall rules list --non-interactive",
+    "vercel firewall rules inspect global-rate-limit --json --non-interactive",
+    "vercel firewall diff --non-interactive"
+  ],
+  "overview": {
+    "firewall": "enabled",
+    "customRulesActive": 1,
+    "customRulesInactive": 0,
+    "ipBlocks": 0,
+    "systemBypassIps": 0,
+    "attackMode": "off",
+    "systemMitigations": "active",
+    "pendingDraftChanges": 0
+  },
+  "rule": {
+    "name": "global-rate-limit",
+    "id": "rule_global_rate_limit_3eoNNZ",
+    "active": true,
+    "valid": true,
+    "condition": {
+      "type": "path",
+      "operator": "starts_with",
+      "value": "/"
+    },
+    "action": "rate_limit",
+    "algorithm": "fixed_window",
+    "windowSeconds": 60,
+    "limit": 600,
+    "keys": ["ip"],
+    "onExceed": "challenge"
+  },
+  "scopeNote": "This active all-path rule is the broad platform flood-control layer for static release downloads and the retired embed. Vercel rate-limit counters are regional, so exact paid/auth/form budgets remain in the shared Neon application limiter."
+}

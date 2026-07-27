@@ -24,11 +24,15 @@ import {
   INDEX_COMPOSITE_SUNSET_DATE_ISO,
   INDEX_DISPOSITION_SUCCESSOR_HREF,
 } from "@/lib/api/deprecation";
+import { CORS_HEADERS } from "@/lib/api/helpers";
 import {
-  RATE_LIMIT_MAX,
-  RATE_LIMIT_WINDOW_MS,
-  CORS_HEADERS,
-} from "@/lib/api/helpers";
+  EXPORT_RATE_LIMIT_MAX,
+  EXPORT_RATE_LIMIT_WINDOW_MS,
+  RATE_LIMIT_EXCEEDED_STATUS,
+  RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+  V1_RATE_LIMIT_MAX,
+  V1_RATE_LIMIT_WINDOW_MS,
+} from "@/lib/api/contract/rate-limits";
 
 export interface RouteParam {
   name: string;
@@ -40,7 +44,11 @@ export interface RouteParam {
 export interface RateLimitContract {
   max: number;
   windowMs: number;
-  scope: "per-ip";
+  scope: "per-validated-client-identity";
+  backend: "postgres";
+  countedMethods: readonly ["GET"];
+  exceededStatus: typeof RATE_LIMIT_EXCEEDED_STATUS;
+  storeUnavailableStatus: typeof RATE_LIMIT_STORE_UNAVAILABLE_STATUS;
 }
 
 export interface DeprecationEntryContract {
@@ -118,12 +126,145 @@ const indexDispositionDeprecation = (): DeprecationContract => ({
 });
 
 const v1RateLimit: RateLimitContract = {
-  max: RATE_LIMIT_MAX,
-  windowMs: RATE_LIMIT_WINDOW_MS,
-  scope: "per-ip",
+  max: V1_RATE_LIMIT_MAX,
+  windowMs: V1_RATE_LIMIT_WINDOW_MS,
+  scope: "per-validated-client-identity",
+  backend: "postgres",
+  countedMethods: ["GET"],
+  exceededStatus: RATE_LIMIT_EXCEEDED_STATUS,
+  storeUnavailableStatus: RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+};
+
+const exportRateLimit: RateLimitContract = {
+  max: EXPORT_RATE_LIMIT_MAX,
+  windowMs: EXPORT_RATE_LIMIT_WINDOW_MS,
+  scope: "per-validated-client-identity",
+  backend: "postgres",
+  countedMethods: ["GET"],
+  exceededStatus: RATE_LIMIT_EXCEEDED_STATUS,
+  storeUnavailableStatus: RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
 };
 
 export const API_ROUTES: RouteContract[] = [
+  {
+    id: "conditions",
+    docSectionId: "conditions",
+    method: "GET",
+    pathTemplate: "/api/v1/conditions",
+    filePath: "src/app/api/v1/conditions/route.ts",
+    versioned: true,
+    summary:
+      "One selected immutable Civica Conditions release, with source-native component values, reference years, source lineage, alignment outcomes, and coverage derived from that release's calculation rows. Economic Stability has no composite score.",
+    params: [
+      {
+        name: "release",
+        in: "query",
+        type: "string",
+        description:
+          "Optional exact Conditions release id (for example, conditions-atlas-v1). Omit to select the latest stored release deterministically.",
+      },
+    ],
+    cors: true,
+    corsHeaders: CORS_HEADERS,
+    rateLimit: v1RateLimit,
+    errorStatuses: [400, 404, 429, 503],
+    deprecation: null,
+    exampleId: "conditions",
+  },
+  {
+    id: "atlas-query",
+    docSectionId: "atlas-query",
+    method: "GET",
+    pathTemplate: "/api/v1/atlas/query",
+    filePath: "src/app/api/v1/atlas/query/route.ts",
+    versioned: true,
+    summary:
+      "Queries a bounded projection of the frozen Atlas release with stable pagination, schema metadata, source-rights rows, and explicit excluded-corpus reasons.",
+    params: [
+      {
+        name: "table",
+        in: "query",
+        type: "string",
+        description:
+          '"facts" (default), "jurisdictions", or "sources".',
+      },
+      {
+        name: "fields",
+        in: "query",
+        type: "comma-separated string",
+        description:
+          "Optional allowlisted columns for the selected table. Unknown fields fail closed.",
+      },
+      {
+        name: "jurisdiction",
+        in: "query",
+        type: "comma-separated string",
+        description:
+          "Jurisdiction UUID, slug, ISO alpha-2, or ISO alpha-3 filter for facts or jurisdictions.",
+      },
+      {
+        name: "fact_key",
+        in: "query",
+        type: "comma-separated string",
+        description: "Fact-key filter for the facts table.",
+      },
+      {
+        name: "source",
+        in: "query",
+        type: "comma-separated string",
+        description: "Source-id filter for facts or sources.",
+      },
+      {
+        name: "status",
+        in: "query",
+        type: "comma-separated string",
+        description:
+          "jurisdiction-status/v1 filter for facts or jurisdictions.",
+      },
+      {
+        name: "value_status",
+        in: "query",
+        type: "comma-separated string",
+        description: "data-value-state/v1 filter for facts.",
+      },
+      {
+        name: "year_from",
+        in: "query",
+        type: "integer",
+        description: "Minimum observation/reference year for facts.",
+      },
+      {
+        name: "year_to",
+        in: "query",
+        type: "integer",
+        description: "Maximum observation/reference year for facts.",
+      },
+      {
+        name: "limit",
+        in: "query",
+        type: "integer",
+        description: "Page size (default 100, max 1000).",
+      },
+      {
+        name: "offset",
+        in: "query",
+        type: "integer",
+        description: "Stable row offset (default 0).",
+      },
+      {
+        name: "format",
+        in: "query",
+        type: "string",
+        description: '"json" (default) or "csv".',
+      },
+    ],
+    cors: true,
+    corsHeaders: CORS_HEADERS,
+    rateLimit: v1RateLimit,
+    errorStatuses: [400, 429, 500, 503],
+    deprecation: null,
+    exampleId: "atlasQuery",
+  },
   {
     id: "countries",
     docSectionId: "countries",
@@ -184,7 +325,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 429, 500],
+    errorStatuses: [400, 429, 500, 503],
     deprecation: structuralFamilyDeprecation(false),
     exampleId: "countries",
   },
@@ -216,7 +357,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 404, 429, 500],
+    errorStatuses: [400, 404, 429, 500, 503],
     deprecation: structuralFamilyDeprecation(false),
     exampleId: "countryDetail",
   },
@@ -313,7 +454,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: structuralFamilyDeprecation(true),
     exampleId: "governmentTypes",
   },
@@ -344,7 +485,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexCountry",
   },
@@ -375,7 +516,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexHistory",
   },
@@ -414,7 +555,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     // Field-level deprecation only applies when ?taxonomy=structural|regime
     // is requested — see zIndexByGovernmentTypeResponse's meta union.
     deprecation: indexDispositionDeprecation(),
@@ -455,7 +596,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 429, 500],
+    errorStatuses: [400, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexCompare",
   },
@@ -470,17 +611,24 @@ export const API_ROUTES: RouteContract[] = [
       "DEPRECATED — preserved composite methodology record. The current disposition and research evidence are published on the methodology page.",
     params: [
       {
+        name: "release",
+        in: "query",
+        type: "string",
+        description:
+          'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4". This is the canonical selector.',
+      },
+      {
         name: "version",
         in: "query",
         type: "string",
         description:
-          'Optional methodology version id, e.g. "beta". Defaults to the most recently published version.',
+          'Compatibility alias for an unambiguous methodology version, e.g. "beta-r4". Use release when corrections share a methodology and period.',
       },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [400, 404, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexMethodology",
   },
@@ -551,7 +699,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [400, 410, 429, 500],
+    errorStatuses: [400, 410, 429, 500, 503],
     deprecation: indexDispositionDeprecation(),
     exampleId: "indexRankings",
   },
@@ -568,7 +716,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "peerGroupings",
   },
@@ -586,7 +734,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "pulseMethodology",
   },
@@ -603,7 +751,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "pulseClusterCoverage",
   },
@@ -620,7 +768,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "pulseSourceCoverage",
   },
@@ -632,7 +780,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/pulse/[country_slug]/dimensions/route.ts",
     versioned: true,
     summary:
-      "Public experimental per-dimension Pulse deltas for one country, their evidence qualifiers, driving events, and a separate country-period observability verdict. No scalar Pulse score; absent events never become stability evidence.",
+      "Public experimental per-dimension Pulse deltas from one immutable score-run publication, with release-checked evidence, separately labeled live context, and a country-period observability verdict. No scalar Pulse score; absent events never become stability evidence.",
     params: [
       {
         name: ":country_slug",
@@ -644,7 +792,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: null,
     exampleId: "pulseDimensions",
   },
@@ -668,7 +816,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [404, 429, 500],
+    errorStatuses: [404, 429, 500, 503],
     deprecation: null,
     exampleId: "pulseEvents",
   },
@@ -729,7 +877,7 @@ export const API_ROUTES: RouteContract[] = [
     cors: true,
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
-    errorStatuses: [429, 500],
+    errorStatuses: [429, 500, 503],
     deprecation: null,
     exampleId: "pulseChangelog",
   },
@@ -765,8 +913,8 @@ export const API_ROUTES: RouteContract[] = [
     ],
     cors: false,
     corsHeaders: null,
-    rateLimit: null,
-    errorStatuses: [400, 404, 500, 503],
+    rateLimit: exportRateLimit,
+    errorStatuses: [400, 404, 429, 500, 503],
     deprecation: null,
     exampleId: "countryExport",
   },

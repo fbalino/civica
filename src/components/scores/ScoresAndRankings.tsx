@@ -22,7 +22,10 @@
  */
 
 import "@/components/scores/scores.css";
+import { Chip } from "@/components/editorial/Pill";
 import { SourceDot } from "@/components/SourceDot";
+import { Banner } from "@/components/editorial/Banner";
+import { scoreFreshnessPresentation } from "@/components/scores/freshness-label";
 import {
   getScoresForJurisdiction,
   type ScoreRow,
@@ -39,7 +42,7 @@ export interface ScoresAndRankingsProps {
   /** Pre-fetched rows. When present the component skips the DB call.
    *  This is how the atlas client tab integrates without crossing the
    *  server/client boundary. */
-  rows?: ScoreRow[];
+  rows?: ScoreRow[] | null;
 }
 
 const ARROW_BY_TREND: Record<NonNullable<ScoreRow["trend"]>, string> = {
@@ -54,8 +57,30 @@ export async function ScoresAndRankings({
   variant = "factbook",
   rows: prefetched,
 }: ScoresAndRankingsProps) {
-  const rows = prefetched ?? (await getScoresForJurisdiction(jurisdictionId));
-  if (rows.length === 0) return null;
+  if (prefetched === null) {
+    return (
+      <Banner variant="warn">
+        Source-native score records are temporarily unavailable. Civica is not
+        treating this as evidence that {countryName} has no published measures.
+      </Banner>
+    );
+  }
+  let rows: ScoreRow[];
+  if (prefetched !== undefined) {
+    rows = prefetched;
+  } else {
+    try {
+      rows = await getScoresForJurisdiction(jurisdictionId);
+    } catch {
+      return (
+        <Banner variant="warn">
+          Source-native score records are temporarily unavailable. Civica is
+          not treating this as evidence that {countryName} has no published
+          measures.
+        </Banner>
+      );
+    }
+  }
 
   return (
     <ScoresAndRankingsView
@@ -109,6 +134,7 @@ export function ScoresAndRankingsView({
       </div>
 
       {rows.map((row) => {
+        const freshness = scoreFreshnessPresentation(row);
         const arrow = row.trend ? ARROW_BY_TREND[row.trend] : null;
         const trendClass = row.trend
           ? `scores-rankings__trend scores-rankings__trend--${row.trend}`
@@ -126,7 +152,16 @@ export function ScoresAndRankingsView({
             className="scores-rankings__row"
             role="row"
           >
-            <span className="scores-rankings__label">{row.label}</span>
+            <span className="scores-rankings__label">
+              <span>{row.label}</span>
+              <Chip
+                variant={freshness.variant}
+                size="sm"
+                aria-label={freshness.ariaLabel}
+              >
+                {freshness.label}
+              </Chip>
+            </span>
 
             <span className="scores-rankings__value">
               <span>{row.scoreFormatted}</span>

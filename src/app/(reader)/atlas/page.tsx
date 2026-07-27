@@ -4,7 +4,7 @@ import { AtlasStandaloneClient } from "@/components/atlas/AtlasStandaloneClient"
 import { parseLayerParam } from "@/lib/atlas/map-layers";
 import { withOg } from "@/lib/og";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export async function generateMetadata() {
   return {
@@ -59,7 +59,8 @@ export default async function AtlasMapPage({
   return (
     <AtlasStandaloneClient
       countries={countries}
-      layerData={layerData}
+      layerData={layerData.values}
+      layerSources={layerData.sources}
       initialLayer={initialLayer}
     />
   );

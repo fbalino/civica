@@ -1,0 +1,19 @@
+{
+  "id": "exp-030-retired-embed-document",
+  "toVersion": "civica-index-retired-embed-document-v43",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["plan/evidence/EXP-030/README.md"],
+    "registry": ["src/lib/claims/provenance-coverage.ts"],
+    "release_note": ["plan/evidence/EXP-030/index-change-control-release-note.md"],
+    "migration_plan": ["plan/evidence/EXP-030/index-change-control-migration-plan.md"],
+    "golden_test": ["src/lib/api/pulse-scalar-retirement.test.ts"],
+    "contract_test": ["e2e/exp-030-retired-embed.spec.ts"]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine"
+  ]
+}

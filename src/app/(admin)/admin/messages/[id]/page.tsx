@@ -2,12 +2,12 @@
  * Contact-message detail — read-only view + triage.
  *
  * Shows the full submission (sender, subject, message body, metadata) and the
- * status-transition buttons. Each button POSTs to `/api/admin/messages/[id]`
- * (auth: admin session cookie), which flips `status` and 303s back here. Page
- * auth gating happens in `(admin)/layout.tsx`.
+ * status-transition and deletion controls. Each action POSTs to
+ * `/api/admin/messages/[id]` (auth: admin session cookie). Page auth gating
+ * happens in `(admin)/layout.tsx`.
  *
- * The message body itself is never mutated — this surface is read-only apart
- * from the triage status.
+ * The message body itself is never edited. Permanent deletion supports the
+ * privacy-request and minimization path.
  */
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -103,12 +103,6 @@ export default async function MessageDetailPage({ params }: PageProps) {
             </dd>
             <dt>Subject</dt>
             <dd>{msg.subject}</dd>
-            {msg.ipAddress ? (
-              <>
-                <dt>IP address</dt>
-                <dd>{msg.ipAddress}</dd>
-              </>
-            ) : null}
           </dl>
         </div>
       </section>
@@ -124,8 +118,7 @@ export default async function MessageDetailPage({ params }: PageProps) {
         <h2 className="admin-section-title">Set status</h2>
         <p className="admin-section-intro">
           Mark this message read or archived. The current status is disabled.
-          This is the only mutation on this surface — the message itself is
-          never edited.
+          The message itself is never edited.
         </p>
         <div className="admin-actions">
           {STATUSES.map((s) => (
@@ -155,6 +148,28 @@ export default async function MessageDetailPage({ params }: PageProps) {
             Reply by email
           </a>
         </div>
+      </section>
+
+      <section className="admin-section">
+        <h2 className="admin-section-title">Delete message</h2>
+        <p className="admin-section-intro">
+          Permanently delete the message after its purpose and any related
+          complaint or security need are resolved. This cannot be undone.
+        </p>
+        <form
+          method="post"
+          action={`/api/admin/messages/${msg.id}`}
+          className="admin-action-form"
+        >
+          <input type="hidden" name="intent" value="delete" />
+          <label>
+            <input type="checkbox" name="confirm" value="delete" required />{" "}
+            I understand this permanently deletes the message.
+          </label>
+          <button type="submit" className="btn btn--secondary btn--sm">
+            Delete permanently
+          </button>
+        </form>
       </section>
     </>
   );

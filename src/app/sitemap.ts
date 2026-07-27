@@ -4,6 +4,8 @@ import { getAllPosts } from "@/lib/blog";
 import { ORGANIZATIONS } from "@/lib/data/international-organizations";
 import { absoluteUrl, METADATA_CONTENT_RELEASE_DATE } from "@/lib/site";
 
+export const revalidate = 0;
+
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
 interface StaticRoute {
@@ -41,10 +43,12 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/civica-index/methodology/pulse/backtest", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/pulse-changelog", changeFrequency: "monthly", priority: 0.7 },
   { path: "/civica-index/corrections", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/report-data-issue", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/replication", changeFrequency: "monthly", priority: 0.5 },
   { path: "/methodology", changeFrequency: "monthly", priority: 0.7 },
   { path: "/policies", changeFrequency: "monthly", priority: 0.5 },
   { path: "/methodology/approach", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/methodology/case-studies", changeFrequency: "monthly", priority: 0.6 },
   { path: "/methodology/provenance-coverage", changeFrequency: "weekly", priority: 0.6 },
   { path: "/methodology/source-coverage", changeFrequency: "weekly", priority: 0.6 },
   { path: "/country/methodology/reconciliation", changeFrequency: "monthly", priority: 0.6 },
@@ -55,6 +59,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/elections/systems", changeFrequency: "monthly", priority: 0.6 },
   { path: "/civica-conditions", changeFrequency: "weekly", priority: 0.7 },
   { path: "/governance-evidence", changeFrequency: "weekly", priority: 0.95 },
+  { path: "/governance-change", changeFrequency: "weekly", priority: 0.7 },
   { path: "/rankings", changeFrequency: "weekly", priority: 0.7 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
   { path: "/about", changeFrequency: "monthly", priority: 0.4 },

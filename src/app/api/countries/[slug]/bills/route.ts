@@ -1,13 +1,21 @@
 import { NextResponse } from "next/server";
 import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { bills as billsTable, governmentBodies, sources } from "@/lib/db/schema";
+import {
+  bills as billsTable,
+  governmentBodies,
+  sources,
+} from "@/lib/db/schema";
 import { getBillsForJurisdiction } from "@/lib/db/queries";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { parsePathContract } from "@/lib/api/request-contract";
+import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
 import {
   BILLS_SOURCE_LABELS,
   BILLS_STAGE_LABELS,
   BILLS_SUPPORTED_JURISDICTION_NAMES,
+  billsCoverageMessage,
   isBillsSupportedSlug,
 } from "@/lib/bills/coverage";
 
@@ -28,22 +36,26 @@ const SOURCE_TAG = BILLS_SOURCE_LABELS;
  * object naming which jurisdictions ARE covered instead of a bare empty
  * `bills: []` array with no explanation.
  */
-export async function GET(
+async function handleBills(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(req, { scope: "countries-bills" });
+  const limited = await enforceRequestRateLimit(
+    req,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
 
-  const { slug } = await params;
+  const path = await parsePathContract(params, "jurisdiction-slug-params/v1");
+  if (!path.ok) return path.response;
+  const { slug } = path.data;
   let result;
   try {
     result = await getBillsForJurisdiction(slug, 10);
   } catch {
-    return NextResponse.json({ error: "DB unavailable" }, { status: 503 });
+    return apiProblem("DATA_UNAVAILABLE");
   }
-  if (!result)
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!result) return apiProblem("NOT_FOUND");
 
   // Look up sources.last_sync_at once for the distinct sources in
   // the result so each bill row carries its own provenance dot.
@@ -56,10 +68,7 @@ export async function GET(
         .from(sources)
         .where(inArray(sources.id, sourceIds));
       for (const r of rows) {
-        sourceMap.set(
-          r.id,
-          r.lastSyncAt ? r.lastSyncAt.toISOString() : null,
-        );
+        sourceMap.set(r.id, r.lastSyncAt ? r.lastSyncAt.toISOString() : null);
       }
     } catch {
       /* sources table read is best-effort */
@@ -69,9 +78,14 @@ export async function GET(
   // Chamber — `bodyId` FK into `government_bodies`, populated for the
   // DE/FR/BR/CA adapters only (see coverage.ts / ATL-013 evidence doc).
   const bodyIds = Array.from(
-    new Set(result.rows.map((b) => b.bodyId).filter((id): id is string => !!id)),
+    new Set(
+      result.rows.map((b) => b.bodyId).filter((id): id is string => !!id),
+    ),
   );
-  const bodyMap = new Map<string, { name: string; chamberType: string | null }>();
+  const bodyMap = new Map<
+    string,
+    { name: string; chamberType: string | null }
+  >();
   if (bodyIds.length > 0) {
     try {
       const bodyRows = await db
@@ -137,9 +151,7 @@ export async function GET(
     supported,
     supportedJurisdictions: BILLS_SUPPORTED_JURISDICTION_NAMES,
     totalTrackedForJurisdiction: totalCount,
-    message: supported
-      ? null
-      : `Civica's bills/legislative-activity pipeline currently covers six jurisdictions (${BILLS_SUPPORTED_JURISDICTION_NAMES.join(", ")}). ${result.jurisdiction.name} is not yet in that set — an empty list here reflects missing coverage, not an absence of legislative activity.`,
+    message: supported ? null : billsCoverageMessage(result.jurisdiction.name),
   };
 
   return NextResponse.json({
@@ -147,4 +159,13 @@ export async function GET(
     bills,
     coverage,
   });
+}
+
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ slug: string }> },
+) {
+  return withSafeJsonErrors("api/countries/[slug]/bills", () =>
+    handleBills(request, context),
+  );
 }

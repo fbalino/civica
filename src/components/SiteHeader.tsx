@@ -26,7 +26,7 @@ export function SiteHeader({
         borderBottom: "1px solid var(--color-divider)",
         position: "sticky",
         top: 0,
-        zIndex: 100,
+        zIndex: "var(--z-sticky)",
         background: "var(--color-bg-nav)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",

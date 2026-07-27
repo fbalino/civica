@@ -19,7 +19,7 @@ const citationFiles = [
   },
   {
     path: "data/releases/governance-evidence-review-packet-2026-07-v4/CITATION.cff",
-    familyNames: "Balino",
+    familyNames: "Baliño",
   },
 ] as const;
 for (const { path, familyNames } of citationFiles) {

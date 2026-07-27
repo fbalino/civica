@@ -19,7 +19,7 @@
  * SSR renders an empty framed container). Re-themes automatically when
  * `data-theme` flips.
  */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import {
@@ -65,106 +65,134 @@ export function CountryMap({
 }: CountryMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     let observer: MutationObserver | null = null;
     const selfHosted = isPmtilesEnabled();
+    let usingOpenFreeMap = !selfHosted;
 
     (async () => {
-      const maplibregl = (await import("maplibre-gl")).default;
-      if (cancelled || !containerRef.current) return;
+      try {
+        const maplibregl = (await import("maplibre-gl")).default;
+        if (cancelled || !containerRef.current) return;
 
-      const isDark =
-        document.documentElement.getAttribute("data-theme") === "dark";
+        const isDark =
+          document.documentElement.getAttribute("data-theme") === "dark";
 
-      // Self-hosted path: register the pmtiles protocol and build the pre-colored
-      // style. Fallback path: point at OpenFreeMap and recolor after load.
-      let style: string | Awaited<ReturnType<typeof buildCivicaPmtilesStyle>> =
-        CIVICA_MAP_BASE_STYLE;
-      if (selfHosted) {
-        try {
-          await ensurePmtilesProtocol(maplibregl);
-          style = await buildCivicaPmtilesStyle(
-            readCivicaMapPalette(isDark),
-            isDark,
-          );
-        } catch {
-          // If the self-hosted style can't be built, degrade to OpenFreeMap.
-          style = CIVICA_MAP_BASE_STYLE;
-        }
-      }
-      if (cancelled || !containerRef.current) return;
-
-      const map = new maplibregl.Map({
-        container: containerRef.current,
-        style,
-        bounds: bounds.bbox,
-        fitBoundsOptions: { padding: 24, animate: false },
-        // Cap max zoom in the self-hosted path so users never zoom past the
-        // extract's z9 base into blur (~2 levels of vector overzoom stays crisp).
-        maxZoom: selfHosted ? CIVICA_PMTILES_MAX_ZOOM : undefined,
-        interactive,
-        dragRotate: false,
-        pitchWithRotate: false,
-        // The non-interactive masthead preview supplies its attribution as
-        // sibling links beside the activation button. Letting MapLibre inject
-        // links into that preview would create nested interactive controls.
-        attributionControl: interactive ? { compact: true } : false,
-      });
-      mapRef.current = map;
-
-      if (showControls) {
-        map.addControl(
-          new maplibregl.NavigationControl({ showCompass: false }),
-          "top-right",
-        );
-      }
-
-      // Self-hosted styles are pre-colored, so only the OpenFreeMap fallback
-      // needs the in-place recolor.
-      const applyPalette = () => {
-        if (selfHosted) return;
-        try {
-          recolorCivicaMap(map, readCivicaMapPalette());
-        } catch {
-          /* base style not ready — the load handler will retry */
-        }
-      };
-
-      map.on("load", () => {
-        if (cancelled) return;
-        applyPalette();
-      });
-      // Swallow tile/network errors (e.g. base source offline) rather than throw.
-      map.on("error", () => {});
-
-      observer = new MutationObserver((muts) => {
-        for (const m of muts) {
-          if (m.attributeName === "data-theme") {
-            if (selfHosted) {
-              // Recolor for the new theme. The layer structure is identical
-              // across themes (only colors change), so `diff: true` lets
-              // MapLibre update paint properties in place — no source re-init,
-              // no blank flash while the pmtiles source reloads.
-              const dark =
-                document.documentElement.getAttribute("data-theme") === "dark";
-              buildCivicaPmtilesStyle(readCivicaMapPalette(dark), dark)
-                .then((next) => {
-                  if (!cancelled) map.setStyle(next, { diff: true });
-                })
-                .catch(() => {});
-            } else {
-              applyPalette();
-            }
-            break;
+        // Self-hosted path: register the pmtiles protocol and build the pre-colored
+        // style. Fallback path: point at OpenFreeMap and recolor after load.
+        let style: string | Awaited<ReturnType<typeof buildCivicaPmtilesStyle>> =
+          CIVICA_MAP_BASE_STYLE;
+        if (selfHosted) {
+          try {
+            await ensurePmtilesProtocol(maplibregl);
+            style = await buildCivicaPmtilesStyle(
+              readCivicaMapPalette(isDark),
+              isDark,
+            );
+          } catch {
+            // If the self-hosted style can't be built, degrade to OpenFreeMap.
+            usingOpenFreeMap = true;
+            style = CIVICA_MAP_BASE_STYLE;
           }
         }
-      });
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ["data-theme"],
-      });
+        if (cancelled || !containerRef.current) return;
+
+        const map = new maplibregl.Map({
+          container: containerRef.current,
+          style,
+          bounds: bounds.bbox,
+          fitBoundsOptions: { padding: 24, animate: false },
+          // Cap max zoom in the self-hosted path so users never zoom past the
+          // extract's z9 base into blur (~2 levels of vector overzoom stays crisp).
+          maxZoom: selfHosted ? CIVICA_PMTILES_MAX_ZOOM : undefined,
+          interactive,
+          dragRotate: false,
+          pitchWithRotate: false,
+          // The non-interactive masthead preview supplies its attribution as
+          // sibling links beside the activation button. Letting MapLibre inject
+          // links into that preview would create nested interactive controls.
+          attributionControl: interactive ? { compact: true } : false,
+        });
+        mapRef.current = map;
+
+        if (showControls) {
+          map.addControl(
+            new maplibregl.NavigationControl({ showCompass: false }),
+            "top-right",
+          );
+        }
+
+        // Self-hosted styles are pre-colored, so only the OpenFreeMap fallback
+        // needs the in-place recolor.
+        const applyPalette = () => {
+          if (!usingOpenFreeMap) return;
+          try {
+            recolorCivicaMap(map, readCivicaMapPalette());
+          } catch {
+            /* base style not ready — the load handler will retry */
+          }
+        };
+
+        const markUnavailable = () => {
+          if (!cancelled) setUnavailable(true);
+        };
+        const fallbackOrMarkUnavailable = () => {
+          if (cancelled) return;
+          if (!usingOpenFreeMap) {
+            usingOpenFreeMap = true;
+            try {
+              map.setStyle(CIVICA_MAP_BASE_STYLE);
+            } catch {
+              markUnavailable();
+            }
+            return;
+          }
+          markUnavailable();
+        };
+
+        map.on("load", () => {
+          if (cancelled) return;
+          setUnavailable(false);
+          applyPalette();
+        });
+        // An unavailable self-hosted basemap gets one keyless fallback before
+        // the reader sees an explicit status instead of a blank canvas.
+        map.on("error", fallbackOrMarkUnavailable);
+
+        observer = new MutationObserver((muts) => {
+          for (const m of muts) {
+            if (m.attributeName === "data-theme") {
+              if (!usingOpenFreeMap) {
+                // Recolor for the new theme. The layer structure is identical
+                // across themes (only colors change), so `diff: true` lets
+                // MapLibre update paint properties in place — no source re-init,
+                // no blank flash while the pmtiles source reloads.
+                const dark =
+                  document.documentElement.getAttribute("data-theme") === "dark";
+                buildCivicaPmtilesStyle(readCivicaMapPalette(dark), dark)
+                  .then((next) => {
+                    if (!cancelled) map.setStyle(next, { diff: true });
+                  })
+                  .catch(fallbackOrMarkUnavailable);
+              } else {
+                applyPalette();
+              }
+              break;
+            }
+          }
+        });
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["data-theme"],
+        });
+      } catch {
+        // Dynamic imports and WebGL initialization are optional enhancements;
+        // preserve the surrounding country evidence when either is unavailable.
+        if (!cancelled) setUnavailable(true);
+      }
     })();
 
     return () => {
@@ -182,9 +210,18 @@ export function CountryMap({
   return (
     <div
       ref={containerRef}
-      className={`country-map-canvas${className ? ` ${className}` : ""}`}
+      className={`country-map-canvas${className ? ` ${className}` : ""}${
+        unavailable ? " country-map-canvas--unavailable" : ""
+      }`}
       role={interactive ? "application" : "img"}
       aria-label={`Map of ${countryName}`}
-    />
+    >
+      {unavailable ? (
+        <p className="country-map-unavailable" role="status">
+          Map data is temporarily unavailable. Country facts and sources remain
+          available while the map recovers.
+        </p>
+      ) : null}
+    </div>
   );
 }

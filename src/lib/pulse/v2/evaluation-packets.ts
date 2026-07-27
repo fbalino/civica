@@ -15,6 +15,10 @@ import {
 
 export const PULSE_EVALUATION_PACKET_MANIFEST_VERSION =
   "pulse-evaluation-packet-manifest/v1" as const;
+export const PULSE_EVALUATION_PACKET_FROZEN_INPUT_VERSION =
+  "pulse-evaluation-packet-frozen-inputs/v1" as const;
+export const PULSE_EVALUATION_PACKET_LIVE_AUDIT_VERSION =
+  "pulse-evaluation-packet-live-audit/v1" as const;
 
 export type PulseEvaluationPacketFrame =
   | "retained_event_candidate_census"
@@ -80,6 +84,62 @@ export interface PulseEvaluationPacketManifest {
   semanticSha256: string;
 }
 
+export interface PulseEvaluationPacketFrozenInputs {
+  schemaVersion: typeof PULSE_EVALUATION_PACKET_FROZEN_INPUT_VERSION;
+  protocolVersion: typeof PULSE_EVALUATION_SAMPLING_VERSION;
+  populationFreezeAt: string;
+  populationArtifactSha256: string;
+  acceptedEventIdentityHash: string;
+  systemNegativeIdentityHash: string;
+  packetManifestSemanticSha256: string;
+  retainedInputSnapshotAt: string;
+  reconstructionBasis: "append_only_history_unique_manifest_match";
+  rightsPosture: "safe_context_only_no_publisher_payload";
+  counts: {
+    eventCandidates: number;
+    systemNegativePopulation: number;
+  };
+  eventCandidates: PulseEvaluationPacketInput[];
+  systemNegativePopulation: PulseEvaluationPacketInput[];
+  semanticSha256: string;
+}
+
+export interface PulseEvaluationPacketPopulationReference {
+  protocolVersion: string;
+  populationFreezeAt: string;
+  semanticSha256: string;
+  counts: {
+    retainedEventCandidateCensus: number;
+    systemNegativePopulation: number;
+  };
+  identityHashes: {
+    acceptedEvents: string;
+    systemNegatives: string;
+  };
+}
+
+export interface PulseEvaluationPacketInputDifference {
+  frozenCount: number;
+  liveCount: number;
+  frozenPrimaryStratumCounts: Record<string, number>;
+  livePrimaryStratumCounts: Record<string, number>;
+  addedUnitRefs: string[];
+  removedUnitRefs: string[];
+  changedUnitRefs: string[];
+  primaryStratumTransitions: Record<string, number>;
+}
+
+export interface PulseEvaluationPacketLiveAudit {
+  schemaVersion: typeof PULSE_EVALUATION_PACKET_LIVE_AUDIT_VERSION;
+  readOnly: true;
+  checkedManifestSemanticSha256: string;
+  frozenInputSemanticSha256: string;
+  liveManifestSemanticSha256: string | null;
+  liveManifestStatus: "matches" | "differs" | "cannot_rebuild";
+  eventCandidates: PulseEvaluationPacketInputDifference;
+  systemNegativePopulation: PulseEvaluationPacketInputDifference;
+}
+
 const PRODUCTION_OUTPUT_KEYS = new Set([
   "category",
   "dimension",
@@ -92,9 +152,70 @@ const PRODUCTION_OUTPUT_KEYS = new Set([
   "humanReviewed",
   "corroborationConfidence",
 ]);
+const PUBLISHER_PAYLOAD_KEYS = new Set([
+  "title",
+  "body",
+  "raw",
+  "headline",
+  "description",
+  "sourceUrl",
+  "source_url",
+  "publisherPayload",
+]);
 
 function hash(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
+}
+
+function canonicalPacketInput(input: PulseEvaluationPacketInput): PulseEvaluationPacketInput {
+  return {
+    unitRef: input.unitRef,
+    referenceDate: input.referenceDate,
+    primaryStratum: input.primaryStratum,
+    evidence: [...input.evidence].sort((a, b) =>
+      a.evidenceIdentityKey.localeCompare(b.evidenceIdentityKey),
+    ),
+  };
+}
+
+function canonicalPacketInputs(
+  inputs: readonly PulseEvaluationPacketInput[],
+): PulseEvaluationPacketInput[] {
+  return inputs
+    .map(canonicalPacketInput)
+    .sort((a, b) => a.unitRef.localeCompare(b.unitRef));
+}
+
+export function buildPulseEvaluationPacketFrozenInputs(input: {
+  populationArtifactSha256: string;
+  acceptedEventIdentityHash: string;
+  systemNegativeIdentityHash: string;
+  packetManifestSemanticSha256: string;
+  retainedInputSnapshotAt: string;
+  eventCandidates: PulseEvaluationPacketInput[];
+  systemNegativePopulation: PulseEvaluationPacketInput[];
+}): PulseEvaluationPacketFrozenInputs {
+  const eventCandidates = canonicalPacketInputs(input.eventCandidates);
+  const systemNegativePopulation = canonicalPacketInputs(input.systemNegativePopulation);
+  const body = {
+    schemaVersion: PULSE_EVALUATION_PACKET_FROZEN_INPUT_VERSION,
+    protocolVersion: PULSE_EVALUATION_SAMPLING_VERSION,
+    populationFreezeAt: PULSE_EVALUATION_SAMPLING_PROTOCOL.populationFreezeAt,
+    populationArtifactSha256: input.populationArtifactSha256,
+    acceptedEventIdentityHash: input.acceptedEventIdentityHash,
+    systemNegativeIdentityHash: input.systemNegativeIdentityHash,
+    packetManifestSemanticSha256: input.packetManifestSemanticSha256,
+    retainedInputSnapshotAt: input.retainedInputSnapshotAt,
+    reconstructionBasis: "append_only_history_unique_manifest_match" as const,
+    rightsPosture: "safe_context_only_no_publisher_payload" as const,
+    counts: {
+      eventCandidates: eventCandidates.length,
+      systemNegativePopulation: systemNegativePopulation.length,
+    },
+    eventCandidates,
+    systemNegativePopulation,
+  };
+  return { ...body, semanticSha256: hash(body) };
 }
 
 function stableKey(frame: string, unitRef: string): string {
@@ -263,6 +384,250 @@ function hasProductionOutputKey(value: unknown): boolean {
   );
 }
 
+function hasPublisherPayloadKey(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(hasPublisherPayloadKey);
+  if (!value || typeof value !== "object") return false;
+  return Object.entries(value as Record<string, unknown>).some(
+    ([key, child]) => PUBLISHER_PAYLOAD_KEYS.has(key) || hasPublisherPayloadKey(child),
+  );
+}
+
+function packetInputErrors(
+  input: PulseEvaluationPacketInput,
+  context: string,
+): string[] {
+  const errors: string[] = [];
+  if (!input.unitRef) errors.push(`${context}: unit reference is empty`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(input.referenceDate))
+    errors.push(`${context}: reference date is invalid`);
+  if (!input.primaryStratum) errors.push(`${context}: primary stratum is empty`);
+  if (!input.evidence.length) errors.push(`${context}: evidence is empty`);
+  const identities = input.evidence.map(({ evidenceIdentityKey }) => evidenceIdentityKey);
+  if (new Set(identities).size !== identities.length)
+    errors.push(`${context}: evidence identity is duplicated`);
+  if (
+    JSON.stringify(input.evidence) !==
+    JSON.stringify(canonicalPacketInput(input).evidence)
+  )
+    errors.push(`${context}: evidence is not canonically ordered`);
+  for (const evidence of input.evidence) {
+    if (
+      !/^pulse-evidence\/sha256:[a-f0-9]{64}$/.test(evidence.evidenceIdentityKey) ||
+      !/^[a-f0-9]{64}$/.test(evidence.evidenceContentHash) ||
+      !evidence.sourceFamilyId ||
+      !["specialist", "news"].includes(evidence.sourceType) ||
+      !evidence.language ||
+      (evidence.reportedDate !== null &&
+        !/^\d{4}-\d{2}-\d{2}$/.test(evidence.reportedDate)) ||
+      Number.isNaN(Date.parse(evidence.retrievedAt))
+    )
+      errors.push(`${context}: evidence context is invalid`);
+  }
+  return errors;
+}
+
+export function pulseEvaluationPacketFrozenInputErrors(
+  frozen: PulseEvaluationPacketFrozenInputs,
+  population?: PulseEvaluationPacketPopulationReference,
+): string[] {
+  const errors: string[] = [];
+  if (frozen.schemaVersion !== PULSE_EVALUATION_PACKET_FROZEN_INPUT_VERSION)
+    errors.push("wrong frozen-input version");
+  if (frozen.protocolVersion !== PULSE_EVALUATION_SAMPLING_VERSION)
+    errors.push("wrong frozen-input sampling protocol");
+  if (frozen.populationFreezeAt !== PULSE_EVALUATION_SAMPLING_PROTOCOL.populationFreezeAt)
+    errors.push("frozen-input population freeze drifted");
+  if (frozen.reconstructionBasis !== "append_only_history_unique_manifest_match")
+    errors.push("frozen-input reconstruction basis drifted");
+  if (frozen.rightsPosture !== "safe_context_only_no_publisher_payload")
+    errors.push("frozen-input rights posture permits publisher payload");
+  if (
+    Number.isNaN(Date.parse(frozen.retainedInputSnapshotAt)) ||
+    new Date(frozen.retainedInputSnapshotAt).toISOString() !== frozen.retainedInputSnapshotAt
+  )
+    errors.push("frozen-input snapshot timestamp is invalid");
+  if (
+    frozen.counts.eventCandidates !== frozen.eventCandidates.length ||
+    frozen.counts.systemNegativePopulation !== frozen.systemNegativePopulation.length
+  )
+    errors.push("frozen-input counts drifted");
+  if (
+    JSON.stringify(frozen.eventCandidates) !==
+      JSON.stringify(canonicalPacketInputs(frozen.eventCandidates)) ||
+    JSON.stringify(frozen.systemNegativePopulation) !==
+      JSON.stringify(canonicalPacketInputs(frozen.systemNegativePopulation))
+  )
+    errors.push("frozen packet inputs are not canonically ordered");
+  const eventIds = frozen.eventCandidates.map(({ unitRef }) => unitRef);
+  const negativeIds = frozen.systemNegativePopulation.map(({ unitRef }) => unitRef);
+  if (new Set(eventIds).size !== eventIds.length)
+    errors.push("frozen event-candidate identity is duplicated");
+  if (new Set(negativeIds).size !== negativeIds.length)
+    errors.push("frozen system-negative identity is duplicated");
+  if (hash(eventIds) !== frozen.acceptedEventIdentityHash)
+    errors.push("frozen event-candidate identity hash drifted");
+  if (hash(negativeIds.map((unitRef) => `raw:${unitRef}`)) !== frozen.systemNegativeIdentityHash)
+    errors.push("frozen system-negative identity hash drifted");
+  frozen.eventCandidates.forEach((row, index) =>
+    errors.push(...packetInputErrors(row, `eventCandidates[${index}]`)),
+  );
+  frozen.systemNegativePopulation.forEach((row, index) =>
+    errors.push(...packetInputErrors(row, `systemNegativePopulation[${index}]`)),
+  );
+  if (containsPulseCoderForbiddenField(frozen) || hasProductionOutputKey(frozen))
+    errors.push("production, owner, model, review, or answer field leaked into frozen inputs");
+  if (hasPublisherPayloadKey(frozen))
+    errors.push("publisher payload leaked into frozen inputs");
+  if (population) {
+    if (
+      population.protocolVersion !== frozen.protocolVersion ||
+      population.populationFreezeAt !== frozen.populationFreezeAt ||
+      population.semanticSha256 !== frozen.populationArtifactSha256
+    )
+      errors.push("frozen inputs are not linked to the population artifact");
+    if (
+      population.counts.retainedEventCandidateCensus !== frozen.counts.eventCandidates ||
+      population.counts.systemNegativePopulation !== frozen.counts.systemNegativePopulation
+    )
+      errors.push("frozen inputs do not match population counts");
+    if (
+      population.identityHashes.acceptedEvents !== frozen.acceptedEventIdentityHash ||
+      population.identityHashes.systemNegatives !== frozen.systemNegativeIdentityHash
+    )
+      errors.push("frozen inputs do not match population identity hashes");
+  }
+  const body = { ...frozen } as Record<string, unknown>;
+  delete body.semanticSha256;
+  if (frozen.semanticSha256 !== hash(body)) errors.push("frozen-input hash drifted");
+  return errors;
+}
+
+export function buildPulseEvaluationPacketManifestFromFrozenInputs(
+  frozen: PulseEvaluationPacketFrozenInputs,
+): PulseEvaluationPacketManifest {
+  const errors = pulseEvaluationPacketFrozenInputErrors(frozen);
+  if (errors.length)
+    throw new Error(`invalid frozen evaluation-packet inputs: ${errors.join("; ")}`);
+  return buildPulseEvaluationPacketManifest({
+    populationArtifactSha256: frozen.populationArtifactSha256,
+    acceptedEventIdentityHash: frozen.acceptedEventIdentityHash,
+    systemNegativeIdentityHash: frozen.systemNegativeIdentityHash,
+    eventCandidates: frozen.eventCandidates,
+    systemNegativePopulation: frozen.systemNegativePopulation,
+  });
+}
+
+export function pulseEvaluationPacketReleaseErrors(input: {
+  frozenInputs: PulseEvaluationPacketFrozenInputs;
+  manifest: PulseEvaluationPacketManifest;
+  population?: PulseEvaluationPacketPopulationReference;
+}): string[] {
+  const errors = [
+    ...pulseEvaluationPacketFrozenInputErrors(input.frozenInputs, input.population),
+    ...pulseEvaluationPacketManifestErrors(input.manifest),
+  ];
+  if (
+    input.manifest.populationArtifactSha256 !== input.frozenInputs.populationArtifactSha256 ||
+    input.manifest.populationFreezeAt !== input.frozenInputs.populationFreezeAt
+  )
+    errors.push("packet manifest is not linked to the frozen inputs");
+  if (
+    input.manifest.semanticSha256 !==
+    input.frozenInputs.packetManifestSemanticSha256
+  )
+    errors.push("packet manifest does not match the frozen-input release pin");
+  if (!errors.length) {
+    const rebuilt = buildPulseEvaluationPacketManifestFromFrozenInputs(input.frozenInputs);
+    if (JSON.stringify(rebuilt) !== JSON.stringify(input.manifest))
+      errors.push("packet manifest does not reproduce from retained frozen inputs");
+  }
+  return errors;
+}
+
+function inputDifference(
+  frozenRows: readonly PulseEvaluationPacketInput[],
+  liveRows: readonly PulseEvaluationPacketInput[],
+): PulseEvaluationPacketInputDifference {
+  const frozen = new Map(
+    canonicalPacketInputs(frozenRows).map((row) => [row.unitRef, row]),
+  );
+  const live = new Map(canonicalPacketInputs(liveRows).map((row) => [row.unitRef, row]));
+  const addedUnitRefs = [...live.keys()].filter((unitRef) => !frozen.has(unitRef)).sort();
+  const removedUnitRefs = [...frozen.keys()].filter((unitRef) => !live.has(unitRef)).sort();
+  const changedUnitRefs: string[] = [];
+  const primaryStratumTransitions: Record<string, number> = {};
+  const stratumCounts = (rows: Iterable<PulseEvaluationPacketInput>) => {
+    const counts: Record<string, number> = {};
+    for (const row of rows)
+      counts[row.primaryStratum] = (counts[row.primaryStratum] ?? 0) + 1;
+    return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a.localeCompare(b)));
+  };
+  for (const [unitRef, frozenRow] of frozen) {
+    const liveRow = live.get(unitRef);
+    if (!liveRow || JSON.stringify(frozenRow) === JSON.stringify(liveRow)) continue;
+    changedUnitRefs.push(unitRef);
+    if (frozenRow.primaryStratum !== liveRow.primaryStratum) {
+      const transition = `${frozenRow.primaryStratum}->${liveRow.primaryStratum}`;
+      primaryStratumTransitions[transition] =
+        (primaryStratumTransitions[transition] ?? 0) + 1;
+    }
+  }
+  return {
+    frozenCount: frozen.size,
+    liveCount: live.size,
+    frozenPrimaryStratumCounts: stratumCounts(frozen.values()),
+    livePrimaryStratumCounts: stratumCounts(live.values()),
+    addedUnitRefs,
+    removedUnitRefs,
+    changedUnitRefs: changedUnitRefs.sort(),
+    primaryStratumTransitions: Object.fromEntries(
+      Object.entries(primaryStratumTransitions).sort(([a], [b]) => a.localeCompare(b)),
+    ),
+  };
+}
+
+export function auditPulseEvaluationPacketLiveDifferences(input: {
+  frozenInputs: PulseEvaluationPacketFrozenInputs;
+  checkedManifest: PulseEvaluationPacketManifest;
+  liveEventCandidates: PulseEvaluationPacketInput[];
+  liveSystemNegativePopulation: PulseEvaluationPacketInput[];
+}): PulseEvaluationPacketLiveAudit {
+  let liveManifestSemanticSha256: string | null = null;
+  let liveManifestStatus: PulseEvaluationPacketLiveAudit["liveManifestStatus"] =
+    "cannot_rebuild";
+  try {
+    const live = buildPulseEvaluationPacketManifest({
+      populationArtifactSha256: input.frozenInputs.populationArtifactSha256,
+      acceptedEventIdentityHash: input.frozenInputs.acceptedEventIdentityHash,
+      systemNegativeIdentityHash: input.frozenInputs.systemNegativeIdentityHash,
+      eventCandidates: input.liveEventCandidates,
+      systemNegativePopulation: input.liveSystemNegativePopulation,
+    });
+    liveManifestSemanticSha256 = live.semanticSha256;
+    liveManifestStatus =
+      live.semanticSha256 === input.checkedManifest.semanticSha256 ? "matches" : "differs";
+  } catch {
+    // A changed live identity frame is itself a reportable difference. The
+    // frozen release validator never consumes this mutable comparison.
+  }
+  return {
+    schemaVersion: PULSE_EVALUATION_PACKET_LIVE_AUDIT_VERSION,
+    readOnly: true,
+    checkedManifestSemanticSha256: input.checkedManifest.semanticSha256,
+    frozenInputSemanticSha256: input.frozenInputs.semanticSha256,
+    liveManifestSemanticSha256,
+    liveManifestStatus,
+    eventCandidates: inputDifference(
+      input.frozenInputs.eventCandidates,
+      input.liveEventCandidates,
+    ),
+    systemNegativePopulation: inputDifference(
+      input.frozenInputs.systemNegativePopulation,
+      input.liveSystemNegativePopulation,
+    ),
+  };
+}
+
 export function pulseEvaluationPacketManifestErrors(
   manifest: PulseEvaluationPacketManifest,
 ): string[] {
@@ -365,6 +730,7 @@ export function pulseEvaluationPacketManifestErrors(
   }
   if (containsPulseCoderForbiddenField(manifest) || hasProductionOutputKey(manifest))
     errors.push("production, owner, model, review, or answer field leaked");
+  if (hasPublisherPayloadKey(manifest)) errors.push("publisher payload leaked");
   const body = { ...manifest } as Record<string, unknown>;
   delete body.semanticSha256;
   if (manifest.semanticSha256 !== hash(body)) errors.push("manifest hash drifted");

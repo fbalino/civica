@@ -11,7 +11,7 @@ import {
 } from "../source-input-manifest";
 
 test("all deployed pipelines and sources form a closed manifest contract", () => {
-  assert.equal(productionPipelineContracts().length, 47);
+  assert.equal(productionPipelineContracts().length, 50);
   assert.equal(SOURCE_INPUT_SPECS.length, 44);
   assert.deepEqual(validateSourceInputContract(), []);
 });

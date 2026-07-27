@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { resolve } from "node:path";
-import { MANUAL_PRODUCTION_ADAPTERS } from "../production-adapter-registry";
+import {
+  CONDITIONS_PRODUCTION_COMMAND,
+  MANUAL_PRODUCTION_ADAPTERS,
+} from "../production-adapter-registry";
 
 const root = process.cwd();
 
@@ -23,21 +26,66 @@ test("every manual production script exposes an explicit dry-run path", () => {
   assert.deepEqual(missing, []);
 });
 
+test("Conditions observability binds only the unified canonical orchestrator", () => {
+  const adapter = MANUAL_PRODUCTION_ADAPTERS.find(
+    (candidate) => candidate.id === "conditions.current-beta",
+  );
+  assert.ok(adapter);
+  assert.equal(adapter.entrypoint, "scripts/ingest-conditions-all.ts");
+  assert.deepEqual(adapter.implementationPaths, [
+    "scripts/ingest-conditions-all.ts",
+    "src/lib/conditions/production-workflow.ts",
+    "src/lib/conditions/ingest.ts",
+  ]);
+  const packageJson = JSON.parse(
+    readFileSync(resolve(root, "package.json"), "utf8"),
+  ) as { scripts: Record<string, string> };
+  assert.equal(
+    packageJson.scripts[adapter.canonicalNpmScript],
+    CONDITIONS_PRODUCTION_COMMAND,
+  );
+  for (const legacy of [
+    "scripts/ingest-conditions-hdi.ts",
+    "scripts/ingest-conditions-gpi.ts",
+    "scripts/ingest-conditions-economic.ts",
+  ]) {
+    assert.ok(!adapter.implementationPaths.includes(legacy));
+    assert.ok(!CONDITIONS_PRODUCTION_COMMAND.includes(legacy));
+  }
+});
+
 test("direct-write manual scripts retain retry-safe identity guards", () => {
   const contracts: Record<string, RegExp[]> = {
     "scripts/seed-from-factbook.ts": [/writeAtlasCountry/, /DRY_RUN/],
     "scripts/sync-elections-ipu.ts": [
       /writeElection/,
-      /existingEstStmt/,
+      /upsertEstimatedElectionWithHistory/,
+      /deleteEstimatedElectionWithHistory/,
+      /resolveAtlasReleaseId/,
       /DRY_RUN/,
     ],
-    "scripts/sync-elections-turnout-idea.ts": [/existingStmt/, /DRY_RUN/],
-    "scripts/sync-elections-wikidata.ts": [/writeElection/, /DRY_RUN/],
+    "scripts/sync-elections-turnout-idea.ts": [
+      /updateElectionTurnoutWithHistory/,
+      /resolveAtlasReleaseId/,
+      /DRY_RUN/,
+    ],
+    "scripts/sync-elections-wikidata.ts": [
+      /writeElection/,
+      /resolveAtlasReleaseId/,
+      /DRY_RUN/,
+    ],
+    "scripts/sync-wikidata-parties.ts": [
+      /writeLegislatureComposition/,
+      /dryRun: DRY_RUN/,
+      /DRY_RUN/,
+    ],
     "scripts/ingest-vparty-positions.ts": [/writePartyPositions/, /DRY_RUN/],
     "scripts/ingest-indicator-history.ts": [/writeIndicatorHistory/, /dryRun/],
     "scripts/sync-organization-memberships.ts": [
       /neonSql\.transaction/,
-      /sourceFreshnessTransactionQuery/,
+      /markSourcesSyncedTransactionQuery/,
+      /atlas_entity_change_history/,
+      /resolveAtlasReleaseId/,
       /DRY_RUN/,
     ],
   };

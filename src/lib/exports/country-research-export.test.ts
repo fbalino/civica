@@ -69,7 +69,17 @@ const blockedRights = (sourceId: string): SourceRightsRecord => ({
 
 function fixture() {
   const canonical = row("fr-wb", "world_bank", 68_170_000);
-  const alternate = row("fr-wd", "wikidata", 68_100_000);
+  const alternate = row("fr-wd", "wikidata", 68_100_000, {
+    asOf: null,
+    valueJson: {
+      publisherDate: {
+        precision: "month",
+        year: 2025,
+        month: 4,
+        day: null,
+      },
+    },
+  });
   const projection = row("fr-cia-proj", "cia_factbook", 68_521_974, {
     valueType: "projected",
     factYear: 2025,
@@ -87,19 +97,32 @@ function fixture() {
     all: [canonical, alternate, projection, rejected, restricted],
     isDisputed: true,
     decisionReason: "fresher_winner",
-    decisionTrace: [{
-      code: "canonical_selection",
-      outcome: "selected",
-      detail: "World Bank selected for the France population fixture.",
-      sourceIds: ["world_bank"],
-    }],
+    decisionTrace: [
+      {
+        code: "canonical_selection",
+        outcome: "selected",
+        detail: "World Bank selected for the France population fixture.",
+        sourceIds: ["world_bank"],
+      },
+    ],
     proposedDisputes: [],
     canonicalIsProjection: false,
   };
   const sourceIds = ["world_bank", "wikidata", "cia_factbook", "ipu_parline"];
   return buildCountryResearchExport({
     generatedAt: "2026-07-11T00:00:00.000Z",
-    selection: { mode: "live", asOf: "live", vintage: null, cutoffAt: null, retrievedThrough: "2026-07-11T00:00:00.000Z", methodologyVersions: ["v0.2-beta"], candidateSetStatus: "live", candidateSetChecksum: null, winnerSetChecksum: null, resolverVersionHash: null },
+    selection: {
+      mode: "live",
+      asOf: "live",
+      vintage: null,
+      cutoffAt: null,
+      retrievedThrough: "2026-07-11T00:00:00.000Z",
+      methodologyVersions: ["v0.2-beta"],
+      candidateSetStatus: "live",
+      candidateSetChecksum: null,
+      winnerSetChecksum: null,
+      resolverVersionHash: null,
+    },
     jurisdiction: {
       id: "france-id",
       slug: "france",
@@ -116,20 +139,27 @@ function fixture() {
         administeringJurisdictionIso3: null,
         disputed: false,
         includeInSovereignStateCounts: true,
-        sources: [{
-          id: "un_member_states",
-          label: "United Nations Member States",
-          url: "https://www.un.org/en/about-us/member-states",
-        }],
+        sources: [
+          {
+            id: "un_member_states",
+            label: "United Nations Member States",
+            url: "https://www.un.org/en/about-us/member-states",
+          },
+        ],
       },
     },
     resolutions: { population_total: resolution },
-    sources: new Map(sourceIds.map((id) => [id, {
-      id,
-      name: id,
-      baseUrl: `https://example.test/${id}`,
-      lastSyncAt: "2026-07-01T00:00:00.000Z",
-    }])),
+    sources: new Map(
+      sourceIds.map((id) => [
+        id,
+        {
+          id,
+          name: id,
+          baseUrl: `https://example.test/${id}`,
+          lastSyncAt: "2026-07-01T00:00:00.000Z",
+        },
+      ]),
+    ),
     rights: new Map([
       ["world_bank", allowedRights("world_bank")],
       ["wikidata", allowedRights("wikidata")],
@@ -147,11 +177,17 @@ function parseCsv(text: string): string[][] {
   for (let index = 0; index < text.length; index += 1) {
     const char = text[index];
     if (quoted && char === '"' && text[index + 1] === '"') {
-      field += '"'; index += 1;
+      field += '"';
+      index += 1;
     } else if (char === '"') quoted = !quoted;
-    else if (char === "," && !quoted) { record.push(field); field = ""; }
-    else if (char === "\n" && !quoted) {
-      record.push(field); records.push(record); record = []; field = "";
+    else if (char === "," && !quoted) {
+      record.push(field);
+      field = "";
+    } else if (char === "\n" && !quoted) {
+      record.push(field);
+      records.push(record);
+      record = [];
+      field = "";
     } else field += char;
   }
   return records;
@@ -162,9 +198,18 @@ test("France population exports one canonical plus separately typed evidence", (
   assert.equal(document.facts.length, 1);
   const population = document.facts[0];
   assert.equal(population.canonical.rowId, "fr-wb");
-  assert.deepEqual(population.alternates.map((item) => item.rowId), ["fr-wd"]);
-  assert.deepEqual(population.projections.map((item) => item.rowId), ["fr-cia-proj"]);
-  assert.deepEqual(population.rejected.map((item) => item.rowId), ["fr-wb-rejected"]);
+  assert.deepEqual(
+    population.alternates.map((item) => item.rowId),
+    ["fr-wd"],
+  );
+  assert.deepEqual(
+    population.projections.map((item) => item.rowId),
+    ["fr-cia-proj"],
+  );
+  assert.deepEqual(
+    population.rejected.map((item) => item.rowId),
+    ["fr-wb-rejected"],
+  );
   assert.equal(population.canonical.dispute.openOrInReview, true);
   assert.equal(population.canonical.source.license, "CC-BY-4.0");
   assert.equal(document.withheld.observationCount, 1);
@@ -182,7 +227,8 @@ test("France population JSON and CSV preserve the same observation semantics", (
   }));
   const csv = parseCsv(countryResearchExportCsv(document));
   const header = csv[0];
-  const value = (record: string[], column: string) => record[header.indexOf(column)];
+  const value = (record: string[], column: string) =>
+    record[header.indexOf(column)];
   const csvRows = csv.slice(1).map((record) => ({
     rowId: value(record, "row_id"),
     recordClass: value(record, "record_class"),
@@ -193,9 +239,36 @@ test("France population JSON and CSV preserve the same observation semantics", (
   assert.deepEqual(csvRows, jsonRows);
 });
 
+test("country JSON and CSV expose publisher date precision without a fake day", () => {
+  const document = fixture();
+  const alternate = document.facts[0].alternates[0];
+  const records = parseCsv(countryResearchExportCsv(document));
+  const header = records[0];
+  const alternateRecord = records.find(
+    (record) => record[header.indexOf("row_id")] === alternate.rowId,
+  );
+  assert.ok(alternateRecord);
+  assert.equal(alternate.freshness.asOf, null);
+  assert.deepEqual(
+    JSON.parse(alternateRecord[header.indexOf("publisher_date_json")]),
+    alternate.freshness.publisherDate,
+  );
+  assert.equal(alternateRecord[header.indexOf("as_of")], "");
+});
+
+test("country CSV preserves a genuine negative numeric value as numeric", () => {
+  const document = fixture();
+  document.facts[0].canonical.value.numeric = -12.5;
+  const csvText = countryResearchExportCsv(document);
+  const records = parseCsv(csvText);
+  const header = records[0];
+  const numeric = records[1][header.indexOf("value_numeric")];
+  assert.equal(numeric, "-12.5");
+  assert.equal(csvText.includes("'-12.5"), false);
+});
+
 test("a restricted canonical withholds the fact instead of relabeling an alternate", () => {
   const document = fixture();
-  const population = document.facts[0];
   const restrictedCanonical: ResolverOutput = {
     ...({} as ResolverOutput),
     jurisdictionId: "france-id",
@@ -218,7 +291,15 @@ test("a restricted canonical withholds the fact instead of relabeling an alterna
     jurisdiction: document.jurisdiction,
     resolutions: { population_total: restrictedCanonical },
     sources: new Map([
-      ["ipu_parline", { id: "ipu_parline", name: "IPU", baseUrl: "https://ipu.org", lastSyncAt: null }],
+      [
+        "ipu_parline",
+        {
+          id: "ipu_parline",
+          name: "IPU",
+          baseUrl: "https://ipu.org",
+          lastSyncAt: null,
+        },
+      ],
     ]),
     rights: new Map([["ipu_parline", blockedRights("ipu_parline")]]),
   });

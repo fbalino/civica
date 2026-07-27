@@ -9,7 +9,7 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { civicaIndex, replicationPackage } from "@/lib/content/site-state";
 import type { ReplicationComponentStatus } from "@/lib/content/site-state";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Civica Index Replication Status",

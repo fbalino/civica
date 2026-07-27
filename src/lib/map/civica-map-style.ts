@@ -19,10 +19,9 @@
  * Palette is READ FROM THE LIVE CSS CUSTOM PROPERTIES (`--color-bg`,
  * `--color-text-primary`, `--color-divider`, `--color-accent`, …) at build/recolor
  * time, so the map automatically matches the site's current light/dark theme and
- * any future palette change — no hardcoded brand hexes here. The only literal
- * colors are the three cartographic tints (water / park / building) that have no
- * exact design token; those are the sanctioned map-data exception (like
- * `DesignSystemSwatch`), kept here in one place and theme-aware.
+ * any future palette change. The only non-token values are the cartographic
+ * fallback palette in `civica-map-fallback-palette.json`; it is structured map
+ * data for stylesheet-unavailable states, not component or page styling.
  *
  * See plan/self-hosted-tiles-v1.md for the tile build, hosting, and cost design.
  */
@@ -31,6 +30,7 @@ import type {
   StyleSpecification,
 } from "maplibre-gl";
 import type { Flavor } from "@protomaps/basemaps";
+import FALLBACK_PALETTE from "./civica-map-fallback-palette.json";
 
 /** Free, keyless OpenMapTiles vector base. Fallback tile source. */
 export const CIVICA_MAP_BASE_STYLE =
@@ -89,6 +89,11 @@ function readVar(root: HTMLElement, name: string, fallback: string): string {
   return v || fallback;
 }
 
+/** The stable cartographic fallback used only when document tokens are absent. */
+export function fallbackCivicaMapPalette(isDark: boolean): CivicaMapPalette {
+  return isDark ? FALLBACK_PALETTE.dark : FALLBACK_PALETTE.light;
+}
+
 /**
  * Read the current Civica palette from the document's CSS custom properties.
  * Call at recolor time (and whenever `data-theme` flips) so the map tracks the
@@ -98,16 +103,16 @@ export function readCivicaMapPalette(
   isDark = document.documentElement.getAttribute("data-theme") === "dark",
 ): CivicaMapPalette {
   const root = document.documentElement;
+  const fallback = fallbackCivicaMapPalette(isDark);
   return {
-    paper: readVar(root, "--color-bg", isDark ? "#16140f" : "#FAF7F2"),
-    ink: readVar(root, "--color-text-primary", isDark ? "#ebe6d6" : "#0B1B2D"),
-    muted: readVar(root, "--color-text-40", isDark ? "#8a8370" : "#6A7688"),
-    rule: readVar(root, "--color-divider", isDark ? "#3d382d" : "#E4E1DC"),
-    accent: readVar(root, "--color-accent", isDark ? "#d98a63" : "#B7512B"),
-    // Cartographic tints (no exact token): warm-dark vs soft-light.
-    water: isDark ? "#1a2028" : "#C4D2D0",
-    green: isDark ? "#1a1c12" : "#E1E4D6",
-    building: isDark ? "#211d14" : "#ECE5DA",
+    paper: readVar(root, "--color-bg", fallback.paper),
+    ink: readVar(root, "--color-text-primary", fallback.ink),
+    muted: readVar(root, "--color-text-40", fallback.muted),
+    rule: readVar(root, "--color-divider", fallback.rule),
+    accent: readVar(root, "--color-accent", fallback.accent),
+    water: fallback.water,
+    green: fallback.green,
+    building: fallback.building,
   };
 }
 

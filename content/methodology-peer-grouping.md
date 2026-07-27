@@ -90,6 +90,11 @@ The governance fallback is flatter on purpose. RoW only has four tiers, so once 
 
 When the fallback fires, the panel displays a small note such as "n=4 in region+income; using region only (n=21)." Readers should always be able to see when a substitution has happened.
 
+The eligible universe is also declared per measure: only sovereign jurisdictions
+with an observed value in the selected metric/release enter the cohort. If the
+subject has no observed value, Civica shows no peer cohort rather than borrowing
+the classification universe or imputing a comparison.
+
 ## Coverage limitations — non-sovereign and ambiguous jurisdictions {#coverage-limitations}
 
 Some jurisdictions lack World Bank or V-Dem coverage entirely. Civica documents the per-jurisdiction fallback explicitly rather than silently mapping these to the closest peer:

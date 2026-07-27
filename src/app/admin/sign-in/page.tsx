@@ -7,6 +7,8 @@ import { getAdminSession } from "@/lib/admin/session";
 import { isGoogleSignInConfigured } from "@/lib/admin/google-oauth";
 import "@/app/admin.css";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Admin sign-in",
   robots: { index: false, follow: false },
@@ -38,15 +40,15 @@ interface PageProps {
  */
 export default async function AdminSignInPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const session = await getAdminSession();
-  if (session) redirect(params.redirect ?? "/admin/pulse-review");
-
-  const error = params.error === "1";
-  const googleError = params.error === "google";
   const redirectAfter = safeInternalPathOr(
     params.redirect,
     "/admin/pulse-review",
   );
+  const session = await getAdminSession();
+  if (session) redirect(redirectAfter);
+
+  const error = params.error === "1";
+  const googleError = params.error === "google";
   const googleConfigured = isGoogleSignInConfigured();
 
   return (
@@ -73,8 +75,8 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
         {error ? (
           <div role="alert" id="signin-error" tabIndex={-1} autoFocus>
             <Banner variant="danger" className="admin-signin-error">
-              That username or password did not match. Check your credentials and
-              try again.
+              That username or password did not match. Check your credentials
+              and try again.
             </Banner>
           </div>
         ) : null}

@@ -41,6 +41,7 @@ import {
 import { Chip } from "@/components/editorial/Pill";
 import { Button } from "@/components/editorial/Button";
 import { CountryFlag } from "@/components/CountryFlag";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
 import { ideologyLabelForEconLR } from "@/lib/parties/ideology-labels";
@@ -184,7 +185,7 @@ export function PartyExplorer({
     null | "region" | "country" | "coalition"
   >(null);
   // Table pagination — keeps the initial DOM small (default page below).
-  const [showAll, setShowAll] = useState<boolean>(false);
+  const [showAllFilterKey, setShowAllFilterKey] = useState<string | null>(null);
 
   const menusRef = useRef<HTMLDivElement>(null);
 
@@ -244,11 +245,10 @@ export function PartyExplorer({
     });
   }, [parties, region, countrySlug, coalition, onlyWithIdeology]);
 
-  // Reset to the first page whenever the filter set changes, so a narrowed view
-  // never opens already-expanded to thousands of rows.
-  useEffect(() => {
-    setShowAll(false);
-  }, [region, countrySlug, coalition, onlyWithIdeology]);
+  // An expanded table applies only to the exact filter set that requested it,
+  // so narrowing results never opens already-expanded to thousands of rows.
+  const filterKey = `${region}|${countrySlug}|${coalition}|${onlyWithIdeology}`;
+  const showAll = showAllFilterKey === filterKey;
 
   // Rows fed to the table. The compass always uses the FULL `filtered` set; the
   // table body is capped to PAGE_SIZE (seat-ranked, matching the default sort)
@@ -280,6 +280,8 @@ export function PartyExplorer({
   );
 
   const plottedCount = compassParties.length;
+  const ideologySource = filtered.find((party) => party.position)?.position
+    ?.source;
   const seatCoveragePct =
     coverage.totalSeats > 0
       ? Math.round((coverage.seatsWithPosition / coverage.totalSeats) * 100)
@@ -351,6 +353,22 @@ export function PartyExplorer({
         render: (p) => <IdeologyCell party={p} />,
       },
       {
+        id: "economic_lr",
+        label: "Economic L–R",
+        numeric: true,
+        sortValue: (p) => p.position?.economicLR ?? null,
+        render: (p) =>
+          p.position ? p.position.economicLR.toFixed(2) : "Not recorded",
+      },
+      {
+        id: "anti_pluralism",
+        label: "Anti-pluralism",
+        numeric: true,
+        sortValue: (p) => p.position?.antiPlural ?? null,
+        render: (p) =>
+          p.position ? p.position.antiPlural.toFixed(2) : "Not recorded",
+      },
+      {
         id: "provenance",
         label: "Source",
         render: (p) => (
@@ -378,6 +396,23 @@ export function PartyExplorer({
           never fabricated. Dot size reflects each party&rsquo;s share of its
           chamber.
         </p>
+        <ResearchVisualizationDisclosure
+          title="Party ideology compass"
+          description="The sortable Party table below is the full nonvisual equivalent: it carries every party's recorded economic left-right and anti-pluralism values alongside chamber-seat context."
+          sources={[
+            {
+              id: ideologySource?.id ?? "vparty",
+              label: ideologySource ? sourceLabel(ideologySource.id) : "V-Party",
+              retrievedAt: ideologySource?.retrievedAt ?? null,
+            },
+          ]}
+          missingData="Parties without a displayable V-Party position remain in the table as not recorded and are not assigned a placeholder point."
+          dataAccess={{
+            kind: "withheld",
+            reason:
+              "Party-position observation downloads are unavailable until the source-specific redistribution terms are verified.",
+          }}
+        />
       </div>
 
       {/* Filters */}
@@ -464,7 +499,7 @@ export function PartyExplorer({
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setShowAll(true)}
+                onClick={() => setShowAllFilterKey(filterKey)}
               >
                 Show all {filtered.length.toLocaleString()} parties
               </Button>

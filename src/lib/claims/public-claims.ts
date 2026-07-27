@@ -586,19 +586,19 @@ export const PUBLIC_CLAIMS = [
     surface: "licensing",
     routeOrArtifact: "/licensing#code",
     exactClaim:
-      "The Civica source code is publicly viewable, but no root LICENSE file is published and no open-source reuse license is currently granted.",
+      "The Civica source code is publicly viewable, but its root LICENSE records a non-open, all-rights-reserved posture and grants no open-source or general code-reuse permission.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/lib/claims/reuse-rights.ts",
       "src/app/licensing/page.tsx",
     ],
     implementationOwner: "Licensing and data governance",
-    methodologyVersion: "interim-rights-registry-v1",
+    methodologyVersion: "code-rights-non-open-v1",
     gate: "G2",
     source: {
       path: "src/lib/claims/reuse-rights.ts",
       fragment:
-        "No root LICENSE file is published, so no open-source reuse license (MIT or otherwise) is currently granted for the code.",
+        "Its root LICENSE records a non-open, all-rights-reserved posture",
       mirrors: ["src/app/licensing/page.tsx"],
     },
   },

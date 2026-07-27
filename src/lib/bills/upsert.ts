@@ -1,11 +1,12 @@
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { bills } from "@/lib/db/schema";
-import { markSourcesSynced } from "@/lib/db/source-freshness";
+import { markSourcesSyncedFromInsertedRowsCte } from "@/lib/db/source-freshness";
 import type * as schema from "@/lib/db/schema";
 import type { BillIngest } from "./types";
 
 type Db = NeonHttpDatabase<typeof schema>;
+type AtomicExecutor = Pick<Db, "execute">;
 
 export interface UpsertResult {
   inserted: number;
@@ -20,8 +21,33 @@ export interface UpsertResult {
 export interface UpsertBillsOptions {
   dryRun?: boolean;
   now?: Date;
-  stampSources?: typeof markSourcesSynced;
+  /** Deterministic failure/retry seam. Production callers omit this. */
+  atomicWrite?: AtomicBillWriter;
+  /** Deterministic planning-read seam. Production callers omit this. */
+  readExisting?: (
+    db: Pick<Db, "select">,
+    row: BillIngest,
+  ) => Promise<typeof bills.$inferSelect | null>;
 }
+
+export interface PlannedBillWrite {
+  ordinal: number;
+  operation: "insert" | "update";
+  existingId: string | null;
+  row: BillIngest;
+}
+
+export interface AtomicBillWriteResult {
+  inserted: number;
+  updated: number;
+  sourcesStamped: string[];
+}
+
+export type AtomicBillWriter = (
+  db: AtomicExecutor,
+  writes: readonly PlannedBillWrite[],
+  committedAt: Date,
+) => Promise<AtomicBillWriteResult>;
 
 export function billIngestErrors(row: BillIngest): string[] {
   const errors: string[] = [];
@@ -29,9 +55,12 @@ export function billIngestErrors(row: BillIngest): string[] {
   if (!row.sourceId.trim()) errors.push("sourceId is required");
   if (!row.externalId.trim()) errors.push("externalId is required");
   if (!row.title.trim()) errors.push("title is required");
-  if (!Number.isSafeInteger(row.stage) || row.stage < 0 || row.stage > 4) errors.push("stage must be an integer from 0 to 4");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(row.lastActionDate)) errors.push("lastActionDate must use YYYY-MM-DD");
-  if (row.introducedDate && !/^\d{4}-\d{2}-\d{2}$/.test(row.introducedDate)) errors.push("introducedDate must use YYYY-MM-DD");
+  if (!Number.isSafeInteger(row.stage) || row.stage < 0 || row.stage > 4)
+    errors.push("stage must be an integer from 0 to 4");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(row.lastActionDate))
+    errors.push("lastActionDate must use YYYY-MM-DD");
+  if (row.introducedDate && !/^\d{4}-\d{2}-\d{2}$/.test(row.introducedDate))
+    errors.push("introducedDate must use YYYY-MM-DD");
   try {
     const url = new URL(row.url);
     if (url.protocol !== "https:") errors.push("url must use HTTPS");
@@ -42,16 +71,11 @@ export function billIngestErrors(row: BillIngest): string[] {
 }
 
 /**
- * Idempotent insert into the `bills` table, keyed by `(sourceId,
- * externalId)`. After a successful pass, stamps `sources.lastSyncAt =
- * NOW()` for every distinct source represented in `rows` — this is
- * the convention required by AGENTS.md and was previously unused
- * across the codebase.
- *
- * Drizzle's `onConflictDoUpdate` returns the row regardless of
- * whether it inserted or updated, so we count manually using
- * `xmax = 0` (Postgres-specific: 0 means the tuple was just
- * inserted).
+ * Plan idempotent changes using the job-lease-serialized snapshot, then commit
+ * every bill write and eligible source-freshness stamp in one PostgreSQL
+ * statement. A uniqueness race, missing planned update, or final freshness
+ * failure aborts the whole statement, so retrying the same input can never get
+ * stranded behind already-committed bill rows and an unstamped source.
  */
 export async function upsertBills(
   db: Db,
@@ -59,107 +83,282 @@ export async function upsertBills(
   options: UpsertBillsOptions = {},
 ): Promise<UpsertResult> {
   if (rows.length === 0) {
-    return { inserted: 0, updated: 0, unchanged: 0, wouldWrite: 0, dryRun: options.dryRun ?? false, sourcesStamped: [] };
+    return {
+      inserted: 0,
+      updated: 0,
+      unchanged: 0,
+      wouldWrite: 0,
+      dryRun: options.dryRun ?? false,
+      sourcesStamped: [],
+    };
   }
 
   const keys = new Set<string>();
   for (const [index, row] of rows.entries()) {
     const errors = billIngestErrors(row);
-    if (errors.length) throw new Error(`Invalid bill at index ${index}: ${errors.join("; ")}`);
+    if (errors.length)
+      throw new Error(`Invalid bill at index ${index}: ${errors.join("; ")}`);
     const key = `${row.sourceId}::${row.externalId}`;
     if (keys.has(key)) throw new Error(`Duplicate bill input key: ${key}`);
     keys.add(key);
   }
 
   if (options.dryRun) {
-    return { inserted: 0, updated: 0, unchanged: 0, wouldWrite: rows.length, dryRun: true, sourcesStamped: [] };
+    return {
+      inserted: 0,
+      updated: 0,
+      unchanged: 0,
+      wouldWrite: rows.length,
+      dryRun: true,
+      sourcesStamped: [],
+    };
   }
 
-  let inserted = 0;
-  let updated = 0;
   let unchanged = 0;
+  const plannedWrites: PlannedBillWrite[] = [];
 
-  // Drizzle on Neon HTTP doesn't reliably surface (xmax = 0). Do
-  // per-row upserts and detect insert-vs-update by checking the
-  // existing row first. Cheap on the Neon HTTP driver because each
-  // call is a single round-trip.
+  // Classify rows with read-only lookups. No mutation happens until the
+  // complete plan crosses the one-statement atomic boundary below.
   for (const row of rows) {
-    const existing = await db
-      .select()
-      .from(bills)
-      .where(
-        sql`${bills.sourceId} = ${row.sourceId} AND ${bills.externalId} = ${row.externalId}`,
-      )
-      .limit(1);
+    const existingRow = options.readExisting
+      ? await options.readExisting(db, row)
+      : (
+          await db
+            .select()
+            .from(bills)
+            .where(
+              sql`${bills.sourceId} = ${row.sourceId} AND ${bills.externalId} = ${row.externalId}`,
+            )
+            .limit(1)
+        )[0];
 
-    if (existing[0]) {
-      if (billMatches(existing[0], row)) {
+    if (existingRow) {
+      if (billMatches(existingRow, row)) {
         unchanged++;
         continue;
       }
-      await db
-        .update(bills)
-        .set({
-          jurisdictionId: row.jurisdictionId,
-          bodyId: row.bodyId,
-          title: row.title,
-          longTitle: row.longTitle,
-          summary: row.summary,
-          stage: row.stage,
-          rawStatus: row.rawStatus,
-          introducedDate: row.introducedDate,
-          lastActionDate: row.lastActionDate,
-          lastActionText: row.lastActionText,
-          sponsorName: row.sponsorName,
-          sponsorParty: row.sponsorParty,
-          url: row.url,
-          textUrl: row.textUrl,
-          voteYes: row.voteYes,
-          voteNo: row.voteNo,
-          voteAbstain: row.voteAbstain,
-          raw: row.raw,
-          updatedAt: options.now ?? new Date(),
-        })
-        .where(eq(bills.id, existing[0].id));
-      updated++;
-    } else {
-      await db.insert(bills).values({
-        jurisdictionId: row.jurisdictionId,
-        bodyId: row.bodyId,
-        sourceId: row.sourceId,
-        externalId: row.externalId,
-        title: row.title,
-        longTitle: row.longTitle,
-        summary: row.summary,
-        stage: row.stage,
-        rawStatus: row.rawStatus,
-        introducedDate: row.introducedDate,
-        lastActionDate: row.lastActionDate,
-        lastActionText: row.lastActionText,
-        sponsorName: row.sponsorName,
-        sponsorParty: row.sponsorParty,
-        url: row.url,
-        textUrl: row.textUrl,
-        voteYes: row.voteYes,
-        voteNo: row.voteNo,
-        voteAbstain: row.voteAbstain,
-        raw: row.raw,
+      plannedWrites.push({
+        ordinal: plannedWrites.length,
+        operation: "update",
+        existingId: existingRow.id,
+        row,
       });
-      inserted++;
+    } else {
+      plannedWrites.push({
+        ordinal: plannedWrites.length,
+        operation: "insert",
+        existingId: null,
+        row,
+      });
     }
   }
 
-  // Stamp lastSyncAt on every distinct source we just touched — but only
-  // when at least one row was written. markSourcesSynced
-  // (src/lib/db/source-freshness.ts) is the one sanctioned path: it stamps
-  // iff rowsWritten > 0 and returns the ids it actually stamped. AGENTS.md:
-  // "Sync scripts MUST stamp `sources.last_sync_at = NOW()` on success."
-  const sourcesStamped = await (options.stampSources ?? markSourcesSynced)(
-    Array.from(new Set(rows.map((r) => r.sourceId))),
-    { rowsWritten: inserted + updated, executor: db },
+  if (plannedWrites.length === 0) {
+    return {
+      inserted: 0,
+      updated: 0,
+      unchanged,
+      wouldWrite: 0,
+      dryRun: false,
+      sourcesStamped: [],
+    };
+  }
+
+  const committedAt = options.now ?? new Date();
+  const atomic = await (options.atomicWrite ?? executeAtomicBillWrites)(
+    db,
+    plannedWrites,
+    committedAt,
   );
 
-  return { inserted, updated, unchanged, wouldWrite: inserted + updated, dryRun: false, sourcesStamped };
+  return {
+    inserted: atomic.inserted,
+    updated: atomic.updated,
+    unchanged,
+    wouldWrite: atomic.inserted + atomic.updated,
+    dryRun: false,
+    sourcesStamped: atomic.sourcesStamped,
+  };
+}
+
+/**
+ * One-statement Bills publish for Neon HTTP. Planning reads happen before this
+ * boundary under the cron's job-wide lease; only this function mutates state.
+ */
+export const executeAtomicBillWrites: AtomicBillWriter = async (
+  db,
+  writes,
+  committedAt,
+) => {
+  if (writes.length === 0) {
+    return { inserted: 0, updated: 0, sourcesStamped: [] };
+  }
+  if (!Number.isFinite(committedAt.getTime())) {
+    throw new RangeError("Bills atomic commit timestamp is invalid");
+  }
+
+  const prepared = writes.map(({ ordinal, operation, existingId, row }) => ({
+    ordinal,
+    operation,
+    existingId,
+    ...row,
+  }));
+  const expectedSources = new Set(writes.map(({ row }) => row.sourceId)).size;
+  const freshnessCte = markSourcesSyncedFromInsertedRowsCte(committedAt);
+
+  const result = await db.execute(sql`
+    WITH input_rows AS (
+      SELECT *
+      FROM jsonb_to_recordset(${JSON.stringify(prepared)}::jsonb) AS input(
+        ordinal integer,
+        operation text,
+        "existingId" uuid,
+        "jurisdictionId" uuid,
+        "bodyId" uuid,
+        "sourceId" text,
+        "externalId" text,
+        title text,
+        "longTitle" text,
+        summary text,
+        stage integer,
+        "rawStatus" text,
+        "introducedDate" date,
+        "lastActionDate" date,
+        "lastActionText" text,
+        "sponsorName" text,
+        "sponsorParty" text,
+        url text,
+        "textUrl" text,
+        "voteYes" integer,
+        "voteNo" integer,
+        "voteAbstain" integer,
+        raw jsonb
+      )
+    ), inserted_bills AS (
+      INSERT INTO bills (
+        jurisdiction_id,
+        body_id,
+        source_id,
+        external_id,
+        title,
+        long_title,
+        summary,
+        stage,
+        raw_status,
+        introduced_date,
+        last_action_date,
+        last_action_text,
+        sponsor_name,
+        sponsor_party,
+        url,
+        text_url,
+        vote_yes,
+        vote_no,
+        vote_abstain,
+        raw
+      )
+      SELECT
+        input."jurisdictionId",
+        input."bodyId",
+        input."sourceId",
+        input."externalId",
+        input.title,
+        input."longTitle",
+        input.summary,
+        input.stage,
+        input."rawStatus",
+        input."introducedDate",
+        input."lastActionDate",
+        input."lastActionText",
+        input."sponsorName",
+        input."sponsorParty",
+        input.url,
+        input."textUrl",
+        input."voteYes",
+        input."voteNo",
+        input."voteAbstain",
+        input.raw
+      FROM input_rows input
+      WHERE input.operation = 'insert'
+      ORDER BY input.ordinal
+      RETURNING id, source_id
+    ), updated_bills AS (
+      UPDATE bills bill
+      SET
+        jurisdiction_id = input."jurisdictionId",
+        body_id = input."bodyId",
+        title = input.title,
+        long_title = input."longTitle",
+        summary = input.summary,
+        stage = input.stage,
+        raw_status = input."rawStatus",
+        introduced_date = input."introducedDate",
+        last_action_date = input."lastActionDate",
+        last_action_text = input."lastActionText",
+        sponsor_name = input."sponsorName",
+        sponsor_party = input."sponsorParty",
+        url = input.url,
+        text_url = input."textUrl",
+        vote_yes = input."voteYes",
+        vote_no = input."voteNo",
+        vote_abstain = input."voteAbstain",
+        raw = input.raw,
+        updated_at = ${committedAt}
+      FROM input_rows input
+      WHERE input.operation = 'update'
+        AND bill.id = input."existingId"
+        AND bill.source_id = input."sourceId"
+        AND bill.external_id = input."externalId"
+      RETURNING bill.id, bill.source_id
+    ), written_bills AS (
+      SELECT id, source_id, 'inserted'::text AS outcome
+      FROM inserted_bills
+      UNION ALL
+      SELECT id, source_id, 'updated'::text AS outcome
+      FROM updated_bills
+    ), inserted_source_rows AS (
+      SELECT DISTINCT source_id
+      FROM written_bills
+    ), ${freshnessCte}, atomic_guard AS (
+      SELECT 1 / CASE
+        WHEN (SELECT count(*) FROM written_bills) = ${writes.length}
+          AND (SELECT count(*) FROM stamped_sources) = ${expectedSources}
+          THEN 1
+        ELSE 0
+      END AS ok
+    )
+    SELECT
+      count(*) FILTER (WHERE outcome = 'inserted')::integer AS inserted,
+      count(*) FILTER (WHERE outcome = 'updated')::integer AS updated,
+      COALESCE(
+        ARRAY(SELECT id FROM stamped_sources ORDER BY id),
+        ARRAY[]::text[]
+      ) AS sources_stamped,
+      (SELECT ok FROM atomic_guard) AS guard_ok
+    FROM written_bills
+  `);
+
+  const resultRows = ((result as unknown as { rows?: unknown[] }).rows ??
+    result) as Array<Record<string, unknown>>;
+  const summary = resultRows[0] ?? {};
+
+  return {
+    inserted: Number(summary.inserted ?? 0),
+    updated: Number(summary.updated ?? 0),
+    sourcesStamped: parseTextArray(summary.sources_stamped),
+  };
+};
+
+function parseTextArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String);
+  if (
+    typeof value === "string" &&
+    value.startsWith("{") &&
+    value.endsWith("}")
+  ) {
+    return value.slice(1, -1).split(",").filter(Boolean);
+  }
+  return [];
 }
 
 function stableJson(value: unknown): string {
@@ -173,8 +372,12 @@ function stableJson(value: unknown): string {
   return JSON.stringify(value);
 }
 
-function billMatches(existing: typeof bills.$inferSelect, row: BillIngest): boolean {
-  return existing.jurisdictionId === row.jurisdictionId &&
+function billMatches(
+  existing: typeof bills.$inferSelect,
+  row: BillIngest,
+): boolean {
+  return (
+    existing.jurisdictionId === row.jurisdictionId &&
     existing.bodyId === row.bodyId &&
     existing.sourceId === row.sourceId &&
     existing.externalId === row.externalId &&
@@ -193,5 +396,6 @@ function billMatches(existing: typeof bills.$inferSelect, row: BillIngest): bool
     existing.voteYes === row.voteYes &&
     existing.voteNo === row.voteNo &&
     existing.voteAbstain === row.voteAbstain &&
-    stableJson(existing.raw) === stableJson(row.raw);
+    stableJson(existing.raw) === stableJson(row.raw)
+  );
 }

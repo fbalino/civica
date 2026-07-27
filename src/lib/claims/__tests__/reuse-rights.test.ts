@@ -31,11 +31,12 @@ test("RIGHTS_REGISTRY_PATH is an anchored /licensing section", () => {
   assert.ok(RIGHTS_REGISTRY_URL.endsWith("/licensing#reuse"));
 });
 
-test("CODE_RIGHTS declares no license file and does not assert an affirmative MIT/open-source grant", () => {
-  assert.equal(CODE_RIGHTS.hasLicenseFile, false);
-  // The posture mentions "MIT" only to deny it ("no ... reuse license (MIT or
-  // otherwise) is currently granted") — the scanner must not flag this.
+test("CODE_RIGHTS declares the non-open license file without asserting an affirmative MIT/open-source grant", () => {
+  assert.equal(CODE_RIGHTS.hasLicenseFile, true);
+  // The posture mentions "MIT" only to deny it; the scanner must not flag
+  // the denial as an affirmative reuse grant.
   assert.deepEqual(findCodeOpenSourceClaims(CODE_RIGHTS.posture), []);
+  assert.ok(/non-open, all-rights-reserved/i.test(CODE_RIGHTS.posture));
   assert.ok(/no open-source reuse license/i.test(CODE_RIGHTS.posture));
 });
 

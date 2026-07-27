@@ -52,6 +52,7 @@ export function PeerLensPanel({ lens, peerSet, rank }: PeerLensPanelProps) {
         <div className="peer-lens-panel__cohort-label peer-lens-panel__cohort-label--muted">
           Limited peer comparison available
         </div>
+        <PeerContractMeta peerSet={peerSet} />
         <div className="peer-lens-panel__fallback-note">
           {fallbackNote(peerSet.fallbackChain)}
         </div>
@@ -103,11 +104,23 @@ export function PeerLensPanel({ lens, peerSet, rank }: PeerLensPanelProps) {
           {peerSet.n} {peerSet.n === 1 ? "country" : "countries"} in cohort
         </div>
       )}
+      <PeerContractMeta peerSet={peerSet} />
       {peerSet.fallbackChain.length > 0 ? (
         <div className="peer-lens-panel__fallback-note">
           {fallbackNote(peerSet.fallbackChain, peerSet.lensUsed)}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function PeerContractMeta({ peerSet }: { peerSet: PeerSetResult }) {
+  const cohortCount = `${peerSet.attemptedN} attempted → ${peerSet.finalN} final`;
+  return (
+    <div className="peer-lens-panel__contract-meta">
+      <span>{cohortCount}</span>
+      <span>{peerSet.eligibleN} observed eligible</span>
+      <span>{peerSet.upstreamVintage ?? "Upstream vintage not recorded"}</span>
     </div>
   );
 }
@@ -124,6 +137,9 @@ function fallbackNote(
   const first = chain[0];
   if (first === "non_sovereign_or_uncovered") {
     return "Not classified by the upstream source. See methodology page for coverage limits.";
+  }
+  if (first === "subject_not_observed") {
+    return "This measure has no observed value for the country, so no peer cohort is calculated.";
   }
   if (first === "no_classification") {
     return "No classification yet for this country. Showing global comparison.";

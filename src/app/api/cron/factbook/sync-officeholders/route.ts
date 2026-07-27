@@ -2,7 +2,7 @@
  * Wikidata officeholder sync — cron handler.
  *
  * Runs monthly via Vercel cron. Authenticated by `CRON_SECRET`
- * (per `requireCronAuth`). Refreshes the head-of-state / head-of-government
+ * (per the shared cron boundary). Refreshes the head-of-state / head-of-government
  * spine AND the P39 title + P102/colour party enrichment, then stamps
  * `sources.last_sync_at` for `wikidata` (via the shared sync core).
  *
@@ -11,8 +11,9 @@
  * (mirrors `/api/cron/factbook/sync-wikidata`).
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
+import { officeholderSyncCronOutcome } from "@/lib/factbook/cron-outcomes";
 import { syncFactbookOfficeholders } from "@/lib/factbook/officeholders-sync";
 
 export const runtime = "nodejs";
@@ -22,57 +23,63 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 800;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
-  try {
-    const summary = await syncFactbookOfficeholders({
-      db,
-      // Drop progress lines in cron mode — too verbose for the log buffer.
-      // The summary at the end has counters; warnings (`!`) still surface.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-      dryRun,
-    });
+  const summary = await syncFactbookOfficeholders({
+    db,
+    // Drop progress lines in cron mode — too verbose for the log buffer.
+    // The summary at the end has counters; warnings (`!`) still surface.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+    dryRun,
+  });
 
-    if (summary.totalRowsWritten === 0) {
-      return NextResponse.json({ ok: false, step: "factbook.officeholders.sync", dryRun, error: "No officeholder rows produced" }, { status: 502 });
-    }
-
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.officeholders.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      countriesSynced: summary.countriesSynced,
-      countriesSkipped: summary.countriesSkipped,
-      qidNamesResolved: summary.qidNamesResolved,
-      titlesWritten: summary.titlesWritten,
-      partiesWritten: summary.partiesWritten,
-      portraitsWritten: summary.portraitsWritten,
-      birthdatesWritten: summary.birthdatesWritten,
-      personPortraitsWritten: summary.personPortraitsWritten,
-      personBirthdatesWritten: summary.personBirthdatesWritten,
-      totalRowsWritten: summary.totalRowsWritten,
-      freshnessStamped: summary.freshnessStamped,
-      dryRun,
-    });
-  } catch (err) {
-    console.error("[cron factbook.officeholders.sync] failed:", err);
+  const outcome = officeholderSyncCronOutcome(summary);
+  if (!outcome.ok) {
     return NextResponse.json(
       {
         ok: false,
+        outcome: outcome.outcome,
+        healthOk: outcome.healthOk,
         step: "factbook.officeholders.sync",
-        error: err instanceof Error ? err.message : String(err),
+        dryRun,
+        error:
+          outcome.reason === "incomplete_stage"
+            ? "Officeholder sync completed only part of its stages"
+            : "No officeholder rows produced",
+        countriesSynced: summary.countriesSynced,
+        totalRowsWritten: summary.totalRowsWritten,
+        freshnessStamped: summary.freshnessStamped,
       },
-      { status: 500 }
+      { status: outcome.httpStatus },
     );
   }
+
+  return NextResponse.json({
+    ok: true,
+    outcome: outcome.outcome,
+    healthOk: outcome.healthOk,
+    step: "factbook.officeholders.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    countriesSynced: summary.countriesSynced,
+    countriesSkipped: summary.countriesSkipped,
+    qidNamesResolved: summary.qidNamesResolved,
+    titlesWritten: summary.titlesWritten,
+    partiesWritten: summary.partiesWritten,
+    portraitsWritten: summary.portraitsWritten,
+    birthdatesWritten: summary.birthdatesWritten,
+    personPortraitsWritten: summary.personPortraitsWritten,
+    personBirthdatesWritten: summary.personBirthdatesWritten,
+    totalRowsWritten: summary.totalRowsWritten,
+    freshnessStamped: summary.freshnessStamped,
+    dryRun,
+  });
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.officeholders", handler);
+
+export { cronHandler as GET, cronHandler as POST };

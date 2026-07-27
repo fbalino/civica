@@ -26,6 +26,13 @@ const PER_PAGE = 500;
 const START_YEAR = 2015;
 const END_YEAR = 2024;
 const DRY_RUN = process.argv.includes("--dry-run");
+const ATLAS_RELEASE_ID =
+  process.argv
+    .find((arg) => arg.startsWith("--release-id="))
+    ?.slice("--release-id=".length)
+    .trim() ||
+  process.env.CIVICA_ATLAS_RELEASE_ID?.trim() ||
+  null;
 
 interface WBDataPoint {
   country: { id: string; value: string };
@@ -73,6 +80,11 @@ async function buildIso3Map(): Promise<Map<string, string>> {
 }
 
 async function main() {
+  if (!DRY_RUN && !ATLAS_RELEASE_ID) {
+    throw new Error(
+      "A named Atlas release is required: pass --release-id=<id> or set CIVICA_ATLAS_RELEASE_ID.",
+    );
+  }
   console.log("Syncing World Bank indicators...\n");
 
   const iso3Map = await buildIso3Map();
@@ -122,7 +134,17 @@ async function main() {
   // this run actually upserted rows (AGENTS.md provenance invariant). Was
   // previously an unconditional stamp that faked freshness on an
   // empty/failed run.
-  await writeCountryMetrics(db as never, output, { dryRun: DRY_RUN });
+  await writeCountryMetrics(db as never, output, {
+    dryRun: DRY_RUN,
+    history: ATLAS_RELEASE_ID
+      ? {
+          changeKind: "routine_refresh",
+          reason: "World Bank indicator release refresh",
+          methodologyVersion: "world-bank-country-metrics/v1",
+          releaseId: ATLAS_RELEASE_ID,
+        }
+      : undefined,
+  });
 
   console.log(`\nDone. Total inserted: ${totalInserted}, skipped: ${totalSkipped}`);
 }

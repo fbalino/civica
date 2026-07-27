@@ -111,15 +111,12 @@ test("four canonical outer widths and named structural tracks drive layouts", ()
   assert.match(factbook, /var\(--width-country-context\)/);
 });
 
-test("country landing composes PageHero and keeps its centered variant", () => {
+test("country landing composes PageHero and keeps its approved centered variant", () => {
   const almanac = source("src/components/factbook/FactbookAlmanac.tsx");
   const factbook = source("src/app/factbook.css");
 
   assert.match(almanac, /import \{ PageHero \}/);
-  assert.match(
-    almanac,
-    /<PageHero[\s\S]*className="factbook-landing-hero--centered"/,
-  );
+  assert.match(almanac, /<PageHero[\s\S]*className="factbook-landing-hero--centered"/);
   assert.doesNotMatch(almanac, /<section[^>]+factbook-landing-hero/);
   assert.match(
     factbook,
@@ -145,6 +142,9 @@ test("country directory is sequential and does not use CSS multi-column flow", (
 
 test("DataTable row headers share cell alignment, borders, and hover surface", () => {
   const editorial = source("src/app/editorial.css");
+  const governancePage = source(
+    "src/app/(reader)/governance-change/page.tsx",
+  );
 
   assert.match(
     editorial,
@@ -157,5 +157,9 @@ test("DataTable row headers share cell alignment, borders, and hover surface", (
   assert.match(
     editorial,
     /\.editorial-data-table tbody tr:hover > :is\(th, td\)/,
+  );
+  assert.doesNotMatch(
+    governancePage,
+    /<div className="editorial-table-scroll">\s*<DataTable/,
   );
 });

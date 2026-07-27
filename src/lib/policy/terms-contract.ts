@@ -55,7 +55,10 @@ export const TERMS_CLAUSES: readonly TermsClause[] = [
     id: "acceptable-use",
     label: "Acceptable use",
     anchor: "use",
-    requiredPatterns: [/good faith/i, /do not attempt to[\s\S]*?(break|overload|scrape)/i],
+    requiredPatterns: [
+      /good faith/i,
+      /do not attempt to[\s\S]*?(break|overload|scrape)/i,
+    ],
     prohibitedPatterns: [
       /no (rate limits?|restrictions) (apply|whatsoever)/i,
       /unlimited (scraping|automated access)/i,
@@ -83,10 +86,10 @@ export const TERMS_CLAUSES: readonly TermsClause[] = [
     prohibitedPatterns: [
       /no rate limits? (apply|exist)/i,
       /unlimited requests/i,
-      /export route (applies|has|enforces) a rate limit/i,
+      /export route (is|remains) not (currently )?rate[- ]limited/i,
     ],
     description:
-      "API use is bound by the published per-IP rate limits documented in API Docs; unrated routes are described as such, not silently assumed limited.",
+      "Public API GETs and the per-country export are bound by the published distributed limits in API Docs; shared-counter outages fail closed.",
   },
   {
     id: "uptime-no-warranty",
@@ -153,7 +156,7 @@ export const TERMS_CLAUSES: readonly TermsClause[] = [
     requiredPatterns: [/update these terms/i, /last updated/i],
     prohibitedPatterns: [/terms (never|cannot) change/i],
     description:
-      "These terms may be updated as the site evolves; the \"last updated\" date reflects the current version.",
+      'These terms may be updated as the site evolves; the "last updated" date reflects the current version.',
   },
   {
     id: "contact",
@@ -212,7 +215,8 @@ export function findMissingClausePhrases(
 ): TermsConditionsIssue[] {
   const normalized = normalizeWhitespace(termsSource);
   return TERMS_CLAUSES.filter(
-    (clause) => !clause.requiredPatterns.some((pattern) => pattern.test(normalized)),
+    (clause) =>
+      !clause.requiredPatterns.some((pattern) => pattern.test(normalized)),
   ).map((clause) => ({
     code: "missing-clause-phrase" as const,
     clauseId: clause.id,

@@ -1,6 +1,9 @@
 {
+  "schemaVersion": "temporal-metadata-audit/v1",
   "checkedAt": "2026-07-11",
   "contract": "temporal-metadata/v1",
+  "auditSource": "production_neon_read_only_aggregate",
+  "readOnly": true,
   "atlasVintage": {
     "rows": 17506,
     "observationReferenceYearPresent": 14588,
@@ -19,5 +22,6 @@
     "civicaPublicationVersion": "2026_v1",
     "temporalMismatches": 0
   },
-  "writesPerformedByAudit": 0
+  "writesPerformedByAudit": 0,
+  "semanticSha256": "8d72060ff7c0ab1fa6f010191e3e2ea1e84597d31074a7152f9e2990aab9c49b"
 }

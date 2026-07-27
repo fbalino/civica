@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import type { FaoCsvRow } from "../sync-fao-faostat";
 import { syncFaoFaostat } from "../sync-fao-faostat";
 
@@ -32,6 +33,19 @@ function harness() {
   return { db: db as never, facts, writes: () => writes };
 }
 
+const fixtureFactWriter: CountryFactHistoryWriter = async (database, write) => {
+  const fixtureDb = database as unknown as {
+    insert: (table: unknown) => {
+      values: (value: Record<string, unknown>) => {
+        onConflictDoUpdate: () => Promise<unknown>;
+      };
+    };
+  };
+  await fixtureDb.insert(countryFacts).values(write.values as Record<string, unknown>).onConflictDoUpdate();
+};
+
+const historyOptions = { atlasReleaseId: "atlas-test", writeFact: fixtureFactWriter };
+
 const noDisputes = async () => ({ jurisdictionsScanned: 1, pairsScanned: 1, proposedTotal: 0, inserted: 0, skippedDuplicate: 0, skippedNoFactGroup: 0, errors: [] });
 const fetchArchive = async () => ({ rows: [observation], archiveBytes: 1234 });
 
@@ -46,7 +60,7 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
 
 test("FAO fixture applications converge on one canonical fact", async () => {
   const state = harness();
-  const options = { factKey: "agricultural_land_pct", jurisdictions: [jurisdiction], fetchArchive, persistDisputes: noDisputes as never, markSynced: (async () => ["fao_faostat"]) as never };
+  const options = { ...historyOptions, factKey: "agricultural_land_pct", jurisdictions: [jurisdiction], fetchArchive, persistDisputes: noDisputes as never, markSynced: (async () => ["fao_faostat"]) as never };
   await syncFaoFaostat(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
   await syncFaoFaostat(state.db, options);
@@ -67,6 +81,7 @@ test("FAO upstream failure is loud before freshness", async () => {
   const state = harness();
   let stampCalls = 0;
   const result = await syncFaoFaostat(state.db, {
+    ...historyOptions,
     factKey: "agricultural_land_pct",
     jurisdictions: [jurisdiction],
     fetchArchive: async () => { throw new Error("upstream schema changed"); },

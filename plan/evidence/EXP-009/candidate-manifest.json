@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "civica-exp-009-illustration-candidates/v1",
+  "createdAt": "2026-07-23",
+  "status": "pending_human_approval",
+  "tool": {
+    "name": "image_gen.imagegen",
+    "model": null,
+    "modelDisclosure": "The runtime did not expose an exact model or version, so none is inferred.",
+    "seed": null,
+    "seedDisclosure": "The runtime did not expose a seed.",
+    "conversion": "cwebp 1.6.0",
+    "lightGrade": "ImageMagick 7.1.2-18"
+  },
+  "productionAssets": [
+    {
+      "country": "France",
+      "theme": "light",
+      "path": "public/engravings/countries/fra.webp",
+      "sha256": "4d4bf0b6ca4f0a8c39f610d2655fc3d750a0baa468707d30acf0df29a2f2ff07"
+    },
+    {
+      "country": "France",
+      "theme": "dark",
+      "path": "public/engravings/countries/fra-dark.webp",
+      "sha256": "510da0766e65835822f48b7513b5b44414c4d7af61b4ca7bfb6614504a2abab4"
+    },
+    {
+      "country": "United Kingdom",
+      "theme": "light",
+      "path": "public/engravings/countries/gbr.webp",
+      "sha256": "66fcd525c54709bdf6314adc8bba5b5d17f93bdacce413d2957ac8771e524099"
+    },
+    {
+      "country": "United Kingdom",
+      "theme": "dark",
+      "path": "public/engravings/countries/gbr-dark.webp",
+      "sha256": "6ad48b6038fc3b0bf17d696acf583e18e25c34a2e5ba412cdaa35df85d444b5a"
+    }
+  ],
+  "candidates": [
+    {
+      "country": "France",
+      "iso3": "fra",
+      "theme": "light",
+      "path": "plan/evidence/EXP-009/candidates/fra-candidate-light.webp",
+      "sha256": "a279bdacf0ccfa94c9ea201cb420365fe5cfbc426c6fece7c688ea0aebc85a79",
+      "width": 1500,
+      "height": 1000,
+      "format": "webp",
+      "colorSpace": "srgb",
+      "byteCount": 379228,
+      "generationCall": "call_QUD9NJyiirJnMdV2Pa1HPOpg",
+      "sourcePngSha256": "996d4e842909ac4aed1c7fd127c4ee5a0ef5048d6dc7db819c49975f4ed5d840",
+      "postprocess": "resize 1500x1000, WebP q88; then brightness 102%, saturation 75%, hue unchanged, metadata stripped, WebP q88",
+      "metrics": {
+        "meanSat": 0.1145967874,
+        "satP95": 0.1390728477,
+        "lumaP05": 0.2828878431,
+        "lumaP50": 0.8304086275,
+        "lumaP95": 0.908572549,
+        "toneRange": 0.6256847059,
+        "orangeFrac": 0,
+        "warmFrac": 0.468005618
+      }
+    },
+    {
+      "country": "France",
+      "iso3": "fra",
+      "theme": "dark",
+      "path": "plan/evidence/EXP-009/candidates/fra-candidate-dark.webp",
+      "sha256": "9da855b0eaa9b8b9da257d40373dd0490f41514c90b798175a67150d0ce02bb7",
+      "width": 1500,
+      "height": 1000,
+      "format": "webp",
+      "colorSpace": "srgb",
+      "byteCount": 345160,
+      "generationCall": "call_KMCYIug6SzOY1DY1qMHj10ka",
+      "sourcePngSha256": "1d4d023646b98b7441889dc863f2e190d1f3caa16dca8c9442c02087dffb51f3",
+      "postprocess": "resize 1500x1000, metadata stripped, WebP q88",
+      "metrics": {
+        "meanSat": 0.1768110743,
+        "satP95": 0.3548387097,
+        "lumaP05": 0.0817866667,
+        "lumaP50": 0.1226698039,
+        "lumaP95": 0.26348,
+        "toneRange": 0.1816933333,
+        "orangeFrac": 0.2242696629,
+        "warmFrac": 0.6036516854
+      }
+    },
+    {
+      "country": "United Kingdom",
+      "iso3": "gbr",
+      "theme": "light",
+      "path": "plan/evidence/EXP-009/candidates/gbr-candidate-light.webp",
+      "sha256": "2b7da926d1aeb21cd2713ad525dcc46efe9d0d89cac232973faa2e8c4c2efdcf",
+      "width": 1500,
+      "height": 1000,
+      "format": "webp",
+      "colorSpace": "srgb",
+      "byteCount": 397114,
+      "generationCall": "call_fKqu6WU6BWx0dYgjLWROX2Q0",
+      "sourcePngSha256": "887b992ebd863fbf7b26887c19fdad1bd086fa005c303480538109e14ee4bb3c",
+      "postprocess": "resize 1500x1000, WebP q88; then brightness 115%, saturation 85%, hue unchanged, metadata stripped, WebP q88",
+      "metrics": {
+        "meanSat": 0.1002310114,
+        "satP95": 0.1450381679,
+        "lumaP05": 0.2837576471,
+        "lumaP50": 0.7752705882,
+        "lumaP95": 0.9509278431,
+        "toneRange": 0.6671701961,
+        "orangeFrac": 0.0000187266,
+        "warmFrac": 0.2334925094
+      }
+    },
+    {
+      "country": "United Kingdom",
+      "iso3": "gbr",
+      "theme": "dark",
+      "path": "plan/evidence/EXP-009/candidates/gbr-candidate-dark.webp",
+      "sha256": "813b4279c3fd55b134187c164e30679afd8f834bfc9ef5d05a6d549c9bfec17a",
+      "width": 1500,
+      "height": 1000,
+      "format": "webp",
+      "colorSpace": "srgb",
+      "byteCount": 362880,
+      "generationCall": "call_kS95V8rHsvC0ozieyMJn4d1D",
+      "sourcePngSha256": "62d688d1bbe9a859a250197559a218c4674b578fc6b8031990c9b22d1ed3f479",
+      "postprocess": "resize 1500x1000, metadata stripped, WebP q88",
+      "metrics": {
+        "meanSat": 0.3065820478,
+        "satP95": 0.4769230769,
+        "lumaP05": 0.06328,
+        "lumaP50": 0.1016619608,
+        "lumaP95": 0.2754603922,
+        "toneRange": 0.2121803922,
+        "orangeFrac": 0.5612078652,
+        "warmFrac": 0.9034269663
+      }
+    }
+  ],
+  "rejectedAttempts": [
+    {
+      "country": "France",
+      "generationCall": "call_QxiHOgEcQBiZ7xMLoKtmlL42",
+      "sourcePngSha256": "71f7100b307b09633f512f363379a59d4b15e68b883c9e68c88cc4218b2c259d",
+      "reason": "The bridge approach contained an invented winged monument. The image was rejected before packaging and replaced by a targeted correction."
+    }
+  ],
+  "landmarkChecks": [
+    {
+      "country": "France",
+      "checkedAt": "2026-07-23",
+      "sources": [
+        "https://www.toureiffel.paris/en/news/history-and-culture/brief-history-towers-lighting",
+        "https://en.wikipedia.org/wiki/Pont_d%27I%C3%A9na"
+      ],
+      "result": "The candidate keeps the Eiffel Tower and a five-arch Pont d'Iena relationship and replaces the rejected winged monument with an equestrian approach sculpture. It remains illustration, not architectural evidence."
+    },
+    {
+      "country": "United Kingdom",
+      "checkedAt": "2026-07-23",
+      "sources": [
+        "https://www.parliament.uk/bigben/",
+        "https://www.parliament.uk/globalassets/documents/commons-information-office/g11.pdf"
+      ],
+      "result": "The candidate keeps Elizabeth Tower attached to the Palace of Westminster beside Westminster Bridge and excludes Tower Bridge and the Tower of London. It remains illustration, not architectural evidence."
+    }
+  ],
+  "approval": {
+    "reviewer": null,
+    "decision": null,
+    "decidedAt": null,
+    "approvedCandidatePaths": []
+  }
+}

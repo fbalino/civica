@@ -12,9 +12,13 @@ import { CountryJumpSearch } from "@/components/country/CountryJumpSearch";
 import { FactbookSidebar } from "@/components/factbook/FactbookSidebar";
 import { buildArticleNav } from "@/lib/constitution/article-nav";
 import { withOg } from "@/lib/og";
+import {
+  atlasSurfaceQueryValue,
+  captureAtlasSurfaceQuery,
+} from "@/lib/atlas/surface-query-state";
 import "@/app/civica-data.css";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 // Per-tab metadata. The shared layout's generateMetadata sets the Factbook
 // title + /country/[slug] canonical (correct for the base tab); metadata
@@ -51,8 +55,8 @@ export async function generateMetadata({
 // Explorer's reading column) plus a prominent "Open in the Constitution
 // Explorer" CTA. When a country has no ingested text (67 of 253
 // jurisdictions) we degrade to an on-brand empty state that points at the
-// Explorer landing. Both the fetch and the source lookup soft-fail so a Neon
-// hiccup degrades gracefully instead of 500-ing the tab.
+// Explorer landing. The document query keeps an outage distinct from a
+// genuinely unindexed constitution; source metadata remains best-effort.
 export default async function CountryConstitutionTab({
   params,
 }: {
@@ -63,15 +67,17 @@ export default async function CountryConstitutionTab({
   const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
-  // getConstitutionWithArticles already soft-fails (try/catch → null) and
-  // returns null when the country has no structured articles, so the empty
-  // state covers both "no text" and "DB unreachable". countryOptions feeds the
-  // shared <CountryJumpSearch>; it soft-fails to an empty list.
-  const [constitution, constituteSource, countryOptions] = await Promise.all([
-    getConstitutionWithArticles(slug),
+  // The country reader asks the query layer to preserve a database failure so
+  // the rendered state cannot call an outage "not yet indexed". countryOptions
+  // feeds the shared <CountryJumpSearch>; it is a non-critical enhancement.
+  const [constitutionResult, constituteSource, countryOptions] = await Promise.all([
+    captureAtlasSurfaceQuery(() =>
+      getConstitutionWithArticles(slug, { throwOnError: true }),
+    ),
     getSource("constitute_project").catch(() => null),
     getFactbookCountryOptions().catch(() => []),
   ]);
+  const constitution = atlasSurfaceQueryValue(constitutionResult);
 
   const sourceRetrievedAt = constituteSource?.lastSyncAt
     ? constituteSource.lastSyncAt.toISOString()
@@ -88,8 +94,9 @@ export default async function CountryConstitutionTab({
     />
   );
 
-  // ── Empty state — no ingested constitution text ──────────────────────
+  // ── Empty or unavailable state ───────────────────────────────────────
   if (!constitution) {
+    const unavailable = constitutionResult.status === "unavailable";
     return (
       <div className="factbook-tab">
         <div className="civica-data-body">
@@ -105,14 +112,25 @@ export default async function CountryConstitutionTab({
             aria-labelledby="constitution-heading"
           >
             <span className="editorial-eyebrow">Constitution</span>
-            <h2 id="constitution-heading">Not yet indexed</h2>
+            <h2 id="constitution-heading">
+              {unavailable ? "Temporarily unavailable" : "Not yet indexed"}
+            </h2>
             <div className="constitution-empty-state">
-              <p>
-                Civica indexes constitution texts supplied by the Constitute
-                Project. {jurisdiction.name} is not yet in this index. Its
-                government, institutions, and governance evidence remain
-                available elsewhere in the country profile.
-              </p>
+              {unavailable ? (
+                <p>
+                  {jurisdiction.name}&rsquo;s constitutional text could not be
+                  loaded right now. Civica is not treating this as evidence
+                  that no indexed text exists. Please try again, or explore
+                  the available country reference information below.
+                </p>
+              ) : (
+                <p>
+                  Civica indexes constitution texts supplied by the Constitute
+                  Project. {jurisdiction.name} is not yet in this index. Its
+                  government, institutions, and governance evidence remain
+                  available elsewhere in the country profile.
+                </p>
+              )}
               <Link className="btn btn--primary" href="/constitution">
                 Open the Constitution Explorer
                 <span className="btn__arrow" aria-hidden="true">

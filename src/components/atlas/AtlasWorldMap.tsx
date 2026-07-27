@@ -10,14 +10,19 @@ import {
   useState,
 } from "react";
 import { RotateCcw } from "lucide-react";
+import { useReducedMotion } from "motion/react";
+import Link from "next/link";
 import type { Country } from "./data";
 import { type MapPath, MAP_W, MAP_H } from "./map-geom";
 import { CountryHoverCard } from "@/components/v2/CountryHoverCard";
 import { SegmentedControl } from "@/components/editorial/SegmentedControl";
 import { Tooltip } from "@/components/editorial/Tooltip";
-import type { AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
+import { SourceDot } from "@/components/SourceDot";
+import type { AtlasLayerSource, AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
 import {
   type AtlasLayerKey,
+  ATLAS_LAYER_DESCRIPTION,
+  ATLAS_LAYER_MISSINGNESS,
   ATLAS_LAYER_OPTIONS,
   ATLAS_LAYER_TITLE,
   NO_DATA_FILL,
@@ -30,9 +35,8 @@ import {
 /* ----------------------------------------------------------------
  * Choropleth layer switcher (Wave 6)
  *
- * The map colors every country by one of four CATEGORICAL data layers —
- * government type, V-Dem regime, or World Bank income
- * group. The active `layer` is controlled by the parent (URL `?layer=`);
+ * The map colors every country by one publisher-native categorical layer.
+ * The active `layer` is controlled by the parent (URL `?layer=`);
  * all color-token + legend + tooltip logic lives in
  * `src/lib/atlas/map-layers.ts` so it stays in one documented place.
  * ---------------------------------------------------------------- */
@@ -50,14 +54,18 @@ export interface AtlasWorldMapProps {
   filteredCountryIds: string[];
   /** Per-iso3 (lower-case) data-layer values fetched server-side — no client DB access. */
   layerData: Record<string, AtlasLayerValues>;
+  /** Source and vintage retained for each source-native map layer. */
+  layerSources: Record<AtlasLayerKey, AtlasLayerSource>;
   /** The active choropleth layer (owned by the parent; synced to `?layer=`). */
   layer: AtlasLayerKey;
   /** Switch the active layer (parent updates state + URL). */
   onLayerChange: (layer: AtlasLayerKey) => void;
   /** Country IDs pinned for compare (up to 2). Shows the compare banner. */
   pinned: string[];
-  /** Called when a country path is clicked; `shift` mirrors e.shiftKey so the caller can route to pin vs open. */
-  onCountrySelect: (country: Country, modifiers: { shift: boolean }) => void;
+  /** Country selection is owned by the parent and shared with its accessible controls. */
+  onCountrySelect: (country: Country) => void;
+  /** The current selection, shown consistently on the map and in the control panel. */
+  selectedCountryId: string | null;
   /** Remove the pinned country at index i. */
   onUnpinAt: (index: number) => void;
   /** Transition into the compare view with the two pinned countries. */
@@ -72,10 +80,12 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       mapLoaded,
       filteredCountryIds,
       layerData,
+      layerSources,
       layer,
       onLayerChange,
       pinned,
       onCountrySelect,
+      selectedCountryId,
       onUnpinAt,
       onOpenCompare,
     },
@@ -85,6 +95,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
     const contentRef = useRef<SVGGElement>(null);
     const labelsRef = useRef<SVGGElement>(null);
     const transformRef = useRef({ k: 1, x: 0, y: 0 });
+    const animationFrameRef = useRef<number | null>(null);
     const dragRef = useRef({
       dragging: false,
       moved: false, // true once the pointer travels past the click threshold
@@ -100,12 +111,16 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       x: number;
       y: number;
     } | null>(null);
+    const reduceMotion = useReducedMotion();
 
     // PROVENANCE_COVERAGE: atlas.choropleth-layer
     // Legend rows for the active layer, plus a trailing "No data" row when
     // at least one mapped country falls back to the neutral no-data fill —
     // a country with a missing value must never inherit a real category.
     const legendEntries = useMemo(() => legendFor(layer), [layer]);
+    const activeLayerSource = layerSources[layer];
+    const mapTitle = `World map colored by ${ATLAS_LAYER_TITLE[layer]}`;
+    const mapDescription = `${ATLAS_LAYER_DESCRIPTION[layer]} ${ATLAS_LAYER_MISSINGNESS[layer]} The synchronized map-layer table after the map provides every map-eligible country, its active value, and its availability.`;
     const hasNoDataCountry = useMemo(
       () =>
         countries.some(
@@ -143,8 +158,18 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       }
     }, []);
 
+    const stopMapAnimation = useCallback(() => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    }, []);
+
+    useEffect(() => stopMapAnimation, [stopMapAnimation]);
+
     const zoomAround = useCallback(
       (cx: number, cy: number, factor: number) => {
+        stopMapAnimation();
         const t = transformRef.current;
         const prevK = t.k;
         const nextK = Math.max(0.8, Math.min(12, prevK * factor));
@@ -154,13 +179,19 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
         t.k = nextK;
         applyTransform();
       },
-      [applyTransform],
+      [applyTransform, stopMapAnimation],
     );
 
     const animateTo = useCallback(
       (tx: number, ty: number, tk: number) => {
+        stopMapAnimation();
         const start = { ...transformRef.current };
         const end = { x: tx, y: ty, k: tk };
+        if (reduceMotion) {
+          transformRef.current = end;
+          applyTransform();
+          return;
+        }
         const t0 = performance.now();
         const DUR = 650;
         function frame(now: number) {
@@ -170,11 +201,15 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
           transformRef.current.y = start.y + (end.y - start.y) * e;
           transformRef.current.k = start.k + (end.k - start.k) * e;
           applyTransform();
-          if (t < 1) requestAnimationFrame(frame);
+          if (t < 1) {
+            animationFrameRef.current = requestAnimationFrame(frame);
+          } else {
+            animationFrameRef.current = null;
+          }
         }
-        requestAnimationFrame(frame);
+        animationFrameRef.current = requestAnimationFrame(frame);
       },
-      [applyTransform],
+      [applyTransform, reduceMotion, stopMapAnimation],
     );
 
     const flyTo = useCallback(
@@ -204,6 +239,13 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       }),
       [flyTo, animateTo],
     );
+
+    // The native country list and pointer/touch map share one selection state.
+    // Wait for the geometry to arrive before flying to a list-selected country.
+    useEffect(() => {
+      if (!selectedCountryId || !mapLoaded) return;
+      flyTo(selectedCountryId);
+    }, [flyTo, mapLoaded, selectedCountryId, mapPaths]);
 
     // Label sizing in TRUE screen pixels: 1 CSS px on screen = MAP_W/width
     // user units in the un-transformed label layer. Set once per mount/resize
@@ -336,6 +378,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       // report: the map could only be grabbed on water). Click-vs-drag is
       // disambiguated by the movement threshold below: a mouseup without
       // movement still selects the country (see the path onClick guard).
+      stopMapAnimation();
       dragRef.current = {
         dragging: true,
         moved: false,
@@ -354,9 +397,11 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
           viewBox={`0 0 ${MAP_W} ${MAP_H}`}
           preserveAspectRatio="xMidYMid meet"
           role="img"
-          aria-label={`World map colored by ${ATLAS_LAYER_TITLE[layer]}`}
+          aria-labelledby="atlas-world-map-title atlas-world-map-description"
           onMouseDown={handleSvgMouseDown}
         >
+          <title id="atlas-world-map-title">{mapTitle}</title>
+          <desc id="atlas-world-map-description">{mapDescription}</desc>
           <defs>
             <pattern
               id="dots"
@@ -382,9 +427,15 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               width="4000"
               height="2000"
               fill="url(#dots)"
+              pointerEvents="none"
             />
             {/* Graticule */}
-            <g stroke="var(--atlas-rule-2)" strokeWidth="1" fill="none">
+            <g
+              stroke="var(--atlas-rule-2)"
+              strokeWidth="1"
+              fill="none"
+              pointerEvents="none"
+            >
               {Array.from({ length: 9 }, (_, i) => (
                 <line
                   key={`h${i}`}
@@ -406,10 +457,9 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                 />
               ))}
             </g>
-            {/* Country paths — categorical choropleth driven by the active
-                data layer (government / CI score / regime / income). Hover
-                signals via stroke change instead of fill so the layer color
-                stays visible while the cursor is over. */}
+            {/* Country paths — categorical choropleth driven only by the
+                active publisher-native layer. Hover signals via stroke
+                change instead of fill so the layer color stays visible. */}
             {mapPaths.map((p, i) => {
               const baseFill = p.country
                 ? fillForLayer(layer, p.country, layerData[p.country.id])
@@ -426,8 +476,17 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                   data-id={p.id || undefined}
                   data-iso={p.neId}
                   data-base-fill={baseFill}
+                  data-selected={
+                    p.country?.id === selectedCountryId ? "1" : "0"
+                  }
                   style={{
                     cursor: p.country ? "pointer" : "default",
+                    strokeWidth:
+                      p.country?.id === selectedCountryId ? "2.4" : undefined,
+                    filter:
+                      p.country?.id === selectedCountryId
+                        ? "brightness(0.88)"
+                        : undefined,
                     opacity: p.country
                       ? filteredCountryIds.includes(p.id!)
                         ? 1
@@ -472,7 +531,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                       // A pan that started on this country ends with a click
                       // event — don't treat it as a selection.
                       if (dragRef.current.moved) return;
-                      onCountrySelect(p.country, { shift: e.shiftKey });
+                      onCountrySelect(p.country);
                     }
                   }}
                 />
@@ -564,8 +623,32 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               )}
             </ul>
             <p className="atlas-indicator-scope">
+              <strong>Source:</strong>{" "}
+              {activeLayerSource.sourceUrl ? (
+                <a href={activeLayerSource.sourceUrl}>
+                  {activeLayerSource.sourceName}
+                </a>
+              ) : (
+                activeLayerSource.sourceName
+              )}{" "}
+              <SourceDot
+                source={activeLayerSource.sourceId}
+                retrievedAt={activeLayerSource.lastSyncedAt}
+              />
+              <br />
+              <strong>Vintage:</strong>{" "}
+              {activeLayerSource.upstreamVintageLabel ??
+                "No active source vintage is recorded."}
+            </p>
+            <p className="atlas-indicator-scope">
+              {ATLAS_LAYER_DESCRIPTION[layer]}
+            </p>
+            <p className="atlas-indicator-scope">
+              {ATLAS_LAYER_MISSINGNESS[layer]}
+            </p>
+            <p className="atlas-indicator-scope">
               Map scope: map-eligible sovereign-state entries under
-              jurisdiction-status/v1. <a href="/country">Browse the full reference catalog</a>.
+              jurisdiction-status/v1. <Link href="/country">Browse the full reference catalog</Link>.
             </p>
           </div>
         </div>
@@ -594,7 +677,9 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               </span>
             ))}
             <button
+              type="button"
               className="go-btn"
+              disabled={pinned.length < 2}
               onClick={() => {
                 if (pinned.length < 2) return;
                 onOpenCompare();
@@ -611,13 +696,12 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
             <div className="cta cta--desktop">
               <span className="k">Drag</span> to pan &middot;{" "}
               <span className="k">Scroll</span> to zoom &middot;{" "}
-              <span className="k">Click</span> a country &middot;{" "}
-              <span className="k">Shift-click</span> to compare
+              <span className="k">Click</span> a country to select it
             </div>
             <div className="cta cta--mobile">
               <span className="k">Pinch</span> to zoom &middot;{" "}
-              <span className="k">Tap</span> a country &middot;{" "}
-              <span className="k">Tap two</span> to compare
+              <span className="k">Tap</span> a country to select it &middot;{" "}
+              use Country controls to compare
             </div>
           </div>
           <div className="atlas-zoombar">
@@ -653,7 +737,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               position: "fixed",
               left: hoverCard.x,
               top: hoverCard.y,
-              zIndex: 60,
+              zIndex: "var(--z-tooltip)",
               pointerEvents: "none",
               width: 360,
             }}

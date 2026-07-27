@@ -14,6 +14,13 @@ const db = createDb();
 const SOURCE_ID = "transparency_intl";
 const METRIC_ID = "cpi";
 const DRY_RUN = process.argv.includes("--dry-run");
+const ATLAS_RELEASE_ID =
+  process.argv
+    .find((arg) => arg.startsWith("--release-id="))
+    ?.slice("--release-id=".length)
+    .trim() ||
+  process.env.CIVICA_ATLAS_RELEASE_ID?.trim() ||
+  null;
 
 function competitionRanks(
   rows: readonly { iso3: string; score: number }[],
@@ -33,6 +40,11 @@ function competitionRanks(
 }
 
 async function main() {
+  if (!DRY_RUN && !ATLAS_RELEASE_ID) {
+    throw new Error(
+      "A named Atlas release is required: pass --release-id=<id> or set CIVICA_ATLAS_RELEASE_ID.",
+    );
+  }
   const datasetYear = Number(
     process.env.CI_DATASET_YEAR ?? CI_RELEASE_DATASET_YEAR,
   );
@@ -64,7 +76,17 @@ async function main() {
     written += 1;
   }
 
-  await writeCountryMetrics(db as never, output, { dryRun: DRY_RUN });
+  await writeCountryMetrics(db as never, output, {
+    dryRun: DRY_RUN,
+    history: ATLAS_RELEASE_ID
+      ? {
+          changeKind: "routine_refresh",
+          reason: "Transparency International CPI release refresh",
+          methodologyVersion: "transparency-cpi-country-metrics/v1",
+          releaseId: ATLAS_RELEASE_ID,
+        }
+      : undefined,
+  });
   console.log(`Done. Inserted/updated: ${written}; source rows: ${result.records.length}`);
 }
 

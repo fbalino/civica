@@ -86,17 +86,24 @@
 import { eq, sql } from "drizzle-orm";
 
 import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -240,8 +247,7 @@ export const STATCAN_INDICATORS: readonly StatCanIndicatorConfig[] = [
     tableRef: "17-10-0009-01",
     factKey: "population_total",
     label: "Population estimates, quarterly (Canada total)",
-    docUrl:
-      "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710000901",
+    docUrl: "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710000901",
     civicaRole: "canonical",
   },
   {
@@ -263,8 +269,7 @@ export const STATCAN_INDICATORS: readonly StatCanIndicatorConfig[] = [
     tableRef: "18-10-0004-01",
     factKey: "inflation_rate",
     label: "Consumer Price Index, all-items NSA, monthly (Canada YoY)",
-    docUrl:
-      "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401",
+    docUrl: "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810000401",
     civicaRole: "canonical",
     valueTransform: (observations: StatCanObservation[]) => {
       // Observations come back oldest-first per WDS spec; the
@@ -294,10 +299,8 @@ export const STATCAN_INDICATORS: readonly StatCanIndicatorConfig[] = [
     productId: 14100287,
     tableRef: "14-10-0287-03",
     factKey: "unemployment_rate_pct",
-    label:
-      "Unemployment rate, both genders, 15+, seasonally adjusted, monthly",
-    docUrl:
-      "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410028703",
+    label: "Unemployment rate, both genders, 15+, seasonally adjusted, monthly",
+    docUrl: "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410028703",
     civicaRole: "canonical",
   },
 ];
@@ -349,6 +352,8 @@ export interface StatCanSyncSummary {
 }
 
 export interface StatCanSyncOptions {
+  /** Override configured targets for deterministic aggregate fixtures. */
+  targets?: readonly StatCanIndicatorConfig[];
   /** Limit to a specific fact-key (for testing). */
   factKey?: string;
   /** When true, no DB writes — just exercise fetch + filter + log. */
@@ -360,6 +365,8 @@ export interface StatCanSyncOptions {
   fetchObservations?: typeof fetchVectorObservations;
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface StatCanJurisdiction {
@@ -571,8 +578,12 @@ export async function syncStatCanCa(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
-  const targets = STATCAN_INDICATORS.filter((c) => {
+  const targets = (options.targets ?? STATCAN_INDICATORS).filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
     return true;
   });
@@ -592,15 +603,17 @@ export async function syncStatCanCa(
 
   // Resolve the Canada jurisdiction once; the sync is single-jurisdiction
   // by design (Statistics Canada scope is Canada-only).
-  const canRows = options.jurisdiction ? [options.jurisdiction] : await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso2: jurisdictions.iso2,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(eq(jurisdictions.iso2, "CA"));
+  const canRows = options.jurisdiction
+    ? [options.jurisdiction]
+    : await db
+        .select({
+          id: jurisdictions.id,
+          slug: jurisdictions.slug,
+          iso2: jurisdictions.iso2,
+          iso3: jurisdictions.iso3,
+        })
+        .from(jurisdictions)
+        .where(eq(jurisdictions.iso2, "CA"));
   if (canRows.length === 0) {
     return {
       startedAt,
@@ -623,10 +636,7 @@ export async function syncStatCanCa(
 
   const counters = new Map<string, PerStatCanCounters>();
   for (const c of targets) {
-    counters.set(
-      c.factKey,
-      freshCounters(c.factKey, c.vectorId, c.productId),
-    );
+    counters.set(c.factKey, freshCounters(c.factKey, c.vectorId, c.productId));
   }
 
   const currentYear = new Date().getUTCFullYear();
@@ -653,10 +663,9 @@ export async function syncStatCanCa(
     let observations: StatCanObservation[];
     let numericValue: number;
     try {
-      observations = await (options.fetchObservations ?? fetchVectorObservations)(
-        config.vectorId,
-        config.latestN,
-      );
+      observations = await (
+        options.fetchObservations ?? fetchVectorObservations
+      )(config.vectorId, config.latestN);
       counter.observations = observations.length;
       const transform =
         config.valueTransform ??
@@ -677,6 +686,12 @@ export async function syncStatCanCa(
       log(
         `  rejected_parse_error: StatCan returned non-finite value for ${config.factKey} (observations=${observations.length})`,
       );
+      recordRequiredSubfeedOutcome({
+        errors,
+        source: "StatCan",
+        target: `${config.factKey} (vector ${config.vectorId})`,
+        rowsWritten: counter.written,
+      });
       continue;
     }
     counter.jurisdictions_with_value = 1;
@@ -705,6 +720,12 @@ export async function syncStatCanCa(
         log(
           `  rejected_envelope: ${config.factKey} = ${numericValue} outside [${min}, ${max}]`,
         );
+        recordRequiredSubfeedOutcome({
+          errors,
+          source: "StatCan",
+          target: `${config.factKey} (vector ${config.vectorId})`,
+          rowsWritten: counter.written,
+        });
         continue;
       }
     }
@@ -764,6 +785,12 @@ export async function syncStatCanCa(
       counter.written++;
       totalWritten++;
       touchedPairs.add(`${can.id}|${config.factKey}`);
+      recordRequiredSubfeedOutcome({
+        errors,
+        source: "StatCan",
+        target: `${config.factKey} (vector ${config.vectorId})`,
+        rowsWritten: counter.written,
+      });
       continue;
     }
 
@@ -792,61 +819,34 @@ export async function syncStatCanCa(
         .limit(1);
       const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-      await db
-        .insert(countryFacts)
-        .values({
-          jurisdictionId: can.id,
-          factKey: config.factKey,
-          factGroup: factKeyDef.group,
-          category: factKeyDef.category,
-          sourceId: "statcan_ca",
-          sourceUrl: config.docUrl,
-          references: referencesPayload,
-          sourceHash: hash,
-          factValue: String(numericValue),
-          factValueNumeric: numericValue,
-          factUnit: factKeyDef.unit ?? null,
-          factYear,
-          valueJson: null,
-          asOf,
-          retrievedAt: new Date(),
-          upstreamVintageLabel: vintageLabel,
-          methodologyVersion: "v0.1-beta",
-          status: "active",
-          statusReason: null,
-          snapshotId,
-          sourceNote: null,
-          valueType,
-        })
-        .onConflictDoUpdate({
-          target: [
-            countryFacts.jurisdictionId,
-            countryFacts.factKey,
-            countryFacts.sourceId,
-          ],
-          // F.5.1 invariant: do NOT add `status` or `statusReason`
-          // to this set clause. Reviewer-demoted rows must survive
-          // a re-sync so the resolver continues to honour the
-          // human decision.
-          //
-          // Bug 1 — `valueType` IS included in the set clause so
-          // per-row tag updates land on subsequent syncs.
-          set: {
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            asOf,
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: vintageLabel,
-            snapshotId,
-            valueType,
-            updatedAt: new Date(),
-          },
-        });
+      const values = {
+        jurisdictionId: can.id,
+        factKey: config.factKey,
+        factGroup: factKeyDef.group,
+        category: factKeyDef.category,
+        sourceId: "statcan_ca",
+        sourceUrl: config.docUrl,
+        references: referencesPayload,
+        sourceHash: hash,
+        factValue: String(numericValue),
+        factValueNumeric: numericValue,
+        factUnit: factKeyDef.unit ?? null,
+        factYear,
+        valueJson: null,
+        asOf,
+        retrievedAt: new Date(),
+        upstreamVintageLabel: vintageLabel,
+        methodologyVersion: "v0.1-beta",
+        status: "active",
+        statusReason: null,
+        snapshotId,
+        sourceNote: null,
+        valueType,
+      };
+      await writeFact(db, {
+        values,
+        history: routineCountryFactHistory(values, atlasReleaseId!),
+      });
       counter.written++;
       totalWritten++;
       touchedPairs.add(`${can.id}|${config.factKey}`);
@@ -860,13 +860,13 @@ export async function syncStatCanCa(
         }`,
       );
     }
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "StatCan",
+      target: `${config.factKey} (vector ${config.vectorId})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("statcan_ca", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -881,13 +881,17 @@ export async function syncStatCanCa(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return;
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return;
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -897,6 +901,15 @@ export async function syncStatCanCa(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "statcan_ca",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerStatCanCounters> = {};

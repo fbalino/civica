@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "pulse-prospective-start-readiness/v1",
+  "taskId": "PUL-040",
+  "checkedAt": "2026-07-26T16:00:20.208Z",
+  "status": "blocked",
+  "protocol": {
+    "schemaVersion": "pulse-validation-protocol/v1",
+    "semanticSha256": "89bea0ceb83090725e9a65a39e7e96a0f8e5badcae988493cd06873267a329e3",
+    "status": "preregistered_not_started",
+    "currentRuntimeMethod": "pulse-v2.15-beta",
+    "durationDays": 90
+  },
+  "runtime": {
+    "codeMethodVersion": "pulse-v2.15-beta",
+    "checkedContractVersion": "pulse-v2.15-beta",
+    "checkedContractHash": "992f3ee25ca794835d318dfeec554856dd39c2b6a2631a11c79eab9d10bcce20",
+    "checkedObservedEvidenceThrough": "2026-07-26",
+    "liveObservedEvidenceThrough": "2026-07-26"
+  },
+  "scheduledRoutes": [
+    {
+      "route": "/api/cron/pulse/v2/ingest",
+      "configuredInRepository": true,
+      "deployedEnabledState": "not_verified"
+    },
+    {
+      "route": "/api/cron/pulse/v2/cluster",
+      "configuredInRepository": true,
+      "deployedEnabledState": "not_verified"
+    },
+    {
+      "route": "/api/cron/pulse/v2/classify",
+      "configuredInRepository": true,
+      "deployedEnabledState": "not_verified"
+    },
+    {
+      "route": "/api/cron/pulse/v2/score",
+      "configuredInRepository": true,
+      "deployedEnabledState": "not_verified"
+    },
+    {
+      "route": "/api/cron/pulse/v2/review-sla",
+      "configuredInRepository": true,
+      "deployedEnabledState": "not_verified"
+    }
+  ],
+  "currentMethodSuccessfulRuns": [
+    {
+      "stage": "ingest",
+      "completedCount": 0,
+      "latestCompletedAt": null
+    },
+    {
+      "stage": "cluster",
+      "completedCount": 0,
+      "latestCompletedAt": null
+    },
+    {
+      "stage": "classify",
+      "completedCount": 0,
+      "latestCompletedAt": null
+    },
+    {
+      "stage": "corroborate",
+      "completedCount": 1,
+      "latestCompletedAt": "2026-07-12 11:26:09.685"
+    },
+    {
+      "stage": "score",
+      "completedCount": 1,
+      "latestCompletedAt": "2026-07-12 11:26:10.262"
+    }
+  ],
+  "prerequisites": [
+    {
+      "id": "protocol_artifact_and_hash_checked_in",
+      "status": "pass",
+      "evidence": "protocol pulse-validation-protocol/v1 semantic SHA-256 89bea0ceb83090725e9a65a39e7e96a0f8e5badcae988493cd06873267a329e3"
+    },
+    {
+      "id": "runtime_method_and_every_stage_version_frozen",
+      "status": "pass",
+      "evidence": "runtime pulse-v2.15-beta contract 992f3ee25ca794835d318dfeec554856dd39c2b6a2631a11c79eab9d10bcce20"
+    },
+    {
+      "id": "scheduled_ingest_cluster_classify_score_and_review_sla_routes_enabled",
+      "status": "configured_not_deployed_verified",
+      "evidence": "vercel.json"
+    },
+    {
+      "id": "one_successful_current_version_run_for_each_automatic_stage",
+      "status": "fail",
+      "evidence": "read-only aggregate pulse_pipeline_runs query"
+    },
+    {
+      "id": "append_only_evidence_and_output_history_live_validators_pass",
+      "status": "blocked_pending_migrations_and_live_validation",
+      "evidence": "PUL-024, PUL-027, and PUL-043 completion boundaries"
+    },
+    {
+      "id": "source_coverage_and_observability_snapshot_recorded",
+      "status": "not_recorded_at_start_boundary",
+      "evidence": "start boundary does not yet exist"
+    },
+    {
+      "id": "no_prospective_human_labels_exist",
+      "status": "pass",
+      "evidence": "protocol remains preregistered_not_started; no start/window record exists"
+    },
+    {
+      "id": "start_instant_and_planned_end_date_recorded_before_first_eligible_retrieval",
+      "status": "not_recorded",
+      "evidence": "earliest compliant start remains unknown"
+    }
+  ],
+  "earliestCompliantStart": null,
+  "plannedEnd": null,
+  "startCalculation": "After every prerequisite passes, record the boundary before the next eligible retrieval. The start is that first retained eligible retrieval timestamp; plannedEnd is exactly 90 consecutive UTC days later. Never backdate.",
+  "semanticSha256": "ac3d5f7b79bc53fea4cecb090535c2b38cc313bc4237492996c308ff664665ac"
+}

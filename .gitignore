@@ -24,6 +24,7 @@
 /output/
 /test-results/
 /.firecrawl/
+/data/research-input-cache/
 
 # misc
 .DS_Store

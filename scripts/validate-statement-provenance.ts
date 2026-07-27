@@ -8,8 +8,6 @@ config({ path: ".env.local" });
 const migrationPath = "drizzle/authoritative/0001_aspiring_bloodaxe.sql";
 const migration = readFileSync(migrationPath, "utf8");
 const producerPaths = [
-  "scripts/sync-elections-ipu.ts",
-  "scripts/sync-elections-turnout-idea.ts",
   "src/lib/elections/writer.ts",
   "src/lib/factbook/atlas-seed-writer.ts",
   "src/lib/factbook/cia-cabinets-sync.ts",
@@ -47,15 +45,31 @@ function findTypeScriptFiles(directory: string): string[] {
 
 const discoveredProducers = ["src", "scripts"]
   .flatMap(findTypeScriptFiles)
-  .filter((path) => /insert\(statements\)|db\.insert\(statements\)/.test(readFileSync(path, "utf8")))
+  .filter((path) => !path.includes("/__tests__/") && !path.endsWith(".test.ts"))
+  .filter((path) =>
+    /insert\(statements\)|db\.insert\(statements\)|INSERT\s+INTO\s+statements/i.test(
+      readFileSync(path, "utf8"),
+    ),
+  )
   .sort();
 if (JSON.stringify(discoveredProducers) !== JSON.stringify(producerPaths)) {
   errors.push(`statement producer inventory drift: ${JSON.stringify(discoveredProducers)}`);
 }
 for (let index = 0; index < producerSources.length; index += 1) {
   const source = producerSources[index];
-  if (!source.includes("statements.sourceId")) errors.push(`${producerPaths[index]} does not include source_id in its statement identity lookup`);
-  if (!/select\(|\.select\(/.test(source) || !/update\(statements\)|\.update\(statements\)/.test(source)) {
+  const rawSqlProducer = /INSERT\s+INTO\s+statements/i.test(source);
+  const hasSourceIdentity = rawSqlProducer
+    ? /source_id\s*=\s*\$\{|ON CONFLICT\s*\([^)]*source_id/i.test(source)
+    : source.includes("statements.sourceId");
+  if (!hasSourceIdentity)
+    errors.push(
+      `${producerPaths[index]} does not include source_id in its statement identity lookup`,
+    );
+  const hasRerunUpdate = rawSqlProducer
+    ? /ON CONFLICT\s*\([^)]*source_id[^)]*\)\s*DO UPDATE SET/i.test(source)
+    : (/select\(|\.select\(/.test(source) &&
+      /update\(statements\)|\.update\(statements\)/.test(source));
+  if (!hasRerunUpdate) {
     errors.push(`${producerPaths[index]} lacks an update-on-rerun statement path`);
   }
 }

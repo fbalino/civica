@@ -6,15 +6,14 @@
  */
 
 /* ----------------------------------------------------------------
- * Local chart / pulse-impact tokens — scoped to this page's
- * container so they don't pollute :root. These are chart-blue and
- * pulse-direction colors that have no global equivalent token.
+ * Local aliases compose the canonical semantic tokens used by the
+ * chart and Pulse impact states.
  * ---------------------------------------------------------------- */
 .ci-country-detail-container {
-  --chart-line-default: oklch(55% 0.18 245);
-  --pulse-impact-mid-pos: oklch(60% 0.17 45);
-  --pulse-impact-strong-neg: oklch(52% 0.18 145);
-  --pulse-impact-mid-neg: oklch(65% 0.17 85);
+  --chart-line-default: var(--gov-parl);
+  --pulse-impact-mid-pos: var(--color-warn);
+  --pulse-impact-strong-neg: var(--color-success);
+  --pulse-impact-mid-neg: var(--color-warn);
 }
 
 /* ----------------------------------------------------------------
@@ -945,6 +944,12 @@
 .compare-indicator-history-country strong {
   color: var(--color-text-primary);
   font-size: var(--text-14);
+}
+
+.compare-indicator-history-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 @media (max-width: 768px) {

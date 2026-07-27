@@ -4,12 +4,16 @@ import { readFileSync } from "node:fs";
 import {
   currentIndexSnapshot,
   indexChangeControlErrors,
+  stagedIndexSnapshot,
   type IndexChangeRegistry,
 } from "../src/lib/ci/index-change-control";
 
 const path = "data/releases/index-change-control-v1/registry.v1.json";
 const registry = JSON.parse(readFileSync(path, "utf8")) as IndexChangeRegistry;
-const errors = indexChangeControlErrors(registry, currentIndexSnapshot());
+const snapshot = process.argv.includes("--staged")
+  ? stagedIndexSnapshot()
+  : currentIndexSnapshot();
+const errors = indexChangeControlErrors(registry, snapshot);
 if (errors.length > 0) {
   for (const error of errors) console.error(`ERROR: ${error}`);
   process.exit(1);

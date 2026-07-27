@@ -15,14 +15,18 @@
  * Resolution:  ~/Downloads/resolution\ \(2\).md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
+import { createDeferredSourceFreshness } from "@/lib/db/source-freshness";
+import {
+  assertRequiredClassificationOutputs,
+  finalizeClassificationFreshness,
+} from "@/lib/factbook/reconcile/classification-freshness";
 import {
   syncWorldBankClassifications,
   syncVdemRow,
   syncMonarchyAndGovernmentForm,
 } from "@/lib/factbook/reconcile/sync-classifications";
-import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,75 +34,64 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 180;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
-  try {
-    const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
-    const wb = await syncWorldBankClassifications(db, { dryRun });
-    const vdem = await syncVdemRow(db, { dryRun });
-    const monarchy = await syncMonarchyAndGovernmentForm(db, { dryRun });
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
+  const freshness = createDeferredSourceFreshness();
+  const wb = await syncWorldBankClassifications(db, {
+    dryRun,
+    markSynced: freshness.capture,
+  });
+  const vdem = await syncVdemRow(db, {
+    dryRun,
+    markSynced: freshness.capture,
+  });
+  const monarchy = await syncMonarchyAndGovernmentForm(db, {
+    dryRun,
+    markSynced: freshness.capture,
+  });
 
-    assertExternalSyncSucceeded("factbook.classifications.world-bank", {
-      totalWritten: wb.regionRowsWritten + wb.incomeRowsWritten,
-      errors: wb.errors,
-      dryRun,
-    });
-    assertExternalSyncSucceeded("factbook.classifications.vdem", {
-      totalWritten: vdem.rowsWritten,
-      errors: vdem.errors,
-      dryRun,
-    });
-    assertExternalSyncSucceeded("factbook.classifications.monarchy", {
-      totalWritten: monarchy.monarchyRowsWritten + monarchy.formDescriptionRowsWritten,
-      errors: monarchy.errors,
-      dryRun,
-    });
+  await finalizeClassificationFreshness(
+    () => {
+      assertRequiredClassificationOutputs({
+        worldBank: wb,
+        vdem,
+        cia: monarchy,
+        dryRun,
+      });
+    },
+    () => freshness.flush({ executor: db }),
+  );
 
-    const totalErrors = [
-      ...wb.errors,
-      ...vdem.errors,
-      ...monarchy.errors,
-    ];
+  const totalErrors = [...wb.errors, ...vdem.errors, ...monarchy.errors];
 
-    return NextResponse.json({
-      ok: totalErrors.length === 0,
-      step: "factbook.sync-classifications",
-      started: startedAt,
-      finished: new Date().toISOString(),
-      worldBank: {
-        regionRows: wb.regionRowsWritten,
-        incomeRows: wb.incomeRowsWritten,
-        durationSec: Math.round(wb.durationMs / 1000),
-        errors: wb.errors.length,
-      },
-      vdem: {
-        rows: vdem.rowsWritten,
-        durationSec: Math.round(vdem.durationMs / 1000),
-        errors: vdem.errors.length,
-      },
-      monarchy: {
-        monarchyRows: monarchy.monarchyRowsWritten,
-        formRows: monarchy.formDescriptionRowsWritten,
-        buckets: monarchy.monarchyBuckets,
-        durationSec: Math.round(monarchy.durationMs / 1000),
-        errors: monarchy.errors.length,
-      },
-      totalErrors: totalErrors.length,
-    });
-  } catch (err) {
-    console.error("[cron factbook.sync-classifications] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.sync-classifications",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    ok: totalErrors.length === 0,
+    step: "factbook.sync-classifications",
+    started: startedAt,
+    finished: new Date().toISOString(),
+    worldBank: {
+      regionRows: wb.regionRowsWritten,
+      incomeRows: wb.incomeRowsWritten,
+      durationSec: Math.round(wb.durationMs / 1000),
+      errors: wb.errors.length,
+    },
+    vdem: {
+      rows: vdem.rowsWritten,
+      durationSec: Math.round(vdem.durationMs / 1000),
+      errors: vdem.errors.length,
+    },
+    monarchy: {
+      monarchyRows: monarchy.monarchyRowsWritten,
+      formRows: monarchy.formDescriptionRowsWritten,
+      buckets: monarchy.monarchyBuckets,
+      durationSec: Math.round(monarchy.durationMs / 1000),
+      errors: monarchy.errors.length,
+    },
+    totalErrors: totalErrors.length,
+  });
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.classifications", handler);
+
+export { cronHandler as GET, cronHandler as POST };

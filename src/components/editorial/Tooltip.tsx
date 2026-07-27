@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  cloneElement,
-  isValidElement,
   useCallback,
   useEffect,
   useId,
@@ -11,22 +9,18 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
-  type PointerEvent as ReactPointerEvent,
-  type ReactElement,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 
-// SSR-safe "are we on the client?" signal, via useSyncExternalStore: the server
-// snapshot is false, the client snapshot is true, so the portalled bubble is
-// only ever created after hydration — no `document` access during SSR and no
-// hydration mismatch. (Preferred over a setState-in-effect mount flag.)
-const emptySubscribe = () => () => {};
+// SSR-safe mount signal. The first client render deliberately matches the
+// server's `false`, then enables the portal after hydration; a client-only
+// snapshot during hydration would change the trigger tree and cause a mismatch.
 function useMounted(): boolean {
   return useSyncExternalStore(
-    emptySubscribe,
+    () => () => {},
     () => true,
-    () => false
+    () => false,
   );
 }
 
@@ -54,15 +48,14 @@ function useMounted(): boolean {
  *
  * A11y
  * role="tooltip" on the bubble; aria-describedby is wired only while the tooltip
- * is open, onto WHATEVER element actually receives focus. When the child is
- * natively focusable (a <button>, <a href>, <input>, or anything carrying its
- * own tabIndex), the wrapper stays a passive span and aria-describedby is cloned
- * onto the child. When the child is NOT focusable (a bare <span>/<img>, as the
- * leader portrait passes), the wrapper itself becomes the keyboard target
- * (tabIndex={0}, role="button") and carries aria-describedby — so every tooltip
- * can be opened by keyboard, not just the ones whose child happens to be
- * interactive. Escape closes it. On touch/coarse pointers a tap toggles it (the
- * <InfoTip> trigger is a real <button> so it is keyboard- and touch-operable).
+ * is open, onto WHATEVER element actually receives focus. The wrapper begins as
+ * a passive span on both the server and the first client render. After hydration
+ * it detects a focusable child (a <button>, <a href>, <input>, or tab-indexed
+ * control): that child remains the focus target; otherwise the wrapper becomes
+ * the keyboard target. This post-hydration decision avoids inspecting an RSC
+ * child during render, which can produce different server/client trees. Escape
+ * closes it. On touch/coarse pointers a tap toggles it (the <InfoTip> trigger is
+ * a real <button> so it is keyboard- and touch-operable).
  *
  * Styling lives entirely in editorial.css under `.editorial-tooltip` — tokens
  * only, no hardcoded colors/fonts/spacing here.
@@ -73,34 +66,14 @@ type TooltipPlacement = "top" | "bottom";
 const VIEWPORT_MARGIN = 8; // px gutter kept between the bubble and the viewport edge
 const TRIGGER_GAP = 8; // px between the trigger and the bubble
 
-// Tags that are keyboard-focusable without an explicit tabIndex. Kept lowercase
-// because React lowercases intrinsic element `type` strings.
-const NATIVELY_FOCUSABLE_TAGS = new Set([
-  "a",
-  "button",
-  "input",
-  "select",
-  "textarea",
-]);
-
-/**
- * Is this trigger child already keyboard-focusable on its own? True when it is a
- * natively-focusable element (and, for <a>, actually has an href) or it carries
- * an explicit non-negative tabIndex. Used to decide whether the WRAPPER must
- * become the keyboard target instead.
- */
-function childIsFocusable(child: ReactElement): boolean {
-  const props = (child.props ?? {}) as {
-    tabIndex?: number;
-    href?: string;
-    disabled?: boolean;
-  };
-  if (typeof props.tabIndex === "number") return props.tabIndex >= 0;
-  if (typeof child.type !== "string") return false; // component — assume not focusable
-  const tag = child.type.toLowerCase();
-  if (tag === "a") return props.href != null; // an anchor is only focusable with href
-  return NATIVELY_FOCUSABLE_TAGS.has(tag);
-}
+const FOCUSABLE_DESCENDANT = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(", ");
 
 interface TooltipCoords {
   left: number;
@@ -112,7 +85,7 @@ interface TooltipProps {
   /** The tooltip body. Kept short — the surface caps at 280px and wraps. */
   content: ReactNode;
   /** The element the tooltip describes. A single focusable/hoverable node. */
-  children: ReactElement;
+  children: ReactNode;
   /** Preferred side; flips automatically when it would clip. Default "top". */
   placement?: TooltipPlacement;
   /** Extra class on the trigger wrapper. */
@@ -124,6 +97,10 @@ interface TooltipProps {
    * the wrapper (the Tooltip positions against `triggerRef.getBoundingClientRect()`).
    */
   triggerStyle?: CSSProperties;
+  /** Accessible label for a non-native tooltip trigger. */
+  ariaLabel?: string;
+  /** Semantic role for a non-native trigger. Data-only hover regions use img. */
+  triggerRole?: "button" | "img";
 }
 
 export function Tooltip({
@@ -132,13 +109,28 @@ export function Tooltip({
   placement = "top",
   className,
   triggerStyle,
+  ariaLabel,
+  triggerRole = "button",
 }: TooltipProps) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState<TooltipCoords | null>(null);
+  const [wrapperIsFocusable, setWrapperIsFocusable] = useState(false);
+  const [focusTarget, setFocusTarget] = useState<HTMLElement | null>(null);
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const bubbleRef = useRef<HTMLDivElement | null>(null);
   const tipId = useId();
   const mounted = useMounted();
+
+  // An RSC child is not guaranteed to be a React element on the first client
+  // render. Resolve its actual DOM shape only after hydration so the wrapper
+  // never changes from a server <span> into a client child node.
+  useEffect(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const descendant = trigger.querySelector<HTMLElement>(FOCUSABLE_DESCENDANT);
+    setFocusTarget(descendant);
+    setWrapperIsFocusable(descendant === null);
+  }, []);
 
   const position = useCallback(() => {
     const trigger = triggerRef.current;
@@ -202,6 +194,22 @@ export function Tooltip({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // Keep the relationship on the element that receives focus. This must happen
+  // after hydration because RSC children cannot safely be cloned during render.
+  useEffect(() => {
+    if (!focusTarget) return;
+    const previous = focusTarget.getAttribute("aria-describedby");
+    if (open) {
+      const ids = new Set((previous ?? "").split(/\s+/).filter(Boolean));
+      ids.add(tipId);
+      focusTarget.setAttribute("aria-describedby", [...ids].join(" "));
+    }
+    return () => {
+      if (previous === null) focusTarget.removeAttribute("aria-describedby");
+      else focusTarget.setAttribute("aria-describedby", previous);
+    };
+  }, [focusTarget, open, tipId]);
+
   const show = useCallback(() => setOpen(true), []);
   // Reset coords on hide (in the handler, not an effect) so the next open
   // measures fresh — no stale position flashes for a frame before re-measure.
@@ -229,9 +237,15 @@ export function Tooltip({
     else show();
   }, [open, hide, show]);
 
-  if (!isValidElement(children)) return children;
-
-  const focusableChild = childIsFocusable(children);
+  const onTriggerKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLSpanElement>) => {
+      if (!wrapperIsFocusable) return;
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      onClick();
+    },
+    [wrapperIsFocusable, onClick],
+  );
 
   const wrapperClass = ["editorial-tooltip-trigger", className]
     .filter(Boolean)
@@ -262,39 +276,33 @@ export function Tooltip({
       )
     ) : null;
 
-  // A1: describe whichever node actually receives focus. When the child is
-  // natively focusable, aria-describedby lives on the CHILD (focus lands there,
-  // not on the wrapper span) and the wrapper stays a passive anchor. When the
-  // child is NOT focusable (a bare <span>/<img> like the leader portrait), the
-  // wrapper itself becomes the keyboard target and carries the description — so
-  // the tooltip is reachable and announced by keyboard in both cases.
+  // A1: describe whichever node actually receives focus. A focusable descendant
+  // receives the relationship in the effect above; otherwise this wrapper is the
+  // focus target after hydration.
   const describedBy = open ? tipId : undefined;
-  const renderedChild = focusableChild
-    ? cloneElement(children as ReactElement<{ "aria-describedby"?: string }>, {
-        "aria-describedby": describedBy,
-      })
-    : children;
 
   return (
     <span
       ref={triggerRef}
       className={wrapperClass}
       style={triggerStyle}
-      {...(focusableChild
-        ? {}
-        : {
+      {...(wrapperIsFocusable
+        ? {
             tabIndex: 0,
-            role: "button",
+            role: triggerRole,
+            "aria-label": ariaLabel,
             "aria-describedby": describedBy,
-          })}
+          }
+        : {})}
       onPointerDown={onPointerDown}
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}
       onBlur={hide}
       onClick={onClick}
+      onKeyDown={onTriggerKeyDown}
     >
-      {renderedChild}
+      {children}
       {bubble}
     </span>
   );

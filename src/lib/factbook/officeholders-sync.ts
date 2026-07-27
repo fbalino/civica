@@ -17,7 +17,7 @@
  * run stamps `sources.last_sync_at` via `markSourcesSynced("wikidata", …)` —
  * the one sanctioned path — and only when rows were actually written.
  */
-import { eq, sql, ilike } from "drizzle-orm";
+import { and, eq, ilike, notInArray, sql } from "drizzle-orm";
 
 import { db as sharedDb } from "@/lib/db";
 import {
@@ -29,8 +29,18 @@ import {
   statements,
   legislatureParties,
 } from "@/lib/db/schema";
-import { sparqlQuery, extractQid } from "@/lib/data/wikidata";
+import {
+  sparqlQuery,
+  extractQid,
+  type SparqlBinding,
+} from "@/lib/data/wikidata";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "@/lib/factbook/country-fact-history-writer";
+import {
+  governmentEntityHistoryWriters,
+  type GovernmentEntityHistoryContext,
+  type GovernmentEntityHistoryWriters,
+} from "@/lib/factbook/government-entity-history-writer";
 import {
   chunk,
   mediaQuery,
@@ -59,9 +69,14 @@ export interface OfficeholderSyncOptions {
   enrichmentPlan?: EnrichmentPlan;
   enrichPersons?: typeof enrichPersonPortraits;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  entityWriters?: GovernmentEntityHistoryWriters;
+  retirePrincipalTerms?: typeof retireUnselectedPrincipalTerms;
 }
 
 export interface OfficeholderSyncSummary {
+  /** Whether every stage completed. Partial runs never advance freshness. */
+  status: "completed" | "partial";
   startedAt: string;
   finishedAt: string;
   durationMs: number;
@@ -69,6 +84,8 @@ export interface OfficeholderSyncSummary {
   countriesSynced: number;
   /** Countries seen in Wikidata but not matched to a jurisdiction. */
   countriesSkipped: number;
+  /** Previously-current principal terms retired after full-set reconciliation. */
+  termsRetired: number;
   /** Unresolved `Q…`-as-name persons that were resolved to real labels. */
   qidNamesResolved: number;
   /** Real office titles (P39) written over generic names. */
@@ -83,6 +100,8 @@ export interface OfficeholderSyncSummary {
   personPortraitsWritten: number;
   /** Wider `persons` backfill: birthdates filled for non-principal persons. */
   personBirthdatesWritten: number;
+  /** Whether the wider person backfill failed after the principal sync. */
+  personPortraitBackfillFailed: boolean;
   /** Total rows written (base + titles + parties + portraits + birthdates + person backfill) — drives the freshness stamp. */
   totalRowsWritten: number;
   /** Whether `sources.last_sync_at` was stamped this run. */
@@ -95,30 +114,184 @@ export interface OfficeholderSyncSummary {
 // of these, so it is never clobbered.
 const GENERIC_OFFICE_NAMES = new Set(["Head of State", "Head of Government"]);
 
-const QUERY = `
+export const OFFICEHOLDER_QUERY = `
 SELECT ?state ?stateLabel ?iso2 ?iso3 ?shortName
-       ?headOfState ?headOfStateLabel ?hosStart
-       ?headOfGov ?headOfGovLabel ?hogStart
+       ?headOfState ?headOfStateLabel ?hosStart ?hosRank
+       ?headOfGov ?headOfGovLabel ?hogStart ?hogRank
 WHERE {
   ?state wdt:P31 wd:Q3624078 .
   OPTIONAL { ?state wdt:P297 ?iso2 . }
   OPTIONAL { ?state wdt:P298 ?iso3 . }
   OPTIONAL { ?state wdt:P1813 ?shortName . FILTER(LANG(?shortName) = "en") }
   OPTIONAL {
+    ?state wdt:P35 ?headOfState .
     ?state p:P35 ?hosStatement .
     ?hosStatement ps:P35 ?headOfState .
+    ?hosStatement wikibase:rank ?hosRank .
     OPTIONAL { ?hosStatement pq:P580 ?hosStart . }
     FILTER NOT EXISTS { ?hosStatement pq:P582 ?hosEnd . }
   }
   OPTIONAL {
+    ?state wdt:P6 ?headOfGov .
     ?state p:P6 ?hogStatement .
     ?hogStatement ps:P6 ?headOfGov .
+    ?hogStatement wikibase:rank ?hogRank .
     OPTIONAL { ?hogStatement pq:P580 ?hogStart . }
     FILTER NOT EXISTS { ?hogStatement pq:P582 ?hogEnd . }
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 `;
+
+export type PrincipalOfficeholderRole =
+  | "head_of_state"
+  | "head_of_government";
+
+export interface ResolvedOfficeholderCandidate {
+  personQid: string;
+  personName: string;
+  startDate: string | null;
+  rank: "preferred" | "normal";
+}
+
+export interface ResolvedOfficeholderState {
+  stateQid: string;
+  stateName: string;
+  iso2: string | null;
+  iso3: string | null;
+  shortName: string | null;
+  headOfState: ResolvedOfficeholderCandidate[];
+  headOfGovernment: ResolvedOfficeholderCandidate[];
+  ambiguousRoles: PrincipalOfficeholderRole[];
+}
+
+function statementRank(
+  value: string | undefined,
+): "preferred" | "normal" | "deprecated" {
+  if (value?.endsWith("#PreferredRank")) return "preferred";
+  if (value?.endsWith("#DeprecatedRank")) return "deprecated";
+  return "normal";
+}
+
+function addCandidate(
+  target: Map<string, ResolvedOfficeholderCandidate>,
+  binding: SparqlBinding,
+  role: "hos" | "hog",
+) {
+  const personValue =
+    role === "hos" ? binding.headOfState?.value : binding.headOfGov?.value;
+  if (!personValue) return;
+  const rank = statementRank(
+    role === "hos" ? binding.hosRank?.value : binding.hogRank?.value,
+  );
+  if (rank === "deprecated") return;
+  const personQid = extractQid(personValue);
+  const personName =
+    (role === "hos"
+      ? binding.headOfStateLabel?.value
+      : binding.headOfGovLabel?.value) ?? personQid;
+  const startDate =
+    (role === "hos" ? binding.hosStart?.value : binding.hogStart?.value)
+      ?.split("T")[0] ?? null;
+  const candidate = { personQid, personName, startDate, rank };
+  const current = target.get(personQid);
+  if (
+    !current ||
+    (current.rank === "normal" && rank === "preferred") ||
+    (current.rank === rank &&
+      (candidate.startDate ?? "") > (current.startDate ?? ""))
+  ) {
+    target.set(personQid, candidate);
+  }
+}
+
+function selectCurrentCandidates(
+  candidates: Map<string, ResolvedOfficeholderCandidate>,
+): {
+  rows: ResolvedOfficeholderCandidate[];
+  ambiguous: boolean;
+} {
+  const all = [...candidates.values()];
+  const preferred = all.filter((row) => row.rank === "preferred");
+  if (preferred.length) {
+    return {
+      rows: preferred.sort((a, b) =>
+        a.personQid.localeCompare(b.personQid),
+      ),
+      ambiguous: false,
+    };
+  }
+  if (all.length <= 1) {
+    return {
+      rows: all.sort((a, b) => a.personQid.localeCompare(b.personQid)),
+      ambiguous: false,
+    };
+  }
+  // A normal rank is neutral and does not assert currency. Multiple
+  // un-ended normal statements are therefore unresolved source ambiguity,
+  // not evidence of co-leadership.
+  return { rows: [], ambiguous: true };
+}
+
+/**
+ * Converts the SPARQL cross-product into one deterministic state record.
+ * Preferred statements win; multiple preferred statements remain explicit
+ * co-leadership. Multiple un-ended normal statements fail closed.
+ */
+export function resolveOfficeholderBindings(
+  bindings: SparqlBinding[],
+): ResolvedOfficeholderState[] {
+  const states = new Map<
+    string,
+    {
+      state: Omit<
+        ResolvedOfficeholderState,
+        "headOfState" | "headOfGovernment" | "ambiguousRoles"
+      >;
+      hos: Map<string, ResolvedOfficeholderCandidate>;
+      hog: Map<string, ResolvedOfficeholderCandidate>;
+    }
+  >();
+  for (const binding of bindings) {
+    if (!binding.state?.value) continue;
+    const stateQid = extractQid(binding.state.value);
+    const row =
+      states.get(stateQid) ??
+      {
+        state: {
+          stateQid,
+          stateName: binding.stateLabel?.value ?? stateQid,
+          iso2: binding.iso2?.value ?? null,
+          iso3: binding.iso3?.value ?? null,
+          shortName: binding.shortName?.value ?? null,
+        },
+        hos: new Map<string, ResolvedOfficeholderCandidate>(),
+        hog: new Map<string, ResolvedOfficeholderCandidate>(),
+      };
+    addCandidate(row.hos, binding, "hos");
+    addCandidate(row.hog, binding, "hog");
+    states.set(stateQid, row);
+  }
+  return [...states.values()]
+    .map(({ state, hos, hog }) => {
+      const headOfState = selectCurrentCandidates(hos);
+      const headOfGovernment = selectCurrentCandidates(hog);
+      return {
+        ...state,
+        headOfState: headOfState.rows,
+        headOfGovernment: headOfGovernment.rows,
+        ambiguousRoles: [
+          ...(headOfState.ambiguous
+            ? (["head_of_state"] as const)
+            : []),
+          ...(headOfGovernment.ambiguous
+            ? (["head_of_government"] as const)
+            : []),
+        ],
+      };
+    })
+    .sort((a, b) => a.stateQid.localeCompare(b.stateQid));
+}
 
 const WIKIDATA_TO_SLUG: Record<string, string> = {
   "People's Republic of China": "china",
@@ -259,55 +432,37 @@ async function resolveQidLabel(qid: string): Promise<string | null> {
 async function upsertPerson(
   db: OfficeholderSyncDb,
   name: string,
-  qid: string
+  qid: string,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: persons.id, name: persons.name })
-    .from(persons)
-    .where(eq(persons.wikidataQid, qid))
-    .limit(1);
-
-  if (existing.length > 0) {
-    if (existing[0].name !== name && !name.match(/^Q\d+$/)) {
-      await db.update(persons).set({ name }).where(eq(persons.id, existing[0].id));
-    }
-    return existing[0].id;
-  }
-
-  const inserted = await db
-    .insert(persons)
-    .values({ name, wikidataQid: qid })
-    .returning({ id: persons.id });
-  return inserted[0].id;
+  return writers.mutatePerson(db, {
+    identityQid: qid,
+    insertName: name,
+    values: {
+      ...(name.match(/^Q\d+$/) ? {} : { name }),
+      wikidataQid: qid,
+    },
+    history,
+  });
 }
 
 async function upsertBody(
   db: OfficeholderSyncDb,
   jurisdictionId: string,
   name: string,
-  branch: string
+  branch: string,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: governmentBodies.id })
-    .from(governmentBodies)
-    .where(
-      sql`${governmentBodies.jurisdictionId} = ${jurisdictionId} AND ${governmentBodies.branch} = ${branch}`
-    )
-    .limit(1);
-
-  if (existing.length > 0) return existing[0].id;
-
-  const inserted = await db
-    .insert(governmentBodies)
-    .values({
-      jurisdictionId,
-      name,
-      bodyType: branch === "executive" ? "cabinet" : "parliament",
-      branch,
-      hierarchyLevel: 0,
-    })
-    .returning({ id: governmentBodies.id });
-  return inserted[0].id;
+  return writers.upsertBody(db, {
+    jurisdictionId,
+    name,
+    bodyType: branch === "executive" ? "cabinet" : "parliament",
+    branch,
+    hierarchyLevel: 0,
+    history,
+  });
 }
 
 async function upsertOffice(
@@ -315,29 +470,19 @@ async function upsertOffice(
   bodyId: string,
   name: string,
   officeType: string,
-  qid?: string
+  qid: string | undefined,
+  writers: GovernmentEntityHistoryWriters,
+  history: GovernmentEntityHistoryContext,
 ): Promise<string> {
-  const existing = await db
-    .select({ id: offices.id })
-    .from(offices)
-    .where(
-      sql`${offices.bodyId} = ${bodyId} AND ${offices.officeType} = ${officeType}`
-    )
-    .limit(1);
-
-  if (existing.length > 0) return existing[0].id;
-
-  const inserted = await db
-    .insert(offices)
-    .values({
-      bodyId,
-      name,
-      officeType,
-      isElected: true,
-      wikidataQid: qid,
-    })
-    .returning({ id: offices.id });
-  return inserted[0].id;
+  return writers.upsertOffice(db, {
+    bodyId,
+    name,
+    officeType,
+    isElected: true,
+    wikidataQid: qid,
+    identityMode: "office_type",
+    history,
+  });
 }
 
 async function upsertTerm(
@@ -359,15 +504,11 @@ async function upsertTerm(
     )
     .limit(1);
 
-  // 2. Mark every other term on this office as not current — the new one
-  //    (or the existing match) is the only current incumbent.
+  // 2. Keep the matching term current. Other current terms are reconciled
+  //    only after the complete source candidate set for this jurisdiction and
+  //    role has been resolved; deactivating here would erase legitimate
+  //    multiple-preferred co-leadership.
   if (existing.length > 0) {
-    await db
-      .update(terms)
-      .set({ isCurrent: false })
-      .where(
-        sql`${terms.officeId} = ${officeId} AND ${terms.id} <> ${existing[0].id} AND ${terms.isCurrent} = true`
-      );
     if (!existing[0].isCurrent) {
       await db
         .update(terms)
@@ -377,17 +518,40 @@ async function upsertTerm(
     return existing[0].id;
   }
 
-  await db
-    .update(terms)
-    .set({ isCurrent: false })
-    .where(
-      sql`${terms.officeId} = ${officeId} AND ${terms.isCurrent} = true`
-    );
-
   const inserted = await db.insert(terms).values({
     officeId, personId, startDate, isCurrent: true,
   }).returning({ id: terms.id });
   return inserted[0].id;
+}
+
+async function retireUnselectedPrincipalTerms(
+  db: OfficeholderSyncDb,
+  jurisdictionId: string,
+  officeType: PrincipalOfficeholderRole,
+  selectedTermIds: string[],
+): Promise<number> {
+  const scope = sql`${terms.officeId} IN (
+    SELECT ${offices.id}
+    FROM ${offices}
+    INNER JOIN ${governmentBodies}
+      ON ${offices.bodyId} = ${governmentBodies.id}
+    WHERE ${governmentBodies.jurisdictionId} = ${jurisdictionId}
+      AND ${offices.officeType} = ${officeType}
+  )`;
+  const retired = await db
+    .update(terms)
+    .set({ isCurrent: false })
+    .where(
+      and(
+        eq(terms.isCurrent, true),
+        scope,
+        selectedTermIds.length
+          ? notInArray(terms.id, selectedTermIds)
+          : undefined,
+      ),
+    )
+    .returning({ id: terms.id });
+  return retired.length;
 }
 
 async function upsertStatement(
@@ -555,6 +719,7 @@ interface EnrichmentRow {
   jurisdictionId: string;
   country: string;
   countryQid: string | null;
+  bodyId: string;
   officeId: string;
   officeType: "head_of_state" | "head_of_government";
   officeName: string;
@@ -572,6 +737,7 @@ interface EnrichmentRow {
 interface ProposedTitle {
   country: string;
   role: string;
+  bodyId: string;
   officeId: string;
   oldName: string;
   newName: string;
@@ -665,7 +831,7 @@ export async function computeEnrichmentPlan(
   // title step re-checks GENERIC_OFFICE_NAMES per row.
   const spineRows = (await db.execute(sql`
     SELECT j.id AS jurisdiction_id, j.name AS country, j.wikidata_qid AS country_qid,
-           o.id AS office_id, o.office_type, o.name AS office_name,
+           gb.id AS body_id, o.id AS office_id, o.office_type, o.name AS office_name,
            p.id AS person_id, p.name AS person_name, p.wikidata_qid AS person_qid,
            p.photo_url AS current_photo, p.date_of_birth AS current_dob,
            t.id AS term_id, (t.party_name IS NOT NULL) AS has_party
@@ -685,6 +851,7 @@ export async function computeEnrichmentPlan(
     jurisdictionId: String(r.jurisdiction_id),
     country: String(r.country),
     countryQid: r.country_qid ? String(r.country_qid) : null,
+    bodyId: String(r.body_id),
     officeId: String(r.office_id),
     officeType: String(r.office_type) as "head_of_state" | "head_of_government",
     officeName: String(r.office_name),
@@ -899,6 +1066,7 @@ export async function computeEnrichmentPlan(
         plan.titles.push({
           country: row.country,
           role: row.officeType,
+          bodyId: row.bodyId,
           officeId: row.officeId,
           oldName: row.officeName,
           newName: chosen.title,
@@ -1153,28 +1321,59 @@ export async function syncFactbookOfficeholders(
 ): Promise<OfficeholderSyncSummary> {
   const db = options.db ?? sharedDb;
   const log = options.onProgress ?? (() => {});
+  const writers = options.entityWriters ?? governmentEntityHistoryWriters;
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
 
   log("=== Wikidata Officeholder Sync ===");
   log("Querying Wikidata SPARQL endpoint...");
 
-  const bindings = options.bindings ?? await sparqlQuery(QUERY);
+  const bindings =
+    options.bindings ?? (await sparqlQuery(OFFICEHOLDER_QUERY));
   log(`Got ${bindings.length} results`);
+  if (bindings.length === 0) {
+    throw new Error(
+      "Wikidata officeholder primary feed returned no usable bindings",
+    );
+  }
+  const resolvedStates = resolveOfficeholderBindings(bindings);
+  if (
+    !resolvedStates.some(
+      (state) =>
+        state.headOfState.length > 0 ||
+        state.headOfGovernment.length > 0,
+    )
+  ) {
+    throw new Error(
+      "Wikidata officeholder primary feed returned no usable leadership bindings",
+    );
+  }
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const history: GovernmentEntityHistoryContext | null = atlasReleaseId
+    ? {
+        changeKind: "routine_refresh",
+        reason: "Wikidata officeholder source refresh",
+        methodologyVersion: "wikidata-officeholder-sync/v1",
+        releaseId: atlasReleaseId,
+      }
+    : null;
 
   let synced = 0;
   let skipped = 0;
-  const seen = new Set<string>();
+  let retiredTerms = 0;
 
-  for (const binding of bindings) {
-    const stateQid = extractQid(binding.state.value);
-    if (seen.has(stateQid)) continue;
-    seen.add(stateQid);
-
-    const stateName = binding.stateLabel?.value ?? stateQid;
-    const iso2 = binding.iso2?.value ?? null;
-    const iso3 = binding.iso3?.value ?? null;
-    const shortName = binding.shortName?.value ?? null;
+  for (const state of resolvedStates) {
+    const {
+      stateQid,
+      stateName,
+      iso2,
+      iso3,
+      shortName,
+      headOfState,
+      headOfGovernment,
+    } = state;
 
     const jurisdictionId = await (options.findJurisdictionId ?? findJurisdiction)(
       db,
@@ -1185,10 +1384,16 @@ export async function syncFactbookOfficeholders(
     );
     if (!jurisdictionId) {
       skipped++;
-      if (binding.headOfState?.value || binding.headOfGov?.value) {
+      if (headOfState.length || headOfGovernment.length) {
         log(`! Skipped ${stateName} (${stateQid}) — no DB match, has leadership data`);
       }
       continue;
+    }
+
+    for (const role of state.ambiguousRoles) {
+      log(
+        `! ${stateName}: multiple un-ended normal-rank ${role} statements; failing closed instead of selecting by endpoint order`,
+      );
     }
 
     if (options.dryRun) {
@@ -1210,42 +1415,88 @@ export async function syncFactbookOfficeholders(
       db,
       jurisdictionId,
       `Executive of ${stateName}`,
-      "executive"
+      "executive",
+      writers,
+      history!,
     );
 
-    // Head of State
-    if (binding.headOfState?.value) {
-      const hosQid = extractQid(binding.headOfState.value);
-      const hosName = binding.headOfStateLabel?.value ?? hosQid;
-      const hosStart = binding.hosStart?.value?.split("T")[0] ?? null;
-
-      const personId = await upsertPerson(db, hosName, hosQid);
+    const headOfStateTermIds: string[] = [];
+    if (headOfState.length) {
       const officeId = await upsertOffice(
         db,
         execBody,
         "Head of State",
-        "head_of_state"
+        "head_of_state",
+        undefined,
+        writers,
+        history!,
       );
-      const termId = await upsertTerm(db, officeId, personId, hosStart);
-      await upsertStatement(db, termId, "head_of_state", hosName, stateQid);
+      for (const candidate of headOfState) {
+        const personId = await upsertPerson(
+          db,
+          candidate.personName,
+          candidate.personQid,
+          writers,
+          history!,
+        );
+        const termId = await upsertTerm(
+          db,
+          officeId,
+          personId,
+          candidate.startDate,
+        );
+        await upsertStatement(
+          db,
+          termId,
+          "head_of_state",
+          candidate.personName,
+          stateQid,
+        );
+        headOfStateTermIds.push(termId);
+      }
     }
+    retiredTerms += await (
+      options.retirePrincipalTerms ?? retireUnselectedPrincipalTerms
+    )(db, jurisdictionId, "head_of_state", headOfStateTermIds);
 
-    // Head of Government
-    if (binding.headOfGov?.value) {
-      const hogQid = extractQid(binding.headOfGov.value);
-      const hogName = binding.headOfGovLabel?.value ?? hogQid;
-      const hogStart = binding.hogStart?.value?.split("T")[0] ?? null;
-
-      const personId = await upsertPerson(db, hogName, hogQid);
+    const headOfGovernmentTermIds: string[] = [];
+    if (headOfGovernment.length) {
       const officeId = await upsertOffice(
         db,
         execBody,
         "Head of Government",
-        "head_of_government"
+        "head_of_government",
+        undefined,
+        writers,
+        history!,
       );
-      const termId = await upsertTerm(db, officeId, personId, hogStart);
-      await upsertStatement(db, termId, "head_of_government", hogName, stateQid);
+      for (const candidate of headOfGovernment) {
+        const personId = await upsertPerson(
+          db,
+          candidate.personName,
+          candidate.personQid,
+          writers,
+          history!,
+        );
+        const termId = await upsertTerm(
+          db,
+          officeId,
+          personId,
+          candidate.startDate,
+        );
+        await upsertStatement(
+          db,
+          termId,
+          "head_of_government",
+          candidate.personName,
+          stateQid,
+        );
+        headOfGovernmentTermIds.push(termId);
+      }
     }
+    retiredTerms += await (
+      options.retirePrincipalTerms ?? retireUnselectedPrincipalTerms
+    )(db, jurisdictionId, "head_of_government", headOfGovernmentTermIds);
 
     synced++;
     log(`  ✓ ${stateName}`);
@@ -1254,6 +1505,16 @@ export async function syncFactbookOfficeholders(
   log(`=== Base Sync Complete ===`);
   log(`Synced:  ${synced}`);
   log(`Skipped: ${skipped}`);
+  log(`Retired stale principal terms: ${retiredTerms}`);
+
+  // Leadership bindings that cannot be mapped to even one Civica
+  // jurisdiction are a failed primary stage. Do not let unrelated title,
+  // party, or portrait enrichment turn that failure into a healthy run.
+  if (synced === 0) {
+    throw new Error(
+      "Wikidata officeholder primary feed matched zero Civica jurisdictions",
+    );
+  }
 
   // Resolve any remaining QID-as-name persons via Wikidata entity API
   let qidNamesResolved = 0;
@@ -1267,7 +1528,13 @@ export async function syncFactbookOfficeholders(
       const qid = person.wikidataQid ?? person.name;
       const realName = await resolveQidLabel(qid);
       if (realName) {
-        await db.update(persons).set({ name: realName }).where(eq(persons.id, person.id));
+        await writers.mutatePerson(db, {
+          stableId: person.id,
+          identityQid: qid,
+          insertName: realName,
+          values: { name: realName },
+          history: history!,
+        });
         qidNamesResolved++;
         log(`  ✓ ${qid} → ${realName}`);
       } else {
@@ -1289,7 +1556,16 @@ export async function syncFactbookOfficeholders(
       titlesWritten++;
       continue;
     }
-    await db.update(offices).set({ name: t.newName }).where(eq(offices.id, t.officeId));
+    await writers.upsertOffice(db, {
+      stableId: t.officeId,
+      bodyId: t.bodyId,
+      name: t.newName,
+      officeType: t.role,
+      isElected: true,
+      wikidataQid: t.positionQid,
+      identityMode: "office_type",
+      history: history!,
+    });
     titlesWritten++;
   }
 
@@ -1319,10 +1595,16 @@ export async function syncFactbookOfficeholders(
       portraitsWritten++;
       continue;
     }
-    await db
-      .update(persons)
-      .set({ photoUrl: p.file, photoLicense: p.license, photoCredit: p.credit })
-      .where(eq(persons.id, p.personId));
+    await writers.mutatePerson(db, {
+      stableId: p.personId,
+      insertName: p.person,
+      values: {
+        photoUrl: p.file,
+        photoLicense: p.license,
+        photoCredit: p.credit,
+      },
+      history: history!,
+    });
     portraitsWritten++;
   }
 
@@ -1333,10 +1615,12 @@ export async function syncFactbookOfficeholders(
       birthdatesWritten++;
       continue;
     }
-    await db
-      .update(persons)
-      .set({ dateOfBirth: b.dob })
-      .where(eq(persons.id, b.personId));
+    await writers.mutatePerson(db, {
+      stableId: b.personId,
+      insertName: b.person,
+      values: { dateOfBirth: b.dob },
+      history: history!,
+    });
     birthdatesWritten++;
   }
 
@@ -1358,24 +1642,35 @@ export async function syncFactbookOfficeholders(
   // covers all writes, including these.
   let personPortraitsWritten = 0;
   let personBirthdatesWritten = 0;
+  let personPortraitBackfillFailed = false;
   try {
     const personPass = options.dryRun ? null : await (options.enrichPersons ?? enrichPersonPortraits)({
       db,
+      atlasReleaseId: atlasReleaseId!,
+      writePerson: writers.mutatePerson,
       // The delta pass owns its own freshness stamp normally, but here the
       // officeholder sync stamps once at the end, so run it as a non-stamping
       // apply by folding its counts in and stamping below. It still writes.
       onProgress: (line) => {
         if (line.startsWith("!")) log(line);
       },
+      // The officeholder aggregate owns the only eligible freshness stamp.
+      // The nested pass reports its writes and any partial failure, but never
+      // advances Wikidata freshness independently.
+      markSynced: async () => [],
     });
     personPortraitsWritten = personPass?.portraitsWritten ?? 0;
     personBirthdatesWritten = personPass?.birthdatesWritten ?? 0;
+    if (personPass?.status === "partial") {
+      personPortraitBackfillFailed = true;
+    }
     log(
         `Person-portrait backfill: ${personPortraitsWritten} portraits, ${personBirthdatesWritten} birthdates (${personPass?.candidates ?? 0} candidates scanned)`,
     );
   } catch (err) {
+    personPortraitBackfillFailed = true;
     log(
-      `! person-portrait backfill failed (non-fatal): ${
+      `! person-portrait backfill failed (partial run): ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -1386,17 +1681,20 @@ export async function syncFactbookOfficeholders(
   // covers the base sync plus the enrichment writes.
   const totalRowsWritten =
     synced +
+    retiredTerms +
     titlesWritten +
     partiesWritten +
     portraitsWritten +
     birthdatesWritten +
     personPortraitsWritten +
     personBirthdatesWritten;
-  const stamped = await (options.markSynced ?? markSourcesSynced)("wikidata", {
-    rowsWritten: totalRowsWritten,
-    dryRun: options.dryRun,
-    executor: db,
-  });
+  const stamped = personPortraitBackfillFailed
+    ? []
+    : await (options.markSynced ?? markSourcesSynced)("wikidata", {
+        rowsWritten: totalRowsWritten,
+        dryRun: options.dryRun,
+        executor: db,
+      });
 
   const finishedAtMs = Date.now();
   log(`=== Sync Complete ===`);
@@ -1405,11 +1703,13 @@ export async function syncFactbookOfficeholders(
   );
 
   return {
+    status: personPortraitBackfillFailed ? "partial" : "completed",
     startedAt,
     finishedAt: new Date(finishedAtMs).toISOString(),
     durationMs: finishedAtMs - startedAtMs,
     countriesSynced: synced,
     countriesSkipped: skipped,
+    termsRetired: retiredTerms,
     qidNamesResolved,
     titlesWritten,
     partiesWritten,
@@ -1417,6 +1717,7 @@ export async function syncFactbookOfficeholders(
     birthdatesWritten,
     personPortraitsWritten,
     personBirthdatesWritten,
+    personPortraitBackfillFailed,
     totalRowsWritten,
     freshnessStamped: stamped.length > 0,
     dryRun: options.dryRun ?? false,

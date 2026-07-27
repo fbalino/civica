@@ -1,0 +1,22 @@
+{
+  "contract": "exp-029-live-preflight/v1",
+  "capturedAt": "2026-07-23T09:37:38Z",
+  "mode": "zero_write",
+  "migrationPlan": {
+    "id": "0048_entity_name_forms",
+    "artifact": "drizzle/authoritative/0048_entity_name_forms.sql",
+    "kind": "schema",
+    "historyStatus": "journaled",
+    "sha256": "9eafb5c92efbe965a6289f31ac67ae7df55f37b7716ba1cd99cd7c69868364e0",
+    "affectedRelations": [
+      "entity_name_forms"
+    ],
+    "statementCount": 5,
+    "destructiveStatementCount": 0,
+    "liveRowCounts": {
+      "entity_name_forms": "missing"
+    },
+    "writesPerformed": 0
+  },
+  "activationState": "pending_owner_authorized_production_migration_and_source_refresh"
+}

@@ -99,10 +99,7 @@ test("passage card uses a safe heading id and exposes provenance", () => {
   const html = renderToStaticMarkup(
     createElement(ConstitutionPassageCard, { result }),
   );
-  assert.match(
-    html,
-    /id="constitution-passage-constitution-japan-section-96"/,
-  );
+  assert.match(html, /id="constitution-passage-constitution-japan-section-96"/);
   assert.match(html, /<h3/);
   assert.doesNotMatch(html, /<h2/);
   assert.match(html, /<mark>Amendments <\/mark>/);
@@ -143,6 +140,7 @@ test("rate-limited search is announced as an alert", () => {
       error: {
         schemaVersion: CONSTITUTION_SEARCH_SCHEMA_VERSION,
         error: "rate_limited",
+        code: "RATE_LIMITED",
         message: "Rate limit exceeded. Try again shortly.",
       },
     }),

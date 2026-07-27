@@ -1,91 +1,43 @@
-/**
- * Civica Conditions — Human Development dimension
- *
- * Copies existing HDI rows from ci_dimension_scores into
- * civica_conditions_scores using the fixed-bound normalization from
- * the methodology spec §2.3: score × 100 (HDI is already 0–1).
- *
- * Source: UNDP Human Development Index (source_id = 'undp_hdi')
- * Dimension: human_development
- * Quarter convention: ${dataset_year}-Q4 (same as CI pipeline)
- */
+/** Civica Conditions — Human Development component ledger. */
 
 import { config } from "dotenv";
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 import { db } from "../src/lib/db";
-import { ciDimensionScores } from "../src/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { writeConditionScores, type ConditionScoreInput } from "../src/lib/conditions/ingest";
+import { CURRENT_CONDITIONS_METHODOLOGY_VERSION } from "../src/lib/conditions/contract";
+import { writeConditionsRelease } from "../src/lib/conditions/ingest";
+import { prepareHdiConditions } from "../src/lib/conditions/production-workflow";
 
-const METHODOLOGY_VERSION = "beta";
-const SOURCE_ID = "undp_hdi";
-const CI_DIMENSION = "human_development";
-const CONDITIONS_DIMENSION = "human_development";
 const DRY_RUN = process.argv.includes("--dry-run");
+const RELEASE_ID = process.argv.find((arg) => arg.startsWith("--release-id="))?.slice(
+  "--release-id=".length,
+);
 
 async function main() {
-  console.log("=== Civica Conditions — Human Development (HDI) ===\n");
-
-  // Pull all HDI rows from ci_dimension_scores
-  const ciRows = await db
-    .select()
-    .from(ciDimensionScores)
-    .where(eq(ciDimensionScores.dimension, CI_DIMENSION));
-
-  if (ciRows.length === 0) {
-    console.log("No HDI rows found in ci_dimension_scores. Run ingest:ci first.");
-    process.exit(1);
+  console.log("=== Civica Conditions — Human Development component ledger ===\n");
+  if (!RELEASE_ID) {
+    throw new Error("Pass a stable --release-id=conditions-*-vN; releases are never implicit");
   }
-
-  console.log(`Found ${ciRows.length} HDI rows in ci_dimension_scores.`);
-
-  let inserted = 0;
-  const output: ConditionScoreInput[] = [];
-
-  for (const row of ciRows) {
-    // spec §2.3 fixed bound: HDI is 0–1, so score × 100 = normalized score
-    const rawValue = row.rawValue ?? null;
-    const normalizedScore = rawValue !== null
-      ? Math.min(100, Math.max(0, rawValue * 100))
-      : row.normalizedScore; // fallback to existing normalized score if no raw
-
-    const quarter = row.quarter;
-    const datasetYear = parseInt(quarter.split("-")[0], 10);
-
-    output.push({
-        jurisdictionId: row.jurisdictionId,
-        dimension: CONDITIONS_DIMENSION,
-        quarter,
-        normalizedScore,
-        rawValue,
-        sourceId: SOURCE_ID,
-        datasetYear,
-        methodologyVersion: METHODOLOGY_VERSION,
-        indicatorId: row.indicatorId,
-        upstreamRelease: row.upstreamRelease,
-        artifactHash: row.artifactHash,
-        artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
-        temporalCoverage: row.temporalCoverage,
-        licenseUrl: row.licenseUrl,
-        transformationId: "conditions-hdi-fixed-bound/v1",
-        substitutionReason: null,
-        methodVersion: METHODOLOGY_VERSION,
-      });
-
-    inserted++;
+  if (!DRY_RUN) {
+    throw new Error(
+      "Single-dimension Conditions writes are disabled; use ingest:conditions:all for one canonical release",
+    );
   }
-
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually upserted rows (AGENTS.md provenance invariant). The
-  // helper applies the same `inserted > 0` gate internally.
-  await writeConditionScores(db, output, { dryRun: DRY_RUN });
-
-  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${inserted} rows ${DRY_RUN ? "with zero writes" : "upserted into civica_conditions_scores"}.`);
-  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);
+  const prepared = await prepareHdiConditions(db, RELEASE_ID);
+  const summary = await writeConditionsRelease(db, {
+    releaseId: RELEASE_ID,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceSets: prepared.referenceSets,
+  }, prepared.rows, { dryRun: DRY_RUN });
+  console.log(
+    `${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.proposed} calculations, ${summary.written} decomposable scores, and ${DRY_RUN ? prepared.rows.length : summary.componentsWritten} component rows.`,
+  );
+  console.log(
+    `Dimension: human_development | Source: undp_hdi | Release: ${RELEASE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`,
+  );
 }
 
-main().catch((err) => {
-  console.error("Ingest failed:", err);
+main().catch((error) => {
+  console.error("Ingest failed:", error);
   process.exit(1);
 });

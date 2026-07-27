@@ -12,11 +12,8 @@
  *
  * Per AGENTS.md: stamps `sources.last_sync_at = NOW()` on success.
  *
- * R.12's first run also performs an idempotent migration of legacy
- * trade-aggregate fact-keys per
- * `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d. The migration
- * is gated by `WHERE fact_key = '<old>'` filters; subsequent runs
- * no-op the migration step.
+ * The historical R.12 cleanup is retired from this recurring source refresh.
+ * Data/schema migrations belong to the authoritative migration path.
  */
 import { config } from "dotenv";
 config({ path: ".env.local", override: true });
@@ -70,9 +67,10 @@ async function main() {
   console.log(`Jurisdictions:     ${summary.jurisdictionsInScope}`);
   console.log(`Total rows written: ${summary.totalWritten}`);
 
-  console.log("\n=== Legacy migration (R.12 idempotent) ===");
+  console.log("\n=== Legacy migration ===");
+  console.log("Retired from recurring sync: yes");
   console.log(
-    `Rows renamed:       ${summary.legacyMigration.rowsMigrated} ` +
+    `Rows renamed now:   ${summary.legacyMigration.rowsMigrated} ` +
       `(legacy fact-keys: ${summary.legacyMigration.expectedFactKeysRemoved.join(", ")})`,
   );
   console.log(
@@ -80,7 +78,7 @@ async function main() {
       `(alternate → canonical on goods+services rows)`,
   );
   console.log(
-    `License tightened:  ${summary.legacyMigration.licenseTightened ? "yes (open_data_attribution → ODbL-1.0)" : "no (already ODbL-1.0)"}`,
+    `License tightened:  ${summary.legacyMigration.licenseTightened ? "yes" : "no recurring write"}`,
   );
 
   console.log("\n=== Per-fact-key ===");

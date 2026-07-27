@@ -43,6 +43,9 @@ const webServer = process.env.E2E_WEBSERVER_CMD
 export default defineConfig({
   testDir: "./e2e",
   outputDir: "./output/playwright/results",
+  // Baselines are never created or rewritten by ordinary test/CI commands.
+  // QA-013's explicit candidate command passes --update-snapshots instead.
+  updateSnapshots: "none",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -60,6 +63,18 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "off",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+      testMatch: /qa-016-browser-degradation\.spec\.ts/,
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+      testMatch: /qa-016-browser-degradation\.spec\.ts/,
+    },
+  ],
   ...(webServer ? { webServer } : {}),
 });

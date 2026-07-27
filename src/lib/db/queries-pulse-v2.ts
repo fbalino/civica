@@ -10,14 +10,12 @@ import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   jurisdictions,
-  pulseDimensionalDeltas,
+  pulseDimensionalDeltaHistory,
   pulseEventsV2,
   pulsePipelineRuns,
-  rawEvents,
-  pulseSources,
+  pulseScorePublicationPointers,
 } from "@/lib/db/schema";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
-import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
 import {
   missingInformationEnvironmentContext,
   type PulseInformationEnvironmentContext,
@@ -39,6 +37,16 @@ import type {
 } from "@/lib/pulse/v2/evidence-identity";
 import { loadPulseCountryPeriodObservability } from "@/lib/pulse/v2/observability-live";
 import type { PulseCountryPeriodObservability } from "@/lib/pulse/v2/observability";
+import {
+  assertPulsePublishedDeltaRows,
+  assertPulsePublishedEvidence,
+  assertPulseScorePublication,
+  pulsePublishedDeltaLineageStatus,
+  withPulsePublicationLineageCoverage,
+  type PulseDerivationLineageStatus,
+  type PulseScorePublicationIdentity,
+} from "@/lib/pulse/v2/publication-consistency";
+import type { DerivationVersionEnvelope } from "@/lib/research/derivation-version";
 
 export interface PulseRunIdentity {
   runId: string;
@@ -89,7 +97,7 @@ export interface DimensionRow {
   /** Null when no eligible published event supports this dimension now. */
   delta: number | null;
   contributingEventIds: string[];
-  /** 0–2 driving event headlines for the panel, sorted by absolute decayed impact. */
+  /** 0–2 current descriptive event records linked to the frozen event IDs. */
   drivingEvents: Array<{
     id: string;
     headline: string;
@@ -100,7 +108,7 @@ export interface DimensionRow {
   }>;
   /**
    * Evidence basis for judging whether this delta rests on thin ground.
-   * Computed across the dimension's contributing PUBLISHED events.
+   * Computed from current event context across the frozen contributing IDs.
    */
   evidence: {
     /** Number of contributing published events behind this delta. */
@@ -127,10 +135,18 @@ export interface DimensionRow {
   limitedReason: string | null;
   /** Exact immutable score-stage run behind this stored output. */
   versionIdentity: PulseRunIdentity | null;
+  /** Exact frozen row derivation, including explicit legacy input lineage. */
+  derivationIdentity: {
+    versionKey: string;
+    versions: DerivationVersionEnvelope;
+    lineageStatus: PulseDerivationLineageStatus;
+  } | null;
 }
 
 export interface PulseV2ForCountry {
   jurisdiction: { id: string; slug: string; name: string; iso3: string | null };
+  /** The single immutable score-stage publication selected for this request. */
+  publication: PulseScorePublicationIdentity;
   dimensions: Record<PulseDimension, DimensionRow>;
   lastComputedAt: string | null;
   /** Total published events feeding the deltas. */
@@ -168,44 +184,93 @@ export async function getPulseV2ForCountry(
 
   const jurisdiction = jurisdictionRows[0];
   if (!jurisdiction) return null;
-  // Pull all stored dimension rows. Missing or not-yet-computed dimensions
-  // remain unobserved (`delta: null`) below.
-  const deltaRows = await db
-    .select()
-    .from(pulseDimensionalDeltas)
-    .where(eq(pulseDimensionalDeltas.jurisdictionId, jurisdiction.id));
-  const computationRuns = await loadPulseRunMap(
-    deltaRows.map(({ computationRunId }) => computationRunId),
-  );
-
-  // Pull driving events per dimension — only the same trailing 365-day
-  // window used by the scoring pipeline. Older published rows remain in the
-  // ledger but must not inflate the country panel's event count or evidence.
-  const eventRows = await db
+  // Resolve one publication pointer first, then read only immutable history
+  // rows for that run. A later pointer flip cannot change this request's
+  // selected run, so every returned dimension has one method/source identity.
+  const [publicationRow] = await db
     .select({
-      id: pulseEventsV2.id,
-      incidentId: pulseEventsV2.incidentId,
-      dimension: pulseEventsV2.dimension,
-      headline: pulseEventsV2.headline,
-      eventDate: pulseEventsV2.eventDate,
-      severityTier: pulseEventsV2.severityTier,
-      severityValue: pulseEventsV2.severityValue,
-      corroborationConfidence: pulseEventsV2.corroborationConfidence,
+      product: pulseScorePublicationPointers.product,
+      computationRunId: pulseScorePublicationPointers.computationRunId,
+      versionKey: pulseScorePublicationPointers.versionKey,
+      scoreAsOf: pulseScorePublicationPointers.scoreAsOf,
+      publishedAt: pulseScorePublicationPointers.publishedAt,
+      runStatus: pulsePipelineRuns.status,
+      runStage: pulsePipelineRuns.stage,
+      runVersionKey: pulsePipelineRuns.versionKey,
+      runVersions: pulsePipelineRuns.versions,
+      runCompletedAt: pulsePipelineRuns.completedAt,
     })
-    .from(pulseEventsV2)
-    .where(
-      and(
-        eq(pulseEventsV2.jurisdictionId, jurisdiction.id),
-        eq(pulseEventsV2.published, true),
-        eq(pulseEventsV2.projectionStatus, "current"),
-        sql`${pulseEventsV2.reviewStatus} IN ('approved', 'edited')`,
-        sql`${pulseEventsV2.category} <> 'none'`,
-        sql`${pulseEventsV2.eventDate} >= CURRENT_DATE - (${SCORE_WINDOW_DAYS} * INTERVAL '1 day')`,
-        sql`${pulseEventsV2.eventDate} <= CURRENT_DATE`,
+    .from(pulseScorePublicationPointers)
+    .innerJoin(
+      pulsePipelineRuns,
+      eq(
+        pulseScorePublicationPointers.computationRunId,
+        pulsePipelineRuns.id,
       ),
     )
-    .orderBy(desc(sql`ABS(${pulseEventsV2.severityValue})`));
+    .where(eq(pulseScorePublicationPointers.product, "pulse_dimensions"))
+    .limit(1);
+  const publicationPointer = assertPulseScorePublication(publicationRow);
 
+  // Validate the entire selected release, not only the requested country. A
+  // malformed panel anywhere cannot hide behind a globally shared pointer or
+  // produce misleading release-level lineage counts.
+  const allDeltaRows = await db
+    .select()
+    .from(pulseDimensionalDeltaHistory)
+    .where(
+      eq(
+        pulseDimensionalDeltaHistory.computationRunId,
+        publicationPointer.versionIdentity.runId,
+      ),
+    );
+  const releaseRowsByJurisdiction = new Map<
+    string,
+    typeof allDeltaRows
+  >();
+  for (const row of allDeltaRows) {
+    const group = releaseRowsByJurisdiction.get(row.jurisdictionId) ?? [];
+    group.push(row);
+    releaseRowsByJurisdiction.set(row.jurisdictionId, group);
+  }
+  for (const rows of releaseRowsByJurisdiction.values()) {
+    assertPulsePublishedDeltaRows(publicationPointer, rows);
+  }
+  const publication = withPulsePublicationLineageCoverage(
+    publicationPointer,
+    allDeltaRows,
+  );
+  const deltaRows = allDeltaRows.filter(
+    (row) => row.jurisdictionId === jurisdiction.id,
+  );
+  const { runId, versionKey, versions } = publication.versionIdentity;
+  const computationRuns = new Map<string, PulseRunIdentity>([
+    [runId, { runId, versionKey, versions }],
+  ]);
+
+  // Evidence is selected by the frozen run's contributing IDs, never by the
+  // current date or current publication flags. Later editorial changes can
+  // create a new run but cannot rewrite the already-published score basis.
+  const contributingEventIds = [
+    ...new Set(deltaRows.flatMap((row) => row.contributingEventIds)),
+  ];
+  const eventRows = contributingEventIds.length
+    ? await db
+        .select({
+          id: pulseEventsV2.id,
+          jurisdictionId: pulseEventsV2.jurisdictionId,
+          incidentId: pulseEventsV2.incidentId,
+          dimension: pulseEventsV2.dimension,
+          headline: pulseEventsV2.headline,
+          eventDate: pulseEventsV2.eventDate,
+          severityTier: pulseEventsV2.severityTier,
+          severityValue: pulseEventsV2.severityValue,
+          corroborationConfidence: pulseEventsV2.corroborationConfidence,
+        })
+        .from(pulseEventsV2)
+        .where(inArray(pulseEventsV2.id, contributingEventIds))
+        .orderBy(desc(sql`ABS(${pulseEventsV2.severityValue})`))
+    : [];
   // Source map for quick attribution lookup
   const eventIds = eventRows.map((e) => e.id);
   const sourceMap = new Map<string, string[]>();
@@ -213,9 +278,7 @@ export async function getPulseV2ForCountry(
     const sourceRows = resultRows(await db.execute(sql`
       SELECT current_event.id AS event_id, ps.source_id
       FROM pulse_events_v2 current_event
-      JOIN pulse_events_v2 evidence_event
-        ON evidence_event.incident_id = current_event.incident_id
-      JOIN pulse_sources ps ON ps.event_id = evidence_event.id
+      JOIN pulse_sources ps ON ps.event_id = current_event.id
       WHERE current_event.id IN ${eventIds}
       ORDER BY current_event.id, ps.source_id
     `));
@@ -226,10 +289,23 @@ export async function getPulseV2ForCountry(
       sourceMap.set(eventId, arr);
     }
   }
+  assertPulsePublishedEvidence(
+    deltaRows,
+    eventRows.map((event) => ({
+      id: event.id,
+      jurisdictionId: event.jurisdictionId,
+      dimension: event.dimension,
+      sourceIds: sourceMap.get(event.id) ?? [],
+      headline: event.headline,
+      eventDate: event.eventDate,
+      severityTier: event.severityTier,
+      severityValue: event.severityValue,
+      corroborationConfidence: event.corroborationConfidence,
+    })),
+  );
 
-  // Per-event lookups for evidence-basis (thinness) computation. Both
-  // maps are keyed only by PUBLISHED events — the rows that actually
-  // drive the score and that the panel can show.
+  // Per-event lookups for the explicitly live evidence qualifiers. Both maps
+  // are keyed only by the frozen publication's contributing event IDs.
   const confidenceByEvent = new Map<string, number>();
   const sourceCountByEvent = new Map<string, number>();
   for (const e of eventRows) {
@@ -242,10 +318,7 @@ export async function getPulseV2ForCountry(
   let lastComputedAt: string | null = null;
   for (const dim of PULSE_DIMENSIONS) {
     const deltaRow = deltaRows.find((r) => r.dimension === dim);
-    if (deltaRow?.lastComputedAt) {
-      const stamp = deltaRow.lastComputedAt.toISOString();
-      if (!lastComputedAt || stamp > lastComputedAt) lastComputedAt = stamp;
-    }
+    lastComputedAt = publication.completedAt;
     const driving = eventRows
       .filter((e) => e.dimension === dim)
       .slice(0, 2)
@@ -258,14 +331,10 @@ export async function getPulseV2ForCountry(
         sources: Array.from(new Set(sourceMap.get(e.id) ?? [])),
       }));
 
-    // Evidence basis: judge thinness across the dimension's contributing
-    // PUBLISHED events. We intersect the delta's contributing-event ids
-    // with the published set so unpublished/queued events never inflate
-    // (or deflate) the basis.
+    // Contributor membership is frozen to the score run. Confidence and source
+    // counts are current context and are labeled live in response metadata.
     const contributingIds = deltaRow?.contributingEventIds ?? [];
-    const publishedContributing = contributingIds.filter((id) =>
-      sourceCountByEvent.has(id),
-    );
+    const publishedContributing = contributingIds;
     const nEvents = publishedContributing.length;
     const confidences = publishedContributing.map(
       (id) => confidenceByEvent.get(id) ?? 0,
@@ -313,11 +382,19 @@ export async function getPulseV2ForCountry(
       versionIdentity: deltaRow
         ? (computationRuns.get(deltaRow.computationRunId) ?? null)
         : null,
+      derivationIdentity: deltaRow
+        ? {
+            versionKey: deltaRow.derivationVersionKey,
+            versions: deltaRow.derivationVersions,
+            lineageStatus: pulsePublishedDeltaLineageStatus(deltaRow),
+          }
+        : null,
     };
   }
 
   return {
     jurisdiction,
+    publication,
     dimensions,
     lastComputedAt,
     totalEvents: eventRows.length,

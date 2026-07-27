@@ -4,8 +4,10 @@
  * POST /api/admin/messages/[id]
  *
  * Form body or JSON:
- *   status     'new' | 'read' | 'archived'   (required)
- *   redirect   post-success redirect path     (default: messages queue)
+ *   intent     'status' | 'delete'            (status is the default)
+ *   status     'new' | 'read' | 'archived'    (required for status)
+ *   confirm    'delete'                        (required for delete)
+ *   redirect   post-success redirect path      (default: messages queue)
  *
  * Flips a contact submission's triage status so the Messages queue's filter
  * chips (New / Read / Archived) reflect reality. This is the smallest honest
@@ -21,7 +23,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
-import { getAdminSession } from "@/lib/admin/session";
+import { adminMutationProblem, withAdminMutation } from "@/lib/admin/mutation";
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
+import type { AdminSession } from "@/lib/admin/session";
+import {
+  FORM_MEDIA_TYPE,
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+  requestInputErrorResponse,
+} from "@/lib/api/request-body";
+import {
+  adminMessageStatusFormSchema,
+  adminMessageStatusBodySchema,
+  REQUEST_BODY_LIMITS,
+  requestUuidSchema,
+  type AdminMessageStatusBody,
+} from "@/lib/api/request-body-schemas";
 
 const VALID_STATUSES = ["new", "read", "archived"] as const;
 type Status = (typeof VALID_STATUSES)[number];
@@ -33,45 +50,54 @@ function isStatus(value: unknown): value is Status {
   );
 }
 
-interface StatusBody {
-  status?: string;
-  redirect?: string;
-}
-
-async function readBody(
-  request: NextRequest
-): Promise<{ body: StatusBody; isForm: boolean }> {
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/x-www-form-urlencoded")) {
-    const form = await request.formData();
-    return {
-      isForm: true,
-      body: {
-        status: form.get("status") ? String(form.get("status")) : undefined,
-        redirect: form.get("redirect")
-          ? String(form.get("redirect"))
-          : undefined,
-      },
-    };
-  }
-  const json = (await request.json()) as StatusBody;
-  return { isForm: false, body: json };
-}
-
-export async function POST(
+async function mutateMessage(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  id: string,
+  auth: AdminSession,
 ) {
-  const auth = await getAdminSession();
-  if (!auth) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const parsedId = requestUuidSchema.safeParse(id);
+  if (!parsedId.success) return requestInputErrorResponse("INVALID_REQUEST");
 
-  const { id } = await params;
-  const { body, isForm } = await readBody(request);
+  const parsed = await parseBoundedRequestBody<AdminMessageStatusBody>(
+    request,
+    {
+      maxBytes: REQUEST_BODY_LIMITS.adminMessageStatus,
+      media: [
+        { mediaType: JSON_MEDIA_TYPE, schema: adminMessageStatusBodySchema },
+        { mediaType: FORM_MEDIA_TYPE, schema: adminMessageStatusFormSchema },
+      ],
+    },
+  );
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+  const isForm = parsed.mediaType === FORM_MEDIA_TYPE;
+  id = parsedId.data;
+
+  if (body.intent === "delete") {
+    if (body.confirm !== "delete")
+      return adminMutationProblem(
+        "DELETION_CONFIRMATION_REQUIRED",
+        "deletion confirmation required",
+        400,
+      );
+    const deleted = await db
+      .delete(contactSubmissions)
+      .where(eq(contactSubmissions.id, id))
+      .returning({ id: contactSubmissions.id });
+    if (deleted.length === 0)
+      return adminMutationProblem("MESSAGE_NOT_FOUND", "message not found", 404);
+    if (isForm)
+      return NextResponse.redirect(new URL("/admin/messages", request.url), 303);
+    return NextResponse.json({
+      ok: true,
+      id,
+      deleted: true,
+      reviewerId: auth.reviewerId,
+    });
+  }
 
   if (!isStatus(body.status)) {
-    return NextResponse.json({ error: "invalid status" }, { status: 400 });
+    return adminMutationProblem("INVALID_STATUS", "invalid status", 400);
   }
 
   const updated = await db
@@ -81,11 +107,11 @@ export async function POST(
     .returning({ id: contactSubmissions.id });
 
   if (updated.length === 0) {
-    return NextResponse.json({ error: "message not found" }, { status: 404 });
+    return adminMutationProblem("MESSAGE_NOT_FOUND", "message not found", 404);
   }
 
   if (isForm) {
-    const redirect = body.redirect ?? "/admin/messages";
+    const redirect = safeInternalPathOr(body.redirect, "/admin/messages");
     return NextResponse.redirect(new URL(redirect, request.url), 303);
   }
   return NextResponse.json({
@@ -94,4 +120,21 @@ export async function POST(
     status: body.status,
     reviewerId: auth.reviewerId,
   });
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return withAdminMutation(
+    request,
+    {
+      route: "/api/admin/messages/[id]",
+      action: "contact_submission.mutate",
+      targetType: "contact_submission",
+      targetId: id,
+    },
+    (auth) => mutateMessage(request, id, auth),
+  );
 }

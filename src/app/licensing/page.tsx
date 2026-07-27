@@ -19,7 +19,7 @@ import {
   SOURCE_RIGHTS,
 } from "@/lib/rights/manifest";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Licensing — Data & Code Reuse Terms",
@@ -304,8 +304,9 @@ export default function LicensingPage() {
           >
             GitHub
           </a>
-          . Check the repository for any future license file and notices
-          before redistributing code or building a derivative service.
+          . The root LICENSE and NOTICE are authoritative for code reuse and
+          preserve separate contributor, dependency, generated-material, data,
+          font, asset, and trademark rights.
         </p>
       </section>
 

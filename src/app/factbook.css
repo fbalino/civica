@@ -55,6 +55,8 @@
   height: 120%;
   object-fit: cover;
   object-position: center 28%;
+  background-size: cover;
+  background-position: center 28%;
   z-index: 0;
   will-change: transform;
 }
@@ -79,7 +81,7 @@
   position: relative;
   z-index: 2;
 }
-[data-theme="dark"] .factbook-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark) {
+[data-theme="dark"] .factbook-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image) {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 
@@ -288,7 +290,7 @@
   line-height: var(--leading-normal);
   white-space: normal;
   text-align: left;
-  z-index: 70;
+  z-index: var(--z-tooltip);
   pointer-events: none;
 }
 .factbook-meta-pill-help:hover::after,
@@ -542,7 +544,7 @@
   box-shadow:
     0 12px 32px color-mix(in oklab, var(--color-text-primary) 14%, transparent),
     0 4px 8px color-mix(in oklab, var(--color-text-primary) 6%, transparent);
-  z-index: 40;
+  z-index: var(--z-popover);
   display: flex;
   flex-direction: column;
   /* iOS Safari: keep the drawer above the bottom UI */
@@ -612,6 +614,7 @@
     height: auto;
     aspect-ratio: 5 / 4;
     object-position: center 30%;
+    background-position: center 30%;
     order: 0;
     /* This img is an in-flow banner on mobile (not an absolute over-scan), so
        the parallax translateY must NOT displace it out of the vertical stack. */
@@ -705,7 +708,7 @@
   .factbook-mobile-subheader {
     position: sticky;
     top: 56px;
-    z-index: 30;
+    z-index: var(--z-sticky);
     display: none;
     align-items: center;
     justify-content: space-between;
@@ -1162,11 +1165,13 @@
   height: 120%;
   object-fit: cover;
   object-position: center 42%;
+  background-size: cover;
+  background-position: center 42%;
   opacity: 0.85;
   z-index: 0;
   will-change: transform;
 }
-[data-theme="dark"] .factbook-hero-art:not(.theme-engraving-light):not(.theme-engraving-dark) {
+[data-theme="dark"] .factbook-hero-art:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image) {
   opacity: 0.42;
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
@@ -1424,7 +1429,7 @@
   position: absolute;
   top: calc(100% + var(--space-2));
   left: 0;
-  z-index: 30;
+  z-index: var(--z-popover);
   min-width: 240px;
   padding: var(--space-2);
   border: 1px solid var(--color-border-default);
@@ -1779,7 +1784,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 /* Hover tooltip — positioned via clientX/clientY in the component */
 .factbook-legislature-tip {
   pointer-events: none;
-  z-index: 50;
+  z-index: var(--z-tooltip);
   background: var(--color-text-primary);
   color: var(--color-bg);
   padding: var(--space-2) var(--space-3);
@@ -2158,7 +2163,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
     display: none;
   }
   .factbook-outcomes-position {
-    font-size: 9px;
+    font-size: var(--text-12);
     padding: 2px 4px;
   }
   .factbook-outcomes-name {
@@ -2217,14 +2222,14 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 }
 .factbook-org-chart-node-label {
   font-family: var(--font-heading);
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 400;
   fill: var(--color-text-primary);
   letter-spacing: var(--tracking-tighter);
 }
 .factbook-org-chart-node-sublabel {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-12);
   letter-spacing: 0.04em;
   fill: var(--color-text-60);
 }
@@ -2292,10 +2297,10 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
     max-width: 100% !important;
   }
   .factbook-org-chart-node-label {
-    font-size: 11px;
+    font-size: var(--text-12);
   }
   .factbook-org-chart-node-sublabel {
-    font-size: 9px;
+    font-size: var(--text-12);
   }
 }
 
@@ -2309,6 +2314,20 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   inset: 0;
   width: 100%;
   height: 100%;
+}
+.country-map-canvas--unavailable {
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+  background: var(--color-surface-secondary);
+}
+.country-map-unavailable {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  text-align: center;
 }
 /* Masthead tile */
 .country-map-tile {
@@ -2354,6 +2373,9 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   line-height: var(--leading-tight);
 }
 .country-map-attribution a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--space-6);
   color: var(--color-text-60);
   text-decoration: none;
 }
@@ -2392,7 +2414,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 .map-explorer-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   justify-content: center;

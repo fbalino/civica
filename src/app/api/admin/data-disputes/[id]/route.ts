@@ -32,19 +32,38 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { countryFacts, dataDisputes } from "@/lib/db/schema";
+import { dataDisputes } from "@/lib/db/schema";
+import {
+  demoteCountryFactWithHistory,
+  resolveAtlasReleaseId,
+} from "@/lib/factbook/country-fact-history-writer";
 import {
   disputeLoserId,
   OPEN_DISPUTE_STATUSES,
 } from "@/lib/factbook/reconcile/dispute-resolution";
-import { getAdminSession } from "@/lib/admin/session";
+import { adminMutationProblem, withAdminMutation } from "@/lib/admin/mutation";
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
+import type { AdminSession } from "@/lib/admin/session";
 import {
   snapshotDispute,
   writeDisputeAuditLog,
   type DisputeAuditAction,
 } from "@/lib/factbook/reconcile/dispute-audit-log";
+import {
+  FORM_MEDIA_TYPE,
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+  requestInputErrorResponse,
+} from "@/lib/api/request-body";
+import {
+  adminDataDisputeBodySchema,
+  adminDataDisputeFormSchema,
+  REQUEST_BODY_LIMITS,
+  requestUuidSchema,
+  type AdminDataDisputeBody,
+} from "@/lib/api/request-body-schemas";
 
 type Action = "resolve_a" | "resolve_b" | "hold" | "reject" | "reopen";
 
@@ -63,47 +82,28 @@ const ACTION_TO_STATUS: Record<Exclude<Action, "reopen">, string> = {
   reject: "rejected_invalid",
 };
 
-interface ResolveBody {
-  action: Action;
-  notes?: string;
-  redirect?: string;
-}
-
-async function readBody(
+async function mutateDataDispute(
   request: NextRequest,
-): Promise<{ body: ResolveBody; isForm: boolean }> {
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/x-www-form-urlencoded")) {
-    const form = await request.formData();
-    return {
-      isForm: true,
-      body: {
-        action: String(form.get("action") ?? "") as Action,
-        notes: form.get("notes") ? String(form.get("notes")) : undefined,
-        redirect: form.get("redirect")
-          ? String(form.get("redirect"))
-          : undefined,
-      },
-    };
-  }
-  const json = (await request.json()) as ResolveBody;
-  return { isForm: false, body: json };
-}
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  id: string,
+  auth: AdminSession,
 ) {
-  const auth = await getAdminSession();
-  if (!auth) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const parsedId = requestUuidSchema.safeParse(id);
+  if (!parsedId.success) return requestInputErrorResponse("INVALID_REQUEST");
 
-  const { id } = await params;
-  const { body, isForm } = await readBody(request);
+  const parsed = await parseBoundedRequestBody<AdminDataDisputeBody>(request, {
+    maxBytes: REQUEST_BODY_LIMITS.adminDataDispute,
+    media: [
+      { mediaType: JSON_MEDIA_TYPE, schema: adminDataDisputeBodySchema },
+      { mediaType: FORM_MEDIA_TYPE, schema: adminDataDisputeFormSchema },
+    ],
+  });
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+  const isForm = parsed.mediaType === FORM_MEDIA_TYPE;
+  id = parsedId.data;
 
   if (!VALID_ACTIONS.has(body.action)) {
-    return NextResponse.json({ error: "invalid action" }, { status: 400 });
+    return adminMutationProblem("INVALID_ACTION", "invalid action", 400);
   }
 
   const existingRows = await db
@@ -113,7 +113,7 @@ export async function POST(
     .limit(1);
   const existing = existingRows[0];
   if (!existing) {
-    return NextResponse.json({ error: "dispute not found" }, { status: 404 });
+    return adminMutationProblem("DISPUTE_NOT_FOUND", "dispute not found", 404);
   }
 
   const beforeSnap = snapshotDispute(existing);
@@ -127,9 +127,12 @@ export async function POST(
       existing.status.startsWith("resolved_") ||
       existing.status === "rejected_invalid";
     if (!isResolved) {
-      return NextResponse.json(
-        { ok: true, action: "reopen", status: existing.status, noop: true },
-      );
+      return NextResponse.json({
+        ok: true,
+        action: "reopen",
+        status: existing.status,
+        noop: true,
+      });
     }
 
     await db
@@ -160,7 +163,10 @@ export async function POST(
     });
 
     if (isForm) {
-      const redirect = body.redirect ?? `/admin/data-disputes/${id}`;
+      const redirect = safeInternalPathOr(
+        body.redirect,
+        `/admin/data-disputes/${id}`,
+      );
       return NextResponse.redirect(new URL(redirect, request.url), 303);
     }
     return NextResponse.json({
@@ -195,24 +201,19 @@ export async function POST(
     // (flipping resolve_a↔resolve_b leaves BOTH parties demoted, pointing the
     // dispute at two dead rows). Require an explicit reopen first.
     if (!OPEN_DISPUTE_STATUSES.has(existing.status)) {
-      return NextResponse.json(
-        {
-          error: `dispute is already ${existing.status}; reopen it before re-resolving`,
-        },
-        { status: 409 },
+      return adminMutationProblem(
+        "DISPUTE_STATE_CONFLICT",
+        "dispute must be reopened before re-resolving",
+        409,
       );
     }
     const winnerId =
       body.action === "resolve_a" ? existing.factIdA : existing.factIdB;
     if (!winnerId) {
-      return NextResponse.json(
-        {
-          error:
-            body.action === "resolve_a"
-              ? "cannot resolve in favour of A: dispute has no fact_id_a"
-              : "cannot resolve in favour of B: dispute has no fact_id_b",
-        },
-        { status: 400 },
+      return adminMutationProblem(
+        "WINNING_FACT_NOT_FOUND",
+        "selected winning fact is unavailable",
+        400,
       );
     }
     const loserId = disputeLoserId(
@@ -223,25 +224,18 @@ export async function POST(
     // Unary disputes (e.g. plausibility_envelope) carry no fact_id_b, so
     // there is no losing peer to demote — record the decision, demote nothing.
     if (loserId) {
-      const demoteResult = await db
-        .update(countryFacts)
-        .set({
-          status: "demoted",
-          // Status reason carries the dispute id so the audit trail can
-          // be reconstructed even if data_disputes evolves later.
-          statusReason: `demoted_by_dispute_${id}`,
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(countryFacts.id, loserId),
-            // Keep the active predicate so a re-run / already-demoted loser
-            // is a safe no-op rather than a redundant write.
-            eq(countryFacts.status, "active"),
-          ),
-        )
-        .returning({ id: countryFacts.id });
-      demotedCount = demoteResult.length;
+      demotedCount = await demoteCountryFactWithHistory(db, {
+        factId: loserId,
+        // Status reason carries the dispute id so the audit trail can be
+        // reconstructed even if data_disputes evolves later.
+        statusReason: `demoted_by_dispute_${id}`,
+        history: {
+          changeKind: "substantive_revision",
+          reason: `Reviewer resolution of data dispute ${id} demoted the losing source row`,
+          methodologyVersion: "fact-reconciliation-dispute-review/v1",
+          releaseId: resolveAtlasReleaseId(),
+        },
+      });
     }
   }
 
@@ -287,7 +281,10 @@ export async function POST(
   }
 
   if (isForm) {
-    const redirect = body.redirect ?? `/admin/data-disputes/${id}`;
+    const redirect = safeInternalPathOr(
+      body.redirect,
+      `/admin/data-disputes/${id}`,
+    );
     return NextResponse.redirect(new URL(redirect, request.url), 303);
   }
   return NextResponse.json({
@@ -298,4 +295,21 @@ export async function POST(
     resolvedAt: now.toISOString(),
     demotedFactIds: demotedCount,
   });
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return withAdminMutation(
+    request,
+    {
+      route: "/api/admin/data-disputes/[id]",
+      action: "data_dispute.review",
+      targetType: "data_dispute",
+      targetId: id,
+    },
+    (auth) => mutateDataDispute(request, id, auth),
+  );
 }

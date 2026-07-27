@@ -31,6 +31,7 @@ import {
   zIndexCompareResponse,
   zIndexMethodologyResponse,
   zIndexRankingsResponse,
+  zConditionsReleaseResponse,
   zPeerGroupingsResponse,
   zPulseMethodologyResponse,
   zPulseClusterCoverageResponse,
@@ -38,6 +39,7 @@ import {
   zPulseDimensionsResponse,
   zPulseEventsResponse,
   zPulseChangelogResponse,
+  zAtlasQueryResponse,
   zCountryExportJson,
   zElectionResearchExport,
   type GovernmentClassificationShape,
@@ -56,6 +58,7 @@ import {
   shapeIndexMethodologyData,
   shapeIndexRankingsItem,
   shapeIndexRankingsMeta,
+  shapeConditionsReleaseResponse,
   shapePeerGroupingsData,
   shapePulseDimensionsData,
   shapePulseEventsData,
@@ -67,10 +70,24 @@ import {
   CURRENT_CI_METHODOLOGY_VERSION,
   CURRENT_CI_RELEASE_ID,
 } from "@/lib/ci/current-release";
-import { resolveCiRelease } from "@/lib/ci/release-selection";
+import {
+  publicCiReleaseIdentity,
+  resolveCiRelease,
+} from "@/lib/ci/release-selection";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
+import {
+  pulseDeltaVersionEnvelope,
+  pulseEventVersionEnvelope,
+} from "@/lib/pulse/v2/versioning";
 
-const currentCiSeries = resolveCiRelease(CURRENT_CI_RELEASE_ID).series;
+const currentCiRelease = resolveCiRelease(CURRENT_CI_RELEASE_ID);
+const currentCiSeries = currentCiRelease.series;
+const currentCiReleaseIdentity = publicCiReleaseIdentity(currentCiRelease);
+const currentCiContextComponents = publicCiPublicationComponents(
+  currentCiRelease,
+  { jurisdiction: "live_current", taxonomy: "live_current" },
+);
 
 /* ────────────────────────────────────────────────────────────────
  * Shared fixture pieces
@@ -166,6 +183,7 @@ const exampleProvenanceEntry = {
   source: "un_data",
   sourceName: "UN Statistics Division",
   asOf: "2024",
+  publisherDate: null,
   vintageLabel: "UN World Population Prospects 2024 revision",
   decisionReason: "fresher_winner" as const,
   decisionTrace: [
@@ -189,6 +207,7 @@ const exampleProvenanceEntry = {
       sourceName: "CIA World Factbook",
       value: 68170228,
       asOf: "2024-07",
+      publisherDate: null,
       vintageLabel: "CIA World Factbook, archived January 2026",
       url: null,
       valueType: "measured" as const,
@@ -267,6 +286,197 @@ const countriesExampleResponse = zCountriesListResponse.strict().parse({
     },
   }),
 });
+
+/* ────────────────────────────────────────────────────────────────
+ * /api/v1/conditions
+ * ──────────────────────────────────────────────────────────────── */
+
+const conditionsExampleResponse = zConditionsReleaseResponse.strict().parse(
+  shapeConditionsReleaseResponse({
+    contract: "civica-conditions-public-release/v1",
+    release: {
+      releaseId: "conditions-atlas-v1",
+      methodologyVersion: "conditions-components/v1",
+      manifestSha256: "c".repeat(64),
+      createdAt: "2026-07-18T00:00:00.000Z",
+    },
+    coverage: [
+      {
+        dimension: "human_development",
+        calculations: 1,
+        aligned: 1,
+        scored: 1,
+        mixedYearRefused: 0,
+        missingComponent: 0,
+        components: 1,
+        observedComponents: 1,
+        unavailableComponents: 0,
+      },
+      {
+        dimension: "peace_security",
+        calculations: 1,
+        aligned: 1,
+        scored: 1,
+        mixedYearRefused: 0,
+        missingComponent: 0,
+        components: 1,
+        observedComponents: 1,
+        unavailableComponents: 0,
+      },
+      {
+        dimension: "economic_stability",
+        calculations: 1,
+        aligned: 1,
+        scored: 0,
+        mixedYearRefused: 0,
+        missingComponent: 0,
+        components: 3,
+        observedComponents: 3,
+        unavailableComponents: 0,
+      },
+    ],
+    calculations: [
+      {
+        releaseId: "conditions-atlas-v1",
+        jurisdictionId: "illustrative-uruguay-id",
+        countryName: "Uruguay",
+        countrySlug: "uruguay",
+        countryIso3: "URY",
+        dimension: "human_development",
+        calculationKey: `conditions-calculation/v1/sha256:${"1".repeat(64)}`,
+        alignmentPolicy: "all-components-same-reference-year/v1",
+        alignmentStatus: "aligned",
+        referenceYear: 2024,
+        normalizedScore: 83.4,
+        rawValue: 0.83,
+        scoreSourceId: "undp_hdi",
+        scoreSourceName: "UNDP",
+        scoreIndicatorId: "hdi",
+        scoreUpstreamRelease: "HDR 2025",
+        scoreLicenseUrl: "https://example.test/undp",
+        components: [
+          {
+            componentId: "hdi",
+            nativeValue: 0.83,
+            nativeUnit: "index_0_1",
+            referenceYear: 2024,
+            valueStatus: "observed",
+            valueStatusReason: null,
+            inclusionDecision: "included",
+            sourceId: "undp_hdi",
+            sourceName: "UNDP",
+            indicatorId: "hdi",
+            upstreamRelease: "HDR 2025",
+            licenseUrl: "https://example.test/undp",
+            transformationId: "conditions-hdi-component/v2",
+          },
+        ],
+      },
+      {
+        releaseId: "conditions-atlas-v1",
+        jurisdictionId: "illustrative-uruguay-id",
+        countryName: "Uruguay",
+        countrySlug: "uruguay",
+        countryIso3: "URY",
+        dimension: "peace_security",
+        calculationKey: `conditions-calculation/v1/sha256:${"2".repeat(64)}`,
+        alignmentPolicy: "all-components-same-reference-year/v1",
+        alignmentStatus: "aligned",
+        referenceYear: 2024,
+        normalizedScore: 75.6,
+        rawValue: 1.4,
+        scoreSourceId: "global_peace_index",
+        scoreSourceName: "Institute for Economics & Peace",
+        scoreIndicatorId: "gpi",
+        scoreUpstreamRelease: "GPI 2025",
+        scoreLicenseUrl: "https://example.test/gpi",
+        components: [
+          {
+            componentId: "global_peace_index",
+            nativeValue: 1.4,
+            nativeUnit: "index",
+            referenceYear: 2024,
+            valueStatus: "observed",
+            valueStatusReason: null,
+            inclusionDecision: "included",
+            sourceId: "global_peace_index",
+            sourceName: "Institute for Economics & Peace",
+            indicatorId: "gpi",
+            upstreamRelease: "GPI 2025",
+            licenseUrl: "https://example.test/gpi",
+            transformationId: "conditions-gpi-component/v2",
+          },
+        ],
+      },
+      {
+        releaseId: "conditions-atlas-v1",
+        jurisdictionId: "illustrative-uruguay-id",
+        countryName: "Uruguay",
+        countrySlug: "uruguay",
+        countryIso3: "URY",
+        dimension: "economic_stability",
+        calculationKey: `conditions-calculation/v1/sha256:${"3".repeat(64)}`,
+        alignmentPolicy: "all-components-same-reference-year/v1",
+        alignmentStatus: "aligned",
+        referenceYear: 2024,
+        normalizedScore: null,
+        rawValue: null,
+        scoreSourceId: null,
+        scoreSourceName: null,
+        scoreIndicatorId: null,
+        scoreUpstreamRelease: null,
+        scoreLicenseUrl: null,
+        components: [
+          {
+            componentId: "inflation",
+            nativeValue: 4.2,
+            nativeUnit: "percent",
+            referenceYear: 2024,
+            valueStatus: "observed",
+            valueStatusReason: null,
+            inclusionDecision: "included",
+            sourceId: "world_bank",
+            sourceName: "World Bank",
+            indicatorId: "FP.CPI.TOTL.ZG",
+            upstreamRelease: "WDI 2025",
+            licenseUrl: "https://example.test/worldbank",
+            transformationId: "conditions-economic-component/v1",
+          },
+          {
+            componentId: "unemployment",
+            nativeValue: 7.8,
+            nativeUnit: "percent",
+            referenceYear: 2024,
+            valueStatus: "observed",
+            valueStatusReason: null,
+            inclusionDecision: "included",
+            sourceId: "world_bank",
+            sourceName: "World Bank",
+            indicatorId: "SL.UEM.TOTL.ZS",
+            upstreamRelease: "WDI 2025",
+            licenseUrl: "https://example.test/worldbank",
+            transformationId: "conditions-economic-component/v1",
+          },
+          {
+            componentId: "gdp_growth",
+            nativeValue: 3.1,
+            nativeUnit: "percent",
+            referenceYear: 2024,
+            valueStatus: "observed",
+            valueStatusReason: null,
+            inclusionDecision: "included",
+            sourceId: "world_bank",
+            sourceName: "World Bank",
+            indicatorId: "NY.GDP.MKTP.KD.ZG",
+            upstreamRelease: "WDI 2025",
+            licenseUrl: "https://example.test/worldbank",
+            transformationId: "conditions-economic-component/v1",
+          },
+        ],
+      },
+    ],
+  }),
+);
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/countries/[code]
@@ -403,18 +613,18 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
     slug: "france",
     name: "France",
     governmentClassification: franceClassification,
-    quarter: "2026-Q1",
-    vintageLabel: "Civica Index 2026 Q1 (Beta)",
+    quarter: currentCiRelease.quarter,
+    vintageLabel: currentCiRelease.vintageLabel,
     score: 83.2,
-    scoreLower: 79.1,
-    scoreUpper: 86.4,
+    scoreLower: null,
+    scoreUpper: null,
     completenessFlag: "full",
     rank: 18,
-    totalRanked: 167,
+    totalRanked: currentCiRelease.compositeRowSet.rows,
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta-r3",
+    methodologyVersion: currentCiRelease.methodologyVersion,
     dimensions: [
       {
         dimension: "democratic_quality",
@@ -427,7 +637,9 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
   }),
   meta: {
     methodology: CI_METHODOLOGY_META,
+    release: currentCiReleaseIdentity,
     series: currentCiSeries,
+    components: currentCiContextComponents,
     deprecations: [
       {
         identifier: "structural_family",
@@ -455,23 +667,20 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
 const indexHistoryExampleResponse = zIndexHistoryResponse.strict().parse({
   data: [
     shapeIndexHistoryItem({
-      quarter: "2025-Q4",
-      score: 82.6,
-      rank: 19,
-      totalRanked: 165,
-      isPartial: false,
-    }),
-    shapeIndexHistoryItem({
-      quarter: "2026-Q1",
+      quarter: currentCiRelease.quarter,
       score: 83.2,
       rank: 18,
-      totalRanked: 167,
+      totalRanked: currentCiRelease.compositeRowSet.rows,
       isPartial: false,
     }),
   ],
   meta: {
     methodology: CI_METHODOLOGY_META,
+    release: currentCiReleaseIdentity,
     series: currentCiSeries,
+    components: publicCiPublicationComponents(currentCiRelease, {
+      jurisdiction: "live_current",
+    }),
   },
 });
 
@@ -495,7 +704,7 @@ const indexByGovernmentTypeExampleResponse = zIndexByGovernmentTypeResponse
         q3: 88.9,
       }),
     ],
-    meta: { quarter: "2026-Q1", taxonomy: "raw", series: currentCiSeries },
+    meta: { quarter: currentCiRelease.quarter, taxonomy: "raw", release: currentCiReleaseIdentity, series: currentCiSeries, components: currentCiContextComponents },
   });
 
 /* ────────────────────────────────────────────────────────────────
@@ -514,18 +723,18 @@ const indexCompareResultA = shapeIndexCompareResult({
     governmentClassification: franceClassification,
   },
   composite: {
-    quarter: "2026-Q1",
-    vintageLabel: "Civica Index 2026 Q1 (Beta)",
+    quarter: currentCiRelease.quarter,
+    vintageLabel: currentCiRelease.vintageLabel,
     score: 83.2,
-    scoreLower: 79.1,
-    scoreUpper: 86.4,
+    scoreLower: null,
+    scoreUpper: null,
     completenessFlag: "full",
     rank: 18,
-    totalRanked: 167,
+    totalRanked: currentCiRelease.compositeRowSet.rows,
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta-r3",
+    methodologyVersion: currentCiRelease.methodologyVersion,
   },
   dimensions: [
     {
@@ -565,18 +774,18 @@ const indexCompareResultB = shapeIndexCompareResult({
     },
   },
   composite: {
-    quarter: "2026-Q1",
-    vintageLabel: "Civica Index 2026 Q1 (Beta)",
+    quarter: currentCiRelease.quarter,
+    vintageLabel: currentCiRelease.vintageLabel,
     score: 85.6,
-    scoreLower: 81.9,
-    scoreUpper: 88.7,
+    scoreLower: null,
+    scoreUpper: null,
     completenessFlag: "full",
     rank: 12,
-    totalRanked: 167,
+    totalRanked: currentCiRelease.compositeRowSet.rows,
     isPartial: false,
     missingDimensions: [],
     dimensionsAvailable: 4,
-    methodologyVersion: "beta-r3",
+    methodologyVersion: currentCiRelease.methodologyVersion,
   },
   dimensions: [
     {
@@ -592,10 +801,12 @@ const indexCompareResultB = shapeIndexCompareResult({
 const indexCompareExampleResponse = zIndexCompareResponse.parse({
   data: [indexCompareResultA, indexCompareResultB],
   meta: {
-    quarter: null,
+    quarter: currentCiRelease.quarter,
     count: 2,
     methodology: CI_METHODOLOGY_META,
+    release: currentCiReleaseIdentity,
     series: currentCiSeries,
+    components: currentCiContextComponents,
     deprecations: [
       {
         identifier: "structural_family",
@@ -627,10 +838,10 @@ const indexMethodologyExampleResponse = zIndexMethodologyResponse
       id: CURRENT_CI_METHODOLOGY_VERSION,
       publishedAt: "2026-05-15T00:00:00.000Z",
       weights: {
-        democratic_quality: 0.3,
-        rule_of_law: 0.3,
-        freedom_rights: 0.2,
-        corruption_control: 0.2,
+        democratic_quality: 0.27,
+        rule_of_law: 0.26,
+        freedom_rights: 0.23,
+        corruption_control: 0.24,
       },
       notes:
         "Research-beta composite under active validation. Numeric estimates are secondary experimental outputs and are not categorical country grades.",
@@ -638,7 +849,9 @@ const indexMethodologyExampleResponse = zIndexMethodologyResponse
     }),
     meta: {
       methodology: CI_METHODOLOGY_META,
+      release: currentCiReleaseIdentity,
       series: currentCiSeries,
+      components: publicCiPublicationComponents(currentCiRelease),
     },
   });
 
@@ -651,14 +864,14 @@ const indexRankingsExampleResponse = zIndexRankingsResponse.strict().parse({
     shapeIndexRankingsItem({
       rank: 1,
       score: 91.4,
-      scoreLower: 88.6,
-      scoreUpper: 93.9,
+      scoreLower: null,
+      scoreUpper: null,
       completenessFlag: "full",
-      vintageLabel: "Civica Index 2026 Q1 (Beta)",
+      vintageLabel: currentCiRelease.vintageLabel,
       isPartial: false,
       missingDimensions: [],
       dimensionsAvailable: 4,
-      methodologyVersion: "beta-r3",
+      methodologyVersion: currentCiRelease.methodologyVersion,
       slug: "norway",
       name: "Norway",
       iso2: "NO",
@@ -670,12 +883,13 @@ const indexRankingsExampleResponse = zIndexRankingsResponse.strict().parse({
     }),
   ],
   meta: shapeIndexRankingsMeta({
-    total: 195,
+    total: currentCiRelease.compositeRowSet.rows,
     limit: 50,
     offset: 0,
     hasMore: true,
-    quarter: "2026-Q1",
+    quarter: currentCiRelease.quarter,
     taxonomy: "raw",
+    release: currentCiRelease,
     series: currentCiSeries,
   }),
 });
@@ -907,8 +1121,8 @@ function pulseMethodologyMetaExample() {
       format: "per_dimension",
       public_status: "public_experimental",
       scalar_pulse_score: false as const,
-      trailing_window_days: 365,
-      bounds_per_dimension: { lower: -10, upper: 10 },
+      trailing_window_days: 730,
+      bounds_per_dimension: { lower: -15, upper: 10 },
     },
     evaluation: {
       current_production_backtest_complete: false,
@@ -980,6 +1194,18 @@ function pulseVersionIdentityExample(
           : [],
       upstreamRunIds: [],
     },
+  };
+}
+
+function pulseDeltaDerivationIdentityExample(contributing: boolean) {
+  const version = pulseDeltaVersionEnvelope(
+    contributing ? [pulseEventVersionEnvelope(["gdelt"]).envelope] : [],
+    contributing ? ["gdelt"] : [],
+  );
+  return {
+    versionKey: version.key,
+    versions: version.envelope,
+    lineageStatus: "current_versioned" as const,
   };
 }
 
@@ -1060,6 +1286,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: pulseDeltaDerivationIdentityExample(false),
       },
       rule_of_law: {
         dimension: "rule_of_law",
@@ -1085,6 +1312,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: true,
         limitedReason: "Single event",
         versionIdentity: pulseVersionIdentityExample("score"),
+        derivationIdentity: pulseDeltaDerivationIdentityExample(true),
       },
       freedom_rights: {
         dimension: "freedom_rights",
@@ -1101,6 +1329,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: pulseDeltaDerivationIdentityExample(false),
       },
       corruption_control: {
         dimension: "corruption_control",
@@ -1117,6 +1346,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: pulseDeltaDerivationIdentityExample(false),
       },
       stability: {
         dimension: "stability",
@@ -1133,6 +1363,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         limitedSignal: false,
         limitedReason: null,
         versionIdentity: null,
+        derivationIdentity: pulseDeltaDerivationIdentityExample(false),
       },
     },
     lastComputedAt: "2026-07-09T09:00:29.000Z",
@@ -1193,6 +1424,39 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
   }),
   meta: {
     methodology: pulseMethodologyMetaExample(),
+    release: {
+      schemaVersion: "pulse-score-publication/v1",
+      product: "pulse_dimensions",
+      scoreAsOf: "2026-07-09",
+      publishedAt: "2026-07-09T09:00:29.000Z",
+      completedAt: "2026-07-09T09:00:29.000Z",
+      versionIdentity: {
+        ...pulseVersionIdentityExample("score"),
+        versionKeySerialization: "stable_json_v1",
+      },
+      lineageCoverage: {
+        schemaVersion: "pulse-score-lineage-coverage/v1",
+        state: "current_versioned_only",
+        totalRows: 5,
+        totalJurisdictions: 1,
+        currentVersionedRows: 5,
+        legacyInputLineageRows: 0,
+        legacyInputLineageJurisdictions: 0,
+      },
+    },
+    components: {
+      dimensionalScores: "frozen_score_publication",
+      contributingEventIds: "frozen_score_publication",
+      derivationLineage:
+        "frozen_explicit_current_or_legacy_input_lineage",
+      drivingEventDetails: "live_context",
+      evidenceQualifiers: "live_context",
+      scoreEvidenceLinkage:
+        "live_context_id_jurisdiction_dimension_sources_checked",
+      jurisdictionIdentity: "live_context",
+      observability: "live_context",
+      informationEnvironment: "live_context",
+    },
   },
 });
 
@@ -1467,6 +1731,7 @@ const countryExportJsonExample = zCountryExportJson.parse({
         },
         freshness: {
           asOf: "2024-01-01",
+          publisherDate: null,
           observationYear: 2024,
           dataVintageYear: 2024,
           retrievedAt: "2026-04-01T00:00:00.000Z",
@@ -1502,6 +1767,134 @@ const countryExportJsonExample = zCountryExportJson.parse({
     reason: "Rows whose source terms do not permit public export are omitted.",
   },
   rights: { manifest: "/api/rights-manifest", policy: "source-row-filtered" },
+});
+
+const atlasQueryExample = zAtlasQueryResponse.parse({
+  schemaVersion: "civica-atlas-query/v1",
+  release: {
+    id: "atlas-2026-07-11",
+    date: "2026-07-11",
+    vintageLabel: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+    cutoffAt: "2026-05-05 19:54:22.775",
+    exportSchemaVersion: "civica-atlas-export/v3",
+    semanticSha256:
+      "60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc",
+    bulkDownload: "/downloads/civica-atlas-2026-07-11.json.gz",
+    manifestDownload:
+      "/downloads/civica-atlas-2026-07-11.manifest.json",
+  },
+  query: {
+    table: "facts",
+    fields: [
+      "jurisdiction_id",
+      "fact_key",
+      "fact_value_numeric",
+      "fact_unit",
+      "source_id",
+      "observation_reference_year",
+    ],
+    filters: {
+      jurisdiction: ["FRA"],
+      factKey: ["population"],
+      source: [],
+      status: [],
+      valueStatus: ["observed"],
+      yearFrom: null,
+      yearTo: null,
+    },
+  },
+  data: [
+    {
+      jurisdiction_id: "example-france-id",
+      fact_key: "population",
+      fact_value_numeric: 68170000,
+      fact_unit: "people",
+      source_id: "world_bank",
+      observation_reference_year: 2024,
+    },
+  ],
+  meta: {
+    total: 1,
+    limit: 100,
+    offset: 0,
+    hasMore: false,
+    nextOffset: null,
+    previousOffset: null,
+  },
+  schema: {
+    table: "facts",
+    columns: {
+      jurisdiction_id: "Foreign key to jurisdictions.id.",
+      fact_key: "Stable Civica fact identifier.",
+      fact_value_numeric: "Numeric form when available; zero is observed, not missing.",
+      fact_unit: "Unit attached to the value.",
+      source_id: "Foreign key to sources.sourceId.",
+      observation_reference_year:
+        "Year the observation describes; never an ingestion or release year.",
+    },
+    joins: {
+      "facts.jurisdiction_id": "jurisdictions.id",
+      "facts.source_id": "sources.sourceId",
+    },
+    ordering: "jurisdiction_id, fact_key, source_id, id ascending",
+  },
+  rights: {
+    manifest: "/api/rights-manifest",
+    policy: "frozen-release-allowlist",
+    note:
+      "Every source represented on this fact page has a matching frozen source-rights row below.",
+    sources: [
+      {
+        sourceId: "world_bank",
+        licenseId: "CC-BY-4.0",
+        termsUrl: "https://datacatalog.worldbank.org/public-licenses",
+        reviewStatus: "verified",
+        reviewedAt: "2026-07-10",
+        publicExport: "allowed",
+        commercialUse: true,
+        derivatives: true,
+        attributionRequired: true,
+        shareAlikeRequired: false,
+        restrictions: [
+          "Dataset-specific catalog terms override the default license",
+          "Indicate changes",
+          "Do not imply World Bank endorsement",
+        ],
+      },
+    ],
+  },
+  exclusions: [
+    {
+      id: "civica-index",
+      reason:
+        "The Civica Index is a separate research experiment and is not part of the frozen Atlas reference export.",
+    },
+    {
+      id: "civica-pulse",
+      reason:
+        "Pulse event evidence and experimental numeric outputs are outside the Atlas release.",
+    },
+    {
+      id: "alternate-and-rejected-observations",
+      reason:
+        "The checked Q1 release retained canonical selections only; alternates, projections, and rejected rows are not reconstructed.",
+    },
+    {
+      id: "restricted-sources",
+      reason:
+        "Rows whose source-specific rights do not permit public bulk export are excluded rather than reassigned.",
+    },
+    {
+      id: "images-and-constitution-text",
+      reason:
+        "Images and constitution full text have separate rights and display contracts and are not redistributed here.",
+    },
+    {
+      id: "raw-publisher-payloads",
+      reason:
+        "Raw publisher payloads are retained only where permitted and never enter this normalized public query surface.",
+    },
+  ],
 });
 
 const electionResearchExample = zElectionResearchExport.parse({
@@ -1592,6 +1985,7 @@ const electionResearchExample = zElectionResearchExport.parse({
  * ──────────────────────────────────────────────────────────────── */
 
 export const EXAMPLES = {
+  conditions: conditionsExampleResponse,
   countries: countriesExampleResponse,
   countryDetail: countryDetailExampleResponse,
   governmentTypes: governmentTypesExampleResponse,
@@ -1608,6 +2002,7 @@ export const EXAMPLES = {
   pulseDimensions: pulseDimensionsExampleResponse,
   pulseEvents: pulseEventsExampleResponse,
   pulseChangelog: pulseChangelogExampleResponse,
+  atlasQuery: atlasQueryExample,
   countryExport: countryExportJsonExample,
   elections: electionResearchExample,
 } as const;

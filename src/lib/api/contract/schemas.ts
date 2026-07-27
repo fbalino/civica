@@ -27,6 +27,12 @@ import {
   STRUCTURAL_FAMILY_SUNSET_DATE_ISO,
   PEER_GROUPINGS_SUCCESSOR_HREF,
 } from "@/lib/api/deprecation";
+import {
+  CONDITIONS_ALIGNMENT_STATUSES,
+  CONDITIONS_COMPONENTS,
+  CONDITIONS_DIMENSIONS,
+  CONDITIONS_INCLUSION_DECISIONS,
+} from "@/lib/conditions/contract";
 
 /* ────────────────────────────────────────────────────────────────
  * Primitive enums (mirrored from their owning modules — these are
@@ -154,6 +160,15 @@ export type GovernmentClassificationShape = z.infer<
   typeof zGovernmentClassification
 >;
 
+export const zPublisherDate = z
+  .object({
+    precision: z.enum(["year", "month", "day", "unknown"]),
+    year: z.number().int().nullable(),
+    month: z.number().int().min(1).max(12).nullable(),
+    day: z.number().int().min(1).max(31).nullable(),
+  })
+  .strict();
+
 /** Mirrors `ApiAlternate` (src/lib/factbook/reconcile/api.ts). */
 export const zApiAlternate = z
   .object({
@@ -161,6 +176,7 @@ export const zApiAlternate = z
     sourceName: z.string(),
     value: z.union([z.number(), z.string(), z.null()]),
     asOf: z.string().nullable(),
+    publisherDate: zPublisherDate.nullable(),
     vintageLabel: z.string().nullable(),
     url: z.string().nullable(),
     rejected: z.literal(true).optional(),
@@ -178,6 +194,7 @@ export const zApiProvenanceEntry = z
     source: z.string(),
     sourceName: z.string(),
     asOf: z.string().nullable(),
+    publisherDate: zPublisherDate.nullable(),
     vintageLabel: z.string().nullable(),
     decisionReason: z.enum([
       "single_source",
@@ -186,6 +203,7 @@ export const zApiProvenanceEntry = z
       "incumbent_held",
       "cia_default_group_a",
       "cia_default_group_c",
+      "canonical_only_legacy",
       "no_active_rows",
     ]),
     decisionTrace: z.array(
@@ -251,6 +269,7 @@ export const zDeprecationHeaders = z
 /** Mirrors `CI_METHODOLOGY_META` (src/lib/api/helpers.ts). */
 export const zCiMethodologyMeta = z
   .object({
+    scope: z.literal("current_runtime_interpretation"),
     status: z.string(),
     standing: z.literal("secondary_research_experiment"),
     independent_validation: z.literal(false),
@@ -312,6 +331,131 @@ export const zCiMethodologyMeta = z
   })
   .strict();
 
+/** Exact immutable data-release identity, separate from the current runtime
+ * interpretation/presentation policy above. */
+export const zCiReleaseIdentity = z
+  .object({
+    schemaVersion: z.literal("ci-release-identity/v1"),
+    releaseId: z.string().regex(/^ci-[a-z0-9-]+-\d{4}-Q[1-4]$/),
+    methodologyVersion: z.string().min(1),
+    quarter: z.string().regex(/^\d{4}-Q[1-4]$/),
+    vintageLabel: z.string(),
+    supersessionKind: z.enum([
+      "none",
+      "registered_release",
+      "legacy_unregistered_vintage",
+    ]),
+    supersedesReleaseId: z
+      .string()
+      .regex(/^ci-[a-z0-9-]+-\d{4}-Q[1-4]$/)
+      .nullable(),
+    supersedesVintageLabel: z.string().nullable(),
+    methodologyContentSha256: z.string().regex(/^[a-f0-9]{64}$/),
+    inputTransformationVersion: z.string(),
+    compositeAlgorithmVersion: z.string(),
+    displayTransformVersion: z.string(),
+    inputManifestSha256: z.string().regex(/^[a-f0-9]{64}$/),
+    dimensionRowSet: z
+      .object({ rows: z.number().int().positive(), sha256: z.string().regex(/^[a-f0-9]{64}$/) })
+      .strict(),
+    compositeRowSet: z
+      .object({ rows: z.number().int().positive(), sha256: z.string().regex(/^[a-f0-9]{64}$/) })
+      .strict(),
+    uncertainty: z
+      .object({
+        schemaVersion: z.literal("ci-index-uncertainty/v1"),
+        pointEstimate: z.enum([
+          "seeded_simulation_median",
+          "deterministic_weighted_composite",
+        ]),
+        displayedRange: z.enum([
+          "sensitivity_summary_5th_95th_percentile",
+          "not_published",
+        ]),
+        bounds: z.enum(["required", "absent"]),
+        simulations: z.number().int().nonnegative(),
+        covarianceModel: z.enum(["independence_assumed", "not_available"]),
+        interpretation: z.string().min(1),
+      })
+      .strict(),
+    dimensionRules: z
+      .array(
+        z
+          .object({
+            dimension: z.string().min(1),
+            sourceId: z.string().min(1),
+            indicatorId: z.string().min(1),
+            priority: z.number().int().positive(),
+            artifactSha256: z.string().regex(/^[a-f0-9]{64}$/),
+            upstreamRelease: z.string().min(1),
+            artifactKind: z.literal("publisher_bytes"),
+            temporalCoverage: z.string().min(1),
+            licenseUrl: z.string().url(),
+            substitutionReason: z.string().nullable(),
+          })
+          .strict(),
+      )
+      .length(5),
+    sourceArtifacts: z
+      .record(z.string(), z.string().regex(/^[a-f0-9]{64}$/))
+      .refine((value) => Object.keys(value).length > 0, {
+        message: "release source artifact basket cannot be empty",
+      }),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (
+      value.supersessionKind === "none" &&
+      (value.supersedesReleaseId != null || value.supersedesVintageLabel != null)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["supersessionKind"],
+        message: "a non-superseding release cannot name a predecessor",
+      });
+    }
+    if (
+      value.supersessionKind === "registered_release" &&
+      (value.supersedesReleaseId == null || value.supersedesVintageLabel == null)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["supersessionKind"],
+        message: "a registered predecessor requires both release and vintage identities",
+      });
+    }
+    if (
+      value.supersessionKind === "legacy_unregistered_vintage" &&
+      (value.supersedesReleaseId != null || value.supersedesVintageLabel == null)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["supersessionKind"],
+        message: "a legacy predecessor carries only its retained vintage label",
+      });
+    }
+    if (
+      (value.uncertainty.bounds === "required") !==
+      (value.uncertainty.displayedRange !== "not_published")
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["uncertainty"],
+        message: "uncertainty bounds and displayed range disagree",
+      });
+    }
+    if (
+      (value.uncertainty.simulations > 0) !==
+      (value.uncertainty.pointEstimate === "seeded_simulation_median")
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["uncertainty"],
+        message: "uncertainty simulation and point-estimate policies disagree",
+      });
+    }
+  });
+
 export const zCiSeriesProvenance = z
   .object({
     releaseId: z.string(),
@@ -324,6 +468,130 @@ export const zCiSeriesProvenance = z
     citationLabel: z.string(),
   })
   .strict();
+
+export const zCiPublicationComponents = z
+  .object({
+    scoreData: z
+      .object({
+        freshness: z.literal("frozen_release"),
+        releaseId: z.string(),
+        methodologyVersion: z.string(),
+      })
+      .strict(),
+    methodologyDefinition: z
+      .object({
+        freshness: z.literal("frozen_release"),
+        sha256: z.string().regex(/^[a-f0-9]{64}$/),
+      })
+      .strict(),
+    jurisdictionContext: z
+      .object({ freshness: z.enum(["live_current", "not_used"]) })
+      .strict(),
+    taxonomyContext: z
+      .object({
+        freshness: z.enum(["live_current", "not_used"]),
+        taxonomyVersion: z.string().nullable(),
+      })
+      .strict(),
+    peerFilterContext: z
+      .object({ freshness: z.enum(["live_current", "not_used"]) })
+      .strict(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (
+      (value.taxonomyContext.freshness === "live_current") !==
+      (value.taxonomyContext.taxonomyVersion != null)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["taxonomyContext", "taxonomyVersion"],
+        message: "live taxonomy context requires an explicit version",
+      });
+    }
+  });
+
+type CiReleaseIdentity = z.infer<typeof zCiReleaseIdentity>;
+type CiSeriesProvenance = z.infer<typeof zCiSeriesProvenance>;
+type CiPublicationComponents = z.infer<typeof zCiPublicationComponents>;
+
+function addCiReleaseEnvelopeIssues(
+  ctx: z.RefinementCtx,
+  release: CiReleaseIdentity,
+  series: CiSeriesProvenance | null,
+  components: CiPublicationComponents,
+  options: {
+    seriesPath: (string | number)[];
+    composite?: {
+      quarter: string;
+      vintageLabel: string | null;
+      methodologyVersion: string;
+      score?: number;
+      scoreLower?: number | null;
+      scoreUpper?: number | null;
+      totalRanked?: number | null;
+    } | null;
+    compositePath?: (string | number)[];
+  },
+): void {
+  const issue = (path: (string | number)[], message: string) =>
+    ctx.addIssue({ code: "custom", path, message });
+  if (components.scoreData.releaseId !== release.releaseId)
+    issue(["meta", "components", "scoreData", "releaseId"], "component release id differs from release metadata");
+  if (components.scoreData.methodologyVersion !== release.methodologyVersion)
+    issue(["meta", "components", "scoreData", "methodologyVersion"], "component methodology differs from release metadata");
+  if (components.methodologyDefinition.sha256 !== release.methodologyContentSha256)
+    issue(["meta", "components", "methodologyDefinition", "sha256"], "component methodology hash differs from release metadata");
+  if (series) {
+    if (series.releaseId !== release.releaseId)
+      issue([...options.seriesPath, "releaseId"], "series release id differs from release metadata");
+    if (series.methodVersion !== release.compositeAlgorithmVersion)
+      issue([...options.seriesPath, "methodVersion"], "series method differs from release metadata");
+    if (
+      series.observationPeriodStart !== release.quarter ||
+      series.observationPeriodEnd !== release.quarter
+    ) {
+      issue(options.seriesPath, "series observation period differs from release quarter");
+    }
+  }
+  const composite = options.composite;
+  if (!composite) return;
+  const base = options.compositePath ?? ["data"];
+  if (composite.quarter !== release.quarter)
+    issue([...base, "quarter"], "score quarter differs from release metadata");
+  if (composite.vintageLabel !== release.vintageLabel)
+    issue([...base, "vintageLabel"], "score vintage differs from release metadata");
+  if (composite.methodologyVersion !== release.methodologyVersion)
+    issue([...base, "methodologyVersion"], "score methodology differs from release metadata");
+  if (
+    release.uncertainty.bounds === "required" &&
+    (composite.scoreLower == null || composite.scoreUpper == null)
+  ) {
+    issue(base, "release requires both score bounds");
+  }
+  if (
+    release.uncertainty.bounds === "absent" &&
+    (composite.scoreLower != null || composite.scoreUpper != null)
+  ) {
+    issue(base, "release forbids score bounds");
+  }
+  if (
+    composite.score != null &&
+    composite.scoreLower != null &&
+    composite.scoreUpper != null &&
+    (composite.scoreLower > composite.score ||
+      composite.scoreUpper < composite.score ||
+      composite.scoreLower > composite.scoreUpper)
+  ) {
+    issue(base, "score bounds do not contain the point estimate");
+  }
+  if (
+    composite.totalRanked != null &&
+    composite.totalRanked !== release.compositeRowSet.rows
+  ) {
+    issue([...base, "totalRanked"], "score population differs from release row set");
+  }
+}
 
 /** Mirrors `PULSE_METHODOLOGY_META` (src/lib/api/helpers.ts). */
 export const zPulseMethodologyMeta = z
@@ -391,7 +659,21 @@ export const zPaginationMeta = z
   })
   .strict();
 
-export const zApiErrorEnvelope = z.object({ error: z.string() }).strict();
+export const zApiErrorEnvelope = z
+  .object({
+    error: z.string(),
+    code: z.enum([
+      "BAD_REQUEST",
+      "UNAUTHORIZED",
+      "FORBIDDEN",
+      "NOT_FOUND",
+      "CONFLICT",
+      "RATE_LIMITED",
+      "INTERNAL_ERROR",
+      "SERVICE_UNAVAILABLE",
+    ]),
+  })
+  .strict();
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/countries
@@ -647,11 +929,18 @@ export const zIndexCountryResponse = z
   .object({
     data: zIndexCountryData,
     meta: z
-      .object({ methodology: zCiMethodologyMeta, series: zCiSeriesProvenance })
+      .object({ methodology: zCiMethodologyMeta, release: zCiReleaseIdentity, series: zCiSeriesProvenance, components: zCiPublicationComponents })
       .extend(zDeprecationMeta.shape)
       .strict(),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    addCiReleaseEnvelopeIssues(ctx, value.meta.release, value.meta.series, value.meta.components, {
+      seriesPath: ["meta", "series"],
+      composite: value.data,
+      compositePath: ["data"],
+    });
+  });
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/index/[country_slug]/history
@@ -671,10 +960,34 @@ export const zIndexHistoryResponse = z
   .object({
     data: z.array(zIndexHistoryItem),
     meta: z
-      .object({ methodology: zCiMethodologyMeta, series: zCiSeriesProvenance })
+      .object({ methodology: zCiMethodologyMeta, release: zCiReleaseIdentity, series: zCiSeriesProvenance, components: zCiPublicationComponents })
       .strict(),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    addCiReleaseEnvelopeIssues(ctx, value.meta.release, value.meta.series, value.meta.components, {
+      seriesPath: ["meta", "series"],
+    });
+    for (const [index, row] of value.data.entries()) {
+      if (row.quarter !== value.meta.release.quarter) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["data", index, "quarter"],
+          message: "history row differs from the selected release quarter",
+        });
+      }
+      if (
+        row.totalRanked != null &&
+        row.totalRanked !== value.meta.release.compositeRowSet.rows
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["data", index, "totalRanked"],
+          message: "history population differs from the release row set",
+        });
+      }
+    }
+  });
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/index/by-government-type
@@ -698,7 +1011,9 @@ export const zIndexByGovernmentTypeMetaBase = z
   .object({
     quarter: z.string().nullable(),
     taxonomy: z.string(),
+    release: zCiReleaseIdentity,
     series: zCiSeriesProvenance,
+    components: zCiPublicationComponents,
   })
   .strict();
 
@@ -710,7 +1025,19 @@ export const zIndexByGovernmentTypeResponse = z
       zIndexByGovernmentTypeMetaBase.extend(zDeprecationMeta.shape).strict(),
     ]),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    addCiReleaseEnvelopeIssues(ctx, value.meta.release, value.meta.series, value.meta.components, {
+      seriesPath: ["meta", "series"],
+    });
+    if (value.meta.quarter !== value.meta.release.quarter) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["meta", "quarter"],
+        message: "aggregate quarter differs from release metadata",
+      });
+    }
+  });
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/index/compare
@@ -743,7 +1070,9 @@ export const zIndexCompareResponse = z
         quarter: z.string().nullable(),
         count: z.number(),
         methodology: zCiMethodologyMeta,
+        release: zCiReleaseIdentity,
         series: zCiSeriesProvenance,
+        components: zCiPublicationComponents,
       })
       .extend(zDeprecationMeta.shape)
       .strict(),
@@ -752,6 +1081,26 @@ export const zIndexCompareResponse = z
   .refine((val) => val.data.length === val.meta.count, {
     message: "meta.count must equal data.length",
     path: ["meta", "count"],
+  })
+  .superRefine((value, ctx) => {
+    addCiReleaseEnvelopeIssues(ctx, value.meta.release, value.meta.series, value.meta.components, {
+      seriesPath: ["meta", "series"],
+    });
+    if (value.meta.quarter !== value.meta.release.quarter) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["meta", "quarter"],
+        message: "comparison quarter differs from release metadata",
+      });
+    }
+    for (const [index, row] of value.data.entries()) {
+      if (!row.composite) continue;
+      addCiReleaseEnvelopeIssues(ctx, value.meta.release, null, value.meta.components, {
+        seriesPath: ["meta", "series"],
+        composite: row.composite,
+        compositePath: ["data", index, "composite"],
+      });
+    }
   });
 
 /* ────────────────────────────────────────────────────────────────
@@ -774,11 +1123,25 @@ export const zIndexMethodologyResponse = z
     meta: z
       .object({
         methodology: zCiMethodologyMeta,
-        series: zCiSeriesProvenance.nullable(),
+        release: zCiReleaseIdentity,
+        series: zCiSeriesProvenance,
+        components: zCiPublicationComponents,
       })
       .strict(),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    addCiReleaseEnvelopeIssues(ctx, value.meta.release, value.meta.series, value.meta.components, {
+      seriesPath: ["meta", "series"],
+    });
+    if (value.data.id !== value.meta.release.methodologyVersion) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["data", "id"],
+        message: "methodology record differs from release metadata",
+      });
+    }
+  });
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/index/rankings
@@ -830,7 +1193,9 @@ export const zIndexRankingsMeta = zPaginationMeta
     quarter: z.string().nullable(),
     taxonomy: z.string(),
     methodology: zCiMethodologyMeta,
+    release: zCiReleaseIdentity,
     series: zCiSeriesProvenance,
+    components: zCiPublicationComponents,
   })
   .extend(zDeprecationMeta.shape)
   .strict();
@@ -840,7 +1205,33 @@ export const zIndexRankingsResponse = z
     data: z.array(zIndexRankingsItem),
     meta: zIndexRankingsMeta,
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    addCiReleaseEnvelopeIssues(ctx, value.meta.release, value.meta.series, value.meta.components, {
+      seriesPath: ["meta", "series"],
+    });
+    if (value.meta.quarter !== value.meta.release.quarter) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["meta", "quarter"],
+        message: "ranking quarter differs from release metadata",
+      });
+    }
+    for (const [index, row] of value.data.entries()) {
+      addCiReleaseEnvelopeIssues(ctx, value.meta.release, null, value.meta.components, {
+        seriesPath: ["meta", "series"],
+        composite: {
+          quarter: value.meta.quarter ?? "",
+          vintageLabel: row.vintageLabel,
+          methodologyVersion: row.methodologyVersion,
+          score: row.score,
+          scoreLower: row.scoreLower,
+          scoreUpper: row.scoreUpper,
+        },
+        compositePath: ["data", index],
+      });
+    }
+  });
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/peer-groupings
@@ -905,6 +1296,185 @@ export const zPeerGroupingsResponse = z
   .strict();
 
 /* ────────────────────────────────────────────────────────────────
+ * /api/v1/conditions
+ * ──────────────────────────────────────────────────────────────── */
+
+const zConditionsDimension = z.enum(CONDITIONS_DIMENSIONS);
+const zConditionsAlignmentStatus = z.enum(CONDITIONS_ALIGNMENT_STATUSES);
+const zConditionsInclusionDecision = z.enum(CONDITIONS_INCLUSION_DECISIONS);
+const zConditionsComponentId = z.enum([
+  "hdi",
+  "global_peace_index",
+  "inflation",
+  "unemployment",
+  "gdp_growth",
+]);
+
+export const zConditionsPublicComponent = z
+  .object({
+    componentId: zConditionsComponentId,
+    nativeValue: z.number().nullable(),
+    nativeUnit: z.string(),
+    referenceYear: z.number().int().nullable(),
+    valueStatus: zDataValueStatus,
+    valueStatusReason: z.string().nullable(),
+    inclusionDecision: zConditionsInclusionDecision,
+    sourceId: z.string(),
+    sourceName: z.string().nullable(),
+    indicatorId: z.string(),
+    upstreamRelease: z.string(),
+    licenseUrl: z.string(),
+    transformationId: z.string(),
+  })
+  .strict();
+
+export const zConditionsPublicCalculation = z
+  .object({
+    releaseId: z.string().regex(/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/),
+    jurisdictionId: z.string(),
+    countryName: z.string(),
+    countrySlug: z.string(),
+    countryIso3: z.string().nullable(),
+    dimension: zConditionsDimension,
+    calculationKey: z
+      .string()
+      .regex(/^conditions-calculation\/v1\/sha256:[a-f0-9]{64}$/),
+    alignmentPolicy: z.literal("all-components-same-reference-year/v1"),
+    alignmentStatus: zConditionsAlignmentStatus,
+    referenceYear: z.number().int().nullable(),
+    normalizedScore: z.number().min(0).max(100).nullable(),
+    rawValue: z.number().nullable(),
+    scoreSourceId: z.string().nullable(),
+    scoreSourceName: z.string().nullable(),
+    scoreIndicatorId: z.string().nullable(),
+    scoreUpstreamRelease: z.string().nullable(),
+    scoreLicenseUrl: z.string().nullable(),
+    components: z.array(zConditionsPublicComponent),
+  })
+  .strict();
+
+export const zConditionsPublicRelease = z
+  .object({
+    contract: z.literal("civica-conditions-public-release/v1"),
+    release: z
+      .object({
+        releaseId: z.string().regex(/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/),
+        methodologyVersion: z.string(),
+        manifestSha256: z.string().regex(/^[a-f0-9]{64}$/),
+        createdAt: z.string(),
+      })
+      .strict(),
+    coverage: z.array(
+      z
+        .object({
+          dimension: zConditionsDimension,
+          calculations: z.number().int().nonnegative(),
+          aligned: z.number().int().nonnegative(),
+          scored: z.number().int().nonnegative(),
+          mixedYearRefused: z.number().int().nonnegative(),
+          missingComponent: z.number().int().nonnegative(),
+          components: z.number().int().nonnegative(),
+          observedComponents: z.number().int().nonnegative(),
+          unavailableComponents: z.number().int().nonnegative(),
+        })
+        .strict(),
+    ),
+    calculations: z.array(zConditionsPublicCalculation),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const report = (path: (string | number)[], message: string) =>
+      context.addIssue({ code: "custom", path, message });
+    const coverageByDimension = new Map(
+      value.coverage.map((coverage) => [coverage.dimension, coverage]),
+    );
+
+    if (coverageByDimension.size !== CONDITIONS_DIMENSIONS.length) {
+      report(["coverage"], "coverage must contain every Conditions dimension exactly once");
+    }
+
+    for (const dimension of CONDITIONS_DIMENSIONS) {
+      const coverage = coverageByDimension.get(dimension);
+      if (!coverage) continue;
+      const calculations = value.calculations.filter(
+        (calculation) => calculation.dimension === dimension,
+      );
+      const components = calculations.flatMap(
+        (calculation) => calculation.components,
+      );
+      const expected = {
+        calculations: calculations.length,
+        aligned: calculations.filter(
+          (calculation) => calculation.alignmentStatus === "aligned",
+        ).length,
+        scored: calculations.filter(
+          (calculation) => calculation.normalizedScore !== null,
+        ).length,
+        mixedYearRefused: calculations.filter(
+          (calculation) => calculation.alignmentStatus === "mixed_year_refused",
+        ).length,
+        missingComponent: calculations.filter(
+          (calculation) => calculation.alignmentStatus === "missing_component",
+        ).length,
+        components: components.length,
+        observedComponents: components.filter(
+          (component) => component.valueStatus === "observed",
+        ).length,
+        unavailableComponents: components.filter(
+          (component) => component.valueStatus !== "observed",
+        ).length,
+      };
+      for (const [key, expectedValue] of Object.entries(expected)) {
+        if (coverage[key as keyof typeof expected] !== expectedValue) {
+          report(["coverage"], `${dimension} coverage does not match its calculation rows`);
+          break;
+        }
+      }
+    }
+
+    for (const [index, calculation] of value.calculations.entries()) {
+      const path = ["calculations", index] as const;
+      if (calculation.releaseId !== value.release.releaseId) {
+        report([...path, "releaseId"], "calculation belongs to another release");
+      }
+      const expectedComponents = CONDITIONS_COMPONENTS[calculation.dimension];
+      const actualComponents = calculation.components
+        .map((component) => component.componentId)
+        .sort();
+      if (
+        actualComponents.length !== expectedComponents.length ||
+        actualComponents.some((component, componentIndex) =>
+          component !== [...expectedComponents].sort()[componentIndex],
+        )
+      ) {
+        report([...path, "components"], "calculation omits or adds a declared component");
+      }
+      if (
+        calculation.alignmentStatus === "aligned" &&
+        calculation.referenceYear === null
+      ) {
+        report([...path, "referenceYear"], "aligned calculation has no reference year");
+      }
+      if (
+        calculation.alignmentStatus !== "aligned" &&
+        (calculation.normalizedScore !== null || calculation.rawValue !== null)
+      ) {
+        report([...path], "unaligned calculation carries a score");
+      }
+      if (
+        calculation.dimension === "economic_stability" &&
+        (calculation.normalizedScore !== null || calculation.rawValue !== null)
+      ) {
+        report([...path], "economic stability must not publish a composite score");
+      }
+    }
+  });
+
+export const zConditionsReleaseResponse = z
+  .object({ data: zConditionsPublicRelease })
+  .strict();
+
+/* ────────────────────────────────────────────────────────────────
  * Pulse — shared building blocks
  * ──────────────────────────────────────────────────────────────── */
 
@@ -962,6 +1532,93 @@ const zPulseRunIdentity = z
   })
   .strict();
 
+export const zPulseScorePublication = z
+  .object({
+    schemaVersion: z.literal("pulse-score-publication/v1"),
+    product: z.literal("pulse_dimensions"),
+    scoreAsOf: z.string(),
+    publishedAt: z.string(),
+    completedAt: z.string(),
+    versionIdentity: zPulseRunIdentity
+      .extend({
+        versionKeySerialization: z.enum([
+          "stable_json_v1",
+          "legacy_insertion_order_json_v1",
+        ]),
+      })
+      .strict(),
+    lineageCoverage: z
+      .object({
+        schemaVersion: z.literal("pulse-score-lineage-coverage/v1"),
+        state: z.enum([
+          "current_versioned_only",
+          "mixed_current_and_legacy_input_lineage",
+          "legacy_input_lineage_only",
+        ]),
+        totalRows: z.number().int().positive(),
+        totalJurisdictions: z.number().int().positive(),
+        currentVersionedRows: z.number().int().nonnegative(),
+        legacyInputLineageRows: z.number().int().nonnegative(),
+        legacyInputLineageJurisdictions: z.number().int().nonnegative(),
+      })
+      .strict()
+      .superRefine((value, ctx) => {
+        if (
+          value.currentVersionedRows + value.legacyInputLineageRows !==
+          value.totalRows
+        ) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["totalRows"],
+            message: "lineage row counts must close over the release",
+          });
+        }
+        if (
+          value.legacyInputLineageJurisdictions > value.totalJurisdictions ||
+          (value.legacyInputLineageRows === 0) !==
+            (value.legacyInputLineageJurisdictions === 0)
+        ) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["legacyInputLineageJurisdictions"],
+            message: "legacy jurisdiction coverage disagrees with row coverage",
+          });
+        }
+        const expectedState =
+          value.legacyInputLineageRows === 0
+            ? "current_versioned_only"
+            : value.currentVersionedRows === 0
+              ? "legacy_input_lineage_only"
+              : "mixed_current_and_legacy_input_lineage";
+        if (value.state !== expectedState) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["state"],
+            message: "lineage state disagrees with release row counts",
+          });
+        }
+      }),
+  })
+  .strict();
+
+const zPulseDimensionsComponents = z
+  .object({
+    dimensionalScores: z.literal("frozen_score_publication"),
+    contributingEventIds: z.literal("frozen_score_publication"),
+    derivationLineage: z.literal(
+      "frozen_explicit_current_or_legacy_input_lineage",
+    ),
+    drivingEventDetails: z.literal("live_context"),
+    evidenceQualifiers: z.literal("live_context"),
+    scoreEvidenceLinkage: z.literal(
+      "live_context_id_jurisdiction_dimension_sources_checked",
+    ),
+    jurisdictionIdentity: z.literal("live_context"),
+    observability: z.literal("live_context"),
+    informationEnvironment: z.literal("live_context"),
+  })
+  .strict();
+
 const zPulseVersionSetSummary = z
   .object({
     state: z.enum(["single_version", "mixed_version", "legacy_only", "empty"]),
@@ -970,6 +1627,52 @@ const zPulseVersionSetSummary = z
     comparableAsSingleSeries: z.boolean(),
   })
   .strict();
+
+const zDerivationVersionRef = z.discriminatedUnion("state", [
+  z.object({ state: z.literal("versioned"), id: z.string().min(1) }).strict(),
+  z
+    .object({ state: z.literal("not_applicable"), reason: z.string().min(1) })
+    .strict(),
+  z
+    .object({ state: z.literal("legacy_unversioned"), reason: z.string().min(1) })
+    .strict(),
+]);
+
+const zDerivationVersionEnvelope = z
+  .object({
+    schemaVersion: z.literal("derivation-version-envelope/v1"),
+    methodology: zDerivationVersionRef,
+    algorithm: zDerivationVersionRef,
+    prompt: zDerivationVersionRef,
+    taxonomy: zDerivationVersionRef,
+    sourceBasket: zDerivationVersionRef,
+    sourceIds: z.array(z.string().min(1)),
+  })
+  .strict();
+
+const zPulseDimensionDerivationIdentity = z
+  .object({
+    versionKey: z.string().regex(/^derivation\/sha256:[a-f0-9]{16}$/),
+    versions: zDerivationVersionEnvelope,
+    lineageStatus: z.enum(["current_versioned", "legacy_input_lineage"]),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    const containsLegacy = [
+      value.versions.methodology,
+      value.versions.prompt,
+      value.versions.taxonomy,
+    ].some((ref) => ref.state === "legacy_unversioned");
+    if (
+      (value.lineageStatus === "legacy_input_lineage") !== containsLegacy
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["lineageStatus"],
+        message: "lineage label must expose every legacy input reference",
+      });
+    }
+  });
 
 export const zPulseDrivingEvent = z
   .object({
@@ -1000,6 +1703,7 @@ export const zPulseDimensionRow = z
     limitedSignal: z.boolean(),
     limitedReason: z.string().nullable(),
     versionIdentity: zPulseRunIdentity.nullable(),
+    derivationIdentity: zPulseDimensionDerivationIdentity.nullable(),
   })
   .strict();
 
@@ -1212,9 +1916,31 @@ export const zPulseDimensionsData = z
 export const zPulseDimensionsResponse = z
   .object({
     data: zPulseDimensionsData,
-    meta: z.object({ methodology: zPulseMethodologyMeta }).strict(),
+    meta: z
+      .object({
+        methodology: zPulseMethodologyMeta,
+        release: zPulseScorePublication,
+        components: zPulseDimensionsComponents,
+      })
+      .strict(),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    const hasLegacyDimension = Object.values(value.data.dimensions).some(
+      (row) =>
+        row.derivationIdentity?.lineageStatus === "legacy_input_lineage",
+    );
+    if (
+      hasLegacyDimension &&
+      value.meta.release.lineageCoverage.legacyInputLineageRows === 0
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["meta", "release", "lineageCoverage"],
+        message: "release coverage cannot hide a legacy dimension row",
+      });
+    }
+  });
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/pulse/[country_slug]/events
@@ -1704,6 +2430,7 @@ const zCountryExportObservation = z
     freshness: z
       .object({
         asOf: z.string().nullable(),
+        publisherDate: zPublisherDate.nullable(),
         observationYear: z.number().int().nullable(),
         dataVintageYear: z.number().int().nullable(),
         retrievedAt: z.string().datetime(),
@@ -1802,6 +2529,108 @@ export const zCountryExportJson = z
       .strict(),
   })
   .strict();
+
+/* /api/v1/atlas/query — bounded projection of the frozen Atlas release. */
+export const zAtlasQueryResponse = z
+  .object({
+    schemaVersion: z.literal("civica-atlas-query/v1"),
+    release: z
+      .object({
+        id: z.literal("atlas-2026-07-11"),
+        date: z.literal("2026-07-11"),
+        vintageLabel: z.string(),
+        cutoffAt: z.string(),
+        exportSchemaVersion: z.literal("civica-atlas-export/v3"),
+        semanticSha256: z.string().regex(/^[a-f0-9]{64}$/),
+        bulkDownload: z.literal(
+          "/downloads/civica-atlas-2026-07-11.json.gz",
+        ),
+        manifestDownload: z.literal(
+          "/downloads/civica-atlas-2026-07-11.manifest.json",
+        ),
+      })
+      .strict(),
+    query: z
+      .object({
+        table: z.enum(["jurisdictions", "facts", "sources"]),
+        fields: z.array(z.string()).min(1),
+        filters: z
+          .object({
+            jurisdiction: z.array(z.string()),
+            factKey: z.array(z.string()),
+            source: z.array(z.string()),
+            status: z.array(z.string()),
+            valueStatus: z.array(z.string()),
+            yearFrom: z.number().int().nullable(),
+            yearTo: z.number().int().nullable(),
+          })
+          .strict(),
+      })
+      .strict(),
+    data: z.array(z.record(z.string(), z.unknown())),
+    meta: z
+      .object({
+        total: z.number().int().nonnegative(),
+        limit: z.number().int().min(1).max(1_000),
+        offset: z.number().int().nonnegative(),
+        hasMore: z.boolean(),
+        nextOffset: z.number().int().nonnegative().nullable(),
+        previousOffset: z.number().int().nonnegative().nullable(),
+      })
+      .strict(),
+    schema: z
+      .object({
+        table: z.enum(["jurisdictions", "facts", "sources"]),
+        columns: z.record(z.string(), z.string()),
+        joins: z.record(z.string(), z.string()),
+        ordering: z.string(),
+      })
+      .strict(),
+    rights: z
+      .object({
+        manifest: z.literal("/api/rights-manifest"),
+        policy: z.literal("frozen-release-allowlist"),
+        note: z.string().min(1),
+        sources: z.array(z.record(z.string(), z.unknown())),
+      })
+      .strict(),
+    exclusions: z.array(
+      z
+        .object({
+          id: z.string(),
+          reason: z.string(),
+        })
+        .strict(),
+    ),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.query.table !== value.schema.table) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["schema", "table"],
+        message: "schema table differs from query table",
+      });
+    }
+    if (
+      value.query.fields.some(
+        (field) => !(field in value.schema.columns),
+      )
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["schema", "columns"],
+        message: "selected fields are missing from schema metadata",
+      });
+    }
+    if (value.data.length > value.meta.limit) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["data"],
+        message: "page exceeds declared limit",
+      });
+    }
+  });
 
 /* /api/v1/elections — qualified, rights-filtered election research export. */
 export const zElectionResearchExport = z
@@ -1925,7 +2754,10 @@ export const zElectionResearchExport = z
     meta: z
       .object({
         auditedRowsMatchingFilters: z.number().int().nonnegative(),
-        qualifiedEventOrContestRowsMatchingFilters: z.number().int().nonnegative(),
+        qualifiedEventOrContestRowsMatchingFilters: z
+          .number()
+          .int()
+          .nonnegative(),
         projectionRowsMatchingFilters: z.number().int().nonnegative(),
         emittedRows: z.number().int().nonnegative(),
       })

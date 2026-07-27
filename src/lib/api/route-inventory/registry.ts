@@ -18,7 +18,10 @@
  *   - "oauth-bootstrap"       pre-session OAuth step (CSRF state cookie + account allowlist)
  *   - "credential-check"      the login route itself: username/password or access-code verification
  *   - "cron-secret"           gated on requireCronAuth() / CRON_SECRET bearer token
- *   - "rate-limit"            per-IP in-memory and/or durable rate limiting
+ *   - "rate-limit"            shared HMAC-subject/Neon rate limiting
+ *   - "platform-rate-limit"   externally verified Vercel WAF rate limiting
+ *   - "same-origin-mutation"  exact-origin/Fetch-Metadata CSRF guard
+ *   - "admin-audit"           common actor/action/target/result audit ledger
  *   - "input-validation"      schema/hand-rolled field validation before use
  *   - "public"                intentionally open; no auth (read-only or static)
  *
@@ -26,10 +29,7 @@
  * sensitive entry whose controls don't match its exposure class's
  * minimum bar (cron -> cron-secret; admin/pulse-coding -> a session
  * control or documented oauth-bootstrap; public-mutation ->
- * input-validation or rate-limit). Two real, intentionally-uncontrolled
- * findings are recorded here rather than hidden: the admin and
- * pulse-coding sign-out routes clear cookies with no session check
- * (benign — see their notes). `scripts/validate-route-inventory.ts`
+ * input-validation or rate-limit). `scripts/validate-route-inventory.ts`
  * only fails the build on an UNDOCUMENTED uncontrolled finding (empty
  * `note`); a documented one is printed prominently but does not fail,
  * per PLT-008's "flag, don't hide" mandate.
@@ -47,13 +47,7 @@ export type RouteExposure =
   | "internal";
 
 export type HttpMethod =
-  | "GET"
-  | "POST"
-  | "PUT"
-  | "PATCH"
-  | "DELETE"
-  | "HEAD"
-  | "OPTIONS";
+  "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
 
 export type RouteControl =
   | "admin-session"
@@ -62,6 +56,9 @@ export type RouteControl =
   | "credential-check"
   | "cron-secret"
   | "rate-limit"
+  | "platform-rate-limit"
+  | "same-origin-mutation"
+  | "admin-audit"
   | "input-validation"
   | "public";
 
@@ -88,8 +85,22 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Flips advisory-application triage status; gated on the admin session cookie via getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Updates or deletes an advisory application through the shared active-session, exact-origin, and common audit boundary.",
+  },
+  {
+    filePath: "api/admin/corrections/[id]/route.ts",
+    exposure: "admin",
+    methods: ["POST"],
+    mutation: true,
+    sensitive: true,
+    controls: [
+      "admin-session",
+      "same-origin-mutation",
+      "admin-audit",
+      "input-validation",
+    ],
+    note: "Triages precise Atlas data reports through the shared active-session, exact-origin, input, and common audit boundaries; corrected resolution additionally requires linked ATL-020 history.",
   },
   {
     filePath: "api/admin/advisory-applications/route.ts",
@@ -115,8 +126,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Resolves/reopens data disputes with audit-log write; gated on getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Resolves/reopens data disputes through the shared active-session, exact-origin, and common audit boundary plus the domain audit log.",
   },
   {
     filePath: "api/admin/google/callback/route.ts",
@@ -124,8 +135,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: true,
-    controls: ["oauth-bootstrap"],
-    note: "Pre-session OAuth code exchange: verifies the short-lived CSRF state cookie AND an exact ADMIN_GOOGLE_EMAIL allowlist match before ever issuing an admin session cookie. Cannot itself require admin-session (it is what establishes one) — the state cookie + allowlist match is the control.",
+    controls: ["oauth-bootstrap", "rate-limit"],
+    note: "Pre-session OAuth code exchange: a shared 10/15min bootstrap budget runs before upstream work, then the short-lived CSRF state cookie and exact ADMIN_GOOGLE_EMAIL allowlist gate session issuance.",
   },
   {
     filePath: "api/admin/google/start/route.ts",
@@ -133,8 +144,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: true,
-    controls: ["oauth-bootstrap"],
-    note: "Mints a short-lived HttpOnly CSRF state cookie and 303s to Google; no data access. Pre-session by design (kicks off the login flow the callback route verifies).",
+    controls: ["oauth-bootstrap", "rate-limit"],
+    note: "Mints a short-lived HttpOnly CSRF state cookie and redirects to Google only after the shared 10/15min OAuth-bootstrap budget allows the request.",
   },
   {
     filePath: "api/admin/messages/[id]/route.ts",
@@ -142,8 +153,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Flips a contact submission's triage status; gated on getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Updates a contact submission through the shared active-session, exact-origin, and common audit boundary.",
   },
   {
     filePath: "api/admin/pulse-review/[id]/exception/route.ts",
@@ -151,8 +162,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Grants a review-SLA exception; gated on getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Grants a review-SLA exception through the shared active-session, exact-origin, and common audit boundary.",
   },
   {
     filePath: "api/admin/pulse-review/[id]/route.ts",
@@ -160,8 +171,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Approves/edits/rejects a Pulse event with audit-log write; gated on getAdminSession().",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Reviews a Pulse event through the shared active-session, exact-origin, and common audit boundary plus the domain audit log.",
   },
   {
     filePath: "api/admin/session/route.ts",
@@ -169,8 +180,14 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["DELETE", "POST"],
     mutation: true,
     sensitive: true,
-    controls: ["credential-check"],
-    note: "POST is the login route itself (constant-time username compare + scrypt password verify against ADMIN_PASSWORD_HASH) — cannot require an existing admin-session, since it is what creates one. DELETE clears cookies unconditionally with no prior session check (same no-risk pattern as the dedicated sign-out routes below); documented, not hidden.",
+    controls: [
+      "credential-check",
+      "rate-limit",
+      "same-origin-mutation",
+      "admin-session",
+      "admin-audit",
+    ],
+    note: "POST is the exact-origin, durably throttled constant-time credential bootstrap and records successful issuance; DELETE uses the shared signed-session revocation and audit boundary.",
   },
   {
     filePath: "api/admin/sign-out/route.ts",
@@ -178,8 +195,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: [],
-    note: "OPEN FINDING (benign): clears admin session cookies with no session check before doing so. Intentional — logging out an already-unauthenticated caller is a no-op, and clearing cookies carries no confidentiality/integrity risk. Flagged by findUncontrolledMutations as an admin-exposure POST with no session control; documented here rather than silenced.",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Idempotent logout verifies any signed envelope, persists a hashed revocation tombstone, records the outcome, then clears cookies; missing/expired cookies only clear after exact-origin validation.",
   },
   {
     filePath: "api/advisory-applications/route.ts",
@@ -188,7 +205,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     mutation: true,
     sensitive: true,
     controls: ["rate-limit", "input-validation"],
-    note: "Public advisory-board application intake; durable per-IP rate limit (5/30min) + validateAdvisoryApplication() field/length checks. Collects applicant PII.",
+    note: "Public advisory-board application intake; shared HMAC/Neon limit (5/30min) plus validateAdvisoryApplication() field/length checks. Collects applicant PII.",
   },
   {
     filePath: "api/chat/route.ts",
@@ -197,7 +214,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     mutation: true,
     sensitive: true,
     controls: ["rate-limit", "input-validation"],
-    note: "Public Ask Civica chat proxy to a paid Anthropic model; two-layer (in-memory + durable) per-IP rate limit and hard input-size/shape caps enforced before any model call (2026-06-07 audit remediation).",
+    note: "Public Ask Civica proxy to a paid Anthropic model; shared burst (15/min) and sustained (100/hour) HMAC/Neon budgets plus hard input-size/shape caps run before any model call.",
   },
   {
     filePath: "api/citations/[entityType]/[id]/route.ts",
@@ -205,8 +222,26 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "ATL-019 public stable-entity-citation resolver (fact/institution/office/person/election/constitution-passage/organization/indicator); in-memory rate limited, no PII, no auth required by design.",
+    controls: ["rate-limit", "public"],
+    note: "ATL-019 stable-entity citation resolver; shared public-dynamic-read budget, no PII, and no authentication required by design.",
+  },
+  {
+    filePath: "api/citations/[entityType]/[id]/history/route.ts",
+    exposure: "public-read",
+    methods: ["GET"],
+    mutation: false,
+    sensitive: false,
+    controls: ["rate-limit", "public"],
+    note: "ATL-020 public, field-safe release-history projection keyed by ATL-019 stable entity identity; never returns raw retained snapshots.",
+  },
+  {
+    filePath: "api/v1/atlas/query/route.ts",
+    exposure: "public-read",
+    methods: ["GET", "OPTIONS"],
+    mutation: false,
+    sensitive: false,
+    controls: ["rate-limit", "input-validation", "public"],
+    note: "ATL-021 rights-aware query projection over the checked frozen Atlas release; bounded fields, filters, pagination, and CSV/JSON output.",
   },
   {
     filePath: "api/civica-index/corrections/route.ts",
@@ -215,7 +250,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     mutation: true,
     sensitive: true,
     controls: ["rate-limit", "input-validation"],
-    note: "Public correction-submission intake; per-IP in-memory rate limit (5/10min) + server-side category/dimension/email/length checks. Collects optional submitter PII.",
+    note: "Public correction intake; shared HMAC/Neon limit (5/10min) plus category/dimension/email/length checks. Collects optional submitter PII.",
   },
   {
     filePath: "api/constitution/excerpts/notable/route.ts",
@@ -223,8 +258,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
+    controls: ["rate-limit", "public"],
+    note: "Public constitution read using the shared public-dynamic-read budget; no PII or authentication.",
   },
   {
     filePath: "api/constitution/excerpts/route.ts",
@@ -232,8 +267,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
+    controls: ["rate-limit", "public"],
+    note: "Public constitution read using the shared public-dynamic-read budget; no PII or authentication.",
   },
   {
     filePath: "api/constitution/passages/[digest]/route.ts",
@@ -241,8 +276,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
+    controls: ["rate-limit", "public"],
+    note: "Public stable-passage read using the shared public-dynamic-read budget; no PII or authentication.",
   },
   {
     filePath: "api/constitution/search/route.ts",
@@ -250,8 +285,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
+    controls: ["rate-limit", "public"],
+    note: "Indexed constitution search uses a shared 30/min HMAC/Neon budget before its bounded query transaction.",
   },
   {
     filePath: "api/contact/route.ts",
@@ -260,7 +295,16 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     mutation: true,
     sensitive: true,
     controls: ["rate-limit", "input-validation"],
-    note: "Public contact-form intake; per-IP in-memory rate limit (5/10min) + hand-rolled email/length validation. Collects submitter PII.",
+    note: "Public contact-form intake; shared HMAC/Neon limit (5/10min) plus email/length validation. Collects submitter PII.",
+  },
+  {
+    filePath: "api/observability/client-error/route.ts",
+    exposure: "public-mutation",
+    methods: ["POST"],
+    mutation: true,
+    sensitive: false,
+    controls: ["rate-limit", "input-validation"],
+    note: "Content-free client-boundary signal; a shared HMAC/Neon limit and a strict two-field schema run before the server reduces the pathname to a route template.",
   },
   {
     filePath: "api/countries/[slug]/bills/route.ts",
@@ -268,7 +312,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
+    controls: ["rate-limit", "public"],
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
   },
   {
@@ -277,7 +321,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
+    controls: ["rate-limit", "public"],
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
   },
   {
@@ -286,7 +330,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
+    controls: ["rate-limit", "public"],
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
   },
   {
@@ -295,8 +339,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "DAT-027 per-country research export (JSON/CSV); rights-filtered at the resolver layer before rows are emitted. Read-only, no PII.",
+    controls: ["rate-limit", "public"],
+    note: "DAT-027 rights-filtered country export; shared 30/min dynamic-export budget runs before data assembly. Read-only and no PII.",
   },
   {
     filePath: "api/countries/[slug]/indicator-history/route.ts",
@@ -304,8 +348,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
+    controls: ["rate-limit", "public"],
+    note: "Rights-filtered indicator-history export using the shared 30/min dynamic-export budget; no PII or authentication.",
   },
   {
     filePath: "api/countries/[slug]/international/route.ts",
@@ -313,7 +357,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
+    controls: ["rate-limit", "public"],
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
   },
   {
@@ -322,7 +366,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
+    controls: ["rate-limit", "public"],
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
   },
   {
@@ -331,7 +375,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
+    controls: ["rate-limit", "public"],
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
   },
   {
@@ -340,7 +384,7 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
+    controls: ["rate-limit", "public"],
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
   },
   {
@@ -695,13 +739,49 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     note: "Vercel Cron entrypoint; requireCronAuth() rejects any request without the CRON_SECRET bearer token Vercel sends. GET+POST both wired to the same handler.",
   },
   {
+    filePath: "api/cron/operations/error-alerts/route.ts",
+    exposure: "cron",
+    methods: ["GET", "POST"],
+    mutation: true,
+    sensitive: true,
+    controls: ["cron-secret"],
+    note: "Vercel Cron entrypoint; requireCronAuth() protects the content-free error-alert check before any retained monitoring event is read.",
+  },
+  {
+    filePath: "api/cron/operations/pipeline-alerts/route.ts",
+    exposure: "cron",
+    methods: ["GET", "POST"],
+    mutation: true,
+    sensitive: true,
+    controls: ["cron-secret"],
+    note: "Vercel Cron entrypoint; requireCronAuth() protects the retained production-pipeline alert check before any run detail is read.",
+  },
+  {
+    filePath: "api/cron/operations/health-alerts/route.ts",
+    exposure: "cron",
+    methods: ["GET", "POST"],
+    mutation: true,
+    sensitive: true,
+    controls: ["cron-secret"],
+    note: "Vercel Cron entrypoint; requireCronAuth() protects the content-free health report and owner alert check before any component state is read.",
+  },
+  {
     filePath: "api/governance-evidence/[slug]/route.ts",
     exposure: "public-read",
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
+    controls: ["rate-limit", "public"],
+    note: "Public Governance Evidence export using the shared 30/min dynamic-export budget; no PII or authentication.",
+  },
+  {
+    filePath: "api/health/route.ts",
+    exposure: "public-read",
+    methods: ["GET"],
+    mutation: false,
+    sensitive: false,
+    controls: ["platform-rate-limit", "public"],
+    note: "Public, content-free availability contract for the independent monitor and status page; the verified all-path platform WAF supplies flood protection without making a database-backed limiter part of the database probe.",
   },
   {
     filePath: "api/metrics/[metricId]/strip-data/route.ts",
@@ -709,8 +789,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
+    controls: ["rate-limit", "public"],
+    note: "Public metric-strip read using the shared public-dynamic-read budget; no PII or authentication.",
   },
   {
     filePath: "api/provenance-coverage/route.ts",
@@ -736,8 +816,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["admin-session"],
-    note: "Issues a pulse-coding participant access code; gated on the OWNER admin session (getAdminSession()), a stronger control than a participant session — this is the coordinator-only provisioning route.",
+    controls: ["admin-session", "same-origin-mutation", "admin-audit"],
+    note: "Issues a participant through the owner-admin shared active-session, exact-origin, and common audit boundary; the coding domain also writes participant/assignment audit rows.",
   },
   {
     filePath: "api/pulse-coding/assignments/[id]/route.ts",
@@ -763,8 +843,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: ["credential-check"],
-    note: "Pulse-coding sign-in itself (authenticatePulseCodingAccessCode against an issued access code) — cannot require an existing pulse-coding-session, since it is what creates one.",
+    controls: ["credential-check", "rate-limit", "same-origin-mutation"],
+    note: "Exact-origin pulse-coding sign-in authenticates an issued access code after the shared 5/15min credential-bootstrap budget allows the request.",
   },
   {
     filePath: "api/pulse-coding/sign-out/route.ts",
@@ -772,8 +852,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["POST"],
     mutation: true,
     sensitive: true,
-    controls: [],
-    note: "OPEN FINDING (benign): clears pulse-coding session cookies with no session check before doing so. Same no-risk logout pattern as /api/admin/sign-out.",
+    controls: ["platform-rate-limit", "same-origin-mutation"],
+    note: "Exact-origin logout performs only a browser-cookie clear and remains under the verified all-path WAF ceiling. OPEN FINDING (bounded): participant credential revocation remains the server-side invalidation path.",
   },
   {
     filePath: "api/reconciliation-audit/route.ts",
@@ -801,6 +881,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     sensitive: false,
     controls: ["public"],
     note: "Public read endpoint backing a country/reader-page data tab; no PII, no auth required by design.",
+  },
+  {
+    filePath: "api/v1/conditions/route.ts",
+    exposure: "public-read",
+    methods: ["GET", "OPTIONS"],
+    mutation: false,
+    sensitive: false,
+    controls: ["rate-limit", "public"],
+    note: "Public versioned Conditions release API; CORS-open, per-IP rate limited, and returns only one immutable release selected by its optional release id.",
   },
   {
     filePath: "api/v1/countries/[code]/route.ts",
@@ -961,8 +1050,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Serves the checked, rights-cleared frozen G2 Atlas release archive/manifest from disk. Static, publicly downloadable by design (DAT-017); no auth, no per-request DB access.",
+    controls: ["platform-rate-limit", "public"],
+    note: "Serves the checked frozen release from disk; the verified all-path Vercel WAF supplies 600/60s/IP challenge protection without request-time DB access.",
   },
   {
     filePath: "downloads/civica-atlas-2026-07-11.manifest.json/route.ts",
@@ -970,8 +1059,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Serves the checked, rights-cleared frozen G2 Atlas release archive/manifest from disk. Static, publicly downloadable by design (DAT-017); no auth, no per-request DB access.",
+    controls: ["platform-rate-limit", "public"],
+    note: "Serves the checked frozen manifest from disk; the verified all-path Vercel WAF supplies 600/60s/IP challenge protection without request-time DB access.",
   },
   {
     filePath: "embed/[slug]/route.ts",
@@ -979,8 +1068,8 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     methods: ["GET", "OPTIONS"],
     mutation: false,
     sensitive: false,
-    controls: ["public"],
-    note: "Legacy iframe embed route; the retired Index composite is no longer served — every request fails closed to a static replacement-link HTML page. No data access.",
+    controls: ["platform-rate-limit", "public"],
+    note: "Retired static replacement-link embed with no data access; the verified all-path Vercel WAF supplies 600/60s/IP challenge protection.",
   },
 ];
 

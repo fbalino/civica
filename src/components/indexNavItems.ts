@@ -19,6 +19,11 @@ export type IndexNavItem = {
  */
 export const INDEX_NAV_ITEMS: IndexNavItem[] = [
   { href: "/governance-evidence", label: "Evidence Dashboard", descriptor: "Source-native observations" },
+  {
+    href: "/governance-change",
+    label: "Governance Change",
+    descriptor: "Source-native longitudinal windows",
+  },
   { href: "/civica-index", label: "Research Status", descriptor: "Disposition and evidence" },
   {
     href: "/civica-index/pulse-changelog",

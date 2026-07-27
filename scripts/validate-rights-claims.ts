@@ -18,7 +18,7 @@
  *      false code-open-source/MIT claims, and false "complete manifest
  *      exists" claims — negation-aware, so honest denials pass.
  *   4. Code-license overclaim guard: fails if any scanned file asserts an
- *      open-source/MIT grant while no root LICENSE file exists.
+ *      open-source/MIT grant that contradicts the canonical code posture.
  *   5. False affirmative complete-manifest claims anywhere in the swept set.
  *   6. Required public-claim linkage: the `/licensing` page markers
  *      (`licensing.mixed-rights`, `licensing.code-status`,
@@ -199,7 +199,7 @@ async function main(): Promise<void> {
   }
   console.log(`  ${additionalFilesScanned} additional reader-facing file(s) scanned`);
 
-  // 4. Code-license overclaim guard (root LICENSE existence) ------------
+  // 4. Code-license posture guard (root LICENSE existence) ---------------
   console.log("\n--- Code-license overclaim guard ---");
   const rootLicenseFiles = await findRootLicenseFiles();
   const hasRootLicense = rootLicenseFiles.length > 0;
@@ -215,18 +215,18 @@ async function main(): Promise<void> {
       `  OK  CODE_RIGHTS.hasLicenseFile (${CODE_RIGHTS.hasLicenseFile}) matches the repository (root LICENSE ${hasRootLicense ? "present" : "absent"})`,
     );
   }
-  if (!hasRootLicense) {
-    // The code-open-source-claim findings already collected above (part of
-    // findAllProhibitedRightsLanguage) cover this; this section documents
-    // *why* those findings matter and is a no-op when the sweep is clean.
-    const codeClaimProblems = problems.filter(
-      (p) => p.category === "prohibited-language" && p.detail.includes("code-open-source-claim"),
+  // Code-open-source-claim findings are collected above as prohibited
+  // language. They remain invalid when a root file exists because the
+  // canonical LICENSE is deliberately non-open.
+  const codeClaimProblems = problems.filter(
+    (p) =>
+      p.category === "prohibited-language" &&
+      p.detail.includes("code-open-source-claim"),
+  );
+  if (codeClaimProblems.length > 0) {
+    console.log(
+      `  FAIL  ${codeClaimProblems.length} open-source/MIT overclaim(s) contradict the canonical code posture`,
     );
-    if (codeClaimProblems.length > 0) {
-      console.log(
-        `  FAIL  ${codeClaimProblems.length} open-source/MIT overclaim(s) found while no root LICENSE exists`,
-      );
-    }
   }
 
   // 6. Required public-claim linkage on /licensing ----------------------

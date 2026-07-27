@@ -21,8 +21,15 @@ const requiredFragments: Record<string, string[]> = {
   ],
   "src/lib/pulse/v2/upsert.ts": [
     "buildPulseEvidenceIdentity",
-    "retrievedAt: evidence[index].retrievedAt",
-    "...evidence[index].identity",
+    "const identity = buildPulseEvidenceIdentity(row, retrievedAt)",
+    "retrievedAt: retrievedAt.toISOString()",
+    "evidenceIdentityKey: identity.evidenceIdentityKey",
+    "evidenceContentHash: identity.evidenceContentHash",
+    "evidenceLanguage: identity.evidenceLanguage",
+    "evidencePublisher: identity.evidencePublisher",
+    "evidenceAttribution: identity.evidenceAttribution",
+    "evidenceRights: identity.evidenceRights",
+    "evidenceRetention: identity.evidenceRetention",
   ],
   "src/lib/pulse/v2/evidence-identity.ts": [
     "pulse-raw-evidence/v1",

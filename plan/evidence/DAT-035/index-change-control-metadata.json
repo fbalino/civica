@@ -1,0 +1,28 @@
+{
+  "id": "dat-035-pulse-control-reconciliation",
+  "toVersion": "civica-index-pulse-stored-ensemble-v36",
+  "categories": ["weight_or_model"],
+  "evidence": {
+    "documentation": ["plan/evidence/DAT-035/README.md"],
+    "registry": [
+      "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",
+      "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json",
+      "src/lib/pulse/v2/runtime-method.generated.json"
+    ],
+    "release_note": ["plan/evidence/DAT-035/release-note.md"],
+    "migration_plan": ["plan/evidence/DAT-035/migration-plan.md"],
+    "golden_test": ["src/lib/pulse/v2/stored-ensemble.test.ts"],
+    "contract_test": [
+      "scripts/validate-pulse-agreement.ts",
+      "scripts/validate-pulse-runtime-method.ts"
+    ]
+  },
+  "validations": [
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-research-archive",
+    "validate:index-pulse-classification-state",
+    "validate:pulse-agreement",
+    "validate:pulse-runtime"
+  ]
+}

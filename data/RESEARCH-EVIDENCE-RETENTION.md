@@ -6,7 +6,7 @@
 ## Scope
 
 Civica keeps the evidence needed to reproduce and challenge its factual and
-experimental outputs. The protected registry currently covers 35 relations:
+experimental outputs. The protected registry currently covers 38 relations:
 country facts and disputes, Index inputs and outputs, Pulse inputs and review
 records, elections, constitutions, legislatures, organizations, officeholders,
 provenance statements, corrections, backtest records, and version-bound
@@ -18,9 +18,10 @@ the resulting row. Each history entry records the relation, row identifier,
 operation, reason, actor, and database timestamp. The history table rejects
 updates and deletions.
 
-Rate-limit counters are the only registered deletion exemption. They are
-short-lived abuse-control state and contain no source, classification, review,
-or evaluation evidence.
+Rate-limit counters and route-performance observations are the only registered
+deletion exemptions. They are short-lived abuse-control or privacy-bounded
+operational state and contain no source, classification, review, or evaluation
+evidence.
 
 ## Pulse
 
@@ -42,9 +43,16 @@ legacy-quarantined item is unpublished and is not a human review decision.
 Pulse dimensional scores have a mutable current-state projection and a separate
 append-only `pulse-dimensional-delta-history/v1` ledger. Every computation
 records its score run, jurisdiction, dimension, contributing event IDs,
-derivation envelope, score date, and trailing 365-day lookback. Zero-output
+derivation envelope, score date, and versioned 365- or 730-day lookback. Zero-output
 clearing rows remain in that ledger so an aged-out signal can be reproduced
 without treating its deleted or zeroed current projection as historical truth.
+
+Pulse drift monitoring retains immutable, explicit baseline snapshots plus one
+aggregate observation for each completed score run and separate alert rows.
+The records contain only category counts, bounded internal row identifiers,
+threshold comparison, and a remediation path; they never duplicate source
+payloads, reviewer notes, prompts, or model output. A scheduled monitor cannot
+move or overwrite a baseline to make a distribution change disappear.
 
 `pulse_evaluation_evidence` provides one internal query surface for:
 

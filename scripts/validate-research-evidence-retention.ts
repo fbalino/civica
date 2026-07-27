@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
+import ts from "typescript";
 import {
   APPEND_ONLY_EVIDENCE_RELATIONS,
   DESTRUCTIVE_WRITE_PATHS,
@@ -9,7 +10,7 @@ import {
   RESEARCH_EVIDENCE_RETENTION_VERSION,
 } from "../src/lib/research/evidence-retention";
 
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 const root = process.cwd();
 const migration =
   readFileSync(
@@ -60,6 +61,22 @@ const partyIdentityMigration = readFileSync(
   resolve(root, "drizzle/authoritative/0031_hot_saracen.sql"),
   "utf8",
 );
+const conditionsComponentsMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0040_closed_young_avengers.sql"),
+  "utf8",
+);
+const conditionsReleaseMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0042_grey_sally_floyd.sql"),
+  "utf8",
+);
+const pulseDriftMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0044_pulse_drift_monitoring.sql"),
+  "utf8",
+);
+const entityNameFormsMigration = readFileSync(
+  resolve(root, "drizzle/authoritative/0048_entity_name_forms.sql"),
+  "utf8",
+);
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -87,6 +104,39 @@ function sourceFiles(directory: string): string[] {
   );
 }
 
+function containsDestructiveDatabaseWrite(path: string): boolean {
+  const sourceText = readFileSync(resolve(root, path), "utf8");
+  const source = ts.createSourceFile(
+    path,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  let found = false;
+  const visit = (node: ts.Node) => {
+    if (found) return;
+    if (
+      ts.isCallExpression(node) &&
+      ts.isPropertyAccessExpression(node.expression) &&
+      node.expression.name.text === "delete"
+    ) {
+      found = true;
+      return;
+    }
+    if (
+      ts.isTaggedTemplateExpression(node) &&
+      /DELETE\s+FROM/i.test(node.template.getText(source))
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return found;
+}
+
 for (const relation of RETAINED_EVIDENCE_RELATIONS) {
   if (
     !migration.includes(`'${relation}'`) &&
@@ -99,9 +149,17 @@ for (const relation of RETAINED_EVIDENCE_RELATIONS) {
     !absorptionMigration.includes(`ON ${relation}`) &&
     !informationEnvironmentMigration.includes(`ON ${relation}`) &&
     !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
+      conditionsComponentsMigration,
+    ) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
+      conditionsReleaseMigration,
+    ) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(pulseDriftMigration) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(
       constitutionPassageMigration,
     ) &&
-    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(partyIdentityMigration)
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(partyIdentityMigration) &&
+    !new RegExp(`ON\\s+"?${relation}"?`, "i").test(entityNameFormsMigration)
   ) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
   }
@@ -117,6 +175,7 @@ for (const relation of APPEND_ONLY_EVIDENCE_RELATIONS) {
     absorptionMigration,
     informationEnvironmentMigration,
     partyIdentityMigration,
+    pulseDriftMigration,
   ];
   const guarded = sources.some((source) =>
     new RegExp(
@@ -142,21 +201,19 @@ for (const required of [
 }
 
 for (const path of DESTRUCTIVE_WRITE_PATHS) {
-  const source = readFileSync(resolve(root, path.path), "utf8");
-  if (!/\.delete\s*\(|DELETE\s+FROM/i.test(source)) {
+  if (!containsDestructiveDatabaseWrite(path.path)) {
     fail(
       `registered destructive path no longer contains a database deletion: ${path.path}`,
     );
   }
   for (const relation of path.relations) {
     if (
-      relation !== "rate_limits" &&
       !RETAINED_EVIDENCE_RELATIONS.includes(
         relation as (typeof RETAINED_EVIDENCE_RELATIONS)[number],
-      )
-    ) {
+      ) &&
+      !("exemption" in path && /short-lived|ephemeral/i.test(path.exemption))
+    )
       fail(`${path.path} deletes unprotected evidence relation ${relation}`);
-    }
   }
 }
 
@@ -164,11 +221,7 @@ const registeredPaths = new Set<string>(
   DESTRUCTIVE_WRITE_PATHS.map((row) => row.path),
 );
 const discoveredPaths = [...sourceFiles("scripts"), ...sourceFiles("src/lib")]
-  .filter((path) =>
-    /\.delete\s*\(|DELETE\s+FROM/i.test(
-      readFileSync(resolve(root, path), "utf8"),
-    ),
-  )
+  .filter(containsDestructiveDatabaseWrite)
   .sort();
 for (const path of discoveredPaths) {
   if (!registeredPaths.has(path))
@@ -267,6 +320,9 @@ async function main() {
               ('pulse_event_information_environment_pins', 'pulse_event_information_environment_pins_append_only'),
               ('pulse_information_environment_releases', 'pulse_information_environment_releases_append_only'),
               ('pulse_information_environment_values', 'pulse_information_environment_values_append_only'),
+              ('pulse_drift_baselines', 'pulse_drift_baselines_append_only'),
+              ('pulse_drift_observations', 'pulse_drift_observations_append_only'),
+              ('pulse_drift_alerts', 'pulse_drift_alerts_append_only'),
               ('pulse_review_sla_events', 'pulse_review_sla_events_append_only')
             )`,
       sql`SELECT count(*)::int AS n FROM pg_constraint

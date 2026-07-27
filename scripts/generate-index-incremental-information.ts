@@ -1,6 +1,4 @@
-import { config } from "dotenv";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { neon } from "@neondatabase/serverless";
 import {
   runAllTournamentBaselines,
   type BaselinePanelObservation,
@@ -25,15 +23,20 @@ import {
   INCREMENTAL_INFORMATION_PREREGISTRATION,
   INCREMENTAL_INFORMATION_PROTOCOL_VERSION,
 } from "../src/lib/ci/incremental-information-preregistration";
-config({ path: ".env.local" });
-if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL required");
-const sql = neon(process.env.DATABASE_URL);
+import { readIndexAnalysisReplayInputs } from "../src/lib/ci/index-analysis-inputs";
 type Panel = BaselinePanelObservation & { dimension: string };
 const key = (r: { iso3: string; periodYear: number }) =>
   `${r.iso3}:${r.periodYear}`;
 export async function buildIncrementalInformationAnalysis() {
-  const rows =
-    (await sql`SELECT p.jurisdiction_id::text AS "jurisdictionId",j.iso3,p.period_year AS "periodYear",p.dimension,p.source_id AS "sourceId",p.indicator_id AS "indicatorId",p.value,p.native_min AS "nativeMin",p.native_max AS "nativeMax",p.is_inverted AS "isInverted" FROM ci_research_panel_rows p JOIN jurisdictions j ON j.id=p.jurisdiction_id WHERE p.release_id=${CI_TOURNAMENT_PANEL_V3_RELEASE_ID} AND (p.source_id||':'||p.indicator_id)=ANY(${["vdem:v2x_libdem", "worldbank_wgi:va.est", "worldbank_wgi:rl.est", "freedom_house:pr_cl_total", "transparency_intl:score"]}) ORDER BY j.iso3,p.period_year,p.source_id,p.indicator_id`) as unknown as Panel[];
+  const rows = readIndexAnalysisReplayInputs().panel.filter((row) =>
+    [
+      "vdem:v2x_libdem",
+      "worldbank_wgi:va.est",
+      "worldbank_wgi:rl.est",
+      "freedom_house:pr_cl_total",
+      "transparency_intl:score",
+    ].includes(`${row.sourceId}:${row.indicatorId}`),
+  ) as Panel[];
   const normalized = rows.map((r) => ({
     ...r,
     value: r.value === null ? null : Number(r.value),
@@ -47,8 +50,7 @@ export async function buildIncrementalInformationAnalysis() {
       id,
       new Map(out.map((r) => [r.unitId, r])),
     ]),
-  ) as Record<string, Map<string, any>>;
-  const k1map = new Map(k1.map((r) => [r.unitId, r]));
+  ) as Record<string, Map<string, (typeof baseline.outputs)[keyof typeof baseline.outputs][number]>>;
   const groups = new Map<string, Panel[]>();
   for (const r of normalized)
     groups.set(key(r), [...(groups.get(key(r)) ?? []), r]);
@@ -95,7 +97,7 @@ export async function buildIncrementalInformationAnalysis() {
       fitScalar(
         development.map((r) => ({
           target: r.scoreInteger,
-          value: maps[id].get(r.unitId).value,
+          value: maps[id]!.get(r.unitId)!.value!,
         })),
       ),
     ]),
@@ -115,7 +117,7 @@ export async function buildIncrementalInformationAnalysis() {
         id === "P1"
           ? predictOls(ols, features.get(r.unitId)!)
           : scalar[id].intercept +
-            scalar[id].slope * maps[id].get(r.unitId).value,
+            scalar[id].slope * maps[id]!.get(r.unitId)!.value!,
     }));
   const models = ["B1", "B2", "B3", "P1"].map((id) => {
     const p = predictions(id);

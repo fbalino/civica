@@ -3,9 +3,11 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import {
+  INDEX_CHANGE_EVIDENCE_ROLES,
   indexChangeControlErrors,
   indexSnapshotSha256,
   requiredIndexValidations,
+  sha256,
   unclassifiedIndexSemanticFiles,
   type IndexChangeRegistry,
 } from "./index-change-control";
@@ -21,6 +23,43 @@ test("protected semantic drift requires an appended versioned record", () => {
   const drifted = structuredClone(registry.entries.at(-1)!.protectedFiles);
   drifted[0].sha256 = "a".repeat(64);
   assert.ok(indexChangeControlErrors(registry, drifted).includes("protected Index files changed without a new change record"));
+});
+
+test("evidence-only records refresh all evidence roles without changing the protected snapshot", () => {
+  const next = structuredClone(registry) as IndexChangeRegistry;
+  const prior = next.entries.at(-1)!;
+  const fixturePath = "src/lib/ci/index-change-control.test.ts";
+  const fixtureHash = sha256(readFileSync(fixturePath));
+  const contractPath = "src/lib/ci/index-change-control.ts";
+  const contractHash = sha256(readFileSync(contractPath));
+  const evidence = Object.fromEntries(
+    INDEX_CHANGE_EVIDENCE_ROLES.map((role) => {
+      const isTestRole = role === "golden_test" || role === "contract_test";
+      return [
+        role,
+        [
+          isTestRole
+            ? { path: contractPath, sha256: contractHash }
+            : { path: fixturePath, sha256: fixtureHash },
+        ],
+      ];
+    }),
+  ) as typeof prior.evidence;
+  const entry = {
+    ...structuredClone(prior),
+    id: "fixture-evidence-refresh",
+    fromVersion: prior.toVersion,
+    toVersion: "fixture-evidence-v2",
+    recordKind: "evidence" as const,
+    parentSnapshotSha256: prior.snapshotSha256,
+    categories: [],
+    changedPaths: [],
+    evidence,
+    validations: requiredIndexValidations([]),
+  };
+  next.entries.push(entry);
+  next.currentSnapshotSha256 = entry.snapshotSha256;
+  assert.deepEqual(indexChangeControlErrors(next, prior.protectedFiles), []);
 });
 
 test("a future record cannot reuse unchanged docs, registry, notes, migration, or tests", () => {

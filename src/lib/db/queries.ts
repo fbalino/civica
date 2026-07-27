@@ -6,19 +6,33 @@ import {
   CURRENT_CI_RELEASE_ID,
 } from "@/lib/ci/current-release";
 import {
-  resolveCiRelease,
+  assertCiReleaseCompositeRow,
   selectCiReleaseDimensionRows,
 } from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import { parseDataValueStatus } from "@/lib/data/value-state";
+import { CURRENT_CONDITIONS_METHODOLOGY_VERSION } from "@/lib/conditions/contract";
+import {
+  buildConditionsPublicRelease,
+  selectConditionsPublicRelease,
+  type ConditionsPublicCalculation,
+  type ConditionsPublicComponent,
+  type ConditionsPublicReleaseHeader,
+} from "@/lib/conditions/public-release";
 import {
   buildGovernmentClassificationMap,
   type JurisdictionTaxonomyInput,
 } from "./government-taxonomy";
 import {
+  DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
   getGovernmentTaxonomyGroupingLabel,
   type GovernmentTaxonomyLens,
 } from "@/lib/government-taxonomy";
 import { buildJurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
+import {
+  getMaterialMetricPeerCohort,
+  materialPeerBand,
+} from "@/lib/peer-grouping/material-metric-cohort";
 import {
   ELECTION_CORPUS_AUDIT,
   getElectionAuditRow,
@@ -39,6 +53,7 @@ import {
   persons,
   sources,
   legislatureParties,
+  partyCompositionRuns,
   constitutions,
   elections,
   electionResults,
@@ -609,9 +624,31 @@ export async function getLegislatureComposition(jurisdictionId: string) {
     )
     .orderBy(desc(legislatureParties.seatCount));
 
+  const compositionRunIds = [
+    ...new Set(parties.map((party) => party.compositionRunId)),
+  ];
+  const compositionRuns =
+    compositionRunIds.length > 0
+      ? await db
+          .select()
+          .from(partyCompositionRuns)
+          .where(inArray(partyCompositionRuns.id, compositionRunIds))
+      : [];
+
   return bodies.map((body) => ({
     body,
     parties: parties.filter((p) => p.bodyId === body.id),
+    compositionSources: compositionRuns
+      .filter((run) => run.bodyId === body.id)
+      .map((run) => ({
+        runKey: run.runKey,
+        sourceId: run.sourceId,
+        sourceUrl: run.sourceUrl,
+        sourceLicense: run.sourceLicense,
+        sourceRetrievedAt: run.sourceRetrievedAt,
+        recordedAt: run.recordedAt,
+        writerVersion: run.writerVersion,
+      })),
   }));
 }
 
@@ -639,10 +676,28 @@ export async function getDemocracyScores(jurisdictionId: string) {
     .limit(1);
 
   const freedomHouseFacts = await db
-    .select()
+    .select({
+      factKey: countryFacts.factKey,
+      category: countryFacts.category,
+      sourceId: countryFacts.sourceId,
+      sourceUrl: countryFacts.sourceUrl,
+      factValue: countryFacts.factValue,
+      factValueNumeric: countryFacts.factValueNumeric,
+      factUnit: countryFacts.factUnit,
+      factYear: countryFacts.factYear,
+      valueJson: countryFacts.valueJson,
+      valueStatus: countryFacts.valueStatus,
+      valueStatusReason: countryFacts.valueStatusReason,
+      asOf: countryFacts.asOf,
+      retrievedAt: countryFacts.retrievedAt,
+      upstreamVintageLabel: countryFacts.upstreamVintageLabel,
+      valueType: countryFacts.valueType,
+    })
     .from(countryFacts)
     .where(
-      sql`${countryFacts.jurisdictionId} = ${jurisdictionId} AND ${countryFacts.factKey} LIKE 'freedom_house%'`,
+      sql`${countryFacts.jurisdictionId} = ${jurisdictionId}
+        AND ${countryFacts.factKey} LIKE 'freedom_house%'
+        AND ${countryFacts.status} = 'active'`,
     );
 
   return {
@@ -1230,44 +1285,35 @@ export async function getCountryOutcomes(jurisdictionId: string, year: number) {
     JOIN metric_definitions md ON cm.metric_id = md.id
     WHERE cm.jurisdiction_id = ${jurisdictionId}
       AND cm.year <= ${year}
+      AND cm.value_status = 'observed'
+      AND cm.value IS NOT NULL
     ORDER BY cm.metric_id, cm.year DESC
   `);
+  const rows = (Array.isArray(countryData)
+    ? countryData
+    : ((countryData as { rows?: unknown[] }).rows ?? [])) as Array<{
+    metricId: string;
+    value: number;
+  }>;
+  const metrics = rows.filter(
+    (row) => typeof row.metricId === "string" && Number.isFinite(row.value),
+  );
+  const cohorts = await Promise.all(
+    metrics.map((metric) =>
+      getMaterialMetricPeerCohort({
+        jurisdictionId,
+        metricId: metric.metricId,
+        year,
+      }),
+    ),
+  );
+  const peerBands = cohorts.flatMap((cohort) => {
+    if (!cohort) return [];
+    const band = materialPeerBand(cohort);
+    return band ? [{ metricId: cohort.metricId, ...band }] : [];
+  });
 
-  const jurisdictionRow = await db
-    .select({ governmentType: jurisdictions.governmentType })
-    .from(jurisdictions)
-    .where(eq(jurisdictions.id, jurisdictionId))
-    .limit(1);
-
-  const govType = jurisdictionRow[0]?.governmentType ?? null;
-
-  if (!govType) {
-    return { metrics: countryData, peerBands: [], govType: null };
-  }
-
-  const peerBands = await db.execute(sql`
-    WITH latest_per_country AS (
-      SELECT DISTINCT ON (cm.jurisdiction_id, cm.metric_id)
-        cm.metric_id,
-        cm.value
-      FROM country_metrics cm
-      JOIN jurisdictions j ON cm.jurisdiction_id = j.id
-      WHERE j.government_type = ${govType}
-        AND j.type = 'sovereign_state'
-        AND cm.year <= ${year}
-      ORDER BY cm.jurisdiction_id, cm.metric_id, cm.year DESC
-    )
-    SELECT
-      metric_id                                                           AS "metricId",
-      COUNT(*)::int                                                       AS "peerCount",
-      MIN(value)                                                          AS "peerMin",
-      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY value)                 AS "peerMedian",
-      MAX(value)                                                          AS "peerMax"
-    FROM latest_per_country
-    GROUP BY metric_id
-  `);
-
-  return { metrics: countryData, peerBands, govType };
+  return { metrics, peerBands, peerDomain: "material" as const };
 }
 
 // --- Civica Index queries ---
@@ -1293,7 +1339,9 @@ export async function getCIRankings(
     releaseId?: string;
   },
 ) {
-  const release = resolveCiRelease(filters?.releaseId ?? CURRENT_CI_RELEASE_ID);
+  const release = await loadPublishedCiRelease(
+    filters?.releaseId ?? CURRENT_CI_RELEASE_ID,
+  );
   if (
     filters?.methodologyVersion &&
     filters.methodologyVersion !== release.methodologyVersion
@@ -1343,6 +1391,7 @@ export async function getCIRankings(
     ? sql`AND EXISTS (
         SELECT 1 FROM government_taxonomies gt
         WHERE gt.jurisdiction_id = j.id
+          AND gt.taxonomy_version = ${DEFAULT_GOVERNMENT_TAXONOMY_VERSION}
           AND gt.regime_type_cgv = ${filters.cgvRegime}
       )`
     : sql``;
@@ -1354,17 +1403,21 @@ export async function getCIRankings(
       cs.score_upper          AS "scoreUpper",
       cs.completeness_flag    AS "completenessFlag",
       cs.vintage_label        AS "vintageLabel",
+      cs.supersedes_vintage_label AS "supersedesVintageLabel",
       cs.rank,
       (SELECT COUNT(*)::int
        FROM ci_composite_scores tied
-       WHERE tied.quarter = cs.quarter
-         AND tied.methodology_version = cs.methodology_version
+       WHERE tied.release_id = cs.release_id
          AND tied.score = cs.score) AS "tieCount",
       cs.total_ranked         AS "totalRanked",
       cs.is_partial           AS "isPartial",
       cs.dimensions_available AS "dimensionsAvailable",
       cs.missing_dimensions   AS "missingDimensions",
       cs.methodology_version  AS "methodologyVersion",
+      cs.release_id           AS "releaseId",
+      cs.content_hash         AS "contentHash",
+      cs.derivation_version_key AS "derivationVersionKey",
+      cs.derivation_versions  AS "derivationVersions",
       j.id                    AS "jurisdictionId",
       j.slug,
       j.name,
@@ -1379,6 +1432,7 @@ export async function getCIRankings(
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
     WHERE cs.quarter = ${q}
       AND cs.methodology_version = ${methodologyVersion}
+      AND cs.release_id = ${release.releaseId}
       AND j.type = 'sovereign_state'
       ${continentFilter}
       ${govTypeFilter}
@@ -1401,6 +1455,9 @@ export async function getCIRankings(
       governmentTypeDetail?: string | null;
     } & Record<string, unknown>
   >;
+  for (const row of typedRows) {
+    assertCiReleaseCompositeRow(row as never, release.releaseId);
+  }
   const classificationMap = await buildGovernmentClassificationMap(
     typedRows.map((row) => ({
       id: row.jurisdictionId,
@@ -1422,7 +1479,7 @@ export async function getCICountryDetail(
   quarter?: string,
   releaseId: string = CURRENT_CI_RELEASE_ID,
 ) {
-  const release = resolveCiRelease(releaseId);
+  const release = await loadPublishedCiRelease(releaseId);
   if (quarter && quarter !== release.quarter)
     throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const q = release.quarter;
@@ -1447,11 +1504,11 @@ export async function getCICountryDetail(
       scoreUpper: ciCompositeScores.scoreUpper,
       completenessFlag: ciCompositeScores.completenessFlag,
       vintageLabel: ciCompositeScores.vintageLabel,
+      supersedesVintageLabel: ciCompositeScores.supersedesVintageLabel,
       rank: ciCompositeScores.rank,
       tieCount: sql<number>`(
         SELECT COUNT(*)::int FROM ci_composite_scores tied
-        WHERE tied.quarter = ${ciCompositeScores.quarter}
-          AND tied.methodology_version = ${ciCompositeScores.methodologyVersion}
+        WHERE tied.release_id = ${ciCompositeScores.releaseId}
           AND tied.score = ${ciCompositeScores.score}
       )`,
       totalRanked: ciCompositeScores.totalRanked,
@@ -1459,13 +1516,18 @@ export async function getCICountryDetail(
       dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
       missingDimensions: ciCompositeScores.missingDimensions,
       methodologyVersion: ciCompositeScores.methodologyVersion,
+      releaseId: ciCompositeScores.releaseId,
+      contentHash: ciCompositeScores.contentHash,
+      derivationVersionKey: ciCompositeScores.derivationVersionKey,
+      derivationVersions: ciCompositeScores.derivationVersions,
       calculatedAt: ciCompositeScores.calculatedAt,
     })
     .from(ciCompositeScores)
     .where(
       sql`${ciCompositeScores.jurisdictionId} = ${jId}
         AND ${ciCompositeScores.quarter} = ${q}
-        AND ${ciCompositeScores.methodologyVersion} = ${methodologyVersion}`,
+        AND ${ciCompositeScores.methodologyVersion} = ${methodologyVersion}
+        AND ${ciCompositeScores.releaseId} = ${release.releaseId}`,
     )
     .limit(1);
 
@@ -1482,6 +1544,14 @@ export async function getCICountryDetail(
       transformationId: ciDimensionScores.transformationId,
       methodVersion: ciDimensionScores.methodVersion,
       artifactHash: ciDimensionScores.artifactHash,
+      upstreamRelease: ciDimensionScores.upstreamRelease,
+      artifactKind: ciDimensionScores.artifactKind,
+      temporalCoverage: ciDimensionScores.temporalCoverage,
+      licenseUrl: ciDimensionScores.licenseUrl,
+      substitutionReason: ciDimensionScores.substitutionReason,
+      releaseId: ciDimensionScores.releaseId,
+      derivationVersionKey: ciDimensionScores.derivationVersionKey,
+      derivationVersions: ciDimensionScores.derivationVersions,
     })
     .from(ciDimensionScores)
     .where(
@@ -1489,13 +1559,16 @@ export async function getCICountryDetail(
       // v1.0 and beta rows (e.g. 2023-Q4) mix legacy raw values into a
       // beta-labeled breakdown. Matches the pin on the composite above and
       // on compareCICountries / getCIByGovernmentTypeDots.
-      sql`${ciDimensionScores.jurisdictionId} = ${jId} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${methodologyVersion}`,
+      sql`${ciDimensionScores.jurisdictionId} = ${jId} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${methodologyVersion} AND ${ciDimensionScores.releaseId} = ${release.releaseId}`,
     );
 
   const releaseDimensions = selectCiReleaseDimensionRows(
     dimensions,
     release.releaseId,
   );
+  if (composite) {
+    assertCiReleaseCompositeRow(composite, release.releaseId);
+  }
   const classificationMap = await buildGovernmentClassificationMap([
     jurisdiction[0],
   ]);
@@ -1515,7 +1588,7 @@ export async function getCICountryHistory(
   slug: string,
   releaseId: string = CURRENT_CI_RELEASE_ID,
 ) {
-  const release = resolveCiRelease(releaseId);
+  const release = await loadPublishedCiRelease(releaseId);
   const jurisdiction = await db
     .select({ id: jurisdictions.id })
     .from(jurisdictions)
@@ -1527,13 +1600,26 @@ export async function getCICountryHistory(
   // Filter to a single methodology version — without this the chart mixes
   // retired v1.0 and live beta rows for the same quarter, producing a
   // duplicate-quarter zig-zag timeline.
-  return db
+  const rows = await db
     .select({
       quarter: ciCompositeScores.quarter,
       score: ciCompositeScores.score,
+      scoreLower: ciCompositeScores.scoreLower,
+      scoreUpper: ciCompositeScores.scoreUpper,
+      completenessFlag: ciCompositeScores.completenessFlag,
+      vintageLabel: ciCompositeScores.vintageLabel,
+      supersedesVintageLabel: ciCompositeScores.supersedesVintageLabel,
       rank: ciCompositeScores.rank,
       totalRanked: ciCompositeScores.totalRanked,
       isPartial: ciCompositeScores.isPartial,
+      dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
+      missingDimensions: ciCompositeScores.missingDimensions,
+      methodologyVersion: ciCompositeScores.methodologyVersion,
+      releaseId: ciCompositeScores.releaseId,
+      contentHash: ciCompositeScores.contentHash,
+      derivationVersionKey: ciCompositeScores.derivationVersionKey,
+      derivationVersions: ciCompositeScores.derivationVersions,
+      jurisdictionId: ciCompositeScores.jurisdictionId,
     })
     .from(ciCompositeScores)
     .where(
@@ -1541,9 +1627,20 @@ export async function getCICountryHistory(
         eq(ciCompositeScores.jurisdictionId, jurisdiction[0].id),
         eq(ciCompositeScores.methodologyVersion, release.methodologyVersion),
         eq(ciCompositeScores.quarter, release.quarter),
+        eq(ciCompositeScores.releaseId, release.releaseId),
       ),
     )
     .orderBy(asc(ciCompositeScores.quarter));
+  for (const row of rows) {
+    assertCiReleaseCompositeRow(row, release.releaseId);
+  }
+  return rows.map(({ quarter, score, rank, totalRanked, isPartial }) => ({
+    quarter,
+    score,
+    rank,
+    totalRanked,
+    isPartial,
+  }));
 }
 
 /**
@@ -1719,7 +1816,7 @@ export async function compareCICountries(
   releaseId: string = CURRENT_CI_RELEASE_ID,
 ) {
   if (slugs.length === 0) return [];
-  const release = resolveCiRelease(releaseId);
+  const release = await loadPublishedCiRelease(releaseId);
   if (quarter && quarter !== release.quarter)
     throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const q = release.quarter;
@@ -1744,29 +1841,37 @@ export async function compareCICountries(
       scoreUpper: ciCompositeScores.scoreUpper,
       completenessFlag: ciCompositeScores.completenessFlag,
       vintageLabel: ciCompositeScores.vintageLabel,
+      supersedesVintageLabel: ciCompositeScores.supersedesVintageLabel,
       rank: ciCompositeScores.rank,
       totalRanked: ciCompositeScores.totalRanked,
       isPartial: ciCompositeScores.isPartial,
       dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
       missingDimensions: ciCompositeScores.missingDimensions,
       methodologyVersion: ciCompositeScores.methodologyVersion,
+      releaseId: ciCompositeScores.releaseId,
+      contentHash: ciCompositeScores.contentHash,
+      derivationVersionKey: ciCompositeScores.derivationVersionKey,
+      derivationVersions: ciCompositeScores.derivationVersions,
       calculatedAt: ciCompositeScores.calculatedAt,
     })
     .from(ciCompositeScores)
     .where(
-      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q} AND ${ciCompositeScores.methodologyVersion} = ${release.methodologyVersion}`,
+      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q} AND ${ciCompositeScores.methodologyVersion} = ${release.methodologyVersion} AND ${ciCompositeScores.releaseId} = ${release.releaseId}`,
     );
 
   const dimensions = await db
     .select()
     .from(ciDimensionScores)
     .where(
-      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${release.methodologyVersion}`,
+      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${release.methodologyVersion} AND ${ciDimensionScores.releaseId} = ${release.releaseId}`,
     );
   const releaseDimensions = selectCiReleaseDimensionRows(
     dimensions,
     release.releaseId,
   );
+  for (const composite of composites) {
+    assertCiReleaseCompositeRow(composite, release.releaseId);
+  }
 
   const classificationMap = await buildGovernmentClassificationMap(countries);
 
@@ -1786,7 +1891,7 @@ export async function getCIByGovernmentTypeDots(
   quarter?: string,
   releaseId: string = CURRENT_CI_RELEASE_ID,
 ) {
-  const release = resolveCiRelease(releaseId);
+  const release = await loadPublishedCiRelease(releaseId);
   if (quarter && quarter !== release.quarter)
     throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
   const q = release.quarter;
@@ -1799,11 +1904,27 @@ export async function getCIByGovernmentTypeDots(
       j.name,
       j.iso2,
       j.iso3,
-      cs.score
+      cs.score,
+      cs.score_lower AS "scoreLower",
+      cs.score_upper AS "scoreUpper",
+      cs.completeness_flag AS "completenessFlag",
+      cs.vintage_label AS "vintageLabel",
+      cs.supersedes_vintage_label AS "supersedesVintageLabel",
+      cs.rank,
+      cs.total_ranked AS "totalRanked",
+      cs.is_partial AS "isPartial",
+      cs.dimensions_available AS "dimensionsAvailable",
+      cs.missing_dimensions AS "missingDimensions",
+      cs.methodology_version AS "methodologyVersion",
+      cs.release_id AS "releaseId",
+      cs.content_hash AS "contentHash",
+      cs.derivation_version_key AS "derivationVersionKey",
+      cs.derivation_versions AS "derivationVersions"
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
     WHERE cs.quarter = ${q}
       AND cs.methodology_version = ${release.methodologyVersion}
+      AND cs.release_id = ${release.releaseId}
       AND j.government_type IS NOT NULL
       AND j.type = 'sovereign_state'
     ORDER BY j.government_type, cs.score DESC
@@ -1820,7 +1941,10 @@ export async function getCIByGovernmentTypeDots(
     iso2?: string | null;
     iso3?: string | null;
     score: number;
-  }>;
+  } & Record<string, unknown>>;
+  for (const row of typedRows) {
+    assertCiReleaseCompositeRow(row as never, release.releaseId);
+  }
   const classificationMap = await buildGovernmentClassificationMap(
     typedRows.map((row) => ({
       id: row.jurisdictionId,
@@ -1837,7 +1961,7 @@ export async function getCIByGovernmentTypeDots(
 }
 
 export async function getGovTypeTrajectory() {
-  const release = resolveCiRelease();
+  const release = await loadPublishedCiRelease();
   const result = await db.execute(sql`
     SELECT
       cs.quarter,
@@ -1846,11 +1970,27 @@ export async function getGovTypeTrajectory() {
       j.government_type_detail AS "governmentTypeDetail",
       j.slug,
       j.iso3,
-      cs.score
+      cs.score,
+      cs.score_lower AS "scoreLower",
+      cs.score_upper AS "scoreUpper",
+      cs.completeness_flag AS "completenessFlag",
+      cs.vintage_label AS "vintageLabel",
+      cs.supersedes_vintage_label AS "supersedesVintageLabel",
+      cs.rank,
+      cs.total_ranked AS "totalRanked",
+      cs.is_partial AS "isPartial",
+      cs.dimensions_available AS "dimensionsAvailable",
+      cs.missing_dimensions AS "missingDimensions",
+      cs.methodology_version AS "methodologyVersion",
+      cs.release_id AS "releaseId",
+      cs.content_hash AS "contentHash",
+      cs.derivation_version_key AS "derivationVersionKey",
+      cs.derivation_versions AS "derivationVersions"
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
     WHERE cs.methodology_version = ${release.methodologyVersion}
       AND cs.quarter = ${release.quarter}
+      AND cs.release_id = ${release.releaseId}
       AND j.government_type IS NOT NULL
       AND j.type = 'sovereign_state'
     ORDER BY cs.quarter ASC, j.government_type ASC, cs.score DESC
@@ -1866,7 +2006,10 @@ export async function getGovTypeTrajectory() {
     slug: string;
     iso3?: string | null;
     score: number;
-  }>;
+  } & Record<string, unknown>>;
+  for (const row of typedRows) {
+    assertCiReleaseCompositeRow(row as never, release.releaseId);
+  }
   const classificationMap = await buildGovernmentClassificationMap(
     typedRows.map((row) => ({
       id: row.jurisdictionId,
@@ -1883,18 +2026,15 @@ export async function getGovTypeTrajectory() {
 }
 
 export async function getCIMethodology(versionId?: string) {
-  if (versionId) {
-    const [row] = await db
-      .select()
-      .from(ciMethodologyVersions)
-      .where(eq(ciMethodologyVersions.id, versionId))
-      .limit(1);
-    return row ?? null;
-  }
   const [row] = await db
     .select()
     .from(ciMethodologyVersions)
-    .orderBy(desc(ciMethodologyVersions.publishedAt))
+    .where(
+      eq(
+        ciMethodologyVersions.id,
+        versionId ?? CURRENT_CI_METHODOLOGY_VERSION,
+      ),
+    )
     .limit(1);
   return row ?? null;
 }
@@ -1981,17 +2121,18 @@ export async function getBillsForJurisdiction(slug: string, limit = 10) {
 
 /**
  * Phase 5.4 — Civica Conditions companion layer.
- * Returns the latest score row for each of the 3 dimensions
- * (human_development, peace_security, economic_stability) for a given
- * jurisdictionId under the specified methodologyVersion.
+ * Returns the latest published score row for Conditions dimensions for a given
+ * jurisdictionId under the specified methodologyVersion. The economic
+ * component ledger is intentionally separate: ATL-028 does not authorize an
+ * economic-stability score from a current-year growth observation.
  *
- * At most 3 rows are returned (one per dimension). If a dimension has
- * no data, it is simply absent from the array — callers render a
- * placeholder card for missing dimensions.
+ * At most two rows are returned (one per currently scoreable dimension). If a
+ * dimension has no published score, it is absent — callers render an honest
+ * placeholder.
  */
 export async function getCivicaConditionsForJurisdiction(
   jurisdictionId: string,
-  methodologyVersion: string = "beta",
+  methodologyVersion: string = CURRENT_CONDITIONS_METHODOLOGY_VERSION,
 ) {
   // For each dimension, pick the row with the latest quarter.
   const rows = await db.execute(sql`
@@ -2003,11 +2144,18 @@ export async function getCivicaConditionsForJurisdiction(
       ccs.source_id         AS "sourceId",
       ccs.dataset_year      AS "datasetYear",
       ccs.methodology_version AS "methodologyVersion",
+      ccs.calculation_key   AS "calculationKey",
+      ccc.reference_year    AS "referenceYear",
+      ccc.alignment_status  AS "alignmentStatus",
       s.name                AS "sourceName"
     FROM civica_conditions_scores ccs
+    INNER JOIN civica_conditions_calculations ccc
+      ON ccc.calculation_key = ccs.calculation_key
     LEFT JOIN sources s ON ccs.source_id = s.id
     WHERE ccs.jurisdiction_id = ${jurisdictionId}
       AND ccs.methodology_version = ${methodologyVersion}
+      AND ccc.alignment_status = 'aligned'
+      AND ccs.dimension <> 'economic_stability'
     ORDER BY ccs.dimension, ccs.quarter DESC
   `);
 
@@ -2023,6 +2171,190 @@ export async function getCivicaConditionsForJurisdiction(
     sourceId: string;
     datasetYear: number;
     methodologyVersion: string;
+    calculationKey: string;
+    referenceYear: number;
+    alignmentStatus: "aligned";
+    sourceName: string | null;
+  }>;
+}
+
+/**
+ * ATL-029 public Conditions read. Every row is selected through one immutable
+ * release header; callers never mix the latest score of each dimension.
+ * Components stay attached to their calculation so absent/refused inputs are
+ * visible instead of disappearing behind a generic country-metric fallback.
+ */
+export async function getConditionsPublicRelease(
+  requestedReleaseId?: string | null,
+) {
+  const releaseResult = await db.execute(sql`
+    SELECT id AS "releaseId", methodology_version AS "methodologyVersion",
+      manifest_sha256 AS "manifestSha256", created_at AS "createdAt"
+    FROM civica_conditions_releases
+    ORDER BY created_at DESC, id DESC
+  `);
+  const releaseRows = (Array.isArray(releaseResult)
+    ? releaseResult
+    : ((releaseResult as { rows?: unknown[] }).rows ?? [])) as Array<{
+    releaseId: string;
+    methodologyVersion: string;
+    manifestSha256: string;
+    createdAt: string | Date;
+  }>;
+  const releases: ConditionsPublicReleaseHeader[] = releaseRows.map((row) => {
+    const createdAt = toIso(row.createdAt);
+    if (!createdAt) {
+      throw new Error(`Conditions release ${row.releaseId} has an invalid creation time`);
+    }
+    return { ...row, createdAt };
+  });
+  const release = selectConditionsPublicRelease(releases, requestedReleaseId);
+  if (!release) return null;
+
+  const [calculationResult, componentResult] = await Promise.all([
+    db.execute(sql`
+      SELECT
+        calculation.calculation_key AS "calculationKey",
+        calculation.release_id AS "releaseId",
+        calculation.jurisdiction_id AS "jurisdictionId",
+        jurisdiction.name AS "countryName",
+        jurisdiction.slug AS "countrySlug",
+        jurisdiction.iso3 AS "countryIso3",
+        calculation.dimension,
+        calculation.alignment_policy AS "alignmentPolicy",
+        calculation.alignment_status AS "alignmentStatus",
+        calculation.reference_year AS "referenceYear",
+        score.normalized_score AS "normalizedScore",
+        score.raw_value AS "rawValue",
+        score.source_id AS "scoreSourceId",
+        scoreSource.name AS "scoreSourceName",
+        score.indicator_id AS "scoreIndicatorId",
+        score.upstream_release AS "scoreUpstreamRelease",
+        score.license_url AS "scoreLicenseUrl"
+      FROM civica_conditions_calculations calculation
+      INNER JOIN jurisdictions jurisdiction
+        ON jurisdiction.id = calculation.jurisdiction_id
+      LEFT JOIN civica_conditions_scores score
+        ON score.calculation_key = calculation.calculation_key
+        AND score.release_id = ${release.releaseId}
+      LEFT JOIN sources scoreSource ON scoreSource.id = score.source_id
+      WHERE calculation.release_id = ${release.releaseId}
+        AND jurisdiction.type = 'sovereign_state'
+      ORDER BY jurisdiction.name, calculation.dimension
+    `),
+    db.execute(sql`
+      SELECT
+        component.calculation_key AS "calculationKey",
+        component.component_id AS "componentId",
+        component.native_value AS "nativeValue",
+        component.native_unit AS "nativeUnit",
+        component.reference_year AS "referenceYear",
+        component.value_status AS "valueStatus",
+        component.value_status_reason AS "valueStatusReason",
+        component.inclusion_decision AS "inclusionDecision",
+        component.source_id AS "sourceId",
+        source.name AS "sourceName",
+        component.indicator_id AS "indicatorId",
+        component.upstream_release AS "upstreamRelease",
+        component.license_url AS "licenseUrl",
+        component.transformation_id AS "transformationId"
+      FROM civica_conditions_components component
+      INNER JOIN civica_conditions_calculations calculation
+        ON calculation.calculation_key = component.calculation_key
+      LEFT JOIN sources source ON source.id = component.source_id
+      INNER JOIN jurisdictions jurisdiction
+        ON jurisdiction.id = calculation.jurisdiction_id
+      WHERE calculation.release_id = ${release.releaseId}
+        AND jurisdiction.type = 'sovereign_state'
+      ORDER BY component.calculation_key, component.component_id
+    `),
+  ]);
+
+  const calculationRows = (Array.isArray(calculationResult)
+    ? calculationResult
+    : ((calculationResult as { rows?: unknown[] }).rows ?? [])) as Array<
+    Omit<ConditionsPublicCalculation, "components">
+  >;
+  const componentRows = (Array.isArray(componentResult)
+    ? componentResult
+    : ((componentResult as { rows?: unknown[] }).rows ?? [])) as Array<
+    ConditionsPublicComponent & { calculationKey: string }
+  >;
+  const componentsByCalculation = new Map<string, ConditionsPublicComponent[]>();
+  for (const component of componentRows) {
+    const { calculationKey, ...publicComponent } = component;
+    componentsByCalculation.set(calculationKey, [
+      ...(componentsByCalculation.get(calculationKey) ?? []),
+      publicComponent,
+    ]);
+  }
+
+  return buildConditionsPublicRelease({
+    release,
+    calculations: calculationRows.map((calculation) => ({
+      ...calculation,
+      components: componentsByCalculation.get(calculation.calculationKey) ?? [],
+    })),
+  });
+}
+
+/**
+ * The non-display Conditions ledger. It retains every native component and
+ * refusal/missing decision so researchers can inspect a score without
+ * inferring its reference year from a newest available input.
+ */
+export async function getCivicaConditionsComponentLedger(
+  jurisdictionId: string,
+  methodologyVersion: string = CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+) {
+  const result = await db.execute(sql`
+    SELECT
+      ccal.calculation_key AS "calculationKey",
+      ccal.dimension,
+      ccal.alignment_policy AS "alignmentPolicy",
+      ccal.alignment_status AS "alignmentStatus",
+      ccal.reference_year AS "referenceYear",
+      component.component_id AS "componentId",
+      component.native_value AS "nativeValue",
+      component.native_unit AS "nativeUnit",
+      component.reference_year AS "componentReferenceYear",
+      component.value_status AS "valueStatus",
+      component.value_status_reason AS "valueStatusReason",
+      component.inclusion_decision AS "inclusionDecision",
+      component.source_id AS "sourceId",
+      component.indicator_id AS "indicatorId",
+      component.upstream_release AS "upstreamRelease",
+      component.artifact_hash AS "artifactHash",
+      component.license_url AS "licenseUrl",
+      component.transformation_id AS "transformationId",
+      source.name AS "sourceName"
+    FROM civica_conditions_calculations ccal
+    INNER JOIN civica_conditions_components component
+      ON component.calculation_key = ccal.calculation_key
+    LEFT JOIN sources source ON source.id = component.source_id
+    WHERE ccal.jurisdiction_id = ${jurisdictionId}
+      AND ccal.methodology_version = ${methodologyVersion}
+    ORDER BY ccal.dimension, ccal.created_at DESC, component.component_id
+  `);
+  return (Array.isArray(result) ? result : (result as { rows?: unknown[] }).rows ?? []) as Array<{
+    calculationKey: string;
+    dimension: string;
+    alignmentPolicy: string;
+    alignmentStatus: string;
+    referenceYear: number | null;
+    componentId: string;
+    nativeValue: number | null;
+    nativeUnit: string;
+    componentReferenceYear: number | null;
+    valueStatus: string;
+    valueStatusReason: string | null;
+    inclusionDecision: string;
+    sourceId: string;
+    indicatorId: string;
+    upstreamRelease: string;
+    artifactHash: string;
+    licenseUrl: string;
+    transformationId: string;
     sourceName: string | null;
   }>;
 }

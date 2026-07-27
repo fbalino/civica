@@ -99,9 +99,9 @@ Civica publishes these as the **Civica Conditions** companion layer at [/civica-
 | -------------------- | ---------------------------------------------------------- |
 | Human Development    | UNDP Human Development Index                               |
 | Peace & Security     | Institute for Economics and Peace, Global Peace Index      |
-| Economic Stability   | World Bank composite (inflation, unemployment, GDP growth) |
+| Economic Stability   | World Bank source-native inflation, unemployment, and GDP-growth inputs; no composite is currently published |
 
-The contrast between CI and Conditions is itself informative. A country can have a higher numeric governance estimate alongside lower material-condition estimates, or the inverse. Reading the source dimensions together tells a fuller story than any single composite can.
+The contrast between CI and Conditions is itself informative. A country can have a higher numeric governance estimate alongside different material indicators, or the inverse. Reading the source dimensions together tells a fuller story than any single composite can. The versioned inputs, transformations, missingness rules, and replication boundary are documented in the [Conditions codebook](/civica-conditions/methodology).
 
 ## Section 9 · Government type {#gov-type}
 

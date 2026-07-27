@@ -1,31 +1,106 @@
 import assert from "node:assert/strict";
+import { createHmac } from "node:crypto";
 import { test } from "node:test";
 
 import {
+  ADMIN_REVIEWER_COOKIE,
   ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_TTL_SECONDS,
+  ADMIN_SESSION_VERSION,
   adminReviewerName,
-  buildAdminCookieHeaders,
+  isAdminSessionConfigured,
+  mintAdminSessionCookie,
   sanitizeReviewerName,
   verifyAdminUsername,
   verifySessionCookie,
 } from "./session";
 
-/** Run `fn` with a scoped env override, restoring the original value
- *  (including "was unset") afterward — even if `fn` throws. */
+const FIXED_NOW_MS = Date.UTC(2026, 6, 14, 12, 0, 0);
+const TEST_SECRET = "test-secret-abc123";
+
+/** Scope an environment override and restore even an originally-unset key. */
 function withEnv<T>(key: string, value: string | undefined, fn: () => T): T {
   const had = Object.prototype.hasOwnProperty.call(process.env, key);
-  const prev = process.env[key];
+  const previous = process.env[key];
   try {
     if (value === undefined) delete process.env[key];
     else process.env[key] = value;
     return fn();
   } finally {
-    if (had) process.env[key] = prev;
+    if (had) process.env[key] = previous;
     else delete process.env[key];
   }
 }
 
-// ─── verifyAdminUsername ────────────────────────────────────────────────
+function withAdminEnv<T>(
+  fn: () => T,
+  options: {
+    username?: string | undefined;
+    displayName?: string | undefined;
+    secret?: string | undefined;
+  } = {},
+): T {
+  const username = Object.hasOwn(options, "username")
+    ? options.username
+    : "fernando";
+  const displayName = options.displayName;
+  const secret = Object.hasOwn(options, "secret")
+    ? options.secret
+    : TEST_SECRET;
+  return withEnv("ADMIN_USERNAME", username, () =>
+    withEnv("ADMIN_DISPLAY_NAME", displayName, () =>
+      withEnv("ADMIN_SESSION_SECRET", secret, fn),
+    ),
+  );
+}
+
+function cookieValueFromHeaders(headers: Array<[string, string]>): string {
+  const [, raw] = headers[0];
+  const equals = raw.indexOf("=");
+  const semicolon = raw.indexOf(";");
+  return decodeURIComponent(raw.slice(equals + 1, semicolon));
+}
+
+function mintCookieValue(
+  nowMs = FIXED_NOW_MS,
+  options?: Parameters<typeof withAdminEnv>[1],
+): string {
+  return withAdminEnv(
+    () => cookieValueFromHeaders(mintAdminSessionCookie(nowMs).headers),
+    options,
+  );
+}
+
+function verifyAs(
+  cookieValue: string | null | undefined,
+  secret: string | null | undefined = TEST_SECRET,
+  nowMs = FIXED_NOW_MS,
+  options?: Omit<Parameters<typeof withAdminEnv>[1], "secret">,
+) {
+  return withAdminEnv(() => verifySessionCookie(cookieValue, secret, nowMs), {
+    ...options,
+    secret: secret ?? undefined,
+  });
+}
+
+function decodePayload(cookieValue: string): Record<string, unknown> {
+  const [, encodedPayload] = cookieValue.split(".");
+  return JSON.parse(
+    Buffer.from(encodedPayload, "base64url").toString("utf8"),
+  ) as Record<string, unknown>;
+}
+
+function signTestPayload(
+  payload: Record<string, unknown>,
+  secret = TEST_SECRET,
+): string {
+  const encodedPayload = Buffer.from(JSON.stringify(payload), "utf8").toString(
+    "base64url",
+  );
+  const signedValue = `v1.${encodedPayload}`;
+  const mac = createHmac("sha256", secret).update(signedValue).digest("hex");
+  return `${signedValue}.${mac}`;
+}
 
 test("verifyAdminUsername fails closed when ADMIN_USERNAME is unset", () => {
   withEnv("ADMIN_USERNAME", undefined, () => {
@@ -36,209 +111,222 @@ test("verifyAdminUsername fails closed when ADMIN_USERNAME is unset", () => {
   });
 });
 
-test("verifyAdminUsername accepts an exact match", () => {
+test("verifyAdminUsername accepts only the trimmed exact configured value", () => {
   withEnv("ADMIN_USERNAME", "fernando", () => {
     assert.equal(verifyAdminUsername("fernando"), true);
-  });
-});
-
-test("verifyAdminUsername trims surrounding whitespace on the submitted value", () => {
-  withEnv("ADMIN_USERNAME", "fernando", () => {
-    assert.equal(verifyAdminUsername("  fernando  "), true);
-    assert.equal(verifyAdminUsername("\tfernando\n"), true);
-  });
-});
-
-test("verifyAdminUsername rejects a mismatch", () => {
-  withEnv("ADMIN_USERNAME", "fernando", () => {
-    assert.equal(verifyAdminUsername("Fernando"), false); // case-sensitive
-    assert.equal(verifyAdminUsername("fernand"), false); // prefix
-    assert.equal(verifyAdminUsername("fernando "), true); // trimmed, still equal
+    assert.equal(verifyAdminUsername("  fernando\n"), true);
+    assert.equal(verifyAdminUsername("Fernando"), false);
+    assert.equal(verifyAdminUsername("fernand"), false);
     assert.equal(verifyAdminUsername("fernando2"), false);
-    assert.equal(verifyAdminUsername(null), false);
-    assert.equal(verifyAdminUsername(undefined), false);
   });
 });
 
-// ─── sanitizeReviewerName / adminReviewerName ───────────────────────────
-
-test("sanitizeReviewerName keeps the allowed character set and trims", () => {
-  assert.equal(sanitizeReviewerName("  Fernando Balino  ", "admin"), "Fernando Balino");
-  assert.equal(sanitizeReviewerName("F.B_1-2", "admin"), "F.B_1-2");
-});
-
-test("sanitizeReviewerName strips disallowed characters", () => {
+test("sanitizeReviewerName bounds and filters audit identities", () => {
   assert.equal(
-    sanitizeReviewerName("<script>alert(1)</script>", "admin"),
+    sanitizeReviewerName("  Fernando Balino  ", "fallback"),
+    "Fernando Balino",
+  );
+  assert.equal(
+    sanitizeReviewerName("<script>alert(1)</script>", "fallback"),
     "scriptalert1script",
   );
-  assert.equal(sanitizeReviewerName("name@site.com", "admin"), "namesite.com");
+  assert.equal(sanitizeReviewerName("a".repeat(120), "fallback").length, 80);
+  assert.equal(sanitizeReviewerName("@@@###", "fallback"), "fallback");
 });
 
-test("sanitizeReviewerName caps at 80 characters", () => {
-  const long = "a".repeat(120);
-  const result = sanitizeReviewerName(long, "admin");
-  assert.equal(result.length, 80);
-  assert.equal(result, "a".repeat(80));
-});
-
-test("sanitizeReviewerName falls back when the sanitized result is empty", () => {
-  assert.equal(sanitizeReviewerName(null, "admin"), "admin");
-  assert.equal(sanitizeReviewerName(undefined, "admin"), "admin");
-  assert.equal(sanitizeReviewerName("", "admin"), "admin");
-  assert.equal(sanitizeReviewerName("   ", "admin"), "admin");
-  // Only-disallowed-characters also collapses to empty -> fallback.
-  assert.equal(sanitizeReviewerName("@@@###", "admin"), "admin");
-});
-
-test("adminReviewerName prefers ADMIN_DISPLAY_NAME over ADMIN_USERNAME", () => {
-  withEnv("ADMIN_DISPLAY_NAME", "Reviewer Name", () => {
-    withEnv("ADMIN_USERNAME", "fernando", () => {
-      assert.equal(adminReviewerName(), "Reviewer Name");
-    });
+test("adminReviewerName prefers a valid display name then the username", () => {
+  withAdminEnv(() => assert.equal(adminReviewerName(), "Fernando Balino"), {
+    displayName: "Fernando Balino",
+  });
+  withAdminEnv(() => assert.equal(adminReviewerName(), "fernando"));
+  withAdminEnv(() => assert.equal(adminReviewerName(), "fernando"), {
+    displayName: "@@@",
   });
 });
 
-test("adminReviewerName falls back to ADMIN_USERNAME when no display name is set", () => {
-  withEnv("ADMIN_DISPLAY_NAME", undefined, () => {
-    withEnv("ADMIN_USERNAME", "fernando", () => {
-      assert.equal(adminReviewerName(), "fernando");
-    });
+test("production identity fails closed with no hardcoded default", () => {
+  withAdminEnv(
+    () => {
+      assert.equal(adminReviewerName(), null);
+      assert.equal(isAdminSessionConfigured(), false);
+      assert.throws(
+        () => mintAdminSessionCookie(FIXED_NOW_MS),
+        /identity or signing secret is not configured/,
+      );
+    },
+    { username: undefined, displayName: undefined },
+  );
+});
+
+test("session configuration requires both a signing secret and identity", () => {
+  withAdminEnv(() => assert.equal(isAdminSessionConfigured(), true));
+  withAdminEnv(() => assert.equal(isAdminSessionConfigured(), false), {
+    secret: undefined,
+  });
+  withAdminEnv(() => assert.equal(isAdminSessionConfigured(), false), {
+    username: undefined,
   });
 });
 
-test("adminReviewerName falls back to the generic 'admin' when nothing is configured", () => {
-  withEnv("ADMIN_DISPLAY_NAME", undefined, () => {
-    withEnv("ADMIN_USERNAME", undefined, () => {
-      assert.equal(adminReviewerName(), "admin");
-    });
-  });
-});
+test("a genuine v1 session verifies its identity, times, and random ID", () => {
+  const cookieValue = mintCookieValue();
+  assert.equal(cookieValue.split(".")[0], "v1");
 
-// ─── verifySessionCookie ─────────────────────────────────────────────────
-//
-// Round-trip through the REAL production cookie minter
-// (`buildAdminCookieHeaders`) rather than reimplementing the HMAC here, so
-// these tests exercise the exact bytes a browser would receive.
-
-function mintCookieValue(secret: string, reviewerName = "fernando"): string {
-  return withEnv("ADMIN_SESSION_SECRET", secret, () => {
-    const headers = buildAdminCookieHeaders(reviewerName);
-    // headers[0] is always the ADMIN_SESSION_COOKIE Set-Cookie line: parse
-    // out just the `<nonce>.<hmac>` value (URL-decoded, stripped of the
-    // trailing cookie attributes).
-    const [, raw] = headers[0];
-    const eq = raw.indexOf("=");
-    const semi = raw.indexOf(";");
-    const encoded = raw.slice(eq + 1, semi === -1 ? undefined : semi);
-    return decodeURIComponent(encoded);
-  });
-}
-
-test("verifySessionCookie accepts a genuine cookie minted with the same secret", () => {
-  const secret = "test-secret-abc123";
-  const cookieValue = mintCookieValue(secret, "fernando");
-  const result = verifySessionCookie(cookieValue, secret);
+  const result = verifyAs(cookieValue);
   assert.equal(result.valid, true);
-  assert.equal(result.reviewerId, adminReviewerName());
+  assert.ok(result.session);
+  assert.equal(result.session.version, ADMIN_SESSION_VERSION);
+  assert.equal(result.session.reviewerId, "fernando");
+  assert.equal(result.session.issuedAt, FIXED_NOW_MS / 1000);
+  assert.equal(
+    result.session.expiresAt,
+    FIXED_NOW_MS / 1000 + ADMIN_SESSION_TTL_SECONDS,
+  );
+  assert.match(result.session.sessionId, /^[0-9a-f]{36}$/);
 });
 
-test("verifySessionCookie rejects a tampered HMAC", () => {
-  const secret = "test-secret-abc123";
-  const cookieValue = mintCookieValue(secret);
-  // Flip the last character of the HMAC half.
-  const lastChar = cookieValue.at(-1)!;
-  const flipped = lastChar === "0" ? "1" : "0";
-  const tampered = cookieValue.slice(0, -1) + flipped;
-  assert.notEqual(tampered, cookieValue);
-  const result = verifySessionCookie(tampered, secret);
-  assert.equal(result.valid, false);
-  assert.equal(result.reviewerId, null);
+test("each newly minted session receives a unique session ID", () => {
+  const first = decodePayload(mintCookieValue()).sessionId;
+  const second = decodePayload(mintCookieValue()).sessionId;
+  assert.equal(typeof first, "string");
+  assert.equal(typeof second, "string");
+  assert.notEqual(first, second);
 });
 
-test("verifySessionCookie rejects a tampered nonce (same principle as a forged cookie)", () => {
-  const secret = "test-secret-abc123";
-  const cookieValue = mintCookieValue(secret);
-  const dot = cookieValue.indexOf(".");
-  const nonce = cookieValue.slice(0, dot);
-  const mac = cookieValue.slice(dot + 1);
-  const forgedNonce = nonce.slice(0, -1) + (nonce.at(-1) === "a" ? "b" : "a");
-  const result = verifySessionCookie(`${forgedNonce}.${mac}`, secret);
-  assert.equal(result.valid, false);
-  assert.equal(result.reviewerId, null);
+test("verification rejects tampered payloads and signatures", () => {
+  const cookieValue = mintCookieValue();
+  const [format, encoded, mac] = cookieValue.split(".");
+  const changedPayload = `${format}.${encoded.slice(0, -1)}${encoded.at(-1) === "a" ? "b" : "a"}.${mac}`;
+  const changedMac = `${format}.${encoded}.${mac.slice(0, -1)}${mac.at(-1) === "0" ? "1" : "0"}`;
+
+  assert.deepEqual(verifyAs(changedPayload), { valid: false, session: null });
+  assert.deepEqual(verifyAs(changedMac), { valid: false, session: null });
 });
 
-test("verifySessionCookie invalidates outstanding cookies after a secret rotation", () => {
-  // Documented behavior (session.ts header comment): "rotating the secret
-  // invalidates every outstanding cookie." A cookie signed under the old
-  // secret must fail verification against the new one — this is the
-  // module's only expiry-like mechanism (there is no timestamp encoded in
-  // the cookie itself; wall-clock expiry is delegated to the browser via
-  // the Set-Cookie Max-Age attribute, which this pure function does not
-  // see).
-  const oldSecret = "old-secret-value";
-  const newSecret = "new-secret-value";
-  const cookieValue = mintCookieValue(oldSecret);
-  const result = verifySessionCookie(cookieValue, newSecret);
-  assert.equal(result.valid, false);
-  assert.equal(result.reviewerId, null);
-});
-
-test("verifySessionCookie fails closed when the server has no secret configured", () => {
-  const cookieValue = mintCookieValue("some-secret");
-  assert.deepEqual(verifySessionCookie(cookieValue, undefined), {
+test("verification rejects a cookie after signing-secret rotation", () => {
+  const cookieValue = mintCookieValue();
+  assert.deepEqual(verifyAs(cookieValue, "rotated-secret"), {
     valid: false,
-    reviewerId: null,
-  });
-  assert.deepEqual(verifySessionCookie(cookieValue, null), {
-    valid: false,
-    reviewerId: null,
-  });
-  assert.deepEqual(verifySessionCookie(cookieValue, ""), {
-    valid: false,
-    reviewerId: null,
+    session: null,
   });
 });
 
-test("verifySessionCookie rejects missing cookie values", () => {
-  const secret = "test-secret-abc123";
-  assert.deepEqual(verifySessionCookie(undefined, secret), {
+test("verification binds the signed reviewer to current server identity", () => {
+  const cookieValue = mintCookieValue();
+  assert.deepEqual(
+    verifyAs(cookieValue, TEST_SECRET, FIXED_NOW_MS, { username: "other" }),
+    { valid: false, session: null },
+  );
+  assert.deepEqual(
+    verifyAs(cookieValue, TEST_SECRET, FIXED_NOW_MS, {
+      username: undefined,
+      displayName: undefined,
+    }),
+    { valid: false, session: null },
+  );
+});
+
+test("verification enforces server-side expiry independent of Max-Age", () => {
+  const cookieValue = mintCookieValue();
+  const justBeforeExpiry = FIXED_NOW_MS + ADMIN_SESSION_TTL_SECONDS * 1000 - 1;
+  const atExpiry = FIXED_NOW_MS + ADMIN_SESSION_TTL_SECONDS * 1000;
+
+  assert.equal(
+    verifyAs(cookieValue, TEST_SECRET, justBeforeExpiry).valid,
+    true,
+  );
+  assert.deepEqual(verifyAs(cookieValue, TEST_SECRET, atExpiry), {
     valid: false,
-    reviewerId: null,
-  });
-  assert.deepEqual(verifySessionCookie(null, secret), {
-    valid: false,
-    reviewerId: null,
-  });
-  assert.deepEqual(verifySessionCookie("", secret), {
-    valid: false,
-    reviewerId: null,
+    session: null,
   });
 });
 
-test("verifySessionCookie rejects malformed cookie shapes", () => {
-  const secret = "test-secret-abc123";
-  for (const malformed of [
-    "no-dot-at-all",
-    ".leading-dot-empty-nonce",
-    "trailing-dot-empty-mac.",
-    "..",
-    ".",
-  ]) {
-    const result = verifySessionCookie(malformed, secret);
-    assert.equal(result.valid, false, `should reject: ${JSON.stringify(malformed)}`);
-    assert.equal(result.reviewerId, null);
+test("verification rejects issued-at timestamps beyond clock-skew allowance", () => {
+  const cookieValue = mintCookieValue(FIXED_NOW_MS + 61_000);
+  assert.deepEqual(verifyAs(cookieValue), { valid: false, session: null });
+
+  const withinSkew = mintCookieValue(FIXED_NOW_MS + 60_000);
+  assert.equal(verifyAs(withinSkew).valid, true);
+});
+
+test("verification strictly validates the signed payload schema", () => {
+  const validPayload = decodePayload(mintCookieValue());
+  const malformedPayloads: Array<Record<string, unknown>> = [
+    { ...validPayload, version: "civica-admin-session/v0" },
+    { ...validPayload, expiresAt: Number(validPayload.expiresAt) + 1 },
+    { ...validPayload, issuedAt: Number.MAX_VALUE },
+    { ...validPayload, sessionId: "predictable" },
+    { ...validPayload, extra: true },
+  ];
+
+  for (const payload of malformedPayloads) {
+    assert.deepEqual(verifyAs(signTestPayload(payload)), {
+      valid: false,
+      session: null,
+    });
   }
 });
 
-test("verifySessionCookie is deterministic — same inputs, same result, no throw", () => {
-  const secret = "test-secret-abc123";
-  const cookieValue = mintCookieValue(secret);
-  const first = verifySessionCookie(cookieValue, secret);
-  const second = verifySessionCookie(cookieValue, secret);
-  assert.deepEqual(first, second);
+test("session time inputs fail closed outside JavaScript's safe range", () => {
+  const cookieValue = mintCookieValue();
+  assert.deepEqual(verifyAs(cookieValue, TEST_SECRET, Number.MAX_VALUE), {
+    valid: false,
+    session: null,
+  });
+  withAdminEnv(() =>
+    assert.throws(
+      () => mintAdminSessionCookie(Number.MAX_VALUE),
+      /issuance time is outside the safe range/,
+    ),
+  );
 });
 
-test("ADMIN_SESSION_COOKIE name is stable (audit-log / cookie-clearing contract)", () => {
+test("verification rejects missing, legacy, and malformed cookie envelopes", () => {
+  for (const malformed of [
+    undefined,
+    null,
+    "",
+    "legacy-nonce.legacy-mac",
+    "v1.payload",
+    "v2.payload.mac",
+    "v1.payload.not-a-valid-mac",
+    "v1.." + "0".repeat(64),
+    "v1.payload." + "0".repeat(64) + ".extra",
+  ]) {
+    assert.deepEqual(verifyAs(malformed), { valid: false, session: null });
+  }
+});
+
+test("verification fails closed when no signing secret is supplied", () => {
+  const cookieValue = mintCookieValue();
+  assert.deepEqual(
+    withAdminEnv(() =>
+      verifySessionCookie(cookieValue, undefined, FIXED_NOW_MS),
+    ),
+    { valid: false, session: null },
+  );
+  for (const secret of [null, ""]) {
+    assert.deepEqual(verifyAs(cookieValue, secret), {
+      valid: false,
+      session: null,
+    });
+  }
+});
+
+test("issued cookies align browser Max-Age and clear legacy reviewer state", () => {
+  const headers = withAdminEnv(
+    () => mintAdminSessionCookie(FIXED_NOW_MS).headers,
+  );
+  assert.match(
+    headers[0][1],
+    new RegExp(`Max-Age=${ADMIN_SESSION_TTL_SECONDS}`),
+  );
+  assert.match(headers[0][1], /HttpOnly/);
+  assert.match(headers[0][1], /SameSite=Lax/);
+  assert.match(headers[1][1], new RegExp(`^${ADMIN_REVIEWER_COOKIE}=;`));
+  assert.match(headers[1][1], /Max-Age=0/);
+});
+
+test("ADMIN_SESSION_COOKIE name remains stable", () => {
   assert.equal(ADMIN_SESSION_COOKIE, "civica_admin_session");
 });

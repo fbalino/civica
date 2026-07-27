@@ -169,6 +169,7 @@ export async function calculateCompositeScores(
           ciCompositeScores.jurisdictionId,
           ciCompositeScores.quarter,
           ciCompositeScores.methodologyVersion,
+          ciCompositeScores.releaseId,
         ],
         set: {
           score: r.score,

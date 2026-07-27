@@ -20,7 +20,11 @@ import {
   writeCachedSummary,
 } from "./summarize";
 import { upsertBills } from "./upsert";
-import type { BillIngest, BillIngestDraft } from "./types";
+import type {
+  BillFetchResult,
+  BillIngest,
+  BillSourceFetchOutcome,
+} from "./types";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -32,7 +36,7 @@ export interface RunBillsSyncOptions {
   /** Source adapter call — receives the resolved jurisdictionId. */
   fetchDrafts: (opts: {
     jurisdictionId: string;
-  }) => Promise<BillIngestDraft[]>;
+  }) => Promise<BillFetchResult>;
   dryRun?: boolean;
   /** Deterministic fixture seams; production callers omit these. */
   jurisdictionId?: string;
@@ -52,8 +56,29 @@ export interface RunBillsSyncSummary {
   unchanged: number;
   wouldWrite: number;
   summarised: number;
+  sourceOutcomes: BillSourceFetchOutcome[];
   sourcesStamped: string[];
   dryRun: boolean;
+}
+
+export class BillSourceAggregateError extends Error {
+  readonly outcomes: BillSourceFetchOutcome[];
+
+  constructor(jurisdictionSlug: string, outcomes: BillSourceFetchOutcome[]) {
+    const failures = outcomes.filter(
+      (outcome): outcome is Extract<
+        BillSourceFetchOutcome,
+        { status: "failed" }
+      > => outcome.status === "failed",
+    );
+    super(
+      `Bills upstream failed for ${jurisdictionSlug}: ${failures
+        .map((failure) => `${failure.sourceId} (${failure.error})`)
+        .join(", ")}`,
+    );
+    this.name = "BillSourceAggregateError";
+    this.outcomes = outcomes;
+  }
 }
 
 export async function runBillsSync(
@@ -74,10 +99,47 @@ export async function runBillsSync(
   }
 
   // Fetch and stage drafts.
-  const drafts = await opts.fetchDrafts({ jurisdictionId });
-  if (drafts.length === 0 && !opts.allowEmpty) {
-    throw new Error(`Bills upstream returned no rows for ${opts.jurisdictionSlug}`);
+  const fetched = await opts.fetchDrafts({ jurisdictionId });
+  const drafts = Array.isArray(fetched) ? fetched : fetched.drafts;
+  const sourceOutcomes = Array.isArray(fetched)
+    ? Array.from(new Set(fetched.map((draft) => draft.sourceId))).map(
+        (sourceId): BillSourceFetchOutcome => ({
+          sourceId,
+          status: "success",
+          fetched: fetched.filter((draft) => draft.sourceId === sourceId)
+            .length,
+          mapped: fetched.filter((draft) => draft.sourceId === sourceId).length,
+        }),
+      )
+    : fetched.sourceOutcomes;
+  if (sourceOutcomes.some((outcome) => outcome.status === "failed")) {
+    throw new BillSourceAggregateError(opts.jurisdictionSlug, sourceOutcomes);
   }
+  const mappedReported = sourceOutcomes.reduce(
+    (sum, outcome) => sum + outcome.mapped,
+    0,
+  );
+  if (mappedReported !== drafts.length) {
+    throw new Error(
+      `Bills upstream mapping contract drifted for ${opts.jurisdictionSlug}: ` +
+        `${mappedReported} mapped row(s) reported for ${drafts.length} draft(s)`,
+    );
+  }
+  const explicitlyBenignEmpty =
+    !Array.isArray(fetched) &&
+    sourceOutcomes.length > 0 &&
+    sourceOutcomes.every(
+      (outcome) =>
+        outcome.status === "success" &&
+        outcome.mapped === 0 &&
+        outcome.emptyReason !== undefined,
+    );
+  if (drafts.length === 0 && !opts.allowEmpty && !explicitlyBenignEmpty) {
+    throw new Error(
+      `Bills upstream returned no rows for ${opts.jurisdictionSlug}`,
+    );
+  }
+
 
   // Batch-summarise. Cache key uses iso2 + (longTitle || title) — same
   // shape the legacy live-fetch route uses, so cached entries carry
@@ -143,6 +205,7 @@ export async function runBillsSync(
     unchanged: result.unchanged,
     wouldWrite: result.wouldWrite,
     summarised: summarisedCount,
+    sourceOutcomes,
     sourcesStamped: result.sourcesStamped,
     dryRun: opts.dryRun ?? false,
   };

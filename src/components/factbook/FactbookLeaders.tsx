@@ -3,6 +3,9 @@ import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { titleCaseTitle } from "@/lib/text/title-case";
 import { SourceDot } from "@/components/SourceDot";
 import { Chip } from "@/components/editorial/Pill";
+import { Banner } from "@/components/editorial/Banner";
+import { DataTable } from "@/components/editorial/DataTable";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import {
   LeaderTenureTimeline,
   type TenureEntry,
@@ -41,16 +44,19 @@ import "./leaders.css";
  * absent.
  */
 
+type LeaderRow = Awaited<ReturnType<typeof getLeaderTimeline>>[number];
+
 interface FactbookLeadersProps {
   jurisdictionId: string;
   countryName: string;
+  countrySlug: string;
   // Optional — when the orchestrator already fetched the wikidata source's
   // last_sync_at it can pass it through. Without it the SourceDot still
   // renders, just with the "Not yet synced" tooltip.
   retrievedAt?: string | null;
+  /** A route-level prefetch preserves an outage separately from an empty roster. */
+  initialRows?: LeaderRow[] | null;
 }
-
-type LeaderRow = Awaited<ReturnType<typeof getLeaderTimeline>>[number];
 
 interface OfficeStint {
   officeName: string;
@@ -211,12 +217,44 @@ function groupByPerson(rows: LeaderRow[]): PersonGroup[] {
 
 export async function FactbookLeaders({
   jurisdictionId,
+  countryName,
+  countrySlug,
   retrievedAt,
+  initialRows,
 }: FactbookLeadersProps) {
-  const rows = (await getLeaderTimeline(jurisdictionId).catch(
-    () => [] as LeaderRow[]
-  )) as LeaderRow[];
-  if (rows.length === 0) return null;
+  let rows: LeaderRow[];
+  if (initialRows === null) {
+    return (
+      <Banner variant="warn">
+        Leadership records are temporarily unavailable. Civica is not treating
+        this as evidence that {countryName} has no current officeholders.
+      </Banner>
+    );
+  }
+  if (initialRows !== undefined) {
+    rows = initialRows;
+  } else {
+    try {
+      rows = await getLeaderTimeline(jurisdictionId);
+    } catch {
+      return (
+        <Banner variant="warn">
+          Leadership records are temporarily unavailable. Civica is not
+          treating this as evidence that {countryName} has no current
+          officeholders.
+        </Banner>
+      );
+    }
+  }
+  if (rows.length === 0) {
+    return (
+      <Banner variant="info">
+        No source-backed current officeholder records have been compiled for
+        {countryName} yet. This is not a claim that the country has no
+        government.
+      </Banner>
+    );
+  }
 
   const nowYear = new Date().getUTCFullYear();
   const groups = groupByPerson(rows);
@@ -466,6 +504,45 @@ export async function FactbookLeaders({
         <section className="lead-block">
           <h3 className="lead-eyebrow">Time in office</h3>
           <LeaderTenureTimeline entries={timelineEntries} nowYear={nowYear} />
+          <ResearchVisualizationDisclosure
+            title="Current-officeholder tenure"
+            description="The bars only visualize each current officeholder's recorded current-term start. The table gives the same names, offices, dates, and elapsed years without relying on bar length."
+            sources={[
+              {
+                id: "wikidata",
+                label: "Wikidata current-officeholder records",
+                retrievedAt,
+              },
+            ]}
+            missingData="Officeholders without a recorded current-term start remain in the roster but are not assigned a made-up tenure bar."
+            dataAccess={{
+              kind: "download",
+              href: `/api/countries/${encodeURIComponent(countrySlug)}/leaders`,
+              label: "Download current-officeholder rows as JSON",
+            }}
+            tableLabel="Show tenure timeline table"
+          >
+            <DataTable aria-label={`${countryName} current-officeholder tenure data table`}>
+              <thead>
+                <tr>
+                  <th scope="col">Officeholder</th>
+                  <th scope="col">Current office</th>
+                  <th scope="col">Current term began</th>
+                  <th scope="col">Elapsed years</th>
+                </tr>
+              </thead>
+              <tbody>
+                {timelineEntries.map((entry) => (
+                  <tr key={`${entry.personName}-${entry.officeLabel}`}>
+                    <th scope="row">{entry.personName}</th>
+                    <td>{entry.officeLabel}</td>
+                    <td>{entry.startYear}</td>
+                    <td>{Math.max(0, nowYear - entry.startYear)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </DataTable>
+          </ResearchVisualizationDisclosure>
         </section>
       )}
 

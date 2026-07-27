@@ -1,0 +1,42 @@
+{
+  "id": "pul-040-runtime-cut-and-pulse-publication-clock-2026-07-26",
+  "toVersion": "civica-index-pulse-runtime-publication-v54",
+  "categories": ["weight_or_model", "presentation"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/PUL-027/README.md",
+      "plan/evidence/PUL-040/README.md",
+      "plan/evidence/PUL-040/protected-contract-rollup-2026-07-26.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json",
+      "plan/evidence/PUL-040/start-readiness.json"
+    ],
+    "release_note": [
+      "plan/evidence/PUL-040/runtime-evidence-cut-release-note-2026-07-26.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-040/runtime-evidence-cut-migration-plan-2026-07-26.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts",
+      "src/lib/pulse/v2/score-cron-retry.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pulse-runtime-method.ts",
+      "scripts/validate-pulse-delta-lifecycle.ts",
+      "scripts/audit-pulse-prospective-start.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-pulse-cron-recovery",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:pulse-delta-lifecycle",
+    "validate:pulse-prospective-start",
+    "validate:pulse-runtime"
+  ]
+}

@@ -238,8 +238,8 @@
     {
       "artifactId": "packet-citation",
       "role": "packet-document",
-      "bytes": 742,
-      "sha256": "920df5709e25959a549611d3b8cc470ac21eef1da46fe7d0e1dc365c9fdca2d2",
+      "bytes": 743,
+      "sha256": "f18d8fdd736e36e00eaf882362f45490d1468ca861fecbf29dfda14b8520e195",
       "path": "data/releases/governance-evidence-review-packet-2026-07-v4/CITATION.cff"
     },
     {
@@ -434,8 +434,8 @@
     {
       "artifactId": "package-lock",
       "role": "environment",
-      "bytes": 408861,
-      "sha256": "9558f57eba3b959d92f0a83410297d26f348b243a38a6e4a9ff5a40e7e8439a4",
+      "bytes": 416947,
+      "sha256": "3dd23dfb35d626d88997f6198ad9631737897d59c520a3ede0d0b579bc33469c",
       "path": "package-lock.json"
     },
     {
@@ -469,8 +469,8 @@
     {
       "artifactId": "selected-product-code-8",
       "role": "selected-product-code",
-      "bytes": 3800,
-      "sha256": "0a39c0d5fa7b4600803a210ce1813661b6aeaf5a4f49504796727645c56f4988",
+      "bytes": 3784,
+      "sha256": "fe84ae32065eca23cbbf924633a5d6b15eea93e30c95c248ad2a9b60437147ea",
       "path": "scripts/validate-ci-series-provenance.ts"
     },
     {
@@ -490,15 +490,15 @@
     {
       "artifactId": "selected-product-code-5",
       "role": "selected-product-code",
-      "bytes": 1606,
-      "sha256": "6bf9432491827c85cabeec581a68354714672495fbc7d48528d72efc9344ae00",
+      "bytes": 2791,
+      "sha256": "049d499d97a432dfaf1012891b962920ad6bb9712e93f74aa4a1d467182dd87e",
       "path": "src/app/api/governance-evidence/[slug]/route.ts"
     },
     {
       "artifactId": "selected-product-code-4",
       "role": "selected-product-code",
-      "bytes": 7667,
-      "sha256": "166ce3826678bb59a104def99b060de353a893eb0195c35e58420e59b5df9efd",
+      "bytes": 7664,
+      "sha256": "159364d7b0587607b2d9d6d143a0caf1dacabe29da4c2ff33414e50b8249dedc",
       "path": "src/app/governance-evidence/page.tsx"
     },
     {
@@ -511,8 +511,8 @@
     {
       "artifactId": "review-packet-builder",
       "role": "selected-product-code",
-      "bytes": 10820,
-      "sha256": "118d9ba257fb6f4370097e5160abbb7a32f5c9c6543948aa61d440c72da4a596",
+      "bytes": 10821,
+      "sha256": "f97306e949a653b6788b7831b80f7ea59f7df755e1d0ad38fef71ad3392386e2",
       "path": "src/lib/ci/governance-evidence-review-package.ts"
     },
     {
@@ -525,8 +525,8 @@
     {
       "artifactId": "selected-product-code-1",
       "role": "selected-product-code",
-      "bytes": 5593,
-      "sha256": "de469f2c7465b7bc3effac5dd006b06f2dcb7b1f46a1b0d182e0ff9fca1624e7",
+      "bytes": 7365,
+      "sha256": "51ebcfb59fd26fca2b3f5835354d0c2eee9e6c8afc1fc3b04ea0feedd65e193c",
       "path": "src/lib/ci/governance-evidence.ts"
     },
     {
@@ -551,5 +551,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "8538231e9ad6af8b336489553c9bea8ebb5376e9a4d217f9fb16ef41e5850832"
+  "bundleSemanticSha256": "1a0d039e6da4210282852152dda6fff3f419c957c75e95ba33df8f60a6e18289"
 }

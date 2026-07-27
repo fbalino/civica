@@ -400,6 +400,22 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "license is descriptive source metadata; authoritative reuse decisions come from the rights manifest.",
     deprecation: active,
   },
+  entity_name_forms: {
+    definition:
+      "Versioned source, native, official, transliterated, and English display forms for canonical Atlas entities.",
+    rowGrain:
+      "One entity, name role, language tag, and source observation version.",
+    releaseScope: "atlas_public",
+    sourceOrDerivation:
+      "Explicit publisher records written through the entity-name-form contract; language, script, translation, and transliteration status are never inferred from the rendered string.",
+    cadence:
+      "Per authorized identity-source refresh; materially changed rows supersede rather than overwrite prior evidence.",
+    vintageSemantics:
+      "retrieved_at records Civica capture time, upstream_vintage records the named publisher vintage, and superseded_at closes a prior current form.",
+    rights:
+      "Each name form inherits the linked source's rights posture and retains its exact source URL.",
+    deprecation: active,
+  },
   government_taxonomies: {
     definition:
       "Source and derived government-system classifications by jurisdiction and reference year.",
@@ -419,8 +435,9 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rowGrain: "One submitted contact message.",
     releaseScope: "private_submission",
     sourceOrDerivation:
-      "Direct user submission plus Civica processing metadata.",
-    cadence: "On form submission and administrative processing.",
+      "Direct user submission plus Civica processing metadata. New submissions exclude raw request IP addresses; the nullable ip_address column is legacy-only pending the authorized minimization purge.",
+    cadence:
+      "On form submission and administrative processing; retained messages can be permanently deleted through the authenticated owner-admin detail surface.",
     vintageSemantics:
       "created_at is submission time; processed_at is workflow time.",
     rights:
@@ -491,6 +508,35 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     vintageSemantics:
       "effective_from/to bound the interpretation period; version is not a source-data vintage.",
     rights: "Civica-authored metadata; input-source rights remain separate.",
+    deprecation: active,
+  },
+  ci_index_releases: {
+    definition:
+      "Immutable release headers for staged and published Civica Index research outputs.",
+    rowGrain: "One exact Index release identity and reproduction contract.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Civica-authored header binding methodology content, source artifacts, transforms, uncertainty policy, row counts, and checked row-set hashes.",
+    cadence:
+      "One staged row per candidate release; publication changes only status and publication time through the guarded publication function.",
+    vintageSemantics:
+      "quarter names the input reference period, vintage_label names the research artifact, and published_at records Civica publication time; none are interchangeable.",
+    rights:
+      "Header metadata is Civica-authored; released values remain constrained by every included source artifact's rights.",
+    deprecation: active,
+  },
+  ci_index_release_pointers: {
+    definition:
+      "Atomic selector for the one complete Civica Index research release exposed by current-release readers.",
+    rowGrain: "One product pointer to one validated published Index release.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Written only by the database publication function after exact release reproduction and completeness checks.",
+    cadence: "Changes only when a verified successor release is published.",
+    vintageSemantics:
+      "updated_at is pointer-switch time; the referenced release retains its own quarter, vintage, calculation, and publication times.",
+    rights:
+      "Operational selector metadata is Civica-authored; the selected release retains its source-specific rights contract.",
     deprecation: active,
   },
   ci_source_ingestions: {
@@ -591,6 +637,20 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rights: "Derived output subject to the combined rights of included inputs.",
     deprecation: active,
   },
+  pulse_score_publication_pointers: {
+    definition:
+      "Atomic selector for the one complete Pulse dimensional score run exposed by the public dimensions reader.",
+    rowGrain: "One product pointer to one completed five-dimension score run.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Written in the same atomic score batch as immutable history rows and run completion after database completeness checks.",
+    cadence: "Changes when a complete successor Pulse score run is published.",
+    vintageSemantics:
+      "score_as_of is the dimensional observation cut, published_at is pointer-switch time, and the referenced run retains its own execution/version identity.",
+    rights:
+      "Civica-authored publication metadata; linked event and source context retains publisher-specific rights and display limits.",
+    deprecation: active,
+  },
   pulse_events: {
     definition: "Legacy Pulse v1 classified governance events.",
     rowGrain: "One legacy classified article/event candidate.",
@@ -631,19 +691,95 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Every public relationship retains the exact official source URL and publisher terms; underlying publisher content is not redistributed.",
     deprecation: active,
   },
+  civica_conditions_releases: {
+    definition: "Immutable Conditions release headers bound to a canonical manifest hash.",
+    rowGrain: "One named Conditions release.",
+    releaseScope: "research_beta",
+    sourceOrDerivation: "Civica release-control metadata generated from frozen Conditions calculations and reference sets.",
+    cadence: "Only when a new, explicitly named Conditions release is created.",
+    vintageSemantics: "id and manifest_sha256 identify the immutable release; created_at is storage time, not an observation date.",
+    rights: "Civica-derived metadata; component-level source rights remain controlling for underlying values.",
+    deprecation: active,
+  },
+  civica_conditions_reference_sets: {
+    definition: "Frozen per-dimension, per-period Conditions reference populations, components, and missingness counts.",
+    rowGrain: "One Conditions release, dimension, and reference period.",
+    releaseScope: "research_beta",
+    sourceOrDerivation: "Deterministic release-time selection over decomposable Conditions calculations.",
+    cadence: "Written once with its immutable Conditions release.",
+    vintageSemantics: "reference_period is the observed period; jurisdiction_ids and population_sha256 retain the exact normalization population.",
+    rights: "Civica-derived selection metadata; each included component retains its own source rights.",
+    deprecation: active,
+  },
+  civica_conditions_normalization_parameters: {
+    definition: "Frozen transformation and direction parameters for one Conditions reference set component.",
+    rowGrain: "One Conditions release, dimension, reference period, and component.",
+    releaseScope: "research_beta",
+    sourceOrDerivation: "Deterministic release-time normalization calculation or adopted fixed bound.",
+    cadence: "Written once with its immutable Conditions reference set.",
+    vintageSemantics: "Parameters apply only to the named release and reference period; later releases cannot revise them in place.",
+    rights: "Civica-derived transform metadata; underlying component values retain source-specific rights.",
+    deprecation: active,
+  },
+  civica_conditions_calculations: {
+    definition:
+      "Versioned Conditions calculation decisions, including aligned scores and explicitly unavailable candidates.",
+    rowGrain:
+      "One jurisdiction, Conditions dimension, component-input bundle, and methodology decision.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Deterministic Civica calculation envelope over the retained component rows.",
+    cadence: "Per upstream ingestion run and revised methodology version.",
+    vintageSemantics:
+      "reference_year exists only for an aligned all-component calculation; a refused or missing candidate deliberately has no aggregate year.",
+    rights:
+      "Calculation metadata is Civica-derived; component source rights remain controlling for input values.",
+    deprecation: active,
+  },
+  civica_conditions_components: {
+    definition:
+      "Native source components considered for a Conditions calculation, including unavailable or refused inputs.",
+    rowGrain:
+      "One declared component in one Conditions calculation input bundle.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Captured source observation or explicit no-observation outcome with full input lineage.",
+    cadence: "Per upstream ingestion run and source correction.",
+    vintageSemantics:
+      "reference_year is the component's own observation year and is never replaced by a newer sibling component year.",
+    rights:
+      "Resolved per source_id and component-level lineage; unavailable rows expose no source value.",
+    deprecation: active,
+  },
   civica_conditions_scores: {
     definition:
       "Country-level descriptive Conditions indicators and display positions.",
     rowGrain:
-      "One jurisdiction, metric, data year, source, and methodology version.",
+      "One decomposable jurisdiction, metric, reference year, source, and methodology version.",
     releaseScope: "research_beta",
     sourceOrDerivation:
       "Versioned transform of HDI, GPI, and World Bank economic inputs.",
     cadence: "Per upstream annual/source release.",
     vintageSemantics:
-      "data_year is observation/reference year; calculated_at is computation time.",
+      "dataset_year is the all-component reference year; calculation_key joins the exact input ledger. Legacy rows without a calculation key are not returned by the decomposable read path.",
     rights:
       "Resolved per source_id; derived display positions inherit input restrictions.",
+    deprecation: active,
+  },
+  atlas_entity_change_history: {
+    definition:
+      "Public, field-allowlisted release history for stable Atlas citation entities.",
+    rowGrain:
+      "One release-mapped routine refresh, substantive revision, correction, retraction, or methodology change for one stable Atlas entity.",
+    releaseScope: "public_support",
+    sourceOrDerivation:
+      "Derived from explicit Atlas writer context and a closed per-entity public field registry; complete DAT-016 snapshots and private correction details are excluded.",
+    cadence:
+      "Appended atomically with an eligible Atlas entity change after the ATL-020 contract begins.",
+    vintageSemantics:
+      "release_id identifies the Civica release containing the change; recorded_at is the append time, while old/new source and upstream-vintage fields remain inside the bounded changes array.",
+    rights:
+      "Civica-authored change metadata; any projected source value retains the source-specific rights represented by the named release.",
     deprecation: active,
   },
   correction_log: {
@@ -677,8 +813,9 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rowGrain: "One submitted application.",
     releaseScope: "private_submission",
     sourceOrDerivation:
-      "Direct applicant submission plus administrative review fields.",
-    cadence: "On submission and review action.",
+      "Direct applicant submission plus administrative review fields. New submissions exclude raw request IP addresses; the nullable ip_address column is legacy-only.",
+    cadence:
+      "On submission and review action; applications are deleted within the declared 18-month window or earlier on an approved request.",
     vintageSemantics:
       "created/updated timestamps describe application workflow.",
     rights:
@@ -1036,7 +1173,7 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Versioned experimental scoring from verified Pulse v2 event classifications.",
     cadence: "Daily after classification/corroboration and on rescore.",
     vintageSemantics:
-      "score_as_of and window_start bound the trailing 365-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
+      "score_as_of, window_start, and window_days fix the versioned 365- or 730-day lookback; computation_run_id and derivation_version_key fix the scoring interpretation.",
     rights:
       "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
     deprecation: active,
@@ -1052,9 +1189,53 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     cadence:
       "Append-only on every score run; existing current-state rows were copied at the PUL-035 migration boundary.",
     vintageSemantics:
-      "score_as_of and window_start bound the trailing 365-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
+      "score_as_of, window_start, and window_days retain each run's 365- or 730-day lookback; created_at records the original computation time for migrated rows and insertion time thereafter.",
     rights:
       "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+    deprecation: active,
+  },
+  pulse_drift_baselines: {
+    definition:
+      "Immutable, explicit reference distributions for Pulse operational drift monitoring.",
+    rowGrain:
+      "One manually captured trailing-window aggregate snapshot for one Pulse runtime method.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Read-only aggregates over version-matched Pulse evidence and pipeline rows; a scheduled monitor cannot create or replace a baseline.",
+    cadence:
+      "Only after the frozen method has enough retained source, language, and model observations for an owner-authorized capture.",
+    vintageSemantics:
+      "window_start/window_end identify the evidence period; created_at identifies the immutable capture time and baseline_key binds its complete snapshot.",
+    rights:
+      "Internal aggregate metadata only; no source payload, prompt, model response, or review note is copied.",
+    deprecation: active,
+  },
+  pulse_drift_observations: {
+    definition:
+      "Immutable post-score assessment of current Pulse operational distributions against one explicit baseline.",
+    rowGrain: "One completed score run and trailing monitoring window.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Version-matched aggregate counts across source, language, model, taxonomy, corroboration-weight, abstention, and review-outcome dimensions.",
+    cadence: "Once after each completed current-method Pulse score run; retries reuse the same score-run identity.",
+    vintageSemantics:
+      "observed_at is assessment time; window_start/window_end fix the measured evidence interval; baseline_id makes comparison reproducible.",
+    rights:
+      "Internal aggregate metadata only; bounded identifiers point to retained evidence without reproducing it.",
+    deprecation: active,
+  },
+  pulse_drift_alerts: {
+    definition:
+      "Append-only operational warnings for a Pulse distribution shift or a novel production model version.",
+    rowGrain: "One triggered metric/reason within one immutable drift observation.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Derived from the recorded baseline and observation using the versioned categorical-distance threshold contract.",
+    cadence: "Only when an observation exceeds its metric threshold or contains a novel model version.",
+    vintageSemantics:
+      "created_at is alert time; observation_id and baseline_id bind the exact compared windows and method.",
+    rights:
+      "Internal aggregate comparison plus bounded row references and a remediation path; no source payload is retained here.",
     deprecation: active,
   },
   pulse_review_audit_log: {
@@ -1149,15 +1330,174 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-authored correction metadata; linked evidence retains source restrictions.",
     deprecation: active,
   },
-  rate_limits: {
-    definition: "Operational request counters used to enforce API limits.",
-    rowGrain: "One rate-limit key and time window.",
+  admin_session_revocations: {
+    definition:
+      "Durable hashed tombstones that invalidate signed owner-admin sessions after logout.",
+    rowGrain: "One revoked signed admin session.",
     releaseScope: "internal_operational",
-    sourceOrDerivation: "Generated from application request traffic.",
-    cadence: "Per request with expiry/cleanup by window.",
+    sourceOrDerivation:
+      "Generated only by the shared admin logout boundary from a domain-separated hash of the signed random session ID.",
+    cadence: "Append-only on authenticated logout.",
     vintageSemantics:
-      "window_start identifies the current operational counting interval.",
-    rights: "Internal security/operations data; excluded from public release.",
+      "issued_at and expires_at reproduce the signed lifetime; revoked_at is the server-side invalidation time.",
+    rights:
+      "Private security metadata; raw session IDs and cookies are never stored or released.",
+    deprecation: active,
+  },
+  admin_mutation_audit_log: {
+    definition:
+      "Append-only common security audit events for owner-admin authentication and mutations.",
+    rowGrain: "One attempted or terminal admin request event.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated by shared admin auth/mutation boundaries from bounded route, actor, action, target, status, and result context.",
+    cadence: "Append-only before and after authenticated mutations.",
+    vintageSemantics:
+      "created_at is the audit-event time; request_id correlates an attempt with its terminal outcome.",
+    rights:
+      "Private operational security evidence; request bodies, credentials, raw session IDs, IP addresses, and unbounded errors are excluded.",
+    deprecation: active,
+  },
+  cron_job_executions: {
+    definition:
+      "Durable delivery-identity and terminal-outcome ledger for authenticated cron jobs.",
+    rowGrain:
+      "One logical scheduled or manual delivery for one registered cron job.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated by the shared cron boundary from the registered job and route, hashed request identity, schedule or hashed manual scope, retry counters, and terminal HTTP outcome; request bodies, credentials, raw idempotency keys, payloads, and error text are excluded.",
+    cadence:
+      "Created on first acquisition, advanced on a bounded retry, and finalized on success or failure; execution evidence is retained and cannot be deleted or truncated.",
+    vintageSemantics:
+      "schedule_slot is the logical scheduled-delivery time; first_started_at, last_started_at, completed_at, and updated_at describe the delivery lifecycle rather than source-data vintage.",
+    rights:
+      "Private internal operational evidence; excluded from public release and not a source-data rights grant.",
+    deprecation: active,
+  },
+  pulse_classification_delivery_bindings: {
+    definition:
+      "Immutable handoff from one authenticated cron delivery to the Pulse classification run that owns its work.",
+    rowGrain:
+      "One logical cron delivery bound to exactly one Pulse classify run; multiple later deliveries may adopt the same still-running classify run.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Created by the Pulse classifier from the authenticated cron execution key and the exact existing, adopted, or newly started classify run; no request payload, credential, model content, or error text is retained.",
+    cadence:
+      "Inserted once before a delivery resumes or adopts classify work and retained without update, deletion, or truncation.",
+    vintageSemantics:
+      "created_at is the durable handoff time; the linked pipeline run retains its own processing clocks and frozen input identity.",
+    rights:
+      "Private internal coordination evidence; excluded from public release and not a source-data rights grant.",
+    deprecation: active,
+  },
+  cron_job_leases: {
+    definition:
+      "Persistent job-wide mutex and monotonic fencing state for cron delivery control.",
+    rowGrain: "One persistent lease state for one registered cron job.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Maintained by the database cron acquisition and finalization functions from opaque lease/attempt identifiers, hashed execution identity, expiry, and a monotonic fence; no request payload or credential is stored.",
+    cadence:
+      "Updated on acquisition, expiry takeover, and release; idle rows clear holder fields but are never deleted or truncated because resetting the fence could let a stale runner finalize newer work.",
+    vintageSemantics:
+      "lease_expires_at is the active lease deadline and updated_at is transition time; lease_fence is monotonic concurrency state, not a source-data vintage.",
+    rights:
+      "Private internal coordination metadata; excluded from public release.",
+    deprecation: active,
+  },
+  cron_job_attempts: {
+    definition:
+      "Retained attempt-level execution evidence for authenticated cron deliveries, including expired attempts.",
+    rowGrain: "One bounded attempt for one logical cron-job delivery.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated by the database cron acquisition and finalization functions from the execution identity, attempt ordinal, fence, lifecycle status, bounded result code, and HTTP status; request bodies, credentials, payloads, and error text are excluded.",
+    cadence:
+      "Created on lease acquisition and closed once as succeeded, failed, or expired; attempt evidence is retained and cannot be deleted or truncated.",
+    vintageSemantics:
+      "started_at and completed_at describe attempt execution; ordinal and fence preserve retry and takeover order rather than source-data vintage.",
+    rights:
+      "Private internal operational evidence; excluded from public release and contains no reusable source payload.",
+    deprecation: active,
+  },
+  rate_limits: {
+    definition:
+      "Shared fixed-window request counters used for fail-closed rate-limit enforcement across application instances.",
+    rowGrain:
+      "One policy scope, opaque HMAC subject digest, and database-derived window start encoded together in the primary key.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated from protected request traffic after the trusted request identity is converted to an opaque HMAC digest; the database clock derives the window and expiry, so no raw request identity is stored.",
+    cadence:
+      "Each protected request atomically removes expired rows through the expires_at index and increments its current window, with the count saturated at the policy limit plus one.",
+    vintageSemantics:
+      "The database-derived window start is encoded in key and expires_at records its end; neither field represents source-data vintage.",
+    rights:
+      "Internal security/operations data containing no raw request identity; excluded from public release.",
+    deprecation: active,
+  },
+  route_performance_observations: {
+    definition:
+      "Short-lived, privacy-bounded server route and cron performance observations used for internal operational diagnosis.",
+    rowGrain:
+      "One completed server request, server error, or registered cron-job duration at a canonical route-template level.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated after a server response by the PLT-016 proxy, instrumentation hook, or shared cron boundary from a closed route template, method, bounded timing/status, cache profile, release ID, and telemetry version; raw paths, parameters, queries, headers, cookies, IP addresses, user agents, request bodies, account identifiers, and error content are excluded.",
+    cadence:
+      "Written best-effort after production responses and pruned after 30 days by the non-retired cron boundary; telemetry failures never affect the reader response.",
+    vintageSemantics:
+      "observed_at is operational observation time; release_id and telemetry_version identify the deployed code/contract rather than a source-data vintage.",
+    rights:
+      "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+    deprecation: active,
+  },
+  error_monitoring_events: {
+    definition:
+      "Privacy-bounded exception fingerprints and lifecycle state for server, client, cron, and production-script failures.",
+    rowGrain:
+      "One deterministic fingerprint for a closed surface, canonical route/job context, error code, release, and source-map identity.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Generated best-effort by shared error boundaries from closed route/job identifiers, a closed error code, release/source-map identities, and bounded lifecycle timestamps; exception messages, stacks, digests, request bodies, headers, cookies, IP addresses, account identifiers, and source payloads are excluded.",
+    cadence:
+      "Upserted when the same safe fingerprint recurs, resolved by an explicit owner action, and pruned after the registered operational retention period.",
+    vintageSemantics:
+      "first_seen_at, last_seen_at, and resolved_at describe operational incident lifecycle; release_id and source_map_id identify deployed code rather than an upstream data vintage.",
+    rights:
+      "Private operational metadata with no publisher payload or reader identity; excluded from public releases and raw public APIs.",
+    deprecation: active,
+  },
+  error_monitoring_issue_links: {
+    definition:
+      "Owned correction or status-record references associated with an internal error-monitoring fingerprint.",
+    rowGrain:
+      "One error-monitoring event, record type, and opaque correction/status record identifier.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Explicitly linked by the owner through the error-monitoring operational command; free-text notes, URLs, exception content, and source payloads are not stored.",
+    cadence:
+      "Inserted when a known issue is associated with a correction or status record; removed only through the linked event's retention lifecycle.",
+    vintageSemantics:
+      "linked_at records the operational association time and does not claim a source-data vintage.",
+    rights:
+      "Private operational coordination metadata; the referenced correction or status record retains its own access and rights policy.",
+    deprecation: active,
+  },
+  production_pipeline_runs: {
+    definition:
+      "Durable internal outcome ledger for registered scheduled and canonical manual production pipelines.",
+    rowGrain:
+      "One registered pipeline execution, keyed to an authenticated cron delivery where applicable.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Created by the shared cron boundary or canonical manual runner from the registered pipeline/source-input contract, bounded counters, freshness checks, release identifier, and a safe terminal code; raw publisher payloads, request bodies, credentials, URLs, and exception content are excluded.",
+    cadence:
+      "Created before each pipeline begins and finalized with one terminal outcome; the alert job evaluates missed expected slots and failed, empty, or anomalous outcomes daily.",
+    vintageSemantics:
+      "source_versions declares the source-input version/vintage contract active for the run; started_at/completed_at are operational execution times and freshness_source_ids records only sources whose sanctioned freshness timestamp advanced during that run.",
+    rights:
+      "Private operational evidence with no reusable source payload; excluded from public releases and raw public APIs.",
     deprecation: active,
   },
 };

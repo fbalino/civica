@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import type { WhoGhoDataPoint } from "../sync-who-gho";
 import { syncWhoGho } from "../sync-who-gho";
 
@@ -54,6 +55,19 @@ function harness() {
   return { db: db as never, facts, writes: () => writes };
 }
 
+const fixtureFactWriter: CountryFactHistoryWriter = async (database, write) => {
+  const fixtureDb = database as unknown as {
+    insert: (table: unknown) => {
+      values: (value: Record<string, unknown>) => {
+        onConflictDoUpdate: () => Promise<unknown>;
+      };
+    };
+  };
+  await fixtureDb.insert(countryFacts).values(write.values as Record<string, unknown>).onConflictDoUpdate();
+};
+
+const historyOptions = { atlasReleaseId: "atlas-test", writeFact: fixtureFactWriter };
+
 const noDisputes = async () => ({ jurisdictionsScanned: 1, pairsScanned: 1, proposedTotal: 0, inserted: 0, skippedDuplicate: 0, skippedNoFactGroup: 0, errors: [] });
 
 function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
@@ -68,6 +82,7 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
 test("WHO GHO fixture applications converge on one canonical fact", async () => {
   const state = harness();
   const options = {
+    ...historyOptions,
     factKey: "life_expectancy_years",
     whoCode: "WHOSIS_000001",
     jurisdictions: [jurisdiction],
@@ -103,6 +118,7 @@ test("WHO GHO upstream failure cannot stamp freshness", async () => {
   const state = harness();
   const stampedRows: number[] = [];
   const result = await syncWhoGho(state.db, {
+    ...historyOptions,
     factKey: "life_expectancy_years",
     whoCode: "WHOSIS_000001",
     jurisdictions: [jurisdiction],
@@ -111,6 +127,6 @@ test("WHO GHO upstream failure cannot stamp freshness", async () => {
     markSynced: (async (_ids: unknown, options: { rowsWritten: number }) => { stampedRows.push(options.rowsWritten); return []; }) as never,
   });
   assert.match(result.errors.join(" "), /upstream schema changed/);
-  assert.deepEqual(stampedRows, [0]);
+  assert.deepEqual(stampedRows, []);
   assert.equal(state.writes(), 0);
 });

@@ -18,6 +18,7 @@ import {
   dataDisputes,
   advisoryApplications,
   contactSubmissions,
+  correctionLog,
   pulseCodingComparisons,
   pulseCodingAdjudications,
 } from "@/lib/db/schema";
@@ -32,6 +33,8 @@ export interface AdminCounts {
   advisoryNew: number;
   /** Contact messages not yet read (status='new'). */
   messagesNew: number;
+  /** Public Atlas data-error reports still open or in review. */
+  correctionsOpen: number;
   /** Locked double-coded packets awaiting a terminal adjudication. */
   codingReady: number;
 }
@@ -56,7 +59,14 @@ async function countOr0(
  * one failing query can't take down the others.
  */
 export async function getAdminCounts(): Promise<AdminCounts> {
-  const [pulsePending, disputesOpen, advisoryNew, messagesNew, codingReady] =
+  const [
+    pulsePending,
+    disputesOpen,
+    advisoryNew,
+    messagesNew,
+    correctionsOpen,
+    codingReady,
+  ] =
     await Promise.all([
       countOr0("pulse", async () => {
         const rows = await db
@@ -92,6 +102,18 @@ export async function getAdminCounts(): Promise<AdminCounts> {
           .where(eq(contactSubmissions.status, "new"));
         return rows[0]?.n ?? 0;
       }),
+      countOr0("atlas corrections", async () => {
+        const rows = await db
+          .select({ n: sql<number>`count(*)::int` })
+          .from(correctionLog)
+          .where(
+            and(
+              eq(correctionLog.category, "atlas_data_error"),
+              sql`${correctionLog.status} in ('open', 'in_review')`,
+            ),
+          );
+        return rows[0]?.n ?? 0;
+      }),
       countOr0("coding", async () => {
         const rows = await db
           .select({ n: sql<number>`count(*)::int` })
@@ -108,5 +130,12 @@ export async function getAdminCounts(): Promise<AdminCounts> {
       }),
     ]);
 
-  return { pulsePending, disputesOpen, advisoryNew, messagesNew, codingReady };
+  return {
+    pulsePending,
+    disputesOpen,
+    advisoryNew,
+    messagesNew,
+    correctionsOpen,
+    codingReady,
+  };
 }

@@ -1,0 +1,22 @@
+{
+  "light": {
+    "paper": "#FAF7F2",
+    "ink": "#0B1B2D",
+    "muted": "#6A7688",
+    "rule": "#E4E1DC",
+    "accent": "#B7512B",
+    "water": "#C4D2D0",
+    "green": "#E1E4D6",
+    "building": "#ECE5DA"
+  },
+  "dark": {
+    "paper": "#16140f",
+    "ink": "#ebe6d6",
+    "muted": "#8a8370",
+    "rule": "#3d382d",
+    "accent": "#d98a63",
+    "water": "#1a2028",
+    "green": "#1a1c12",
+    "building": "#211d14"
+  }
+}

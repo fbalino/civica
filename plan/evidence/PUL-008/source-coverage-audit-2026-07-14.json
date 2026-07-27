@@ -1,0 +1,653 @@
+{
+  "schemaVersion": "pulse-source-coverage-audit/v1",
+  "capturedAt": "2026-07-14T04:38:23.912Z",
+  "runtimeMethodVersion": "pulse-v2.15-beta",
+  "reportSchemaVersion": "pulse-source-coverage/v1",
+  "auditSource": "production_neon_read_only_pulse_source_coverage",
+  "readOnly": true,
+  "writesPerformedByAudit": 0,
+  "report": {
+    "schemaVersion": "pulse-source-coverage/v1",
+    "generatedAt": "2026-07-14T04:38:23.912Z",
+    "standing": "operational_observability_not_retrieval_validation",
+    "feeds": [
+      {
+        "feedId": "acled",
+        "connectorId": "acled",
+        "sourceIds": ["acled"],
+        "role": "specialist",
+        "state": "inactive",
+        "stateReason": "Requires licensed academic API access and a registered account email.",
+        "retrieval": {
+          "observedRuns": 0,
+          "successfulRuns": 0,
+          "failedRuns": 0,
+          "latestAttemptAt": null,
+          "latestOutcome": "not_observed",
+          "latestFetched": null,
+          "latestYield": null,
+          "latestInserted": null,
+          "latestSkippedDuplicate": null,
+          "latestUnmatchedCountry": null
+        },
+        "evidence": {
+          "retainedRows": 0,
+          "lastDataAt": null,
+          "languages": [],
+          "observedJurisdictions": 0,
+          "jurisdictionIso3s": [],
+          "unresolvedJurisdictionRows": 0
+        },
+        "rights": [
+          {
+            "sourceId": "acled",
+            "licenseId": "unregistered",
+            "termsUrl": null,
+            "reviewStatus": "missing",
+            "publicExport": "blocked",
+            "redistributionPosture": "unregistered",
+            "restrictions": [
+              "No source-input and rights contract is registered."
+            ]
+          }
+        ],
+        "activation": "Requires licensed academic API access and a registered account email.",
+        "blindSpots": [
+          "Not operating; no Pulse retrieval coverage is available."
+        ]
+      },
+      {
+        "feedId": "amnesty",
+        "connectorId": "amnesty",
+        "sourceIds": ["amnesty"],
+        "role": "specialist",
+        "state": "operating",
+        "stateReason": "The latest connector attempt succeeded and retained evidence exists.",
+        "retrieval": {
+          "observedRuns": 3,
+          "successfulRuns": 3,
+          "failedRuns": 0,
+          "latestAttemptAt": "2026-07-13T08:00:40.503Z",
+          "latestOutcome": "successful",
+          "latestFetched": 12,
+          "latestYield": 12,
+          "latestInserted": 0,
+          "latestSkippedDuplicate": 12,
+          "latestUnmatchedCountry": 4
+        },
+        "evidence": {
+          "retainedRows": 67,
+          "lastDataAt": "2026-07-11T08:01:09.853Z",
+          "languages": ["und"],
+          "observedJurisdictions": 26,
+          "jurisdictionIso3s": [
+            "BFA",
+            "CHN",
+            "CUB",
+            "FJI",
+            "GIN",
+            "IDN",
+            "IRN",
+            "ISR",
+            "KAZ",
+            "LBN",
+            "LBY",
+            "LKA",
+            "MLI",
+            "NGA",
+            "PAK",
+            "PHL",
+            "RUS",
+            "SAU",
+            "SDN",
+            "SWZ",
+            "TUN",
+            "TUR",
+            "TZA",
+            "UGA",
+            "YEM",
+            "ZMB"
+          ],
+          "unresolvedJurisdictionRows": 29
+        },
+        "rights": [
+          {
+            "sourceId": "amnesty",
+            "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
+            "termsUrl": "https://www.amnesty.org/en/feed/",
+            "reviewStatus": "pending",
+            "publicExport": "blocked",
+            "redistributionPosture": "restricted-no-redistribution",
+            "restrictions": [
+              "Source-specific terms have not completed DAT-003 verification",
+              "Bulk export remains blocked until the terms record is verified"
+            ]
+          }
+        ],
+        "activation": "Default Amnesty International RSS feed.",
+        "blindSpots": [
+          "RSS selection and publisher cadence do not provide a complete Amnesty corpus."
+        ]
+      },
+      {
+        "feedId": "ap",
+        "connectorId": "reuters_ap",
+        "sourceIds": ["ap_wire"],
+        "role": "news",
+        "state": "inactive",
+        "stateReason": "No working default feed; requires an explicitly configured feed URL.",
+        "retrieval": {
+          "observedRuns": 0,
+          "successfulRuns": 0,
+          "failedRuns": 0,
+          "latestAttemptAt": null,
+          "latestOutcome": "not_observed",
+          "latestFetched": null,
+          "latestYield": null,
+          "latestInserted": null,
+          "latestSkippedDuplicate": null,
+          "latestUnmatchedCountry": null
+        },
+        "evidence": {
+          "retainedRows": 0,
+          "lastDataAt": null,
+          "languages": [],
+          "observedJurisdictions": 0,
+          "jurisdictionIso3s": [],
+          "unresolvedJurisdictionRows": 0
+        },
+        "rights": [
+          {
+            "sourceId": "ap_wire",
+            "licenseId": "unregistered",
+            "termsUrl": null,
+            "reviewStatus": "missing",
+            "publicExport": "blocked",
+            "redistributionPosture": "unregistered",
+            "restrictions": [
+              "No source-input and rights contract is registered."
+            ]
+          }
+        ],
+        "activation": "No working default feed; requires an explicitly configured feed URL.",
+        "blindSpots": [
+          "Not operating; no AP Pulse retrieval coverage is available."
+        ]
+      },
+      {
+        "feedId": "civicus",
+        "connectorId": "civicus",
+        "sourceIds": ["civicus_monitor"],
+        "role": "specialist",
+        "state": "operating",
+        "stateReason": "The latest connector attempt succeeded and retained evidence exists.",
+        "retrieval": {
+          "observedRuns": 3,
+          "successfulRuns": 3,
+          "failedRuns": 0,
+          "latestAttemptAt": "2026-07-13T08:00:40.503Z",
+          "latestOutcome": "successful",
+          "latestFetched": 10,
+          "latestYield": 10,
+          "latestInserted": 0,
+          "latestSkippedDuplicate": 10,
+          "latestUnmatchedCountry": 3
+        },
+        "evidence": {
+          "retainedRows": 27,
+          "lastDataAt": "2026-07-10T08:00:16.256Z",
+          "languages": ["und"],
+          "observedJurisdictions": 14,
+          "jurisdictionIso3s": [
+            "AFG",
+            "AUS",
+            "BHS",
+            "BOL",
+            "CHN",
+            "IND",
+            "IRN",
+            "LAO",
+            "MYS",
+            "NPL",
+            "NZL",
+            "PAK",
+            "SGP",
+            "THA"
+          ],
+          "unresolvedJurisdictionRows": 12
+        },
+        "rights": [
+          {
+            "sourceId": "civicus_monitor",
+            "licenseId": "PUBLISHER-TERMS-PENDING:open-share-alike",
+            "termsUrl": "https://monitor.civicus.org/RSSFeed.xml",
+            "reviewStatus": "pending",
+            "publicExport": "pending-review",
+            "redistributionPosture": "open-share-alike",
+            "restrictions": [
+              "Source-specific terms have not completed DAT-003 verification",
+              "Bulk export remains blocked until the terms record is verified"
+            ]
+          }
+        ],
+        "activation": "Default CIVICUS Monitor RSS feed.",
+        "blindSpots": [
+          "RSS selection and publisher geography do not provide a country-complete sampling frame."
+        ]
+      },
+      {
+        "feedId": "gdelt",
+        "connectorId": "gdelt",
+        "sourceIds": ["gdelt"],
+        "role": "news",
+        "state": "degraded",
+        "stateReason": "The latest observed connector retrieval failed.",
+        "retrieval": {
+          "observedRuns": 3,
+          "successfulRuns": 1,
+          "failedRuns": 2,
+          "latestAttemptAt": "2026-07-13T08:00:40.503Z",
+          "latestOutcome": "failed",
+          "latestFetched": 0,
+          "latestYield": 0,
+          "latestInserted": 0,
+          "latestSkippedDuplicate": 0,
+          "latestUnmatchedCountry": 0
+        },
+        "evidence": {
+          "retainedRows": 1306,
+          "lastDataAt": "2026-07-11T16:45:00.899Z",
+          "languages": [
+            "ar",
+            "de",
+            "en",
+            "es",
+            "fr",
+            "id",
+            "it",
+            "pt",
+            "ru",
+            "und",
+            "zh"
+          ],
+          "observedJurisdictions": 90,
+          "jurisdictionIso3s": [
+            "ALB",
+            "ARG",
+            "ARM",
+            "AUS",
+            "AUT",
+            "AZE",
+            "BEL",
+            "BGD",
+            "BGR",
+            "BHR",
+            "BRA",
+            "CAN",
+            "CHE",
+            "CHL",
+            "CHN",
+            "COL",
+            "CUB",
+            "CYP",
+            "CZE",
+            "DEU",
+            "DNK",
+            "DZA",
+            "ECU",
+            "EGY",
+            "ESP",
+            "FIN",
+            "FRA",
+            "GBR",
+            "GHA",
+            "GRC",
+            "GTM",
+            "HRV",
+            "HUN",
+            "IDN",
+            "IND",
+            "IRL",
+            "IRN",
+            "ISR",
+            "ITA",
+            "JAM",
+            "JOR",
+            "JPN",
+            "KAZ",
+            "KEN",
+            "KOR",
+            "LBN",
+            "LBY",
+            "LKA",
+            "LTU",
+            "LVA",
+            "MAR",
+            "MDA",
+            "MEX",
+            "MKD",
+            "MUS",
+            "MYS",
+            "NGA",
+            "NOR",
+            "NPL",
+            "NZL",
+            "PAK",
+            "PAN",
+            "PER",
+            "PHL",
+            "PNG",
+            "POL",
+            "PRT",
+            "PRY",
+            "QAT",
+            "ROU",
+            "RUS",
+            "SAU",
+            "SDN",
+            "SGP",
+            "SRB",
+            "SVN",
+            "SWE",
+            "THA",
+            "TUN",
+            "TUR",
+            "TWN",
+            "UKR",
+            "URY",
+            "USA",
+            "VEN",
+            "VNM",
+            "XKS",
+            "YEM",
+            "ZAF",
+            "ZWE"
+          ],
+          "unresolvedJurisdictionRows": 124
+        },
+        "rights": [
+          {
+            "sourceId": "gdelt",
+            "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+            "termsUrl": "https://api.gdeltproject.org/api/v2/doc/doc",
+            "reviewStatus": "pending",
+            "publicExport": "pending-review",
+            "redistributionPosture": "open-with-attribution",
+            "restrictions": [
+              "Source-specific terms have not completed DAT-003 verification",
+              "Bulk export remains blocked until the terms record is verified"
+            ]
+          }
+        ],
+        "activation": "Default GDELT document API query with best-effort article enrichment.",
+        "blindSpots": [
+          "Query terms, GDELT indexing, publisher access, paywalls, language, and enrichment failures constrain recall."
+        ]
+      },
+      {
+        "feedId": "hrw",
+        "connectorId": "hrw",
+        "sourceIds": ["hrw"],
+        "role": "specialist",
+        "state": "operating",
+        "stateReason": "The latest connector attempt succeeded and retained evidence exists.",
+        "retrieval": {
+          "observedRuns": 3,
+          "successfulRuns": 3,
+          "failedRuns": 0,
+          "latestAttemptAt": "2026-07-13T08:00:40.503Z",
+          "latestOutcome": "successful",
+          "latestFetched": 20,
+          "latestYield": 20,
+          "latestInserted": 2,
+          "latestSkippedDuplicate": 18,
+          "latestUnmatchedCountry": 6
+        },
+        "evidence": {
+          "retainedRows": 109,
+          "lastDataAt": "2026-07-13T08:00:40.653Z",
+          "languages": ["und"],
+          "observedJurisdictions": 44,
+          "jurisdictionIso3s": [
+            "AFG",
+            "ARG",
+            "AUS",
+            "AZE",
+            "BFA",
+            "BGD",
+            "CAF",
+            "CAN",
+            "CHN",
+            "DEU",
+            "ECU",
+            "EGY",
+            "ETH",
+            "FRA",
+            "GEO",
+            "HUN",
+            "IDN",
+            "IND",
+            "ISR",
+            "JOR",
+            "JPN",
+            "KAZ",
+            "KHM",
+            "LBN",
+            "LBY",
+            "MLI",
+            "MMR",
+            "MWI",
+            "NER",
+            "NPL",
+            "PHL",
+            "SAU",
+            "SDN",
+            "SWE",
+            "THA",
+            "TJK",
+            "TUN",
+            "TUR",
+            "UGA",
+            "UKR",
+            "UZB",
+            "VNM",
+            "ZMB",
+            "ZWE"
+          ],
+          "unresolvedJurisdictionRows": 38
+        },
+        "rights": [
+          {
+            "sourceId": "hrw",
+            "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
+            "termsUrl": "https://www.hrw.org/rss/news",
+            "reviewStatus": "pending",
+            "publicExport": "blocked",
+            "redistributionPosture": "restricted-no-redistribution",
+            "restrictions": [
+              "Source-specific terms have not completed DAT-003 verification",
+              "Bulk export remains blocked until the terms record is verified"
+            ]
+          }
+        ],
+        "activation": "Default Human Rights Watch RSS feed.",
+        "blindSpots": [
+          "RSS selection and publisher cadence do not provide a complete Human Rights Watch corpus."
+        ]
+      },
+      {
+        "feedId": "ipu",
+        "connectorId": "ipu",
+        "sourceIds": ["ipu_parline"],
+        "role": "specialist",
+        "state": "inactive",
+        "stateReason": "Scheduled elections-endpoint scaffold; no daily parliamentary-actions feed exists.",
+        "retrieval": {
+          "observedRuns": 0,
+          "successfulRuns": 0,
+          "failedRuns": 0,
+          "latestAttemptAt": null,
+          "latestOutcome": "not_observed",
+          "latestFetched": null,
+          "latestYield": null,
+          "latestInserted": null,
+          "latestSkippedDuplicate": null,
+          "latestUnmatchedCountry": null
+        },
+        "evidence": {
+          "retainedRows": 0,
+          "lastDataAt": null,
+          "languages": [],
+          "observedJurisdictions": 0,
+          "jurisdictionIso3s": [],
+          "unresolvedJurisdictionRows": 0
+        },
+        "rights": [
+          {
+            "sourceId": "ipu_parline",
+            "licenseId": "PUBLISHER-TERMS-PENDING:non-commercial",
+            "termsUrl": "https://api.data.ipu.org/v1",
+            "reviewStatus": "pending",
+            "publicExport": "non-commercial-only",
+            "redistributionPosture": "non-commercial",
+            "restrictions": [
+              "Source-specific terms have not completed DAT-003 verification",
+              "Bulk export remains blocked until the terms record is verified"
+            ]
+          }
+        ],
+        "activation": "Scheduled elections-endpoint scaffold; no daily parliamentary-actions feed exists.",
+        "blindSpots": ["Not operating as a daily parliamentary-actions feed."]
+      },
+      {
+        "feedId": "reuters",
+        "connectorId": "reuters_ap",
+        "sourceIds": ["reuters_wire"],
+        "role": "news",
+        "state": "inactive",
+        "stateReason": "No working default feed; requires an explicitly configured feed URL.",
+        "retrieval": {
+          "observedRuns": 0,
+          "successfulRuns": 0,
+          "failedRuns": 0,
+          "latestAttemptAt": null,
+          "latestOutcome": "not_observed",
+          "latestFetched": null,
+          "latestYield": null,
+          "latestInserted": null,
+          "latestSkippedDuplicate": null,
+          "latestUnmatchedCountry": null
+        },
+        "evidence": {
+          "retainedRows": 0,
+          "lastDataAt": null,
+          "languages": [],
+          "observedJurisdictions": 0,
+          "jurisdictionIso3s": [],
+          "unresolvedJurisdictionRows": 0
+        },
+        "rights": [
+          {
+            "sourceId": "reuters_wire",
+            "licenseId": "unregistered",
+            "termsUrl": null,
+            "reviewStatus": "missing",
+            "publicExport": "blocked",
+            "redistributionPosture": "unregistered",
+            "restrictions": [
+              "No source-input and rights contract is registered."
+            ]
+          }
+        ],
+        "activation": "No working default feed; requires an explicitly configured feed URL.",
+        "blindSpots": [
+          "Not operating; no Reuters Pulse retrieval coverage is available."
+        ]
+      },
+      {
+        "feedId": "rsf",
+        "connectorId": "rsf",
+        "sourceIds": ["rsf_alerts"],
+        "role": "specialist",
+        "state": "inactive",
+        "stateReason": "No public feed is configured; requires an approved ingestion surface.",
+        "retrieval": {
+          "observedRuns": 0,
+          "successfulRuns": 0,
+          "failedRuns": 0,
+          "latestAttemptAt": null,
+          "latestOutcome": "not_observed",
+          "latestFetched": null,
+          "latestYield": null,
+          "latestInserted": null,
+          "latestSkippedDuplicate": null,
+          "latestUnmatchedCountry": null
+        },
+        "evidence": {
+          "retainedRows": 0,
+          "lastDataAt": null,
+          "languages": [],
+          "observedJurisdictions": 0,
+          "jurisdictionIso3s": [],
+          "unresolvedJurisdictionRows": 0
+        },
+        "rights": [
+          {
+            "sourceId": "rsf_alerts",
+            "licenseId": "unregistered",
+            "termsUrl": null,
+            "reviewStatus": "missing",
+            "publicExport": "blocked",
+            "redistributionPosture": "unregistered",
+            "restrictions": [
+              "No source-input and rights contract is registered."
+            ]
+          }
+        ],
+        "activation": "No public feed is configured; requires an approved ingestion surface.",
+        "blindSpots": [
+          "Not operating; no RSF Pulse retrieval coverage is available."
+        ]
+      },
+      {
+        "feedId": "vdem",
+        "connectorId": "vdem_pulse",
+        "sourceIds": [],
+        "role": "specialist",
+        "state": "inactive",
+        "stateReason": "Placeholder returns no rows because V-Dem has no daily Pulse feed.",
+        "retrieval": {
+          "observedRuns": 0,
+          "successfulRuns": 0,
+          "failedRuns": 0,
+          "latestAttemptAt": null,
+          "latestOutcome": "not_observed",
+          "latestFetched": null,
+          "latestYield": null,
+          "latestInserted": null,
+          "latestSkippedDuplicate": null,
+          "latestUnmatchedCountry": null
+        },
+        "evidence": {
+          "retainedRows": 0,
+          "lastDataAt": null,
+          "languages": [],
+          "observedJurisdictions": 0,
+          "jurisdictionIso3s": [],
+          "unresolvedJurisdictionRows": 0
+        },
+        "rights": [],
+        "activation": "Placeholder returns no rows because V-Dem has no daily Pulse feed.",
+        "blindSpots": [
+          "Placeholder only; it supplies no event retrieval coverage."
+        ]
+      }
+    ],
+    "summary": {
+      "operating": 3,
+      "degraded": 1,
+      "inactive": 6
+    }
+  },
+  "semanticSha256": "7a4dd4807e22dc9394809e68b06b58cc37f9d914c14c33081ed32ca2303559a3"
+}

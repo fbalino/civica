@@ -12,6 +12,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/editorial/Button";
+import { reportClientBoundaryError } from "@/lib/platform/error-monitoring-client";
 
 export default function Error({
   error,
@@ -21,8 +22,9 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Surface to the logs/monitoring pipeline with the render digest.
-    console.error("[route-error]", error.digest ?? "", error.message);
+    // Never serialize an error message, stack, or digest from the browser.
+    // The monitor retains only the route template and closed boundary code.
+    reportClientBoundaryError("route_boundary");
   }, [error]);
 
   return (

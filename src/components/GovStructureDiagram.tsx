@@ -377,7 +377,7 @@ function BodyNodeItem({
               )}
             </>
           ) : (
-            <div className="ghc-node-holder" style={{ fontSize: 13, color: "var(--color-text-40)" }}>
+            <div className="ghc-node-holder" style={{ fontSize: "var(--text-13)", color: "var(--color-text-40)" }}>
               {node.body.bodyType}
             </div>
           )}

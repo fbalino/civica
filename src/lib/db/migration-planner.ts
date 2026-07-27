@@ -13,8 +13,8 @@ export function affectedRelations(entry: MigrationArtifact, source: string): str
   if (declared) return [...names].sort();
   if (entry.path.endsWith(".sql")) {
     const sqlOnly = source.replace(/--[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "").replace(/'(?:''|[^'])*'/g, "''");
-    const keywords = new Set(["all", "delete", "update", "cascade", "restrict", "conflict", "on", "set", "select", "where", "values", "when", "current_date", "no", "public"]);
-    for (const match of sqlOnly.matchAll(/(?:TABLE|INTO|UPDATE|FROM|JOIN|REFERENCES|ON)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?["']?([a-z][a-z0-9_]*)["']?/gi)) if (!keywords.has(match[1].toLowerCase())) names.add(match[1]);
+    const keywords = new Set(["all", "delete", "update", "or", "cascade", "restrict", "conflict", "on", "set", "select", "where", "values", "when", "current_date", "no", "public"]);
+    for (const match of sqlOnly.matchAll(/\b(?:TABLE|INTO|UPDATE|FROM|JOIN|REFERENCES|ON)\b\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?["']?([a-z][a-z0-9_]*)["']?/gi)) if (!keywords.has(match[1].toLowerCase())) names.add(match[1]);
   } else {
     for (const [exportName, value] of Object.entries(schema)) {
       if (!new RegExp(`\\b${exportName}\\b`).test(source)) continue;

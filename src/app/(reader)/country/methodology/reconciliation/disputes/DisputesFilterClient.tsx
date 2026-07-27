@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Pill } from "@/components/editorial/Pill";
 import { SegmentedControl } from "@/components/editorial/SegmentedControl";
 import { SingleSelectMenu } from "@/components/editorial/SingleSelectMenu";
 import {
   PUBLIC_DISPUTE_STATUS_BUCKETS,
   PUBLIC_DISPUTE_STATUS_LABELS,
-  groupDisputesByFact,
   type PublicDisputeStatusBucket,
   type PublicDisputeRow,
   type PublicAuditLogRow,
   type AgeBucket,
   type DisputeSortKey,
   type DisputeFilterDistributions,
+  type DisputeFactGroup,
 } from "@/lib/db/queries-data-disputes";
 import {
   SEVERITY_BUCKETS,
@@ -23,6 +24,11 @@ import {
   type SeverityScore,
 } from "@/lib/factbook/reconcile/dispute-severity";
 import { loadAuditLog } from "./actions";
+import {
+  DISPUTES_PAGE_SIZE,
+  publicDisputesSearch,
+  type PublicDisputesPageQuery,
+} from "./query";
 
 const KIND_LABELS: Record<string, string> = {
   material_error: "Material error",
@@ -73,8 +79,6 @@ const SORT_LABELS: Record<DisputeSortKey, string> = {
   age: "Newest",
   oldest: "Oldest",
 };
-
-const PAGE_SIZE = 50;
 
 /** Which dropdown is currently open — enforces "one menu open at a time". */
 type OpenMenu =
@@ -132,38 +136,34 @@ function severityBadgeVariant(score: SeverityScore) {
   return SEVERITY_VARIANT[score.bucket];
 }
 
-function ageBucketOf(createdAtIso: string): AgeBucket {
-  const ageDays =
-    (Date.now() - new Date(createdAtIso).getTime()) / (1000 * 60 * 60 * 24);
-  if (ageDays <= 7) return "0-7d";
-  if (ageDays <= 30) return "7-30d";
-  if (ageDays <= 90) return "30-90d";
-  return "90d+";
-}
-
 interface Props {
-  disputes: PublicDisputeRow[];
+  groups: DisputeFactGroup<PublicDisputeRow>[];
   distributions: DisputeFilterDistributions;
   totalAll: number;
+  totalMatching: number;
+  totalGroups: number;
+  query: PublicDisputesPageQuery;
 }
 
 export function DisputesFilterClient({
-  disputes,
+  groups,
   distributions,
   totalAll,
+  totalMatching,
+  totalGroups,
+  query,
 }: Props) {
-  const [statusBucket, setStatusBucket] = useState<
-    PublicDisputeStatusBucket | "all"
-  >("all");
-  const [kind, setKind] = useState<string>("");
-  const [group, setGroup] = useState<string>("");
-  const [factKey, setFactKey] = useState<string>("");
-  const [sourcePair, setSourcePair] = useState<string>("");
-  const [severityBucket, setSeverityBucket] = useState<SeverityBucket | "">("");
-  const [ageBucket, setAgeBucket] = useState<AgeBucket | "">("");
-  const [sort, setSort] = useState<DisputeSortKey>("severity");
+  const pathname = usePathname();
+  const router = useRouter();
+  const statusBucket = query.status ?? "all";
+  const kind = query.kind ?? "";
+  const group = query.group ?? "";
+  const factKey = query.factKey ?? "";
+  const sourcePair = query.sourcePair ?? "";
+  const severityBucket = query.severity ?? "";
+  const ageBucket = query.age ?? "";
+  const sort = query.sort;
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
-  const [page, setPage] = useState(1);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [auditCache, setAuditCache] = useState<
     Record<string, PublicAuditLogRow[] | "loading">
@@ -171,7 +171,14 @@ export function DisputesFilterClient({
   const [, startTransition] = useTransition();
   const toolbarRef = useRef<HTMLDivElement>(null);
 
-  const resetPage = () => setPage(1);
+  function navigate(next: Partial<PublicDisputesPageQuery>) {
+    const nextQuery: PublicDisputesPageQuery = {
+      ...query,
+      ...next,
+      page: next.page ?? 1,
+    };
+    router.push(`${pathname}${publicDisputesSearch(nextQuery)}`);
+  }
 
   // Outside-click / Escape closes any open dropdown (SingleSelectMenu is
   // caller-controlled, so the parent owns dismissal).
@@ -206,72 +213,17 @@ export function DisputesFilterClient({
     Boolean(ageBucket);
 
   const resetAll = () => {
-    setStatusBucket("all");
-    setKind("");
-    setGroup("");
-    setFactKey("");
-    setSourcePair("");
-    setSeverityBucket("");
-    setAgeBucket("");
-    resetPage();
+    navigate({
+      status: undefined,
+      kind: undefined,
+      group: undefined,
+      factKey: undefined,
+      sourcePair: undefined,
+      severity: undefined,
+      age: undefined,
+    });
   };
-
-  // ── Filter + sort the flat pairwise rows, THEN consolidate into one entry
-  //    per (jurisdiction, fact_key). The three near-identical pairwise
-  //    disputes for one fact collapse into a single expandable group.
-  const groups = useMemo(() => {
-    const matched = disputes.filter((d) => {
-      if (statusBucket !== "all" && d.statusBucket !== statusBucket)
-        return false;
-      if (kind && d.disputeKind !== kind) return false;
-      if (group && d.factGroup !== group) return false;
-      if (factKey && d.factKey !== factKey) return false;
-      if (sourcePair) {
-        const [pa, pb] = sourcePair.split("|");
-        if (pa && d.factA?.sourceId !== pa) return false;
-        if (pb && d.factB?.sourceId !== pb) return false;
-      }
-      if (severityBucket && d.severity.bucket !== severityBucket) return false;
-      if (ageBucket && ageBucketOf(d.createdAt) !== ageBucket) return false;
-      return true;
-    });
-
-    matched.sort((a, b) => {
-      if (sort === "severity") {
-        const av = a.severity.severity ?? -Infinity;
-        const bv = b.severity.severity ?? -Infinity;
-        if (bv !== av) return bv - av;
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      }
-      if (sort === "age") {
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      }
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    });
-
-    return groupDisputesByFact(matched);
-  }, [
-    disputes,
-    statusBucket,
-    kind,
-    group,
-    factKey,
-    sourcePair,
-    severityBucket,
-    ageBucket,
-    sort,
-  ]);
-
-  const totalGroups = groups.length;
-  const totalMatchingRows = groups.reduce((n, g) => n + g.members.length, 0);
-  const totalPages = Math.max(1, Math.ceil(totalGroups / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const offset = (safePage - 1) * PAGE_SIZE;
-  const slice = groups.slice(offset, offset + PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(totalGroups / DISPUTES_PAGE_SIZE));
 
   const handleExpand = (disputeId: string) => {
     if (expandedId === disputeId) {
@@ -333,8 +285,7 @@ export function DisputesFilterClient({
           ariaLabel="Filter by status"
           value={statusBucket}
           onChange={(v) => {
-            setStatusBucket(v);
-            resetPage();
+            navigate({ status: v === "all" ? undefined : v });
           }}
           options={[
             { value: "all", label: "All" },
@@ -354,8 +305,7 @@ export function DisputesFilterClient({
             open={openMenu === "sort"}
             onOpenChange={(o) => setOpenMenu(o ? "sort" : null)}
             onSelect={(v) => {
-              setSort(v as DisputeSortKey);
-              resetPage();
+              navigate({ sort: v as DisputeSortKey });
             }}
             minWidth={130}
           />
@@ -367,8 +317,7 @@ export function DisputesFilterClient({
             open={openMenu === "kind"}
             onOpenChange={(o) => setOpenMenu(o ? "kind" : null)}
             onSelect={(v) => {
-              setKind(v);
-              resetPage();
+              navigate({ kind: v || undefined });
             }}
             minWidth={150}
           />
@@ -380,8 +329,7 @@ export function DisputesFilterClient({
             open={openMenu === "factKey"}
             onOpenChange={(o) => setOpenMenu(o ? "factKey" : null)}
             onSelect={(v) => {
-              setFactKey(v);
-              resetPage();
+              navigate({ factKey: v || undefined });
             }}
             minWidth={170}
           />
@@ -393,8 +341,7 @@ export function DisputesFilterClient({
             open={openMenu === "severity"}
             onOpenChange={(o) => setOpenMenu(o ? "severity" : null)}
             onSelect={(v) => {
-              setSeverityBucket(v as SeverityBucket | "");
-              resetPage();
+              navigate({ severity: (v as SeverityBucket) || undefined });
             }}
             minWidth={140}
           />
@@ -406,8 +353,7 @@ export function DisputesFilterClient({
             open={openMenu === "group"}
             onOpenChange={(o) => setOpenMenu(o ? "group" : null)}
             onSelect={(v) => {
-              setGroup(v);
-              resetPage();
+              navigate({ group: v || undefined });
             }}
             minWidth={120}
           />
@@ -419,8 +365,7 @@ export function DisputesFilterClient({
             open={openMenu === "sourcePair"}
             onOpenChange={(o) => setOpenMenu(o ? "sourcePair" : null)}
             onSelect={(v) => {
-              setSourcePair(v);
-              resetPage();
+              navigate({ sourcePair: v || undefined });
             }}
             minWidth={180}
           />
@@ -432,8 +377,7 @@ export function DisputesFilterClient({
             open={openMenu === "age"}
             onOpenChange={(o) => setOpenMenu(o ? "age" : null)}
             onSelect={(v) => {
-              setAgeBucket(v as AgeBucket | "");
-              resetPage();
+              navigate({ age: (v as AgeBucket) || undefined });
             }}
             minWidth={120}
           />
@@ -454,18 +398,18 @@ export function DisputesFilterClient({
         <span aria-hidden>·</span>
         <span>
           {totalGroups} {totalGroups === 1 ? "fact" : "facts"} in conflict
-          {totalMatchingRows !== totalGroups
-            ? ` (${totalMatchingRows} source pairs)`
+          {totalMatching !== totalGroups
+            ? ` (${totalMatching} source pairs)`
             : ""}
           {hasActiveFilter ? " · filtered" : ""}
         </span>
         <span aria-hidden>·</span>
         <span>
-          Page {safePage} of {totalPages}
+          Page {query.page} of {totalPages}
         </span>
       </p>
 
-      {slice.length === 0 ? (
+      {groups.length === 0 ? (
         <p className="editorial-empty">
           {totalAll === 0
             ? "No disputes recorded yet. The resolver runs after each fact-sync; new disputes will appear here as upstream sources disagree."
@@ -473,7 +417,7 @@ export function DisputesFilterClient({
         </p>
       ) : (
         <div style={{ marginBottom: "var(--space-6)" }}>
-          {slice.map((factGroup) => (
+          {groups.map((factGroup) => (
             <DisputeGroupCard
               key={factGroup.key}
               factGroup={factGroup}
@@ -485,27 +429,27 @@ export function DisputesFilterClient({
         </div>
       )}
 
-      {totalGroups > PAGE_SIZE ? (
+      {totalGroups > DISPUTES_PAGE_SIZE ? (
         <nav className="editorial-pagination" aria-label="Pagination">
-          {safePage > 1 ? (
+          {query.page > 1 ? (
             <button
               type="button"
-              onClick={() => setPage(safePage - 1)}
+              onClick={() => navigate({ page: query.page - 1 })}
               className="editorial-pagination-link"
             >
-              ← Page {safePage - 1}
+              ← Page {query.page - 1}
             </button>
           ) : (
             <span>—</span>
           )}
-          <span>Page {safePage}</span>
-          {offset + slice.length < totalGroups ? (
+          <span>Page {query.page}</span>
+          {query.page * DISPUTES_PAGE_SIZE < totalGroups ? (
             <button
               type="button"
-              onClick={() => setPage(safePage + 1)}
+              onClick={() => navigate({ page: query.page + 1 })}
               className="editorial-pagination-link"
             >
-              Page {safePage + 1} →
+              Page {query.page + 1} →
             </button>
           ) : (
             <span>—</span>
@@ -529,7 +473,7 @@ function DisputeGroupCard({
   auditCache,
   onToggleAudit,
 }: {
-  factGroup: ReturnType<typeof groupDisputesByFact<PublicDisputeRow>>[number];
+  factGroup: DisputeFactGroup<PublicDisputeRow>;
   expandedId: string | null;
   auditCache: Record<string, PublicAuditLogRow[] | "loading">;
   onToggleAudit: (id: string) => void;

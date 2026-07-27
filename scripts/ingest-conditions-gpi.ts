@@ -1,107 +1,43 @@
-/**
- * Civica Conditions — Peace & Security dimension
- *
- * Copies GPI rows from ci_dimension_scores (where dimension='stability_security')
- * into civica_conditions_scores with dimension='peace_security' (renamed per spec §2.8).
- *
- * Normalization per spec §2.3 (GPI is inverted — 1.0 = most peaceful, 5.0 = least):
- *   normalized_score = ((5.0 − raw) / 4.0) × 100
- *
- * Source: Institute for Economics & Peace — Global Peace Index (source_id = 'global_peace_index')
- * Dimension: peace_security
- * Quarter convention: ${dataset_year}-Q4
- */
+/** Civica Conditions — Peace & Security component ledger. */
 
 import { config } from "dotenv";
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 import { db } from "../src/lib/db";
-import { ciDimensionScores } from "../src/lib/db/schema";
-import { and, eq } from "drizzle-orm";
-import { writeConditionScores, type ConditionScoreInput } from "../src/lib/conditions/ingest";
+import { CURRENT_CONDITIONS_METHODOLOGY_VERSION } from "../src/lib/conditions/contract";
+import { writeConditionsRelease } from "../src/lib/conditions/ingest";
+import { prepareGpiConditions } from "../src/lib/conditions/production-workflow";
 
-const METHODOLOGY_VERSION = "beta";
-const SOURCE_ID = "global_peace_index";
-// GPI is stored under stability_security in the CI pipeline
-const CI_DIMENSION = "stability_security";
-const CONDITIONS_DIMENSION = "peace_security";
 const DRY_RUN = process.argv.includes("--dry-run");
-
-function normalizeGpi(raw: number): number {
-  // GPI scale 1–5, inverted: 1.0 = most peaceful (best), 5.0 = least peaceful (worst)
-  // spec §2.3: ((5.0 − raw) / 4.0) × 100
-  const score = ((5.0 - raw) / 4.0) * 100;
-  return Math.min(100, Math.max(0, score));
-}
+const RELEASE_ID = process.argv.find((arg) => arg.startsWith("--release-id="))?.slice(
+  "--release-id=".length,
+);
 
 async function main() {
-  console.log("=== Civica Conditions — Peace & Security (GPI) ===\n");
-
-  // Pull all GPI rows from ci_dimension_scores
-  const ciRows = await db
-    .select()
-    .from(ciDimensionScores)
-    .where(
-      and(
-        eq(ciDimensionScores.dimension, CI_DIMENSION),
-        eq(ciDimensionScores.sourceId, SOURCE_ID)
-      )
+  console.log("=== Civica Conditions — Peace & Security component ledger ===\n");
+  if (!RELEASE_ID) {
+    throw new Error("Pass a stable --release-id=conditions-*-vN; releases are never implicit");
+  }
+  if (!DRY_RUN) {
+    throw new Error(
+      "Single-dimension Conditions writes are disabled; use ingest:conditions:all for one canonical release",
     );
-
-  if (ciRows.length === 0) {
-    console.log("No GPI rows found in ci_dimension_scores. Run ingest:ci first.");
-    process.exit(1);
   }
-
-  console.log(`Found ${ciRows.length} GPI rows in ci_dimension_scores.`);
-
-  let upserted = 0;
-  const output: ConditionScoreInput[] = [];
-
-  for (const row of ciRows) {
-    const rawValue = row.rawValue ?? null;
-
-    // Apply the fixed-bound inversion formula
-    const normalizedScore = rawValue !== null
-      ? normalizeGpi(rawValue)
-      : row.normalizedScore; // fallback if raw value wasn't stored
-
-    const quarter = row.quarter;
-    const datasetYear = parseInt(quarter.split("-")[0], 10);
-
-    output.push({
-        jurisdictionId: row.jurisdictionId,
-        dimension: CONDITIONS_DIMENSION,
-        quarter,
-        normalizedScore,
-        rawValue,
-        sourceId: SOURCE_ID,
-        datasetYear,
-        methodologyVersion: METHODOLOGY_VERSION,
-        indicatorId: row.indicatorId,
-        upstreamRelease: row.upstreamRelease,
-        artifactHash: row.artifactHash,
-        artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
-        temporalCoverage: row.temporalCoverage,
-        licenseUrl: row.licenseUrl,
-        transformationId: "conditions-gpi-fixed-bound/v1",
-        substitutionReason: null,
-        methodVersion: METHODOLOGY_VERSION,
-      });
-
-    upserted++;
-  }
-
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually upserted rows (AGENTS.md provenance invariant). The
-  // helper applies the same `upserted > 0` gate internally.
-  await writeConditionScores(db, output, { dryRun: DRY_RUN });
-
-  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${upserted} rows ${DRY_RUN ? "with zero writes" : "upserted into civica_conditions_scores"}.`);
-  console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);
+  const prepared = await prepareGpiConditions(db, RELEASE_ID);
+  const summary = await writeConditionsRelease(db, {
+    releaseId: RELEASE_ID,
+    methodologyVersion: CURRENT_CONDITIONS_METHODOLOGY_VERSION,
+    referenceSets: prepared.referenceSets,
+  }, prepared.rows, { dryRun: DRY_RUN });
+  console.log(
+    `${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${summary.proposed} calculations, ${summary.written} decomposable scores, and ${DRY_RUN ? prepared.rows.length : summary.componentsWritten} component rows.`,
+  );
+  console.log(
+    `Dimension: peace_security | Source: global_peace_index | Release: ${RELEASE_ID} | Version: ${CURRENT_CONDITIONS_METHODOLOGY_VERSION}`,
+  );
 }
 
-main().catch((err) => {
-  console.error("Ingest failed:", err);
+main().catch((error) => {
+  console.error("Ingest failed:", error);
   process.exit(1);
 });

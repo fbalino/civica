@@ -3,7 +3,7 @@ import { join } from "node:path";
 import Link from "next/link";
 import { getAllReferenceJurisdictions } from "@/lib/db/queries";
 import {
-  readCachedFieldFromRow,
+  readFreshCachedFieldFromRow,
   getCanonicalFactsForJurisdictions,
 } from "@/lib/factbook/reconcile/api";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -14,6 +14,8 @@ import {
   HeroRevealItem,
 } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import { Banner } from "@/components/editorial/Banner";
+import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 
 const countryEngravingDir = join(process.cwd(), "public", "engravings", "countries");
 
@@ -31,12 +33,7 @@ function SpotEngraving({
   darkSrc: string;
 }) {
   return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="theme-engraving-light" src={src} alt="" aria-hidden="true" />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="theme-engraving-dark" src={darkSrc} alt="" aria-hidden="true" />
-    </>
+    <ThemedDecorativeImage src={src} darkSrc={darkSrc} />
   );
 }
 
@@ -58,19 +55,28 @@ function govLabel(row: FeaturedCountryRow): string | null {
 }
 
 /** Build the (real-data-only) stat columns for a featured CountryCard. */
-function buildCardStats(row: FeaturedCountryRow): CountryCardStat[] {
+function buildCardStats(
+  row: FeaturedCountryRow,
+  cacheReadAt: Date,
+): CountryCardStat[] {
   const stats: CountryCardStat[] = [];
   const gov = govLabel(row);
   if (gov) stats.push({ label: "Government type", value: gov });
-  const pop = formatPopulation(row.population);
+  const pop = formatPopulation(
+    readFreshCachedFieldFromRow(row, "population_total", {
+      now: cacheReadAt,
+    }).value,
+  );
   if (pop) stats.push({ label: "Population", value: pop });
   return stats;
 }
 
 export async function HomeGrid() {
+  const cacheReadAt = new Date();
   // Country list for the hero search (graceful empty on DB error).
   let countries: Parameters<typeof GlobalSearch>[0]["countries"] = [];
   let allJurisdictions: Awaited<ReturnType<typeof getAllReferenceJurisdictions>> = [];
+  let catalogAvailable = true;
   try {
     allJurisdictions = await getAllReferenceJurisdictions();
     const all = allJurisdictions;
@@ -78,10 +84,14 @@ export async function HomeGrid() {
       slug: c.slug,
       name: c.name,
       iso2: c.iso2,
-      capital: readCachedFieldFromRow(c, "capital"),
+      capital: readFreshCachedFieldFromRow(c, "capital", {
+        now: cacheReadAt,
+      }).value,
       status: c.jurisdictionStatus,
     }));
-  } catch {}
+  } catch {
+    catalogAvailable = false;
+  }
 
   // Featured cards use the atlas jurisdiction spine, never a derived ranking.
   const findRow = (slug: string, iso3: string) =>
@@ -136,6 +146,12 @@ export async function HomeGrid() {
             <HeroRevealItem className="home-hero-search">
               <GlobalSearch countries={countries} />
             </HeroRevealItem>
+            {!catalogAvailable ? (
+              <Banner variant="warn">
+                The country catalog is temporarily unavailable. Civica is not
+                treating this as a zero-country atlas.
+              </Banner>
+            ) : null}
             <HeroRevealItem className="home-stats" role="group" aria-label="Coverage">
               {/* PROVENANCE_COVERAGE: home.catalog-count */}
               <div className="home-stat">
@@ -189,7 +205,7 @@ export async function HomeGrid() {
               name={japan.name}
               iso2={japan.iso2}
               incomeGroup={incomeByJur[japan.id] ?? null}
-              stats={buildCardStats(japan)}
+              stats={buildCardStats(japan, cacheReadAt)}
               iso3="jpn"
               engravingDarkSrc={japanDarkEngraving}
               href={`/country/${japan.slug}`}
@@ -232,7 +248,7 @@ export async function HomeGrid() {
               name={estonia.name}
               iso2={estonia.iso2}
               incomeGroup={incomeByJur[estonia.id] ?? null}
-              stats={buildCardStats(estonia)}
+              stats={buildCardStats(estonia, cacheReadAt)}
               iso3="est"
               engravingDarkSrc={estoniaDarkEngraving}
               href={`/country/${estonia.slug}`}

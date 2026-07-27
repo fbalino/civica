@@ -255,7 +255,7 @@ export function FactValueDot({
                   position: "fixed",
                   top: pos.top,
                   left: pos.left,
-                  zIndex: 60,
+                  zIndex: "var(--z-overlay)",
                 }}
                 onMouseEnter={cancelTimers}
                 onMouseLeave={scheduleClose}

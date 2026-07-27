@@ -1,49 +1,81 @@
 /**
  * Admin session helpers.
  *
- * Browser-friendly auth for the /admin/* routes. Access is a single
- * owner account: a username (`ADMIN_USERNAME`) plus a password whose
- * salted scrypt hash lives in `ADMIN_PASSWORD_HASH` (see
- * `src/lib/admin/password.ts`). The operator signs in once with
- * username + password; on success we set an HttpOnly cookie that proves
- * the browser completed a valid sign-in — WITHOUT storing the password
- * or its hash in the cookie.
+ * Browser-friendly auth for the /admin/* routes. Access is a single owner
+ * account: a username (`ADMIN_USERNAME`) plus a password whose salted scrypt
+ * hash lives in `ADMIN_PASSWORD_HASH` (see `src/lib/admin/password.ts`).
  *
- * Cookie format: `<nonce>.<hmac>`, where `nonce` is a random per-session
- * value and `hmac = HMAC-SHA256(ADMIN_SESSION_SECRET, nonce)`. The
- * signing key is a dedicated `ADMIN_SESSION_SECRET` — deliberately
- * separate from the password hash so the cookie's validity doesn't hinge
- * on the credential, and rotating the secret invalidates every
- * outstanding cookie. Validation recomputes the HMAC from the cookie's
- * nonce plus the server secret and constant-time compares, so a leaked
- * cookie exposes neither the secret nor the password.
+ * Cookie format: `v1.<base64url-json>.<hmac>`. The signed JSON payload carries
+ * the server-configured audit identity, issued-at time, expiry time, and a
+ * cryptographically random session ID. The HMAC covers both the outer format
+ * version and the payload. Verification checks the signature, payload schema,
+ * configured identity, issued-at boundary, fixed seven-day lifetime, expiry,
+ * and session-ID shape on every request. Otherwise-valid sessions are then
+ * denied when their domain-separated ID hash appears in the durable logout
+ * tombstone table. Browser Max-Age is only a client-side convenience; it is
+ * never the authority for session expiry.
  *
- * There is NO bearer/API-key path anymore — the /admin/* surface and its
- * mutation routes gate on this session cookie only. The reviewer display
- * name on every audit-log row is the configured `ADMIN_USERNAME` (or an
- * optional `ADMIN_DISPLAY_NAME` override), captured at sign-in time and
- * stored in a sibling HttpOnly `civica_admin_reviewer` cookie.
+ * The legacy `civica_admin_reviewer` cookie is cleared when a new session is
+ * issued and is never read. Audit identity comes only from the signed payload
+ * after it matches current server configuration, so an unsigned client cookie
+ * cannot alter an audit actor.
  */
 
-import { cookies } from "next/headers";
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { cookies } from "next/headers";
+import {
+  databaseAdminSessionRevocationStore,
+  isAdminSessionRevoked,
+  type AdminSessionRevocationStore,
+} from "./session-revocation-store";
 
 export const ADMIN_SESSION_COOKIE = "civica_admin_session";
+/** Retained only so existing browsers can have the obsolete cookie cleared. */
 export const ADMIN_REVIEWER_COOKIE = "civica_admin_reviewer";
-const SESSION_TTL_DAYS = 7;
+export const ADMIN_SESSION_VERSION = "civica-admin-session/v1" as const;
+export const ADMIN_SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
+
+const COOKIE_FORMAT_VERSION = "v1";
+const MAX_CLOCK_SKEW_SECONDS = 60;
+const SESSION_ID_PATTERN = /^[0-9a-f]{36}$/;
+const PAYLOAD_KEYS = [
+  "expiresAt",
+  "issuedAt",
+  "reviewerId",
+  "sessionId",
+  "version",
+] as const;
 
 export interface AdminSession {
+  version: typeof ADMIN_SESSION_VERSION;
   reviewerId: string;
+  /** Unix timestamp in seconds. */
+  issuedAt: number;
+  /** Unix timestamp in seconds. */
+  expiresAt: number;
+  sessionId: string;
 }
 
-/** Sign a nonce with the session secret. The secret never leaves the
- *  server — only this keyed HMAC of the nonce is stored in the cookie. */
-function signNonce(secret: string, nonce: string): string {
-  return createHmac("sha256", secret).update(nonce).digest("hex");
+export interface SessionCookieVerification {
+  valid: boolean;
+  session: AdminSession | null;
 }
 
-/** Constant-time string compare that tolerates length mismatches
- *  (timingSafeEqual throws when buffer lengths differ). */
+export interface MintedAdminSessionCookie {
+  session: AdminSession;
+  headers: Array<[string, string]>;
+}
+
+function invalidSession(): SessionCookieVerification {
+  return { valid: false, session: null };
+}
+
+/** Sign the complete versioned payload envelope with the dedicated secret. */
+function signValue(secret: string, value: string): string {
+  return createHmac("sha256", secret).update(value).digest("hex");
+}
+
+/** Constant-time string compare that tolerates length mismatches. */
 function safeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a, "utf8");
   const bufB = Buffer.from(b, "utf8");
@@ -52,139 +84,273 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 /**
- * The reviewer display name for audit-log rows. Prefers the optional
- * `ADMIN_DISPLAY_NAME`, falling back to `ADMIN_USERNAME`, then to a
- * generic "admin". Sanitised to the audit-safe shape so an odd env value
- * can't land unescaped in a log row.
+ * The server-configured reviewer identity for signed sessions and audit rows.
+ * `ADMIN_DISPLAY_NAME` is preferred, then `ADMIN_USERNAME`. Missing or wholly
+ * invalid configuration returns null; there is deliberately no hardcoded
+ * production actor such as "admin".
  */
-export function adminReviewerName(): string {
-  return sanitizeReviewerName(
-    process.env.ADMIN_DISPLAY_NAME || process.env.ADMIN_USERNAME,
-    "admin",
-  );
+export function adminReviewerName(): string | null {
+  const displayName = sanitizeReviewerName(process.env.ADMIN_DISPLAY_NAME, "");
+  if (displayName) return displayName;
+  const username = sanitizeReviewerName(process.env.ADMIN_USERNAME, "");
+  return username || null;
+}
+
+/** A session can be minted only with both a signing key and an identity. */
+export function isAdminSessionConfigured(): boolean {
+  return Boolean(process.env.ADMIN_SESSION_SECRET && adminReviewerName());
 }
 
 /**
  * Constant-time verify a submitted username against `ADMIN_USERNAME`.
- * Returns false when `ADMIN_USERNAME` is unset (fail closed). The
- * password half is checked separately via `verifyPassword`
- * (`src/lib/admin/password.ts`); a sign-in requires BOTH.
+ * Returns false when `ADMIN_USERNAME` is unset. Password verification remains
+ * a separate, timing-safe scrypt check in `src/lib/admin/password.ts`.
  */
-export function verifyAdminUsername(username: string | null | undefined): boolean {
+export function verifyAdminUsername(
+  username: string | null | undefined,
+): boolean {
   const expected = process.env.ADMIN_USERNAME;
   if (!expected) return false;
   return safeEqual((username ?? "").trim(), expected);
 }
 
 /**
- * Sanitise an operator-supplied reviewer name to a bounded, audit-safe
- * shape: keep only `[a-zA-Z0-9 _.\-]`, trim, and cap at 80 chars. Returns
- * `fallback` when the result is empty.
+ * Sanitise an operator-supplied reviewer name to a bounded, audit-safe shape:
+ * keep only `[a-zA-Z0-9 _.\-]`, trim, and cap at 80 characters.
  */
 export function sanitizeReviewerName(
   raw: string | null | undefined,
   fallback: string,
 ): string {
   return (
-    (raw ?? "").replace(/[^a-zA-Z0-9 _.\-]/g, "").trim().slice(0, 80) ||
-    fallback
+    (raw ?? "")
+      .replace(/[^a-zA-Z0-9 _.\-]/g, "")
+      .trim()
+      .slice(0, 80) || fallback
   );
 }
 
-/**
- * Result of verifying a raw session-cookie value against a server secret.
- * `valid: false` covers every rejection path (missing, malformed, or a
- * signature that doesn't match) — callers only need `reviewerId` when
- * `valid` is `true`.
- */
-export interface SessionCookieVerification {
-  valid: boolean;
-  reviewerId: string | null;
+function parsePayload(encoded: string): AdminSession | null {
+  if (
+    encoded.length === 0 ||
+    encoded.length > 2048 ||
+    !/^[A-Za-z0-9_-]+$/.test(encoded)
+  ) {
+    return null;
+  }
+
+  let decoded: Buffer;
+  let value: unknown;
+  try {
+    decoded = Buffer.from(encoded, "base64url");
+    // Buffer decoding is deliberately permissive; require canonical encoding.
+    if (decoded.toString("base64url") !== encoded) return null;
+    value = JSON.parse(decoded.toString("utf8"));
+  } catch {
+    return null;
+  }
+
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  if (
+    Object.keys(record).length !== PAYLOAD_KEYS.length ||
+    PAYLOAD_KEYS.some((key) => !Object.hasOwn(record, key))
+  ) {
+    return null;
+  }
+
+  if (record.version !== ADMIN_SESSION_VERSION) return null;
+  if (
+    typeof record.reviewerId !== "string" ||
+    record.reviewerId.length === 0 ||
+    record.reviewerId.length > 80 ||
+    sanitizeReviewerName(record.reviewerId, "") !== record.reviewerId
+  ) {
+    return null;
+  }
+  if (
+    typeof record.issuedAt !== "number" ||
+    !Number.isSafeInteger(record.issuedAt) ||
+    record.issuedAt < 0 ||
+    typeof record.expiresAt !== "number" ||
+    !Number.isSafeInteger(record.expiresAt) ||
+    record.expiresAt - record.issuedAt !== ADMIN_SESSION_TTL_SECONDS
+  ) {
+    return null;
+  }
+  if (
+    typeof record.sessionId !== "string" ||
+    !SESSION_ID_PATTERN.test(record.sessionId)
+  ) {
+    return null;
+  }
+
+  return {
+    version: ADMIN_SESSION_VERSION,
+    reviewerId: record.reviewerId,
+    issuedAt: record.issuedAt,
+    expiresAt: record.expiresAt,
+    sessionId: record.sessionId,
+  };
 }
 
 /**
- * Pure cookie-parse + HMAC-verify logic, extracted from `getAdminSession()`
- * so it's unit-testable without Next.js request context (`cookies()` only
- * works inside a request). Given the raw `<nonce>.<hmac>` cookie value and
- * the server secret, recomputes the expected HMAC and constant-time
- * compares it against the presented one.
- *
- * Behavior-preserving extraction (QA-002): every branch below is byte-for-
- * byte the same logic `getAdminSession()` used to run inline. On success,
- * the reviewer identity is derived the same way as before — from the
- * environment via `adminReviewerName()`, NEVER from the unsigned
- * `civica_admin_reviewer` cookie, which a client could edit to forge
- * audit-row identity (PLT-027).
+ * Pure parse, signature, payload, identity, and time verification. `nowMs` is
+ * injectable so expiry and issued-at boundaries have deterministic tests.
  */
+function verifySessionCookieEnvelope(
+  cookieValue: string | null | undefined,
+  secret: string | null | undefined,
+  nowMs: number,
+  bindConfiguredIdentity: boolean,
+): SessionCookieVerification {
+  if (!secret || !cookieValue || !Number.isFinite(nowMs) || nowMs < 0) {
+    return invalidSession();
+  }
+
+  const parts = cookieValue.split(".");
+  if (parts.length !== 3) return invalidSession();
+  const [formatVersion, encodedPayload, presentedMac] = parts;
+  if (
+    formatVersion !== COOKIE_FORMAT_VERSION ||
+    !/^[0-9a-f]{64}$/.test(presentedMac)
+  ) {
+    return invalidSession();
+  }
+
+  const signedValue = `${formatVersion}.${encodedPayload}`;
+  const expectedMac = signValue(secret, signedValue);
+  if (!safeEqual(presentedMac, expectedMac)) return invalidSession();
+
+  const session = parsePayload(encodedPayload);
+  if (!session) return invalidSession();
+
+  if (bindConfiguredIdentity) {
+    const expectedIdentity = adminReviewerName();
+    if (!expectedIdentity || !safeEqual(session.reviewerId, expectedIdentity)) {
+      return invalidSession();
+    }
+  }
+
+  const nowSeconds = Math.floor(nowMs / 1000);
+  if (
+    !Number.isSafeInteger(nowSeconds) ||
+    session.issuedAt > nowSeconds + MAX_CLOCK_SKEW_SECONDS ||
+    session.expiresAt <= nowSeconds
+  ) {
+    return invalidSession();
+  }
+
+  return { valid: true, session };
+}
+
 export function verifySessionCookie(
   cookieValue: string | null | undefined,
   secret: string | null | undefined,
+  nowMs = Date.now(),
 ): SessionCookieVerification {
-  if (!secret) return { valid: false, reviewerId: null };
-  if (!cookieValue) return { valid: false, reviewerId: null };
-
-  // Cookie is `<nonce>.<hmac>`. Recompute the expected HMAC from the
-  // nonce + server secret and constant-time compare.
-  const dot = cookieValue.indexOf(".");
-  if (dot <= 0 || dot === cookieValue.length - 1) {
-    return { valid: false, reviewerId: null };
-  }
-  const nonce = cookieValue.slice(0, dot);
-  const presentedMac = cookieValue.slice(dot + 1);
-  const expectedMac = signNonce(secret, nonce);
-  if (!safeEqual(presentedMac, expectedMac)) {
-    return { valid: false, reviewerId: null };
-  }
-
-  return { valid: true, reviewerId: adminReviewerName() };
+  return verifySessionCookieEnvelope(cookieValue, secret, nowMs, true);
 }
 
-/** Read + validate the admin session cookie. Returns null when the
- *  cookie is missing, invalid, or the server isn't configured with
- *  ADMIN_SESSION_SECRET. */
+/**
+ * Verify cryptography, payload shape, and lifetime, then fail closed against
+ * the durable logout denylist. Invalid envelopes never touch the store.
+ */
+export async function verifyActiveSessionCookie(
+  cookieValue: string | null | undefined,
+  secret: string | null | undefined,
+  nowMs = Date.now(),
+  revocations: AdminSessionRevocationStore = databaseAdminSessionRevocationStore,
+): Promise<SessionCookieVerification> {
+  const verification = verifySessionCookie(cookieValue, secret, nowMs);
+  if (!verification.valid || !verification.session) return verification;
+  if (await isAdminSessionRevoked(verification.session, revocations)) {
+    return invalidSession();
+  }
+  return verification;
+}
+
+/**
+ * Logout needs the signed actor/session even when the configured display name
+ * changed after issuance. It still enforces signature, schema, and expiry.
+ */
+export function verifySessionCookieForLogout(
+  cookieValue: string | null | undefined,
+  secret: string | null | undefined,
+  nowMs = Date.now(),
+): SessionCookieVerification {
+  return verifySessionCookieEnvelope(cookieValue, secret, nowMs, false);
+}
+
+/** Read and validate the admin session cookie against current server state. */
 export async function getAdminSession(): Promise<AdminSession | null> {
   const secret = process.env.ADMIN_SESSION_SECRET;
   if (!secret) return null;
 
   const cookieJar = await cookies();
-  const session = cookieJar.get(ADMIN_SESSION_COOKIE)?.value;
-
-  const result = verifySessionCookie(session, secret);
-  if (!result.valid || !result.reviewerId) return null;
-
-  return { reviewerId: result.reviewerId };
+  const cookieValue = cookieJar.get(ADMIN_SESSION_COOKIE)?.value;
+  const result = await verifyActiveSessionCookie(cookieValue, secret);
+  return result.valid ? result.session : null;
 }
 
-/** Set both cookies on a Response. Mints a fresh per-session nonce and
- *  stores `<nonce>.<hmac>` — never any secret material. */
-export function buildAdminCookieHeaders(
-  reviewerName: string,
-): Array<[string, string]> {
-  const secret = process.env.ADMIN_SESSION_SECRET ?? "";
-  const nonce = randomBytes(18).toString("hex");
-  const sessionValue = `${nonce}.${signNonce(secret, nonce)}`;
-  const maxAge = SESSION_TTL_DAYS * 24 * 60 * 60;
-  // SameSite=Lax, not Strict: the Google sign-in return (start → Google →
-  // callback → this cookie) is a cross-site-initiated top-level GET
-  // redirect chain, and Strict cookies aren't sent on the request
-  // immediately following it — the browser would land back on
-  // /admin/sign-in even though the cookie was set correctly. Lax still
-  // blocks the cookie on cross-site POST/PUT/DELETE (the actual CSRF
-  // vector); every mutating admin route is POST/PUT/DELETE already.
-  const common = `Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
-  // Secure flag in production only (cookies-without-secure are blocked
-  // on HTTPS but useful for local dev over http://localhost).
+/** Read a still-valid signed envelope for idempotent server-side logout. */
+export async function getAdminSessionForLogout(): Promise<AdminSession | null> {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret) return null;
+  const cookieJar = await cookies();
+  const cookieValue = cookieJar.get(ADMIN_SESSION_COOKIE)?.value;
+  const result = verifySessionCookieForLogout(cookieValue, secret);
+  return result.valid ? result.session : null;
+}
+
+/**
+ * Mint a fresh signed v1 session. Identity is always derived inside this
+ * function from server configuration; callers cannot supply an audit actor.
+ */
+export function mintAdminSessionCookie(
+  nowMs = Date.now(),
+): MintedAdminSessionCookie {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  const reviewerId = adminReviewerName();
+  if (!secret || !reviewerId || !Number.isFinite(nowMs) || nowMs < 0) {
+    throw new Error(
+      "Admin session identity or signing secret is not configured",
+    );
+  }
+
+  const issuedAt = Math.floor(nowMs / 1000);
+  if (!Number.isSafeInteger(issuedAt)) {
+    throw new Error("Admin session issuance time is outside the safe range");
+  }
+  const payload: AdminSession = {
+    version: ADMIN_SESSION_VERSION,
+    reviewerId,
+    issuedAt,
+    expiresAt: issuedAt + ADMIN_SESSION_TTL_SECONDS,
+    sessionId: randomBytes(18).toString("hex"),
+  };
+  const encodedPayload = Buffer.from(JSON.stringify(payload), "utf8").toString(
+    "base64url",
+  );
+  const signedValue = `${COOKIE_FORMAT_VERSION}.${encodedPayload}`;
+  const sessionValue = `${signedValue}.${signValue(secret, signedValue)}`;
+
+  // SameSite=Lax permits the Google top-level callback while still blocking
+  // cookies on cross-site mutation requests. Secure is production-only so
+  // local HTTP development continues to work.
+  const common = `Path=/; HttpOnly; SameSite=Lax; Max-Age=${ADMIN_SESSION_TTL_SECONDS}`;
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  return [
-    [
-      "Set-Cookie",
-      `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(sessionValue)}; ${common}${secure}`,
+  const clearLegacy = `Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`;
+  return {
+    session: payload,
+    headers: [
+      [
+        "Set-Cookie",
+        `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(sessionValue)}; ${common}${secure}`,
+      ],
+      ["Set-Cookie", `${ADMIN_REVIEWER_COOKIE}=; ${clearLegacy}`],
     ],
-    [
-      "Set-Cookie",
-      `${ADMIN_REVIEWER_COOKIE}=${encodeURIComponent(reviewerName)}; ${common}${secure}`,
-    ],
-  ];
+  };
 }
 
 export function buildAdminClearCookieHeaders(): Array<[string, string]> {

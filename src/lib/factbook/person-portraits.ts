@@ -38,12 +38,17 @@
  * `markSourcesSynced("wikidata", …)` — the one sanctioned path — and only when
  * rows were actually written.
  */
-import { eq, isNull, and, isNotNull, or } from "drizzle-orm";
+import { isNull, and, isNotNull, or } from "drizzle-orm";
 
 import { db as sharedDb } from "@/lib/db";
 import { persons } from "@/lib/db/schema";
 import { sparqlQuery, extractQid } from "@/lib/data/wikidata";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "@/lib/factbook/country-fact-history-writer";
+import {
+  mutatePersonWithHistory,
+  type PersonHistoryWrite,
+} from "@/lib/factbook/government-entity-history-writer";
 
 const COMMONS_ENDPOINT = "https://commons.wikimedia.org/w/api.php";
 const COMMONS_USER_AGENT =
@@ -195,6 +200,10 @@ export interface PersonPortraitCandidate {
   personId: string;
   personName: string;
   personQid: string;
+  /** False when the row was selected only because its birthdate is missing. */
+  needsPortrait?: boolean;
+  /** False when the row was selected only because its portrait is missing. */
+  needsBirthdate?: boolean;
 }
 
 /** A person that gained a free portrait (or already had this exact file). */
@@ -257,7 +266,13 @@ export async function loadPortraitCandidates(
   limit?: number,
 ): Promise<PersonPortraitCandidate[]> {
   const q = db
-    .select({ id: persons.id, name: persons.name, qid: persons.wikidataQid })
+    .select({
+      id: persons.id,
+      name: persons.name,
+      qid: persons.wikidataQid,
+      photoUrl: persons.photoUrl,
+      dateOfBirth: persons.dateOfBirth,
+    })
     .from(persons)
     .where(
       and(
@@ -269,8 +284,14 @@ export async function loadPortraitCandidates(
     .orderBy(persons.name, persons.id);
   const rows = limit && limit > 0 ? await q.limit(limit) : await q;
   return rows
-    .filter((r): r is { id: string; name: string; qid: string } => Boolean(r.qid))
-    .map((r) => ({ personId: r.id, personName: r.name, personQid: r.qid }));
+    .filter((r) => Boolean(r.qid))
+    .map((r) => ({
+      personId: r.id,
+      personName: r.name,
+      personQid: r.qid!,
+      needsPortrait: r.photoUrl === null,
+      needsBirthdate: r.dateOfBirth === null,
+    }));
 }
 
 /**
@@ -342,7 +363,7 @@ export async function computePersonPortraitPlan(
   // 3. Assemble per-person proposals.
   for (const c of candidates) {
     const dob = dobByQid.get(c.personQid);
-    if (dob) {
+    if (dob && c.needsBirthdate !== false) {
       plan.stats.dobFound++;
       plan.birthdates.push({
         personId: c.personId,
@@ -352,6 +373,7 @@ export async function computePersonPortraitPlan(
       });
     }
 
+    if (c.needsPortrait === false) continue;
     const file = imageFileByQid.get(c.personQid);
     if (!file) {
       plan.stats.portraitNoImage++;
@@ -393,15 +415,31 @@ export interface EnrichPersonPortraitsOptions {
   dryRun?: boolean;
   /** Progress sink. Lines starting with `!` are warnings. */
   onProgress?: (line: string) => void;
+  /** Fixture/aggregate seam. Defaults to the sanctioned immediate helper. */
+  markSynced?: typeof markSourcesSynced;
+  /** Bounded fixture seam. Production loads candidates from the database. */
+  loadCandidates?: typeof loadPortraitCandidates;
+  /** Bounded fixture seam. Production computes the live Wikidata plan. */
+  computePlan?: typeof computePersonPortraitPlan;
+  /** Named Civica Atlas data release. Required only for an applied write. */
+  atlasReleaseId?: string;
+  /** Fixture seam; production uses the atomic person+history CTE. */
+  writePerson?: (
+    database: PersonPortraitsDb,
+    input: PersonHistoryWrite,
+  ) => Promise<unknown>;
 }
 
 export interface EnrichPersonPortraitsSummary {
+  /** Partial means at least one planned row failed to write. */
+  status: "completed" | "partial";
   startedAt: string;
   finishedAt: string;
   durationMs: number;
   candidates: number;
   portraitsWritten: number;
   birthdatesWritten: number;
+  writeFailures: number;
   portraitsSkippedNonFree: number;
   portraitsNoImage: number;
   dryRun: boolean;
@@ -427,33 +465,53 @@ export async function enrichPersonPortraits(
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
 
-  const candidates = await loadPortraitCandidates(db, options.limit);
+  const candidates = await (options.loadCandidates ?? loadPortraitCandidates)(
+    db,
+    options.limit,
+  );
   log(
     `Loaded ${candidates.length} candidate persons (wikidata_qid set, photo_url null)` +
       (options.limit ? ` [--limit=${options.limit}]` : ""),
   );
 
-  const plan = await computePersonPortraitPlan(candidates, log);
+  const plan = await (options.computePlan ?? computePersonPortraitPlan)(
+    candidates,
+    log,
+  );
 
   let portraitsWritten = 0;
   let birthdatesWritten = 0;
+  let writeFailures = 0;
 
   if (!dryRun) {
+    const atlasReleaseId = resolveAtlasReleaseId(options.atlasReleaseId);
+    const writePerson = options.writePerson ?? mutatePersonWithHistory;
+    const history = {
+      changeKind: "routine_refresh" as const,
+      reason: "Wikidata person portrait and birthdate refresh",
+      methodologyVersion: "wikidata-person-media/v1",
+      releaseId: atlasReleaseId,
+    };
     // Portraits: bare Commons file name + per-file credit. The candidate query
     // guarantees photo_url IS NULL, so this only ever FILLS, never overwrites.
-    // Per-row try/catch: one unexpected row error must never abort the pass and
-    // lose the freshness stamp for the rows that DID write.
+    // Per-row try/catch retains the complete failure count for the aggregate.
+    // Any failed planned write makes the pass partial and withholds freshness.
     for (const p of plan.portraits) {
       try {
-        const res = await db
-          .update(persons)
-          .set({ photoUrl: p.file, photoLicense: p.license, photoCredit: p.credit })
-          .where(and(eq(persons.id, p.personId), isNull(persons.photoUrl)));
-        // Count only a row that actually changed — a candidate re-seen because
-        // it was missing a DOB (not a photo) no-ops here and must not inflate.
-        const rowCount = (res as unknown as { rowCount?: number }).rowCount;
-        if (rowCount === undefined || rowCount > 0) portraitsWritten++;
+        await writePerson(db, {
+          stableId: p.personId,
+          identityQid: p.personQid,
+          insertName: p.personName,
+          values: {
+            photoUrl: p.file,
+            photoLicense: p.license,
+            photoCredit: p.credit,
+          },
+          history,
+        });
+        portraitsWritten++;
       } catch (err) {
+        writeFailures++;
         log(
           `! portrait write failed for ${p.personName} (${p.personQid}): ${
             err instanceof Error ? err.message : String(err)
@@ -465,14 +523,16 @@ export async function enrichPersonPortraits(
     // Birthdates: only fill when currently null (never clobber a curated DOB).
     for (const b of plan.birthdates) {
       try {
-        const res = await db
-          .update(persons)
-          .set({ dateOfBirth: b.dob })
-          .where(and(eq(persons.id, b.personId), isNull(persons.dateOfBirth)));
-        // neon-http returns { rowCount }; count only a row that actually changed.
-        const rowCount = (res as unknown as { rowCount?: number }).rowCount;
-        if (rowCount === undefined || rowCount > 0) birthdatesWritten++;
+        await writePerson(db, {
+          stableId: b.personId,
+          identityQid: b.personQid,
+          insertName: b.personName,
+          values: { dateOfBirth: b.dob },
+          history,
+        });
+        birthdatesWritten++;
       } catch (err) {
+        writeFailures++;
         log(
           `! birthdate write failed for ${b.personName} (${b.personQid}): ${
             err instanceof Error ? err.message : String(err)
@@ -483,21 +543,23 @@ export async function enrichPersonPortraits(
   }
 
   const totalRowsWritten = portraitsWritten + birthdatesWritten;
-  const stamped = dryRun
+  const stamped = dryRun || writeFailures > 0
     ? []
-    : await markSourcesSynced("wikidata", {
+    : await (options.markSynced ?? markSourcesSynced)("wikidata", {
         rowsWritten: totalRowsWritten,
         executor: db,
       });
 
   const finishedAtMs = Date.now();
   return {
+    status: writeFailures > 0 ? "partial" : "completed",
     startedAt,
     finishedAt: new Date(finishedAtMs).toISOString(),
     durationMs: finishedAtMs - startedAtMs,
     candidates: candidates.length,
     portraitsWritten,
     birthdatesWritten,
+    writeFailures,
     portraitsSkippedNonFree: plan.stats.portraitSkippedNonFree,
     portraitsNoImage: plan.stats.portraitNoImage,
     dryRun,

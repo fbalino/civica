@@ -27,8 +27,8 @@ import { rawEvents } from "../src/lib/db/schema";
 import { createDb } from "../src/lib/pulse/v2/ingest";
 import {
   persistClassificationFailureDecision,
-  persistNonEventDecision,
   writeEvent,
+  writeNonEventCluster,
   type ClusterToClassify,
   type ClassifyOneResult,
 } from "../src/lib/pulse/v2/classify";
@@ -138,15 +138,13 @@ async function main() {
       continue;
     }
     if (!d.isGovernanceEvent || d.category === "none") {
-      await retainDisposition(
-        d,
-        "non_governance",
-        "classifier determined that the cluster was not a governance event",
-      );
-      await persistNonEventDecision(db, cluster, classificationRun.id, {
+      await writeNonEventCluster(db, cluster, classificationRun.id, {
         actor: subscriptionActor,
         rationale:
           "Subscription-agent classifier found no qualifying governance event.",
+        reason:
+          "classifier determined that the cluster was not a governance event",
+        decision: d,
       });
       skipped++;
       continue;

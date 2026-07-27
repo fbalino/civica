@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "pulse-evaluation-packet-live-audit-evidence/v1",
+  "observedAt": "2026-07-14T03:36:43.859Z",
+  "readOnly": true,
+  "command": "npx tsx scripts/audit-pulse-evaluation-packets-live.ts",
+  "checkedManifestSemanticSha256": "b683175e07caca1572d86f26b69cdcb17b72023f27b3bee578a960fa46c109bf",
+  "frozenInputSemanticSha256": "4f21465e3586a46fedc64fc89eee5771eff37561b6e89996d12113ab5de1896d",
+  "liveManifestSemanticSha256": "b68fba20f7f0152bfa4dfe7202f1b1417d54d45d1f4ab9e780ae19d6fafebcad",
+  "liveManifestStatus": "differs",
+  "eventCandidates": {
+    "frozenCount": 384,
+    "liveCount": 384,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "frozenPrimaryStratumCounts": {
+      "2026-04": 87,
+      "2026-05": 84,
+      "2026-06": 98,
+      "2026-07": 115
+    },
+    "livePrimaryStratumCounts": {
+      "2026-04": 87,
+      "2026-05": 84,
+      "2026-06": 98,
+      "2026-07": 115
+    }
+  },
+  "systemNegativePopulation": {
+    "frozenCount": 978,
+    "liveCount": 978,
+    "added": 0,
+    "removed": 0,
+    "changed": 43,
+    "frozenPrimaryStratumCounts": {
+      "non_governance": 97,
+      "pending": 881
+    },
+    "livePrimaryStratumCounts": {
+      "non_governance": 140,
+      "pending": 838
+    },
+    "primaryStratumTransitions": {
+      "pending->non_governance": 43
+    }
+  }
+}

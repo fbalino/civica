@@ -136,6 +136,8 @@ export interface WikidataClaimRow {
    *  undefined; in that case we fall back to the statement's
    *  `start time` (P580) when present. */
   pointInTime: string | undefined;
+  /** Wikibase time precision: 9=year, 10=month, 11=day. */
+  pointInTimePrecision?: number;
   /** Wikidata rank — 'preferred' | 'normal'. Deprecated already
    *  filtered out at the SPARQL level. */
   rank: "preferred" | "normal";
@@ -190,7 +192,7 @@ export async function getClaimsForEntity(
   // present; P123 is the fallback.
   const query = `
     SELECT
-      ?stmt ?value ?unit ?pit ?startTime ?rank
+      ?stmt ?value ?unit ?pit ?pitPrecision ?startTime ?startPrecision ?rank
       ?refStatedIn ?refStatedInLabel ?refPublisher ?refPublisherLabel ?refUrl
     WHERE {
       wd:${entityQid} p:${propertyPid} ?stmt.
@@ -202,8 +204,16 @@ export async function getClaimsForEntity(
         ?stmt psv:${propertyPid} ?vNode.
         ?vNode wikibase:quantityUnit ?unit.
       }
-      OPTIONAL { ?stmt pq:P585 ?pit. }
-      OPTIONAL { ?stmt pq:P580 ?startTime. }
+      OPTIONAL {
+        ?stmt pq:P585 ?pit;
+              pqv:P585 ?pitNode.
+        ?pitNode wikibase:timePrecision ?pitPrecision.
+      }
+      OPTIONAL {
+        ?stmt pq:P580 ?startTime;
+              pqv:P580 ?startNode.
+        ?startNode wikibase:timePrecision ?startPrecision.
+      }
 
       OPTIONAL {
         ?stmt prov:wasDerivedFrom ?ref.
@@ -239,6 +249,9 @@ export async function getClaimsForEntity(
     const pit = b.pit?.value;
     const start = b.startTime?.value;
     const pointInTime = pit ?? start;
+    const pointInTimePrecision = Number(
+      b.pitPrecision?.value ?? b.startPrecision?.value,
+    );
     const rankRaw = b.rank?.value ?? "";
     const rank: "preferred" | "normal" = rankRaw.endsWith("PreferredRank")
       ? "preferred"
@@ -260,6 +273,9 @@ export async function getClaimsForEntity(
       valueRaw,
       valueUnitQid,
       pointInTime,
+      pointInTimePrecision: Number.isFinite(pointInTimePrecision)
+        ? pointInTimePrecision
+        : undefined,
       rank,
       refStatedInQid,
       refStatedInLabel,
@@ -278,6 +294,7 @@ export interface GroupedClaim {
   valueRaw: string;
   valueUnitQid: string | undefined;
   pointInTime: string | undefined;
+  pointInTimePrecision?: number;
   rank: "preferred" | "normal";
   references: Array<{
     statedInQid: string | undefined;
@@ -302,6 +319,7 @@ export function groupClaimsByStatement(
         valueRaw: row.valueRaw,
         valueUnitQid: row.valueUnitQid,
         pointInTime: row.pointInTime,
+        pointInTimePrecision: row.pointInTimePrecision,
         rank: row.rank,
         references: [],
       };

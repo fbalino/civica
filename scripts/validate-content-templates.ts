@@ -164,6 +164,7 @@ const CTX_ALLOWLIST: Record<string, readonly string[]> = {
     "corrLow",
     "corrHigh",
   ],
+  "content/methodology-conditions.md": [],
   "content/methodology-pca-appendix.md": [
     "pc1VariancePct",
     "loadLow",

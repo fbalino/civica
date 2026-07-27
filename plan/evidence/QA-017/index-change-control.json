@@ -1,0 +1,46 @@
+{
+  "id": "qa-017-post-r5-index-pulse-conditions-reconciliation",
+  "toVersion": "civica-index-pulse-conditions-reconciliation-v41",
+  "categories": [
+    "input",
+    "weight_or_model",
+    "presentation"
+  ],
+  "evidence": {
+    "documentation": [
+      "plan/QA-017-clean-checkout-2026-07-18.md",
+      "content/methodology-civica-index.md",
+      "content/methodology-pulse.md"
+    ],
+    "registry": [
+      "src/lib/ci/index-analysis-inputs.ts",
+      "src/lib/ci/subgroup-fairness-inputs.ts"
+    ],
+    "release_note": [
+      "plan/evidence/QA-017/index-change-control-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/QA-017/index-change-control-migration-plan.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/score-golden.test.ts",
+      "src/lib/ci/index-analysis-inputs.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/pulse/v2/score-fixture.test.ts",
+      "src/lib/ci/subgroup-fairness-inputs.test.ts"
+    ]
+  },
+  "validations": [
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-pulse-cron-recovery",
+    "validate:index-quarantine",
+    "validate:index-research-archive"
+  ]
+}

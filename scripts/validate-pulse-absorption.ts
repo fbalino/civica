@@ -50,7 +50,8 @@ for (const marker of [
   'e.absorptionOutcome === "absorbed" ? 0 : e.corroborationConfidence',
   "LEFT JOIN LATERAL",
   "pulse_event_absorptions",
-  "a.as_of <= CURRENT_DATE",
+  "a.as_of <= ${throughDate}",
+  "a.decided_at <= ${selectionCutoff}",
 ]) {
   if (!score.includes(marker)) fail(`score path is missing ${marker}`);
 }

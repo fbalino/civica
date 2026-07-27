@@ -7,7 +7,9 @@ import { Banner } from "@/components/editorial/Banner";
 import {
   BILLS_SOURCE_LABELS,
   BILLS_STAGE_LABELS,
+  billsCoverageMessage,
   billsSupportedCoverageNote,
+  isBillsSupportedSlug,
 } from "@/lib/bills/coverage";
 import { FactbookBillAskButton } from "./FactbookBillAskButton";
 
@@ -20,18 +22,10 @@ import { FactbookBillAskButton } from "./FactbookBillAskButton";
  * sync scripts under `scripts/sync-bills-*` and the matching cron routes
  * under `/api/cron/bills/*`).
  *
- * Empty state: returns null so the orchestrator can hide the section
- * entirely (matching how visibleSections filters out empty CIA factbook
- * sections in `(reader)/factbook/[slug]/page.tsx`).
- *
- * This ONLY runs for the six bills-supported jurisdictions in practice —
- * `hasBills`/`isVisible("bills")` in the parent `civica-data/page.tsx`
- * (an Index-change-control-protected file, `src/lib/ci/index-change-control.ts`)
- * already excludes the whole numbered "Bills" section from the sidebar and
- * scroll column whenever `getBillsForJurisdiction` returns zero rows, so an
- * unsupported country (e.g. Japan) never reaches this component at all —
- * see `plan/evidence/ATL-013/README.md` for why that gate could not be
- * changed here and what a follow-up would need to do.
+ * Empty state: a valid jurisdiction with zero rows remains visible. An
+ * unsupported country receives the shared coverage explanation; a supported
+ * country with zero rows receives a source-availability warning. Neither
+ * state can be mistaken for an absence of legislative activity.
  *
  * Provenance: each row carries a SourceDot tied to the bill's
  * `sourceId` plus the matching `sources.last_sync_at` timestamp. A
@@ -49,20 +43,83 @@ const STAGE_LABELS = BILLS_STAGE_LABELS;
 export interface FactbookBillsProps {
   countrySlug: string;
   countryName: string;
+  /** A route-level prefetch preserves an outage separately from no bill rows. */
+  initialResult?: Awaited<ReturnType<typeof getBillsForJurisdiction>> | null;
 }
 
 export async function FactbookBills({
   countrySlug,
   countryName,
+  initialResult,
 }: FactbookBillsProps) {
-  let result;
-  try {
-    result = await getBillsForJurisdiction(countrySlug, 20);
-  } catch {
-    // DB unavailable — same posture as the API route: hide the section.
-    return null;
+  if (!isBillsSupportedSlug(countrySlug)) {
+    return (
+      <div className="factbook-bills-list">
+        <Banner variant="warn" className="factbook-bill-coverage-note">
+          {billsCoverageMessage(countryName)} See the{" "}
+          <a href="/methodology/source-coverage#bills">
+            source coverage report
+          </a>{" "}
+          for per-jurisdiction freshness and field completeness.
+        </Banner>
+      </div>
+    );
   }
-  if (!result || result.rows.length === 0) return null;
+
+  let result: Awaited<ReturnType<typeof getBillsForJurisdiction>>;
+  if (initialResult === null) {
+    return (
+      <div className="factbook-bills-list">
+        <Banner variant="warn" className="factbook-bill-coverage-note">
+          Bill records are temporarily unavailable. Civica is not treating this
+          as evidence that no legislation is being considered in {countryName}.
+        </Banner>
+      </div>
+    );
+  }
+  if (initialResult !== undefined) {
+    result = initialResult;
+  } else {
+    try {
+      result = await getBillsForJurisdiction(countrySlug, 20);
+    } catch {
+      return (
+        <div className="factbook-bills-list">
+          <Banner variant="warn" className="factbook-bill-coverage-note">
+            Bill records are temporarily unavailable. Civica is not treating
+            this as evidence that no legislation is being considered in
+            {" "}{countryName}.
+          </Banner>
+        </div>
+      );
+    }
+  }
+  if (!result) {
+    return (
+      <div className="factbook-bills-list">
+        <Banner variant="warn" className="factbook-bill-coverage-note">
+          Bill records are temporarily unavailable. Civica could not resolve
+          the country record for this source-backed module.
+        </Banner>
+      </div>
+    );
+  }
+  if (result.rows.length === 0) {
+    return (
+      <div className="factbook-bills-list">
+        <Banner variant="warn" className="factbook-bill-coverage-note">
+          {billsSupportedCoverageNote()} No tracked bill records are currently
+          available for {countryName}. This may reflect a sync or source-
+          availability gap; it is not a claim that no legislation is being
+          considered. See the{" "}
+          <a href="/methodology/source-coverage#bills">
+            source coverage report
+          </a>{" "}
+          for per-jurisdiction freshness and field completeness.
+        </Banner>
+      </div>
+    );
+  }
 
   // Look up sources.last_sync_at once for the distinct sources in
   // the result so each bill row carries its own provenance dot.
@@ -75,10 +132,7 @@ export async function FactbookBills({
         .from(sources)
         .where(inArray(sources.id, sourceIds));
       for (const r of rows) {
-        sourceMap.set(
-          r.id,
-          r.lastSyncAt ? r.lastSyncAt.toISOString() : null,
-        );
+        sourceMap.set(r.id, r.lastSyncAt ? r.lastSyncAt.toISOString() : null);
       }
     } catch {
       /* best-effort */
@@ -90,9 +144,14 @@ export async function FactbookBills({
   // for why that half of the coverage set can't publish a chamber yet).
   // Best-effort: a lookup failure just omits the chip, never hides bills.
   const bodyIds = Array.from(
-    new Set(result.rows.map((b) => b.bodyId).filter((id): id is string => !!id)),
+    new Set(
+      result.rows.map((b) => b.bodyId).filter((id): id is string => !!id),
+    ),
   );
-  const bodyMap = new Map<string, { name: string; chamberType: string | null }>();
+  const bodyMap = new Map<
+    string,
+    { name: string; chamberType: string | null }
+  >();
   if (bodyIds.length > 0) {
     try {
       const bodyRows = await db
@@ -128,14 +187,13 @@ export async function FactbookBills({
   return (
     <div className="factbook-bills-list">
       <Banner variant="info" className="factbook-bill-coverage-note">
-        {billsSupportedCoverageNote()} Showing the {result.rows.length} most recent
+        {billsSupportedCoverageNote()} Showing the {result.rows.length} most
+        recent
         {totalCount != null && totalCount > result.rows.length
           ? ` of ${totalCount.toLocaleString("en-US")} tracked ${countryName} bills`
           : ` tracked ${countryName} bills`}
         . See the{" "}
-        <a href="/methodology/source-coverage#bills">
-          source coverage report
-        </a>{" "}
+        <a href="/methodology/source-coverage#bills">source coverage report</a>{" "}
         for per-jurisdiction freshness.
       </Banner>
       {result.rows.map((b, i) => {
@@ -200,15 +258,18 @@ export async function FactbookBills({
 
               <div className="factbook-bill-timeline" aria-hidden="true">
                 {STAGE_LABELS.map((_, j) => (
-                  <span key={`row-${j}`} className="factbook-bill-timeline-step">
+                  <span
+                    key={`row-${j}`}
+                    className="factbook-bill-timeline-step"
+                  >
                     <span
                       className={
                         "factbook-bill-dot" +
                         (j < b.stage
                           ? " is-done"
                           : j === b.stage
-                          ? " is-now"
-                          : "")
+                            ? " is-now"
+                            : "")
                       }
                     />
                     {j < STAGE_LABELS.length - 1 && (
@@ -223,36 +284,37 @@ export async function FactbookBills({
                 ))}
               </div>
 
-              {votes && (() => {
-                const tot = votes.yes + votes.no + votes.abs;
-                if (tot <= 0) return null;
-                const y = (votes.yes / tot) * 100;
-                const n = (votes.no / tot) * 100;
-                const a = (votes.abs / tot) * 100;
-                return (
-                  <>
-                    <div className="factbook-bill-vote-bar">
-                      <span
-                        className="factbook-bill-vote-yes"
-                        style={{ width: `${y}%` }}
-                      />
-                      <span
-                        className="factbook-bill-vote-no"
-                        style={{ width: `${n}%` }}
-                      />
-                      <span
-                        className="factbook-bill-vote-abs"
-                        style={{ width: `${a}%` }}
-                      />
-                    </div>
-                    <div className="factbook-bill-vote-row">
-                      <span>Yes {votes.yes}</span>
-                      <span>No {votes.no}</span>
-                      <span>Abs {votes.abs}</span>
-                    </div>
-                  </>
-                );
-              })()}
+              {votes &&
+                (() => {
+                  const tot = votes.yes + votes.no + votes.abs;
+                  if (tot <= 0) return null;
+                  const y = (votes.yes / tot) * 100;
+                  const n = (votes.no / tot) * 100;
+                  const a = (votes.abs / tot) * 100;
+                  return (
+                    <>
+                      <div className="factbook-bill-vote-bar">
+                        <span
+                          className="factbook-bill-vote-yes"
+                          style={{ width: `${y}%` }}
+                        />
+                        <span
+                          className="factbook-bill-vote-no"
+                          style={{ width: `${n}%` }}
+                        />
+                        <span
+                          className="factbook-bill-vote-abs"
+                          style={{ width: `${a}%` }}
+                        />
+                      </div>
+                      <div className="factbook-bill-vote-row">
+                        <span>Yes {votes.yes}</span>
+                        <span>No {votes.no}</span>
+                        <span>Abs {votes.abs}</span>
+                      </div>
+                    </>
+                  );
+                })()}
             </div>
 
             <div className="factbook-bill-actions">

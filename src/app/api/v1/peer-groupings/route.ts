@@ -18,7 +18,12 @@
  * consumers see the same metadata conventions across the API.
  */
 
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+} from "@/lib/api/helpers";
 import {
   getWorldBankRegionDistribution,
   getWorldBankIncomeGroupDistribution,
@@ -106,7 +111,7 @@ function decorateLens<K extends string>(
 }
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return rateLimited;
 
   try {
@@ -132,7 +137,10 @@ export async function GET(request: Request) {
         description:
           "World Bank Country and Lending Groups regional classification (7 regions). Default material peer lens — pair with `world_bank_income_group` for the canonical material cohort. Refreshed annually each July.",
         temporal: temporal.world_bank_region,
-        values: decorateLens<WorldBankRegionKey>(region, WORLD_BANK_REGION_META),
+        values: decorateLens<WorldBankRegionKey>(
+          region,
+          WORLD_BANK_REGION_META,
+        ),
       } satisfies LensBlock,
       world_bank_income_group: {
         factKey: "world_bank_income_group",

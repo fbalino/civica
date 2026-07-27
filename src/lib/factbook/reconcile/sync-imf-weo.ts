@@ -46,18 +46,25 @@
  */
 import { sql } from "drizzle-orm";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -307,6 +314,8 @@ export interface ImfWeoSyncOptions {
   jurisdictions?: ImfWeoJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface ImfWeoJurisdiction {
@@ -315,10 +324,7 @@ export interface ImfWeoJurisdiction {
   iso3: string | null;
 }
 
-function freshCounters(
-  factKey: string,
-  weoCode: string,
-): PerImfWeoCounters {
+function freshCounters(factKey: string, weoCode: string): PerImfWeoCounters {
   return {
     factKey,
     weoCode,
@@ -341,17 +347,13 @@ function freshCounters(
  * If the catalog fetch fails, the caller falls back to
  * `IMF_WEO_VINTAGE_FALLBACK`.
  */
-async function fetchIndicatorCatalog(): Promise<
-  Map<string, ImfIndicatorMeta>
-> {
+async function fetchIndicatorCatalog(): Promise<Map<string, ImfIndicatorMeta>> {
   const url = `${IMF_BASE_URL}/indicators`;
   const res = await fetch(url, {
     headers: { "User-Agent": IMF_USER_AGENT, Accept: "application/json" },
   });
   if (!res.ok) {
-    throw new Error(
-      `IMF /indicators: ${res.status} ${res.statusText}`,
-    );
+    throw new Error(`IMF /indicators: ${res.status} ${res.statusText}`);
   }
   const body = (await res.json()) as {
     indicators?: Record<string, ImfIndicatorMeta>;
@@ -400,16 +402,12 @@ async function fetchIndicator(
     headers: { "User-Agent": IMF_USER_AGENT, Accept: "application/json" },
   });
   if (!res.ok) {
-    throw new Error(
-      `IMF ${weoCode}: ${res.status} ${res.statusText}`,
-    );
+    throw new Error(`IMF ${weoCode}: ${res.status} ${res.statusText}`);
   }
   const body = (await res.json()) as ImfIndicatorResponse;
   const indicatorBlock = body.values?.[weoCode];
   if (!indicatorBlock) {
-    throw new Error(
-      `IMF ${weoCode}: response shape missing values.${weoCode}`,
-    );
+    throw new Error(`IMF ${weoCode}: response shape missing values.${weoCode}`);
   }
   return indicatorBlock;
 }
@@ -478,6 +476,10 @@ export async function syncImfWeo(
       dryRun: options.dryRun ?? false,
     };
   }
+  const atlasReleaseId = options.dryRun
+    ? undefined
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   // Discover live vintage label from /indicators metadata. Falls
   // back to the constant if the catalog fetch fails — sync still
@@ -507,14 +509,16 @@ export async function syncImfWeo(
 
   // Build iso3 → jurisdictionId map once; reused across all
   // indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -522,9 +526,7 @@ export async function syncImfWeo(
   for (const j of allJurisdictions) {
     if (j.iso3) iso3ToJurisdiction.set(j.iso3.toUpperCase(), j);
   }
-  log(
-    `${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`,
-  );
+  log(`${allJurisdictions.length} jurisdictions with ISO3 codes loaded.`);
 
   const counters = new Map<string, PerImfWeoCounters>();
   for (const c of targets) {
@@ -569,11 +571,15 @@ export async function syncImfWeo(
       0,
     );
     counter.observations = observationCount;
-    log(`  fetched ${observationCount} observations across ${Object.keys(rows).length} country codes`);
+    log(
+      `  fetched ${observationCount} observations across ${Object.keys(rows).length} country codes`,
+    );
 
     const latestByIso3 = pickLatestPerCountry(rows);
     counter.jurisdictions_with_value = latestByIso3.size;
-    log(`  ${latestByIso3.size} country codes with at least one non-null value`);
+    log(
+      `  ${latestByIso3.size} country codes with at least one non-null value`,
+    );
 
     for (const [iso3, dp] of latestByIso3) {
       const j = iso3ToJurisdiction.get(iso3);
@@ -596,10 +602,14 @@ export async function syncImfWeo(
       const env = factKeyDef.envelope;
       if (env) {
         const min = env.isPercent
-          ? (env.min !== undefined ? env.min : -1)
+          ? env.min !== undefined
+            ? env.min
+            : -1
           : env.min;
         const max = env.isPercent
-          ? (env.max !== undefined ? env.max : 101)
+          ? env.max !== undefined
+            ? env.max
+            : 101
           : env.max;
         if (
           (min !== undefined && numericValue < min) ||
@@ -692,65 +702,34 @@ export async function syncImfWeo(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "imf_weo",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: vintageLabel,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-            valueType,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            //
-            // Bug 1 — `valueType` IS included in the set clause. As
-            // the calendar year advances, IMF rows that were forecasts
-            // become measurements (e.g. a 2026 row written in April
-            // 2026 is a forecast; the same year-key row in 2027 is a
-            // measurement). Re-sync must reflect the current
-            // year-vs-fact_year relationship.
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: vintageLabel,
-              snapshotId,
-              updatedAt: new Date(),
-              valueType,
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "imf_weo",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: vintageLabel,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+          valueType,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written++;
         totalWritten++;
         touchedPairs.add(`${j.id}|${config.factKey}`);
@@ -768,15 +747,13 @@ export async function syncImfWeo(
         `envelope rejects: ${counter.rejected_envelope}, ` +
         `unmatched ISO3: ${counter.skipped_no_jurisdiction})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "IMF WEO",
+      target: `${config.factKey} (${config.weoCode})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually wrote rows (AGENTS.md provenance invariant).
-  await (options.markSynced ?? markSourcesSynced)("imf_weo", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -791,13 +768,17 @@ export async function syncImfWeo(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -807,6 +788,15 @@ export async function syncImfWeo(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "imf_weo",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerImfWeoCounters> = {};

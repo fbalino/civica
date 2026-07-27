@@ -44,6 +44,7 @@ const files = {
     "src/app/api/cron/pulse/v2/review-sla/route.ts",
     "utf8",
   ),
+  cronOutcomes: readFileSync("src/lib/pulse/v2/cron-outcomes.ts", "utf8"),
   vercel: readFileSync("vercel.json", "utf8"),
   methodology: readFileSync("content/methodology-pulse.md", "utf8"),
   changelog: readFileSync(
@@ -59,10 +60,7 @@ const files = {
     "src/components/pulse/PulseEventDetailCard.tsx",
     "utf8",
   ),
-  reportStore: readFileSync(
-    "src/lib/pulse/v2/review-sla-store.ts",
-    "utf8",
-  ),
+  reportStore: readFileSync("src/lib/pulse/v2/review-sla-store.ts", "utf8"),
 };
 
 for (const relation of [
@@ -134,7 +132,11 @@ for (const marker of [
 }
 if (
   !files.monitor.includes("recordDuePulseReviewEscalations") ||
-  !files.monitor.includes("dailyCompletenessEligible: false") ||
+  !files.monitor.includes("pulseV2ReviewSlaCronOutcome(report)") ||
+  !files.cronOutcomes.includes("report.breachedUnexcepted === 0") ||
+  !files.cronOutcomes.includes("report.breachedExcepted === 0") ||
+  !files.cronOutcomes.includes("report.escalationDue === 0") ||
+  !files.reportStore.includes("dailyCompletenessEligible: breached === 0") ||
   !files.vercel.includes("/api/cron/pulse/v2/review-sla")
 ) {
   fail("scheduled fail-closed monitor is incomplete");
@@ -159,10 +161,14 @@ if (
   !files.publicationOrigin.includes('return "legacy_quarantined"') ||
   !files.eventCard.includes("Legacy quarantine · not reviewed")
 ) {
-  fail("API and reader presentation do not keep legacy quarantine distinct from review");
+  fail(
+    "API and reader presentation do not keep legacy quarantine distinct from review",
+  );
 }
 if (!files.reportStore.includes("${now}::timestamp + interval '24 hours'")) {
-  fail("review report does not type its due-within-24-hours timestamp boundary");
+  fail(
+    "review report does not type its due-within-24-hours timestamp boundary",
+  );
 }
 
 async function validateLive() {

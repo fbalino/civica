@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { civicaIndex } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 import { CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY } from "@/lib/pulse/v2/public-numeric-policy";
-import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
+import {
+  V1_RATE_LIMIT_MAX,
+  V1_RATE_LIMIT_WINDOW_MS,
+} from "@/lib/api/contract/rate-limits";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { CURRENT_CI_UNCERTAINTY_POLICY } from "@/lib/ci/uncertainty-policy";
 import { CURRENT_CI_RANK_POLICY } from "@/lib/ci/rank-policy";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 // CLM-012: exported so contract/registry.ts documents the real header
 // values instead of retyping them.
@@ -30,6 +36,7 @@ export const CORS_HEADERS = {
  * so a single state-file edit propagates to every API endpoint.
  */
 export const CI_METHODOLOGY_META = Object.freeze({
+  scope: "current_runtime_interpretation" as const,
   status: civicaIndex.status,
   standing: "secondary_research_experiment" as const,
   independent_validation: false as const,
@@ -108,47 +115,74 @@ export const PULSE_METHODOLOGY_META = Object.freeze({
 
 // CLM-012: exported so contract/registry.ts can document the real
 // numbers instead of a vague "best-effort" description with no figures.
-export const RATE_LIMIT_WINDOW_MS = 60_000;
-export const RATE_LIMIT_MAX = 60;
+export const RATE_LIMIT_WINDOW_MS = V1_RATE_LIMIT_WINDOW_MS;
+export const RATE_LIMIT_MAX = V1_RATE_LIMIT_MAX;
 
-function getRateLimitKey(request: Request): string {
-  return getRequestIp(request);
-}
+const API_V1_RATE_LIMIT_POLICY = getRequestRateLimitPolicy("public-api-v1");
 
 export function corsOptions() {
-  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      ...CORS_HEADERS,
+      "Cache-Control": cacheControlFor("public-live"),
+    },
+  });
 }
 
 export function apiResponse<T>(data: T, status = 200) {
-  return NextResponse.json(data, { status, headers: CORS_HEADERS });
-}
-
-export function apiError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status, headers: CORS_HEADERS });
-}
-
-export function withRateLimit(request: Request): NextResponse | null {
-  const key = getRateLimitKey(request);
-  const { allowed, retryAfterSeconds } = checkInMemoryRateLimit({
-    scope: "api-v1",
-    key,
-    max: RATE_LIMIT_MAX,
-    windowMs: RATE_LIMIT_WINDOW_MS,
+  return NextResponse.json(data, {
+    status,
+    headers: {
+      ...CORS_HEADERS,
+      "Cache-Control": cacheControlFor("public-live"),
+    },
   });
+}
 
-  if (!allowed) {
-    return NextResponse.json(
-      { error: "Rate limit exceeded. Try again shortly." },
-      {
-        status: 429,
-        headers: {
-          ...CORS_HEADERS,
-          "Retry-After": String(retryAfterSeconds),
-          "X-RateLimit-Remaining": "0",
-        },
-      }
-    );
-  }
+export type ApiErrorCode =
+  | "BAD_REQUEST"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "RATE_LIMITED"
+  | "RELEASE_INCONSISTENT"
+  | "INTERNAL_ERROR"
+  | "SERVICE_UNAVAILABLE";
 
-  return null;
+function defaultApiErrorCode(status: number): ApiErrorCode {
+  if (status === 400 || status === 422) return "BAD_REQUEST";
+  if (status === 401) return "UNAUTHORIZED";
+  if (status === 403) return "FORBIDDEN";
+  if (status === 404) return "NOT_FOUND";
+  if (status === 409) return "CONFLICT";
+  if (status === 429) return "RATE_LIMITED";
+  if (status === 503) return "SERVICE_UNAVAILABLE";
+  return "INTERNAL_ERROR";
+}
+
+export function apiError(
+  message: string,
+  status: number,
+  code: ApiErrorCode = defaultApiErrorCode(status),
+) {
+  return NextResponse.json(
+    { error: message, code },
+    {
+      status,
+      headers: {
+        ...CORS_HEADERS,
+        "Cache-Control": cacheControlFor("public-live"),
+      },
+    },
+  );
+}
+
+export async function withRateLimit(
+  request: Request,
+): Promise<NextResponse | null> {
+  return enforceRequestRateLimit(request, API_V1_RATE_LIMIT_POLICY, {
+    headers: CORS_HEADERS,
+  });
 }

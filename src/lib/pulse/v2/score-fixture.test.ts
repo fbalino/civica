@@ -9,6 +9,7 @@ import {
   type PublishedEvent,
 } from "./score";
 import { createPulsePipelineRunRef } from "./pipeline-version";
+import { EVENT_CATEGORIES, SCORE_WINDOW_DAYS } from "./taxonomy";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -17,6 +18,9 @@ const event: PublishedEvent = {
   jurisdictionId: "jurisdiction-1",
   dimension: "rule_of_law",
   category: "judicial_purge",
+  projectionStatus: "current",
+  published: true,
+  reviewStatus: "approved",
   severityTier: "moderate_neg",
   severityValue: -4,
   corroborationConfidence: 0.8,
@@ -35,6 +39,11 @@ const runRef = createPulsePipelineRunRef("score", {
 });
 
 const now = new Date("2026-07-10T00:00:00Z");
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function dateDaysBefore(days: number): string {
+  return new Date(now.getTime() - days * DAY_MS).toISOString().slice(0, 10);
+}
 
 test("score dry-run is stable and performs zero writes", async () => {
   let writes = 0;
@@ -93,10 +102,10 @@ test("empty score input without prior state is an explicit no-op", async () => {
   assert.deepEqual(result.planned, []);
 });
 
-test("a 366-day-old event clears prior country state without publishing a signal", async () => {
+test("an event one day beyond the configured window clears prior country state without publishing a signal", async () => {
   const staleEvent: PublishedEvent = {
     ...event,
-    eventDate: "2025-07-09",
+    eventDate: dateDaysBefore(SCORE_WINDOW_DAYS + 1),
   };
   const result = await calculateDimensionalDeltas({} as Db, {
     events: [staleEvent],
@@ -115,18 +124,18 @@ test("a 366-day-old event clears prior country state without publishing a signal
     assert.deepEqual(row.contributingEventIds, []);
     assert.equal(row.computationRunId, runRef.id);
     assert.equal(row.scoreAsOf, "2026-07-10");
-    assert.equal(row.windowStart, "2025-07-10");
-    assert.equal(row.windowDays, 365);
+    assert.equal(row.windowStart, dateDaysBefore(SCORE_WINDOW_DAYS));
+    assert.equal(row.windowDays, SCORE_WINDOW_DAYS);
     assert.equal(row.derivationVersions.algorithm.state, "versioned");
     assert.equal(row.derivationVersions.sourceBasket.state, "not_applicable");
   }
 });
 
-test("the 365-day boundary is included and future events are excluded", async () => {
+test("the maximum configured half-life boundary is included and future events are excluded", async () => {
   const boundaryEvent: PublishedEvent = {
     ...event,
     id: "event-boundary",
-    eventDate: "2025-07-10",
+    eventDate: dateDaysBefore(SCORE_WINDOW_DAYS),
   };
   const futureEvent: PublishedEvent = {
     ...event,
@@ -147,6 +156,105 @@ test("the 365-day boundary is included and future events are excluded", async ()
   );
   assert.deepEqual(ruleOfLaw?.contributingEventIds, [boundaryEvent.id]);
   assert.ok((ruleOfLaw?.deltaValue ?? 0) < 0);
+});
+
+test("every declared category remains scoreable through its own half-life", async () => {
+  assert.equal(
+    SCORE_WINDOW_DAYS,
+    Math.max(...EVENT_CATEGORIES.map(({ halfLifeDays }) => halfLifeDays)),
+  );
+  assert.ok(
+    EVENT_CATEGORIES.every(
+      ({ halfLifeDays }) => halfLifeDays > 0 && halfLifeDays <= SCORE_WINDOW_DAYS,
+    ),
+  );
+
+  const events: PublishedEvent[] = EVENT_CATEGORIES.map((category) => {
+    const tier = category.allowedTiers[0];
+    return {
+      ...event,
+      id: `half-life-${category.id}`,
+      dimension: category.dimension,
+      category: category.id,
+      severityTier: tier,
+      severityValue: tier.endsWith("_pos") ? 2 : -2,
+      eventDate: dateDaysBefore(category.halfLifeDays),
+    };
+  });
+  const result = await calculateDimensionalDeltas({} as Db, {
+    events,
+    existingJurisdictionIds: [],
+    dryRun: true,
+    now,
+    runRef,
+  });
+
+  assert.equal(result.eventsConsidered, EVENT_CATEGORIES.length);
+  const contributors = result.planned.flatMap(
+    ({ contributingEventIds }) => contributingEventIds,
+  );
+  assert.deepEqual(
+    contributors.toSorted(),
+    events.map(({ id }) => id).toSorted(),
+  );
+});
+
+test("score plans clamp deterministic totals to both declared bounds", async () => {
+  const result = await calculateDimensionalDeltas({} as Db, {
+    events: [
+      {
+        ...event,
+        id: "lower-one",
+        severityTier: "catastrophic_neg",
+        severityValue: -10,
+      },
+      {
+        ...event,
+        id: "lower-two",
+        severityTier: "catastrophic_neg",
+        severityValue: -10,
+      },
+      {
+        ...event,
+        id: "upper-one",
+        dimension: "democratic_quality",
+        category: "fair_election",
+        severityTier: "high_pos",
+        severityValue: 6,
+      },
+      {
+        ...event,
+        id: "upper-two",
+        dimension: "democratic_quality",
+        category: "fair_election",
+        severityTier: "high_pos",
+        severityValue: 6,
+      },
+      {
+        ...event,
+        id: "upper-three",
+        dimension: "democratic_quality",
+        category: "fair_election",
+        severityTier: "high_pos",
+        severityValue: 6,
+      },
+    ],
+    existingJurisdictionIds: [],
+    dryRun: true,
+    now,
+    runRef,
+  });
+
+  assert.equal(
+    result.planned.find(({ dimension }) => dimension === "rule_of_law")
+      ?.deltaValue,
+    -15,
+  );
+  assert.equal(
+    result.planned.find(({ dimension }) => dimension === "democratic_quality")
+      ?.deltaValue,
+    10,
+  );
 });
 
 test("current-event and prior-state jurisdictions form one deduplicated union", async () => {

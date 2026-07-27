@@ -4,7 +4,10 @@ import { getAllReferenceJurisdictions } from "@/lib/db/queries";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 import "./not-found.css";
+
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Page Not Found — 404",
@@ -50,24 +53,13 @@ const DESTINATIONS: ReadonlyArray<{
   },
 ];
 
-/* The compass spot-engraving. Light + dark variants swap via the global
-   .theme-engraving-light / .theme-engraving-dark rules in globals.css. */
+/* The compass spot-engraving resolves one active-theme asset at a time. */
 function CompassEngraving() {
   return (
     <div className="not-found__engraving" aria-hidden="true">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="theme-engraving-light"
+      <ThemedDecorativeImage
         src="/engravings/spot-compass.webp"
-        alt=""
-        aria-hidden="true"
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="theme-engraving-dark"
-        src="/engravings/spot-compass-dark.webp"
-        alt=""
-        aria-hidden="true"
+        darkSrc="/engravings/spot-compass-dark.webp"
       />
     </div>
   );

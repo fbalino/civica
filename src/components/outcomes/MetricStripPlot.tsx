@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { classifyGovernment } from "@/lib/data/government-category";
 import { formatGovernmentType } from "@/lib/text/clean";
 
@@ -64,6 +64,16 @@ const JITTER_RANGE = 20;
 const DOT_R = 5;
 const MEDIAN_TICK_H = 24;
 const NO_DATA_LANE = "__no_data__";
+
+function subscribeToReducedMotion(callback: () => void) {
+  const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
@@ -133,14 +143,11 @@ export function MetricStripPlot({
   const [focusedIdx, setFocusedIdx] = useState<number>(-1);
 
   // Detect prefers-reduced-motion
-  const [reducedMotion, setReducedMotion] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
+  const reducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotionSnapshot,
+    () => false,
+  );
 
   const transition = reducedMotion ? "none" : `opacity 120ms ease, r 150ms ease`;
 
@@ -718,7 +725,7 @@ export function MetricStripPlot({
                 top: `${pctY}%`,
                 transform: "translateY(-50%)",
                 pointerEvents: "none",
-                zIndex: 10,
+                zIndex: "var(--z-tooltip)",
                 background: "var(--color-tooltip-bg)",
                 border: "1px solid var(--color-tooltip-border)",
                 borderRadius: "var(--radius-sm)",

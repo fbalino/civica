@@ -619,6 +619,7 @@ function buildDecisionTrace(
     incumbent_held: "The incumbent remained at least as fresh and no eligible challenger displaced it.",
     cia_default_group_a: "Group A identity policy retained the CIA incumbent; disagreement requires reviewer signoff.",
     cia_default_group_c: "Group C narrative/structural policy retained the CIA incumbent; disagreement remains reviewable.",
+    canonical_only_legacy: "The published historical winner is retained, but its candidate set and cut-time decision reason are unavailable.",
     no_active_rows: "No canonical row was selected.",
   };
   trace.push({

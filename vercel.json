@@ -96,6 +96,18 @@
     { "path": "/api/cron/pulse/v2/cluster", "schedule": "20 8 * * *" },
     { "path": "/api/cron/pulse/v2/classify", "schedule": "40 8 * * *" },
     { "path": "/api/cron/pulse/v2/score", "schedule": "0 9 * * *" },
-    { "path": "/api/cron/pulse/v2/review-sla", "schedule": "10 */6 * * *" }
+    { "path": "/api/cron/pulse/v2/review-sla", "schedule": "10 */6 * * *" },
+    {
+      "path": "/api/cron/operations/error-alerts",
+      "schedule": "50 23 * * *"
+    },
+    {
+      "path": "/api/cron/operations/pipeline-alerts",
+      "schedule": "55 23 * * *"
+    },
+    {
+      "path": "/api/cron/operations/health-alerts",
+      "schedule": "*/15 * * * *"
+    }
   ]
 }

@@ -5,6 +5,12 @@ import {
   jurisdictions,
   statements,
 } from "@/lib/db/schema";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { validateFactNumeric } from "@/lib/factbook/numeric-validation";
 
 type Db = typeof import("@/lib/db").db;
@@ -24,7 +30,11 @@ export async function writeAtlasCountry(
     sections: AtlasSectionInput[];
     facts: AtlasFactInput[];
   },
-  options: { dryRun?: boolean } = {},
+  options: {
+    dryRun?: boolean;
+    atlasReleaseId?: string;
+    writeFact?: CountryFactHistoryWriter;
+  } = {},
 ) {
   if (!input.jurisdiction.slug || input.sections.length === 0 || input.facts.length === 0) {
     throw new Error(`Malformed/empty Factbook country: ${input.jurisdiction.slug}`);
@@ -43,6 +53,8 @@ export async function writeAtlasCountry(
       written: 0,
     };
   }
+  const atlasReleaseId = resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   let jurisdictionId = input.existingId ?? null;
   if (jurisdictionId) {
@@ -66,9 +78,17 @@ export async function writeAtlasCountry(
       ? { status: "active", statusReason: null }
       : { status: "rejected", statusReason: validation.reason };
     if (!validation.accepted) rejectedFacts += 1;
-    await db.insert(countryFacts).values({ jurisdictionId, sourceId: "cia_factbook", ...fact, ...lifecycle }).onConflictDoUpdate({
-      target: [countryFacts.jurisdictionId, countryFacts.factKey, countryFacts.sourceId],
-      set: { ...fact, ...lifecycle, retrievedAt: new Date() },
+    const values = {
+      jurisdictionId,
+      sourceId: "cia_factbook",
+      ...fact,
+      ...lifecycle,
+      retrievedAt: new Date(),
+    };
+    await writeFact(db, {
+      values,
+      history: routineCountryFactHistory(values, atlasReleaseId),
+      preserveReviewStatus: false,
     });
   }
 

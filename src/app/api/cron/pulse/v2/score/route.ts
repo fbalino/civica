@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import { requireCronAuth } from "@/lib/api/cron-auth";
-import * as schema from "@/lib/db/schema";
+import { cronExecutionKeyFromRequest, withCronJob } from "@/lib/api/cron-job";
+import { getDb } from "@/lib/db";
 import { corroborateEvents } from "@/lib/pulse/v2/corroborate";
+import {
+  previewPulseDriftObservation,
+  recordPulseDriftObservation,
+} from "@/lib/pulse/v2/drift-monitor-store";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
 
 export const runtime = "nodejs";
@@ -11,33 +13,53 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const started = new Date().toISOString();
-  try {
-    const sqlClient = neon(process.env.DATABASE_URL!);
-    const db = drizzle({ client: sqlClient, schema });
-    const corroboration = await corroborateEvents(db);
-    const scoring = await calculateDimensionalDeltas(db);
-    return NextResponse.json({
-      ok: true,
-      step: "pulse.v2.score",
-      started,
-      finished: new Date().toISOString(),
-      summary: { corroboration, scoring },
-    });
-  } catch (err) {
-    console.error("[cron pulse.v2.score] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "pulse.v2.score",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 }
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
+  const cronExecutionKey = cronExecutionKeyFromRequest(request);
+  const db = getDb();
+  const corroboration = await corroborateEvents(db, {
+    dryRun,
+    cronExecutionKey,
+  });
+  const scoring = await calculateDimensionalDeltas(db, {
+    dryRun,
+    cronExecutionKey,
+  });
+  const drift = dryRun
+    ? await previewPulseDriftObservation(db)
+    : await recordPulseDriftObservation(db, { scoreRunId: scoring.runId });
+  if (drift.alertCount > 0) {
+    // The durable alert rows contain bounded affected-row references. The
+    // operational log stays smaller and never repeats source evidence.
+    console.error(
+      "[pulse.drift-alert] " +
+        JSON.stringify({
+          scoreRunId: scoring.runId,
+          standing: drift.standing,
+          metrics: drift.alerts.map((alert) => alert.metric),
+        }),
     );
   }
+  return NextResponse.json({
+    ok: true,
+    step: "pulse.v2.score",
+    dryRun,
+    started,
+    finished: new Date().toISOString(),
+    summary: {
+      corroboration,
+      scoring,
+      drift: {
+        standing: drift.standing,
+        alertCount: drift.alertCount,
+        baselineId: drift.baselineId,
+        observationId: drift.observationId,
+        reused: drift.reused,
+      },
+    },
+  });
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("pulse.v2.score", handler);
+
+export { cronHandler as GET, cronHandler as POST };

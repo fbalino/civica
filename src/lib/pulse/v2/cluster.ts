@@ -13,10 +13,10 @@
  * union-find is O(N²) within a capped run and date-window pruning keeps it bounded.
  */
 
-import { createHash } from "node:crypto";
-import { eq, isNull } from "drizzle-orm";
+import { createHash, randomUUID } from "node:crypto";
+import { and, asc, eq, isNull, lte, or } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { rawEvents } from "@/lib/db/schema";
+import { pulsePipelineRuns, rawEvents } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import { tryEmbedBatch, cosineSimilarity } from "./embed";
 import {
@@ -32,20 +32,26 @@ import {
 import {
   PULSE_INCIDENT_ASSIGNMENT_ALGORITHM_VERSION,
   PULSE_INCIDENT_ASSIGNMENT_SCHEMA_VERSION,
-  appendIncidentResolution,
-  assignRawReportToIncident,
-  attachAssignedEvidenceToCurrentEvent,
   buildIncidentAssignmentKey,
   buildIncidentResolutionKey,
-  insertNewIncident,
   loadActiveIncidentCandidates,
+  repairAssignedEvidenceForCurrentEvents,
+  type AttachIncidentEvidencePlan,
   type IncidentAssignmentPlan,
   type IncidentResolutionRecordPlan,
   type NewIncidentPlan,
 } from "./incident-store";
 import {
+  publishSemanticClusterPlan,
+  type SemanticClusterAssignmentPlan,
+  type SemanticClusterIncidentPlan,
+  type SemanticClusterPublisher,
+} from "./cluster-publish";
+import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
+  preparePulsePipelineRun,
+  pulseCronStageRunId,
   startPulsePipelineRun,
   type PulsePipelineRunRef,
 } from "./pipeline-version";
@@ -58,14 +64,22 @@ export const CLUSTER_DATE_WINDOW_HOURS = 48;
 export interface ClusterRunSummary {
   runId: string;
   versionKey: string;
+  /** Partial means lexical fallback replaced the semantic embedding model. */
+  status: "completed" | "partial";
   /** All unclustered rows considered, including unresolved jurisdictions. */
   candidates: number;
-  /** Rows that got a cluster_id assigned */
+  /** Rows that actually received a durable incident/cluster assignment. */
   clustered: number;
-  /** Distinct cluster ids written */
+  /** Distinct durable incidents/clusters created. */
   clustersCreated: number;
+  /** Rows the computed plan would assign if the semantic model is available. */
+  wouldCluster: number;
+  /** Distinct incidents/clusters the computed plan would create. */
+  wouldCreateClusters: number;
   /** New reports attached to an already stable incident. */
   matchedPersistedIncidents: number;
+  /** Reports the plan would attach to an existing incident. */
+  wouldMatchPersistedIncidents: number;
   /** Possible collisions retained for review rather than auto-merged. */
   collisionCandidates: number;
   comparisonPairs: number;
@@ -84,6 +98,8 @@ export interface ClusterRunSummary {
     memberIds: string[];
     matchKind: "new" | "persisted_match";
   }>;
+  /** True when a delivery retry reused its already-completed stage run. */
+  reused: boolean;
 }
 
 export interface CandidateRow {
@@ -108,10 +124,7 @@ export interface CandidateRow {
 interface IncidentPersistence {
   insertIncident: (db: Db, plan: NewIncidentPlan) => Promise<string>;
   assignReport: (db: Db, plan: IncidentAssignmentPlan) => Promise<void>;
-  attachEvidence: (
-    db: Db,
-    plan: Parameters<typeof attachAssignedEvidenceToCurrentEvent>[1],
-  ) => Promise<void>;
+  attachEvidence: (db: Db, plan: AttachIncidentEvidencePlan) => Promise<void>;
   appendResolution: (
     db: Db,
     plan: IncidentResolutionRecordPlan,
@@ -130,7 +143,13 @@ export interface ClusterRunOptions {
   now?: Date;
   clusterIdFactory?: (memberIds: readonly string[]) => string;
   runRef?: PulsePipelineRunRef;
+  /** Stable logical cron delivery key injected by `withCronJob()`. */
+  cronExecutionKey?: string;
   incidentPersistence?: IncidentPersistence;
+  /** Fixture seam for observing or fault-injecting the one-shot publish plan. */
+  publishPlan?: SemanticClusterPublisher;
+  /** Integration-fixture seam for exercising production run persistence. */
+  persistRun?: boolean;
 }
 
 function deterministicFixtureClusterId(memberIds: readonly string[]): string {
@@ -163,6 +182,43 @@ function validateCandidates(candidates: readonly CandidateRow[]): void {
   }
 }
 
+function countValue(counts: Record<string, number>, key: string): number {
+  const value = counts[key];
+  return Number.isFinite(value) ? value : 0;
+}
+
+function reusedClusterSummary(input: {
+  runId: string;
+  versionKey: string;
+  counts: Record<string, number>;
+}): ClusterRunSummary {
+  const { counts } = input;
+  return {
+    runId: input.runId,
+    versionKey: input.versionKey,
+    status: "completed",
+    candidates: countValue(counts, "candidates"),
+    clustered: countValue(counts, "clustered"),
+    clustersCreated: countValue(counts, "clustersCreated"),
+    wouldCluster: countValue(counts, "wouldCluster"),
+    wouldCreateClusters: countValue(counts, "wouldCreateClusters"),
+    matchedPersistedIncidents: countValue(counts, "matchedPersistedIncidents"),
+    wouldMatchPersistedIncidents: countValue(
+      counts,
+      "wouldMatchPersistedIncidents",
+    ),
+    collisionCandidates: countValue(counts, "collisionCandidates"),
+    comparisonPairs: countValue(counts, "comparisonPairs"),
+    multiSourceClusters: countValue(counts, "multiSourceClusters"),
+    multiSourceFamilyClusters: countValue(counts, "multiSourceFamilyClusters"),
+    multilingualClusters: countValue(counts, "multilingualClusters"),
+    crossJurisdictionClusters: countValue(counts, "crossJurisdictionClusters"),
+    dryRun: false,
+    assignments: [],
+    reused: true,
+  };
+}
+
 /**
  * Run the clustering pipeline against all unclustered rows. Returns
  * a summary of what changed.
@@ -172,6 +228,75 @@ export async function runClustering(
   opts: ClusterRunOptions = {},
 ): Promise<ClusterRunSummary> {
   const limit = opts.limit ?? 1000;
+  const persistRun =
+    !opts.dryRun && (opts.persistRun ?? (!opts.candidates && !opts.runRef));
+  const cronRunId = opts.cronExecutionKey
+    ? pulseCronStageRunId(opts.cronExecutionKey, "cluster")
+    : null;
+  if (cronRunId && opts.runRef && cronRunId !== opts.runRef.id) {
+    throw new Error("cluster runRef conflicts with the cron delivery identity");
+  }
+  let runningCronRun: {
+    versionKey: string;
+    counts: Record<string, number>;
+    startedAt: Date;
+  } | null = null;
+
+  // Check the delivery-stable run before reading the mutable queue. If the
+  // domain publish committed but the outer cron ledger failed to finish, the
+  // retry must reuse the completed run rather than derive a new version from
+  // the now-empty queue.
+  if (persistRun && cronRunId) {
+    const existing = await db
+      .select({
+        stage: pulsePipelineRuns.stage,
+        status: pulsePipelineRuns.status,
+        versionKey: pulsePipelineRuns.versionKey,
+        counts: pulsePipelineRuns.counts,
+        startedAt: pulsePipelineRuns.startedAt,
+      })
+      .from(pulsePipelineRuns)
+      .where(eq(pulsePipelineRuns.id, cronRunId))
+      .limit(1);
+    if (existing[0] && existing[0].stage !== "cluster") {
+      throw new Error(`Pulse pipeline run identity collision: ${cronRunId}`);
+    }
+    if (existing[0]?.status === "completed") {
+      return reusedClusterSummary({
+        runId: cronRunId,
+        versionKey: existing[0].versionKey,
+        counts: existing[0].counts,
+      });
+    }
+    if (existing[0] && existing[0].status !== "running") {
+      throw new Error(
+        `Terminal Pulse pipeline run cannot be resumed: ${cronRunId} (${existing[0].status})`,
+      );
+    }
+    if (existing[0]?.status === "running") {
+      runningCronRun = {
+        versionKey: existing[0].versionKey,
+        counts: existing[0].counts,
+        startedAt: existing[0].startedAt,
+      };
+    }
+  }
+  const selectionCutoff = runningCronRun?.startedAt ?? opts.now ?? new Date();
+
+  // A report can receive an incident assignment while classification is
+  // publishing the incident's first event. It was correctly excluded from the
+  // frozen model workset, but must converge into the event's source trail on a
+  // later cluster delivery instead of remaining permanently pending.
+  if (!opts.dryRun && !opts.candidates && !opts.runRef) {
+    const repaired = await repairAssignedEvidenceForCurrentEvents(db, {
+      limit,
+    });
+    if (repaired > 0) {
+      console.info(
+        `[cluster] attached ${repaired} late incident evidence row(s) without reclassification`,
+      );
+    }
+  }
 
   // Pull every unclustered candidate. A provisional country must never prevent
   // two reports about the same event from meeting.
@@ -194,7 +319,19 @@ export async function runClustering(
           ingestRunId: rawEvents.ingestRunId,
         })
         .from(rawEvents)
-        .where(isNull(rawEvents.clusterId))
+        .where(
+          and(
+            isNull(rawEvents.clusterId),
+            // Legacy rows may predate a non-null created_at contract. Keep
+            // them eligible; sanctioned ingest rows receive defaultNow and
+            // are fenced by the durable run cutoff on retry.
+            or(
+              isNull(rawEvents.createdAt),
+              lte(rawEvents.createdAt, selectionCutoff),
+            ),
+          ),
+        )
+        .orderBy(asc(rawEvents.createdAt), asc(rawEvents.id))
         .limit(limit)
     ).map((row) => ({
       id: row.id,
@@ -216,13 +353,34 @@ export async function runClustering(
   const run =
     opts.runRef ??
     createPulsePipelineRunRef("cluster", {
+      id: cronRunId ?? undefined,
       sourceIds: newCandidates.length
         ? newCandidates.map(({ sourceId }) => sourceId)
         : undefined,
       upstreamRunIds: newCandidates.map(({ ingestRunId }) => ingestRunId),
     });
-  const persistRun = !opts.dryRun && !opts.candidates && !opts.runRef;
-  if (persistRun) await startPulsePipelineRun(db, run);
+  if (persistRun) {
+    const prepared = cronRunId
+      ? runningCronRun
+        ? await preparePulsePipelineRun(db, run)
+        : (await db.insert(pulsePipelineRuns).values({
+            id: run.id,
+            stage: run.versions.stage,
+            status: "running",
+            versionKey: run.versionKey,
+            versions: run.versions,
+            startedAt: selectionCutoff,
+          }),
+          { state: "ready" as const })
+      : (await startPulsePipelineRun(db, run), { state: "ready" as const });
+    if (prepared.state === "completed") {
+      return reusedClusterSummary({
+        runId: run.id,
+        versionKey: run.versionKey,
+        counts: prepared.counts,
+      });
+    }
+  }
 
   if (newCandidates.length === 0) {
     if (persistRun) {
@@ -234,10 +392,14 @@ export async function runClustering(
     return {
       runId: run.id,
       versionKey: run.versionKey,
+      status: "completed",
       candidates: 0,
       clustered: 0,
       clustersCreated: 0,
+      wouldCluster: 0,
+      wouldCreateClusters: 0,
       matchedPersistedIncidents: 0,
+      wouldMatchPersistedIncidents: 0,
       collisionCandidates: 0,
       comparisonPairs: 0,
       multiSourceClusters: 0,
@@ -246,6 +408,7 @@ export async function runClustering(
       crossJurisdictionClusters: 0,
       dryRun: opts.dryRun ?? false,
       assignments: [],
+      reused: false,
     };
   }
 
@@ -299,6 +462,10 @@ export async function runClustering(
       ? (opts.embeddingResult ?? null)
       : await tryEmbedBatch(texts);
   const useEmbeddings = embeddings !== null;
+  // Lexical fallback remains a diagnostic plan only. It cannot write durable
+  // incident identity and then report a retryable partial failure: that would
+  // let the retry see an empty queue and falsely finalize the same delivery.
+  const applyAssignments = !opts.dryRun && useEmbeddings;
   if (useEmbeddings && embeddings.length !== candidates.length) {
     throw new Error(
       `Embedding result length ${embeddings.length} does not match ${candidates.length} incident candidates`,
@@ -310,11 +477,14 @@ export async function runClustering(
 
   let clustered = 0;
   let clustersCreated = 0;
+  let wouldCluster = 0;
+  let wouldCreateClusters = 0;
   let multiSourceClusters = 0;
   let multiSourceFamilyClusters = 0;
   let multilingualClusters = 0;
   let crossJurisdictionClusters = 0;
   let matchedPersistedIncidents = 0;
+  let wouldMatchPersistedIncidents = 0;
   const now = opts.now ?? new Date();
   const assignments: ClusterRunSummary["assignments"] = [];
   const persistedByIncident = new Map(
@@ -409,16 +579,20 @@ export async function runClustering(
     groups.set(r, arr);
   }
 
-  const persistence: IncidentPersistence =
-    opts.incidentPersistence ?? {
-      insertIncident: insertNewIncident,
-      assignReport: assignRawReportToIncident,
-      attachEvidence: attachAssignedEvidenceToCurrentEvent,
-      appendResolution: appendIncidentResolution,
-    };
-  const useIncidentStore = !opts.candidates || Boolean(opts.incidentPersistence);
+  const persistence = opts.incidentPersistence;
+  const publisher = opts.publishPlan ?? publishSemanticClusterPlan;
+  const useIncidentStore =
+    !opts.candidates || Boolean(persistence) || Boolean(opts.publishPlan);
+  const useAtomicPublisher = useIncidentStore && !persistence;
+  const incidentPlans: SemanticClusterIncidentPlan[] = [];
+  const assignmentPlans: SemanticClusterAssignmentPlan[] = [];
+  const evidencePlans: AttachIncidentEvidencePlan[] = [];
+  const resolutionPlans: IncidentResolutionRecordPlan[] = [];
   const provisionalToIncident = new Map<string, string>(
-    persistedIncidents.map((candidate) => [candidate.incidentId, candidate.incidentId]),
+    persistedIncidents.map((candidate) => [
+      candidate.incidentId,
+      candidate.incidentId,
+    ]),
   );
 
   // Assign stable incident ids and write back only the incoming reports.
@@ -436,7 +610,7 @@ export async function runClustering(
       : null;
     let incidentId = selectedPersisted?.incidentId ?? null;
     if (!incidentId) {
-      if (opts.dryRun || !useIncidentStore) {
+      if (!applyAssignments || !useIncidentStore) {
         incidentId =
           opts.clusterIdFactory?.(memberIds) ??
           deterministicFixtureClusterId(memberIds);
@@ -446,18 +620,26 @@ export async function runClustering(
           .map((idx) => candidates[idx].eventDate)
           .filter((value): value is string => Boolean(value))
           .sort();
-        incidentId = await persistence.insertIncident(db, {
+        const incidentPlan: NewIncidentPlan = {
           representativeTitle: representative.title,
           body: representative.body,
           eventDateStart: dates[0] ?? null,
           eventDateEnd: dates.at(-1) ?? null,
           embedding: useEmbeddings ? embeddings![newMembers[0]] : null,
           createdRunId: run.id,
-        });
+        };
+        if (useAtomicPublisher) {
+          incidentId = opts.clusterIdFactory?.(memberIds) ?? randomUUID();
+          incidentPlans.push({ id: incidentId, ...incidentPlan });
+        } else {
+          incidentId = await persistence!.insertIncident(db, incidentPlan);
+        }
       }
-      clustersCreated++;
+      wouldCreateClusters++;
+      if (applyAssignments) clustersCreated++;
     } else {
-      matchedPersistedIncidents += newMembers.length;
+      wouldMatchPersistedIncidents += newMembers.length;
+      if (applyAssignments) matchedPersistedIncidents += newMembers.length;
     }
     const matchKind: IncidentAssignmentPlan["matchKind"] = selectedPersisted
       ? "persisted_match"
@@ -472,13 +654,17 @@ export async function runClustering(
       provisionalToIncident.set(incidentCandidates[idx].incidentId, incidentId);
     }
 
-    const sourceIds = new Set(newMembers.map((idx) => candidates[idx].sourceId));
+    const sourceIds = new Set(
+      newMembers.map((idx) => candidates[idx].sourceId),
+    );
     if (sourceIds.size > 1) multiSourceClusters++;
     const sourceFamilyIds = new Set(
       newMembers.map((idx) => candidates[idx].sourceFamilyId),
     );
     if (sourceFamilyIds.size > 1) multiSourceFamilyClusters++;
-    const languages = new Set(newMembers.map((idx) => candidates[idx].language));
+    const languages = new Set(
+      newMembers.map((idx) => candidates[idx].language),
+    );
     if (languages.size > 1) multilingualClusters++;
     const provisionalJurisdictions = new Set(
       newMembers.map((idx) => candidates[idx].jurisdictionId ?? "unresolved"),
@@ -496,7 +682,10 @@ export async function runClustering(
     for (const idx of newMembers) {
       const identity = compareEventIdentities(
         normalizeEventIdentity(candidates[idx].title, candidates[idx].body),
-        normalizeEventIdentity(comparisonTarget.headline, comparisonTarget.body),
+        normalizeEventIdentity(
+          comparisonTarget.headline,
+          comparisonTarget.body,
+        ),
       );
       const semantic = useEmbeddings
         ? Math.max(
@@ -510,7 +699,7 @@ export async function runClustering(
             ),
           )
         : null;
-      if (!opts.dryRun) {
+      if (applyAssignments) {
         if (useIncidentStore) {
           const payload = {
             incidentId,
@@ -538,26 +727,35 @@ export async function runClustering(
             assignmentKey: buildIncidentAssignmentKey(payload),
             ...payload,
           };
-          await persistence.assignReport(db, assignment);
-          if (useEmbeddings) {
+          const evidencePlan = selectedPersisted?.eventId
+            ? {
+                eventId: selectedPersisted.eventId,
+                rawEventId: candidates[idx].id,
+                sourceId: candidates[idx].sourceId,
+                sourceType: candidates[idx].sourceType ?? "news",
+                sourceName: candidates[idx].sourceId,
+                sourceUrl: candidates[idx].sourceUrl ?? null,
+                stageRunId: run.id,
+                attachedAt: now.toISOString(),
+                rationale:
+                  "PUL-031 attached later evidence to the existing current incident without reclassification.",
+              }
+            : null;
+          if (useAtomicPublisher) {
+            assignmentPlans.push({
+              assignment,
+              embedding: embeddings![idx],
+            });
+            if (evidencePlan) evidencePlans.push(evidencePlan);
+          } else {
+            await persistence!.assignReport(db, assignment);
             await db
               .update(rawEvents)
               .set({ embedding: embeddings![idx] })
               .where(eq(rawEvents.id, candidates[idx].id));
-          }
-          if (selectedPersisted?.eventId) {
-            await persistence.attachEvidence(db, {
-              eventId: selectedPersisted.eventId,
-              rawEventId: candidates[idx].id,
-              sourceId: candidates[idx].sourceId,
-              sourceType: candidates[idx].sourceType ?? "news",
-              sourceName: candidates[idx].sourceId,
-              sourceUrl: candidates[idx].sourceUrl ?? null,
-              stageRunId: run.id,
-              attachedAt: now.toISOString(),
-              rationale:
-                "PUL-031 attached later evidence to the existing current incident without reclassification.",
-            });
+            if (evidencePlan) {
+              await persistence!.attachEvidence(db, evidencePlan);
+            }
           }
         } else {
           await db
@@ -573,14 +771,19 @@ export async function runClustering(
         }
       }
     }
-    clustered += newMembers.length;
+    wouldCluster += newMembers.length;
+    if (applyAssignments) clustered += newMembers.length;
   }
 
   const retainedCollisionPairs = new Set<string>();
   for (const finding of collisionFindings) {
     const leftIncidentId = provisionalToIncident.get(finding.candidateIds[0]);
     const rightIncidentId = provisionalToIncident.get(finding.candidateIds[1]);
-    if (!leftIncidentId || !rightIncidentId || leftIncidentId === rightIncidentId) {
+    if (
+      !leftIncidentId ||
+      !rightIncidentId ||
+      leftIncidentId === rightIncidentId
+    ) {
       continue;
     }
     const pair = [leftIncidentId, rightIncidentId].sort();
@@ -607,7 +810,9 @@ export async function runClustering(
       actor: { type: "pipeline", stage: "post_cluster_collision" },
       rationale:
         "Identity evidence suggests a possible duplicate, but the automatic-merge threshold was not met.",
-      evidenceRefs: finding.candidateIds.map((id) => `incident-candidate:${id}`),
+      evidenceRefs: finding.candidateIds.map(
+        (id) => `incident-candidate:${id}`,
+      ),
       decidedAt: now.toISOString(),
     };
     const resolution: IncidentResolutionRecordPlan = {
@@ -615,26 +820,49 @@ export async function runClustering(
       resolutionKey: buildIncidentResolutionKey(payload),
       ...payload,
     };
-    if (!opts.dryRun && useIncidentStore) {
-      await persistence.appendResolution(db, resolution);
+    if (applyAssignments && useIncidentStore) {
+      if (useAtomicPublisher) resolutionPlans.push(resolution);
+      else await persistence!.appendResolution(db, resolution);
     }
   }
 
-  if (persistRun) {
+  const completionCounts = {
+    candidates: newCandidates.length,
+    clustered,
+    clustersCreated,
+    wouldCluster,
+    wouldCreateClusters,
+    matchedPersistedIncidents,
+    wouldMatchPersistedIncidents,
+    collisionCandidates: retainedCollisionPairs.size,
+    multiSourceClusters,
+    multiSourceFamilyClusters,
+    multilingualClusters,
+    crossJurisdictionClusters,
+    comparisonPairs,
+  };
+  const atomicPublish = applyAssignments && useAtomicPublisher;
+  if (atomicPublish) {
+    await publisher(db, {
+      runId: run.id,
+      incidents: incidentPlans,
+      assignments: assignmentPlans,
+      evidence: evidencePlans,
+      resolutions: resolutionPlans,
+      completion: persistRun
+        ? {
+            runId: run.id,
+            counts: completionCounts,
+            completedAt: now.toISOString(),
+          }
+        : null,
+    });
+  }
+
+  if (persistRun && !atomicPublish && useEmbeddings) {
     await finishPulsePipelineRun(db, run.id, {
       status: useEmbeddings ? "completed" : "partial",
-      counts: {
-        candidates: newCandidates.length,
-        clustered,
-        clustersCreated,
-        matchedPersistedIncidents,
-        collisionCandidates: retainedCollisionPairs.size,
-        multiSourceClusters,
-        multiSourceFamilyClusters,
-        multilingualClusters,
-        crossJurisdictionClusters,
-        comparisonPairs,
-      },
+      counts: completionCounts,
       failures: useEmbeddings
         ? []
         : [
@@ -649,10 +877,14 @@ export async function runClustering(
   return {
     runId: run.id,
     versionKey: run.versionKey,
+    status: useEmbeddings ? "completed" : "partial",
     candidates: newCandidates.length,
     clustered,
     clustersCreated,
+    wouldCluster,
+    wouldCreateClusters,
     matchedPersistedIncidents,
+    wouldMatchPersistedIncidents,
     collisionCandidates: retainedCollisionPairs.size,
     comparisonPairs,
     multiSourceClusters,
@@ -663,5 +895,6 @@ export async function runClustering(
     assignments: assignments.sort((left, right) =>
       left.clusterId.localeCompare(right.clusterId),
     ),
+    reused: false,
   };
 }

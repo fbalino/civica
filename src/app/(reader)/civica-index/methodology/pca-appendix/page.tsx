@@ -10,7 +10,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { civicaIndex } from "@/lib/content/site-state";
 import pcaAnalysis from "@/lib/ci/pca-analysis.generated.json";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Historical PCA Weight Record — Civica Index",

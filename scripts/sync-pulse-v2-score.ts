@@ -7,7 +7,7 @@
  * Usage: npm run pulse:v2:score
  */
 import { config } from "dotenv";
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
@@ -18,7 +18,10 @@ import { calculateDimensionalDeltas } from "../src/lib/pulse/v2/score";
 
 async function main() {
   const dryRun = process.argv.includes("--dry-run");
-  const sqlClient = neon(process.env.DATABASE_URL!);
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required");
+  }
+  const sqlClient = neon(process.env.DATABASE_URL);
   const db = drizzle({ client: sqlClient, schema });
 
   const start = Date.now();

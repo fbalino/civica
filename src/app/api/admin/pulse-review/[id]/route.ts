@@ -25,7 +25,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { pulseEventsV2, pulseReviewAuditLog } from "@/lib/db/schema";
-import { getAdminSession } from "@/lib/admin/session";
+import { adminMutationProblem, withAdminMutation } from "@/lib/admin/mutation";
+import { safeInternalPathOr } from "@/lib/admin/safe-redirect";
+import type { AdminSession } from "@/lib/admin/session";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
 import { validatePulseClassification } from "@/lib/pulse/v2/review-validation";
 import {
@@ -42,69 +44,39 @@ import type {
   PulseDecisionKind,
 } from "@/lib/pulse/v2/decision-ledger";
 import type { PulseDimension, SeverityTier } from "@/lib/pulse/v2/types";
+import {
+  FORM_MEDIA_TYPE,
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+  requestInputErrorResponse,
+} from "@/lib/api/request-body";
+import {
+  adminPulseReviewFormBodySchema,
+  adminPulseReviewJsonBodySchema,
+  REQUEST_BODY_LIMITS,
+  requestUuidSchema,
+  type AdminPulseReviewBody,
+} from "@/lib/api/request-body-schemas";
 
-type Action = "approve" | "edit" | "reject";
-
-const VALID_ACTIONS: Set<Action> = new Set(["approve", "edit", "reject"]);
-
-interface ReviewBody {
-  action: Action;
-  category?: string;
-  dimension?: string;
-  severityTier?: string;
-  severityValue?: number;
-  notes?: string;
-  redirect?: string;
-}
-
-async function readBody(
+async function mutatePulseEvent(
   request: NextRequest,
-): Promise<{ body: ReviewBody; isForm: boolean }> {
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/x-www-form-urlencoded")) {
-    const form = await request.formData();
-    return {
-      isForm: true,
-      body: {
-        action: String(form.get("action") ?? "") as Action,
-        category: form.get("category")
-          ? String(form.get("category"))
-          : undefined,
-        dimension: form.get("dimension")
-          ? String(form.get("dimension"))
-          : undefined,
-        severityTier: form.get("severityTier")
-          ? String(form.get("severityTier"))
-          : undefined,
-        severityValue: form.get("severityValue")
-          ? Number(form.get("severityValue"))
-          : undefined,
-        notes: form.get("notes") ? String(form.get("notes")) : undefined,
-        redirect: form.get("redirect")
-          ? String(form.get("redirect"))
-          : undefined,
-      },
-    };
-  }
-  const json = (await request.json()) as ReviewBody;
-  return { isForm: false, body: json };
-}
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  id: string,
+  auth: AdminSession,
 ) {
-  const auth = await getAdminSession();
-  if (!auth) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const parsedId = requestUuidSchema.safeParse(id);
+  if (!parsedId.success) return requestInputErrorResponse("INVALID_REQUEST");
 
-  const { id } = await params;
-  const { body, isForm } = await readBody(request);
-
-  if (!VALID_ACTIONS.has(body.action)) {
-    return NextResponse.json({ error: "invalid action" }, { status: 400 });
-  }
+  const parsed = await parseBoundedRequestBody<AdminPulseReviewBody>(request, {
+    maxBytes: REQUEST_BODY_LIMITS.adminPulseReview,
+    media: [
+      { mediaType: JSON_MEDIA_TYPE, schema: adminPulseReviewJsonBodySchema },
+      { mediaType: FORM_MEDIA_TYPE, schema: adminPulseReviewFormBodySchema },
+    ],
+  });
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+  const isForm = parsed.mediaType === FORM_MEDIA_TYPE;
+  id = parsedId.data;
 
   const existingRows = await db
     .select()
@@ -113,18 +85,20 @@ export async function POST(
     .limit(1);
   const existing = existingRows[0];
   if (!existing) {
-    return NextResponse.json({ error: "event not found" }, { status: 404 });
+    return adminMutationProblem("EVENT_NOT_FOUND", "event not found", 404);
   }
   if (existing.projectionStatus !== "current") {
-    return NextResponse.json(
-      { error: "event projection is no longer current" },
-      { status: 409 },
+    return adminMutationProblem(
+      "EVENT_NOT_CURRENT",
+      "event projection is no longer current",
+      409,
     );
   }
   if (existing.reviewStatus !== "pending" || existing.published) {
-    return NextResponse.json(
-      { error: "event is no longer pending human review" },
-      { status: 409 },
+    return adminMutationProblem(
+      "EVENT_NOT_PENDING",
+      "event is no longer pending human review",
+      409,
     );
   }
 
@@ -171,7 +145,11 @@ export async function POST(
       severityValue,
     });
     if (!validation.valid) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
+      return adminMutationProblem(
+        "INVALID_CLASSIFICATION",
+        "invalid event classification",
+        400,
+      );
     }
     ({ category, dimension, severityTier, severityValue } =
       validation.classification);
@@ -240,9 +218,10 @@ export async function POST(
         },
       ],
     });
-    return NextResponse.json(
-      { error: "event projection is no longer current" },
-      { status: 409 },
+    return adminMutationProblem(
+      "EVENT_NOT_CURRENT",
+      "event projection is no longer current",
+      409,
     );
   }
 
@@ -363,8 +342,25 @@ export async function POST(
   }
 
   if (isForm) {
-    const redirect = body.redirect ?? "/admin/pulse-review";
+    const redirect = safeInternalPathOr(body.redirect, "/admin/pulse-review");
     return NextResponse.redirect(new URL(redirect, request.url), 303);
   }
   return NextResponse.json({ ok: true, action: body.action, after });
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return withAdminMutation(
+    request,
+    {
+      route: "/api/admin/pulse-review/[id]",
+      action: "pulse_event.review",
+      targetType: "pulse_event",
+      targetId: id,
+    },
+    (auth) => mutatePulseEvent(request, id, auth),
+  );
 }

@@ -10,7 +10,7 @@ import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { withOg } from "@/lib/og";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Terms of Use",
@@ -44,19 +44,19 @@ export default function TermsPage() {
       <article className="methodology-content">
         <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Terms of Use</h1>
-        <p className="editorial-page-meta">Last updated: July 10, 2026</p>
+        <p className="editorial-page-meta">Last updated: July 14, 2026</p>
         <p className="editorial-page-subtitle">
           Civica Atlas is a free-to-access comparative reference for how every
-          country on Earth is governed. These terms describe, in plain
-          language, what you can do with the site and its data, and the
-          limits that come with a reference work built from many sources.
+          country on Earth is governed. These terms describe, in plain language,
+          what you can do with the site and its data, and the limits that come
+          with a reference work built from many sources.
         </p>
 
         <section className="editorial-section">
           <Banner variant="info">
             This is a plain-language summary of how the site is meant to be
-            used, not exhaustive legal boilerplate. Where a data source
-            imposes its own terms, those terms govern that data.
+            used, not exhaustive legal boilerplate. Where a data source imposes
+            its own terms, those terms govern that data.
           </Banner>
         </section>
 
@@ -75,13 +75,13 @@ export default function TermsPage() {
             <li>
               Please use the site in good faith. Do not attempt to break,
               overload, or scrape it in ways that degrade the service for
-              others, and do not use it to misrepresent the underlying
-              sources.
+              others, and do not use it to misrepresent the underlying sources.
             </li>
             <li>
               The public API is documented at{" "}
-              <Link href="/api-docs">API Docs</Link>. Use it within any
-              published rate limits and reuse terms.
+              <Link href="/api-docs">API Docs</Link>. Its GET routes and the
+              per-country export are subject to the published distributed rate
+              limits and reuse terms.
             </li>
           </ul>
         </section>
@@ -98,10 +98,10 @@ export default function TermsPage() {
             site combines public-domain material, openly licensed data, and
             publisher-restricted feeds. Public-domain and CC0 data can generally
             be reused freely; publisher-restricted datasets remain governed by
-            their original terms. Preserve any source names, license labels,
-            and freshness dates shown with a data point; that point-of-use
-            coverage is not yet universal. Cite Civica Atlas when reusing
-            Civica Index, Civica Pulse, or reconciliation-derived outputs.
+            their original terms. Preserve any source names, license labels, and
+            freshness dates shown with a data point; that point-of-use coverage
+            is not yet universal. Cite Civica Atlas when reusing Civica Index,
+            Civica Pulse, or reconciliation-derived outputs.
           </p>
 
           <p>
@@ -121,16 +121,18 @@ export default function TermsPage() {
           <p>
             Civica publishes a frozen, rights-filtered Atlas package and a
             per-country research export (
-            <code>/api/countries/:slug/export</code>, JSON or CSV). Both
-            include only facts whose selected source carries verified
-            public-export terms; when a fact&rsquo;s canonical source lacks
-            that permission, the fact is withheld from the download rather
-            than silently reassigned to a different source. No account is
-            required to download either. Downloading is free, but it is not
-            a reuse license — reuse rights remain source-by-source, exactly
-            as described on <Link href="/licensing#reuse">Licensing</Link>.
-            See <Link href="/api-docs#bulk-data">API Docs</Link> for current
-            package contents and export formats.
+            <code>/api/countries/:slug/export</code>, JSON or CSV). Both include
+            only facts whose selected source carries verified public-export
+            terms; when a fact&rsquo;s canonical source lacks that permission,
+            the fact is withheld from the download rather than silently
+            reassigned to a different source. No account is required to download
+            either. The per-country export is rate-limited by the shared policy
+            published in API Docs; OPTIONS requests do not consume that counter.
+            Downloading is free, but it is not a reuse license — reuse rights
+            remain source-by-source, exactly as described on{" "}
+            <Link href="/licensing#reuse">Licensing</Link>. See{" "}
+            <Link href="/api-docs#bulk-data">API Docs</Link> for current package
+            contents and export formats.
           </p>
         </section>
 
@@ -143,16 +145,16 @@ export default function TermsPage() {
 
           <p>
             The legacy <code>/embed/[slug]</code> iframe widget that once
-            rendered a Civica Index score is retired. Every request,
-            including existing embedded iframes, now returns{" "}
-            <code>410 Gone</code> with a short retirement notice linking to
-            the successor <Link href="/governance-evidence">Governance
-            Evidence</Link> page. Civica does not currently offer a
-            replacement scalar score, rank, or live embeddable widget. See{" "}
+            rendered a Civica Index score is retired. Every request, including
+            existing embedded iframes, now returns <code>410 Gone</code> with a
+            short retirement notice linking to the successor{" "}
+            <Link href="/governance-evidence">Governance Evidence</Link> page.
+            Civica does not currently offer a replacement scalar score, rank, or
+            live embeddable widget. See{" "}
             <Link href="/licensing#source-licenses">Licensing</Link> for the
             current reuse posture on retired embeds, and{" "}
-            <Link href="/api-docs#widget-embed">API Docs</Link> for the
-            exact retirement behavior.
+            <Link href="/api-docs#widget-embed">API Docs</Link> for the exact
+            retirement behavior.
           </p>
         </section>
 
@@ -164,11 +166,11 @@ export default function TermsPage() {
           />
 
           <p>
-            The Ask Civica assistant generates answers with an AI model and
-            can be incomplete or wrong. Treat its replies as a starting point,
-            and verify anything important against the source-backed data and
-            citations shown on the country and index pages. Do not rely on it
-            as legal, financial, or professional advice.
+            The Ask Civica assistant generates answers with an AI model and can
+            be incomplete or wrong. Treat its replies as a starting point, and
+            verify anything important against the source-backed data and
+            citations shown on the country and index pages. Do not rely on it as
+            legal, financial, or professional advice.
           </p>
         </section>
 
@@ -184,10 +186,10 @@ export default function TermsPage() {
             and keep provenance attached to each fact, but we make no warranty
             that every data point is complete, current, or error-free, and the
             service may change or be unavailable at times. Governance is a
-            moving subject; some figures are frozen at a stated vintage. To
-            the extent permitted by law, Civica is not liable for losses
-            arising from your use of, or reliance on, the site, the API, or
-            its data. If you spot an error, please tell us through the{" "}
+            moving subject; some figures are frozen at a stated vintage. To the
+            extent permitted by law, Civica is not liable for losses arising
+            from your use of, or reliance on, the site, the API, or its data. If
+            you spot an error, please tell us through the{" "}
             <Link href="/contact">contact page</Link> or the published{" "}
             <Link href="/civica-index/corrections">corrections</Link> process.
           </p>
@@ -220,8 +222,7 @@ export default function TermsPage() {
           <p>
             We may update these terms as the site evolves. The &ldquo;last
             updated&rdquo; date at the top reflects the current version.
-            Questions belong on the{" "}
-            <Link href="/contact">contact page</Link>.
+            Questions belong on the <Link href="/contact">contact page</Link>.
           </p>
         </section>
 

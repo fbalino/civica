@@ -27,15 +27,15 @@ import {
   type PulseCodingStudyContract,
 } from "../src/lib/pulse/v2/coding-workspace";
 
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 const APPLY = process.argv.includes("--apply");
 const MANIFEST_PATH = "data/research/pulse-evaluation-packet-manifest-v1.json";
-const manifest = JSON.parse(
+export const evaluationPacketManifest = JSON.parse(
   readFileSync(MANIFEST_PATH, "utf8"),
 ) as PulseEvaluationPacketManifest;
 
-const FRAME_CONFIG: Record<
+export const EVALUATION_STUDY_FRAME_CONFIG: Record<
   PulseEvaluationPacketFrame,
   { slug: string; title: string }
 > = {
@@ -49,7 +49,7 @@ const FRAME_CONFIG: Record<
   },
 };
 
-function deterministicUuid(value: string): string {
+export function deterministicUuid(value: string): string {
   const hex = createHash("sha256").update(value).digest("hex").slice(0, 32).split("");
   hex[12] = "4";
   hex[16] = ((Number.parseInt(hex[16], 16) & 3) | 8).toString(16);
@@ -62,7 +62,7 @@ function framePacketSetSha256(
   packets: PulseEvaluationPacketManifestRow[],
 ): string {
   return pulseCodingHash({
-    manifestSha256: manifest.semanticSha256,
+    manifestSha256: evaluationPacketManifest.semanticSha256,
     frame,
     packetKeys: packets.map(({ packetKey, packetMaterialSha256 }) => ({
       packetKey,
@@ -79,7 +79,11 @@ export type PrivateEvidence = {
 };
 
 export async function loadPrivateEvidence() {
-  const keys = new Set(manifest.packets.flatMap(({ evidenceIdentityKeys }) => evidenceIdentityKeys));
+  const keys = new Set(
+    evaluationPacketManifest.packets.flatMap(
+      ({ evidenceIdentityKeys }) => evidenceIdentityKeys,
+    ),
+  );
   const rows = await db
     .select({
       evidenceIdentityKey: rawEvents.evidenceIdentityKey,
@@ -98,17 +102,20 @@ export function buildSnapshots(
   studyId: string,
   packets: PulseEvaluationPacketManifestRow[],
   evidenceById: Map<string, PrivateEvidence>,
+  options: { datasetVersion?: string; title?: string } = {},
 ) {
   const packetSetSha256 = framePacketSetSha256(frame, packets);
-  const datasetVersion = `${manifest.schemaVersion}:${frame}`;
+  const config = EVALUATION_STUDY_FRAME_CONFIG[frame];
+  const datasetVersion =
+    options.datasetVersion ?? `${evaluationPacketManifest.schemaVersion}:${frame}`;
   const study: PulseCodingStudyContract = {
     schemaVersion: PULSE_CODING_WORKSPACE_VERSION,
     id: studyId,
-    title: FRAME_CONFIG[frame].title,
+    title: options.title ?? config.title,
     purpose: "evaluation",
-    protocolVersion: manifest.codebookVersion,
-    codebookVersion: manifest.codebookVersion,
-    ontologyVersion: manifest.ontologyVersion,
+    protocolVersion: evaluationPacketManifest.codebookVersion,
+    codebookVersion: evaluationPacketManifest.codebookVersion,
+    ontologyVersion: evaluationPacketManifest.ontologyVersion,
     datasetVersion,
     packetSetSha256,
     traceSetSha256: null,
@@ -170,10 +177,14 @@ async function seedFrame(
   frame: PulseEvaluationPacketFrame,
   evidenceById: Map<string, PrivateEvidence>,
 ) {
-  const packets = manifest.packets.filter((packet) => packet.frame === frame);
-  const studyId = deterministicUuid(`study|${manifest.semanticSha256}|${frame}`);
+  const packets = evaluationPacketManifest.packets.filter(
+    (packet) => packet.frame === frame,
+  );
+  const studyId = deterministicUuid(
+    `study|${evaluationPacketManifest.semanticSha256}|${frame}`,
+  );
   const { study, snapshots } = buildSnapshots(frame, studyId, packets, evidenceById);
-  const config = FRAME_CONFIG[frame];
+  const config = EVALUATION_STUDY_FRAME_CONFIG[frame];
   const existing = await db
     .select()
     .from(pulseCodingStudies)
@@ -207,7 +218,7 @@ async function seedFrame(
       afterSha256: pulseCodingHash(study),
       details: {
         labelStatus: "unlabeled",
-        manifestSha256: manifest.semanticSha256,
+        manifestSha256: evaluationPacketManifest.semanticSha256,
         participantAccess: "disabled_while_setup",
       },
     })
@@ -244,7 +255,10 @@ async function seedFrame(
             entityId: recordId,
             requestId: `pul-041-packet-${recordId}`,
             afterSha256: snapshot.packetSnapshotSha256,
-            details: { packetKey: snapshot.id, manifestSha256: manifest.semanticSha256 },
+            details: {
+              packetKey: snapshot.id,
+              manifestSha256: evaluationPacketManifest.semanticSha256,
+            },
           })),
         )
         .onConflictDoNothing(),
@@ -271,17 +285,19 @@ async function seedFrame(
 }
 
 async function main() {
-  assert.deepEqual(pulseEvaluationPacketManifestErrors(manifest), []);
+  assert.deepEqual(pulseEvaluationPacketManifestErrors(evaluationPacketManifest), []);
   const evidenceById = await loadPrivateEvidence();
   const results = [];
-  for (const frame of Object.keys(FRAME_CONFIG) as PulseEvaluationPacketFrame[])
+  for (const frame of Object.keys(
+    EVALUATION_STUDY_FRAME_CONFIG,
+  ) as PulseEvaluationPacketFrame[])
     results.push(await seedFrame(frame, evidenceById));
   console.log(
     JSON.stringify(
       {
         mode: APPLY ? "apply" : "dry_run",
         writesPerformed: APPLY ? "idempotent_import" : 0,
-        manifestSha256: manifest.semanticSha256,
+        manifestSha256: evaluationPacketManifest.semanticSha256,
         studies: results,
         credentialsIssued: 0,
         assignmentsCreated: 0,

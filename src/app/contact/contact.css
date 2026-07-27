@@ -247,6 +247,12 @@
 .contact-tile-body strong {
   color: var(--color-text-85);
 }
+.contact-tile-body a {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: var(--space-1);
+}
 
 /* ── Two-up name/email row ──────────────────────────────────────── */
 

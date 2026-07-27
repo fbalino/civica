@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import AdmZip from "adm-zip";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "@/lib/db/schema";
 import type { BillIngestDraft } from "../types";
+import { runBillsSync } from "../sync";
 import { billIngestErrors } from "../upsert";
 import { fetchUSBillsForSync } from "./us-congress";
 import { fetchUKBillsForSync } from "./uk-parliament";
@@ -38,8 +40,43 @@ function validateDrafts(rows: BillIngestDraft[]): void {
   }
 }
 
+function anFixtureArchive(
+  dossierParlementaire: Record<string, unknown> = {
+    uid: "DLR5L17N54085",
+    legislature: "17",
+    "@xsi:type": "DossierLegislatif_Type",
+    titreDossier: {
+      titre: "Projet de test",
+      titreChemin: "projet_test",
+    },
+    procedureParlementaire: { libelle: "Projet de loi" },
+    actesLegislatifs: {
+      acteLegislatif: {
+        dateActe: "2026-07-10",
+        libelleActe: { libelleCourt: "Commission" },
+      },
+    },
+  },
+): ArrayBuffer {
+  const zip = new AdmZip();
+  zip.addFile(
+    "fixture.json",
+    Buffer.from(
+      JSON.stringify({
+        dossierParlementaire,
+      }),
+    ),
+  );
+  const archive = zip.toBuffer();
+  return archive.buffer.slice(
+    archive.byteOffset,
+    archive.byteOffset + archive.byteLength,
+  ) as ArrayBuffer;
+}
+
 test("all six bills adapters parse stable source-shaped fixtures", { concurrency: false }, async () => {
   const originalFetch = globalThis.fetch;
+  const anArchive = anFixtureArchive();
   globalThis.fetch = async (input) => {
     const url = String(input);
     if (url.includes("api.congress.gov")) return json({ bills: [{ congress: 119, type: "HR", number: 1, title: "Fixture Act", introducedDate: "2026-07-01", latestAction: { text: "Referred to committee", actionDate: "2026-07-10" } }] });
@@ -48,7 +85,7 @@ test("all six bills adapters parse stable source-shaped fixtures", { concurrency
     if (url.includes("search.dip.bundestag.de")) return json({ documents: [{ id: "301", titel: "Deutscher Testentwurf", beratungsstand: "Ausschussberatung", datum: "2026-07-01", aktualisiert: "2026-07-10", gesta: "C001" }] });
     if (url.includes("dadosabertos.camara")) return json({ dados: [{ id: 401, siglaTipo: "PL", numero: 1, ano: 2026, ementa: "Projeto de teste" }] });
     if (url.includes("legis.senado")) return json({ ListaMateriasAtualizadas: { Materias: { Materia: { IdentificacaoMateria: { CodigoMateria: "402", SiglaSubtipoMateria: "PL", NumeroMateria: "2", AnoMateria: "2026" }, DadosBasicosMateria: { EmentaMateria: "Projeto do Senado", DataApresentacao: "2026-07-01" }, AtualizacoesRecentes: { Atualizacao: [{ DataUltimaAtualizacao: "2026-07-10" }] } } } } });
-    if (url.includes("assemblee-nationale")) return new Response("", { status: 503 });
+    if (url.includes("assemblee-nationale")) return new Response(anArchive, { status: 200 });
     if (url.includes("data.senat.fr")) {
       const csv = 'titre;type;date;url;etat;decision;dateDecision;datePromulgation;numeroLoi;themes\n"Projet test";"Projet";"01/07/2026";"https://www.senat.fr/dossier-legislatif/ppl26-1.html";"Commission";"";"";"";"";"Institutions"';
       return new Response(csv, { status: 200 });
@@ -67,8 +104,17 @@ test("all six bills adapters parse stable source-shaped fixtures", { concurrency
       () => fetchFRBillsForSync({ jurisdictionId, db, limit: 1 }),
     ];
     for (const adapter of adapters) {
-      const first = await adapter();
-      const second = await adapter();
+      const firstResult = await adapter();
+      const secondResult = await adapter();
+      const first = Array.isArray(firstResult) ? firstResult : firstResult.drafts;
+      const second = Array.isArray(secondResult) ? secondResult : secondResult.drafts;
+      if (!Array.isArray(firstResult)) {
+        assert.ok(
+          firstResult.sourceOutcomes.every(
+            (outcome) => outcome.status === "success",
+          ),
+        );
+      }
       assert.deepEqual(second, first);
       validateDrafts(first);
     }
@@ -76,3 +122,219 @@ test("all six bills adapters parse stable source-shaped fixtures", { concurrency
     globalThis.fetch = originalFetch;
   }
 });
+
+test(
+  "France and Brazil fail the aggregate before writes when one chamber is unavailable",
+  { concurrency: false },
+  async () => {
+    const originalFetch = globalThis.fetch;
+    let writes = 0;
+    globalThis.fetch = async (input) => {
+      const url = String(input);
+      if (url.includes("assemblee-nationale")) {
+        return new Response("unavailable", { status: 503 });
+      }
+      if (url.includes("data.senat.fr")) {
+        const csv =
+          'titre;type;date;url;etat;decision;dateDecision;datePromulgation;numeroLoi;themes\n"Projet test";"Projet";"01/07/2026";"https://www.senat.fr/dossier-legislatif/ppl26-1.html";"Commission";"";"";"";"";"Institutions"';
+        return new Response(csv, { status: 200 });
+      }
+      if (url.includes("dadosabertos.camara")) {
+        return new Response("unavailable", { status: 504 });
+      }
+      if (url.includes("legis.senado")) {
+        return json({
+          ListaMateriasAtualizadas: {
+            Materias: {
+              Materia: {
+                IdentificacaoMateria: {
+                  CodigoMateria: "402",
+                  SiglaSubtipoMateria: "PL",
+                },
+                DadosBasicosMateria: { EmentaMateria: "Projeto do Senado" },
+              },
+            },
+          },
+        });
+      }
+      throw new Error(`Unexpected fixture URL: ${url}`);
+    };
+
+    const db = bodyDb();
+    const runnerSeams = {
+      jurisdictionId,
+      dryRun: false,
+      readSummaries: async () => [],
+      writeRows: async () => {
+        writes++;
+        throw new Error("write must remain unreachable");
+      },
+    };
+
+    try {
+      await assert.rejects(
+        runBillsSync(db, {
+          ...runnerSeams,
+          jurisdictionSlug: "france",
+          iso2: "FR",
+          fetchDrafts: ({ jurisdictionId: id }) =>
+            fetchFRBillsForSync({ jurisdictionId: id, db, limit: 1 }),
+        }),
+        /data_assemblee_fr \(HTTP 503\)/,
+      );
+      await assert.rejects(
+        runBillsSync(db, {
+          ...runnerSeams,
+          jurisdictionSlug: "brazil",
+          iso2: "BR",
+          fetchDrafts: ({ jurisdictionId: id }) =>
+            fetchBRBillsForSync({ jurisdictionId: id, db, limit: 1 }),
+        }),
+        /camara_br \(HTTP 504\)/,
+      );
+      assert.equal(writes, 0);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  },
+);
+test(
+  "France and Brazil reject nonempty structured feeds that map zero drafts",
+  { concurrency: false },
+  async () => {
+    const originalFetch = globalThis.fetch;
+    const unmappableAnArchive = anFixtureArchive({
+      legislature: "17",
+      "@xsi:type": "DossierLegislatif_Type",
+      titreDossier: { titre: "Dossier without a stable identifier" },
+    });
+    let mode: "france" | "brazil" = "france";
+    let writes = 0;
+    globalThis.fetch = async (input) => {
+      const url = String(input);
+      if (url.includes("assemblee-nationale")) {
+        return new Response(unmappableAnArchive, { status: 200 });
+      }
+      if (url.includes("data.senat.fr")) {
+        return new Response(
+          "titre;type;date;url;etat;decision;dateDecision;datePromulgation;numeroLoi;themes\n",
+          { status: 200 },
+        );
+      }
+      if (url.includes("dadosabertos.camara")) {
+        return json({
+          dados: [
+            {
+              siglaTipo: "PL",
+              numero: 1,
+              ano: 2026,
+              ementa: "Structured row without the required id",
+            },
+          ],
+        });
+      }
+      if (url.includes("legis.senado")) {
+        return json({ ListaMateriasAtualizadas: {} });
+      }
+      throw new Error(`Unexpected ${mode} fixture URL: ${url}`);
+    };
+
+    const db = bodyDb();
+    const runnerSeams = {
+      jurisdictionId,
+      readSummaries: async () => [],
+      writeRows: async () => {
+        writes++;
+        throw new Error("write must remain unreachable");
+      },
+    };
+
+    try {
+      await assert.rejects(
+        runBillsSync(db, {
+          ...runnerSeams,
+          jurisdictionSlug: "france",
+          iso2: "FR",
+          fetchDrafts: ({ jurisdictionId: id }) =>
+            fetchFRBillsForSync({ jurisdictionId: id, db, limit: 1 }),
+        }),
+        /data_assemblee_fr \(1 Assemblée dossier\(s\) produced zero mappable bill drafts\)/,
+      );
+      mode = "brazil";
+      await assert.rejects(
+        runBillsSync(db, {
+          ...runnerSeams,
+          jurisdictionSlug: "brazil",
+          iso2: "BR",
+          fetchDrafts: ({ jurisdictionId: id }) =>
+            fetchBRBillsForSync({ jurisdictionId: id, db, limit: 1 }),
+        }),
+        /camara_br \(1 Câmara record\(s\) produced zero mappable bill drafts\)/,
+      );
+      assert.equal(writes, 0);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  },
+);
+test(
+  "Brazil accepts a raw-empty chamber and an explicitly non-bill quiet period",
+  { concurrency: false },
+  async () => {
+    const originalFetch = globalThis.fetch;
+    let writes = 0;
+    globalThis.fetch = async (input) => {
+      const url = String(input);
+      if (url.includes("dadosabertos.camara")) return json({ dados: [] });
+      if (url.includes("legis.senado")) {
+        return json({
+          ListaMateriasAtualizadas: {
+            Materias: {
+              Materia: {
+                IdentificacaoMateria: {
+                  CodigoMateria: "quiet-1",
+                  SiglaSubtipoMateria: "REQ",
+                },
+              },
+            },
+          },
+        });
+      }
+      throw new Error(`Unexpected quiet-period fixture URL: ${url}`);
+    };
+
+    const db = bodyDb();
+    try {
+      const summary = await runBillsSync(db, {
+        jurisdictionSlug: "brazil",
+        jurisdictionId,
+        iso2: "BR",
+        fetchDrafts: ({ jurisdictionId: id }) =>
+          fetchBRBillsForSync({ jurisdictionId: id, db, limit: 1 }),
+        readSummaries: async () => [],
+        writeRows: async () => {
+          writes++;
+          return {
+            inserted: 0,
+            updated: 0,
+            unchanged: 0,
+            wouldWrite: 0,
+            dryRun: false,
+            sourcesStamped: [],
+          };
+        },
+      });
+      assert.equal(summary.fetched, 0);
+      assert.equal(writes, 1);
+      assert.deepEqual(summary.sourcesStamped, []);
+      assert.deepEqual(
+        summary.sourceOutcomes.map((outcome) =>
+          outcome.status === "success" ? outcome.emptyReason : undefined,
+        ),
+        ["upstream_returned_no_rows", "no_bill_records_in_period"],
+      );
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  },
+);

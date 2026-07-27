@@ -51,6 +51,7 @@ async function main() {
   console.log(`\nDone in ${elapsed}s.`);
   console.log(`  Jurisdictions refreshed: ${summary.jurisdictionsRefreshed}`);
   console.log(`  Fields written:          ${summary.fieldsWritten}`);
+  console.log(`  Fields cleared:          ${summary.fieldsCleared}`);
   console.log(`  Errors:                  ${summary.errors.length}`);
   if (summary.errors.length > 0) {
     console.log("  First 5 errors:");

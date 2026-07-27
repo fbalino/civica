@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://civicaatlas.org/country" },
 };
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export default async function CountryIndexPage() {
   let countries: FactbookAlmanacCountry[] = [];

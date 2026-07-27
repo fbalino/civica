@@ -1,0 +1,47 @@
+{
+  "contract": "civica-plt-014-verification/v1",
+  "taskId": "PLT-014",
+  "verifiedAt": "2026-07-15",
+  "commands": [
+    {
+      "command": "npm run validate:cache-consistency",
+      "result": "passed",
+      "details": "25 cache-contract tests, 159 registered API methods, 5 exports, 76 database-query boundaries, and 68 page boundaries passed."
+    },
+    {
+      "command": "npm run validate:release-consistency",
+      "result": "passed",
+      "details": "36 release-consistency checks passed across Civica Index, Atlas export, and Pulse publication contracts."
+    },
+    {
+      "command": "npm run validate:route-io-policy && npm run validate:route-inventory",
+      "result": "passed",
+      "details": "The focused route I/O suite passed 180 tests and the complete owned route inventory remained closed."
+    },
+    {
+      "command": "npm run validate:source-input-manifest && npm run validate:raw-retention",
+      "result": "passed",
+      "details": "The regenerated input-manifest byte hash is bound consistently to retention evidence and all staged Index release headers."
+    },
+    {
+      "command": "npm run db:plan -- --all --live --out=plan/evidence/DAT-013/preflight.json",
+      "result": "passed",
+      "details": "All 55 migration plans completed as a zero-write live preflight."
+    },
+    {
+      "command": "npm run validate:authoritative-migrations && npm run validate:migrations && npm run validate:migration-preflight",
+      "result": "passed",
+      "details": "The generated forward migration, hash-pinned authoritative history, journal, and checked preflight agree."
+    },
+    {
+      "command": "npm run typecheck && npm test",
+      "result": "passed",
+      "details": "TypeScript passed; the full test suite reported 1,809 passing tests, zero failures, and three skips."
+    },
+    {
+      "command": "npm run build",
+      "result": "passed_with_warnings",
+      "details": "The full production validation/build chain and Next.js production compile succeeded. Next reported two pre-existing Edge-runtime warnings for node:crypto imports in frozen-vintage and derivation-version helpers."
+    }
+  ]
+}

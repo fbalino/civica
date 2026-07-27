@@ -154,6 +154,12 @@ export function IndicatorTrendChart({
   );
   const [range, setRange] = useState<RangeKey>("50y");
   const [hoverYear, setHoverYear] = useState<number | null>(null);
+  const svgIdBase = `indicator-trend-${drawable
+    .map((series) => trendSeriesKey(series))
+    .join("-")
+    .replace(/[^a-z0-9]+/gi, "-")}`;
+  const svgTitleId = `${svgIdBase}-title`;
+  const svgDescId = `${svgIdBase}-description`;
 
   const activeSeries = useMemo(
     () => drawable.filter((s) => enabled[trendSeriesKey(s)] !== false),
@@ -297,6 +303,14 @@ export function IndicatorTrendChart({
   };
 
   const columnW = windowYears.length > 0 ? PLOT_W / windowYears.length : PLOT_W;
+  const seriesDescription = activeSeries
+    .map((item) => {
+      const first = item.points[0]?.year;
+      const last = item.points[item.points.length - 1]?.year;
+      return `${trendSeriesLabel(item)} from ${item.sourceLabel ?? item.sourceId}, ${first ?? "no year"} to ${last ?? "no year"}`;
+    })
+    .join("; ");
+  const svgDescription = `Normalised 0 to 100 index, higher is better, ${windowMin} to ${windowMax}. ${seriesDescription}. The adjacent data disclosure gives source vintage, missing-data treatment, and the table alternative.`;
 
   return (
     <div className="indicator-trend">
@@ -349,9 +363,11 @@ export function IndicatorTrendChart({
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
           width="100%"
           role="img"
-          aria-label={`${title}. Normalised 0 to 100 index, higher is better, ${windowMin} to ${windowMax}.`}
+          aria-labelledby={`${svgTitleId} ${svgDescId}`}
           className="indicator-trend-svg"
         >
+          <title id={svgTitleId}>{title}</title>
+          <desc id={svgDescId}>{svgDescription}</desc>
           {/* Horizontal gridlines + y-axis tick labels (Inter tabular-nums). */}
           {Y_TICKS.map((t) => {
             const y = yAt(t);
@@ -508,6 +524,8 @@ export function IndicatorTrendChart({
                 key={`hz-${year}`}
                 content={hoverTooltip(year)}
                 className="indicator-trend-hover-col"
+                triggerRole="img"
+                ariaLabel={`${year} indicator observation`}
                 triggerStyle={{
                   left: `${r2(leftPct - widthPct / 2)}%`,
                   width: `${r2(widthPct)}%`,
@@ -517,7 +535,6 @@ export function IndicatorTrendChart({
               >
                 <span
                   className="indicator-trend-hover-hit"
-                  aria-label={`${year} values`}
                   onMouseEnter={() => setHoverYear(year)}
                   onMouseLeave={() => setHoverYear(null)}
                   onFocus={() => setHoverYear(year)}

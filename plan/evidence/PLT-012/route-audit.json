@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "route-io-audit/v1",
+  "checkedAt": "2026-07-14",
+  "policyVersion": "route-io-policy/v1",
+  "inventory": {
+    "routeFiles": 100,
+    "routeMethodTuples": 159,
+    "namedRequestContracts": 50,
+    "querySchemaIds": 26,
+    "pathSchemaIds": 10,
+    "boundedBodyRoutes": 14,
+    "registeredDangerousHtmlSinks": 4
+  },
+  "closedBoundaries": {
+    "requestBodies": "byte-capped JSON or form decoding followed by strict schemas",
+    "queries": "strict raw-query decoding rejects unknown keys, duplicate scalars, malformed escapes, and out-of-range values",
+    "pathParams": "strict named schemas run before database or expensive work",
+    "responses": "strict projections or explicit field construction; response spreads over unprojected rows fail validation",
+    "unknownErrors": "fixed noncacheable problem responses with server-only diagnostics",
+    "storedHtml": "server-only constitution-html/v1 sanitizer before API or client-component egress",
+    "providerUrls": "HTTP(S)-only public-address resolution, pinned non-pooled transport, closed caller-header forwarding, redirect revalidation, and wire/decoded byte ceilings",
+    "csv": "spreadsheet-active string prefixes, including delimiter-exposed formulas, are apostrophe-neutralized before RFC-4180 quoting"
+  },
+  "negativeFixtures": [
+    "unsupported and smuggled media types",
+    "declared and streamed body overflow",
+    "invalid UTF-8 and malformed JSON/form escapes",
+    "prototype keys, excessive depth, and excessive node counts",
+    "unknown fields, wrong types, duplicate scalar values, and noncanonical numbers",
+    "comment, dead-helper, shadowed-parser, wrong-schema, wrong-limit, and extra-media parser proof bypasses",
+    "invalid calendar dates, identifiers, release values, enums, and pagination bounds",
+    "unknown future database/export columns and credential-hash sentinels",
+    "raw exception, provider, database, and secret text",
+    "stored-HTML script, handler, scheme, style, nesting, and malformed-markup payloads",
+    "private, reserved, mapped, translated, redirected, forbidden-header, wire-oversized, decoded-oversized, and compressed URL responses",
+    "spreadsheet formulas after whitespace and full-width formula prefixes"
+  ],
+  "result": "pass"
+}

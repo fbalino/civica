@@ -19,39 +19,37 @@ import {
   corsOptions,
   withRateLimit,
   PULSE_METHODOLOGY_META,
+  CORS_HEADERS,
 } from "@/lib/api/helpers";
 import { getPulseV2Changelog } from "@/lib/db/queries-pulse-v2";
-import type { PulseDimension } from "@/lib/pulse/v2/types";
-import { PULSE_DIMENSIONS } from "@/lib/pulse/v2/types";
 import { shapePulseChangelogRow } from "@/lib/api/contract/shapes";
+import { parseQueryContract } from "@/lib/api/request-contract";
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return rateLimited;
+  const query = parseQueryContract(request, "v1-pulse-changelog-query/v1", {
+    errorHeaders: CORS_HEADERS,
+  });
+  if (!query.ok) return query.response;
 
   try {
-    const url = new URL(request.url);
-    const limit = Math.min(
-      Math.max(parseInt(url.searchParams.get("limit") ?? "50", 10) || 50, 1),
-      250
-    );
-    const offset = Math.max(
-      parseInt(url.searchParams.get("offset") ?? "0", 10) || 0,
-      0
-    );
-
-    const dimensionRaw = url.searchParams.get("dimension");
-    const dimension: PulseDimension | undefined =
-      dimensionRaw && (PULSE_DIMENSIONS as string[]).includes(dimensionRaw)
-        ? (dimensionRaw as PulseDimension)
-        : undefined;
+    const {
+      country,
+      dimension,
+      severity,
+      since,
+      published_only: publishedOnly,
+      limit,
+      offset,
+    } = query.data;
 
     const result = await getPulseV2Changelog({
-      country: url.searchParams.get("country") ?? undefined,
+      country,
       dimension,
-      severityTier: url.searchParams.get("severity") ?? undefined,
-      sinceDate: url.searchParams.get("since") ?? undefined,
-      publishedOnly: url.searchParams.get("published_only") === "1",
+      severityTier: severity,
+      sinceDate: since,
+      publishedOnly,
       limit,
       offset,
     });

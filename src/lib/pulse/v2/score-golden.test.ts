@@ -81,12 +81,14 @@ test("score golden: calculateDimensionalDeltas produces exact per-dimension delt
   const events: PublishedEvent[] = [
     {
       id: "evt-coup", jurisdictionId: "j-coup", dimension: "stability", category: "coup",
+      projectionStatus: "current", published: true, reviewStatus: "approved",
       severityTier: "catastrophic_neg", severityValue: -9, corroborationConfidence: 0.8,
       eventDate: "2026-07-12", derivationVersions: envelope, sourceIds: ["s1"],
       publicationRunId: "pub-1", corroborationRunId: "cor-1", absorptionDecisionKey: null, absorptionOutcome: null,
     },
     {
       id: "evt-jarrest", jurisdictionId: "j-coup", dimension: "freedom_rights", category: "journalist_arrest",
+      projectionStatus: "current", published: true, reviewStatus: "approved",
       severityTier: "severe_neg", severityValue: -5, corroborationConfidence: 0.7,
       eventDate: "2026-05-13", derivationVersions: envelope, sourceIds: ["s2"],
       publicationRunId: "pub-2", corroborationRunId: "cor-2", absorptionDecisionKey: null, absorptionOutcome: null,

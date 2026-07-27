@@ -10,10 +10,15 @@ import {
   type PartyBrowserFacets,
 } from "@/lib/db/queries-parties";
 import { PartyExplorer } from "@/components/parties/PartyExplorer";
+import { Banner } from "@/components/editorial/Banner";
+import {
+  atlasSurfaceQueryValue,
+  captureAtlasSurfaceQuery,
+} from "@/lib/atlas/surface-query-state";
 
 import "../parties.css";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Political Parties — Ideology & Seats Worldwide",
@@ -29,10 +34,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PartiesPage() {
-  // Fetch the browser data. Each query soft-fails to an empty/zeroed shape, so
-  // the page renders coherently when the DB is unreachable.
-  let parties: BrowserParty[] = [];
-  let facets: PartyBrowserFacets = {
+  const emptyFacets: PartyBrowserFacets = {
     countries: [],
     regions: [],
     totalParties: 0,
@@ -40,14 +42,14 @@ export default async function PartiesPage() {
     totalSeats: 0,
     seatsWithPosition: 0,
   };
-  try {
-    [parties, facets] = await Promise.all([
-      getPartiesForBrowser(),
-      getPartyBrowserFacets(),
-    ]);
-  } catch {
-    // queries already soft-fail internally; this guards the Promise.all itself.
-  }
+  const partyBrowserResult = await captureAtlasSurfaceQuery(() =>
+    Promise.all([
+      getPartiesForBrowser({ throwOnError: true }),
+      getPartyBrowserFacets({ throwOnError: true }),
+    ]),
+  );
+  const partyBrowser = atlasSurfaceQueryValue(partyBrowserResult);
+  const [parties, facets] = partyBrowser ?? [[], emptyFacets];
 
   const countryCount = facets.countries.length;
 
@@ -73,7 +75,12 @@ export default async function PartiesPage() {
       />
 
       <EditorialPage width="full">
-      {parties.length > 0 ? (
+      {partyBrowserResult.status === "unavailable" ? (
+        <Banner variant="warn">
+          Party data is temporarily unavailable. Civica is not treating this
+          as evidence that no parties, seats, or ideology records exist.
+        </Banner>
+      ) : parties.length > 0 ? (
         <PartyExplorer
           parties={parties}
           countries={facets.countries.map((c) => ({
@@ -91,7 +98,8 @@ export default async function PartiesPage() {
         />
       ) : (
         <p className="editorial-empty">
-          Party data is temporarily unavailable. Please try again shortly.
+          No source-backed party records are currently compiled. This is a
+          coverage state, not a claim that no parties or legislatures exist.
         </p>
       )}
 

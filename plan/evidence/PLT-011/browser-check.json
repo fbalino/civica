@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "civica-browser-check/v1",
+  "capturedAt": "2026-07-14T10:14:10Z",
+  "inAppBrowser": {
+    "attempted": true,
+    "attempts": 2,
+    "attachedToTab": false,
+    "failureCategory": "installed browser runtime initialization failed before tab attachment"
+  },
+  "fallback": {
+    "tool": "Playwright Chromium",
+    "baseUrl": "http://localhost:3100",
+    "pages": ["/api-docs", "/terms"],
+    "viewports": {
+      "desktop": "1440x1000",
+      "mobile": "390x844"
+    },
+    "themes": ["light", "dark"],
+    "variantCount": 8,
+    "httpStatus": 200,
+    "h1CountPerVariant": 1,
+    "horizontalOverflowPx": 0,
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "failedRequests": 0,
+    "contentChecks": {
+      "apiDocs": [
+        "Rate Limits",
+        "shared PostgreSQL-backed counter",
+        "distributed fail-closed export policy",
+        "429 Retry-After",
+        "counter-unavailable 503",
+        "OPTIONS exemption"
+      ],
+      "terms": [
+        "published distributed rate limits",
+        "rate-limited per-country export",
+        "accuracy and availability"
+      ]
+    },
+    "visualReview": "The changed API Docs rate-limit block and Terms prose remained readable and aligned in all four viewport/theme combinations per page."
+  },
+  "localWorkspaceNote": "The intentional local typography tester overlay was present and was not modified, evaluated as PLT-011 UI, or included in the scoped commit. Screenshots were temporary and were not retained in the repository."
+}

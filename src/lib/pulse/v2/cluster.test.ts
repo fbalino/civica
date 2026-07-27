@@ -68,8 +68,11 @@ test("cluster dry-run is deterministic and performs zero writes", async () => {
   const first = await runClustering(harness.db, options);
   const second = await runClustering(harness.db, options);
   assert.deepEqual(first, second);
-  assert.equal(first.clustered, 2);
-  assert.equal(first.clustersCreated, 1);
+  assert.equal(first.status, "partial");
+  assert.equal(first.clustered, 0);
+  assert.equal(first.clustersCreated, 0);
+  assert.equal(first.wouldCluster, 2);
+  assert.equal(first.wouldCreateClusters, 1);
   assert.equal(first.multiSourceClusters, 1);
   assert.equal(harness.writes(), 0);
 });
@@ -78,7 +81,7 @@ test("two fixture applications produce identical canonical cluster state", async
   const harness = fakeDb();
   const options = {
     candidates,
-    embeddingResult: null,
+    embeddingResult: [[1, 0], [1, 0]],
     now: new Date("2026-07-10T00:00:00Z"),
     clusterIdFactory: fixedId,
     runRef,
@@ -88,6 +91,26 @@ test("two fixture applications produce identical canonical cluster state", async
   await runClustering(harness.db, options);
   assert.deepEqual([...harness.state.entries()], firstState);
   assert.equal(harness.state.size, 2);
+});
+
+test("lexical fallback is retryable without consuming the candidate queue", async () => {
+  const harness = fakeDb();
+  const options = {
+    candidates,
+    embeddingResult: null,
+    now: new Date("2026-07-10T00:00:00Z"),
+    clusterIdFactory: fixedId,
+    runRef,
+  };
+  const first = await runClustering(harness.db, options);
+  const second = await runClustering(harness.db, options);
+  assert.equal(first.status, "partial");
+  assert.equal(second.status, "partial");
+  assert.equal(first.clustered, 0);
+  assert.equal(second.clustered, 0);
+  assert.equal(first.wouldCluster, 2);
+  assert.equal(harness.writes(), 0);
+  assert.deepEqual([...harness.state], []);
 });
 
 test("malformed duplicate fixture rows fail before writes", async () => {
@@ -112,6 +135,7 @@ test("an empty derived input is an explicit no-op", async () => {
     runRef,
   });
   assert.equal(result.candidates, 0);
+  assert.equal(result.status, "completed");
   assert.deepEqual(result.assignments, []);
   assert.equal(harness.writes(), 0);
 });
@@ -145,7 +169,8 @@ test("exact multilingual canonical identity merges despite conflicting provision
     dryRun: true,
     runRef,
   });
-  assert.equal(result.clustersCreated, 1);
+  assert.equal(result.clustersCreated, 0);
+  assert.equal(result.wouldCreateClusters, 1);
   assert.equal(result.collisionCandidates, 0);
   assert.equal(result.multiSourceFamilyClusters, 1);
   assert.equal(result.multilingualClusters, 1);
@@ -175,7 +200,8 @@ test("normalized identity keeps similar same-day events with conflicting anchors
     dryRun: true,
     runRef,
   });
-  assert.equal(result.clustersCreated, 2);
+  assert.equal(result.clustersCreated, 0);
+  assert.equal(result.wouldCreateClusters, 2);
   assert.deepEqual(
     result.assignments.map(({ memberIds }) => memberIds),
     [["oaxaca"], ["puebla"]],
@@ -193,6 +219,7 @@ test("unresolved reports remain eligible for clustering", async () => {
     dryRun: true,
     runRef,
   });
-  assert.equal(result.clustersCreated, 1);
+  assert.equal(result.clustersCreated, 0);
+  assert.equal(result.wouldCreateClusters, 1);
   assert.equal(result.crossJurisdictionClusters, 1);
 });

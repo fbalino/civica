@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { HomeGrid } from "@/components/home/HomeGrid";
 import { withOg } from "@/lib/og";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   // The root layout's `title.template` does not apply to the page of its own

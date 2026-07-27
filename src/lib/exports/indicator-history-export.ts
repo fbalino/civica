@@ -4,6 +4,7 @@ import {
   INDICATOR_HISTORY_CATALOG_VERSION,
   indicatorHistoryCatalogEntry,
 } from "@/lib/indicators/history-catalog";
+import { spreadsheetSafeCsvCell } from "@/lib/exports/csv";
 
 export const INDICATOR_HISTORY_EXPORT_VERSION =
   "indicator-history-country-export/v1" as const;
@@ -170,16 +171,6 @@ const CSV_COLUMNS = [
   "lineage_json",
 ] as const;
 
-function csvCell(value: unknown): string {
-  const text =
-    value == null
-      ? ""
-      : typeof value === "string"
-        ? value
-        : JSON.stringify(value);
-  return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
 export function indicatorHistoryExportCsv(
   document: IndicatorHistoryExportDocument,
 ): string {
@@ -216,7 +207,7 @@ export function indicatorHistoryExportCsv(
   return (
     [
       CSV_COLUMNS.join(","),
-      ...rows.map((row) => row.map(csvCell).join(",")),
+      ...rows.map((row) => row.map(spreadsheetSafeCsvCell).join(",")),
     ].join("\n") + "\n"
   );
 }

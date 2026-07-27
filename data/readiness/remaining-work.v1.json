@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "civica-remaining-work/v1",
+  "reviewedAt": "2026-07-26",
+  "checklist": {
+    "total": 310,
+    "completed": 252,
+    "remaining": 58,
+    "progressPercent": 81.3
+  },
+  "agentExecutableNow": [],
+  "categories": [
+    {
+      "id": "direct-human-owner-professional",
+      "label": "Direct human, owner, or professional review",
+      "count": 14,
+      "taskIds": [
+        "BRD-003",
+        "BRD-010",
+        "BRD-012",
+        "EXP-001",
+        "EXP-009",
+        "EXP-015",
+        "EXP-025",
+        "EXP-038",
+        "GOV-012",
+        "IDX-022",
+        "IDX-034",
+        "PLT-029",
+        "QA-012",
+        "QA-013"
+      ],
+      "nextStep": "Obtain the exact rendered Explore disposition; the four residual EXP-038 dispositions; owner spend and honorarium facts; and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
+    },
+    {
+      "id": "production-staging-external-authority",
+      "label": "Production, staging, or external-system authority",
+      "count": 13,
+      "taskIds": [
+        "ATL-010",
+        "ATL-020",
+        "ATL-024",
+        "ATL-026",
+        "ATL-027",
+        "DAT-036",
+        "EXP-029",
+        "PUL-024",
+        "PUL-027",
+        "PUL-040",
+        "PUL-043",
+        "QA-018",
+        "QA-019"
+      ],
+      "nextStep": "Authorize a new exact-candidate QA-018 run through 0051 plus the remaining production migrations and source refreshes; retain bounded live evidence without treating the historical 0050 run as proof of the new head."
+    },
+    {
+      "id": "external-evidence-unavailable",
+      "label": "Required external evidence unavailable",
+      "count": 1,
+      "taskIds": [
+        "DAT-034"
+      ],
+      "nextStep": "Obtain the exact retained CIA publisher bytes or equivalent official evidence for the frozen sample; do not substitute easier rows or publish a full-sample error estimate without them."
+    },
+    {
+      "id": "calendar-bound-observation",
+      "label": "Calendar-bound observation",
+      "count": 0,
+      "taskIds": [],
+      "nextStep": "No compliant observation is currently running. PUL-026 remains downstream of the authority-gated PUL-040 start and must never be backdated."
+    },
+    {
+      "id": "dependency-blocked-downstream",
+      "label": "Downstream work blocked by an earlier gate",
+      "count": 30,
+      "taskIds": [
+        "ATL-028",
+        "BRD-005",
+        "BRD-016",
+        "EXP-016",
+        "EXP-028",
+        "GOV-015",
+        "GOV-016",
+        "GOV-017",
+        "GOV-018",
+        "GOV-019",
+        "GOV-020",
+        "GOV-021",
+        "GOV-022",
+        "GOV-023",
+        "GOV-024",
+        "GOV-025",
+        "GOV-026",
+        "GOV-027",
+        "GOV-028",
+        "PLT-025",
+        "PUL-018",
+        "PUL-019",
+        "PUL-020",
+        "PUL-021",
+        "PUL-022",
+        "PUL-023",
+        "PUL-026",
+        "PUL-028",
+        "PUL-029",
+        "PUL-030"
+      ],
+      "nextStep": "Do not execute out of dependency order. Resume each task only after its named design, staging, gold-data, prospective-evaluation, G4, G5, DOI, counsel, or disposition prerequisite is real."
+    }
+  ]
+}

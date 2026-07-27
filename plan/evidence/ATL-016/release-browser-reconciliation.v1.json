@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "civica-atl-016-release-browser-reconciliation/v1",
+  "taskId": "ATL-016",
+  "status": "pass",
+  "candidateCommit": "fb7376f3ee7990c89b9da57716b3e563924af028",
+  "deploymentId": "dpl_DuymaVKNXCiyc34cC7q9SuRW6pMw",
+  "isolationEvidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json",
+  "release": {
+    "releaseId": "conditions-qa018-20260726-v2",
+    "methodologyVersion": "conditions-components/v1",
+    "manifestSha256": "d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b"
+  },
+  "browserEvidence": {
+    "path": "plan/evidence/ATL-016/browser-evidence.v1.json",
+    "sha256": "7b374d7820cfe2a28816f4d4d2ebd80d8954306c07951b89577bdeb2b802253f",
+    "checkedAt": "2026-07-26T19:56:33.535Z",
+    "checks": 10,
+    "screenshots": 14,
+    "screenshotInventorySha256": "9cad07c430653d6f12a7783a43729b393339f98d65aeaa15906d9bbd38ebd6b1",
+    "consoleErrors": 0
+  },
+  "coverage": {
+    "surfaces": [
+      "conditions-explorer",
+      "country-conditions-panel",
+      "three-country-comparison"
+    ],
+    "viewports": [
+      "desktop",
+      "390px-mobile"
+    ],
+    "comparisonCountryCount": 3,
+    "alignmentStates": [
+      "aligned",
+      "missing_component",
+      "mixed_year_refused"
+    ],
+    "sourceVisible": true,
+    "nativeUnitVisible": true,
+    "componentYearVisible": true,
+    "missingnessVisible": true,
+    "releaseIdentityVisible": true,
+    "noCompositeDisclosureVisible": true,
+    "crossCountryRankPublished": false,
+    "crossDimensionAggregatePublished": false,
+    "horizontalOverflow": false
+  },
+  "apiReconciliation": "plan/evidence/ATL-029/release-reconciliation.v1.json"
+}

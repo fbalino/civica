@@ -30,6 +30,7 @@ import { API_ROUTES, type RouteContract } from "../contract/registry";
 import { EXAMPLES, type ExampleId } from "../contract/examples";
 import {
   zCountriesListResponse,
+  zAtlasQueryResponse,
   zCountryDetailResponse,
   zElectionResearchExport,
   zGovernmentTypesResponse,
@@ -39,6 +40,7 @@ import {
   zIndexCompareResponse,
   zIndexMethodologyResponse,
   zIndexRankingsResponse,
+  zConditionsReleaseResponse,
   zPeerGroupingsResponse,
   zPulseMethodologyResponse,
   zPulseClusterCoverageResponse,
@@ -59,6 +61,8 @@ import {
  * fixtures in `contract.test.ts` and DAT-027 evidence.
  */
 const RESPONSE_SCHEMA_BY_ROUTE_ID: Record<string, z.ZodTypeAny> = {
+  "atlas-query": zAtlasQueryResponse,
+  conditions: zConditionsReleaseResponse,
   countries: zCountriesListResponse,
   "country-detail": zCountryDetailResponse,
   elections: zElectionResearchExport,
@@ -153,4 +157,25 @@ test("negative fixture: a wrong-type value on a required field is rejected", () 
     data: "should be an array, not a string",
   };
   assert.throws(() => zGovernmentTypesResponse.parse(wrongType), z.ZodError);
+});
+
+test("negative fixture: Conditions cannot publish an economic composite or coverage that drifts from rows", () => {
+  const economicComposite = structuredClone(EXAMPLES.conditions);
+  const economic = economicComposite.data.calculations.find(
+    (calculation) => calculation.dimension === "economic_stability",
+  );
+  assert.ok(economic);
+  economic.normalizedScore = 52;
+  economic.rawValue = 0.52;
+  assert.throws(
+    () => zConditionsReleaseResponse.parse(economicComposite),
+    z.ZodError,
+  );
+
+  const coverageDrift = structuredClone(EXAMPLES.conditions);
+  coverageDrift.data.coverage[0]!.calculations = 99;
+  assert.throws(
+    () => zConditionsReleaseResponse.parse(coverageDrift),
+    z.ZodError,
+  );
 });

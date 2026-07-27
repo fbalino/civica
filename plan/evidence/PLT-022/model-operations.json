@@ -1,0 +1,28 @@
+{
+  "task": "PLT-022",
+  "contract": "civica-model-operations/v1",
+  "status": "implemented-and-locally-validated",
+  "implementedAt": "2026-07-18",
+  "scope": {
+    "credentialScoping": "Dedicated runtime environment variables cover Ask Civica, Pulse classifier/summary, bill summary, and reconciliation. Pulse provider selection is limited to a checked provider/model allowlist.",
+    "localCostControls": "Every paid path has checked input/output, call, retry, and unavailable-state ceilings. Pulse classify is capped at 50 clusters per execution; bill summaries at 25 calls of 20 rows; Stats SA at four PDF calls.",
+    "versioning": "Ask Civica audit events, bill summary cache keys, Stats SA provenance payloads, and existing Pulse classification configuration/stage envelopes carry deterministic model/provider version identity.",
+    "secretSafety": "Model paths log fixed outcome labels rather than provider exception objects, request content, raw responses, or credentials.",
+    "billingFallback": "There is no generic key or alternate provider/model fallback. The legacy Pulse v1 export returns without a model call; dynamic reasoning-token expansion is disabled."
+  },
+  "providerGuidance": [
+    {
+      "title": "Anthropic rate limits and spend limits",
+      "url": "https://platform.claude.com/docs/en/api/rate-limits",
+      "retrievedAt": "2026-07-18",
+      "usedFor": "Organization and workspace spend/rate limits, alerts, and 429 behavior."
+    },
+    {
+      "title": "Anthropic Usage and Cost API",
+      "url": "https://platform.claude.com/docs/en/manage-claude/usage-cost-api",
+      "retrievedAt": "2026-07-18",
+      "usedFor": "Cost attribution and monitoring by API key/workspace without treating an admin key as an inference credential."
+    }
+  ],
+  "externalFollowUp": "Provider-console workspace/project caps, alerts, scoped-key attribution, and redacted confirmation remain owner/provider work in plan/MANUAL-CHECKS.md. No provider key, account identifier, paid call, or billing-console mutation was performed."
+}

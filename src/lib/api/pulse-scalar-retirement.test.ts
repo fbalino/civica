@@ -6,11 +6,12 @@ import {
   PULSE_SCALAR_SUNSET_DATE,
   retiredPulseScalarResponse,
 } from "./pulse-scalar-retirement";
-import { GET as getRankings } from "@/app/api/v1/index/rankings/route";
+import { parseQueryContract } from "@/lib/api/request-contract";
 import {
   GET as getRetiredEmbed,
   OPTIONS as optionsRetiredEmbed,
 } from "@/app/embed/[slug]/route";
+import { RIGHTS_REGISTRY_URL } from "@/lib/claims/reuse-rights";
 
 function assertNeverCached(response: Response) {
   assert.equal(response.headers.get("Cache-Control"), "no-store");
@@ -39,11 +40,17 @@ test("scalar Pulse retirement response is terminal and points to dimensional out
   assert.equal("rank" in body, false);
 });
 
-test("rankings recognizes every casing of the retired cp sort before database work", async () => {
+test("rankings query contract recognizes every casing of the retired cp sort", async () => {
   for (const sort of ["cp", "CP", "Cp", "cP"]) {
-    const response = await getRankings(
+    const parsed = parseQueryContract(
       new Request(`https://civicaatlas.org/api/v1/index/rankings?sort=${sort}`),
+      "v1-index-rankings-query/v1",
     );
+    assert.equal(parsed.ok, true);
+    if (!parsed.ok) continue;
+    assert.equal(parsed.data.sort, "cp");
+
+    const response = retiredPulseScalarResponse();
     assert.equal(response.status, 410);
     assert.equal((await response.json()).code, "pulse_scalar_retired");
     assertNeverCached(response);
@@ -51,25 +58,46 @@ test("rankings recognizes every casing of the retired cp sort before database wo
 });
 
 test("rankings keeps unknown sort values distinct from retired cp", async () => {
-  const response = await getRankings(
+  const parsed = parseQueryContract(
     new Request("https://civicaatlas.org/api/v1/index/rankings?sort=other"),
+    "v1-index-rankings-query/v1",
   );
-  assert.equal(response.status, 400);
-  assert.notEqual((await response.json()).code, "pulse_scalar_retired");
+  assert.equal(parsed.ok, false);
+  if (parsed.ok) return;
+  assert.equal(parsed.response.status, 400);
+  assert.notEqual((await parsed.response.json()).code, "pulse_scalar_retired");
 });
 
-test("legacy embed variants are gone and cannot enter browser or CDN caches", async () => {
+test("legacy embed variants contain only the retired notice and its point-of-use rights pointer", async () => {
   for (const include of ["cp", "ci", "cp,ci", "capital"]) {
     const response = await getRetiredEmbed(
-      new Request(`https://civicaatlas.org/embed/brazil?include=${include}`) as never,
+      new Request(
+        `https://civicaatlas.org/embed/brazil?include=${include}`,
+      ) as never,
       { params: Promise.resolve({ slug: "brazil" }) },
     );
     assert.equal(response.status, 410);
     assertNeverCached(response);
+    assert.equal(response.headers.get("X-Robots-Tag"), "noindex, nofollow");
+    const html = await response.text();
+    assert.ok(
+      html.includes(`<meta name="civica:rights" content="${RIGHTS_REGISTRY_URL}">`),
+    );
+    assert.ok(
+      html.includes('<a href="/licensing#reuse" target="_top">Rights and reuse</a>'),
+    );
+    assert.doesNotMatch(html, /<(?:style|script|table|dl|ul|ol)\\b/i);
+    assert.match(html, /<h1 id="embed-retired-title">Civica Index embed retired<\/h1>/);
+    assert.match(html, /<main aria-labelledby="embed-retired-title">/);
+    assert.match(html, /<meta name="robots" content="noindex, nofollow">/);
+    assert.doesNotMatch(html, /<iframe\b|Civica Index score|Country rank/i);
   }
 
   const options = await optionsRetiredEmbed();
   assert.equal(options.status, 204);
   assertNeverCached(options);
-  assert.equal(options.headers.get("Access-Control-Allow-Methods"), "GET, OPTIONS");
+  assert.equal(
+    options.headers.get("Access-Control-Allow-Methods"),
+    "GET, OPTIONS",
+  );
 });

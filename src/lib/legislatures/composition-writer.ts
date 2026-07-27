@@ -24,7 +24,7 @@ import {
 
 type Db = typeof import("@/lib/db").db;
 
-export interface PartyCompositionRow extends PartyCompositionObservation {}
+export type PartyCompositionRow = PartyCompositionObservation;
 
 export interface LegislatureCompositionInput {
   bodyId: string;
@@ -164,7 +164,9 @@ export async function writeLegislatureComposition(
   ]);
 
   if (!bodyRows[0] || bodyRows[0].jurisdictionId !== input.jurisdictionId) {
-    throw new Error(`Composition body/jurisdiction mismatch for ${input.bodyId}`);
+    throw new Error(
+      `Composition body/jurisdiction mismatch for ${input.bodyId}`,
+    );
   }
 
   const externalIds = input.parties.map((party) => party.sourcePartyId.trim());
@@ -204,7 +206,8 @@ export async function writeLegislatureComposition(
       id: row.entityId,
       jurisdictionId: row.entityJurisdictionId,
       canonicalName: row.canonicalName,
-      identityStatus: row.identityStatus as ExistingPartyEntity["identityStatus"],
+      identityStatus:
+        row.identityStatus as ExistingPartyEntity["identityStatus"],
       identitySourceId: row.identitySourceId,
       identityExternalId: row.identityExternalId,
     },
@@ -213,7 +216,8 @@ export async function writeLegislatureComposition(
     ...row,
     identityStatus: row.identityStatus as ExistingPartyEntity["identityStatus"],
   }));
-  const runId = existingRuns[0]?.id ?? options.idFactory?.() ?? crypto.randomUUID();
+  const runId =
+    existingRuns[0]?.id ?? options.idFactory?.() ?? crypto.randomUUID();
   const plan = planPartyComposition({
     bodyId: input.bodyId,
     jurisdictionId: input.jurisdictionId,

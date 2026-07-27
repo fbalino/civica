@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import { requireCronAuth } from "@/lib/api/cron-auth";
-import * as schema from "@/lib/db/schema";
+import { cronExecutionKeyFromRequest, withCronJob } from "@/lib/api/cron-job";
+import { getDb } from "@/lib/db";
 import { runClustering } from "@/lib/pulse/v2/cluster";
+import { pulseV2ClusterCronOutcome } from "@/lib/pulse/v2/cron-outcomes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,32 +11,30 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const started = new Date().toISOString();
-  try {
-    const sqlClient = neon(process.env.DATABASE_URL!);
-    const db = drizzle({ client: sqlClient, schema });
-    const summary = await runClustering(db, { limit: 1000 });
-    return NextResponse.json({
-      ok: true,
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
+  const cronExecutionKey = cronExecutionKeyFromRequest(request);
+  const db = getDb();
+  const summary = await runClustering(db, {
+    limit: 1000,
+    dryRun,
+    cronExecutionKey,
+  });
+  const outcome = pulseV2ClusterCronOutcome(summary);
+  return NextResponse.json(
+    {
+      ok: outcome.ok,
+      outcome: outcome.outcome,
       step: "pulse.v2.cluster",
+      dryRun,
       started,
       finished: new Date().toISOString(),
       summary,
-    });
-  } catch (err) {
-    console.error("[cron pulse.v2.cluster] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "pulse.v2.cluster",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+    },
+    { status: outcome.httpStatus },
+  );
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("pulse.v2.cluster", handler);
+
+export { cronHandler as GET, cronHandler as POST };

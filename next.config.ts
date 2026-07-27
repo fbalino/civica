@@ -4,6 +4,13 @@ import type { NextConfig } from "next";
 // app's `@/*` alias resolution context, so this must stay relative.
 import { REDIRECTS } from "./src/lib/routing/redirects";
 
+// Vercel's Protected Source Maps setting must be enabled before this build
+// flag is set in production. The matching deployment variable is deliberately
+// opt-in so no production build can accidentally publish browser source maps.
+const protectedSourceMapsEnabled =
+  process.env.VERCEL === "1" &&
+  process.env.VERCEL_PROTECTED_SOURCEMAPS === "true";
+
 // Standard HTTP security response headers (deep audit 2026-06-07, Security #6).
 // Kept deliberately conservative: NO content/script CSP (which could break the
 // app) — the only CSP directive used is `frame-ancestors`, the modern companion
@@ -61,8 +68,22 @@ const FRAME_PROTECTION_HEADERS = [
 
 const nextConfig: NextConfig = {
   /* cacheComponents: true — re-enable after adding `use cache` to data functions */
+  // CountryHoverCard uses the approved 70-quality preview rendition. Next 16
+  // validates image optimizer quality requests against this explicit allowlist.
+  images: {
+    qualities: [70],
+  },
   turbopack: {
     root: __dirname,
+    // Stable bundle/map debug IDs bind a monitored release to its protected
+    // source maps without retaining a stack trace in Civica's own database.
+    debugIds: true,
+  },
+  productionBrowserSourceMaps: protectedSourceMapsEnabled,
+  experimental: {
+    // Server maps stay inside the function bundle; browser maps require the
+    // explicit protected-source-map deployment flag above.
+    serverSourceMaps: true,
   },
   async headers() {
     return [

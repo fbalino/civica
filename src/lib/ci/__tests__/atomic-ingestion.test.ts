@@ -5,10 +5,10 @@ import { canonicalStageChecksum, MINIMUM_CI_STAGE_COVERAGE, REQUIRED_CI_ADAPTERS
 function stages(): StagedCiAdapter[] {
   return REQUIRED_CI_ADAPTERS.map((adapterKey, index) => {
     const [sourceId, dimension] = adapterKey.split(":") as [string, StagedCiAdapter["dimension"]];
-    const rows = Array.from({ length: MINIMUM_CI_STAGE_COVERAGE[adapterKey] }, (_, rowIndex) => ({ jurisdictionId: `j${index}-${rowIndex}`, iso3: `AA${String.fromCharCode(65 + (rowIndex % 26))}`, normalizedScore: 50, rawValue: 50, sourceId, dimension, quarter: "2024-Q4", methodologyVersion: "ci-v2-beta", derivationVersionKey: "v1", derivationVersions: { schemaVersion: "fixture" }, indicatorId: `${sourceId}_indicator`, upstreamRelease: "fixture", artifactHash: "a".repeat(64), artifactKind: "normalized_batch" as const, temporalCoverage: "2024", licenseUrl: "https://example.test/terms", transformationId: "fixture/v1", substitutionReason: null, methodVersion: "ci-v2-beta" }));
+    const rows = Array.from({ length: MINIMUM_CI_STAGE_COVERAGE[adapterKey] }, (_, rowIndex) => ({ jurisdictionId: `j${index}-${rowIndex}`, iso3: `AA${String.fromCharCode(65 + (rowIndex % 26))}`, normalizedScore: 50, rawValue: 50, sourceId, dimension, quarter: "2024-Q4", methodologyVersion: "ci-v2-beta", releaseId: "ci-beta-fixture-2024-Q4", derivationVersionKey: "v1", derivationVersions: { schemaVersion: "fixture" }, indicatorId: `${sourceId}_indicator`, upstreamRelease: "fixture", artifactHash: "a".repeat(64), artifactKind: "normalized_batch" as const, temporalCoverage: "2024", licenseUrl: "https://example.test/terms", transformationId: "fixture/v1", substitutionReason: null, methodVersion: "ci-v2-beta" }));
     return {
       schemaVersion: "ci-atomic-stage/v1", adapterKey, sourceId, dimension,
-      datasetYear: 2024, quarter: "2024-Q4", methodologyVersion: "ci-v2-beta",
+      datasetYear: 2024, quarter: "2024-Q4", methodologyVersion: "ci-v2-beta", releaseId: "ci-beta-fixture-2024-Q4",
       nativeScaleMin: 0, nativeScaleMax: 100, isInverted: false,
       globalMinObserved: 0, globalMaxObserved: 100, countriesCovered: rows.length, skipped: 0,
       rows,

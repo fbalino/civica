@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "civica-atlas-data-error-report-preflight-evidence/v1",
+  "capturedAt": "2026-07-23T09:05:58.943Z",
+  "mode": "zero_write",
+  "schemaAudit": {
+    "schemaReady": false,
+    "correctionRows": 1,
+    "invalidStatusRows": 0,
+    "invalidResolutionShapeRows": 0,
+    "atlasReportRows": 0
+  },
+  "migrationPlan": {
+    "id": "0047_atlas_data_error_reports",
+    "artifact": "drizzle/authoritative/0047_atlas_data_error_reports.sql",
+    "kind": "schema",
+    "historyStatus": "journaled",
+    "sha256": "e36e87c298ac19a50e9a65c7438e51e33b1f849b424c796a3e362a893cd86dfc",
+    "affectedRelations": [
+      "atlas_entity_change_history",
+      "correction_log",
+      "research_evidence_history"
+    ],
+    "statementCount": 22,
+    "destructiveStatementCount": 0,
+    "liveRowCounts": {
+      "atlas_entity_change_history": "missing",
+      "correction_log": 1,
+      "research_evidence_history": 83354
+    },
+    "writesPerformed": 0
+  },
+  "activationState": "pending_owner_authorized_production_migration",
+  "publicFailureMode": "ATLAS_REPORT_SCHEMA_PENDING"
+}

@@ -23,7 +23,7 @@ import {
   releaseOrganizationMembership,
 } from "@/lib/organizations/membership-release";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export async function generateMetadata({
   params,

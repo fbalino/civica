@@ -35,7 +35,12 @@ Primary sources: [QoG Standard Dataset](https://www.gu.se/en/quality-government/
 
 ## Verification
 
-- `npm run validate:temporal-metadata`: pass.
+- `npm run validate:temporal-metadata`: pass. The default command is
+  credential-free: it checks the static source/API/methodology contract and the
+  strict schema, invariants, and semantic hash of the dated 2026-07-11 audit.
+- `npm run validate:temporal-metadata:live`: read-only current Neon verification;
+  current row counts may grow as new immutable releases are added and are not
+  frozen to the 2026-07-11 evidence counts.
 - Database constraints reject mismatched Atlas publication labels and incomplete populated BR/CGV temporal metadata.
 - A seeded `2025` BR cross-section fixture fails with `must be 2022, not 2025`.
 - Peer-grouping API returns all four temporal fields; the reader page visibly says reference year 2022 rather than 2025/2026.
@@ -43,3 +48,13 @@ Primary sources: [QoG Standard Dataset](https://www.gu.se/en/quality-government/
 - 631/631 tests pass.
 - All migration, data, API, claims/documentation, and release gates pass; production build passes.
 - Desktop light and 390px dark browser checks pass; the live API returns the expected temporal object.
+
+### PLT-001 validation split — 2026-07-14
+
+The existing `live-temporal-audit.json` remains the dated DAT-025 acceptance
+evidence. PLT-001 added an explicit audit schema, read-only source marker, and
+semantic SHA-256 without changing its 2026-07-11 observations. The normal build
+now validates that checked artifact without opening a database connection.
+Current production state is checked only when the explicit `--live` command is
+requested; that command retains the original aggregate anomaly checks and
+performs no writes.

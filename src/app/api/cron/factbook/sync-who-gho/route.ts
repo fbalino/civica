@@ -3,7 +3,7 @@
  *
  * Runs quarterly via Vercel cron, scheduled one hour after the WB
  * WDI cron to spread load. Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). Two GHO indicators × ~190 country rows each;
+ * the shared cron boundary). Two GHO indicators × ~190 country rows each;
  * total wall time is dominated by upserts, expect ~30–60s on a
  * warm DB.
  *
@@ -12,7 +12,7 @@
  * Resolution:  ~/civica/plan/who-gho-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncWhoGho } from "@/lib/factbook/reconcile/sync-who-gho";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -22,44 +22,31 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncWhoGho(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all WHO GHO indicators.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-    });
-    assertExternalSyncSucceeded("factbook.who-gho", summary);
+  const summary = await syncWhoGho(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all WHO GHO indicators.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+  });
+  assertExternalSyncSucceeded("factbook.who-gho", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.who-gho.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      totalWritten: summary.totalWritten,
-      perFact: summary.countersByFactKey,
-      disputes: summary.disputes,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.who-gho.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.who-gho.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.who-gho.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    totalWritten: summary.totalWritten,
+    perFact: summary.countersByFactKey,
+    disputes: summary.disputes,
+    errorCount: summary.errors.length,
+  });
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.who-gho", handler);
+
+export { cronHandler as GET, cronHandler as POST };

@@ -88,5 +88,12 @@ export function LeaderPortrait({
     </span>
   );
 
-  return <Tooltip content={tip}>{frame}</Tooltip>;
+  return (
+    <Tooltip
+      content={tip}
+      ariaLabel={`Portrait of ${personName}${office ? `, ${office}` : ""}`}
+    >
+      {frame}
+    </Tooltip>
+  );
 }

@@ -71,3 +71,82 @@ test("the shared bills runner fails loudly on an empty upstream before writes", 
   }), /upstream returned no rows/);
   assert.equal(writes, 0);
 });
+
+test("the shared bills runner accepts an explicitly evidenced quiet period without freshness", async () => {
+  let writes = 0;
+  const result = await runBillsSync({} as Db, {
+    jurisdictionSlug: "brazil",
+    jurisdictionId: draft.jurisdictionId,
+    iso2: "BR",
+    fetchDrafts: async () => ({
+      drafts: [],
+      sourceOutcomes: [
+        {
+          sourceId: "camara_br",
+          status: "success",
+          fetched: 0,
+          mapped: 0,
+          emptyReason: "upstream_returned_no_rows",
+        },
+        {
+          sourceId: "senado_br",
+          status: "success",
+          fetched: 1,
+          mapped: 0,
+          emptyReason: "no_bill_records_in_period",
+        },
+      ],
+    }),
+    readSummaries: async () => [],
+    writeRows: async () => {
+      writes++;
+      return {
+        inserted: 0,
+        updated: 0,
+        unchanged: 0,
+        wouldWrite: 0,
+        dryRun: false,
+        sourcesStamped: [],
+      };
+    },
+  });
+
+  assert.equal(result.fetched, 0);
+  assert.equal(writes, 1);
+  assert.deepEqual(result.sourcesStamped, []);
+});
+
+test("a nonempty zero-mapped success without a benign reason fails closed", async () => {
+  let writes = 0;
+  await assert.rejects(
+    runBillsSync({} as Db, {
+      jurisdictionSlug: "brazil",
+      jurisdictionId: draft.jurisdictionId,
+      iso2: "BR",
+      fetchDrafts: async () => ({
+        drafts: [],
+        sourceOutcomes: [
+          {
+            sourceId: "camara_br",
+            status: "success",
+            fetched: 1,
+            mapped: 0,
+          },
+        ],
+      }),
+      writeRows: async () => {
+        writes++;
+        return {
+          inserted: 0,
+          updated: 0,
+          unchanged: 0,
+          wouldWrite: 0,
+          dryRun: false,
+          sourcesStamped: [],
+        };
+      },
+    }),
+    /upstream returned no rows/,
+  );
+  assert.equal(writes, 0);
+});

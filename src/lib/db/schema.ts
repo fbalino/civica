@@ -23,6 +23,7 @@ import type {
   PulseCodingPacketSnapshot,
   PulseCodingSubmissionEnvelope,
 } from "@/lib/pulse/v2/coding-workspace";
+import type { PulseDriftSnapshot } from "@/lib/pulse/v2/drift-monitor";
 import {
   pgTable,
   uuid,
@@ -31,8 +32,10 @@ import {
   date,
   timestamp,
   real,
+  doublePrecision,
   boolean,
   jsonb,
+  unique,
   uniqueIndex,
   index,
   foreignKey,
@@ -1222,6 +1225,53 @@ export const researchEvidenceHistory = pgTable(
   ],
 );
 
+/**
+ * ATL-020 public, field-safe projection of an Atlas entity revision. This is
+ * deliberately separate from `research_evidence_history`: that trigger ledger
+ * retains complete snapshots for audit and must never become a public API.
+ */
+export const atlasEntityChangeHistory = pgTable(
+  "atlas_entity_change_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    entityTable: text("entity_table").notNull(),
+    operation: text("operation").notNull(),
+    changeKind: text("change_kind").notNull(),
+    changes: jsonb("changes").notNull(),
+    reason: text("reason").notNull(),
+    methodologyVersion: text("methodology_version").notNull(),
+    /** Release identity is mandatory for every new public event. */
+    releaseId: text("release_id").notNull(),
+    correctionLogId: uuid("correction_log_id").references(() => correctionLog.id, {
+      onDelete: "restrict",
+    }),
+    correctionStatus: text("correction_status"),
+    recordedAt: timestamp("recorded_at").notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_atlas_entity_change_history_entity").on(
+      table.entityType,
+      table.entityId,
+      table.recordedAt,
+    ),
+    index("idx_atlas_entity_change_history_release").on(table.releaseId),
+    check(
+      "atlas_entity_change_history_identity_check",
+      dsql`btrim(${table.entityId}) <> '' AND (${table.entityType}, ${table.entityTable}) IN (('fact','country_facts'),('institution','government_bodies'),('office','offices'),('person','persons'),('election','elections'),('constitution-passage','constitution_passages'),('organization','organizations'),('indicator','country_metrics'))`,
+    ),
+    check(
+      "atlas_entity_change_history_event_check",
+      dsql`${table.operation} IN ('insert','update','delete') AND ${table.changeKind} IN ('routine_refresh','substantive_revision','correction','retraction','methodology_change') AND jsonb_typeof(${table.changes}) = 'array' AND btrim(${table.reason}) <> '' AND btrim(${table.methodologyVersion}) <> '' AND ${table.releaseId} ~ '^[A-Za-z0-9._-]{1,96}$'`,
+    ),
+    check(
+      "atlas_entity_change_history_correction_check",
+      dsql`(${table.correctionLogId} IS NULL AND ${table.correctionStatus} IS NULL) OR (${table.correctionLogId} IS NOT NULL AND ${table.correctionStatus} IN ('open','in_review','resolved_corrected','resolved_no_change','rejected'))`,
+    ),
+  ],
+);
+
 export const statements = pgTable(
   "statements",
   {
@@ -1263,6 +1313,88 @@ export const sources = pgTable("sources", {
   isCommercialUseAllowed: boolean("is_commercial_use_allowed").notNull(),
   lastSyncAt: timestamp("last_sync_at"),
 });
+
+/**
+ * Versioned source/native/official/transliterated name forms. The polymorphic
+ * entity key is closed by entity_type and deliberately does not infer a
+ * language, script, translation, or transliteration status from the string.
+ */
+export const entityNameForms = pgTable(
+  "entity_name_forms",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    contractVersion: text("contract_version").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: uuid("entity_id").notNull(),
+    value: text("value").notNull(),
+    languageTag: text("language_tag").notNull(),
+    scriptCode: text("script_code"),
+    nameRole: text("name_role").notNull(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    sourceUrl: text("source_url").notNull(),
+    retrievedAt: timestamp("retrieved_at").notNull(),
+    upstreamVintage: text("upstream_vintage").notNull(),
+    translationStatus: text("translation_status").notNull(),
+    transliterationStatus: text("transliteration_status").notNull(),
+    isCurrent: boolean("is_current").notNull().default(true),
+    supersededAt: timestamp("superseded_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("entity_name_forms_current_identity_idx")
+      .on(
+        table.entityType,
+        table.entityId,
+        table.nameRole,
+        table.languageTag,
+        table.sourceId,
+      )
+      .where(dsql`${table.isCurrent} = true`),
+    index("entity_name_forms_entity_idx").on(
+      table.entityType,
+      table.entityId,
+      table.isCurrent,
+    ),
+    check(
+      "entity_name_forms_contract_check",
+      dsql`${table.contractVersion} = 'civica-entity-name-form/v1'`,
+    ),
+    check(
+      "entity_name_forms_entity_type_check",
+      dsql`${table.entityType} IN ('jurisdiction','person','office','political_party')`,
+    ),
+    check(
+      "entity_name_forms_role_check",
+      dsql`${table.nameRole} IN ('english_display','source','native','official','transliterated')`,
+    ),
+    check(
+      "entity_name_forms_language_check",
+      dsql`${table.languageTag} ~ '^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$'`,
+    ),
+    check(
+      "entity_name_forms_script_check",
+      dsql`${table.scriptCode} IS NULL OR ${table.scriptCode} ~ '^[A-Z][a-z]{3}$'`,
+    ),
+    check(
+      "entity_name_forms_translation_check",
+      dsql`${table.translationStatus} IN ('not_translated','publisher_supplied_translation','civica_translation','unknown')`,
+    ),
+    check(
+      "entity_name_forms_transliteration_check",
+      dsql`${table.transliterationStatus} IN ('not_transliterated','publisher_supplied_transliteration','civica_transliteration','unknown')`,
+    ),
+    check(
+      "entity_name_forms_https_source_check",
+      dsql`${table.sourceUrl} ~ '^https://'`,
+    ),
+    check(
+      "entity_name_forms_lifecycle_check",
+      dsql`(${table.isCurrent} = true AND ${table.supersededAt} IS NULL) OR (${table.isCurrent} = false AND ${table.supersededAt} IS NOT NULL)`,
+    ),
+  ],
+);
 
 export const governmentTaxonomies = pgTable(
   "government_taxonomies",
@@ -1322,6 +1454,7 @@ export const contactSubmissions = pgTable("contact_submissions", {
   email: text("email").notNull(),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
+  /** Legacy nullable column. New submissions do not retain sender IPs. */
   ipAddress: text("ip_address"),
   /**
    * Triage lifecycle for the admin Messages surface: new → read → archived.
@@ -1464,6 +1597,139 @@ export const ciMethodologyVersions = pgTable("ci_methodology_versions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+/**
+ * Closed publication header for a public Civica Index release.
+ *
+ * Coordinate columns on score rows are useful for research queries, but they
+ * are not a release identity: the same coordinates can otherwise be paired
+ * with changed source rows or a changed method record. Public readers bind to
+ * this immutable header through `release_id` and validate the retained hashes.
+ */
+export const ciIndexReleases = pgTable(
+  "ci_index_releases",
+  {
+    id: text("id").primaryKey(),
+    status: text("status").notNull().default("staging"),
+    quarter: text("quarter").notNull(),
+    methodologyVersion: text("methodology_version")
+      .references(() => ciMethodologyVersions.id, { onDelete: "restrict" })
+      .notNull(),
+    methodologyContentSha256: text("methodology_content_sha256").notNull(),
+    vintageLabel: text("vintage_label").notNull().unique(),
+    supersessionKind: text("supersession_kind", {
+      enum: ["none", "registered_release", "legacy_unregistered_vintage"],
+    }).notNull(),
+    supersedesReleaseId: text("supersedes_release_id"),
+    supersedesVintageLabel: text("supersedes_vintage_label"),
+    inputManifestSha256: text("input_manifest_sha256").notNull(),
+    dimensionRowSetSha256: text("dimension_row_set_sha256").notNull(),
+    compositeRowSetSha256: text("composite_row_set_sha256").notNull(),
+    dimensionRowCount: integer("dimension_row_count").notNull(),
+    compositeRowCount: integer("composite_row_count").notNull(),
+    inputTransformationVersion: text("input_transformation_version").notNull(),
+    compositeAlgorithmVersion: text("composite_algorithm_version").notNull(),
+    displayTransformVersion: text("display_transform_version").notNull(),
+    uncertainty: jsonb("uncertainty_policy")
+      .$type<{
+        schemaVersion: "ci-index-uncertainty/v1";
+        pointEstimate:
+          | "seeded_simulation_median"
+          | "deterministic_weighted_composite";
+        displayedRange:
+          | "sensitivity_summary_5th_95th_percentile"
+          | "not_published";
+        bounds: "required" | "absent";
+        simulations: number;
+        covarianceModel: "independence_assumed" | "not_available";
+        interpretation: string;
+      }>()
+      .notNull(),
+    dimensionRules: jsonb("dimension_rules")
+      .$type<
+        Array<{
+          dimension: string;
+          sourceId: string;
+          indicatorId: string;
+          priority: number;
+          artifactSha256: string;
+          upstreamRelease: string;
+          artifactKind: "publisher_bytes";
+          temporalCoverage: string;
+          licenseUrl: string;
+          substitutionReason: string | null;
+        }>
+      >()
+      .notNull(),
+    sourceArtifacts: jsonb("source_artifacts")
+      .$type<Record<string, string>>()
+      .notNull(),
+    publishedAt: timestamp("published_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_ci_index_releases_status").on(table.status, table.publishedAt),
+    foreignKey({
+      name: "ci_index_releases_supersedes_release_id_ci_index_releases_id_fk",
+      columns: [table.supersedesReleaseId],
+      foreignColumns: [table.id],
+    }).onDelete("restrict"),
+    check(
+      "ci_index_releases_status_closed",
+      dsql`${table.status} IN ('staging','published')`,
+    ),
+    check(
+      "ci_index_releases_hashes_valid",
+      dsql`${table.methodologyContentSha256} ~ '^[a-f0-9]{64}$' AND ${table.inputManifestSha256} ~ '^[a-f0-9]{64}$' AND ${table.dimensionRowSetSha256} ~ '^[a-f0-9]{64}$' AND ${table.compositeRowSetSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "ci_index_releases_identity_shape",
+      dsql`${table.id} ~ '^ci-[a-z0-9-]+-[0-9]{4}-Q[1-4]$' AND ${table.quarter} ~ '^[0-9]{4}-Q[1-4]$' AND btrim(${table.methodologyVersion}) <> '' AND btrim(${table.vintageLabel}) <> '' AND btrim(${table.inputTransformationVersion}) <> '' AND btrim(${table.compositeAlgorithmVersion}) <> '' AND btrim(${table.displayTransformVersion}) <> ''`,
+    ),
+    check(
+      "ci_index_releases_supersession_shape",
+      dsql`((${table.supersessionKind} = 'none' AND ${table.supersedesReleaseId} IS NULL AND ${table.supersedesVintageLabel} IS NULL) OR (${table.supersessionKind} = 'legacy_unregistered_vintage' AND ${table.supersedesReleaseId} IS NULL AND ${table.supersedesVintageLabel} IS NOT NULL) OR (${table.supersessionKind} = 'registered_release' AND ${table.supersedesReleaseId} IS NOT NULL AND ${table.supersedesVintageLabel} IS NOT NULL)) AND ${table.supersedesReleaseId} IS DISTINCT FROM ${table.id}`,
+    ),
+    check(
+      "ci_index_releases_uncertainty_shape",
+      dsql`jsonb_typeof(${table.uncertainty}) = 'object' AND ${table.uncertainty}->>'schemaVersion' = 'ci-index-uncertainty/v1' AND ${table.uncertainty}->>'pointEstimate' IN ('seeded_simulation_median','deterministic_weighted_composite') AND ${table.uncertainty}->>'displayedRange' IN ('sensitivity_summary_5th_95th_percentile','not_published') AND ${table.uncertainty}->>'bounds' IN ('required','absent') AND (${table.uncertainty}->>'simulations')::integer >= 0 AND ${table.uncertainty}->>'covarianceModel' IN ('independence_assumed','not_available') AND btrim(${table.uncertainty}->>'interpretation') <> '' AND ((${table.uncertainty}->>'bounds' = 'required') = (${table.uncertainty}->>'displayedRange' <> 'not_published')) AND (((${table.uncertainty}->>'simulations')::integer > 0) = (${table.uncertainty}->>'pointEstimate' = 'seeded_simulation_median'))`,
+    ),
+    check(
+      "ci_index_releases_dimension_rules_shape",
+      dsql`jsonb_typeof(${table.dimensionRules}) = 'array' AND jsonb_array_length(${table.dimensionRules}) = 5`,
+    ),
+    check(
+      "ci_index_releases_source_artifacts_shape",
+      dsql`jsonb_typeof(${table.sourceArtifacts}) = 'object' AND ${table.sourceArtifacts} <> '{}'::jsonb`,
+    ),
+    check(
+      "ci_index_releases_counts_positive",
+      dsql`${table.dimensionRowCount} > 0 AND ${table.compositeRowCount} > 0`,
+    ),
+    check(
+      "ci_index_releases_publication_shape",
+      dsql`(${table.status} = 'staging' AND ${table.publishedAt} IS NULL) OR (${table.status} = 'published' AND ${table.publishedAt} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/** One atomic public pointer; publication flips this only after validation. */
+export const ciIndexReleasePointers = pgTable(
+  "ci_index_release_pointers",
+  {
+    product: text("product").primaryKey(),
+    releaseId: text("release_id")
+      .references(() => ciIndexReleases.id, { onDelete: "restrict" })
+      .notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    check(
+      "ci_index_release_pointers_product_closed",
+      dsql`${table.product} = 'civica_index'`,
+    ),
+  ],
+);
+
 /** One fail-closed orchestration record per multi-source Index refresh. The
  * visible score tables change only in the transaction that marks this run
  * completed; failed staging runs retain their adapter results and error. */
@@ -1579,6 +1845,10 @@ export const ciDimensionScores = pgTable(
     // a no-op (the truncated new name == the existing DB name). Pinning
     // the name here matches the live DB and keeps `push` clean.
     methodologyVersion: text("methodology_version").notNull(),
+    /** Null only on unreleased legacy/research rows. Public reads require it. */
+    releaseId: text("release_id").references(() => ciIndexReleases.id, {
+      onDelete: "restrict",
+    }),
     derivationVersionKey: text("derivation_version_key").notNull(),
     derivationVersions: jsonb("derivation_versions")
       .$type<DerivationVersionEnvelope>()
@@ -1586,16 +1856,21 @@ export const ciDimensionScores = pgTable(
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
-    uniqueIndex("idx_ci_dimension_scores_unique").on(
+    unique("idx_ci_dimension_scores_unique").on(
       table.jurisdictionId,
       table.dimension,
       table.quarter,
       table.methodologyVersion,
       table.sourceId,
       table.indicatorId,
-    ),
+      table.releaseId,
+    ).nullsNotDistinct(),
     index("idx_ci_dimension_scores_quarter").on(table.quarter),
     index("idx_ci_dimension_scores_jurisdiction").on(table.jurisdictionId),
+    index("idx_ci_dimension_scores_release").on(
+      table.releaseId,
+      table.jurisdictionId,
+    ),
     index("idx_ci_dimension_scores_derivation_version").on(
       table.derivationVersionKey,
     ),
@@ -1857,6 +2132,10 @@ export const ciCompositeScores = pgTable(
     // explicit named foreignKey() below, not inline .references(), because
     // Drizzle's auto-generated name truncates past Postgres's 63-byte limit.
     methodologyVersion: text("methodology_version").notNull(),
+    /** Null only on unreleased legacy/research rows. Public reads require it. */
+    releaseId: text("release_id").references(() => ciIndexReleases.id, {
+      onDelete: "restrict",
+    }),
     derivationVersionKey: text("derivation_version_key").notNull(),
     derivationVersions: jsonb("derivation_versions")
       .$type<DerivationVersionEnvelope>()
@@ -1864,13 +2143,18 @@ export const ciCompositeScores = pgTable(
     calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("idx_ci_composite_unique").on(
+    unique("idx_ci_composite_unique").on(
       table.jurisdictionId,
       table.quarter,
       table.methodologyVersion,
-    ),
+      table.releaseId,
+    ).nullsNotDistinct(),
     index("idx_ci_composite_quarter_rank").on(table.quarter, table.rank),
     index("idx_ci_composite_jurisdiction").on(table.jurisdictionId),
+    index("idx_ci_composite_release").on(
+      table.releaseId,
+      table.jurisdictionId,
+    ),
     index("idx_ci_composite_derivation_version").on(table.derivationVersionKey),
     foreignKey({
       name: "ci_composite_scores_methodology_version_ci_methodology_versions",
@@ -2010,6 +2294,129 @@ export const organizationMemberships = pgTable(
 
 // --- Phase 5.2 — Civica Conditions companion layer ---
 
+/** Immutable release header for one Conditions dimension or release bundle. */
+export const civicaConditionsReleases = pgTable(
+  "civica_conditions_releases",
+  {
+    id: text("id").primaryKey(),
+    methodologyVersion: text("methodology_version").notNull(),
+    manifestSha256: text("manifest_sha256").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    check(
+      "conditions_release_identity_check",
+      dsql`${table.id} ~ '^conditions-[a-z0-9-]+-v[1-9][0-9]*$' AND btrim(${table.methodologyVersion}) <> '' AND ${table.manifestSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
+  ],
+);
+
+/** Exact eligible population, components, and missingness rule per period. */
+export const civicaConditionsReferenceSets = pgTable(
+  "civica_conditions_reference_sets",
+  {
+    releaseId: text("release_id")
+      .references(() => civicaConditionsReleases.id)
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    referencePeriod: text("reference_period").notNull(),
+    jurisdictionIds: jsonb("jurisdiction_ids").$type<string[]>().notNull(),
+    populationSha256: text("population_sha256").notNull(),
+    candidateCount: integer("candidate_count").notNull(),
+    alignedCount: integer("aligned_count").notNull(),
+    mixedYearRefusedCount: integer("mixed_year_refused_count").notNull(),
+    missingComponentCount: integer("missing_component_count").notNull(),
+    includedComponents: jsonb("included_components").$type<string[]>().notNull(),
+    missingnessPolicy: text("missingness_policy").notNull(),
+  },
+  (table) => [
+    primaryKey({
+      name: "civica_conditions_reference_sets_pk",
+      columns: [table.releaseId, table.dimension, table.referencePeriod],
+    }),
+    check(
+      "conditions_reference_set_shape_check",
+      dsql`${table.referencePeriod} ~ '^[0-9]{4}-Q[1-4]$' AND jsonb_typeof(${table.jurisdictionIds}) = 'array' AND jsonb_array_length(${table.jurisdictionIds}) > 0 AND ${table.populationSha256} ~ '^[a-f0-9]{64}$' AND ${table.candidateCount} >= ${table.alignedCount} AND ${table.alignedCount} > 0 AND ${table.mixedYearRefusedCount} >= 0 AND ${table.missingComponentCount} >= 0 AND jsonb_typeof(${table.includedComponents}) = 'array' AND jsonb_array_length(${table.includedComponents}) > 0 AND ${table.missingnessPolicy} = 'no-imputation-all-declared-components-observed-same-reference-year/v1'`,
+    ),
+  ],
+);
+
+/** Frozen parameter rows used to normalize a Conditions reference set. */
+export const civicaConditionsNormalizationParameters = pgTable(
+  "civica_conditions_normalization_parameters",
+  {
+    releaseId: text("release_id").notNull(),
+    dimension: text("dimension").notNull(),
+    referencePeriod: text("reference_period").notNull(),
+    componentId: text("component_id").notNull(),
+    direction: text("direction").notNull(),
+    transformationId: text("transformation_id").notNull(),
+    mean: doublePrecision("mean"),
+    standardDeviation: doublePrecision("standard_deviation"),
+    lowerBound: doublePrecision("lower_bound"),
+    upperBound: doublePrecision("upper_bound"),
+  },
+  (table) => [
+    primaryKey({
+      name: "civica_conditions_normalization_parameters_pk",
+      columns: [
+        table.releaseId,
+        table.dimension,
+        table.referencePeriod,
+        table.componentId,
+      ],
+    }),
+    foreignKey({
+      name: "conditions_normalization_reference_set_fk",
+      columns: [table.releaseId, table.dimension, table.referencePeriod],
+      foreignColumns: [
+        civicaConditionsReferenceSets.releaseId,
+        civicaConditionsReferenceSets.dimension,
+        civicaConditionsReferenceSets.referencePeriod,
+      ],
+    }).onDelete("restrict"),
+    check(
+      "conditions_normalization_parameter_shape_check",
+      dsql`${table.direction} IN ('higher_is_better','lower_is_better','not_ranked') AND btrim(${table.transformationId}) <> '' AND (${table.standardDeviation} IS NULL OR ${table.standardDeviation} > 0) AND ((${table.lowerBound} IS NULL AND ${table.upperBound} IS NULL) OR (${table.lowerBound} < ${table.upperBound}))`,
+    ),
+  ],
+);
+
+/**
+ * One declared Conditions calculation, including refused/missing candidates
+ * that do not produce a score. Component rows join through calculationKey.
+ */
+export const civicaConditionsCalculations = pgTable(
+  "civica_conditions_calculations",
+  {
+    calculationKey: text("calculation_key").primaryKey(),
+    /** Null only for an intervening legacy deployment before release freezing. */
+    releaseId: text("release_id").references(() => civicaConditionsReleases.id),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    methodologyVersion: text("methodology_version").notNull(),
+    alignmentPolicy: text("alignment_policy").notNull(),
+    alignmentStatus: text("alignment_status").notNull(),
+    /** Present only when all included components share one reference year. */
+    referenceYear: integer("reference_year"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_conditions_calculation_jurisdiction").on(
+      table.jurisdictionId,
+      table.dimension,
+      table.methodologyVersion,
+      table.releaseId,
+    ),
+    check(
+      "conditions_calculation_contract_check",
+      dsql`${table.calculationKey} ~ '^conditions-calculation/v1/sha256:[a-f0-9]{64}$' AND ${table.alignmentPolicy} = 'all-components-same-reference-year/v1' AND ${table.alignmentStatus} IN ('aligned','mixed_year_refused','missing_component') AND ((${table.alignmentStatus} = 'aligned' AND ${table.referenceYear} BETWEEN 1800 AND 2200) OR (${table.alignmentStatus} <> 'aligned' AND ${table.referenceYear} IS NULL))`,
+    ),
+  ],
+);
+
 /**
  * Civica Conditions scores — material conditions companion to the CI.
  * Three dimensions, each surfaced separately on country pages; never merged
@@ -2029,9 +2436,9 @@ export const civicaConditionsScores = pgTable(
     /** Quarter string matching ci_dimension_scores.quarter, e.g. "2026-Q3" */
     quarter: text("quarter").notNull(),
     /** Normalized 0–100 score (higher = better) */
-    normalizedScore: real("normalized_score").notNull(),
+    normalizedScore: doublePrecision("normalized_score").notNull(),
     /** Original native-scale value, kept for transparency */
-    rawValue: real("raw_value"),
+    rawValue: doublePrecision("raw_value"),
     sourceId: text("source_id")
       .references(() => sources.id)
       .notNull(),
@@ -2048,22 +2455,87 @@ export const civicaConditionsScores = pgTable(
     datasetYear: integer("dataset_year").notNull(),
     /** Methodology version tag — "beta" during the v2 rebuild */
     methodologyVersion: text("methodology_version").notNull(),
+    /** Null only for legacy rows that predate Conditions release freezing. */
+    releaseId: text("release_id").references(() => civicaConditionsReleases.id),
+    /**
+     * Required for decomposition-aware scores. Historic rows remain null and
+     * are deliberately excluded from the decomposable read path.
+     */
+    calculationKey: text("calculation_key").references(
+      () => civicaConditionsCalculations.calculationKey,
+    ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("idx_conditions_unique").on(
+    uniqueIndex("idx_conditions_release_unique").on(
       table.jurisdictionId,
       table.dimension,
       table.quarter,
       table.methodologyVersion,
       table.sourceId,
       table.indicatorId,
+      table.releaseId,
     ),
     index("idx_conditions_quarter").on(table.quarter),
     index("idx_conditions_jurisdiction").on(table.jurisdictionId),
+    index("idx_conditions_calculation").on(table.calculationKey),
+    index("idx_conditions_release").on(table.releaseId, table.dimension),
     check(
       "civica_conditions_scores_lineage_check",
       dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,
+    ),
+  ],
+);
+
+/**
+ * Native source inputs considered for a Conditions calculation. Unavailable
+ * inputs are rows too: their closed value state explains why no score exists.
+ */
+export const civicaConditionsComponents = pgTable(
+  "civica_conditions_components",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    calculationKey: text("calculation_key")
+      .references(() => civicaConditionsCalculations.calculationKey)
+      .notNull(),
+    componentId: text("component_id").notNull(),
+    nativeValue: doublePrecision("native_value"),
+    nativeUnit: text("native_unit").notNull(),
+    referenceYear: integer("reference_year"),
+    valueStatus: text("value_status").notNull(),
+    valueStatusReason: text("value_status_reason"),
+    inclusionDecision: text("inclusion_decision").notNull(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    indicatorId: text("indicator_id").notNull(),
+    upstreamRelease: text("upstream_release").notNull(),
+    artifactHash: text("artifact_hash").notNull(),
+    artifactKind: text("artifact_kind").notNull(),
+    temporalCoverage: text("temporal_coverage").notNull(),
+    licenseUrl: text("license_url").notNull(),
+    transformationId: text("transformation_id").notNull(),
+    substitutionReason: text("substitution_reason"),
+    methodVersion: text("method_version").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_conditions_component_unique").on(
+      table.calculationKey,
+      table.componentId,
+    ),
+    index("idx_conditions_component_source").on(table.sourceId, table.indicatorId),
+    check(
+      "conditions_component_lineage_check",
+      dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`,
+    ),
+    check(
+      "conditions_component_value_state_check",
+      dsql`${table.valueStatus} IN ('observed','missing','unknown','not_applicable','not_observed','disputed','withheld') AND (((${table.valueStatus} IN ('observed','disputed')) AND ${table.nativeValue} IS NOT NULL AND ${table.referenceYear} BETWEEN 1800 AND 2200) OR ((${table.valueStatus} NOT IN ('observed','disputed')) AND ${table.nativeValue} IS NULL AND ${table.referenceYear} IS NULL)) AND ((${table.valueStatus} = 'observed' AND ${table.valueStatusReason} IS NULL) OR (${table.valueStatus} <> 'observed' AND length(trim(${table.valueStatusReason})) > 0))`,
+    ),
+    check(
+      "conditions_component_inclusion_check",
+      dsql`${table.inclusionDecision} IN ('included','excluded_missing','refused_mixed_year')`,
     ),
   ],
 );
@@ -2075,35 +2547,85 @@ export const civicaConditionsScores = pgTable(
  * Pulse misclassification reports. Backs the /civica-index/corrections page.
  * Rows where is_public=false are hidden from the public log (PII redaction).
  */
-export const correctionLog = pgTable("correction_log", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  submittedAt: timestamp("submitted_at").notNull().defaultNow(),
-  /** FK to jurisdictions.id — nullable for methodology-wide disputes */
-  countryId: uuid("country_id").references(() => jurisdictions.id),
-  /**
-   * ci_data_error | ci_methodology | pulse_misclassification |
-   * pulse_severity | pulse_false_positive | pulse_missing_event |
-   * pulse_duplicate | other
-   */
-  category: text("category").notNull(),
-  /** Optional CI dimension the dispute pertains to */
-  dimension: text("dimension"),
-  submitterName: text("submitter_name"),
-  submitterEmail: text("submitter_email"),
-  submitterAffiliation: text("submitter_affiliation"),
-  description: text("description").notNull(),
-  /**
-   * open | in_review | resolved_corrected | resolved_no_change | rejected
-   */
-  status: text("status").notNull().default("open"),
-  /** Public-facing response from Civica, set when resolved */
-  disposition: text("disposition"),
-  resolvedAt: timestamp("resolved_at"),
-  /** false = row is hidden from the public log (PII redaction toggle) */
-  isPublic: boolean("is_public").notNull().default(true),
-  /** Internal team notes — never shown publicly */
-  internalNotes: text("internal_notes"),
-});
+export const correctionLog = pgTable(
+  "correction_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    submittedAt: timestamp("submitted_at").notNull().defaultNow(),
+    /** FK to jurisdictions.id — nullable for methodology-wide disputes */
+    countryId: uuid("country_id").references(() => jurisdictions.id),
+    /**
+     * atlas_data_error | ci_data_error | ci_methodology |
+     * pulse_misclassification | pulse_severity | pulse_false_positive |
+     * pulse_missing_event | pulse_duplicate | other
+     */
+    category: text("category").notNull(),
+    /** Optional CI dimension the dispute pertains to */
+    dimension: text("dimension"),
+    submitterName: text("submitter_name"),
+    submitterEmail: text("submitter_email"),
+    submitterAffiliation: text("submitter_affiliation"),
+    description: text("description").notNull(),
+    /**
+     * open | in_review | resolved_corrected | resolved_no_change | rejected
+     */
+    status: text("status").notNull().default("open"),
+    /** Public-facing response from Civica, set when resolved */
+    disposition: text("disposition"),
+    resolvedAt: timestamp("resolved_at"),
+    /** false = row is hidden from the public log (PII redaction toggle) */
+    isPublic: boolean("is_public").notNull().default(true),
+    /** Internal team notes — never shown publicly */
+    internalNotes: text("internal_notes"),
+    /** ATL-024 exact Atlas entity/field/release/source report coordinates. */
+    entityType: text("entity_type"),
+    entityId: text("entity_id"),
+    fieldPath: text("field_path"),
+    affectedReleaseId: text("affected_release_id"),
+    reportedSourceId: text("reported_source_id"),
+    reportedSourceUrl: text("reported_source_url"),
+    publishedValue: text("published_value"),
+    proposedValue: text("proposed_value"),
+    evidenceUrl: text("evidence_url"),
+    /** Versioned contextual notice accepted by the voluntary submitter. */
+    noticeVersion: text("notice_version"),
+    noticeAcceptedAt: timestamp("notice_accepted_at"),
+    /** Durable on-screen acknowledgement; never a promise of email delivery. */
+    acknowledgmentCode: text("acknowledgment_code"),
+    acknowledgedAt: timestamp("acknowledged_at"),
+    triagedAt: timestamp("triaged_at"),
+    reviewerId: text("reviewer_id"),
+  },
+  (table) => [
+    uniqueIndex("idx_correction_log_acknowledgment_code")
+      .on(table.acknowledgmentCode)
+      .where(dsql`${table.acknowledgmentCode} IS NOT NULL`),
+    index("idx_correction_log_status_submitted").on(
+      table.status,
+      table.submittedAt,
+    ),
+    index("idx_correction_log_entity").on(
+      table.entityType,
+      table.entityId,
+    ),
+    check(
+      "correction_log_status_closed",
+      dsql`${table.status} IN ('open','in_review','resolved_corrected','resolved_no_change','rejected')`,
+    ),
+    check(
+      "correction_log_resolution_shape",
+      dsql`((${table.status} IN ('open','in_review')) AND ${table.resolvedAt} IS NULL) OR ((${table.status} IN ('resolved_corrected','resolved_no_change','rejected')) AND ${table.resolvedAt} IS NOT NULL AND length(trim(${table.disposition})) >= 10)`,
+    ),
+    check(
+      "correction_log_atlas_report_shape",
+      dsql`${table.category} <> 'atlas_data_error' OR (${table.entityType} IN ('fact','institution','office','person','election','constitution-passage','organization','indicator') AND length(trim(${table.entityId})) > 0 AND length(trim(${table.fieldPath})) > 0 AND length(trim(${table.affectedReleaseId})) > 0 AND length(trim(${table.reportedSourceId})) > 0 AND ${table.reportedSourceUrl} LIKE 'https://%' AND length(trim(${table.publishedValue})) > 0 AND ${table.noticeVersion} = 'civica-data-error-report-notice/2026-07-23' AND ${table.noticeAcceptedAt} IS NOT NULL AND ${table.acknowledgmentCode} ~ '^CA-[A-F0-9]{12}$' AND ${table.acknowledgedAt} IS NOT NULL)`,
+    ),
+    check(
+      "correction_log_url_shape",
+      dsql`(${table.reportedSourceUrl} IS NULL OR ${table.reportedSourceUrl} LIKE 'https://%') AND (${table.evidenceUrl} IS NULL OR ${table.evidenceUrl} LIKE 'https://%')`,
+    ),
+  ],
+);
 
 /**
  * Consented public profiles for appointed advisory-board members. The table
@@ -3066,7 +3588,7 @@ export const pulseSources = pgTable(
  * Current dimensional delta state per (country, dimension).
  *
  * Recomputed daily from all `pulse_events_v2` rows where `published=true`
- * within the trailing 365-day window, applying category-specific decay
+ * within the versioned 365- or 730-day window, applying category-specific decay
  * per spec §4.1, then clamped to [-15, +10] per §4.3.
  *
  * One row per (jurisdictionId, dimension). Daily score script upserts.
@@ -3095,7 +3617,7 @@ export const pulseDimensionalDeltas = pgTable(
     scoreAsOf: date("score_as_of").notNull(),
     /** Inclusive start date of the score window. */
     windowStart: date("window_start").notNull(),
-    /** Closed production contract: trailing 365 calendar days. */
+    /** Closed production contract: a versioned 365- or 730-day lookback. */
     windowDays: integer("window_days").notNull(),
     lastComputedAt: timestamp("last_computed_at").defaultNow().notNull(),
   },
@@ -3117,7 +3639,7 @@ export const pulseDimensionalDeltas = pgTable(
     ),
     check(
       "pulse_dimensional_deltas_window_check",
-      dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+      dsql`${table.windowDays} IN (365, 730) AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
     ),
   ],
 );
@@ -3182,7 +3704,152 @@ export const pulseDimensionalDeltaHistory = pgTable(
     ),
     check(
       "pulse_dimensional_delta_history_window_check",
-      dsql`${table.windowDays} = 365 AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+      dsql`${table.windowDays} IN (365, 730) AND ${table.windowStart} = ${table.scoreAsOf} - ${table.windowDays}`,
+    ),
+  ],
+);
+
+/**
+ * PUL-024 — an immutable, explicit reference distribution for operational
+ * Pulse drift monitoring. Baselines are never moved by a scheduled job; a
+ * later method or source-basket change receives a separately captured row.
+ */
+export const pulseDriftBaselines = pgTable(
+  "pulse_drift_baselines",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    baselineKey: text("baseline_key").notNull().unique(),
+    runtimeMethodVersion: text("runtime_method_version").notNull(),
+    windowStart: timestamp("window_start").notNull(),
+    windowEnd: timestamp("window_end").notNull(),
+    snapshot: jsonb("snapshot").$type<PulseDriftSnapshot>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_drift_baseline_method_created").on(
+      table.runtimeMethodVersion,
+      table.createdAt,
+    ),
+    check(
+      "pulse_drift_baselines_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-drift-baseline/v1' AND ${table.baselineKey} ~ '^pulse-drift-baseline/sha256:[a-f0-9]{64}$' AND btrim(${table.runtimeMethodVersion}) <> '' AND ${table.windowEnd} > ${table.windowStart} AND jsonb_typeof(${table.snapshot}) = 'object'`,
+    ),
+  ],
+);
+
+/** One immutable monitoring outcome for a completed Pulse score run. */
+export const pulseDriftObservations = pgTable(
+  "pulse_drift_observations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    observationKey: text("observation_key").notNull().unique(),
+    scoreRunId: uuid("score_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull()
+      .unique(),
+    baselineId: uuid("baseline_id").references(() => pulseDriftBaselines.id, {
+      onDelete: "restrict",
+    }),
+    runtimeMethodVersion: text("runtime_method_version").notNull(),
+    windowStart: timestamp("window_start").notNull(),
+    windowEnd: timestamp("window_end").notNull(),
+    snapshot: jsonb("snapshot").$type<PulseDriftSnapshot>().notNull(),
+    standing: text("standing")
+      .$type<
+        "no_baseline" | "insufficient_evidence" | "within_threshold" | "alerts_open"
+      >()
+      .notNull(),
+    alertCount: integer("alert_count").notNull(),
+    observedAt: timestamp("observed_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_drift_observation_method_time").on(
+      table.runtimeMethodVersion,
+      table.observedAt,
+    ),
+    check(
+      "pulse_drift_observations_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-drift-observation/v1' AND ${table.observationKey} ~ '^pulse-drift-observation/sha256:[a-f0-9]{64}$' AND btrim(${table.runtimeMethodVersion}) <> '' AND ${table.windowEnd} > ${table.windowStart} AND jsonb_typeof(${table.snapshot}) = 'object' AND ${table.standing} IN ('no_baseline','insufficient_evidence','within_threshold','alerts_open') AND ${table.alertCount} >= 0 AND ((${table.standing} = 'no_baseline' AND ${table.baselineId} IS NULL AND ${table.alertCount} = 0) OR (${table.standing} = 'insufficient_evidence' AND ${table.baselineId} IS NOT NULL AND ${table.alertCount} = 0) OR (${table.standing} = 'within_threshold' AND ${table.baselineId} IS NOT NULL AND ${table.alertCount} = 0) OR (${table.standing} = 'alerts_open' AND ${table.baselineId} IS NOT NULL AND ${table.alertCount} > 0))`,
+    ),
+  ],
+);
+
+/** An append-only alert with only aggregate shares and bounded row references. */
+export const pulseDriftAlerts = pgTable(
+  "pulse_drift_alerts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    schemaVersion: text("schema_version").notNull(),
+    alertKey: text("alert_key").notNull().unique(),
+    observationId: uuid("observation_id")
+      .references(() => pulseDriftObservations.id, { onDelete: "restrict" })
+      .notNull(),
+    baselineId: uuid("baseline_id")
+      .references(() => pulseDriftBaselines.id, { onDelete: "restrict" })
+      .notNull(),
+    metric: text("metric")
+      .$type<
+        | "source_mix"
+        | "language_mix"
+        | "model_versions"
+        | "taxonomy_labels"
+        | "corroboration_weight"
+        | "abstention"
+        | "review_overturns"
+      >()
+      .notNull(),
+    reason: text("reason")
+      .$type<"distribution_shift" | "novel_model_version">()
+      .notNull(),
+    comparison: jsonb("comparison").$type<Record<string, unknown>>().notNull(),
+    affectedRowRefs: jsonb("affected_row_refs")
+      .$type<Array<Record<string, unknown>>>()
+      .notNull(),
+    remediationPath: text("remediation_path").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_drift_alert_observation").on(table.observationId),
+    index("idx_pulse_drift_alert_metric_created").on(
+      table.metric,
+      table.createdAt,
+    ),
+    check(
+      "pulse_drift_alerts_contract_check",
+      dsql`${table.schemaVersion} = 'pulse-drift-alert/v1' AND ${table.alertKey} ~ '^pulse-drift-alert/sha256:[a-f0-9]{64}$' AND ${table.metric} IN ('source_mix','language_mix','model_versions','taxonomy_labels','corroboration_weight','abstention','review_overturns') AND ${table.reason} IN ('distribution_shift','novel_model_version') AND jsonb_typeof(${table.comparison}) = 'object' AND jsonb_typeof(${table.affectedRowRefs}) = 'array' AND jsonb_array_length(${table.affectedRowRefs}) > 0 AND btrim(${table.remediationPath}) <> ''`,
+    ),
+  ],
+);
+
+/**
+ * The one score run currently published by the Pulse dimensional endpoint.
+ * History rows and run completion are written first in the same atomic Neon
+ * batch; this pointer flips last, so readers observe either the whole prior
+ * run or the whole next run and never a mixture of both.
+ */
+export const pulseScorePublicationPointers = pgTable(
+  "pulse_score_publication_pointers",
+  {
+    product: text("product").primaryKey(),
+    computationRunId: uuid("computation_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull()
+      .unique(),
+    versionKey: text("version_key").notNull(),
+    scoreAsOf: date("score_as_of").notNull(),
+    publishedAt: timestamp("published_at").defaultNow().notNull(),
+  },
+  (table) => [
+    check(
+      "pulse_score_publication_product_closed",
+      dsql`${table.product} = 'pulse_dimensions'`,
+    ),
+    check(
+      "pulse_score_publication_version_shape",
+      dsql`${table.versionKey} ~ '^pulse-stage/sha256:[a-f0-9]{64}$'`,
     ),
   ],
 );
@@ -3354,6 +4021,8 @@ export const pulseCodingStudies = pgTable(
     datasetVersion: text("dataset_version").notNull(),
     packetSetSha256: text("packet_set_sha256").notNull(),
     traceSetSha256: text("trace_set_sha256"),
+    supersedesStudyId: uuid("supersedes_study_id"),
+    supersessionReason: text("supersession_reason"),
     status: text("status").notNull().default("setup"),
     createdBy: text("created_by").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -3364,10 +4033,20 @@ export const pulseCodingStudies = pgTable(
       "pulse_coding_studies_contract_check",
       dsql`${table.schemaVersion} = 'pulse-coding-workspace/v1' AND ${table.purpose} IN ('instruction_pilot','evaluation') AND ${table.status} IN ('setup','active','closed') AND ${table.protocolVersion} <> '' AND ${table.codebookVersion} <> '' AND ${table.ontologyVersion} <> '' AND ${table.datasetVersion} <> '' AND ${table.packetSetSha256} ~ '^[a-f0-9]{64}$' AND (${table.traceSetSha256} IS NULL OR ${table.traceSetSha256} ~ '^[a-f0-9]{64}$')`,
     ),
+    check(
+      "pulse_coding_studies_supersession_check",
+      dsql`((${table.supersedesStudyId} IS NULL AND ${table.supersessionReason} IS NULL) OR (${table.supersedesStudyId} IS NOT NULL AND ${table.supersessionReason} = 'frozen_packet_hash_mismatch' AND ${table.id} <> ${table.supersedesStudyId}))`,
+    ),
+    foreignKey({
+      name: "pulse_coding_studies_supersedes_study_id_pulse_coding_studies_id_fk",
+      columns: [table.supersedesStudyId],
+      foreignColumns: [table.id],
+    }).onDelete("restrict"),
     uniqueIndex("idx_pulse_coding_study_identity").on(
       table.protocolVersion,
       table.packetSetSha256,
     ),
+    uniqueIndex("idx_pulse_coding_study_supersedes").on(table.supersedesStudyId),
     index("idx_pulse_coding_study_status").on(table.status, table.createdAt),
   ],
 );
@@ -3680,36 +4359,596 @@ export const pulseCorrections = pgTable("pulse_corrections", {
   internalNotes: text("internal_notes"),
 });
 
+// --- Admin authentication and mutation audit ---
+
+/**
+ * PLT-009 durable logout tombstones.
+ *
+ * The browser cookie carries a random signed session ID. Only a
+ * domain-separated SHA-256 digest of that ID reaches this table, so the
+ * revocation store cannot be used to reconstruct a bearer credential. A
+ * matching row makes the cookie invalid until its signed expiry. Rows are
+ * intentionally retained as security evidence; no request path updates or
+ * deletes them.
+ */
+export const adminSessionRevocations = pgTable(
+  "admin_session_revocations",
+  {
+    sessionKey: text("session_key").primaryKey(),
+    reviewerId: text("reviewer_id").notNull(),
+    issuedAt: timestamp("issued_at", { withTimezone: true }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("idx_admin_session_revocations_expires_at").on(table.expiresAt),
+    check(
+      "admin_session_revocations_key_check",
+      dsql`${table.sessionKey} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "admin_session_revocations_reviewer_check",
+      dsql`length(${table.reviewerId}) BETWEEN 1 AND 80 AND ${table.reviewerId} ~ '^[a-zA-Z0-9 _.\\-]+$'`,
+    ),
+    check(
+      "admin_session_revocations_lifetime_check",
+      dsql`${table.expiresAt} = ${table.issuedAt} + interval '7 days'`,
+    ),
+    check(
+      "admin_session_revocations_time_order_check",
+      dsql`${table.revokedAt} >= ${table.issuedAt} - interval '60 seconds' AND ${table.revokedAt} < ${table.expiresAt}`,
+    ),
+  ],
+);
+
+/**
+ * PLT-009 common admin mutation ledger.
+ *
+ * Every authenticated mutation records a bounded attempt before business
+ * work and normally a terminal outcome afterwards. If the outcome insert is
+ * unavailable after business work completes, the durable `attempted` result
+ * marks an interrupted audit lifecycle without inviting a duplicate retry.
+ * Authentication bootstrap and logout record terminal outcomes directly. The
+ * migration installs append-only and no-truncate triggers so
+ * actor/action/target/time/result evidence cannot be rewritten or removed
+ * through ordinary application credentials.
+ */
+export const adminMutationAuditLog = pgTable(
+  "admin_mutation_audit_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    requestId: uuid("request_id").notNull(),
+    event: text("event").notNull(),
+    route: text("route").notNull(),
+    method: text("method").notNull(),
+    actorId: text("actor_id").notNull(),
+    actorSource: text("actor_source").notNull(),
+    sessionKey: text("session_key").notNull(),
+    action: text("action").notNull(),
+    targetType: text("target_type").notNull(),
+    targetId: text("target_id").notNull(),
+    result: text("result").notNull(),
+    httpStatus: integer("http_status"),
+    reasonCode: text("reason_code"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_admin_mutation_audit_request_event").on(
+      table.requestId,
+      table.event,
+    ),
+    index("idx_admin_mutation_audit_actor_date").on(
+      table.actorId,
+      table.createdAt,
+    ),
+    index("idx_admin_mutation_audit_target_date").on(
+      table.targetType,
+      table.targetId,
+      table.createdAt,
+    ),
+    index("idx_admin_mutation_audit_session_date").on(
+      table.sessionKey,
+      table.createdAt,
+    ),
+    check(
+      "admin_mutation_audit_event_result_check",
+      dsql`(${table.event} = 'attempt' AND ${table.result} = 'attempted' AND ${table.httpStatus} IS NULL) OR (${table.event} = 'outcome' AND ${table.result} IN ('succeeded','rejected','failed') AND ${table.httpStatus} BETWEEN 100 AND 599)`,
+    ),
+    check(
+      "admin_mutation_audit_method_check",
+      dsql`${table.method} IN ('GET','POST','PUT','PATCH','DELETE')`,
+    ),
+    check(
+      "admin_mutation_audit_actor_check",
+      dsql`length(${table.actorId}) BETWEEN 1 AND 80 AND ${table.actorId} ~ '^[a-zA-Z0-9 _.\\-]+$' AND ${table.actorSource} IN ('admin_session','password_login','google_login')`,
+    ),
+    check(
+      "admin_mutation_audit_session_key_check",
+      dsql`${table.sessionKey} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "admin_mutation_audit_descriptor_check",
+      dsql`length(${table.route}) BETWEEN 1 AND 160 AND left(${table.route}, 1) = '/' AND length(${table.action}) BETWEEN 1 AND 80 AND ${table.action} ~ '^[a-z][a-z0-9_.-]*$' AND length(${table.targetType}) BETWEEN 1 AND 80 AND ${table.targetType} ~ '^[a-z][a-z0-9_.-]*$' AND length(${table.targetId}) BETWEEN 1 AND 160`,
+    ),
+    check(
+      "admin_mutation_audit_reason_check",
+      dsql`${table.reasonCode} IS NULL OR (length(${table.reasonCode}) BETWEEN 1 AND 80 AND ${table.reasonCode} ~ '^[a-z][a-z0-9_.-]*$')`,
+    ),
+  ],
+);
+
+// --- Cron delivery control ---
+
+/**
+ * One row per logical cron delivery. The request fingerprint makes reuse of
+ * an Idempotency-Key with different parameters a visible conflict. Attempts
+ * are retained separately, while this row projects the latest state used to
+ * suppress completed deliveries and cap retries.
+ */
+export const cronJobExecutions = pgTable(
+  "cron_job_executions",
+  {
+    executionKey: text("execution_key").primaryKey(),
+    jobId: text("job_id").notNull(),
+    route: text("route").notNull(),
+    triggerKind: text("trigger_kind").$type<"scheduled" | "manual">().notNull(),
+    scheduleSlot: timestamp("schedule_slot", { withTimezone: true }),
+    requestMode: text("request_mode").notNull(),
+    scopeKey: text("scope_key"),
+    requestSha256: text("request_sha256").notNull(),
+    status: text("status")
+      .$type<"running" | "succeeded" | "failed">()
+      .notNull(),
+    attemptCount: integer("attempt_count").notNull(),
+    maxAttempts: integer("max_attempts").notNull(),
+    lastAttemptId: uuid("last_attempt_id").notNull(),
+    lastFence: integer("last_fence").notNull(),
+    firstStartedAt: timestamp("first_started_at", {
+      withTimezone: true,
+    }).notNull(),
+    lastStartedAt: timestamp("last_started_at", {
+      withTimezone: true,
+    }).notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    responseStatus: integer("response_status"),
+    resultCode: text("result_code"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_cron_job_execution_scheduled")
+      .on(table.jobId, table.scheduleSlot)
+      .where(dsql`${table.triggerKind} = 'scheduled'`),
+    uniqueIndex("idx_cron_job_execution_manual")
+      .on(table.jobId, table.scopeKey)
+      .where(dsql`${table.triggerKind} = 'manual'`),
+    index("idx_cron_job_execution_status").on(table.status, table.updatedAt),
+    index("idx_cron_job_execution_job_time").on(
+      table.jobId,
+      table.scheduleSlot,
+    ),
+    check(
+      "cron_job_execution_identity_check",
+      dsql`${table.executionKey} ~ '^[a-f0-9]{64}$' AND length(${table.jobId}) BETWEEN 1 AND 80 AND ${table.jobId} ~ '^[a-z][a-z0-9.-]*$' AND length(${table.route}) BETWEEN 1 AND 160 AND ${table.route} ~ '^/api/cron/[a-z0-9_./-]+$' AND (${table.scopeKey} IS NULL OR ${table.scopeKey} ~ '^[a-f0-9]{64}$') AND ${table.requestSha256} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "cron_job_execution_mode_status_check",
+      dsql`${table.requestMode} IN ('apply','dry_run') AND ${table.status} IN ('running','succeeded','failed') AND ${table.attemptCount} >= 1 AND ${table.maxAttempts} >= 1 AND ${table.attemptCount} <= ${table.maxAttempts} AND ${table.lastFence} >= 1`,
+    ),
+    check(
+      "cron_job_execution_trigger_check",
+      dsql`(${table.triggerKind} = 'scheduled' AND ${table.scheduleSlot} IS NOT NULL AND ${table.scopeKey} IS NULL AND ${table.requestMode} = 'apply') OR (${table.triggerKind} = 'manual' AND ${table.scheduleSlot} IS NULL AND ${table.scopeKey} IS NOT NULL)`,
+    ),
+    check(
+      "cron_job_execution_time_order_check",
+      dsql`${table.lastStartedAt} >= ${table.firstStartedAt} AND ${table.updatedAt} >= ${table.createdAt}`,
+    ),
+    check(
+      "cron_job_execution_lifecycle_check",
+      dsql`(${table.status} = 'running' AND ${table.completedAt} IS NULL AND ${table.responseStatus} IS NULL AND ${table.resultCode} IS NULL) OR (${table.status} = 'succeeded' AND ${table.completedAt} IS NOT NULL AND ${table.responseStatus} IS NOT NULL AND ${table.resultCode} IS NOT NULL AND ${table.completedAt} >= ${table.lastStartedAt} AND ${table.responseStatus} BETWEEN 200 AND 299 AND ${table.resultCode} ~ '^[a-z][a-z0-9_.-]*$') OR (${table.status} = 'failed' AND ${table.completedAt} IS NOT NULL AND ${table.responseStatus} IS NOT NULL AND ${table.resultCode} IS NOT NULL AND ${table.completedAt} >= ${table.lastStartedAt} AND ${table.responseStatus} BETWEEN 100 AND 599 AND NOT (${table.responseStatus} BETWEEN 200 AND 299) AND ${table.resultCode} ~ '^[a-z][a-z0-9_.-]*$')`,
+    ),
+  ],
+);
+
+/**
+ * Immutable handoff from an authenticated cron delivery to the classify run
+ * that owns its work. A later schedule slot may adopt the sole older running
+ * classify run; retaining that binding lets every retry of the later delivery
+ * return to the same run even if the cron wrapper failed after the run closed.
+ */
+export const pulseClassificationDeliveryBindings = pgTable(
+  "pulse_classification_delivery_bindings",
+  {
+    executionKey: text("execution_key").primaryKey(),
+    classificationRunId: uuid("classification_run_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "pulse_classification_delivery_execution_fk",
+      columns: [table.executionKey],
+      foreignColumns: [cronJobExecutions.executionKey],
+    }).onDelete("restrict"),
+    foreignKey({
+      name: "pulse_classification_delivery_run_fk",
+      columns: [table.classificationRunId],
+      foreignColumns: [pulsePipelineRuns.id],
+    }).onDelete("restrict"),
+    index("idx_pulse_classification_delivery_run").on(
+      table.classificationRunId,
+    ),
+    check(
+      "pulse_classification_delivery_execution_check",
+      dsql`${table.executionKey} ~ '^[a-f0-9]{64}$'`,
+    ),
+  ],
+);
+
+/**
+ * Job-wide mutex. Locking this row serializes every delivery key for a job,
+ * so a manual invocation cannot overlap its scheduled run. The fence only
+ * moves forward and prevents a timed-out runner from finalizing a newer try.
+ */
+export const cronJobLeases = pgTable(
+  "cron_job_leases",
+  {
+    jobId: text("job_id").primaryKey(),
+    leaseToken: uuid("lease_token"),
+    leaseFence: integer("lease_fence").default(0).notNull(),
+    leaseExpiresAt: timestamp("lease_expires_at", { withTimezone: true }),
+    executionKey: text("execution_key"),
+    attemptId: uuid("attempt_id"),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("idx_cron_job_lease_expiry").on(table.leaseExpiresAt),
+    check(
+      "cron_job_lease_identity_check",
+      dsql`length(${table.jobId}) BETWEEN 1 AND 80 AND ${table.jobId} ~ '^[a-z][a-z0-9.-]*$' AND ${table.leaseFence} >= 0 AND (${table.executionKey} IS NULL OR ${table.executionKey} ~ '^[a-f0-9]{64}$')`,
+    ),
+    check(
+      "cron_job_lease_active_fields_check",
+      dsql`(${table.leaseToken} IS NULL AND ${table.leaseExpiresAt} IS NULL AND ${table.executionKey} IS NULL AND ${table.attemptId} IS NULL) OR (${table.leaseToken} IS NOT NULL AND ${table.leaseExpiresAt} IS NOT NULL AND ${table.executionKey} IS NOT NULL AND ${table.attemptId} IS NOT NULL)`,
+    ),
+  ],
+);
+
+/**
+ * One retained row per execution attempt. Running rows make abandoned work
+ * visible; the database acquisition function closes them as expired before a
+ * retry starts. No request body, credential, payload, or error text is stored.
+ */
+export const cronJobAttempts = pgTable(
+  "cron_job_attempts",
+  {
+    attemptId: uuid("attempt_id").primaryKey(),
+    executionKey: text("execution_key")
+      .references(() => cronJobExecutions.executionKey, {
+        onDelete: "restrict",
+      })
+      .notNull(),
+    jobId: text("job_id").notNull(),
+    ordinal: integer("ordinal").notNull(),
+    fence: integer("fence").notNull(),
+    status: text("status")
+      .$type<"running" | "succeeded" | "failed" | "expired">()
+      .notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    responseStatus: integer("response_status"),
+    resultCode: text("result_code"),
+  },
+  (table) => [
+    uniqueIndex("idx_cron_job_attempt_fence").on(table.jobId, table.fence),
+    uniqueIndex("idx_cron_job_attempt_ordinal").on(
+      table.executionKey,
+      table.ordinal,
+    ),
+    index("idx_cron_job_attempt_execution").on(
+      table.executionKey,
+      table.startedAt,
+    ),
+    index("idx_cron_job_attempt_status").on(table.status, table.startedAt),
+    check(
+      "cron_job_attempt_identity_check",
+      dsql`${table.executionKey} ~ '^[a-f0-9]{64}$' AND length(${table.jobId}) BETWEEN 1 AND 80 AND ${table.jobId} ~ '^[a-z][a-z0-9.-]*$' AND ${table.ordinal} >= 1 AND ${table.fence} >= 1`,
+    ),
+    check(
+      "cron_job_attempt_lifecycle_check",
+      dsql`(${table.status} = 'running' AND ${table.completedAt} IS NULL AND ${table.responseStatus} IS NULL AND ${table.resultCode} IS NULL) OR (${table.status} = 'succeeded' AND ${table.completedAt} IS NOT NULL AND ${table.responseStatus} IS NOT NULL AND ${table.resultCode} IS NOT NULL AND ${table.completedAt} >= ${table.startedAt} AND ${table.responseStatus} BETWEEN 200 AND 299 AND ${table.resultCode} ~ '^[a-z][a-z0-9_.-]*$') OR (${table.status} IN ('failed','expired') AND ${table.completedAt} IS NOT NULL AND ${table.responseStatus} IS NOT NULL AND ${table.resultCode} IS NOT NULL AND ${table.completedAt} >= ${table.startedAt} AND ${table.responseStatus} BETWEEN 100 AND 599 AND NOT (${table.responseStatus} BETWEEN 200 AND 299) AND ${table.resultCode} ~ '^[a-z][a-z0-9_.-]*$')`,
+    ),
+  ],
+);
+
+// --- Privacy-bounded route performance telemetry ---
+
+/**
+ * One numeric, route-template-level observation. This is intentionally not an
+ * analytics event ledger: it never stores a pathname parameter, query string,
+ * cookie, IP address, user agent, request body, account identifier, or error
+ * message. The bounded rows are retained for a short operational window and
+ * are written only after the reader response is complete.
+ */
+export const routePerformanceObservations = pgTable(
+  "route_performance_observations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    observedAt: timestamp("observed_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    routeId: text("route_id").notNull(),
+    method: text("method").notNull(),
+    surface: text("surface")
+      .$type<"request" | "job" | "error">()
+      .notNull(),
+    metric: text("metric")
+      .$type<"request_duration_ms" | "job_duration_ms" | "server_error">()
+      .notNull(),
+    durationMs: integer("duration_ms"),
+    httpStatus: integer("http_status"),
+    cacheProfile: text("cache_profile"),
+    releaseId: text("release_id").notNull(),
+    telemetryVersion: text("telemetry_version").notNull(),
+  },
+  (table) => [
+    index("idx_route_performance_observed_at").on(table.observedAt),
+    index("idx_route_performance_route_metric_time").on(
+      table.routeId,
+      table.metric,
+      table.observedAt,
+    ),
+    index("idx_route_performance_release_time").on(
+      table.releaseId,
+      table.observedAt,
+    ),
+    check(
+      "route_performance_observation_route_shape",
+      dsql`length(${table.routeId}) BETWEEN 1 AND 160 AND ${table.routeId} ~ '^[a-z][a-z0-9._-]*$'`,
+    ),
+    check(
+      "route_performance_observation_method_closed",
+      dsql`${table.method} IN ('GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS','DOCUMENT','UNKNOWN')`,
+    ),
+    check(
+      "route_performance_observation_surface_metric_closed",
+      dsql`(${table.surface} = 'request' AND ${table.metric} = 'request_duration_ms' AND ${table.durationMs} IS NOT NULL) OR (${table.surface} = 'job' AND ${table.metric} = 'job_duration_ms' AND ${table.durationMs} IS NOT NULL) OR (${table.surface} = 'error' AND ${table.metric} = 'server_error' AND ${table.durationMs} IS NULL)`,
+    ),
+    check(
+      "route_performance_observation_duration_bound",
+      dsql`${table.durationMs} IS NULL OR ${table.durationMs} BETWEEN 0 AND 3600000`,
+    ),
+    check(
+      "route_performance_observation_status_bound",
+      dsql`${table.httpStatus} IS NULL OR ${table.httpStatus} BETWEEN 100 AND 599`,
+    ),
+    check(
+      "route_performance_observation_cache_profile_closed",
+      dsql`${table.cacheProfile} IS NULL OR ${table.cacheProfile} IN ('public-live','private-live','checked-build-artifact','immutable-release','build-static','build-revalidated','document')`,
+    ),
+    check(
+      "route_performance_observation_release_shape",
+      dsql`length(${table.releaseId}) BETWEEN 1 AND 96 AND ${table.releaseId} ~ '^[a-zA-Z0-9._-]+$' AND length(${table.telemetryVersion}) BETWEEN 1 AND 96 AND ${table.telemetryVersion} ~ '^[a-zA-Z0-9._/-]+$'`,
+    ),
+  ],
+);
+
+// --- Durable production-pipeline observability ---
+
+/**
+ * One durable execution record for a registered scheduled or manual production
+ * pipeline. The row deliberately keeps only operational metadata: bounded
+ * counters, declared source version/vintage handles, freshness outcomes, and
+ * a closed error code. It is not a source-payload, request, or error-content
+ * retention channel.
+ */
+export const productionPipelineRuns = pgTable(
+  "production_pipeline_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    pipelineId: text("pipeline_id").notNull(),
+    triggerKind: text("trigger_kind")
+      .$type<"scheduled" | "manual">()
+      .notNull(),
+    executionKey: text("execution_key"),
+    scheduleSlot: timestamp("schedule_slot", { withTimezone: true }),
+    status: text("status")
+      .$type<"running" | "succeeded" | "failed" | "empty" | "anomalous">()
+      .notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    rowsRead: integer("rows_read"),
+    rowsWritten: integer("rows_written"),
+    rowsRejected: integer("rows_rejected"),
+    sourceVersions: jsonb("source_versions")
+      .$type<
+        Array<{
+          sourceId: string;
+          upstreamVersion: string;
+          upstreamVintage: string;
+        }>
+      >()
+      .notNull(),
+    costMicrousd: integer("cost_microusd"),
+    errorSummary: text("error_summary"),
+    freshnessSourceIds: text("freshness_source_ids").array().notNull(),
+    metrics: jsonb("metrics").$type<Record<string, number | null>>().notNull(),
+    releaseId: text("release_id").notNull(),
+    observabilityVersion: text("observability_version").notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_production_pipeline_execution")
+      .on(table.executionKey)
+      .where(dsql`${table.executionKey} IS NOT NULL`),
+    index("idx_production_pipeline_status_time").on(
+      table.status,
+      table.startedAt,
+    ),
+    index("idx_production_pipeline_id_time").on(
+      table.pipelineId,
+      table.startedAt,
+    ),
+    index("idx_production_pipeline_schedule_slot").on(
+      table.pipelineId,
+      table.scheduleSlot,
+    ),
+    check(
+      "production_pipeline_run_identity_check",
+      dsql`length(${table.pipelineId}) BETWEEN 1 AND 100 AND ${table.pipelineId} ~ '^[a-z][a-z0-9.-]*$' AND (${table.executionKey} IS NULL OR ${table.executionKey} ~ '^[a-f0-9]{64}$') AND length(${table.releaseId}) BETWEEN 1 AND 96 AND ${table.releaseId} ~ '^[A-Za-z0-9._-]+$' AND length(${table.observabilityVersion}) BETWEEN 1 AND 96 AND ${table.observabilityVersion} ~ '^[A-Za-z0-9._/-]+$'`,
+    ),
+    check(
+      "production_pipeline_run_trigger_shape",
+      dsql`(${table.triggerKind} = 'scheduled' AND ${table.executionKey} IS NOT NULL AND ${table.scheduleSlot} IS NOT NULL) OR (${table.triggerKind} = 'manual' AND ${table.scheduleSlot} IS NULL)`,
+    ),
+    check(
+      "production_pipeline_run_status_shape",
+      dsql`(${table.status} = 'running' AND ${table.completedAt} IS NULL AND ${table.errorSummary} IS NULL) OR (${table.status} IN ('succeeded','empty','anomalous') AND ${table.completedAt} IS NOT NULL AND ${table.errorSummary} IS NULL) OR (${table.status} = 'failed' AND ${table.completedAt} IS NOT NULL AND ${table.errorSummary} IS NOT NULL)`,
+    ),
+    check(
+      "production_pipeline_run_counter_bounds",
+      dsql`(${table.rowsRead} IS NULL OR ${table.rowsRead} >= 0) AND (${table.rowsWritten} IS NULL OR ${table.rowsWritten} >= 0) AND (${table.rowsRejected} IS NULL OR ${table.rowsRejected} >= 0) AND (${table.costMicrousd} IS NULL OR ${table.costMicrousd} >= 0)`,
+    ),
+    check(
+      "production_pipeline_run_payload_shape",
+      dsql`jsonb_typeof(${table.sourceVersions}) = 'array' AND jsonb_typeof(${table.metrics}) = 'object' AND cardinality(${table.freshnessSourceIds}) <= 64 AND (${table.errorSummary} IS NULL OR (${table.errorSummary} ~ '^[a-z][a-z0-9_.-]{0,79}$'))`,
+    ),
+  ],
+);
+
+// --- Scrubbed exception monitoring ---
+
+/**
+ * One deduplicated, content-free exception signature for a released surface.
+ * No error text, stack trace, request URL, headers, body, account identifier,
+ * or browser digest is retained. A repeat after resolution reopens the same
+ * signature so operators cannot mistake a recurrence for a new issue.
+ */
+export const errorMonitoringEvents = pgTable(
+  "error_monitoring_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fingerprint: text("fingerprint").notNull(),
+    surface: text("surface")
+      .$type<"server" | "client" | "cron" | "script">()
+      .notNull(),
+    routeId: text("route_id"),
+    jobId: text("job_id"),
+    errorCode: text("error_code").notNull(),
+    releaseId: text("release_id").notNull(),
+    sourceMapId: text("source_map_id").notNull(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    occurrenceCount: integer("occurrence_count").notNull().default(1),
+    status: text("status").$type<"open" | "resolved">().notNull().default("open"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    monitoringVersion: text("monitoring_version").notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_error_monitoring_fingerprint").on(table.fingerprint),
+    index("idx_error_monitoring_open_last_seen").on(
+      table.status,
+      table.lastSeenAt,
+    ),
+    index("idx_error_monitoring_release_last_seen").on(
+      table.releaseId,
+      table.lastSeenAt,
+    ),
+    check(
+      "error_monitoring_identity_check",
+      dsql`length(${table.fingerprint}) = 64 AND ${table.fingerprint} ~ '^[a-f0-9]{64}$' AND ${table.surface} IN ('server','client','cron','script') AND ${table.errorCode} ~ '^[a-z][a-z0-9_.-]{0,79}$' AND ${table.releaseId} ~ '^[A-Za-z0-9._-]{1,96}$' AND ${table.sourceMapId} ~ '^nextjs-protected/[A-Za-z0-9._-]{1,96}$' AND length(${table.monitoringVersion}) BETWEEN 1 AND 96 AND ${table.monitoringVersion} ~ '^[A-Za-z0-9._/-]+$' AND ${table.occurrenceCount} >= 1`,
+    ),
+    check(
+      "error_monitoring_context_check",
+      dsql`((${table.surface} IN ('server','client') AND ${table.routeId} ~ '^[a-z][a-z0-9._-]{0,159}$' AND ${table.jobId} IS NULL) OR (${table.surface} = 'cron' AND ${table.routeId} ~ '^[a-z][a-z0-9._-]{0,159}$' AND ${table.jobId} ~ '^[a-z][a-z0-9.-]{0,79}$') OR (${table.surface} = 'script' AND ${table.routeId} IS NULL AND ${table.jobId} ~ '^[a-z][a-z0-9.-]{0,79}$'))`,
+    ),
+    check(
+      "error_monitoring_resolution_shape",
+      dsql`(${table.status} = 'open' AND ${table.resolvedAt} IS NULL) OR (${table.status} = 'resolved' AND ${table.resolvedAt} IS NOT NULL AND ${table.resolvedAt} >= ${table.firstSeenAt})`,
+    ),
+  ],
+);
+
+/**
+ * A deliberately small bridge from a monitored exception to the corresponding
+ * correction-log or external status-page record. The reference is an opaque
+ * record ID, never a status URL or reporter-supplied prose.
+ */
+export const errorMonitoringIssueLinks = pgTable(
+  "error_monitoring_issue_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventId: uuid("event_id")
+      .references(() => errorMonitoringEvents.id, { onDelete: "cascade" })
+      .notNull(),
+    recordType: text("record_type")
+      .$type<"correction" | "status">()
+      .notNull(),
+    recordId: text("record_id").notNull(),
+    linkedAt: timestamp("linked_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_error_monitoring_issue_link_unique").on(
+      table.eventId,
+      table.recordType,
+      table.recordId,
+    ),
+    index("idx_error_monitoring_issue_link_event").on(table.eventId),
+    check(
+      "error_monitoring_issue_link_shape",
+      dsql`${table.recordType} IN ('correction','status') AND ${table.recordId} ~ '^[A-Za-z0-9._:-]{1,160}$'`,
+    ),
+  ],
+);
+
 // --- Durable (cross-instance) rate limiter ---
 
 /**
- * Fixed-window rate-limit counters, backed by the existing Neon
- * Postgres so a per-IP limit survives serverless cold starts and
- * coordinates across instances (the in-memory limiter in
- * `src/lib/api/rate-limit.ts` cannot — audit 2026-06-07 Security #9).
+ * Shared fixed-window counters for fail-closed request protection across
+ * application instances. One row represents a scope, an opaque HMAC subject
+ * digest, and a database-derived window start, encoded together in the primary
+ * `key` as `${scope}:${subjectHash}:${windowStartMs}`. Raw request identities
+ * never cross the durable-store boundary or reach this table.
  *
- * One row per (scope, key, window-start). The window start is baked
- * into the primary `key` (e.g. `chat-durable:1.2.3.4:1717848000000`)
- * so a new window opens a fresh row at count 1; the previous row goes
- * stale and is reaped opportunistically via the `expires_at` index.
- * No row is ever read to decide allow/deny — the count is incremented
- * and returned atomically by a single `INSERT … ON CONFLICT DO UPDATE
- * … RETURNING count`.
+ * The durable limiter uses one atomic `INSERT … ON CONFLICT DO UPDATE …
+ * RETURNING count`. Database time selects the window and expiry, and the count
+ * saturates at the applicable policy limit plus one. The same statement uses
+ * the `expires_at` index to remove expired windows before incrementing; any
+ * statement failure denies the protected request instead of bypassing the
+ * shared counter.
  *
- * Purely operational/ephemeral: holds no provenance and no user data
- * beyond the request IP for the duration of one window. Safe to
- * truncate at any time (worst case: counters reset for the current
- * window). Written ONLY by `checkDurableRateLimit()`.
+ * This is internal, ephemeral security state with no provenance payload.
+ * Deleting or truncating rows resets active budgets and is not safe while the
+ * protection is expected to remain enforced. Written only through the durable
+ * rate-limit store used by `checkDurableRateLimit()`; store failures deny the
+ * protected request rather than falling back to an in-process counter.
  */
 export const rateLimits = pgTable(
   "rate_limits",
   {
-    /** `${scope}:${key}:${windowStartMs}` — encodes the window. */
+    /** `${scope}:${subjectHash}:${windowStartMs}`; subjectHash is an opaque HMAC digest and the window start comes from database time. */
     key: text("key").primaryKey(),
-    /** Requests seen in this window so far. */
+    /** Requests observed in the window, saturated at the policy limit plus one. */
     count: integer("count").notNull().default(0),
-    /** Wall-clock end of the window (windowStart + windowMs). Only
-     *  used by the lazy reaper; never consulted on the hot path. */
+    /** Database-derived window end used by the increment statement's indexed expiry cleanup, not a separate allow/deny read. */
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
   (table) => [index("idx_rate_limits_expires_at").on(table.expiresAt)],

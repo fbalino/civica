@@ -1,63 +1,64 @@
-import { config } from "dotenv";
-config({ path: ".env.local", quiet: true });
+import { readFileSync } from "node:fs";
 
-import { zPulseSourceCoverageReport } from "../src/lib/api/contract/schemas";
-import { CURRENT_PULSE_RUNTIME_METHOD } from "../src/lib/pulse/v2/runtime-contract";
-import { loadPulseSourceCoverageReport } from "../src/lib/pulse/v2/source-coverage";
+import {
+  buildPulseSourceCoverageAudit,
+  pulseSourceCoverageAuditErrors,
+  type PulseSourceCoverageAudit,
+} from "../src/lib/pulse/v2/source-coverage-audit";
 
-function fail(message: string): never {
-  throw new Error(`Pulse source-coverage validation failed: ${message}`);
+const CHECKED_PATH =
+  "plan/evidence/PUL-008/source-coverage-audit-2026-07-14.json";
+const LIVE = process.argv.includes("--live");
+const unknownArgs = process.argv.slice(2).filter((arg) => arg !== "--live");
+
+function fail(errors: readonly string[]): never {
+  for (const error of errors) {
+    console.error(`ERROR: ${error}`);
+  }
+  throw new Error(
+    `Pulse source-coverage validation failed with ${errors.length} problem(s).`,
+  );
 }
 
-async function main() {
-  const report = zPulseSourceCoverageReport.parse(
+function describe(label: string, audit: PulseSourceCoverageAudit): string {
+  const { operating, degraded, inactive } = audit.report.summary;
+  return `${label}: ${operating} operating, ${degraded} degraded, ${inactive} inactive`;
+}
+
+async function main(): Promise<void> {
+  if (unknownArgs.length > 0) {
+    fail([`unknown argument(s): ${unknownArgs.join(", ")}`]);
+  }
+
+  const checked = JSON.parse(readFileSync(CHECKED_PATH, "utf8")) as unknown;
+  const checkedErrors = pulseSourceCoverageAuditErrors(checked);
+  if (checkedErrors.length > 0) fail(checkedErrors);
+  const checkedAudit = checked as PulseSourceCoverageAudit;
+
+  if (!LIVE) {
+    console.log(
+      `PASS — checked dated ${describe("Pulse source coverage", checkedAudit)}; ` +
+        `runtime, telemetry, evidence scope, exact rights posture, and blind spots reconcile without Neon.`,
+    );
+    console.log(
+      "NOTICE — this is historical acceptance evidence, not current operating state; run the explicit :live audit for Neon telemetry.",
+    );
+    return;
+  }
+
+  const { config } = await import("dotenv");
+  config({ path: ".env.local", quiet: true });
+  const { loadPulseSourceCoverageReport } =
+    await import("../src/lib/pulse/v2/source-coverage");
+  const liveAudit = buildPulseSourceCoverageAudit(
     await loadPulseSourceCoverageReport(),
   );
-  const counts = {
-    operating: report.feeds.filter(({ state }) => state === "operating").length,
-    degraded: report.feeds.filter(({ state }) => state === "degraded").length,
-    inactive: report.feeds.filter(({ state }) => state === "inactive").length,
-  };
-  if (JSON.stringify(counts) !== JSON.stringify(report.summary)) {
-    fail("summary does not reconcile with feed states");
-  }
-  const declared = new Map(
-    CURRENT_PULSE_RUNTIME_METHOD.feeds.connectors.map((row) => [
-      row.feedId,
-      row,
-    ]),
-  );
-  if (report.feeds.length !== declared.size)
-    fail("connector registry is incomplete");
-  for (const feed of report.feeds) {
-    const contract = declared.get(feed.feedId);
-    if (!contract) fail(`unknown feed ${feed.feedId}`);
-    const canOperate =
-      contract.status === "active_observed" && contract.observedInProduction;
-    if (!canOperate && feed.state !== "inactive") {
-      fail(`${feed.feedId} is gated/stubbed but reports ${feed.state}`);
-    }
-    if (feed.state === "operating") {
-      if (feed.retrieval.latestOutcome !== "successful")
-        fail(`${feed.feedId} operates without a successful latest retrieval`);
-      if (feed.evidence.retainedRows < 1 || !feed.evidence.lastDataAt)
-        fail(`${feed.feedId} operates without retained evidence`);
-      if (
-        feed.rights.length === 0 ||
-        feed.rights.some(({ reviewStatus }) => reviewStatus === "missing")
-      )
-        fail(`${feed.feedId} operates without complete rights records`);
-    }
-    if (
-      feed.retrieval.successfulRuns + feed.retrieval.failedRuns !==
-      feed.retrieval.observedRuns
-    ) {
-      fail(`${feed.feedId} retrieval outcomes do not reconcile`);
-    }
-  }
+  const liveErrors = pulseSourceCoverageAuditErrors(liveAudit);
+  if (liveErrors.length > 0) fail(liveErrors);
+
   console.log(
-    `PASS — ${report.summary.operating} operating, ${report.summary.degraded} degraded, ` +
-      `${report.summary.inactive} inactive Pulse feeds; telemetry, evidence scope, rights, and blind spots reconcile.`,
+    `PASS — read-only ${describe("live Pulse source coverage", liveAudit)}; ` +
+      "current telemetry is valid and may legitimately differ from the dated checked artifact.",
   );
 }
 

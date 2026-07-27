@@ -2,7 +2,7 @@
  * CIA World Leaders cabinet sync — cron handler (day-of-month sharded).
  *
  * Runs DAILY via Vercel cron. Authenticated by `CRON_SECRET`
- * (per `requireCronAuth`). Ingests cabinet + central-bank + deputy + other
+ * (per the shared cron boundary). Ingests cabinet + central-bank + deputy + other
  * officials from the CIA "World Leaders" foreign-governments directory
  * (diplomatic dropped per the P4 scope decision) and stamps
  * `sources.last_sync_at` for `cia_world_leaders` (via the shared sync core).
@@ -18,12 +18,13 @@
  * shards 0–2. Freshness re-stamps on any day a shard writes rows.
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import {
   buildCiaSlugList,
   syncCiaCabinets,
 } from "@/lib/factbook/cia-cabinets-sync";
+import { ciaCabinetSyncCronOutcome } from "@/lib/factbook/cron-outcomes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,86 +37,125 @@ export const maxDuration = 600;
 // February) fully cycles. Days 29–31 map back onto shards 0–2 (idempotent).
 const SHARD_COUNT = 28;
 
-async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
+export function resolveCiaCabinetShard(
+  request: Request,
+  now = new Date(),
+): { ok: true; shardIndex: number } | { ok: false; error: string } {
+  const url = new URL(request.url);
+  const requested = url.searchParams.get("shard");
+  const manual = request.headers.has("idempotency-key");
+  if (manual && requested === null) {
+    return {
+      ok: false,
+      error: "Manual cabinet deliveries require an explicit shard (0-27)",
+    };
+  }
+  if (
+    requested !== null &&
+    (!/^\d+$/.test(requested) ||
+      Number(requested) < 0 ||
+      Number(requested) >= SHARD_COUNT)
+  ) {
+    return { ok: false, error: "Cabinet shard must be an integer from 0-27" };
+  }
+  return {
+    ok: true,
+    shardIndex:
+      requested === null
+        ? (now.getUTCDate() - 1) % SHARD_COUNT
+        : Number(requested),
+  };
+}
 
+async function handler(request: Request) {
   const startedAt = new Date().toISOString();
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
-  try {
-    // Deterministic, sorted full list → stable per-day shard membership.
-    const allSlugs = await buildCiaSlugList(db);
-    const shardIndex = (new Date().getUTCDate() - 1) % SHARD_COUNT;
-    const perShard = Math.ceil(allSlugs.length / SHARD_COUNT);
-    const slugs = allSlugs.slice(
-      shardIndex * perShard,
-      shardIndex * perShard + perShard,
+  const shard = resolveCiaCabinetShard(request);
+  if (!shard.ok) {
+    return NextResponse.json(
+      { ok: false, step: "factbook.cia-cabinets.sync", error: shard.error },
+      { status: 400 },
     );
+  }
+  // Deterministic, sorted full list → stable per-day shard membership.
+  const allSlugs = await buildCiaSlugList(db);
+  const shardIndex = shard.shardIndex;
+  const perShard = Math.ceil(allSlugs.length / SHARD_COUNT);
+  const slugs = allSlugs.slice(
+    shardIndex * perShard,
+    shardIndex * perShard + perShard,
+  );
 
-    if (slugs.length === 0) {
-      return NextResponse.json({
-        ok: true,
-        step: "factbook.cia-cabinets.sync",
-        started: startedAt,
-        shardIndex,
-        shardCount: SHARD_COUNT,
-        countriesInShard: 0,
-        note: "Empty shard for this day-of-month — nothing to crawl.",
-      });
-    }
-
-    const summary = await syncCiaCabinets({
-      db,
-      slugs,
-      // Drop progress lines in cron mode — too verbose for the log buffer.
-      // Warnings (`!`) still surface.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-      dryRun,
-    });
-
-    if (summary.skipped.length > 0 || summary.totalRowsWritten === 0) {
-      return NextResponse.json({ ok: false, step: "factbook.cia-cabinets.sync", dryRun, errors: summary.skipped.length ? summary.skipped : [{ reason: "No cabinet rows produced" }] }, { status: 502 });
-    }
-
+  if (slugs.length === 0) {
     return NextResponse.json({
       ok: true,
       step: "factbook.cia-cabinets.sync",
       started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
       shardIndex,
       shardCount: SHARD_COUNT,
-      countriesInShard: slugs.length,
-      countriesCrawled: summary.countriesCrawled,
-      countriesApplied: summary.countriesApplied,
-      countriesFetchFailed: summary.countriesFetchFailed,
-      countriesUnmatched: summary.countriesUnmatched,
-      officesWritten: summary.officesWritten,
-      termsWritten: summary.termsWritten,
-      personsExisting: summary.personsExisting,
-      personsQidCreated: summary.personsQidCreated,
-      personsIdlessCreated: summary.personsIdlessCreated,
-      vacantOffices: summary.vacantOffices,
-      diplomaticSkipped: summary.diplomaticSkipped,
-      statementsWritten: summary.statementsWritten,
-      totalRowsWritten: summary.totalRowsWritten,
-      freshnessStamped: summary.freshnessStamped,
-      dryRun,
+      countriesInShard: 0,
+      note: "Empty shard for this day-of-month — nothing to crawl.",
     });
-  } catch (err) {
-    console.error("[cron factbook.cia-cabinets.sync] failed:", err);
+  }
+
+  const summary = await syncCiaCabinets({
+    db,
+    slugs,
+    // Drop progress lines in cron mode — too verbose for the log buffer.
+    // Warnings (`!`) still surface.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+    dryRun,
+  });
+  const outcome = ciaCabinetSyncCronOutcome(summary);
+
+  if (!outcome.ok) {
     return NextResponse.json(
       {
-        ok: false,
+        ok: outcome.ok,
+        outcome: outcome.outcome,
+        healthOk: outcome.healthOk,
+        reason: outcome.reason,
         step: "factbook.cia-cabinets.sync",
-        error: err instanceof Error ? err.message : String(err),
+        dryRun,
+        errorCount: Math.max(1, summary.skipped.length),
       },
-      { status: 500 },
+      { status: outcome.httpStatus },
     );
   }
+
+  return NextResponse.json({
+    ok: outcome.ok,
+    outcome: outcome.outcome,
+    healthOk: outcome.healthOk,
+    reason: outcome.reason,
+    step: "factbook.cia-cabinets.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    shardIndex,
+    shardCount: SHARD_COUNT,
+    countriesInShard: slugs.length,
+    countriesCrawled: summary.countriesCrawled,
+    countriesApplied: summary.countriesApplied,
+    countriesFetchFailed: summary.countriesFetchFailed,
+    countriesUnmatched: summary.countriesUnmatched,
+    officesWritten: summary.officesWritten,
+    termsWritten: summary.termsWritten,
+    personsExisting: summary.personsExisting,
+    personsQidCreated: summary.personsQidCreated,
+    personsIdlessCreated: summary.personsIdlessCreated,
+    vacantOffices: summary.vacantOffices,
+    diplomaticSkipped: summary.diplomaticSkipped,
+    statementsWritten: summary.statementsWritten,
+    totalRowsWritten: summary.totalRowsWritten,
+    freshnessStamped: summary.freshnessStamped,
+    dryRun,
+  });
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.cia-cabinets", handler);
+
+export { cronHandler as GET, cronHandler as POST };

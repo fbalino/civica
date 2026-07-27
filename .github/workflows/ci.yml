@@ -1,0 +1,75 @@
+name: Civica continuous integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: civica-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+      - name: Use supported Node runtime
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Validate canonical CI contract
+        run: npm run validate:ci-workflow
+      - name: Validate master plan
+        run: node plan/tools/validate-master-plan.mjs
+      - name: Validate rendered-module ledger
+        run: npm run validate:rendered-module-ledger
+      - name: Scan repository for secrets
+        run: npm run validate:secrets
+      - name: Audit production dependencies
+        run: npm run validate:deps
+      - name: Validate design tokens
+        run: npm run validate:design-tokens
+      - name: Validate design-system pattern registry
+        run: npm run validate:ui-pattern-map
+      - name: Validate design composition
+        run: npm run validate:design-composition
+      - name: Lint owned source
+        run: npm run validate:lint
+      - name: Type-check
+        run: npm run typecheck
+      - name: Module coverage gates
+        run: npm run validate:module-coverage
+      - name: Credential-free production build
+        run: npm run build:ci
+      - name: Install browser support profiles
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Supported-browser and graceful-degradation checks
+        env:
+          E2E_WEBSERVER_CMD: npm run start
+        run: npm run test:e2e:browser-support
+      - name: WCAG AA and keyboard journeys
+        env:
+          E2E_WEBSERVER_CMD: npm run start
+        run: npm run test:e2e:a11y
+      - name: Production browser and API smoke
+        env:
+          E2E_WEBSERVER_CMD: npm run start
+        run: npm run test:e2e -- e2e/harness.selftest.spec.ts e2e/ci-smoke.spec.ts --workers=1 --retries=0
+      - name: Production reader performance budgets
+        env:
+          E2E_WEBSERVER_CMD: npm run start
+        run: npm run test:e2e:performance
+      - name: Navigation and hero asset-transfer budget
+        env:
+          E2E_WEBSERVER_CMD: npm run start
+        run: npm run test:e2e:navigation-assets

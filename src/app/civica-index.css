@@ -498,7 +498,7 @@
   max-width: 900px; /* 900px — layout literal, no token */
 }
 .civica-govtypes .page-lede {
-  font-size: 17px; /* 17px — no exact token; between --text-16 and --text-18 */
+  font-size: var(--text-18);
   color: var(--color-text-60);
   max-width: 720px; /* 720px — layout literal, no token */
   line-height: 1.6;
@@ -633,7 +633,7 @@
 }
 .civica-govtypes .callout-value {
   font-family: var(--font-heading);
-  font-size: 34px; /* 34px — no exact token; between --text-32 and --text-36 */
+  font-size: var(--text-32);
   font-weight: 400;
   letter-spacing: var(--tracking-snug);
   line-height: 1;

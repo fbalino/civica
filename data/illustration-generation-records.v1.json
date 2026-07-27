@@ -124,6 +124,1408 @@
         "sourceEvidence": false
       },
       "correctionHistory": []
+    },
+    {
+      "id": "explore-countries-2026-07-25-v1",
+      "assetKey": "explore-countries",
+      "route": "global-explore-navigation",
+      "subject": "An open civic atlas index with layered country-profile leaves, a compass divider, and a laurel sprig.",
+      "caption": "Open civic atlas index, compass divider, and laurel editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/navigation/explore-countries.webp",
+          "sha256": "0f97dc977bfb0704704f51a1f0ec68b6a42a0c9463b8f9ca862ec51011e76403",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "4c74ce8013d3b037feb3959e25a32e67457a5ed2a264ac80f243d32ceb983810"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/navigation/explore-countries-dark.webp",
+          "sha256": "9ae950a57975714e9db83a85d8962cd7fdfb6687927a7375daee4cab7ee99529",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "ee7f4c76b27dc1bff38a3e2e4ed6d5710f41fd367861f3a1c6be65a837c6116f"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose the exact marketed model or release. Embedded C2PA metadata identifies software agent gpt-image version 2.0, claim generator OpenAI Media Service API, and digital source type trainedAlgorithmicMedia; those technical assertions do not prove an exact marketed model release.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no direct API key, API call, or paid API invocation was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through native ChatGPT/Codex image generation in an authenticated consumer session. The C2PA claim-generator label is technical provenance and does not change that account-terms basis.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1:1 square",
+          "returnedWidth": 1254,
+          "returnedHeight": 1254,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only",
+          "c2paSoftwareAgentName": "gpt-image",
+          "c2paSoftwareAgentVersion": "2.0",
+          "c2paClaimGenerator": "OpenAI Media Service API",
+          "c2paDigitalSourceType": "trainedAlgorithmicMedia",
+          "c2paModelInterpretation": "Technical provenance only; not treated as an exact marketed model release."
+        }
+      },
+      "prompts": {
+        "light": "Asset type: non-production Civica Atlas Explore-menu motif, square.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper; fine coherent cross-hatching, confident architectural and instrument linework, restrained paper texture, subtle outer vignette; scholarly reference atlas, not photorealistic. Composition: one immediately legible civic instrument centered with generous negative space, readable at a 96-pixel display size, no scene-wide background and no decorative frame.\nPalette: near-monochrome graphite and muted parchment with one restrained terracotta accent. Mood: calm, precise, institutional, inviting.\nCreate an open civic atlas index with layered country-profile leaves, a small compass divider, and a restrained laurel sprig. The book/index must be the dominant object; do not render a national map or flag.\nNo text, letters, numbers, labels, logos, watermarks, flags, seals, party insignia, national symbols, identifiable people, famous modern buildings, glossy 3-D iconography, fantasy ornament, faux-antique clutter, photorealism, or decorative border. Do not imply that the image is source evidence.",
+        "dark": "Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve the object, composition, crop, proportions, negative space, and every semantic detail. Change paper/ink polarity and lighting only: near-black navy ground, muted warm sepia and soft gold linework, restrained terracotta accent, high enough separation for a 96-pixel display. Add, remove, move, or reinterpret nothing. Keep every shared constraint from the light master.",
+        "negativePrompt": "No separate negative-prompt field was exposed. The retained shared constraints were included verbatim in the light prompt and incorporated by reference in the matched-dark prompt."
+      },
+      "references": [
+        {
+          "id": "exp015-light-countries",
+          "appliesToTheme": "dark",
+          "kind": "owner-approved-generated-light-master",
+          "path": "output/imagegen/exp015-light/countries.png",
+          "sha256": "4c74ce8013d3b037feb3959e25a32e67457a5ed2a264ac80f243d32ceb983810",
+          "source": "Civica EXP-015 native ChatGPT/Codex generation session",
+          "author": "AI-assisted output; Fernando Baliño directed and approved the light-master batch, without asserting copyright in machine-generated elements.",
+          "licenseOrPermission": "Owner-approved Civica candidate supplied only to generate its matched dark variant under the applicable OpenAI Terms of Use.",
+          "retrievedOn": "2026-07-25",
+          "intendedUse": "Preserve the accepted light composition while generating the paired dark-theme candidate."
+        }
+      ],
+      "referenceDisclosure": "No external image, photograph, artist, building, trademark, insignia, person, or other visual reference was supplied. The dark generation used only the owner-approved light master recorded above.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
+        "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
+        "selectedOn": "2026-07-25",
+        "basis": "The corrected light master was included in the explicitly approved eight-image batch; its matched dark rendition and both public WebPs remain candidates for owner review in the finished menu.",
+        "rejectedAlternatives": [
+          {
+            "stage": "initial-light-generation",
+            "reason": "The first pass contained country or map silhouettes and was replaced before owner batch approval.",
+            "sha256": "not-retained-in-repository-record"
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "theme": "light",
+          "tool": "not-retained-in-checked-evidence",
+          "operation": "Resize the retained 1254x1254 PNG master to a 384x384 WebP review/public candidate encoded at quality 55.",
+          "colorOrContentEdits": "None during deterministic resizing and encoding; the separate pre-approval native correction is recorded in correctionHistory."
+        },
+        {
+          "date": "2026-07-25",
+          "theme": "dark",
+          "tool": "cwebp",
+          "operation": "cwebp -quiet -q 55 -resize 384 384 -metadata none from the retained 1254x1254 PNG master.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No third-party visual reference was supplied; the only image reference was Civica's owner-approved generated light master used for its dark pair."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "No identifiable architecture, public art, or protected interior is depicted."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "The corrected master contains no flag, logo, emblem, seal, national map, or trade dress."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No identifiable person or recognizable public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The book, divider, and laurel are generic editorial motifs; the asset is decorative, non-documentary, and not presented as country or source evidence."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt-record integrity, light/dark candidate pairing, file integrity, and the five required rights-screening domains. This is not owner approval of the rendered menu or professional legal review.",
+        "independentProfessionalReview": false,
+        "ownerLightMasterApproval": true,
+        "ownerRenderedMenuApproval": false,
+        "releaseAuthorized": false
+      },
+      "release": {
+        "releaseIdentity": "exp015-explore-countries-2026-07-25-candidate-v1",
+        "status": "candidate-pending-owner-render-approval",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false,
+        "deployed": false,
+        "productionAuthorized": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-07-25",
+          "stage": "matched-dark-candidate-generation",
+          "action": "Retained the matched dark candidate generated from the owner-approved light master.",
+          "promptDisclosure": "The repository retains only the shared matched-dark prompt. Any per-asset dark repair wording used during iteration was not retained.",
+          "acceptedOutputSha256": "ee7f4c76b27dc1bff38a3e2e4ed6d5710f41fd367861f3a1c6be65a837c6116f",
+          "releaseImpact": "No release was authorized; the pair remains pending owner review in the finished rendered menu."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "pre-release-candidate-generation",
+          "action": "Replaced the first light attempt to remove country or map silhouettes.",
+          "promptDisclosure": "The exact iterative correction wording was not retained in the repository.",
+          "acceptedReplacementOutputSha256": "4c74ce8013d3b037feb3959e25a32e67457a5ed2a264ac80f243d32ceb983810",
+          "releaseImpact": "No released asset was changed; this accepted light output remains part of a candidate pair."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "provenance-record-correction",
+          "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
+          "remainingUnknowns": "Exact marketed model release, seed, and the exact iterative correction wording remain unexposed or unretained.",
+          "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        }
+      ]
+    },
+    {
+      "id": "explore-world-atlas-2026-07-25-v1",
+      "assetKey": "explore-world-atlas",
+      "route": "global-explore-navigation",
+      "subject": "An elegant terrestrial globe on a meridian stand with unlabelled geographic construction.",
+      "caption": "Terrestrial globe and meridian-stand editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/navigation/explore-world-atlas.webp",
+          "sha256": "35c40386ca6c162294404815eb69d6fbf1cd371df50a4935b71fa46ac9d339ed",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "00fe4532a518fc921d4c7dbd696ba4fbb665ed797de9f7f0e5c595a38772ee81"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/navigation/explore-world-atlas-dark.webp",
+          "sha256": "6d2c12440a952d3ccfc901398d48f963328bf841f8680a58c90781387abde056",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "ce5ba3505ceac8fc56cf20e8f7afa8b0fd8464d4335bde759f74ea15aff9e182"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose the exact marketed model or release. Embedded C2PA metadata identifies software agent gpt-image version 2.0, claim generator OpenAI Media Service API, and digital source type trainedAlgorithmicMedia; those technical assertions do not prove an exact marketed model release.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no direct API key, API call, or paid API invocation was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through native ChatGPT/Codex image generation in an authenticated consumer session. The C2PA claim-generator label is technical provenance and does not change that account-terms basis.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1:1 square",
+          "returnedWidth": 1254,
+          "returnedHeight": 1254,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only",
+          "c2paSoftwareAgentName": "gpt-image",
+          "c2paSoftwareAgentVersion": "2.0",
+          "c2paClaimGenerator": "OpenAI Media Service API",
+          "c2paDigitalSourceType": "trainedAlgorithmicMedia",
+          "c2paModelInterpretation": "Technical provenance only; not treated as an exact marketed model release."
+        }
+      },
+      "prompts": {
+        "light": "Asset type: non-production Civica Atlas Explore-menu motif, square.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper; fine coherent cross-hatching, confident architectural and instrument linework, restrained paper texture, subtle outer vignette; scholarly reference atlas, not photorealistic. Composition: one immediately legible civic instrument centered with generous negative space, readable at a 96-pixel display size, no scene-wide background and no decorative frame.\nPalette: near-monochrome graphite and muted parchment with one restrained terracotta accent. Mood: calm, precise, institutional, inviting.\nCreate an elegant terrestrial globe on a precise meridian stand, with abstract coastlines and latitude/longitude construction. Do not privilege or label a country.\nNo text, letters, numbers, labels, logos, watermarks, flags, seals, party insignia, national symbols, identifiable people, famous modern buildings, glossy 3-D iconography, fantasy ornament, faux-antique clutter, photorealism, or decorative border. Do not imply that the image is source evidence.",
+        "dark": "Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve the object, composition, crop, proportions, negative space, and every semantic detail. Change paper/ink polarity and lighting only: near-black navy ground, muted warm sepia and soft gold linework, restrained terracotta accent, high enough separation for a 96-pixel display. Add, remove, move, or reinterpret nothing. Keep every shared constraint from the light master.",
+        "negativePrompt": "No separate negative-prompt field was exposed. The retained shared constraints were included verbatim in the light prompt and incorporated by reference in the matched-dark prompt."
+      },
+      "references": [
+        {
+          "id": "exp015-light-world-atlas",
+          "appliesToTheme": "dark",
+          "kind": "owner-approved-generated-light-master",
+          "path": "output/imagegen/exp015-light/world-atlas.png",
+          "sha256": "00fe4532a518fc921d4c7dbd696ba4fbb665ed797de9f7f0e5c595a38772ee81",
+          "source": "Civica EXP-015 native ChatGPT/Codex generation session",
+          "author": "AI-assisted output; Fernando Baliño directed and approved the light-master batch, without asserting copyright in machine-generated elements.",
+          "licenseOrPermission": "Owner-approved Civica candidate supplied only to generate its matched dark variant under the applicable OpenAI Terms of Use.",
+          "retrievedOn": "2026-07-25",
+          "intendedUse": "Preserve the accepted light composition while generating the paired dark-theme candidate."
+        }
+      ],
+      "referenceDisclosure": "No external image, photograph, artist, building, trademark, insignia, person, or other visual reference was supplied. The dark generation used only the owner-approved light master recorded above.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
+        "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
+        "selectedOn": "2026-07-25",
+        "basis": "The light master was included in the explicitly approved eight-image batch; its matched dark rendition and both public WebPs remain candidates for owner review in the finished menu.",
+        "rejectedAlternatives": []
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "theme": "light",
+          "tool": "not-retained-in-checked-evidence",
+          "operation": "Resize the retained 1254x1254 PNG master to a 384x384 WebP review/public candidate encoded at quality 55.",
+          "colorOrContentEdits": "None during deterministic resizing and encoding."
+        },
+        {
+          "date": "2026-07-25",
+          "theme": "dark",
+          "tool": "cwebp",
+          "operation": "cwebp -quiet -q 55 -resize 384 384 -metadata none from the retained 1254x1254 PNG master.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No third-party visual reference was supplied; the only image reference was Civica's owner-approved generated light master used for its dark pair."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "No architecture, public art, or protected interior is depicted."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "The globe contains no flag, logo, emblem, seal, national label, or trade dress."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No identifiable person or recognizable public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The unlabelled globe is a generic atlas motif; it is decorative and non-documentary, does not privilege a jurisdiction, and is not presented as map or source evidence."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt-record integrity, light/dark candidate pairing, file integrity, and the five required rights-screening domains. This is not owner approval of the rendered menu or professional legal review.",
+        "independentProfessionalReview": false,
+        "ownerLightMasterApproval": true,
+        "ownerRenderedMenuApproval": false,
+        "releaseAuthorized": false
+      },
+      "release": {
+        "releaseIdentity": "exp015-explore-world-atlas-2026-07-25-candidate-v1",
+        "status": "candidate-pending-owner-render-approval",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false,
+        "deployed": false,
+        "productionAuthorized": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-07-25",
+          "stage": "matched-dark-candidate-generation",
+          "action": "Retained the matched dark candidate generated from the owner-approved light master.",
+          "promptDisclosure": "The repository retains only the shared matched-dark prompt. Any per-asset dark repair wording used during iteration was not retained.",
+          "acceptedOutputSha256": "ce5ba3505ceac8fc56cf20e8f7afa8b0fd8464d4335bde759f74ea15aff9e182",
+          "releaseImpact": "No release was authorized; the pair remains pending owner review in the finished rendered menu."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "provenance-record-correction",
+          "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
+          "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
+          "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        }
+      ]
+    },
+    {
+      "id": "explore-compare-2026-07-25-v1",
+      "assetKey": "explore-compare",
+      "route": "global-explore-navigation",
+      "subject": "Two aligned institutional specimen cards separated by a surveyor's divider.",
+      "caption": "Paired institutional specimen cards and surveyor's divider editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/navigation/explore-compare.webp",
+          "sha256": "1141a65020a9d809b337b9dbe1feb4fe66c882c227578cc3e880dad52fd069b4",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "8d985113f06ea63ba3a1e58b75b92955b83be84784371fa4bb7d72e68acca751"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/navigation/explore-compare-dark.webp",
+          "sha256": "65735cdaa66a655c1673343f868f63f8029e1215f0825b638024a0c6d9356e56",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "3ceeb43c6047773d6eef57e522485fb7a08a512f4ee7ef21149032ae26ef223f"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose the exact marketed model or release. Embedded C2PA metadata identifies software agent gpt-image version 2.0, claim generator OpenAI Media Service API, and digital source type trainedAlgorithmicMedia; those technical assertions do not prove an exact marketed model release.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no direct API key, API call, or paid API invocation was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through native ChatGPT/Codex image generation in an authenticated consumer session. The C2PA claim-generator label is technical provenance and does not change that account-terms basis.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1:1 square",
+          "returnedWidth": 1254,
+          "returnedHeight": 1254,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only",
+          "c2paSoftwareAgentName": "gpt-image",
+          "c2paSoftwareAgentVersion": "2.0",
+          "c2paClaimGenerator": "OpenAI Media Service API",
+          "c2paDigitalSourceType": "trainedAlgorithmicMedia",
+          "c2paModelInterpretation": "Technical provenance only; not treated as an exact marketed model release."
+        }
+      },
+      "prompts": {
+        "light": "Asset type: non-production Civica Atlas Explore-menu motif, square.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper; fine coherent cross-hatching, confident architectural and instrument linework, restrained paper texture, subtle outer vignette; scholarly reference atlas, not photorealistic. Composition: one immediately legible civic instrument centered with generous negative space, readable at a 96-pixel display size, no scene-wide background and no decorative frame.\nPalette: near-monochrome graphite and muted parchment with one restrained terracotta accent. Mood: calm, precise, institutional, inviting.\nCreate two aligned specimen cards separated by a surveyor's divider, with matching abstract institutional diagrams that invite side-by-side comparison. Do not add text or numeric scores.\nNo text, letters, numbers, labels, logos, watermarks, flags, seals, party insignia, national symbols, identifiable people, famous modern buildings, glossy 3-D iconography, fantasy ornament, faux-antique clutter, photorealism, or decorative border. Do not imply that the image is source evidence.",
+        "dark": "Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve the object, composition, crop, proportions, negative space, and every semantic detail. Change paper/ink polarity and lighting only: near-black navy ground, muted warm sepia and soft gold linework, restrained terracotta accent, high enough separation for a 96-pixel display. Add, remove, move, or reinterpret nothing. Keep every shared constraint from the light master.",
+        "negativePrompt": "No separate negative-prompt field was exposed. The retained shared constraints were included verbatim in the light prompt and incorporated by reference in the matched-dark prompt."
+      },
+      "references": [
+        {
+          "id": "exp015-light-compare",
+          "appliesToTheme": "dark",
+          "kind": "owner-approved-generated-light-master",
+          "path": "output/imagegen/exp015-light/compare.png",
+          "sha256": "8d985113f06ea63ba3a1e58b75b92955b83be84784371fa4bb7d72e68acca751",
+          "source": "Civica EXP-015 native ChatGPT/Codex generation session",
+          "author": "AI-assisted output; Fernando Baliño directed and approved the light-master batch, without asserting copyright in machine-generated elements.",
+          "licenseOrPermission": "Owner-approved Civica candidate supplied only to generate its matched dark variant under the applicable OpenAI Terms of Use.",
+          "retrievedOn": "2026-07-25",
+          "intendedUse": "Preserve the accepted light composition while generating the paired dark-theme candidate."
+        }
+      ],
+      "referenceDisclosure": "No external image, photograph, artist, building, trademark, insignia, person, or other visual reference was supplied. The dark generation used only the owner-approved light master recorded above.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
+        "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
+        "selectedOn": "2026-07-25",
+        "basis": "The corrected light master was included in the explicitly approved eight-image batch; its matched dark rendition and both public WebPs remain candidates for owner review in the finished menu.",
+        "rejectedAlternatives": [
+          {
+            "stage": "initial-light-generation",
+            "reason": "The first pass contained literal buildings, people, and a small flag and was replaced before owner batch approval.",
+            "sha256": "not-retained-in-repository-record"
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "theme": "light",
+          "tool": "not-retained-in-checked-evidence",
+          "operation": "Resize the retained 1254x1254 PNG master to a 384x384 WebP review/public candidate encoded at quality 55.",
+          "colorOrContentEdits": "None during deterministic resizing and encoding; the separate pre-approval native correction is recorded in correctionHistory."
+        },
+        {
+          "date": "2026-07-25",
+          "theme": "dark",
+          "tool": "cwebp",
+          "operation": "cwebp -quiet -q 55 -resize 384 384 -metadata none from the retained 1254x1254 PNG master.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No third-party visual reference was supplied; the only image reference was Civica's owner-approved generated light master used for its dark pair."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "The corrected abstract specimen diagrams contain no identifiable architecture, public art, or protected interior."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "The corrected master contains no flag, logo, emblem, seal, score, or trade dress."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "The corrected master contains no identifiable person or recognizable public-figure likeness."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The paired diagrams and divider are generic comparison motifs; the asset is decorative, non-documentary, and not presented as institutional or source evidence."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt-record integrity, light/dark candidate pairing, file integrity, and the five required rights-screening domains. This is not owner approval of the rendered menu or professional legal review.",
+        "independentProfessionalReview": false,
+        "ownerLightMasterApproval": true,
+        "ownerRenderedMenuApproval": false,
+        "releaseAuthorized": false
+      },
+      "release": {
+        "releaseIdentity": "exp015-explore-compare-2026-07-25-candidate-v1",
+        "status": "candidate-pending-owner-render-approval",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false,
+        "deployed": false,
+        "productionAuthorized": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-07-25",
+          "stage": "matched-dark-candidate-generation",
+          "action": "Retained the matched dark candidate generated from the owner-approved light master.",
+          "promptDisclosure": "The repository retains only the shared matched-dark prompt. Any per-asset dark repair wording used during iteration was not retained.",
+          "acceptedOutputSha256": "3ceeb43c6047773d6eef57e522485fb7a08a512f4ee7ef21149032ae26ef223f",
+          "releaseImpact": "No release was authorized; the pair remains pending owner review in the finished rendered menu."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "pre-release-candidate-generation",
+          "action": "Replaced the first light attempt to remove literal buildings, people, and a flag and use abstract diagrams.",
+          "promptDisclosure": "The exact iterative correction wording was not retained in the repository.",
+          "acceptedReplacementOutputSha256": "8d985113f06ea63ba3a1e58b75b92955b83be84784371fa4bb7d72e68acca751",
+          "releaseImpact": "No released asset was changed; this accepted light output remains part of a candidate pair."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "provenance-record-correction",
+          "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
+          "remainingUnknowns": "Exact marketed model release, seed, and the exact iterative correction wording remain unexposed or unretained.",
+          "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        }
+      ]
+    },
+    {
+      "id": "explore-constitutions-2026-07-25-v1",
+      "assetKey": "explore-constitutions",
+      "route": "global-explore-navigation",
+      "subject": "A bound civic charter with ribbon marker, a classical column, and an unmarked seal shape.",
+      "caption": "Bound civic charter, classical column, and unmarked seal editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/navigation/explore-constitutions.webp",
+          "sha256": "de282aee3e3d523e87109322a33290228441f50c91048b7f5ddd153a521a63a0",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "fc8c1ae41594ca6a00ba97efd60531b5560e45076a2699c2609ed4864105017d"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/navigation/explore-constitutions-dark.webp",
+          "sha256": "15816bc31185e9e486f145ab048622148a0aa0180e083add9fd2a8381b5f58dc",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "b4461804c7628eb1d4ee343c9f19485bd5cfefd36257514ae7dfc267a4f207a1"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose the exact marketed model or release. Embedded C2PA metadata identifies software agent gpt-image version 2.0, claim generator OpenAI Media Service API, and digital source type trainedAlgorithmicMedia; those technical assertions do not prove an exact marketed model release.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no direct API key, API call, or paid API invocation was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through native ChatGPT/Codex image generation in an authenticated consumer session. The C2PA claim-generator label is technical provenance and does not change that account-terms basis.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1:1 square",
+          "returnedWidth": 1254,
+          "returnedHeight": 1254,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only",
+          "c2paSoftwareAgentName": "gpt-image",
+          "c2paSoftwareAgentVersion": "2.0",
+          "c2paClaimGenerator": "OpenAI Media Service API",
+          "c2paDigitalSourceType": "trainedAlgorithmicMedia",
+          "c2paModelInterpretation": "Technical provenance only; not treated as an exact marketed model release."
+        }
+      },
+      "prompts": {
+        "light": "Asset type: non-production Civica Atlas Explore-menu motif, square.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper; fine coherent cross-hatching, confident architectural and instrument linework, restrained paper texture, subtle outer vignette; scholarly reference atlas, not photorealistic. Composition: one immediately legible civic instrument centered with generous negative space, readable at a 96-pixel display size, no scene-wide background and no decorative frame.\nPalette: near-monochrome graphite and muted parchment with one restrained terracotta accent. Mood: calm, precise, institutional, inviting.\nCreate a bound civic charter with a ribbon marker beside one restrained classical column and a document seal shape with no emblem. The charter must read as a constitutional document without legible writing.\nNo text, letters, numbers, labels, logos, watermarks, flags, seals, party insignia, national symbols, identifiable people, famous modern buildings, glossy 3-D iconography, fantasy ornament, faux-antique clutter, photorealism, or decorative border. Do not imply that the image is source evidence.",
+        "dark": "Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve the object, composition, crop, proportions, negative space, and every semantic detail. Change paper/ink polarity and lighting only: near-black navy ground, muted warm sepia and soft gold linework, restrained terracotta accent, high enough separation for a 96-pixel display. Add, remove, move, or reinterpret nothing. Keep every shared constraint from the light master.",
+        "negativePrompt": "No separate negative-prompt field was exposed. The retained shared constraints were included verbatim in the light prompt and incorporated by reference in the matched-dark prompt."
+      },
+      "references": [
+        {
+          "id": "exp015-light-constitutions",
+          "appliesToTheme": "dark",
+          "kind": "owner-approved-generated-light-master",
+          "path": "output/imagegen/exp015-light/constitutions.png",
+          "sha256": "fc8c1ae41594ca6a00ba97efd60531b5560e45076a2699c2609ed4864105017d",
+          "source": "Civica EXP-015 native ChatGPT/Codex generation session",
+          "author": "AI-assisted output; Fernando Baliño directed and approved the light-master batch, without asserting copyright in machine-generated elements.",
+          "licenseOrPermission": "Owner-approved Civica candidate supplied only to generate its matched dark variant under the applicable OpenAI Terms of Use.",
+          "retrievedOn": "2026-07-25",
+          "intendedUse": "Preserve the accepted light composition while generating the paired dark-theme candidate."
+        }
+      ],
+      "referenceDisclosure": "No external image, photograph, artist, building, trademark, insignia, person, or other visual reference was supplied. The dark generation used only the owner-approved light master recorded above.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
+        "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
+        "selectedOn": "2026-07-25",
+        "basis": "The light master was included in the explicitly approved eight-image batch; its matched dark rendition and both public WebPs remain candidates for owner review in the finished menu.",
+        "rejectedAlternatives": []
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "theme": "light",
+          "tool": "not-retained-in-checked-evidence",
+          "operation": "Resize the retained 1254x1254 PNG master to a 384x384 WebP review/public candidate encoded at quality 55.",
+          "colorOrContentEdits": "None during deterministic resizing and encoding."
+        },
+        {
+          "date": "2026-07-25",
+          "theme": "dark",
+          "tool": "cwebp",
+          "operation": "cwebp -quiet -q 55 -resize 384 384 -metadata none from the retained 1254x1254 PNG master.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No third-party visual reference was supplied; the only image reference was Civica's owner-approved generated light master used for its dark pair."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "The column and small classical facade drawn on the charter are generic motifs, not identifiable architecture, public art, or a protected interior."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "The seal shape is deliberately unmarked; no logo, flag, official emblem, national symbol, or trade dress is depicted."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No identifiable person or recognizable public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The charter, generic classical motifs, and unmarked seal are decorative and non-documentary; they are not presented as a real constitution or source record."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt-record integrity, light/dark candidate pairing, file integrity, and the five required rights-screening domains. This is not owner approval of the rendered menu or professional legal review.",
+        "independentProfessionalReview": false,
+        "ownerLightMasterApproval": true,
+        "ownerRenderedMenuApproval": false,
+        "releaseAuthorized": false
+      },
+      "release": {
+        "releaseIdentity": "exp015-explore-constitutions-2026-07-25-candidate-v1",
+        "status": "candidate-pending-owner-render-approval",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false,
+        "deployed": false,
+        "productionAuthorized": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-07-25",
+          "stage": "matched-dark-candidate-generation",
+          "action": "Retained the matched dark candidate generated from the owner-approved light master.",
+          "promptDisclosure": "The repository retains only the shared matched-dark prompt. Any per-asset dark repair wording used during iteration was not retained.",
+          "acceptedOutputSha256": "b4461804c7628eb1d4ee343c9f19485bd5cfefd36257514ae7dfc267a4f207a1",
+          "releaseImpact": "No release was authorized; the pair remains pending owner review in the finished rendered menu."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "provenance-record-correction",
+          "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
+          "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
+          "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        }
+      ]
+    },
+    {
+      "id": "explore-parties-2026-07-25-v1",
+      "assetKey": "explore-parties",
+      "route": "global-explore-navigation",
+      "subject": "A semicircular assembly rosette paired with an abstract neutral coalition table.",
+      "caption": "Semicircular assembly and neutral coalition-table editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/navigation/explore-parties.webp",
+          "sha256": "9daf069333673d4cabba116417b5202acaa6a320cf8ad5ddcb6a584ac1f4fc89",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "e0e3eee1284b5fa23741b04a30ee0a92f73b8aed50bea82da4a76942ea4c0bf1"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/navigation/explore-parties-dark.webp",
+          "sha256": "2683443d152fc5ab8d125ba3b30bffbeef6fbbaaf16618bb605547b8c45df55a",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "e2a69d538e59d962676ff3bea44b44b894281cc16d0f04b0807e11f0c4c83023"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose the exact marketed model or release. Embedded C2PA metadata identifies software agent gpt-image version 2.0, claim generator OpenAI Media Service API, and digital source type trainedAlgorithmicMedia; those technical assertions do not prove an exact marketed model release.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no direct API key, API call, or paid API invocation was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through native ChatGPT/Codex image generation in an authenticated consumer session. The C2PA claim-generator label is technical provenance and does not change that account-terms basis.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1:1 square",
+          "returnedWidth": 1254,
+          "returnedHeight": 1254,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only",
+          "c2paSoftwareAgentName": "gpt-image",
+          "c2paSoftwareAgentVersion": "2.0",
+          "c2paClaimGenerator": "OpenAI Media Service API",
+          "c2paDigitalSourceType": "trainedAlgorithmicMedia",
+          "c2paModelInterpretation": "Technical provenance only; not treated as an exact marketed model release."
+        }
+      },
+      "prompts": {
+        "light": "Asset type: non-production Civica Atlas Explore-menu motif, square.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper; fine coherent cross-hatching, confident architectural and instrument linework, restrained paper texture, subtle outer vignette; scholarly reference atlas, not photorealistic. Composition: one immediately legible civic instrument centered with generous negative space, readable at a 96-pixel display size, no scene-wide background and no decorative frame.\nPalette: near-monochrome graphite and muted parchment with one restrained terracotta accent. Mood: calm, precise, institutional, inviting.\nCreate a semicircular assembly rosette paired with an abstract coalition table: several distinct but neutral groupings converging toward a shared chamber. No real party colors, logos, initials, or flags.\nNo text, letters, numbers, labels, logos, watermarks, flags, seals, party insignia, national symbols, identifiable people, famous modern buildings, glossy 3-D iconography, fantasy ornament, faux-antique clutter, photorealism, or decorative border. Do not imply that the image is source evidence.",
+        "dark": "Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve the object, composition, crop, proportions, negative space, and every semantic detail. Change paper/ink polarity and lighting only: near-black navy ground, muted warm sepia and soft gold linework, restrained terracotta accent, high enough separation for a 96-pixel display. Add, remove, move, or reinterpret nothing. Keep every shared constraint from the light master.",
+        "negativePrompt": "No separate negative-prompt field was exposed. The retained shared constraints were included verbatim in the light prompt and incorporated by reference in the matched-dark prompt."
+      },
+      "references": [
+        {
+          "id": "exp015-light-parties",
+          "appliesToTheme": "dark",
+          "kind": "owner-approved-generated-light-master",
+          "path": "output/imagegen/exp015-light/parties.png",
+          "sha256": "e0e3eee1284b5fa23741b04a30ee0a92f73b8aed50bea82da4a76942ea4c0bf1",
+          "source": "Civica EXP-015 native ChatGPT/Codex generation session",
+          "author": "AI-assisted output; Fernando Baliño directed and approved the light-master batch, without asserting copyright in machine-generated elements.",
+          "licenseOrPermission": "Owner-approved Civica candidate supplied only to generate its matched dark variant under the applicable OpenAI Terms of Use.",
+          "retrievedOn": "2026-07-25",
+          "intendedUse": "Preserve the accepted light composition while generating the paired dark-theme candidate."
+        }
+      ],
+      "referenceDisclosure": "No external image, photograph, artist, building, trademark, insignia, person, or other visual reference was supplied. The dark generation used only the owner-approved light master recorded above.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
+        "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
+        "selectedOn": "2026-07-25",
+        "basis": "The light master was included in the explicitly approved eight-image batch; its matched dark rendition and both public WebPs remain candidates for owner review in the finished menu.",
+        "rejectedAlternatives": []
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "theme": "light",
+          "tool": "not-retained-in-checked-evidence",
+          "operation": "Resize the retained 1254x1254 PNG master to a 384x384 WebP review/public candidate encoded at quality 55.",
+          "colorOrContentEdits": "None during deterministic resizing and encoding."
+        },
+        {
+          "date": "2026-07-25",
+          "theme": "dark",
+          "tool": "cwebp",
+          "operation": "cwebp -quiet -q 55 -resize 384 384 -metadata none from the retained 1254x1254 PNG master.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No third-party visual reference was supplied; the only image reference was Civica's owner-approved generated light master used for its dark pair."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "The assembly and coalition-table forms are generic diagrams, not identifiable architecture, public art, or a protected interior."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "The neutral groupings contain no real party color system, logo, initials, flag, emblem, seal, or trade dress."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No identifiable person or recognizable public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The chamber and coalition geometry are generic editorial motifs; the asset is decorative, non-documentary, and not presented as a real legislature or party-composition record."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt-record integrity, light/dark candidate pairing, file integrity, and the five required rights-screening domains. This is not owner approval of the rendered menu or professional legal review.",
+        "independentProfessionalReview": false,
+        "ownerLightMasterApproval": true,
+        "ownerRenderedMenuApproval": false,
+        "releaseAuthorized": false
+      },
+      "release": {
+        "releaseIdentity": "exp015-explore-parties-2026-07-25-candidate-v1",
+        "status": "candidate-pending-owner-render-approval",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false,
+        "deployed": false,
+        "productionAuthorized": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-07-25",
+          "stage": "matched-dark-candidate-generation",
+          "action": "Retained the matched dark candidate generated from the owner-approved light master.",
+          "promptDisclosure": "The repository retains only the shared matched-dark prompt. Any per-asset dark repair wording used during iteration was not retained.",
+          "acceptedOutputSha256": "e2a69d538e59d962676ff3bea44b44b894281cc16d0f04b0807e11f0c4c83023",
+          "releaseImpact": "No release was authorized; the pair remains pending owner review in the finished rendered menu."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "provenance-record-correction",
+          "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
+          "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
+          "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        }
+      ]
+    },
+    {
+      "id": "explore-elections-2026-07-25-v1",
+      "assetKey": "explore-elections",
+      "route": "global-explore-navigation",
+      "subject": "A civic ballot box with an unmarked ballot and an abstract tally sheet.",
+      "caption": "Civic ballot box, unmarked ballot, and abstract tally-sheet editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/navigation/explore-elections.webp",
+          "sha256": "983b63b0e6ecd953e558056b2ba2d44de35b005d7af83613bd582fd08ac4cdd1",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "44fc04a869379256b16042434654894c25eb1ee9a1b45c98dfc88d0b85c8a7a6"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/navigation/explore-elections-dark.webp",
+          "sha256": "58d0631b9693f9550b363d3344ec0fe4db6ddab4bda2360830888331ca1ca3ef",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "0e9a514a2ee4fd927f6b562836f82913b3e91af39f3b3d36f9f080fedbf876a6"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose the exact marketed model or release. Embedded C2PA metadata identifies software agent gpt-image version 2.0, claim generator OpenAI Media Service API, and digital source type trainedAlgorithmicMedia; those technical assertions do not prove an exact marketed model release.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no direct API key, API call, or paid API invocation was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through native ChatGPT/Codex image generation in an authenticated consumer session. The C2PA claim-generator label is technical provenance and does not change that account-terms basis.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1:1 square",
+          "returnedWidth": 1254,
+          "returnedHeight": 1254,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only",
+          "c2paSoftwareAgentName": "gpt-image",
+          "c2paSoftwareAgentVersion": "2.0",
+          "c2paClaimGenerator": "OpenAI Media Service API",
+          "c2paDigitalSourceType": "trainedAlgorithmicMedia",
+          "c2paModelInterpretation": "Technical provenance only; not treated as an exact marketed model release."
+        }
+      },
+      "prompts": {
+        "light": "Asset type: non-production Civica Atlas Explore-menu motif, square.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper; fine coherent cross-hatching, confident architectural and instrument linework, restrained paper texture, subtle outer vignette; scholarly reference atlas, not photorealistic. Composition: one immediately legible civic instrument centered with generous negative space, readable at a 96-pixel display size, no scene-wide background and no decorative frame.\nPalette: near-monochrome graphite and muted parchment with one restrained terracotta accent. Mood: calm, precise, institutional, inviting.\nCreate a civic ballot box with a single unmarked ballot and a separate tally sheet made only of abstract line groupings. No candidate, country, party, or campaign marks.\nNo text, letters, numbers, labels, logos, watermarks, flags, seals, party insignia, national symbols, identifiable people, famous modern buildings, glossy 3-D iconography, fantasy ornament, faux-antique clutter, photorealism, or decorative border. Do not imply that the image is source evidence.",
+        "dark": "Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve the object, composition, crop, proportions, negative space, and every semantic detail. Change paper/ink polarity and lighting only: near-black navy ground, muted warm sepia and soft gold linework, restrained terracotta accent, high enough separation for a 96-pixel display. Add, remove, move, or reinterpret nothing. Keep every shared constraint from the light master.",
+        "negativePrompt": "No separate negative-prompt field was exposed. The retained shared constraints were included verbatim in the light prompt and incorporated by reference in the matched-dark prompt."
+      },
+      "references": [
+        {
+          "id": "exp015-light-elections",
+          "appliesToTheme": "dark",
+          "kind": "owner-approved-generated-light-master",
+          "path": "output/imagegen/exp015-light/elections.png",
+          "sha256": "44fc04a869379256b16042434654894c25eb1ee9a1b45c98dfc88d0b85c8a7a6",
+          "source": "Civica EXP-015 native ChatGPT/Codex generation session",
+          "author": "AI-assisted output; Fernando Baliño directed and approved the light-master batch, without asserting copyright in machine-generated elements.",
+          "licenseOrPermission": "Owner-approved Civica candidate supplied only to generate its matched dark variant under the applicable OpenAI Terms of Use.",
+          "retrievedOn": "2026-07-25",
+          "intendedUse": "Preserve the accepted light composition while generating the paired dark-theme candidate."
+        }
+      ],
+      "referenceDisclosure": "No external image, photograph, artist, building, trademark, insignia, person, or other visual reference was supplied. The dark generation used only the owner-approved light master recorded above.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
+        "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
+        "selectedOn": "2026-07-25",
+        "basis": "The corrected light master was included in the explicitly approved eight-image batch; its matched dark rendition and both public WebPs remain candidates for owner review in the finished menu.",
+        "rejectedAlternatives": [
+          {
+            "stage": "initial-light-generation",
+            "reason": "The first pass contained a seal-like medallion and was replaced before owner batch approval.",
+            "sha256": "not-retained-in-repository-record"
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "theme": "light",
+          "tool": "not-retained-in-checked-evidence",
+          "operation": "Resize the retained 1254x1254 PNG master to a 384x384 WebP review/public candidate encoded at quality 55.",
+          "colorOrContentEdits": "None during deterministic resizing and encoding; the separate pre-approval native correction is recorded in correctionHistory."
+        },
+        {
+          "date": "2026-07-25",
+          "theme": "dark",
+          "tool": "cwebp",
+          "operation": "cwebp -quiet -q 55 -resize 384 384 -metadata none from the retained 1254x1254 PNG master.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No third-party visual reference was supplied; the only image reference was Civica's owner-approved generated light master used for its dark pair."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "The generic ballot box and sheet contain no identifiable architecture, public art, or protected interior."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "The corrected master contains no seal, logo, flag, emblem, candidate, party, campaign mark, or trade dress."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No identifiable person or recognizable public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The ballot box, unmarked ballot, and abstract line groupings are generic editorial motifs; the asset is decorative, non-documentary, and not presented as an election record."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt-record integrity, light/dark candidate pairing, file integrity, and the five required rights-screening domains. This is not owner approval of the rendered menu or professional legal review.",
+        "independentProfessionalReview": false,
+        "ownerLightMasterApproval": true,
+        "ownerRenderedMenuApproval": false,
+        "releaseAuthorized": false
+      },
+      "release": {
+        "releaseIdentity": "exp015-explore-elections-2026-07-25-candidate-v1",
+        "status": "candidate-pending-owner-render-approval",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false,
+        "deployed": false,
+        "productionAuthorized": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-07-25",
+          "stage": "matched-dark-candidate-generation",
+          "action": "Retained the matched dark candidate generated from the owner-approved light master.",
+          "promptDisclosure": "The repository retains only the shared matched-dark prompt. Any per-asset dark repair wording used during iteration was not retained.",
+          "acceptedOutputSha256": "0e9a514a2ee4fd927f6b562836f82913b3e91af39f3b3d36f9f080fedbf876a6",
+          "releaseImpact": "No release was authorized; the pair remains pending owner review in the finished rendered menu."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "pre-release-candidate-generation",
+          "action": "Replaced the first light attempt to remove a seal-like medallion.",
+          "promptDisclosure": "The exact iterative correction wording was not retained in the repository.",
+          "acceptedReplacementOutputSha256": "44fc04a869379256b16042434654894c25eb1ee9a1b45c98dfc88d0b85c8a7a6",
+          "releaseImpact": "No released asset was changed; this accepted light output remains part of a candidate pair."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "provenance-record-correction",
+          "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
+          "remainingUnknowns": "Exact marketed model release, seed, and the exact iterative correction wording remain unexposed or unretained.",
+          "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        }
+      ]
+    },
+    {
+      "id": "explore-rankings-2026-07-25-v1",
+      "assetKey": "explore-rankings",
+      "route": "global-explore-navigation",
+      "subject": "A surveyor's balance aligned with a sequence of neutral ordered markers.",
+      "caption": "Surveyor's balance and neutral ordered-marker editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/navigation/explore-rankings.webp",
+          "sha256": "072cddb282441ced74dfe39a0920543ef47832b96fb0a7f23c9cb41509389a98",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "b7ac3abf3fdac2931159c5e0259fc94581e7046a855d366cc6f9540fe78890e4"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/navigation/explore-rankings-dark.webp",
+          "sha256": "ff1ce90dc1faa32e37b4faae2559206db91ff3d6d53f592ae47d003983ca87f0",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "3299009747c4efd4c5ef9ce32ce3b7fb79530cc2afa313021241b4768e4cbcf3"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose the exact marketed model or release. Embedded C2PA metadata identifies software agent gpt-image version 2.0, claim generator OpenAI Media Service API, and digital source type trainedAlgorithmicMedia; those technical assertions do not prove an exact marketed model release.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no direct API key, API call, or paid API invocation was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through native ChatGPT/Codex image generation in an authenticated consumer session. The C2PA claim-generator label is technical provenance and does not change that account-terms basis.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1:1 square",
+          "returnedWidth": 1254,
+          "returnedHeight": 1254,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only",
+          "c2paSoftwareAgentName": "gpt-image",
+          "c2paSoftwareAgentVersion": "2.0",
+          "c2paClaimGenerator": "OpenAI Media Service API",
+          "c2paDigitalSourceType": "trainedAlgorithmicMedia",
+          "c2paModelInterpretation": "Technical provenance only; not treated as an exact marketed model release."
+        }
+      },
+      "prompts": {
+        "light": "Asset type: non-production Civica Atlas Explore-menu motif, square.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper; fine coherent cross-hatching, confident architectural and instrument linework, restrained paper texture, subtle outer vignette; scholarly reference atlas, not photorealistic. Composition: one immediately legible civic instrument centered with generous negative space, readable at a 96-pixel display size, no scene-wide background and no decorative frame.\nPalette: near-monochrome graphite and muted parchment with one restrained terracotta accent. Mood: calm, precise, institutional, inviting.\nCreate a surveyor's balance aligned with a sequence of neutral ordered markers. The image should communicate measured ordering without trophies, podiums, medals, grades, traffic lights, or numeric scores.\nNo text, letters, numbers, labels, logos, watermarks, flags, seals, party insignia, national symbols, identifiable people, famous modern buildings, glossy 3-D iconography, fantasy ornament, faux-antique clutter, photorealism, or decorative border. Do not imply that the image is source evidence.",
+        "dark": "Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve the object, composition, crop, proportions, negative space, and every semantic detail. Change paper/ink polarity and lighting only: near-black navy ground, muted warm sepia and soft gold linework, restrained terracotta accent, high enough separation for a 96-pixel display. Add, remove, move, or reinterpret nothing. Keep every shared constraint from the light master.",
+        "negativePrompt": "No separate negative-prompt field was exposed. The retained shared constraints were included verbatim in the light prompt and incorporated by reference in the matched-dark prompt."
+      },
+      "references": [
+        {
+          "id": "exp015-light-rankings",
+          "appliesToTheme": "dark",
+          "kind": "owner-approved-generated-light-master",
+          "path": "output/imagegen/exp015-light/rankings.png",
+          "sha256": "b7ac3abf3fdac2931159c5e0259fc94581e7046a855d366cc6f9540fe78890e4",
+          "source": "Civica EXP-015 native ChatGPT/Codex generation session",
+          "author": "AI-assisted output; Fernando Baliño directed and approved the light-master batch, without asserting copyright in machine-generated elements.",
+          "licenseOrPermission": "Owner-approved Civica candidate supplied only to generate its matched dark variant under the applicable OpenAI Terms of Use.",
+          "retrievedOn": "2026-07-25",
+          "intendedUse": "Preserve the accepted light composition while generating the paired dark-theme candidate."
+        }
+      ],
+      "referenceDisclosure": "No external image, photograph, artist, building, trademark, insignia, person, or other visual reference was supplied. The dark generation used only the owner-approved light master recorded above.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
+        "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
+        "selectedOn": "2026-07-25",
+        "basis": "The light master was included in the explicitly approved eight-image batch; its matched dark rendition and both public WebPs remain candidates for owner review in the finished menu.",
+        "rejectedAlternatives": []
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "theme": "light",
+          "tool": "not-retained-in-checked-evidence",
+          "operation": "Resize the retained 1254x1254 PNG master to a 384x384 WebP review/public candidate encoded at quality 55.",
+          "colorOrContentEdits": "None during deterministic resizing and encoding."
+        },
+        {
+          "date": "2026-07-25",
+          "theme": "dark",
+          "tool": "cwebp",
+          "operation": "cwebp -quiet -q 55 -resize 384 384 -metadata none from the retained 1254x1254 PNG master.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No third-party visual reference was supplied; the only image reference was Civica's owner-approved generated light master used for its dark pair."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "No architecture, public art, or protected interior is depicted."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "The balance and markers contain no logo, flag, emblem, seal, medal, trophy, grade, traffic light, or trade dress."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No identifiable person or recognizable public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The balance and unnumbered markers are generic measurement motifs; the asset is decorative, non-documentary, and not presented as a country score, rank, or source result."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt-record integrity, light/dark candidate pairing, file integrity, and the five required rights-screening domains. This is not owner approval of the rendered menu or professional legal review.",
+        "independentProfessionalReview": false,
+        "ownerLightMasterApproval": true,
+        "ownerRenderedMenuApproval": false,
+        "releaseAuthorized": false
+      },
+      "release": {
+        "releaseIdentity": "exp015-explore-rankings-2026-07-25-candidate-v1",
+        "status": "candidate-pending-owner-render-approval",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false,
+        "deployed": false,
+        "productionAuthorized": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-07-25",
+          "stage": "matched-dark-candidate-generation",
+          "action": "Retained the matched dark candidate generated from the owner-approved light master.",
+          "promptDisclosure": "The repository retains only the shared matched-dark prompt. Any per-asset dark repair wording used during iteration was not retained.",
+          "acceptedOutputSha256": "3299009747c4efd4c5ef9ce32ce3b7fb79530cc2afa313021241b4768e4cbcf3",
+          "releaseImpact": "No release was authorized; the pair remains pending owner review in the finished rendered menu."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "provenance-record-correction",
+          "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
+          "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
+          "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        }
+      ]
+    },
+    {
+      "id": "explore-organizations-2026-07-25-v1",
+      "assetKey": "explore-organizations",
+      "route": "global-explore-navigation",
+      "subject": "Several interlocking geographic rings arranged around a neutral globe grid.",
+      "caption": "Interlocking geographic rings and neutral globe-grid editorial motif.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/engravings/navigation/explore-organizations.webp",
+          "sha256": "dad5cdf3efda40dbe442cc8884a0d71337937cc34d1d607e9612eb5bb5e1a2da",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "064536237606491b25546c2f8d42ed699160ef43492d2063ae67eda98dc70990"
+        },
+        {
+          "theme": "dark",
+          "path": "public/engravings/navigation/explore-organizations-dark.webp",
+          "sha256": "acd8b3e9f334d3800d8b3faf398eff72b778269e37693e393cca9b31b6560a2c",
+          "width": 384,
+          "height": 384,
+          "format": "webp",
+          "sourceOutputSha256": "954f3c9e527250b9cfd7aaf6be84385dde1d5059425a62135529c17ebedc5673"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose the exact marketed model or release. Embedded C2PA metadata identifies software agent gpt-image version 2.0, claim generator OpenAI Media Service API, and digital source type trainedAlgorithmicMedia; those technical assertions do not prove an exact marketed model release.",
+        "accountContext": "Authenticated ChatGPT/Codex consumer session; no direct API key, API call, or paid API invocation was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-07-25",
+          "applicabilityBasis": "The image was generated through native ChatGPT/Codex image generation in an authenticated consumer session. The C2PA claim-generator label is technical provenance and does not change that account-terms basis.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1:1 square",
+          "returnedWidth": 1254,
+          "returnedHeight": 1254,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only",
+          "c2paSoftwareAgentName": "gpt-image",
+          "c2paSoftwareAgentVersion": "2.0",
+          "c2paClaimGenerator": "OpenAI Media Service API",
+          "c2paDigitalSourceType": "trainedAlgorithmicMedia",
+          "c2paModelInterpretation": "Technical provenance only; not treated as an exact marketed model release."
+        }
+      },
+      "prompts": {
+        "light": "Asset type: non-production Civica Atlas Explore-menu motif, square.\nStyle/medium: premium nineteenth-century copperplate editorial engraving on warm ivory paper; fine coherent cross-hatching, confident architectural and instrument linework, restrained paper texture, subtle outer vignette; scholarly reference atlas, not photorealistic. Composition: one immediately legible civic instrument centered with generous negative space, readable at a 96-pixel display size, no scene-wide background and no decorative frame.\nPalette: near-monochrome graphite and muted parchment with one restrained terracotta accent. Mood: calm, precise, institutional, inviting.\nCreate several interlocking geographic rings around a neutral globe grid, suggesting institutions connecting across borders. Do not use a recognizable organization logo, emblem, building, or flag arrangement.\nNo text, letters, numbers, labels, logos, watermarks, flags, seals, party insignia, national symbols, identifiable people, famous modern buildings, glossy 3-D iconography, fantasy ornament, faux-antique clutter, photorealism, or decorative border. Do not imply that the image is source evidence.",
+        "dark": "Re-render this exact Explore motif for Civica Atlas's dark theme. Preserve the object, composition, crop, proportions, negative space, and every semantic detail. Change paper/ink polarity and lighting only: near-black navy ground, muted warm sepia and soft gold linework, restrained terracotta accent, high enough separation for a 96-pixel display. Add, remove, move, or reinterpret nothing. Keep every shared constraint from the light master.",
+        "negativePrompt": "No separate negative-prompt field was exposed. The retained shared constraints were included verbatim in the light prompt and incorporated by reference in the matched-dark prompt."
+      },
+      "references": [
+        {
+          "id": "exp015-light-organizations",
+          "appliesToTheme": "dark",
+          "kind": "owner-approved-generated-light-master",
+          "path": "output/imagegen/exp015-light/organizations.png",
+          "sha256": "064536237606491b25546c2f8d42ed699160ef43492d2063ae67eda98dc70990",
+          "source": "Civica EXP-015 native ChatGPT/Codex generation session",
+          "author": "AI-assisted output; Fernando Baliño directed and approved the light-master batch, without asserting copyright in machine-generated elements.",
+          "licenseOrPermission": "Owner-approved Civica candidate supplied only to generate its matched dark variant under the applicable OpenAI Terms of Use.",
+          "retrievedOn": "2026-07-25",
+          "intendedUse": "Preserve the accepted light composition while generating the paired dark-theme candidate."
+        }
+      ],
+      "referenceDisclosure": "No external image, photograph, artist, building, trademark, insignia, person, or other visual reference was supplied. The dark generation used only the owner-approved light master recorded above.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-07-25",
+        "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
+        "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
+        "selectedOn": "2026-07-25",
+        "basis": "The light master was included in the explicitly approved eight-image batch; its matched dark rendition and both public WebPs remain candidates for owner review in the finished menu.",
+        "rejectedAlternatives": []
+      },
+      "transformations": [
+        {
+          "date": "2026-07-25",
+          "theme": "light",
+          "tool": "not-retained-in-checked-evidence",
+          "operation": "Resize the retained 1254x1254 PNG master to a 384x384 WebP review/public candidate encoded at quality 55.",
+          "colorOrContentEdits": "None during deterministic resizing and encoding."
+        },
+        {
+          "date": "2026-07-25",
+          "theme": "dark",
+          "tool": "cwebp",
+          "operation": "cwebp -quiet -q 55 -resize 384 384 -metadata none from the retained 1254x1254 PNG master.",
+          "colorOrContentEdits": "None beyond the separate native dark-theme generation and deterministic resize/encoding."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No third-party visual reference was supplied; the only image reference was Civica's owner-approved generated light master used for its dark pair."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "No identifiable architecture, public art, or protected interior is depicted."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "The rings and neutral globe grid do not reproduce a recognizable organization logo, emblem, building, flag arrangement, or trade dress."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No identifiable person or recognizable public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "The globe grid and interlocking rings are generic connection motifs; the asset is decorative, non-documentary, and not presented as a real organization or membership record."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-07-25",
+        "outcome": "cleared",
+        "scope": "Prompt-record integrity, light/dark candidate pairing, file integrity, and the five required rights-screening domains. This is not owner approval of the rendered menu or professional legal review.",
+        "independentProfessionalReview": false,
+        "ownerLightMasterApproval": true,
+        "ownerRenderedMenuApproval": false,
+        "releaseAuthorized": false
+      },
+      "release": {
+        "releaseIdentity": "exp015-explore-organizations-2026-07-25-candidate-v1",
+        "status": "candidate-pending-owner-render-approval",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false,
+        "deployed": false,
+        "productionAuthorized": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-07-25",
+          "stage": "matched-dark-candidate-generation",
+          "action": "Retained the matched dark candidate generated from the owner-approved light master.",
+          "promptDisclosure": "The repository retains only the shared matched-dark prompt. Any per-asset dark repair wording used during iteration was not retained.",
+          "acceptedOutputSha256": "954f3c9e527250b9cfd7aaf6be84385dde1d5059425a62135529c17ebedc5673",
+          "releaseImpact": "No release was authorized; the pair remains pending owner review in the finished rendered menu."
+        },
+        {
+          "date": "2026-07-25",
+          "stage": "provenance-record-correction",
+          "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
+          "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
+          "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        }
+      ]
     }
   ]
 }

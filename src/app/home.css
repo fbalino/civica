@@ -36,12 +36,14 @@
   height: 120%;
   object-fit: cover;
   object-position: center center;
+  background-size: cover;
+  background-position: center center;
   z-index: 0;
   will-change: transform;
 }
-[data-theme="dark"] .home-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark),
-[data-theme="dark"] .home-engraving img:not(.theme-engraving-light):not(.theme-engraving-dark),
-[data-theme="dark"] .country-card-img:not(.theme-engraving-light):not(.theme-engraving-dark) {
+[data-theme="dark"] .home-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image),
+[data-theme="dark"] .home-engraving img:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image),
+[data-theme="dark"] .country-card-img:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image) {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 .home-hero::before {
@@ -148,7 +150,7 @@
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--color-text-primary);
   margin-bottom: var(--space-3);
 }
 .home-feature-title {
@@ -168,14 +170,31 @@
   margin: 0 0 var(--space-5);
   max-width: 46ch;
 }
+
+[data-theme="dark"] .home-feature-num,
+[data-theme="dark"] .home-feature-desc {
+  color: var(--color-text-primary);
+}
+
 .home-feature-link {
   font-family: var(--font-body);
   font-size: var(--text-14);
   font-weight: var(--font-weight-medium);
-  color: var(--color-accent);
-  text-decoration: none;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--space-1);
 }
-.home-feature-link:hover { text-decoration: underline; }
+.home-feature-link:hover { color: var(--color-accent); }
+
+.home-feature .btn--text {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: var(--space-1);
+}
 
 /* Feature visual slot — holds a CountryCard / Index table (which bring
    their own surface) or the .home-feature-visual fallback box. */
@@ -195,8 +214,9 @@
   display: flex; align-items: center; justify-content: center;
   min-height: 170px;
 }
-.home-engraving img { width: 60%; height: auto; opacity: 0.8; }
-.home-engraving--landscape img {
+.home-engraving :is(img, .civica-themed-image) { width: 60%; height: auto; opacity: 0.8; }
+.home-engraving .civica-themed-image { aspect-ratio: 1; }
+.home-engraving--landscape :is(img, .civica-themed-image) {
   width: 100%;
   aspect-ratio: 5 / 3;
   opacity: 0.9;
@@ -344,7 +364,10 @@
   max-height: 200px;
   object-fit: cover;
   object-position: center;
+  background-size: cover;
+  background-position: center;
 }
+.country-card-img.civica-themed-image { aspect-ratio: 3 / 2; }
 .country-card-footer {
   padding: var(--space-4) var(--space-6);
   border-top: 1px solid var(--color-stat-border);

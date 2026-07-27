@@ -1,0 +1,42 @@
+{
+  "contract": "civica-plt-016-verification/v1",
+  "taskId": "PLT-016",
+  "verifiedAt": "2026-07-15",
+  "commands": [
+    {
+      "command": "npm run validate:route-performance-telemetry",
+      "result": "passed",
+      "details": "Four fixtures passed: route templates and query strings are canonicalized, closed metric shapes reject sensitive fields, storage failures are swallowed, and p95/error-rate alerts retain route, release, and cache context."
+    },
+    {
+      "command": "npm run validate:research-evidence-retention",
+      "result": "passed",
+      "details": "The privacy-bounded 30-day telemetry deletion exemption and eight retention fixtures passed without widening protected-relation deletion paths."
+    },
+    {
+      "command": "npm run validate:data-dictionary && npm run validate:doc-references",
+      "result": "passed",
+      "details": "The generated 90-table, 1,256-column dictionary records the internal operational policy for the new relation, and project references remain valid."
+    },
+    {
+      "command": "npm run db:plan -- --all --live --out=plan/evidence/DAT-013/preflight.json",
+      "result": "passed",
+      "details": "The configured database was read only: all 56 plans completed with zero writes and the additive telemetry relation was reported missing."
+    },
+    {
+      "command": "npm run validate:authoritative-migrations && npm run validate:migrations && npm run validate:migration-preflight",
+      "result": "passed",
+      "details": "The migration ledger, journal, manifest, and checked post-migration fingerprint are exact."
+    },
+    {
+      "command": "npm run validate:ci-workflow && npm run typecheck && node --import tsx --test src/lib/api/cron-job.test.ts",
+      "result": "passed",
+      "details": "The CI build contract includes the telemetry gate; TypeScript completed without errors; and all 25 cron-wrapper tests passed with terminal timing and retention scheduling."
+    },
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "details": "The full credentialed production gate completed its ordered validators and the Next.js production compilation, including the privacy-bounded telemetry contract."
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import {
   indexEvidence,
   indexSnapshotSha256,
   requiredIndexValidations,
+  stagedIndexSnapshot,
   type IndexChangeCategory,
   type IndexChangeRegistry,
   type IndexChangeEvidenceRole,
@@ -15,11 +16,13 @@ import {
 const outputDir = "data/releases/index-change-control-v1";
 const outputPath = `${outputDir}/registry.v1.json`;
 const initialize = process.argv.includes("--initialize");
+const staged = process.argv.includes("--staged");
 const metadataArg = process.argv.find((arg) => arg.startsWith("--metadata="));
 
 type Metadata = {
   id: string;
   toVersion: string;
+  recordKind?: "evidence";
   categories?: IndexChangeCategory[];
   evidence: Record<IndexChangeEvidenceRole, string[]>;
   validations?: string[];
@@ -30,7 +33,7 @@ function changedPaths(before: IndexChangeRegistry["entries"][number]["protectedF
   return after.filter((row) => prior.get(row.path) !== row.sha256);
 }
 
-const snapshot = currentIndexSnapshot();
+const snapshot = staged ? stagedIndexSnapshot() : currentIndexSnapshot();
 if (initialize) {
   if (existsSync(outputPath) && !process.argv.includes("--force-initialize")) {
     throw new Error("The change-control registry already exists. Append with --metadata; do not reset its history.");
@@ -76,12 +79,24 @@ if (initialize) {
   const prior = registry.entries.at(-1);
   if (!prior) throw new Error("Registry has no baseline.");
   const changed = changedPaths(prior.protectedFiles, snapshot);
+  // Evidence-only records preserve snapshot continuity while authenticating a
+  // complete replacement set of mutable evidence-role hashes.
+  const evidenceOnly = metadata.recordKind === "evidence";
+  if (!evidenceOnly && changed.length === 0)
+    throw new Error(
+      "No protected Index file changed. Use recordKind: evidence only when every evidence role needs an append-only refresh.",
+    );
+  if (evidenceOnly && changed.length > 0)
+    throw new Error(
+      "Evidence-only records cannot include a protected Index file change.",
+    );
   const categories = [...new Set(changed.map((row) => row.category))];
   if (metadata.categories && metadata.categories.slice().sort().join() !== categories.slice().sort().join()) throw new Error("Metadata categories do not match the protected-file diff.");
   const entry = {
     id: metadata.id,
     fromVersion: prior.toVersion,
     toVersion: metadata.toVersion,
+    ...(evidenceOnly ? { recordKind: "evidence" as const } : {}),
     parentSnapshotSha256: prior.snapshotSha256,
     snapshotSha256: indexSnapshotSha256(snapshot),
     categories,

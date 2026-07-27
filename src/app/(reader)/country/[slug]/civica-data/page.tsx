@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getJurisdictionBySlug,
@@ -7,12 +6,13 @@ import {
   getSource,
   getAllSources,
   getBillsForJurisdiction,
-  getInternationalMembershipsBySlugs,
   getFactbookCountryOptions,
   getIndicatorHistoryForCountry,
+  getConditionsPublicRelease,
 } from "@/lib/db/queries";
-import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
+import { getCountryOrganizationsData } from "@/lib/db/queries-organizations";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
+import { isCiReleaseConsistencyError } from "@/lib/ci/release-selection";
 import { getGovernanceEvidence } from "@/lib/db/queries-governance-evidence";
 import { FactbookGovOrgChart } from "@/components/factbook/FactbookGovOrgChart";
 import { FactbookSidebar } from "@/components/factbook/FactbookSidebar";
@@ -33,16 +33,21 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
 import { CountryTrendSection } from "@/components/ci/CountryTrendSection";
+import { CivicaConditionsPanel } from "@/components/conditions/CivicaConditionsPanel";
 import {
   CountryEvidenceCoverage,
   COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
 } from "@/components/provenance/CountryEvidenceCoverage";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 import { withOg } from "@/lib/og";
+import {
+  atlasSurfaceQueryValue,
+  captureAtlasSurfaceQuery,
+} from "@/lib/atlas/surface-query-state";
 import type { Metadata } from "next";
 import "@/app/civica-data.css";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 // Per-tab metadata. The shared layout's generateMetadata sets the Factbook
 // title + /country/[slug] canonical (correct for the base tab); metadata
@@ -79,12 +84,13 @@ export async function generateMetadata({
 //   1. Evidence coverage — properties of Civica's evidence, never the country.
 //   2. Governance evidence — source-native publisher observations.
 //   3. Indicator history — longitudinal publisher-native observations.
-//   4. Government      — the "How power is organised" org chart.
-//   5. Legislature     — chamber / hemicycle.
-//   6. Leaders         — current officeholder timeline.
-//   7. Bills           — recent legislative actions.
-//   8. Organizations   — international memberships footprint.
-//   9. Rankings        — curated source-native measures.
+//   4. Civica Conditions — versioned, source-native material indicators.
+//   5. Government      — the "How power is organised" org chart.
+//   6. Legislature     — chamber / hemicycle.
+//   7. Leaders         — current officeholder timeline.
+//   8. Bills           — recent legislative actions.
+//   9. Organizations   — international memberships footprint.
+//  10. Rankings        — curated source-native measures.
 //
 // LAYOUT: a factbook-style stacked scroll (<CivicaDataSections>). Every visible
 // section renders one after another in a single scroll column — nothing hidden,
@@ -92,7 +98,9 @@ export async function generateMetadata({
 // scroll-spy anchor navigation: the active entry follows the scroll, and a click
 // smooth-scrolls to that section. Each section opens with a numbered chapter
 // header, then its body, then a compact "Sources" provenance strip. Every
-// section is visibility-gated upfront so the nav never lists a phantom entry.
+// documented section stays in the navigation: an unavailable query and a
+// successful empty result render distinct visible states rather than causing a
+// section to disappear.
 // The masthead, tab bar, reconciliation notice, and AI drawer live in the shared
 // layout. The "jump to country" search + its sticky-bar handoff render here via
 // <CountryJumpSearch> — a normal-flow field above the left sidebar that scrolls away,
@@ -102,6 +110,7 @@ type SectionId =
   | "evidence-coverage"
   | "governance-evidence"
   | "longitudinal"
+  | "conditions"
   | "government"
   | "legislature"
   | "leaders"
@@ -115,6 +124,7 @@ const SECTION_PLAN: SectionPlan[] = [
   { id: "evidence-coverage", label: "Evidence Coverage" },
   { id: "governance-evidence", label: "Governance Evidence" },
   { id: "longitudinal", label: "Indicator History" },
+  { id: "conditions", label: "Civica Conditions" },
   { id: "government", label: "Government" },
   { id: "legislature", label: "Legislature" },
   { id: "leaders", label: "Leaders" },
@@ -172,40 +182,38 @@ export default async function CountryCivicaDataTab({
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) notFound();
 
-  // Each section's data fetch doubles as its visibility gate. Every fetch
-  // soft-fails so a Neon hiccup degrades a single section rather than
-  // 500-ing the whole tab.
+  // Keep a fulfilled empty result distinct from an unavailable query. The
+  // visible module uses that distinction rather than disappearing from the
+  // reader navigation.
   const [
-    governanceEvidence,
-    resolverFacts,
-    indicatorHistory,
-    govStructure,
-    leadersRows,
-    legislatureData,
+    governanceEvidenceResult,
+    resolverFactsResult,
+    indicatorHistoryResult,
+    govStructureResult,
+    leadersRowsResult,
     billsResult,
-    memberships,
-    scoresRows,
+    organizationsResult,
+    scoresRowsResult,
     wikidataSource,
     allSources,
     countryOptions,
+    conditionsReleaseResult,
   ] = await Promise.all([
-    getGovernanceEvidence(slug).catch(() => null),
-    getCanonicalFactsForJurisdiction(
-      jurisdiction.id,
-      COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
-    ).catch(() => null),
-    getIndicatorHistoryForCountry(slug).catch(() => null),
-    getGovernmentStructure(jurisdiction.id).catch(
-      () =>
-        ({ bodies: [], offices: [], currentTerms: [] }) as Awaited<
-          ReturnType<typeof getGovernmentStructure>
-        >,
+    captureAtlasSurfaceQuery(() => getGovernanceEvidence(slug)),
+    captureAtlasSurfaceQuery(() =>
+      getCanonicalFactsForJurisdiction(
+        jurisdiction.id,
+        COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
+      ),
     ),
-    getLeaderTimeline(jurisdiction.id).catch(() => []),
-    getLegislatureForJurisdiction(jurisdiction.id).catch(() => null),
-    getBillsForJurisdiction(slug, 20).catch(() => null),
-    getInternationalMembershipsBySlugs([jurisdiction.id]).catch(() => []),
-    getScoresForJurisdiction(jurisdiction.id).catch(() => []),
+    captureAtlasSurfaceQuery(() => getIndicatorHistoryForCountry(slug)),
+    captureAtlasSurfaceQuery(() => getGovernmentStructure(jurisdiction.id)),
+    captureAtlasSurfaceQuery(() => getLeaderTimeline(jurisdiction.id)),
+    captureAtlasSurfaceQuery(() => getBillsForJurisdiction(slug, 20)),
+    captureAtlasSurfaceQuery(() => getCountryOrganizationsData(jurisdiction.id)),
+    captureAtlasSurfaceQuery(() => getScoresForJurisdiction(jurisdiction.id), {
+      rethrow: isCiReleaseConsistencyError,
+    }),
     getSource("wikidata").catch(() => null),
     // Whole sources table → real `last_sync_at` dates for the per-section
     // Sources strips. Soft-fails to [] so a Neon hiccup just drops the
@@ -218,48 +226,29 @@ export default async function CountryCivicaDataTab({
     getFactbookCountryOptions().catch(
       () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>,
     ),
+    captureAtlasSurfaceQuery(() => getConditionsPublicRelease()),
   ]);
 
-  // Build the org chart once — reused for the gate and the render.
-  const orgChart = buildOrgChartFromGovernmentStructure(
-    govStructure.bodies,
-    govStructure.offices,
-    govStructure.currentTerms,
-  );
-
-  // Per-section visibility flags.
-  const hasGovernanceEvidence = !!governanceEvidence;
-  const hasGovernment = govStructure.offices.length > 0 && !!orgChart;
-  const hasLegislature = !!legislatureData;
-  const hasLeaders = leadersRows.length > 0;
-  const hasBills = !!billsResult && billsResult.rows.length > 0;
-  const hasOrganizations = memberships.length > 0;
-  const hasRankings = scoresRows.length > 0;
-
-  const isVisible = (id: SectionId): boolean => {
-    switch (id) {
-      case "evidence-coverage":
-        return true;
-      case "governance-evidence":
-        return hasGovernanceEvidence;
-      case "longitudinal":
-        return true;
-      case "government":
-        return hasGovernment;
-      case "legislature":
-        return hasLegislature;
-      case "leaders":
-        return hasLeaders;
-      case "bills":
-        return hasBills;
-      case "organizations":
-        return hasOrganizations;
-      case "rankings":
-        return hasRankings;
-    }
-  };
-
-  const visibleSections = SECTION_PLAN.filter((s) => isVisible(s.id));
+  const governanceEvidence = atlasSurfaceQueryValue(governanceEvidenceResult);
+  const resolverFacts = atlasSurfaceQueryValue(resolverFactsResult);
+  const indicatorHistory = atlasSurfaceQueryValue(indicatorHistoryResult);
+  const govStructure = atlasSurfaceQueryValue(govStructureResult);
+  const leadersRows = atlasSurfaceQueryValue(leadersRowsResult);
+  // A fulfilled empty result remains a coverage state. An unavailable result
+  // reaches FactbookBills as null so it receives its distinct outage state.
+  const hasBills = billsResult.status === "available";
+  const bills = hasBills ? billsResult.value : null;
+  const organizations = atlasSurfaceQueryValue(organizationsResult);
+  const scoresRows = atlasSurfaceQueryValue(scoresRowsResult);
+  const conditionsRelease = atlasSurfaceQueryValue(conditionsReleaseResult);
+  const orgChart = govStructure
+    ? buildOrgChartFromGovernmentStructure(
+        govStructure.bodies,
+        govStructure.offices,
+        govStructure.currentTerms,
+      )
+    : null;
+  const visibleSections = SECTION_PLAN;
 
   // --- Per-section provenance --------------------------------------------
   // Each section's Sources strip lists ONLY the sources that section renders,
@@ -295,52 +284,29 @@ export default async function CountryCivicaDataTab({
   // Government structure + leaders are Wikidata-derived; legislature seat
   // composition is IPU Parline; bills carry their own per-source provenance;
   // organizations are Wikidata-derived.
-  const governmentSources: SectionSource[] = hasGovernment
+  const governmentSources: SectionSource[] = orgChart
     ? [sourceEntry("wikidata")]
     : [];
-  const legislatureSources: SectionSource[] = hasLegislature
-    ? [sourceEntry("ipu_parline")]
-    : [];
-  const leadersSources: SectionSource[] = hasLeaders
+  const legislatureSources: SectionSource[] = [];
+  const leadersSources: SectionSource[] = leadersRows?.length
     ? [sourceEntry("wikidata")]
     : [];
   const billsSources: SectionSource[] =
-    hasBills && billsResult
-      ? dedup(billsResult.rows.map((b) => b.sourceId)).map(sourceEntry)
+    bills?.rows.length
+      ? dedup(bills.rows.map((b) => b.sourceId)).map(sourceEntry)
       : [];
-  const organizationsSources: SectionSource[] = hasOrganizations
+  const organizationsSources: SectionSource[] = organizations?.memberships.length
     ? [sourceEntry("wikidata")]
     : [];
   // Rankings rows carry established source-native measures only. The former
   // Civica composite is preserved research and is not returned here.
-  const rankingsSources: SectionSource[] = hasRankings
+  const rankingsSources: SectionSource[] = scoresRows?.length
     ? dedup(scoresRows.map((r) => r.source)).map((id) => sourceEntry(id))
     : [];
 
   const wikidataRetrievedAt = wikidataSource?.lastSyncAt
     ? wikidataSource.lastSyncAt.toISOString()
     : null;
-
-  // Edge case: a country with a masthead but zero Civica overlays. Render
-  // a clean note rather than an empty shell with a phantom nav.
-  if (visibleSections.length === 0) {
-    return (
-      <div className="civica-data-body">
-        <section className="civica-data-empty-card">
-          <h2 className="civica-data-empty-title">Civica Data</h2>
-          <p className="civica-data-empty-copy">
-            Civica governance data for {jurisdiction.name} has not been compiled
-            yet. See the <Link href={`/country/${slug}`}>Factbook tab</Link> for
-            the source reference, or browse the{" "}
-            <Link href="/governance-evidence">
-              Governance Evidence Dashboard
-            </Link>
-            .
-          </p>
-        </section>
-      </div>
-    );
-  }
 
   // Build the section bodies once, server-side, then hand them to the client
   // switcher as props. The client component renders exactly these nodes — it
@@ -353,20 +319,33 @@ export default async function CountryCivicaDataTab({
         resolverFacts={resolverFacts}
       />
     ),
-    "governance-evidence": governanceEvidence ? (
-      <>
-        <Banner variant="info">
-          These publisher observations remain on their native scales. Civica
-          does not average them, rank the country, or treat agreement as
-          independent corroboration.
+    "governance-evidence":
+      governanceEvidenceResult.status === "unavailable" ? (
+        <Banner variant="warn">
+          Source-native governance observations are temporarily unavailable.
+          Civica is not treating this as evidence that {jurisdiction.name} has
+          no governance evidence.
         </Banner>
-        <GovernanceEvidenceTable
-          countryName={jurisdiction.name}
-          rows={governanceEvidence.rows}
-        />
-        <SourcesStrip sources={governanceEvidenceSources} />
-      </>
-    ) : null,
+      ) : governanceEvidence && governanceEvidence.rows.length > 0 ? (
+        <>
+          <Banner variant="info">
+            These publisher observations remain on their native scales. Civica
+            does not average them, rank the country, or treat agreement as
+            independent corroboration.
+          </Banner>
+          <GovernanceEvidenceTable
+            countryName={jurisdiction.name}
+            rows={governanceEvidence.rows}
+          />
+          <SourcesStrip sources={governanceEvidenceSources} />
+        </>
+      ) : (
+        <Banner variant="info">
+          No source-native governance observations are currently recorded for
+          {jurisdiction.name}. This is a coverage state, not a judgment about
+          the country.
+        </Banner>
+      ),
     longitudinal: (
       <CountryTrendSection
         slug={slug}
@@ -375,21 +354,41 @@ export default async function CountryCivicaDataTab({
         initialSources={allSources}
       />
     ),
-    government: orgChart ? (
-      <>
-        <div className="civica-data-gov-structure">
-          <p className="civica-data-gov-dek">
-            How power is organised — the offices, bodies, and current
-            officeholders.
-          </p>
-          <FactbookGovOrgChart
-            chart={orgChart}
-            countryName={jurisdiction.name}
-          />
-        </div>
-        <SourcesStrip sources={governmentSources} />
-      </>
-    ) : null,
+    conditions: (
+      <CivicaConditionsPanel
+        jurisdictionId={jurisdiction.id}
+        release={conditionsRelease}
+        releaseStatus={conditionsReleaseResult.status}
+      />
+    ),
+    government:
+      govStructureResult.status === "unavailable" ? (
+        <Banner variant="warn">
+          Government-structure records are temporarily unavailable. Civica is
+          not treating this as evidence that {jurisdiction.name} has no
+          institutions.
+        </Banner>
+      ) : orgChart ? (
+        <>
+          <div className="civica-data-gov-structure">
+            <p className="civica-data-gov-dek">
+              How power is organised — the offices, bodies, and current
+              officeholders.
+            </p>
+            <FactbookGovOrgChart
+              chart={orgChart}
+              countryName={jurisdiction.name}
+            />
+          </div>
+          <SourcesStrip sources={governmentSources} />
+        </>
+      ) : (
+        <Banner variant="info">
+          No source-backed government-structure records have been compiled for
+          {jurisdiction.name} yet. This is not a claim that the country has no
+          institutions.
+        </Banner>
+      ),
     legislature: (
       <>
         <FactbookLegislature
@@ -404,14 +403,20 @@ export default async function CountryCivicaDataTab({
         <FactbookLeaders
           jurisdictionId={jurisdiction.id}
           countryName={jurisdiction.name}
+          countrySlug={slug}
           retrievedAt={wikidataRetrievedAt}
+          initialRows={leadersRows}
         />
         <SourcesStrip sources={leadersSources} />
       </>
     ),
     bills: (
       <>
-        <FactbookBills countrySlug={slug} countryName={jurisdiction.name} />
+        <FactbookBills
+          countrySlug={slug}
+          countryName={jurisdiction.name}
+          initialResult={bills}
+        />
         <SourcesStrip sources={billsSources} />
       </>
     ),
@@ -421,6 +426,7 @@ export default async function CountryCivicaDataTab({
           jurisdictionId={jurisdiction.id}
           countryName={jurisdiction.name}
           retrievedAt={wikidataRetrievedAt}
+          initialData={organizations}
         />
         <SourcesStrip sources={organizationsSources} />
       </>
@@ -431,6 +437,7 @@ export default async function CountryCivicaDataTab({
           jurisdictionId={jurisdiction.id}
           countryName={jurisdiction.name}
           variant="factbook"
+          rows={scoresRows}
         />
         <SourcesStrip sources={rankingsSources} />
       </>

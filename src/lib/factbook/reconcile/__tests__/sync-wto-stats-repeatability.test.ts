@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import type { CountryFactHistoryWriter } from "@/lib/factbook/country-fact-history-writer";
 import { countryFacts, factSnapshots } from "@/lib/db/schema";
 import type { WtoCsvRow } from "../sync-wto-stats";
 import { syncWtoStats } from "../sync-wto-stats";
@@ -29,11 +30,13 @@ function harness() {
     }) }),
     select: () => ({ from: (table: unknown) => ({ where: () => ({ limit: async () => table === factSnapshots ? [{ id: [...snapshots.values()][0]?.id }] : [] }) }) }),
   };
-  return { db: db as never, facts, writes: () => writes };
+  const writeFact: CountryFactHistoryWriter = async (_database, { values }) => {
+    await db.insert(countryFacts).values(values as unknown as Record<string, unknown>).onConflictDoUpdate();
+  };
+  return { db: db as never, facts, writeFact, writes: () => writes };
 }
 
 const noDisputes = async () => ({ jurisdictionsScanned: 1, pairsScanned: 1, proposedTotal: 0, inserted: 0, skippedDuplicate: 0, skippedNoFactGroup: 0, errors: [] });
-const noMigration = async () => ({ expectedFactKeysRemoved: [], rowsMigrated: 0, rowsRoleFlipped: 0, licenseTightened: false });
 const fetchArchive = async () => ({ rows: [observation], archiveBytes: 1234 });
 
 function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
@@ -47,7 +50,7 @@ function canonicalFacts(facts: Map<string, Record<string, unknown>>) {
 
 test("WTO fixture applications converge on one canonical fact", async () => {
   const state = harness();
-  const options = { factKey: "exports_merchandise_usd", jurisdictions: [jurisdiction], runMigration: noMigration as never, fetchArchive, persistDisputes: noDisputes as never, markSynced: (async () => ["wto_stats"]) as never };
+  const options = { factKey: "exports_merchandise_usd", jurisdictions: [jurisdiction], fetchArchive, persistDisputes: noDisputes as never, markSynced: (async () => ["wto_stats"]) as never, atlasReleaseId: "atlas-test", writeFact: state.writeFact };
   await syncWtoStats(state.db, options);
   const first = structuredClone(canonicalFacts(state.facts));
   await syncWtoStats(state.db, options);
@@ -57,7 +60,7 @@ test("WTO fixture applications converge on one canonical fact", async () => {
 
 test("WTO dry-run is stable and performs zero database writes", async () => {
   const state = harness();
-  const options = { factKey: "exports_merchandise_usd", jurisdictions: [jurisdiction], runMigration: noMigration as never, fetchArchive, persistDisputes: noDisputes as never, markSynced: (async () => []) as never, dryRun: true };
+  const options = { factKey: "exports_merchandise_usd", jurisdictions: [jurisdiction], fetchArchive, persistDisputes: noDisputes as never, markSynced: (async () => []) as never, dryRun: true };
   const first = await syncWtoStats(state.db, options);
   const second = await syncWtoStats(state.db, options);
   assert.deepEqual(first.countersByFactKey, second.countersByFactKey);
@@ -70,12 +73,43 @@ test("WTO upstream failure is loud before freshness", async () => {
   const result = await syncWtoStats(state.db, {
     factKey: "exports_merchandise_usd",
     jurisdictions: [jurisdiction],
-    runMigration: noMigration as never,
     fetchArchive: async () => { throw new Error("upstream schema changed"); },
     persistDisputes: noDisputes as never,
     markSynced: (async () => { stampCalls++; return []; }) as never,
+    atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact,
   });
   assert.match(result.errors.join(" "), /upstream schema changed/);
   assert.equal(stampCalls, 0);
   assert.equal(state.writes(), 0);
+});
+
+test("WTO rejects missing release context before any recurring sync work", async () => {
+  const state = harness();
+  let fetchCalls = 0;
+  await assert.rejects(
+    syncWtoStats(state.db, {
+      factKey: "exports_merchandise_usd",
+      jurisdictions: [jurisdiction],
+      fetchArchive: async () => {
+        fetchCalls++;
+        return fetchArchive();
+      },
+      persistDisputes: noDisputes as never,
+      markSynced: (async () => []) as never,
+      atlasReleaseId: "invalid release id",
+      writeFact: state.writeFact,
+    }),
+    /named Atlas release is required/,
+  );
+  assert.equal(fetchCalls, 0);
+  assert.equal(state.writes(), 0);
+});
+
+test("WTO recurring sync exposes no raw legacy country-fact migration path", async () => {
+  const source = await import("node:fs/promises").then((fs) =>
+    fs.readFile(new URL("../sync-wto-stats.ts", import.meta.url), "utf8"),
+  );
+  assert.doesNotMatch(source, /UPDATE\s+country_facts/i);
+  assert.doesNotMatch(source, /runLegacyMigration/);
 });

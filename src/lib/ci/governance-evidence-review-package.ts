@@ -142,7 +142,7 @@ version: "${citation.version}"
 type: dataset
 authors:
   - given-names: "Fernando"
-    family-names: "Balino"
+    family-names: "Baliño"
     affiliation: "Independent project; no institutional affiliation claimed"
     website: "https://civicaatlas.org/contact"
 publisher: "Civica Atlas"

@@ -89,6 +89,15 @@ export function FactbookLegislatureChart({
     x: number;
     y: number;
   } | null>(null);
+  const svgIdBase = `legislature-composition-${chamber.id}-${houseLabel
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")}`;
+  const svgTitleId = `${svgIdBase}-title`;
+  const svgDescId = `${svgIdBase}-description`;
+  const svgTitle = `${chamber.name} seat composition`;
+  const svgDescription = `${chamber.parties
+    .map((party) => `${party.name}, ${party.seats} seats`)
+    .join("; ")}. The Party browser below provides the same party, seat, share, and coalition data as native document content.`;
 
   const seats = useMemo(
     () => (chamber.total > 0 ? seatLayout(chamber.total) : []),
@@ -149,10 +158,10 @@ export function FactbookLegislatureChart({
             viewBox="-260 -240 520 260"
             preserveAspectRatio="xMidYMid meet"
             role="img"
-            aria-label={`${chamber.name} seat composition: ${chamber.parties
-              .map((p) => `${p.name} ${p.seats}`)
-              .join(", ")}`}
+            aria-labelledby={`${svgTitleId} ${svgDescId}`}
           >
+            <title id={svgTitleId}>{svgTitle}</title>
+            <desc id={svgDescId}>{svgDescription}</desc>
             {/* Rostrum */}
             <path
               d="M -50 0 A 50 50 0 0 1 50 0 L 50 -8 L -50 -8 Z"

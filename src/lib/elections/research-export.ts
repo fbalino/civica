@@ -1,5 +1,6 @@
 import { sourceRights } from "@/lib/rights/manifest";
 import type { getQualifiedElectionResearchRows } from "@/lib/db/queries";
+import { spreadsheetSafeCsvCell } from "@/lib/exports/csv";
 
 export const ELECTION_RESEARCH_EXPORT_VERSION =
   "election-research-export/v1" as const;
@@ -214,11 +215,6 @@ export function buildElectionResearchExport(input: {
   };
 }
 
-const csvCell = (value: unknown) => {
-  const text = value == null ? "" : String(value);
-  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-};
-
 export const ELECTION_RESEARCH_CSV_HEADER = [
   "row_kind",
   "id",
@@ -328,6 +324,6 @@ export function electionResearchExportCsv(
     ]);
   }
   return `${ELECTION_RESEARCH_CSV_HEADER}\n${rows
-    .map((row) => row.map(csvCell).join(","))
+    .map((row) => row.map(spreadsheetSafeCsvCell).join(","))
     .join("\n")}\n`;
 }

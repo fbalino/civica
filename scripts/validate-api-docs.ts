@@ -17,9 +17,10 @@
  *      AND a `routeId="<id>"` EndpointSection call), so a live public
  *      route can never go undocumented without a build failure.
  *   3. Param drift — the query/path params `contract/registry.ts`
- *      declares for a route are cross-checked against a static scan of
- *      that route's `searchParams.get(All)(...)` calls and its
- *      `params: Promise<{...}>` path-param destructuring.
+ *      declares for a route are cross-checked against a static scan of that
+ *      route's exact `parseQueryContract(..., "schema-id")` registry keys,
+ *      direct `searchParams.get(All)(...)` calls, and its
+ *      `params: Promise<{...}>` path-param declaration.
  *   4. Deprecation consistency — every registry entry with a
  *      `deprecation` contract has a route.ts that actually imports
  *      `withStructuralFamilyDeprecation`; every entry WITHOUT one
@@ -31,6 +32,9 @@
  *   6. CSV header contract — the export route's source no longer
  *      hand-types the CSV header/citation strings inline; it calls
  *      into `contract/csv.ts`.
+ *   7. Distributed rate-limit contract — all versioned GETs and the
+ *      country export declare their canonical shared-counter limits,
+ *      counted method, and 429/503 failure responses.
  *
  * The comparison logic in each check is a pure function taking plain
  * strings/sets/arrays — no filesystem or DB access — so
@@ -41,11 +45,21 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import ts from "typescript";
 
 import {
   API_ROUTES,
   type RouteContract,
 } from "../src/lib/api/contract/registry";
+import {
+  EXPORT_RATE_LIMIT_MAX,
+  EXPORT_RATE_LIMIT_WINDOW_MS,
+  RATE_LIMIT_EXCEEDED_STATUS,
+  RATE_LIMIT_STORE_UNAVAILABLE_STATUS,
+  V1_RATE_LIMIT_MAX,
+  V1_RATE_LIMIT_WINDOW_MS,
+} from "../src/lib/api/contract/rate-limits";
+import { QUERY_CONTRACT_SCHEMAS } from "../src/lib/api/request-contract";
 
 const ROOT = process.cwd();
 const V1_DIR = path.join(ROOT, "src/app/api/v1");
@@ -204,9 +218,76 @@ async function checkDocsCoverage(report: Report): Promise<void> {
 
 export function extractQueryParamsRead(source: string): Set<string> {
   const found = new Set<string>();
-  const re = /searchParams\.get(?:All)?\(\s*["'`]([^"'`]+)["'`]\s*\)/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(source))) found.add(m[1]);
+  const parsed = ts.createSourceFile(
+    "route.ts",
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+  const visit = (node: ts.Node) => {
+    if (ts.isCallExpression(node)) {
+      const argument = node.arguments[0];
+      if (
+        ts.isPropertyAccessExpression(node.expression) &&
+        /^(?:get|getAll)$/.test(node.expression.name.text) &&
+        ts.isPropertyAccessExpression(node.expression.expression) &&
+        node.expression.expression.name.text === "searchParams" &&
+        argument &&
+        ts.isStringLiteralLike(argument)
+      ) {
+        found.add(argument.text);
+      }
+      const schemaArgument = node.arguments[1];
+      if (
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === "parseQueryContract" &&
+        schemaArgument &&
+        ts.isStringLiteralLike(schemaArgument)
+      ) {
+        const schemaId =
+          schemaArgument.text as keyof typeof QUERY_CONTRACT_SCHEMAS;
+        const definition = QUERY_CONTRACT_SCHEMAS[schemaId];
+        if (definition) {
+          for (const key of Object.keys(definition.schema.shape)) {
+            found.add(key);
+          }
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(parsed);
+  return found;
+}
+
+export function extractUnknownQueryContractIds(source: string): Set<string> {
+  const found = new Set<string>();
+  const parsed = ts.createSourceFile(
+    "route.ts",
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+  const visit = (node: ts.Node) => {
+    if (
+      ts.isCallExpression(node) &&
+      ts.isIdentifier(node.expression) &&
+      node.expression.text === "parseQueryContract"
+    ) {
+      const schemaArgument = node.arguments[1];
+      if (
+        schemaArgument &&
+        ts.isStringLiteralLike(schemaArgument) &&
+        !Object.hasOwn(QUERY_CONTRACT_SCHEMAS, schemaArgument.text)
+      ) {
+        found.add(schemaArgument.text);
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(parsed);
   return found;
 }
 
@@ -234,6 +315,11 @@ export function diffParams(
 ): string[] {
   const errors: string[] = [];
   const queryRead = extractQueryParamsRead(source);
+  for (const schemaId of extractUnknownQueryContractIds(source)) {
+    errors.push(
+      `[param-drift] route "${routeId}" invokes unknown query contract "${schemaId}" in ${filePath}`,
+    );
+  }
   const pathRead = new Set(
     [...extractPathParamsRead(source)].map((n) => `:${n}`),
   );
@@ -319,7 +405,9 @@ export function deprecationScopeMismatch(
   helperName = "withStructuralFamilyDeprecation",
 ): string | null {
   if (appliesWhen === "always") {
-    const rateLimitPattern = new RegExp(`if\\s*\\(rateLimited\\)\\s*return\\s+${helperName}\\(rateLimited\\)`);
+    const rateLimitPattern = new RegExp(
+      `if\\s*\\(rateLimited\\)\\s*return\\s+${helperName}\\(rateLimited\\)`,
+    );
     if (!rateLimitPattern.test(source)) {
       return `[deprecation] route "${routeId}" does not decorate its 429 rate-limit response in ${filePath}`;
     }
@@ -462,6 +550,67 @@ function assertNoDuplicateRegistryIds(report: Report): void {
   }
 }
 
+export function findRateLimitContractIssues(
+  registry: Pick<
+    RouteContract,
+    "id" | "versioned" | "method" | "rateLimit" | "errorStatuses"
+  >[],
+): string[] {
+  const issues: string[] = [];
+
+  for (const route of registry) {
+    const expected = route.versioned
+      ? { max: V1_RATE_LIMIT_MAX, windowMs: V1_RATE_LIMIT_WINDOW_MS }
+      : {
+          max: EXPORT_RATE_LIMIT_MAX,
+          windowMs: EXPORT_RATE_LIMIT_WINDOW_MS,
+        };
+    const rateLimit = route.rateLimit;
+
+    if (!rateLimit) {
+      issues.push(
+        `[rate-limit] route "${route.id}" has no distributed rate-limit contract`,
+      );
+      continue;
+    }
+
+    if (
+      route.method !== "GET" ||
+      rateLimit.max !== expected.max ||
+      rateLimit.windowMs !== expected.windowMs ||
+      rateLimit.scope !== "per-validated-client-identity" ||
+      rateLimit.backend !== "postgres" ||
+      rateLimit.countedMethods.length !== 1 ||
+      rateLimit.countedMethods[0] !== "GET" ||
+      rateLimit.exceededStatus !== RATE_LIMIT_EXCEEDED_STATUS ||
+      rateLimit.storeUnavailableStatus !== RATE_LIMIT_STORE_UNAVAILABLE_STATUS
+    ) {
+      issues.push(
+        `[rate-limit] route "${route.id}" drifts from its canonical distributed GET-only policy`,
+      );
+    }
+    if (!route.errorStatuses.includes(RATE_LIMIT_EXCEEDED_STATUS)) {
+      issues.push(
+        `[rate-limit] route "${route.id}" does not document ${RATE_LIMIT_EXCEEDED_STATUS}`,
+      );
+    }
+    if (!route.errorStatuses.includes(RATE_LIMIT_STORE_UNAVAILABLE_STATUS)) {
+      issues.push(
+        `[rate-limit] route "${route.id}" does not document ${RATE_LIMIT_STORE_UNAVAILABLE_STATUS}`,
+      );
+    }
+  }
+
+  return issues;
+}
+
+function checkRateLimitContracts(report: Report): void {
+  report.errors.push(...findRateLimitContractIssues(API_ROUTES));
+  report.info.push(
+    `[rate-limit] checked ${API_ROUTES.length} route(s) for canonical distributed limits and 429/503 responses`,
+  );
+}
+
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -474,8 +623,8 @@ async function main(): Promise<void> {
         "",
         "Deterministic, DB-free, network-free. Checks route<->contract",
         "inventory, docs coverage, param drift, deprecation header",
-        "consistency, generated example validity, and the CSV header",
-        "contract.",
+        "consistency, generated example validity, the CSV header contract,",
+        "and distributed rate-limit contracts.",
       ].join("\n"),
     );
     process.exit(0);
@@ -486,6 +635,7 @@ async function main(): Promise<void> {
   const report: Report = { errors: [], info: [] };
 
   assertNoDuplicateRegistryIds(report);
+  checkRateLimitContracts(report);
   await checkInventory(report);
   await checkDocsCoverage(report);
   await checkParamDrift(report);

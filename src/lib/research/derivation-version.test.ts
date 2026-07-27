@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  DERIVATION_VERSION_SCHEMA,
   buildDerivationVersionEnvelope,
   contentVersion,
   derivationVersionErrors,
@@ -11,6 +12,7 @@ import {
   sourceBasketVersion,
   versioned,
   versionSetId,
+  type DerivationVersionEnvelope,
 } from "./derivation-version";
 
 const current = () =>
@@ -66,6 +68,69 @@ test("derivation keys are stable and change on an axis change", () => {
   const changed = { ...current(), algorithm: versioned("algorithm/v3") };
   assert.equal(derivationVersionKey(first), derivationVersionKey(same));
   assert.notEqual(derivationVersionKey(first), derivationVersionKey(changed));
+});
+
+test("derivation keys survive PostgreSQL jsonb object-key reordering", () => {
+  const original = buildDerivationVersionEnvelope({
+    methodology: versioned("method/v1"),
+    algorithm: versioned("algorithm/v1"),
+    prompt: notApplicable("No prompt."),
+    taxonomy: versioned("taxonomy/v1"),
+    sourceIds: ["source-b", "source-a"],
+  });
+  const jsonbShaped: DerivationVersionEnvelope = {
+    algorithm: { id: "algorithm/v1", state: "versioned" },
+    methodology: { id: "method/v1", state: "versioned" },
+    prompt: { reason: "No prompt.", state: "not_applicable" },
+    schemaVersion: DERIVATION_VERSION_SCHEMA,
+    sourceBasket: {
+      id:
+        original.sourceBasket.state === "versioned"
+          ? original.sourceBasket.id
+          : "",
+      state: "versioned",
+    },
+    sourceIds: [...original.sourceIds],
+    taxonomy: { id: "taxonomy/v1", state: "versioned" },
+  };
+  assert.equal(
+    derivationVersionKey(jsonbShaped),
+    derivationVersionKey(original),
+  );
+
+  const withExtra = {
+    ...jsonbShaped,
+    unexpected: "must not be normalized away",
+  } as unknown as DerivationVersionEnvelope;
+  assert.throws(
+    () => derivationVersionKey(withExtra),
+    /unsupported field unexpected/,
+  );
+
+  const missing = { ...jsonbShaped } as Partial<DerivationVersionEnvelope>;
+  delete missing.prompt;
+  assert.throws(
+    () => derivationVersionKey(missing as DerivationVersionEnvelope),
+    /prompt is missing/,
+  );
+
+  const wrongType = {
+    ...jsonbShaped,
+    taxonomy: { state: "versioned", id: 7 },
+  } as unknown as DerivationVersionEnvelope;
+  assert.throws(
+    () => derivationVersionKey(wrongType),
+    /taxonomy has a blank version id/,
+  );
+
+  const changed = {
+    ...jsonbShaped,
+    taxonomy: { state: "versioned" as const, id: "taxonomy/v2" },
+  };
+  assert.notEqual(
+    derivationVersionKey(changed),
+    derivationVersionKey(original),
+  );
 });
 
 test("matches a requested version axis exactly", () => {

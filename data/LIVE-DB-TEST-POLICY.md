@@ -37,15 +37,22 @@ it is enforced by code, not convention.
   contract test (`worked-examples.test.ts`) then executes **read-only** queries
   against `DATABASE_URL` via `getLiveReadOnlyDb()`.
 
-## Current coverage and limits
+## Fixture-database coverage and limits
 
 - The only live-DB contract test today is
   `src/lib/factbook/reconcile/__tests__/worked-examples.test.ts` — it resolves
   the eight reconciliation worked examples and asserts canonical values within
   tolerance. It reads via the read-only client.
-- There is **no fixture database yet** — a disposable, seeded local Postgres
-  cluster that would let more contract tests run without touching production.
-  That is QA-003. Until it lands, live reads use production read-only.
+- `civica-qa-database-fixture/v1` now creates a fresh in-memory PGlite
+  PostgreSQL instance from synthetic, CC0 test rows. It covers jurisdiction
+  statuses, full/partial/missing/disputed/stale states, multiple sources,
+  constitutions, elections, organizations, Index candidates, Pulse
+  negatives/clusters, and a representative authoritative migration without a
+  `DATABASE_URL`. See `data/TEST-FIXTURE-DATABASE.md` and run
+  `npm run validate:fixture-database`.
+- It is a reusable fixture foundation, not a substitute for the deliberately
+  separate production read-only worked-example test. `test:db` continues to
+  target the configured read-only environment only when explicitly requested.
 - `test:db` targets whatever `DATABASE_URL` points at. Point it at a read
   replica or a disposable copy when one exists; the read-only guard makes a
   production target safe for reads regardless.

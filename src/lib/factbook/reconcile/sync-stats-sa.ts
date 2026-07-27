@@ -95,18 +95,31 @@ import Anthropic from "@anthropic-ai/sdk";
 import { PDFDocument } from "pdf-lib";
 
 import {
-  countryFacts,
   factSnapshots,
   jurisdictions,
   sources,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
+import {
+  assertModelOperationRequest,
+  modelOperationVersion,
+} from "@/lib/model-operations/contract";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  type CivicaSourceRole,
+} from "./_sync-common";
 import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
 
 type Db = typeof import("@/lib/db").db;
@@ -183,6 +196,11 @@ const STATS_SA_SCOPE_PREDICATE = "South Africa";
  */
 const STATS_SA_EXTRACTION_MODEL = "claude-haiku-4-5-20251001";
 const STATS_SA_EXTRACTION_PROMPT_VERSION = "v1.0";
+const STATS_SA_EXTRACTION_MODEL_VERSION = modelOperationVersion(
+  "stats-sa-reconciliation",
+  "anthropic",
+  STATS_SA_EXTRACTION_MODEL,
+);
 
 /**
  * Lazy-init the Anthropic client per the project convention.
@@ -192,7 +210,10 @@ const STATS_SA_EXTRACTION_PROMPT_VERSION = "v1.0";
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_RECONCILIATION });
+    _anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY_RECONCILIATION,
+      maxRetries: 0,
+    });
   }
   return _anthropic;
 }
@@ -248,10 +269,10 @@ export interface StatsSaIndicatorConfig {
    *  long appendices well past that limit (P0211 QLFS Q4 2025 ships
    *  139 pages; Table A is on page 1). Setting `maxPages` causes
    *  the orchestrator to use `pdf-lib` to extract just the first N
-   *  pages before encoding for the SDK. Defaults to 30 — enough
-   *  for the headline tables in all 4 R.19 PDFs (verified against
-   *  the 2026Q2 vintage; Table A / Key findings / Summary always
-   *  appear within the first ~10 pages). */
+ *  pages before encoding for the SDK. Defaults to 12 — enough
+ *  for the headline tables in all 4 R.19 PDFs (verified against
+ *  the 2026Q2 vintage; Table A / Key findings / Summary always
+ *  appear within the first ~10 pages). */
   maxPages?: number;
 }
 
@@ -450,6 +471,8 @@ export interface StatsSaSyncOptions {
   extractPdf?: typeof extractFromPdf;
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface StatsSaJurisdiction {
@@ -841,6 +864,11 @@ async function extractFromPdf(
 
   let response: Anthropic.Message;
   try {
+    assertModelOperationRequest(
+      "stats-sa-reconciliation",
+      pdf.base64.length + prompt.length,
+      1024,
+    );
     response = await client.messages.create({
       model: STATS_SA_EXTRACTION_MODEL,
       max_tokens: 1024,
@@ -867,12 +895,8 @@ async function extractFromPdf(
         },
       ],
     });
-  } catch (err) {
-    log(
-      `  EXTRACTION FAILURE: Anthropic SDK call threw — ${
-        err instanceof Error ? err.message : err
-      }`,
-    );
+  } catch {
+    log("  EXTRACTION FAILURE: model request unavailable or over budget.");
     return null;
   }
 
@@ -1108,6 +1132,10 @@ export async function syncStatsSa(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const atlasReleaseId = options.dryRun
+    ? null
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   const targets = STATS_SA_INDICATORS.filter((c) => {
     if (options.factKey && c.factKey !== options.factKey) return false;
@@ -1230,7 +1258,7 @@ export async function syncStatsSa(
     //    for the Anthropic SDK 100-page cap).
     const candidates = enumerateCandidateUrls(config, now);
     log(`  candidate URLs (${candidates.length}): trying newest first.`);
-    const maxPages = config.maxPages ?? 30;
+    const maxPages = config.maxPages ?? 12;
     const pdf = await (options.fetchPdf ?? fetchLatestPdf)(candidates, maxPages, log);
     if (!pdf) {
       counter.rejected_no_pdf++;
@@ -1376,6 +1404,7 @@ export async function syncStatsSa(
       statsSaPdfTruncated: pdf.truncated,
       statsSaExtractionPromptVersion: STATS_SA_EXTRACTION_PROMPT_VERSION,
       statsSaExtractionModel: STATS_SA_EXTRACTION_MODEL,
+      statsSaExtractionModelVersion: STATS_SA_EXTRACTION_MODEL_VERSION,
       statsSaVintage: STATS_SA_VINTAGE,
     };
     // Mark the GDP methodology choice explicitly per resolution §2c.
@@ -1408,6 +1437,7 @@ export async function syncStatsSa(
         statsSaRawQuote: ext.rawQuote,
         statsSaExtractionPromptVersion: STATS_SA_EXTRACTION_PROMPT_VERSION,
         statsSaExtractionModel: STATS_SA_EXTRACTION_MODEL,
+        statsSaExtractionModelVersion: STATS_SA_EXTRACTION_MODEL_VERSION,
       },
     ];
     if (config.pCode === "P0441") {
@@ -1450,69 +1480,35 @@ export async function syncStatsSa(
         .limit(1);
       const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-      await db
-        .insert(countryFacts)
-        .values({
-          jurisdictionId: jurisdiction.id,
-          factKey: config.factKey,
-          factGroup: factKeyDef.group,
-          category: factKeyDef.category,
-          sourceId: STATS_SA_SOURCE_ID,
-          sourceUrl: pdf.url,
-          references: referencesPayload,
-          sourceHash: hash,
-          factValue: String(numericValue),
-          factValueNumeric: numericValue,
-          factUnit: factKeyDef.unit ?? null,
-          factYear,
-          valueJson: null,
-          asOf,
-          retrievedAt: new Date(),
-          upstreamVintageLabel: STATS_SA_VINTAGE,
-          methodologyVersion: "v0.1-beta",
-          status: "active",
-          statusReason: null,
-          snapshotId,
-          sourceNote: config.sourceNote ?? null,
-          valueType,
-          growthMethodology,
-        })
-        .onConflictDoUpdate({
-          target: [
-            countryFacts.jurisdictionId,
-            countryFacts.factKey,
-            countryFacts.sourceId,
-          ],
-          // F.5.1 invariant: do NOT add `status` or `statusReason` to
-          // this set clause. Reviewer-demoted rows must survive a
-          // re-sync so the resolver continues to honour the human
-          // decision.
-          //
-          // Bug 1 — `valueType` IS included in the set clause so
-          // per-row tag updates land on subsequent syncs (e.g. a year
-          // that was projected in 2026 becomes measured when 2027
-          // rolls over).
-          //
-          // `sourceNote` IS included so future R.19 updates that
-          // refine methodology notes land cleanly.
-          set: {
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            asOf,
-            sourceUrl: pdf.url,
-            references: referencesPayload,
-            sourceHash: hash,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: STATS_SA_VINTAGE,
-            snapshotId,
-            sourceNote: config.sourceNote ?? null,
-            valueType,
-            growthMethodology,
-            updatedAt: new Date(),
-          },
-        });
+      const values = {
+        jurisdictionId: jurisdiction.id,
+        factKey: config.factKey,
+        factGroup: factKeyDef.group,
+        category: factKeyDef.category,
+        sourceId: STATS_SA_SOURCE_ID,
+        sourceUrl: pdf.url,
+        references: referencesPayload,
+        sourceHash: hash,
+        factValue: String(numericValue),
+        factValueNumeric: numericValue,
+        factUnit: factKeyDef.unit ?? null,
+        factYear,
+        valueJson: null,
+        asOf,
+        retrievedAt: new Date(),
+        upstreamVintageLabel: STATS_SA_VINTAGE,
+        methodologyVersion: "v0.1-beta",
+        status: "active",
+        statusReason: null,
+        snapshotId,
+        sourceNote: config.sourceNote ?? null,
+        valueType,
+        growthMethodology,
+      };
+      await writeFact(db, {
+        values,
+        history: routineCountryFactHistory(values, atlasReleaseId!),
+      });
       counter.written++;
       totalWritten++;
       touchedPairs.add(`${jurisdiction.id}|${config.factKey}`);
@@ -1540,12 +1536,6 @@ export async function syncStatsSa(
           : ""),
     );
   }
-
-  await (options.markSynced ?? markSourcesSynced)(STATS_SA_SOURCE_ID, {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -1576,6 +1566,15 @@ export async function syncStatsSa(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: STATS_SA_SOURCE_ID,
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerStatsSaCounters> = {};
@@ -1609,6 +1608,7 @@ export const __test = {
   deriveAsOf,
   STATS_SA_EXTRACTION_PROMPT_VERSION,
   STATS_SA_EXTRACTION_MODEL,
+  STATS_SA_EXTRACTION_MODEL_VERSION,
   STATS_SA_LICENSE,
   STATS_SA_LICENSE_CITATION,
 };

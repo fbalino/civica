@@ -41,6 +41,10 @@ import {
   publicDataValueStatus,
   type DataValueStatus,
 } from "@/lib/data/value-state";
+import {
+  storedPublisherDate,
+  type PublisherDate,
+} from "./publisher-date";
 
 /**
  * Phase F.4 / R.22 — public-API metadata block.
@@ -189,6 +193,9 @@ export interface ApiAlternate {
    *  display string. */
   value: number | string | null;
   asOf: string | null;
+  /** Honest upstream date granularity when the publisher supplied
+   *  year- or month-level Wikibase time precision. */
+  publisherDate: PublisherDate | null;
   vintageLabel: string | null;
   url: string | null;
   rejected?: true;
@@ -220,6 +227,9 @@ export interface ApiProvenanceEntry {
   source: string;
   sourceName: string;
   asOf: string | null;
+  /** Honest upstream date granularity when `asOf` cannot represent
+   *  a non-day-precision publisher date without inventing a day. */
+  publisherDate: PublisherDate | null;
   vintageLabel: string | null;
   decisionReason: DecisionReason;
   decisionTrace: DecisionTraceStep[];
@@ -312,6 +322,7 @@ export function buildApiProvenanceEntry(
         sourceName: sourceName(row.sourceId),
         value: alternateValue(row),
         asOf: row.asOf,
+        publisherDate: storedPublisherDate(row.valueJson),
         vintageLabel: row.upstreamVintageLabel,
         url: buildAlternateUrl(row),
         // Bug 1 — surface the per-row valueType so consumers can
@@ -332,6 +343,7 @@ export function buildApiProvenanceEntry(
     source: canonical.sourceId,
     sourceName: sourceName(canonical.sourceId),
     asOf: canonical.asOf,
+    publisherDate: storedPublisherDate(canonical.valueJson),
     vintageLabel: canonical.upstreamVintageLabel,
     decisionReason: output.decisionReason,
     decisionTrace: output.decisionTrace,
@@ -667,8 +679,8 @@ export async function getCanonicalFactsForJurisdictions(
 /**
  * Read the denormalised cache value off `jurisdictions` for fast
  * list paths that don't need provenance / alternates. Returns the
- * raw column value plus the cache timestamp (for SourceDot
- * freshness display).
+ * value only when its row timestamp passes the closed 24-hour
+ * freshness contract, plus the timestamp and decision state.
  *
  * **Use sparingly.** Provenance-bearing surfaces should use
  * `getCanonicalFact()` instead. This is for hot list queries
@@ -684,7 +696,7 @@ export async function getCanonicalFactsForJurisdictions(
  *   - Any SourceDot
  *   - Atlas masthead
  *   - Factbook header strip
- *   - `/api/v1/countries/*` (returns provenance)
+ *   - Provenance-bearing country detail fields
  *   - `/embed/[slug]` (citation-bearing)
  */
 export type CachedField =
@@ -696,30 +708,53 @@ export type CachedField =
   | "currency"
   | "democracyIndex";
 
+/** Closed freshness bound for the denormalised jurisdiction fact cache. */
+export const JURISDICTION_FACT_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1_000;
+
+export type JurisdictionFactCacheReadState =
+  | "fresh"
+  | "missing_timestamp"
+  | "invalid_timestamp"
+  | "future_timestamp"
+  | "stale_timestamp"
+  | "missing_value"
+  | "invalid_value";
+
+export interface JurisdictionFactCacheRead<T extends string | number> {
+  /** Null unless both the value and its cache timestamp pass the contract. */
+  value: T | null;
+  /** Retained for honest data-as-of presentation when the timestamp is valid. */
+  cacheRefreshedAt: Date | null;
+  state: JurisdictionFactCacheReadState;
+}
+
 export async function readCachedField(
   jurisdictionId: string,
-  field: CachedField
-): Promise<{
-  value: string | number | null;
-  cacheRefreshedAt: Date | null;
-}> {
+  field: CachedField,
+  options: { now?: Date } = {},
+): Promise<JurisdictionFactCacheRead<string | number>> {
   const result = await db
     .select({
       value: jurisdictions[field],
-      cacheRefreshedAt: jurisdictions.factCacheRefreshedAt,
+      factCacheRefreshedAt: jurisdictions.factCacheRefreshedAt,
     })
     .from(jurisdictions)
     .where(eq(jurisdictions.id, jurisdictionId))
     .limit(1);
 
   if (result.length === 0) {
-    return { value: null, cacheRefreshedAt: null };
+    return {
+      value: null,
+      cacheRefreshedAt: null,
+      state: "missing_timestamp",
+    };
   }
 
-  return {
-    value: result[0].value as string | number | null,
-    cacheRefreshedAt: result[0].cacheRefreshedAt,
-  };
+  return readFreshCachedValue(
+    result[0].value,
+    result[0].factCacheRefreshedAt,
+    options,
+  );
 }
 
 /**
@@ -746,10 +781,11 @@ export const cachedJurisdictionColumns = {
   languages: jurisdictions.languages,
   currency: jurisdictions.currency,
   democracyIndex: jurisdictions.democracyIndex,
+  factCacheRefreshedAt: jurisdictions.factCacheRefreshedAt,
 } as const;
 
 /**
- * Phase F.4 — fact-key-aware cached read against an already-loaded
+ * Phase F.4 — raw fact-key-aware cached read against an already-loaded
  * jurisdictions row.
  *
  * Use this overload from list-shaped surfaces that already SELECT
@@ -759,7 +795,9 @@ export const cachedJurisdictionColumns = {
  * (e.g. `population`) and returns the value directly. Synchronous,
  * zero DB hits.
  *
- * For surfaces that haven't loaded the row yet, use the async
+ * This legacy helper does not inspect `factCacheRefreshedAt`; new public
+ * surfaces must use `readFreshCachedFieldFromRow()` below. For surfaces that
+ * haven't loaded the row yet, use the async timestamp-aware
  * `readCachedField(jurisdictionId, field)` overload above.
  *
  * The fact-key → column mapping mirrors `COLUMN_TO_FACT_KEY` in
@@ -792,7 +830,112 @@ type CachedFieldHolder = {
   languages?: string | null;
   currency?: string | null;
   democracyIndex?: number | null;
+  factCacheRefreshedAt?: unknown;
 };
+
+type CachedFactValueByKey = {
+  capital: string;
+  population_total: number;
+  gdp_ppp_usd_billions: number;
+  area_total_km2: number;
+  official_languages: string;
+  currency_code: string;
+  vdem_row: number;
+};
+
+function readFreshCachedValue<T extends string | number>(
+  rawValue: unknown,
+  rawTimestamp: unknown,
+  options: { now?: Date } = {},
+): JurisdictionFactCacheRead<T> {
+  if (rawTimestamp == null) {
+    return {
+      value: null,
+      cacheRefreshedAt: null,
+      state: "missing_timestamp",
+    };
+  }
+  if (!(rawTimestamp instanceof Date)) {
+    return {
+      value: null,
+      cacheRefreshedAt: null,
+      state: "invalid_timestamp",
+    };
+  }
+
+  const cacheRefreshedAtMs = rawTimestamp.getTime();
+  if (!Number.isFinite(cacheRefreshedAtMs)) {
+    return {
+      value: null,
+      cacheRefreshedAt: null,
+      state: "invalid_timestamp",
+    };
+  }
+
+  const now = options.now ?? new Date();
+  const nowMs = now.getTime();
+  if (!Number.isFinite(nowMs)) {
+    throw new Error("jurisdiction cache read requires a valid current time");
+  }
+  if (cacheRefreshedAtMs > nowMs) {
+    return {
+      value: null,
+      cacheRefreshedAt: rawTimestamp,
+      state: "future_timestamp",
+    };
+  }
+  if (nowMs - cacheRefreshedAtMs > JURISDICTION_FACT_CACHE_MAX_AGE_MS) {
+    return {
+      value: null,
+      cacheRefreshedAt: rawTimestamp,
+      state: "stale_timestamp",
+    };
+  }
+  if (rawValue == null) {
+    return {
+      value: null,
+      cacheRefreshedAt: rawTimestamp,
+      state: "missing_value",
+    };
+  }
+  if (
+    (typeof rawValue !== "string" && typeof rawValue !== "number") ||
+    (typeof rawValue === "string" && rawValue.trim().length === 0) ||
+    (typeof rawValue === "number" && !Number.isFinite(rawValue))
+  ) {
+    return {
+      value: null,
+      cacheRefreshedAt: rawTimestamp,
+      state: "invalid_value",
+    };
+  }
+
+  return {
+    value: rawValue as T,
+    cacheRefreshedAt: rawTimestamp,
+    state: "fresh",
+  };
+}
+
+/**
+ * Read one already-selected jurisdiction cache field through the mandatory
+ * timestamp bound. Missing, malformed, future-dated, or older-than-24-hour
+ * timestamps fail closed to a null value rather than relabeling stale data as
+ * current. Capture and pass one `now` value when reading several rows so the
+ * entire response shares an identical freshness boundary.
+ */
+export function readFreshCachedFieldFromRow<K extends FactKeyForCache>(
+  row: CachedFieldHolder,
+  factKey: K,
+  options: { now?: Date } = {},
+): JurisdictionFactCacheRead<CachedFactValueByKey[K]> {
+  const column = FACT_KEY_TO_COLUMN[factKey];
+  return readFreshCachedValue<CachedFactValueByKey[K]>(
+    row[column],
+    row.factCacheRefreshedAt,
+    options,
+  );
+}
 
 export function readCachedFieldFromRow<R extends CachedFieldHolder>(
   row: R,

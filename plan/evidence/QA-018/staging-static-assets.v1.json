@@ -1,0 +1,3718 @@
+{
+  "schemaVersion": "civica-staging-static-assets/v1",
+  "rootKind": "vercel-build-output-static",
+  "fileCount": 742,
+  "totalBytes": 245543382,
+  "files": [
+    {
+      "path": ".well-known/security.txt",
+      "bytes": 305,
+      "sha256": "992a0348e43b89ae582e5571cb8081967d15d07ec1868e8f1dad4124cb170e03"
+    },
+    {
+      "path": "500.html",
+      "bytes": 9690,
+      "sha256": "1ff4760f630aaf33b7a527610377e2d115f7e5756edf68af9c0cc365e1b804b2"
+    },
+    {
+      "path": "500.rsc.json",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "path": "500.segments/_tree.segment.rsc.json",
+      "bytes": 2,
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "path": "9a62319232d87013d1330c6cab03bb23.txt",
+      "bytes": 32,
+      "sha256": "b91d0c088bb200764bad123c7a7c51f34bd28ed9cc95e51506455cd3933b684c"
+    },
+    {
+      "path": "_next/__private/trace",
+      "bytes": 68460,
+      "sha256": "5d353486f9524a46133e2e3bb07ab8c647fe8c94ae85f5f982d30eb96185256d"
+    },
+    {
+      "path": "_next/static/chunks/0-28slsa7et0m.css",
+      "bytes": 2775,
+      "sha256": "33df2067ea1311f9acfb1b96f499971d25806669f65909b9f084f4d63cebdf80"
+    },
+    {
+      "path": "_next/static/chunks/00t8aeqj6i-l2.js",
+      "bytes": 15187,
+      "sha256": "b23ad33ed341ef87cb8ef4e83fc9341423c7cf6d58b8a6d24346d56023458020"
+    },
+    {
+      "path": "_next/static/chunks/03fmljl90v_dt.js",
+      "bytes": 24910,
+      "sha256": "c7bd1dd82af0bde0a89dfae1ffa73aadc1de5903bddcc0452da3f0f55d094ec7"
+    },
+    {
+      "path": "_next/static/chunks/06-erwtrz5fhd.js",
+      "bytes": 25174,
+      "sha256": "d4c015e6d263286d7310a722e7b1ee7ad73d1ad873dcfe8f3b7b2f3f82a3fb73"
+    },
+    {
+      "path": "_next/static/chunks/06x8vguih0ij6.js",
+      "bytes": 40547,
+      "sha256": "5fd9c4d8e923e3a010b36d013c618f9ea7ab928cd8fe4d74d62051d56b113395"
+    },
+    {
+      "path": "_next/static/chunks/07gvkvkwerlg7.js",
+      "bytes": 139900,
+      "sha256": "17caa6e6b244613b7b945bccc55d4f0f173cae763ed780ee4a895cec4e1910f1"
+    },
+    {
+      "path": "_next/static/chunks/09zdyiumtz2lj.js",
+      "bytes": 233018,
+      "sha256": "635bdf52f7fca9c2d5cfc895e39b24c945d07f80c11d051b9bfb0f74bf89388d"
+    },
+    {
+      "path": "_next/static/chunks/0afhfhmzwljg-.css",
+      "bytes": 5879,
+      "sha256": "3fbfe8030531a404e46ecb699d965ef432685b405ece50ce409b1c3b8a12efdc"
+    },
+    {
+      "path": "_next/static/chunks/0ch-5u66zhedx.css",
+      "bytes": 4857,
+      "sha256": "30eab8615c65c3806a730d8e3a5186482ece50b05c933d431654f6284e85ee6d"
+    },
+    {
+      "path": "_next/static/chunks/0cz1d0mv5g_q7.js",
+      "bytes": 112594,
+      "sha256": "0973c1d64c88adc8e3c950410cb58b288f72118d5965b78049438deb8f2f9683"
+    },
+    {
+      "path": "_next/static/chunks/0du0_xl-jzb2m.js",
+      "bytes": 19285,
+      "sha256": "3f7be9087602fd1ef115b622ae1b13f1f6750133eff6f72eb61b4e0ae97dde08"
+    },
+    {
+      "path": "_next/static/chunks/0guiylsbwar5e.css",
+      "bytes": 4155,
+      "sha256": "3684a82ecab4eb125351127d976627ce043ca5e4d85dc41274a929788a864062"
+    },
+    {
+      "path": "_next/static/chunks/0h0_x1y4fi4lu.css",
+      "bytes": 4753,
+      "sha256": "309aad7b1b9d755a6f060f37f8e2eeced81227009da43066d1aacbe3a07c578e"
+    },
+    {
+      "path": "_next/static/chunks/0i3o04lzxgooh.js",
+      "bytes": 24619,
+      "sha256": "5c30e3117b0153346f1d050656ef10ccaf529ad9367e1f7d8dabf0368d44df78"
+    },
+    {
+      "path": "_next/static/chunks/0uerxr4jbhsrk.css",
+      "bytes": 23083,
+      "sha256": "22e0e50c6a13c17da93a5179f9da77283c4818420b491c3d3a26cbb5ad9b34e7"
+    },
+    {
+      "path": "_next/static/chunks/0z_e4gtdrr65u.js",
+      "bytes": 3433,
+      "sha256": "c24723becf2601cee13256cb1d425322fe085b51454fe3e51bd790fe85c10ffb"
+    },
+    {
+      "path": "_next/static/chunks/1-9mvjxupvqpn.js",
+      "bytes": 13404,
+      "sha256": "fb5b8ec14af9fb2f157b82fd5f39c5fe57cf76463d0bd880ac46af8495091ee9"
+    },
+    {
+      "path": "_next/static/chunks/1-kwoetr9hngg.js",
+      "bytes": 2892,
+      "sha256": "ef10dc4ea9c200278b4cedb7070c67e1fdbef321562f4dd105d6671f5fe660a6"
+    },
+    {
+      "path": "_next/static/chunks/10bt9ukal53wl.js",
+      "bytes": 16323,
+      "sha256": "3c112129d785067b6ba2200ccc4ed134a59908e6e41fa071e0190c860e6897ec"
+    },
+    {
+      "path": "_next/static/chunks/10g1-6shitonm.js",
+      "bytes": 29686,
+      "sha256": "f5a106a4de23108a6284de0ce75ad50577e96ddd61d045897184d238a651b12d"
+    },
+    {
+      "path": "_next/static/chunks/11zt6m2_34mta.js",
+      "bytes": 22592,
+      "sha256": "45f212bb6dbaea6fafe5eb37a251af2b86bfcadf8a05724ac8de896142e34b77"
+    },
+    {
+      "path": "_next/static/chunks/14au0uvmijlq-.js",
+      "bytes": 40811,
+      "sha256": "6f88d708f3e2511f82aa20a7af6b0446675132754dad9d2ad54945692a44e0a6"
+    },
+    {
+      "path": "_next/static/chunks/15pgwgitx4kjl.js",
+      "bytes": 25622,
+      "sha256": "a9e2176c8b94f888d13ad8ed8197433a73755598d3a1863d68e6cc2ae30df0f4"
+    },
+    {
+      "path": "_next/static/chunks/168s3lnwlg163.js",
+      "bytes": 8961,
+      "sha256": "44cca5af186456949981a720edc71f3bc065ceb5ce6acac680cb282e49f13c9a"
+    },
+    {
+      "path": "_next/static/chunks/18kte2lkmahnl.js",
+      "bytes": 34984,
+      "sha256": "4d557d5181aad5e0a4e1257203ee248742bdad16b11748e70e755a1accbd3786"
+    },
+    {
+      "path": "_next/static/chunks/1_j0vd_e0gr6p.css",
+      "bytes": 111473,
+      "sha256": "ef08a1ec59b15d148a614e2590c74ae473917d86421a494aca7e7527ad787aeb"
+    },
+    {
+      "path": "_next/static/chunks/1ac08dtbr1mjp.js",
+      "bytes": 13781,
+      "sha256": "f9fbaf8199776e18ff6c810ebcf8584b25c45d86aea93bef1a47aa09856af662"
+    },
+    {
+      "path": "_next/static/chunks/1ampex9aw5jal.js",
+      "bytes": 10487,
+      "sha256": "fb15929d36c31edc0eeb29939f49718926e492207f1058edd7b21212cf7573c4"
+    },
+    {
+      "path": "_next/static/chunks/1dz-r0yq7ez0e.css",
+      "bytes": 107153,
+      "sha256": "8b6a0290af5158d348b9dcb3d19efd40221939f0e0a14cdae6891e176393cb97"
+    },
+    {
+      "path": "_next/static/chunks/1ibplvtjvnups.js",
+      "bytes": 121264,
+      "sha256": "3c24ffe9ab27423c003ab5de35c60c5978330c1ae9e99abdcbbbc67bd1e17143"
+    },
+    {
+      "path": "_next/static/chunks/1jgj-68fwufet.js",
+      "bytes": 9127,
+      "sha256": "cf063258625a9fda1c3b044d0b1778e9aac66bae87cea2b98bac85dcbd6fa32a"
+    },
+    {
+      "path": "_next/static/chunks/1l1nflfkzkclb.js",
+      "bytes": 438270,
+      "sha256": "c5cef0f9fd7e5ac705627c4026d41c645db34b91430390844e8eae5915d14bc3"
+    },
+    {
+      "path": "_next/static/chunks/1oq6kw1o1tc4y.js",
+      "bytes": 6949,
+      "sha256": "d507347be398674fe6336698a0d06d8d704564c9759e5098bea712592a09be57"
+    },
+    {
+      "path": "_next/static/chunks/1q9exjmtk7x_v.css",
+      "bytes": 110612,
+      "sha256": "738776b11e4e3f89697a2335b633d693a4c780e1afd8cdccfd788991911d2da5"
+    },
+    {
+      "path": "_next/static/chunks/1qrmost8mbk92.js",
+      "bytes": 56309,
+      "sha256": "1e61369ca9ef721a18aa6d707f83af4cd6419a963289a6c17abfc57a79d928eb"
+    },
+    {
+      "path": "_next/static/chunks/1r6m4omzkx5se.js",
+      "bytes": 2956,
+      "sha256": "29e1718cb7649113ca4dd95bee3672fdbf6551db192f457ff3803959497b25a7"
+    },
+    {
+      "path": "_next/static/chunks/1rfygsgjj4o8r.js",
+      "bytes": 10182,
+      "sha256": "ed76303386e81e44f2c71e16728884a65b8eb591a13a5c2d4915804bde0eff46"
+    },
+    {
+      "path": "_next/static/chunks/1rrwix5tkr0mv.js",
+      "bytes": 13021,
+      "sha256": "561668bb1f78c3e20e090120583a4c02a6a9b392ce06b89a9c450c9508cf3947"
+    },
+    {
+      "path": "_next/static/chunks/1vfvp2vfsoc_7.js",
+      "bytes": 39645,
+      "sha256": "6578889b3e728e8edf6f5912fc3f3b9cbc7e7040b734401b95fe59c88a74bd2f"
+    },
+    {
+      "path": "_next/static/chunks/1xjksmun4tujs.css",
+      "bytes": 2816,
+      "sha256": "60a18be0a6b5a16040e14d8c4fe69a74cb5b0dba5c38ef3d127b459479dee906"
+    },
+    {
+      "path": "_next/static/chunks/1z5ch85fwi4bl.js",
+      "bytes": 2930,
+      "sha256": "4bc088199e10a511eee97741df724665a061a231fc68d608db72bd59d622cc7e"
+    },
+    {
+      "path": "_next/static/chunks/2-k24l6tmb259.css",
+      "bytes": 113029,
+      "sha256": "4dfe06ed9d429ae6787e8532ec4e6c7fd39647398797f491131210c651174f09"
+    },
+    {
+      "path": "_next/static/chunks/2-mdn01cpqed6.css",
+      "bytes": 9358,
+      "sha256": "2ae7d8c37e20359bab9459795facb6c9935dc9da51dd82513ca7b597c1bb2ca0"
+    },
+    {
+      "path": "_next/static/chunks/21_q-xopno8p5.js",
+      "bytes": 11903,
+      "sha256": "86e374ca64068b92fcc572ad7d74bd8916e8aed1519aee3020d38dbd997d1284"
+    },
+    {
+      "path": "_next/static/chunks/21odix0ugfkfa.js",
+      "bytes": 30117,
+      "sha256": "e75c64865159b84c1e687e35c30bf0baf660bafabe7f25793db3e6b5d03353e3"
+    },
+    {
+      "path": "_next/static/chunks/220u_az69hb50.js",
+      "bytes": 8393,
+      "sha256": "4b78bb612c0a6079dbbd926e43802a005dc447fa9c8ba649d3662e384f08028b"
+    },
+    {
+      "path": "_next/static/chunks/24du8e0d9m61l.js",
+      "bytes": 1679,
+      "sha256": "80fb8abf166fe3f47c6802c1dd842ff1f2eee0051a9f01c042c25a25f376145e"
+    },
+    {
+      "path": "_next/static/chunks/24j_572mmx625.js",
+      "bytes": 145049,
+      "sha256": "fc49faa2d841db17c8dab7b41fa134fb03363a97854f1c346ddeea76358ffa9c"
+    },
+    {
+      "path": "_next/static/chunks/24q1l_5x3bxi2.js",
+      "bytes": 38523,
+      "sha256": "24823fcf2236a0c3d8a876f3ae71e9def93efcee7c80d1fbfd303b49e6bfe680"
+    },
+    {
+      "path": "_next/static/chunks/259oqiniy_xa0.css",
+      "bytes": 5212,
+      "sha256": "835458b0f9062f8e921f1a0113572f00abc230cc081f92783c72214a36977a18"
+    },
+    {
+      "path": "_next/static/chunks/26mz623glx4hh.js",
+      "bytes": 41922,
+      "sha256": "85efd91ba5dc7c78f31b9e17ebb566a213616b7589f8ad9d41c5d24633bfd343"
+    },
+    {
+      "path": "_next/static/chunks/279hrkvui_gy0.js",
+      "bytes": 7530,
+      "sha256": "d012f0ef12245d4c133ae6925eac4fe29158ea85af435cc02a547283bed6657f"
+    },
+    {
+      "path": "_next/static/chunks/292qwi_leiusd.js",
+      "bytes": 40702,
+      "sha256": "33ac6daff43b069095fe3560012b14c2741036c17bbb6607d85ea7e8f4ab39d8"
+    },
+    {
+      "path": "_next/static/chunks/29sq53h7yavsf.css",
+      "bytes": 27225,
+      "sha256": "2b7efd176539574ca0e8eeba73e3cd4af20b23e49d292440dd8d600a3debec61"
+    },
+    {
+      "path": "_next/static/chunks/2bu2tp_rkkoiz.js",
+      "bytes": 33123,
+      "sha256": "2e139e73aea476500b54b0daf6f810b160da736efcb1d1bd333754dedf897e1e"
+    },
+    {
+      "path": "_next/static/chunks/2c7ag_77lcjv0.js",
+      "bytes": 2213,
+      "sha256": "93eda4bfbe93eb65e01289bb4f3331e7343d0d5d438b32f8fb7fde5f70278657"
+    },
+    {
+      "path": "_next/static/chunks/2d_0fhn52o8nl.js",
+      "bytes": 330751,
+      "sha256": "13304a81bb162db970e72a0e1e8fff1a1607e5890ae35770e6f9df5fc0dd8058"
+    },
+    {
+      "path": "_next/static/chunks/2f-mq4a38zzus.js",
+      "bytes": 140171,
+      "sha256": "e27cd8f1921393baf24191f82711f023712b9febbb504b4579440e1c9aa71e0e"
+    },
+    {
+      "path": "_next/static/chunks/2q96t6k84u_2_.js",
+      "bytes": 12796,
+      "sha256": "a7c677c53dffa3a13ab5b217c60f334003a8f013adc87f2f02ea05bf061b382b"
+    },
+    {
+      "path": "_next/static/chunks/2ry3lhkcmz7fu.js",
+      "bytes": 19386,
+      "sha256": "4f2534856802662a0e8a55ece3ec7989e31600f03d857bbce36fb5ad3e261273"
+    },
+    {
+      "path": "_next/static/chunks/2tndm_24835s6.js",
+      "bytes": 1032462,
+      "sha256": "1461b87e9c4f973681228e1e3219d2e7585e26df76078e780f9484ff06976f6d"
+    },
+    {
+      "path": "_next/static/chunks/2uityfwk90io1.css",
+      "bytes": 12776,
+      "sha256": "6a865aff8bdbeb267b08117f50436492baab8853b38e154045106505197305c1"
+    },
+    {
+      "path": "_next/static/chunks/2v8y_f8w703xt.css",
+      "bytes": 69723,
+      "sha256": "dcc7bc28909366d3727f532fd71a188b93743762ec3b62a73068e6057cc9d71d"
+    },
+    {
+      "path": "_next/static/chunks/2vt99xssdyuj_.js",
+      "bytes": 58920,
+      "sha256": "4d6cd3486dfed2a9a52413fe5f3b0a0bd7980030e39866934c8734ce66494537"
+    },
+    {
+      "path": "_next/static/chunks/2ytdjs3wk4zj_.js",
+      "bytes": 47556,
+      "sha256": "e4385821f8ba80e2dd6e96b90d64b6e4bbc858f8ed53cd10e14ac1368c8b49c6"
+    },
+    {
+      "path": "_next/static/chunks/351txiag02-8a.js",
+      "bytes": 4016,
+      "sha256": "ed7c2725b06807374705aa46aadd45b5712dab52960a4d2b568a8b249940b915"
+    },
+    {
+      "path": "_next/static/chunks/3dyu1sny0ljvp.js",
+      "bytes": 2871,
+      "sha256": "f580ac6abe20a1c779f31db6431b2608217d6113fcbd11d53ebbf69c8d7ed915"
+    },
+    {
+      "path": "_next/static/chunks/3grgzvyt7vx__.js",
+      "bytes": 39273,
+      "sha256": "1cf097287958284de5d62b66ca404afe5f9769e0725a7f515a9f242732ff666c"
+    },
+    {
+      "path": "_next/static/chunks/3hj-245xhn-ct.js",
+      "bytes": 45936,
+      "sha256": "fcb31292e154073d0afb34acff5c0e225ac5b98cf55c82399eeaa4dbd729d078"
+    },
+    {
+      "path": "_next/static/chunks/3ksg-b7-jrfng.js",
+      "bytes": 1800077,
+      "sha256": "ca2b2777cbc24385c0db1b472bd2cdbfb0f7ff5bdf5b8a7674c7b84283761601"
+    },
+    {
+      "path": "_next/static/chunks/3my0ljh82-264.js",
+      "bytes": 9194,
+      "sha256": "1f41e553fd1306e0633922487ab1d2da9816d919bf17c75466828f10e2c94846"
+    },
+    {
+      "path": "_next/static/chunks/3nsx1qzeu6dm6.js",
+      "bytes": 8134,
+      "sha256": "c31cf0dff5699ac6f29baa29329757fbfbd9d88b73384b6692b255bae6fc0b34"
+    },
+    {
+      "path": "_next/static/chunks/3o2cm_sd-i9hf.js",
+      "bytes": 11616,
+      "sha256": "18df51cc79951915ffe58bd97a412c3f818c4e70f47be3e4979d0ffa396adcb6"
+    },
+    {
+      "path": "_next/static/chunks/3o4zkl71g-y0a.js",
+      "bytes": 32841,
+      "sha256": "756edfa21219837f9fcc6108bfe37dda8c9bf4e437ee35d2df8d59b33fc7dabb"
+    },
+    {
+      "path": "_next/static/chunks/3qy4r09qnc8q_.js",
+      "bytes": 7375,
+      "sha256": "f860c09672e918375221d598769cda2a603dcb4fe7d2e5d430dc145d0ae222c8"
+    },
+    {
+      "path": "_next/static/chunks/3uvdmqk2tdg0k.js",
+      "bytes": 408770,
+      "sha256": "3dfb70ea9d7a13ed16ce2b148c4dfb2535dc24787510ff8a7583101805675429"
+    },
+    {
+      "path": "_next/static/chunks/3z3ucsl6lx1u4.js",
+      "bytes": 31146,
+      "sha256": "d4ed8bb1dd7fb70e873d9d2d179ff9a09ab25c8c0b75bf69e5931d1491107d2c"
+    },
+    {
+      "path": "_next/static/chunks/3z8nnzu0qmol7.js",
+      "bytes": 34521,
+      "sha256": "66f5aedf2054dcf16a9cc63ca60a007d592e21e23f39a276ad2297b6b3ff28a4"
+    },
+    {
+      "path": "_next/static/chunks/turbopack-20l87y60h55rv.js",
+      "bytes": 10949,
+      "sha256": "bfe8b4d895eb3439cc5e288de8e60a1607fa78bc57be6396a65033aeb3a8376e"
+    },
+    {
+      "path": "_next/static/mRFrvGkE7YEMB7js8bttS/_buildManifest.js",
+      "bytes": 219,
+      "sha256": "9476e0afd3f9da68a64e6ec58631191fd3eaca62c9f5a377e7517fe9a89e59ea"
+    },
+    {
+      "path": "_next/static/mRFrvGkE7YEMB7js8bttS/_clientMiddlewareManifest.js",
+      "bytes": 389,
+      "sha256": "15d9e4fa356ca732c2a2e8cb94fe0fa1da4359fa4e4c461b3751346c0576c981"
+    },
+    {
+      "path": "_next/static/mRFrvGkE7YEMB7js8bttS/_ssgManifest.js",
+      "bytes": 80,
+      "sha256": "678f6ce2cb80b1fe72fc67e7412be6e2ab6ada083111b64f7c40d35e3cba5e00"
+    },
+    {
+      "path": "_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2",
+      "bytes": 85272,
+      "sha256": "a28eb6d3ccb534ae0c94ca999371df024aab60b08c3c8a5720ee9e32fa0faaa2"
+    },
+    {
+      "path": "_next/static/media/20aee433927f7d4b-s.3x137p1ifayze.woff2",
+      "bytes": 18108,
+      "sha256": "a8b6177cdab70eb3a8f5263ee6f7e1a6ef5037779e08ee91981953327da76f5d"
+    },
+    {
+      "path": "_next/static/media/256e1f7f180674ba-s.1x971o6gwfy6w.woff2",
+      "bytes": 36500,
+      "sha256": "6a62d50272a315544c8604118cef69e66bbe09be6de1c9c7766371433e6907e0"
+    },
+    {
+      "path": "_next/static/media/292081311a6a8abc-s.1t-2a-g4m3ypx.woff2",
+      "bytes": 42056,
+      "sha256": "1ed39fb3055e4573ff8cdfb790a13b6a085fd288e3f81915907e3679b3c9391b"
+    },
+    {
+      "path": "_next/static/media/2bbe8d2671613f1f-s.0k62hbripvv8p.woff2",
+      "bytes": 10280,
+      "sha256": "8db00ff46c67b22cda8bed865acf7077651cac8d2841d5b40980556b48961931"
+    },
+    {
+      "path": "_next/static/media/2c55a0e60120577a-s.0-dom-5bn10r2.woff2",
+      "bytes": 25844,
+      "sha256": "fccca918fea40089dacadc7045861314d1a6bc91f1f323cc1eeb22ebcdb321b5"
+    },
+    {
+      "path": "_next/static/media/5476f68d60460930-s.2uwcyprjm3xu3.woff2",
+      "bytes": 19044,
+      "sha256": "46dd4cdca58c26ae87cc6927657bf83b2e8abfc39ffd0ab176e301a8d28d22bf"
+    },
+    {
+      "path": "_next/static/media/62492e45f348cf87-s.200fngwr9-1p7.woff2",
+      "bytes": 18348,
+      "sha256": "83f0572f943e8eddb4d7b3eb49e6390fde8000cfb95c47e19ff9bc27bbf5382a"
+    },
+    {
+      "path": "_next/static/media/68d403cf9f2c68c5-s.p.20at88_q9f_kt.woff2",
+      "bytes": 50924,
+      "sha256": "286e05e5e444f44e50724df445808458dea58507e9805bba012b3b12d08ca122"
+    },
+    {
+      "path": "_next/static/media/741805f5bd1ef272-s.104ommt447oe9.woff2",
+      "bytes": 44380,
+      "sha256": "6731b0496c98d042793679e405a58420908601905672b76db3646b1935ff98cd"
+    },
+    {
+      "path": "_next/static/media/753b6407f468151f-s.1veyi_qwtij86.woff2",
+      "bytes": 13440,
+      "sha256": "e7e85bbd5b5736a08db0f4e5fb9d54e3396da82bf43c57b5496c71444ebe7269"
+    },
+    {
+      "path": "_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2",
+      "bytes": 48432,
+      "sha256": "c940764593d0fe5d596be327ca7558855e018039fb78509aa21921fd3644c3e4"
+    },
+    {
+      "path": "_next/static/media/8f9704ed0c18c9e0-s.1takx9ikz9d70.woff2",
+      "bytes": 34896,
+      "sha256": "1253586d61b7f1329b0cf1777c01ee84eb4bc02eaa3d65f1c40cd0ab601cf025"
+    },
+    {
+      "path": "_next/static/media/9c72aa0f40e4eef8-s.1y4-pdgsjb-pw.woff2",
+      "bytes": 18744,
+      "sha256": "aebf2ab4a4ce6810d73c1ac7be7cafb4e5ec4cee2d6db5fb3e09691747ec4bd6"
+    },
+    {
+      "path": "_next/static/media/ad66f9afd8947f86-s.3lvt2whj97whp.woff2",
+      "bytes": 11272,
+      "sha256": "a2e2c783ca6f9c20486e81e72a279203e86730bbf8f01ff6a5ee9dbd09e1c271"
+    },
+    {
+      "path": "_next/static/media/be3bf58b83159894-s.1ri8jgkzoo1l-.woff2",
+      "bytes": 20084,
+      "sha256": "e54d56073d0ce917a445bc344cf272e1e6937be0ad416f5c0a24841511f74730"
+    },
+    {
+      "path": "_next/static/media/c73d4b34880585a8-s.2y9p18vgfwis7.woff2",
+      "bytes": 20508,
+      "sha256": "19d39833a158b8bec582c46146a1d08790b856a9ac519f53894f8e2dcc1bb2bb"
+    },
+    {
+      "path": "_next/static/media/ea3421846039b7f3-s.p.23jyvdx2mwxjn.woff2",
+      "bytes": 51532,
+      "sha256": "ad17ab41cc010420d6a8886d8b8b4a2fc58550c68fee51e54d59f1c7b255a4e4"
+    },
+    {
+      "path": "_next/static/media/f00b8cc54454926d-s.2c2xg2hj0hbwk.woff2",
+      "bytes": 13996,
+      "sha256": "d2d37c050f7397d4d3ba6d5206affe0eac2444bd952a7496713003d2643e968a"
+    },
+    {
+      "path": "_next/static/media/favicon.0xw73wdz0mu60.ico",
+      "bytes": 32038,
+      "sha256": "d95324bd52df1500f3d97651da64714cddf052635b1407ad6d007b63590bec06"
+    },
+    {
+      "path": "_next/static/not-found.txt",
+      "bytes": 9,
+      "sha256": "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+    },
+    {
+      "path": "blog/anatomy-of-a-modern-coup/cover.webp",
+      "bytes": 365342,
+      "sha256": "6faacb02caf84ac81b1abffe98f8a25c9d6f0e97ea509de2db429149d2a9957e"
+    },
+    {
+      "path": "blog/anatomy-of-a-modern-coup/the-guard-at-the-door-is-the-guard-who-opens-it.webp",
+      "bytes": 772470,
+      "sha256": "f5c413d82dec42f4cd9ff76ce4a77f8b4dc5edaf9d7153f376c374d12c70c9ab"
+    },
+    {
+      "path": "blog/anatomy-of-a-modern-coup/the-seat-of-power-between-one-occupant-and-the-next.webp",
+      "bytes": 492312,
+      "sha256": "93fe50941d74446b71feb13a880d43995ca52f32bd278db91ee32715cbf06812"
+    },
+    {
+      "path": "blog/anatomy-of-a-modern-coup/the-transition-clock-periodically-wound-back.webp",
+      "bytes": 760560,
+      "sha256": "379b43fd2e76770acd5fd8ccc43758ae54bbe336bc7baebfd855ec2f122002b8"
+    },
+    {
+      "path": "blog/backsliding-without-tanks/cover.webp",
+      "bytes": 306594,
+      "sha256": "f2935af0982290b0250348ad28fd7614bfca4d4485b09e2bab6a1a7b7ccd1c97"
+    },
+    {
+      "path": "blog/backsliding-without-tanks/hungary-cut-the-judicial-retirement-age-to-62-in-2012-clearing-roughly-one-in-ten-judges-at-a-stroke.webp",
+      "bytes": 675994,
+      "sha256": "5142a2b8474db5eb9d9be55c6abe349ecfea9ae3d4fabfa2f1107d881ef2b4c1"
+    },
+    {
+      "path": "blog/backsliding-without-tanks/hungarys-pro-government-outlets-were-folded-into-one-foundation-kesma-in-2018.webp",
+      "bytes": 660542,
+      "sha256": "754b6e1e94af23b81bfaf6face2a9b74cfbc73ef0f3fdb4a66b1ec2752302c7d"
+    },
+    {
+      "path": "blog/backsliding-without-tanks/polands-2023-winners-found-the-captured-courts-could-block-their-own-undoing.webp",
+      "bytes": 753818,
+      "sha256": "b6db7219856e5724fdcd2ea673552c39941a56bc28bab2769e044747851edb87"
+    },
+    {
+      "path": "blog/backsliding-without-tanks/the-machinery-of-justice-rebuilt-from-the-inside-while-court-is-in-session.webp",
+      "bytes": 586158,
+      "sha256": "79cf449cf8cd8d950be6ecce20729a75a54a179cf896a067232655a7e3f301b9"
+    },
+    {
+      "path": "blog/cia-world-factbook-replacement/cover.webp",
+      "bytes": 369490,
+      "sha256": "6c1f3667c20cad375dc735e5339266b225c5331a17f899ea95cf9094dccae5fd"
+    },
+    {
+      "path": "blog/governing-the-very-small/cover.webp",
+      "bytes": 323620,
+      "sha256": "ab0e4705fcdef53e56464dd9f05efd9ef8d6d6eb6a1c248feb8662458ad4b453"
+    },
+    {
+      "path": "blog/governing-the-very-small/five-states-none-larger-than-a-city-and-each-governed-by-very-different-rules.webp",
+      "bytes": 761588,
+      "sha256": "d0a63ad11128160c450f1ee87e8414d6e25fea0e0de9457b172252972f7ce4d4"
+    },
+    {
+      "path": "blog/governing-the-very-small/liechtensteins-25-seat-landtag-one-legislator-for-roughly-every-1-600-residents.webp",
+      "bytes": 711598,
+      "sha256": "443dee2cf2a2ede7beb0799b638ec6497675a84ad0f546335f81db38b4816b63"
+    },
+    {
+      "path": "blog/governing-the-very-small/naurus-interior-after-phosphate-mining-roughly-four-fifths-of-the-island-stripped-to-bare-rock.webp",
+      "bytes": 704200,
+      "sha256": "f3a851c66432e38a0ef8ce63e459801487a7ba2ac8ecf71418b2e8458760bca4"
+    },
+    {
+      "path": "blog/governing-the-very-small/tuvalus-highest-natural-point-is-about-four-metres-above-sea-level.webp",
+      "bytes": 768258,
+      "sha256": "ff9f3fa317bb80a626acd2f26991f0d69375dc62881deb1185b2dfdba3a752a1"
+    },
+    {
+      "path": "blog/how-democracies-measure-themselves/an-index-is-only-as-current-as-the-hands-still-maintaining-it.webp",
+      "bytes": 654806,
+      "sha256": "6a2fa0ae8c6550fd44696887db54a7d342f2411b13cfdbd6913e12132c06e37a"
+    },
+    {
+      "path": "blog/how-democracies-measure-themselves/cover.webp",
+      "bytes": 344068,
+      "sha256": "669294db37b26d324fb3fb6f2fe40ce6d753d6fbf8bfb38886159b123dd147b2"
+    },
+    {
+      "path": "blog/how-democracies-measure-themselves/four-scales-four-spans-0-100-0-10-0-1-and-10-to-10.webp",
+      "bytes": 696746,
+      "sha256": "07c88cd7075b49e2e033273c699174eca501b63f50ee9cfcdd6dca49b4dd49bd"
+    },
+    {
+      "path": "blog/how-democracies-measure-themselves/the-same-object-measured-four-ways-rarely-gives-the-same-number-twice.webp",
+      "bytes": 809314,
+      "sha256": "fdf54002d4a34fea0d4632d9632f1d2043c918251673da706eecf28d4b4bf193"
+    },
+    {
+      "path": "blog/how-democracies-measure-themselves/three-gauges-one-country-the-needles-rarely-line-up.webp",
+      "bytes": 764490,
+      "sha256": "eaef8af68234dded3c6b10d3cda5acb2213919edf8bc1d2c55bda3a96c2a087b"
+    },
+    {
+      "path": "blog/newest-governments-2020/cover.webp",
+      "bytes": 395542,
+      "sha256": "3692ace8ebc1e2258543fc81f83b2d23b0d19d3f6e1ca6ef4f0ea55954447408"
+    },
+    {
+      "path": "blog/presidential-vs-parliamentary/cover.webp",
+      "bytes": 391634,
+      "sha256": "fa40e1698c8db47f40e5bece388279107530a1e83ac0023d10c13630824bee7e"
+    },
+    {
+      "path": "blog/term-limits-and-the-men-who-broke-them/cover.webp",
+      "bytes": 381590,
+      "sha256": "bc38ee1f46c3bdf21aff0bd3ba513530f3524fbb77e8e972f3c057fff1a92ebd"
+    },
+    {
+      "path": "blog/term-limits-and-the-men-who-broke-them/more-than-thirty-leaders-since-2000-have-tried-to-outlast-their-own-deadlines-about-twenty-managed-it.webp",
+      "bytes": 775584,
+      "sha256": "ab6866092e14064a2e50567007be3e54ddbf330d885065614df46d0363b191b9"
+    },
+    {
+      "path": "blog/term-limits-and-the-men-who-broke-them/the-amendment-that-erases-one-clause-and-leaves-the-rest-intact.webp",
+      "bytes": 516550,
+      "sha256": "b441d2f03c608ad90f596125043b6993a08a2bb9a7171802721da3c13d2620b1"
+    },
+    {
+      "path": "blog/term-limits-and-the-men-who-broke-them/the-clock-that-would-not-run-out.webp",
+      "bytes": 597976,
+      "sha256": "1dc94bc5d48e10c1f2ccced3156c65f03bebe85925b374266accc901780acb93"
+    },
+    {
+      "path": "blog/term-limits-and-the-men-who-broke-them/zeroing-the-clock-the-terms-already-served-are-declared-not-to-count.webp",
+      "bytes": 602984,
+      "sha256": "90f73134a9c5328a13a60cdfdfa9d3790b43ed9daa267ca23fded9f342e239aa"
+    },
+    {
+      "path": "blog/the-quiet-power-of-the-second-chamber/a-second-chamber-at-rest-what-it-can-actually-do-varies-more-than-the-architecture-suggests.webp",
+      "bytes": 537938,
+      "sha256": "a2ba8543c31b15343d61f7910b3d89fcf1f7c977ccf0f21d0c7416af80e8f870"
+    },
+    {
+      "path": "blog/the-quiet-power-of-the-second-chamber/asymmetric-bicameralism-two-chambers-one-of-them-allowed-only-to-wait.webp",
+      "bytes": 527162,
+      "sha256": "2e0699b4bf008554946797aec52421178dea481e9405ff392e528246e4c6ebfb"
+    },
+    {
+      "path": "blog/the-quiet-power-of-the-second-chamber/cover.webp",
+      "bytes": 313614,
+      "sha256": "2e55719689ffe34af49709f02b1632b576463c695477eea3a4c20c21be26db8f"
+    },
+    {
+      "path": "blog/the-quiet-power-of-the-second-chamber/going-unicameral-new-zealand-1951-denmark-1953-and-sweden-1971-each-decided-one-chamber-was-enough.webp",
+      "bytes": 545592,
+      "sha256": "c50bcbe15c138b0f9d1c1b20872ac2b4c37b63c24208a1850bcf2a6dcbe8495d"
+    },
+    {
+      "path": "blog/the-quiet-power-of-the-second-chamber/the-bundesrat-seats-governments-not-legislators-sixteen-state-cabinets-voting-in-blocs.webp",
+      "bytes": 580038,
+      "sha256": "710d1f7ce65eb8c839e68f9a3d50d0253e36981b6290abb6f9f18366cc0e6dcf"
+    },
+    {
+      "path": "blog/the-quiet-power-of-the-second-chamber/three-upper-chambers-three-different-jobs-the-architecture-rarely-tells-you-which.webp",
+      "bytes": 525698,
+      "sha256": "6b9de88c9345607ca6930f79c917e2acb3bf399ef7faa1095dcf9eb39f36bdb8"
+    },
+    {
+      "path": "blog/the-worlds-last-absolute-monarchies/a-gallery-of-surviving-crowns-governing-and-ceremonial-alike.webp",
+      "bytes": 734262,
+      "sha256": "aaf39add8defa1abd9f65e4f12b3d96a67ea773644d67a33a86f35e3d0623859"
+    },
+    {
+      "path": "blog/the-worlds-last-absolute-monarchies/cover.webp",
+      "bytes": 318714,
+      "sha256": "900b5d916211c85ea036fc6a4a22007419d7767396f54bd13a195178be2baffb"
+    },
+    {
+      "path": "blog/the-worlds-last-absolute-monarchies/gulf-consultative-chambers-exist-most-cannot-make-law.webp",
+      "bytes": 694836,
+      "sha256": "d807c010965e6cda811c3481b770908882e71d1cd9aa2c215c7dbe7c0ee3b21b"
+    },
+    {
+      "path": "blog/the-worlds-last-absolute-monarchies/omans-2021-decree-fixed-succession-in-writing-a-first-for-the-sultanate.webp",
+      "bytes": 693690,
+      "sha256": "9d347ac40388f3e37bd963b66f428a8d5a4ccc6bba724a1b112ec99b44277315"
+    },
+    {
+      "path": "blog/the-worlds-last-absolute-monarchies/same-object-opposite-power-a-governing-crown-beside-a-ceremonial-one.webp",
+      "bytes": 758498,
+      "sha256": "ea39fad0e1f9642649517fe6aeefa7b364635e153b2bbd1b4ca11a7309e54839"
+    },
+    {
+      "path": "blog/understanding-government-types/cover.webp",
+      "bytes": 504466,
+      "sha256": "44f5f248e023d96655d2b6e3d7f5fd617fd1e584dfad4a8a5e7378cd855b4e88"
+    },
+    {
+      "path": "blog/welcome-to-civica/cover.webp",
+      "bytes": 438286,
+      "sha256": "a8cd877658a2e36bd947011c043d5e1eae09aebf9d70ae340c09650ac6460b6c"
+    },
+    {
+      "path": "blog/what-makes-a-constitution-last/a-document-that-bends-survives-the-storm-that-breaks-a-rigid-one.webp",
+      "bytes": 533752,
+      "sha256": "444aaea951dbcedcababe4aa656b83ec95efbe4a86d028f933873b4d4f6ba5e3"
+    },
+    {
+      "path": "blog/what-makes-a-constitution-last/cover.webp",
+      "bytes": 351744,
+      "sha256": "05cb8cabfb7aaa915fa00658dfc38cd9b24e19013083e8d32b84696c797bb47c"
+    },
+    {
+      "path": "blog/what-makes-a-constitution-last/documents-written-by-many-hands-outlive-those-written-by-few.webp",
+      "bytes": 576492,
+      "sha256": "d4465db8c5b448b414659cf463a783ad123d637b269b82c9425ab186f65e3cb8"
+    },
+    {
+      "path": "blog/what-makes-a-constitution-last/most-founding-documents-wear-out-faster-than-the-people-who-sign-them.webp",
+      "bytes": 644898,
+      "sha256": "ab964725355716f8263d9722004372ce92fd3eadbcd34f184d235ea7aa371e11"
+    },
+    {
+      "path": "blog/what-makes-a-constitution-last/one-countrys-single-volume-anothers-stack-of-thirty-nine.webp",
+      "bytes": 518752,
+      "sha256": "55159a3d2b6af86c1bcc8ac3376d7162ce5c262ca873062ce7e406c6e7dfe8f1"
+    },
+    {
+      "path": "blog/what-makes-a-constitution-last/too-thin-to-settle-a-dispute-or-too-thick-to-leave-anything-alone.webp",
+      "bytes": 528056,
+      "sha256": "82dac0e31750bdc01dee49566ab555deeae39ddc5848c1a3a17d0177b8abc47a"
+    },
+    {
+      "path": "blog/who-actually-runs-a-country/cohabitation-a-president-and-prime-minister-from-rival-camps-sharing-one-executive.webp",
+      "bytes": 607978,
+      "sha256": "d81897ba185d659be03821db5924f873807b3b12da0e00662232237cdd21e36a"
+    },
+    {
+      "path": "blog/who-actually-runs-a-country/cover.webp",
+      "bytes": 329842,
+      "sha256": "554ee34271135a7dd8ac5480d614d3007c59d4d4227be9ac91f27978daaf85c4"
+    },
+    {
+      "path": "blog/who-actually-runs-a-country/reigning-versus-ruling-the-head-of-state-above-the-head-of-government-at-the-table.webp",
+      "bytes": 641564,
+      "sha256": "df6b160cd49f41d2527cacef75d2a85f46980c18b866369b3b187212e17adafa"
+    },
+    {
+      "path": "blog/who-actually-runs-a-country/switzerlands-federal-council-seven-equals-one-rotating-chair-no-single-chief.webp",
+      "bytes": 609960,
+      "sha256": "866873a3b6c86ce19b1fed0a7e31b22ca123278503f149591546caeea7b12058"
+    },
+    {
+      "path": "blog/who-actually-runs-a-country/the-presidential-model-fuses-ceremony-and-administration-in-one-office.webp",
+      "bytes": 608910,
+      "sha256": "ac871a697f46181363cdf8a5a46d727d1b8aba765e57b5f3a7f91efa403dfd7d"
+    },
+    {
+      "path": "blog/who-actually-runs-a-country/two-seats-of-executive-authority-only-one-of-them-governs.webp",
+      "bytes": 697916,
+      "sha256": "e291cbbc0f522495e905fb3a3ff9fcd6a63eb25536e769bcca0c0f9f0808d8d1"
+    },
+    {
+      "path": "blog/why-the-voting-system-is-the-whole-game/cover.webp",
+      "bytes": 301890,
+      "sha256": "18e4130d3c29837dad969a6a9bb483a76c5688bc71f2a962a06ecf82ba037aa8"
+    },
+    {
+      "path": "blog/why-the-voting-system-is-the-whole-game/evenly-spread-support-wins-nothing-under-first-past-the-post-concentrated-support-wins-everything.webp",
+      "bytes": 777018,
+      "sha256": "53060538e67f0f9b0e5d8690c0fe07060bb34667d0511a7a9f1aeb90f3b29a88"
+    },
+    {
+      "path": "blog/why-the-voting-system-is-the-whole-game/the-machinery-between-a-vote-and-a-seat-is-where-most-of-the-politics-happens.webp",
+      "bytes": 744520,
+      "sha256": "1b48819c4d788efd9dd5ac3fa6cb68c33c16bbc07955816f1cffe733caeaefb0"
+    },
+    {
+      "path": "blog/why-the-voting-system-is-the-whole-game/two-votes-on-one-ballot-a-local-face-and-a-national-party-reconciled-into-one-parliament.webp",
+      "bytes": 723390,
+      "sha256": "9ad2f16f194be98616896542e69112120cc46a1f5566e0dfe7e81a5c806118b6"
+    },
+    {
+      "path": "blog/why-the-voting-system-is-the-whole-game/when-seats-mirror-votes-closely-no-one-rules-alone-governing-means-assembling-a-coalition.webp",
+      "bytes": 726116,
+      "sha256": "34ad85c5d56cfb8d83c6c17914326b3f073ceeff53ff5a128c7a66353c0f01eb"
+    },
+    {
+      "path": "civica-logo.svg",
+      "bytes": 228728,
+      "sha256": "005495087015aaa3fc356bea233c6fb75fd3c56316285c771b622ad031f0921a"
+    },
+    {
+      "path": "engravings/README.md",
+      "bytes": 2428,
+      "sha256": "0649ae6f9ef2ffa1902db79161e1e8ccad928bd098431919552ac4eae00b270b"
+    },
+    {
+      "path": "engravings/countries/afg-dark.webp",
+      "bytes": 257144,
+      "sha256": "a3caab8ccd3fbe24f97e85ccf10b6d81a774b7eda77a7ec2c48fad7372748ae6"
+    },
+    {
+      "path": "engravings/countries/afg.webp",
+      "bytes": 274540,
+      "sha256": "8d4a80f39bd6afc135f118c00440ac0e6e72478d09d81e9c904d71801b290c14"
+    },
+    {
+      "path": "engravings/countries/ago-dark.webp",
+      "bytes": 333828,
+      "sha256": "a9a6750411d28b79bcc38a2275a580f5d4584a54fcb01642e0b7b3d4086288ce"
+    },
+    {
+      "path": "engravings/countries/ago.webp",
+      "bytes": 337030,
+      "sha256": "267a8f0c385d24a71c1b6bb2563e73f35c6f1cb781a3968095bf09ace9efcc20"
+    },
+    {
+      "path": "engravings/countries/alb-dark.webp",
+      "bytes": 334580,
+      "sha256": "754b50bf88188c581b07dda0100d0c053f9f8bd91edd394cf6e54e0f49ca8388"
+    },
+    {
+      "path": "engravings/countries/alb.webp",
+      "bytes": 356864,
+      "sha256": "9120b77bebe3c36341ed174bef159be67e0a8e894cff02b02e7151c09fb4908a"
+    },
+    {
+      "path": "engravings/countries/and-dark.webp",
+      "bytes": 374292,
+      "sha256": "6bc1a926c9d9c8fd2116e35edc2b3a278248713beb739935f60116dafa918938"
+    },
+    {
+      "path": "engravings/countries/and.webp",
+      "bytes": 340840,
+      "sha256": "4b509921913b4b3abce854d4f1909ebfe82302d99042a522ac8df58a21d62c56"
+    },
+    {
+      "path": "engravings/countries/are-dark.webp",
+      "bytes": 400480,
+      "sha256": "2aa621a041e760239e9e4da817b7e70cc2887301d7af72d382af6fe7e3ddf986"
+    },
+    {
+      "path": "engravings/countries/are.webp",
+      "bytes": 349406,
+      "sha256": "1bbb7e14bec574ab18df982728f37c81f4b62c9c5622efec2ff137fd5195f735"
+    },
+    {
+      "path": "engravings/countries/arg-dark.webp",
+      "bytes": 431064,
+      "sha256": "e0016b50d6d0dc3730a975172060f4fe10e8252fe8ab1d9da2e0a9993fff7a6d"
+    },
+    {
+      "path": "engravings/countries/arg.webp",
+      "bytes": 410566,
+      "sha256": "02cd65e679dae9011dbb69def97c00b317b14b20b0576a728116f9037f0fc555"
+    },
+    {
+      "path": "engravings/countries/arm-dark.webp",
+      "bytes": 260020,
+      "sha256": "d67eb973e429f158e586adb4c0d01ef081b15596c1c831f1a55b59e64f9c5fb3"
+    },
+    {
+      "path": "engravings/countries/arm.webp",
+      "bytes": 325416,
+      "sha256": "7ddc6c400c0b52d1500d6dcae19171676d3f1ab211c827b1ff0bc86e9ca8e93c"
+    },
+    {
+      "path": "engravings/countries/atg-dark.webp",
+      "bytes": 325036,
+      "sha256": "a263a2bec4ffdafe010da632d76ae5b65d46ac7eda9fb06f9949aab555dcb7f4"
+    },
+    {
+      "path": "engravings/countries/atg.webp",
+      "bytes": 356522,
+      "sha256": "4e47d788ba7100e7563807541881f8b3b187cd4c2af2c82c535e6ac70fcbaa6f"
+    },
+    {
+      "path": "engravings/countries/aus-dark.webp",
+      "bytes": 362304,
+      "sha256": "1dbdd7f0056e87ffe6eee600dfec121c41e1b886c29719502a2aeb83333cbf4e"
+    },
+    {
+      "path": "engravings/countries/aus.webp",
+      "bytes": 314932,
+      "sha256": "6c0b291d1f8b3c8f84253571644594cb481773e9298eca07ea52742eff90b920"
+    },
+    {
+      "path": "engravings/countries/aut-dark.webp",
+      "bytes": 380050,
+      "sha256": "2b245606c6617565ef91d269b291da64d9f9bee4fd349bb72e8ac834a297ffee"
+    },
+    {
+      "path": "engravings/countries/aut.webp",
+      "bytes": 354514,
+      "sha256": "af14b5ca4190895ba954928a59a6487efdf0529f89bc00c1ff4faff744d51bc6"
+    },
+    {
+      "path": "engravings/countries/aze-dark.webp",
+      "bytes": 379626,
+      "sha256": "cec502e714ec813ba4f428737f3ad2ab15aa1d300c8f2a78b875623a7f63bb4c"
+    },
+    {
+      "path": "engravings/countries/aze.webp",
+      "bytes": 334598,
+      "sha256": "219391335dc2587131b63c9fb6901789a330696f33ef24b14da4f88e8ec4653a"
+    },
+    {
+      "path": "engravings/countries/bdi-dark.webp",
+      "bytes": 162446,
+      "sha256": "62b688dc362317e2eee8f7b8b3e9b3117214ccb32b8bc3d5a1465fb3ae8f1d8e"
+    },
+    {
+      "path": "engravings/countries/bdi.webp",
+      "bytes": 335852,
+      "sha256": "fac5bf8d88b128e4233558dbc533a006b6bb64d94a564bca179e405b909c08f6"
+    },
+    {
+      "path": "engravings/countries/bel-dark.webp",
+      "bytes": 225510,
+      "sha256": "f69f7fedc8d92b9cf51f7af322c8e3688359b9dd7c092f34b2de2098a60cea3d"
+    },
+    {
+      "path": "engravings/countries/bel.webp",
+      "bytes": 345810,
+      "sha256": "6fba800beff6eee948a9b0d3c8d7df112f1af7f315a6dd2c92086c04e3ce6220"
+    },
+    {
+      "path": "engravings/countries/ben-dark.webp",
+      "bytes": 218252,
+      "sha256": "b6b1ecc426e943914d68754d5aaf40f34582f5e69a3bff2917f7ceffbe4def17"
+    },
+    {
+      "path": "engravings/countries/ben.webp",
+      "bytes": 339284,
+      "sha256": "87e46aee65a0693e153b252d1f7ae7dbf48c894be4a664f8b765f95e4147c788"
+    },
+    {
+      "path": "engravings/countries/bfa-dark.webp",
+      "bytes": 231132,
+      "sha256": "b17779183afa63710820d2dfd3a9e94eeb36370111f16e0ff4714f99c14421df"
+    },
+    {
+      "path": "engravings/countries/bfa.webp",
+      "bytes": 374228,
+      "sha256": "73d2538d614640a991dd5e8483512c6728ab901539881583a4a3572a4f10cb2d"
+    },
+    {
+      "path": "engravings/countries/bgd-dark.webp",
+      "bytes": 333788,
+      "sha256": "a9760d0d9b4bb01a6d138dedd3188d2c7ec45e75622d0cf01f70a1ad12e16c73"
+    },
+    {
+      "path": "engravings/countries/bgd.webp",
+      "bytes": 339858,
+      "sha256": "9bcc31ed3d0cf79691ba4eab5ec0eab75ea13234d143d2a11ea925ad80a1235c"
+    },
+    {
+      "path": "engravings/countries/bgr-dark.webp",
+      "bytes": 317032,
+      "sha256": "cc8f122646317aff6557080c1f8765a75764642f8d21c1386fb7b2a384859406"
+    },
+    {
+      "path": "engravings/countries/bgr.webp",
+      "bytes": 327952,
+      "sha256": "c93a6d225be170594752cba8cde02083928ef7f47c24b1f553399609e7c8f9fc"
+    },
+    {
+      "path": "engravings/countries/bhr-dark.webp",
+      "bytes": 364602,
+      "sha256": "225a65ada1c4a550c8f4e85a91f594177c8d0b9402c8b458d35c347c4717a9b4"
+    },
+    {
+      "path": "engravings/countries/bhr.webp",
+      "bytes": 307764,
+      "sha256": "1de1d19299d943711c185797c8466b2bf69f6fc61af6d48e5d23951eb1a8f399"
+    },
+    {
+      "path": "engravings/countries/bhs-dark.webp",
+      "bytes": 367226,
+      "sha256": "101a0650109379cf47132a4602c2dd9f74c63188e5852c4a03ccec650b1741c4"
+    },
+    {
+      "path": "engravings/countries/bhs.webp",
+      "bytes": 342778,
+      "sha256": "fcd7df91c4ea746641942533d65a9e4b013302db6f680ee9980524d65d3213cf"
+    },
+    {
+      "path": "engravings/countries/bih-dark.webp",
+      "bytes": 246542,
+      "sha256": "6f7766e41e857935dc30cf576e542b1ae7581955439d81f467d23c1be8a20fbf"
+    },
+    {
+      "path": "engravings/countries/bih.webp",
+      "bytes": 382890,
+      "sha256": "78c64b16fc1321febe8eef01348501967740dde32837eb919326dc914136baaf"
+    },
+    {
+      "path": "engravings/countries/blr-dark.webp",
+      "bytes": 307600,
+      "sha256": "2819d229e4ce77d7766826746c721cd8f4c605751f6404a058914fa9bd5f58b8"
+    },
+    {
+      "path": "engravings/countries/blr.webp",
+      "bytes": 316738,
+      "sha256": "5906d7a3943370843d64d1fc4c848cb159981089e8298ad8d40adb1a0737ba3c"
+    },
+    {
+      "path": "engravings/countries/blz-dark.webp",
+      "bytes": 180910,
+      "sha256": "7e3eb7f1277bfb801e928b66fbff14b58647e10ca1b41697dda1d8b58a3e51cf"
+    },
+    {
+      "path": "engravings/countries/blz.webp",
+      "bytes": 395430,
+      "sha256": "25c5a5f46599cdd889577193188db89039cf92e583095baae08478ed4be5928b"
+    },
+    {
+      "path": "engravings/countries/bol-dark.webp",
+      "bytes": 232560,
+      "sha256": "7fa190e20098e42df0e555aac0b579ef1670d51bdc2a9fe7daf1409037128536"
+    },
+    {
+      "path": "engravings/countries/bol.webp",
+      "bytes": 325620,
+      "sha256": "3c0f1374f76cde14ad000fa99be3a61683fb7921c92cf96f7e74a3600d2dfb95"
+    },
+    {
+      "path": "engravings/countries/bra-dark.webp",
+      "bytes": 215526,
+      "sha256": "3745102f23e4620bd7f025074eb559e90e9316211b108584474400df6ceb538c"
+    },
+    {
+      "path": "engravings/countries/bra.webp",
+      "bytes": 285856,
+      "sha256": "2d48f5bc79c21099fc30f99869c4e5e15ef88c69f9a8db1d3d243bd2fe6adbe1"
+    },
+    {
+      "path": "engravings/countries/brb-dark.webp",
+      "bytes": 384620,
+      "sha256": "848e3c03528c7c264bc959f0e74409bd97a71316f686afd31c3319e0ceed5cb5"
+    },
+    {
+      "path": "engravings/countries/brb.webp",
+      "bytes": 320240,
+      "sha256": "1f153e548986456a4ec0d9094010c1b18be805423486d196baffc73cc7a8d7d6"
+    },
+    {
+      "path": "engravings/countries/brn-dark.webp",
+      "bytes": 209686,
+      "sha256": "6e2796a5779a6190042c5c0262b91fa690e8711af76b149ceddf3cca06b37cdb"
+    },
+    {
+      "path": "engravings/countries/brn.webp",
+      "bytes": 332884,
+      "sha256": "641d4f5870e4bdb7deaa3e7b43a5b37f83c029c36203b09a30b92cc47677e2a7"
+    },
+    {
+      "path": "engravings/countries/btn-dark.webp",
+      "bytes": 229248,
+      "sha256": "383c49816dfd1df0f90b5166bfe8f907beb84ba43a332256f9bde55ae57d198f"
+    },
+    {
+      "path": "engravings/countries/btn.webp",
+      "bytes": 374400,
+      "sha256": "13b7df85a5b48e963bb5518e2f76a6ca398376308509c6fc99e4f6bf6470bd02"
+    },
+    {
+      "path": "engravings/countries/bwa-dark.webp",
+      "bytes": 194214,
+      "sha256": "a2385d4cdd3888fb9c96bb0e93f15a322576aebb4d41bf548a64e8b365b49e2c"
+    },
+    {
+      "path": "engravings/countries/bwa.webp",
+      "bytes": 342544,
+      "sha256": "8dcc3beecff1fc405ebd3fc4066a6c8681c746c3639a10063d6cad15d8395278"
+    },
+    {
+      "path": "engravings/countries/caf-dark.webp",
+      "bytes": 259652,
+      "sha256": "52831d07064dace1747907ff2618b1867b19de7654555e1cf137c3c0f71661b1"
+    },
+    {
+      "path": "engravings/countries/caf.webp",
+      "bytes": 414014,
+      "sha256": "b374da46f50b170feadbf92afa70f35516821fb16f305d1a44d4bc9b27bd471a"
+    },
+    {
+      "path": "engravings/countries/can-dark.webp",
+      "bytes": 237464,
+      "sha256": "37c9548d7d6245d8d33617b67040d5bb6ca9e928ac8ac145f8906ce21ef60776"
+    },
+    {
+      "path": "engravings/countries/can.webp",
+      "bytes": 353824,
+      "sha256": "5d096aabe24a4100225f0b77218d143f15a9cd28fbe6afd11cbbae7704e6d262"
+    },
+    {
+      "path": "engravings/countries/che-dark.webp",
+      "bytes": 326222,
+      "sha256": "5215d8252646638828a5d67fe8b3c76a583269ad09f01323aac89e81499dc813"
+    },
+    {
+      "path": "engravings/countries/che.webp",
+      "bytes": 396242,
+      "sha256": "9f779b506ebc4bcf7b7528a8e52057e5fedb9eba5e586605c7856fede48a3655"
+    },
+    {
+      "path": "engravings/countries/chl-dark.webp",
+      "bytes": 232300,
+      "sha256": "164aa11c287ed0a3c8feb4ffdc45e0a6c6322ce430fe88c55423cff243a1b698"
+    },
+    {
+      "path": "engravings/countries/chl.webp",
+      "bytes": 358726,
+      "sha256": "4c2d1a6bf0ee6abd252b6f2ac0cd6707058c51662cb08a35f58a9f8186850720"
+    },
+    {
+      "path": "engravings/countries/chn-dark.webp",
+      "bytes": 240502,
+      "sha256": "d4a79b3200478f571d8dec311bc41917a606474c0a1dd513675ad640f311425a"
+    },
+    {
+      "path": "engravings/countries/chn.webp",
+      "bytes": 377364,
+      "sha256": "838a987eb439778ba75abeb1ead67fd3261fef128d0603171e107c5cf15e3c2d"
+    },
+    {
+      "path": "engravings/countries/civ-dark.webp",
+      "bytes": 255404,
+      "sha256": "89dec69dcc7c16a97f5e16a04661bdad7f872cf55d0904e14a34513ed2ed6105"
+    },
+    {
+      "path": "engravings/countries/civ.webp",
+      "bytes": 327292,
+      "sha256": "65f37808e911c2761caa50561cc63866a2051e629302da80ae793a2a05ce36ef"
+    },
+    {
+      "path": "engravings/countries/cmr-dark.webp",
+      "bytes": 169118,
+      "sha256": "b494c1685a54049d0450a0017a630913a60c1b6a3fc1b86291a6df05d7b67689"
+    },
+    {
+      "path": "engravings/countries/cmr.webp",
+      "bytes": 359732,
+      "sha256": "e4d827fceecf5ccfa2a88ce8db2433e629394953778c7d018afc6826cc662d20"
+    },
+    {
+      "path": "engravings/countries/cod-dark.webp",
+      "bytes": 193350,
+      "sha256": "46177f86296f7a5ad308296ebc62cbd2b56cb7b4fc89c7844d2c7574819a2e4d"
+    },
+    {
+      "path": "engravings/countries/cod.webp",
+      "bytes": 386348,
+      "sha256": "2472672a4d9189f8ae5403b7cff7b68ecb0f0c9977271bf5f2b521c776846620"
+    },
+    {
+      "path": "engravings/countries/cog-dark.webp",
+      "bytes": 285306,
+      "sha256": "992dc3779ce528c4fab06ed4191f17c2e8613696a0684f310a9293a5092c0e72"
+    },
+    {
+      "path": "engravings/countries/cog.webp",
+      "bytes": 341058,
+      "sha256": "d6f87c856ee434e8761f4e6c81b55d2f73dff260968823661b382a20b9bc154c"
+    },
+    {
+      "path": "engravings/countries/col-dark.webp",
+      "bytes": 206878,
+      "sha256": "c0f47b11eb38a6e5e7f000ad57c79b3e72debfb47e3f8fe36568380f7380b8e5"
+    },
+    {
+      "path": "engravings/countries/col.webp",
+      "bytes": 367962,
+      "sha256": "2f65b4c5b43b6eae4c8a773f4ead3bb4036eb83166980ee436cb1d2563a551d2"
+    },
+    {
+      "path": "engravings/countries/com-dark.webp",
+      "bytes": 200494,
+      "sha256": "fa90b2b0889c3dbc0ca9f2f8253858c71588a7400710cd8aac2190ae040c9d9e"
+    },
+    {
+      "path": "engravings/countries/com.webp",
+      "bytes": 359184,
+      "sha256": "c75baf9ee0df067031a5d6ccd2eca7d0900af0ffead00e11b9f9632a897a7e01"
+    },
+    {
+      "path": "engravings/countries/cpv-dark.webp",
+      "bytes": 177300,
+      "sha256": "de34a016672314794af44466a928706f86e3f20b777da375c41f24a17fe9675b"
+    },
+    {
+      "path": "engravings/countries/cpv.webp",
+      "bytes": 388398,
+      "sha256": "4f7d4bce4aca3978c847a8651de768f17397b47186dede6291768a5aba2e7e94"
+    },
+    {
+      "path": "engravings/countries/cri-dark.webp",
+      "bytes": 181802,
+      "sha256": "877add171f7def50c53bece1c2fb91a4aeff6dd9e519ac7fe9372e9df3d6e1b7"
+    },
+    {
+      "path": "engravings/countries/cri.webp",
+      "bytes": 387156,
+      "sha256": "6f8633051e7f067c9fd3c00692964c5f8f6df32b1c010da3330f9cf04fdf7e75"
+    },
+    {
+      "path": "engravings/countries/cub-dark.webp",
+      "bytes": 239770,
+      "sha256": "5c5f2afe2289b14ed3a7822c8999ad610f41d3f4d70ceb197ecc97502d621da1"
+    },
+    {
+      "path": "engravings/countries/cub.webp",
+      "bytes": 372228,
+      "sha256": "28acdb3c5c4f75cbb8eca211dd6fa0a31ddc41ccb2aac3dc484d93171779a15d"
+    },
+    {
+      "path": "engravings/countries/cyp-dark.webp",
+      "bytes": 279522,
+      "sha256": "390cc252611a2b31912deb89691b0fe3821beb09e4dcb1c6fe3108026d13d844"
+    },
+    {
+      "path": "engravings/countries/cyp.webp",
+      "bytes": 364674,
+      "sha256": "2b9d09fbac820cc2c633b6061e63f147a04bb80b769e6546a0c845547adbae74"
+    },
+    {
+      "path": "engravings/countries/cze-dark.webp",
+      "bytes": 240210,
+      "sha256": "95b836e3df0a836fcf6a9e67447d8f165c7846fc2c1553501f9949d17ff637a6"
+    },
+    {
+      "path": "engravings/countries/cze.webp",
+      "bytes": 371824,
+      "sha256": "776da3b6f2a865af18d8411f2cf4d46ead2f22f454f66dbd73dcbc705cd8776f"
+    },
+    {
+      "path": "engravings/countries/deu-dark.webp",
+      "bytes": 331218,
+      "sha256": "6a72d158cb5d217d50b0405a72aa0666d464d85485261b56cd48df975ce2c632"
+    },
+    {
+      "path": "engravings/countries/deu.webp",
+      "bytes": 269884,
+      "sha256": "5e74e48e7fcb95272292c27faa8c7192006c9bda8f7072835095001443bdf073"
+    },
+    {
+      "path": "engravings/countries/dji-dark.webp",
+      "bytes": 294996,
+      "sha256": "22ecf94507b78852553c349323c34c48be71c1dadc0a8fabb20d56c1c2d8bd7e"
+    },
+    {
+      "path": "engravings/countries/dji.webp",
+      "bytes": 353744,
+      "sha256": "fb5e5619ba981743a1b291e1937658309d39ad00b51495b75c94516c46871275"
+    },
+    {
+      "path": "engravings/countries/dma-dark.webp",
+      "bytes": 268668,
+      "sha256": "8524d9058d94e61a2fb923a9189e622ae11ff08a3638e0f390fa5cc45763237c"
+    },
+    {
+      "path": "engravings/countries/dma.webp",
+      "bytes": 424898,
+      "sha256": "f421a8b5a570453756839e6b125046a49b5d543782af5399e02ec2889ce85fa2"
+    },
+    {
+      "path": "engravings/countries/dnk-dark.webp",
+      "bytes": 240000,
+      "sha256": "457a9c8709727a3d49fa09ad4a33d193dcc9216355a790e4b94a2b9fccb57762"
+    },
+    {
+      "path": "engravings/countries/dnk.webp",
+      "bytes": 372416,
+      "sha256": "d7ca0cd67e42e3bf8c7c3d02543468e47e220f5965343fc1c5a3893d41679103"
+    },
+    {
+      "path": "engravings/countries/dom-dark.webp",
+      "bytes": 349754,
+      "sha256": "feb036e6e051267c560cef2fcf925ba6d798709a393c710392287ccec758145b"
+    },
+    {
+      "path": "engravings/countries/dom.webp",
+      "bytes": 372966,
+      "sha256": "1f0e0fe8ffccfb3de2a3e5fa0e042d0cac50ba78e5aca2646e27afcbd998a350"
+    },
+    {
+      "path": "engravings/countries/dza-dark.webp",
+      "bytes": 337946,
+      "sha256": "bdebd461d7ba767f9a64dfc0123eaebab12f012d76fdecb097ed571b2ee75763"
+    },
+    {
+      "path": "engravings/countries/dza.webp",
+      "bytes": 304016,
+      "sha256": "562386b1a6a458c742167af57a4bda4e9424dfd08e59358505e59505f784f734"
+    },
+    {
+      "path": "engravings/countries/ecu-dark.webp",
+      "bytes": 249762,
+      "sha256": "872fa01332bdd109a89cabdac825ebbfd4b6bb593f7a3987ce057568a666fa13"
+    },
+    {
+      "path": "engravings/countries/ecu.webp",
+      "bytes": 360572,
+      "sha256": "21358a71c8e6fc3237cb350780662a2f11d93fa0aed0d0d1c285d39981a3058e"
+    },
+    {
+      "path": "engravings/countries/egy-dark.webp",
+      "bytes": 264004,
+      "sha256": "c91f277b2dec27f68370162e05dc980baa8df18159e356c0861d3394bf4edc2f"
+    },
+    {
+      "path": "engravings/countries/egy.webp",
+      "bytes": 300928,
+      "sha256": "95c98fe435e4df3052bc4e21893718dfe4cceffdbfd4c66a48c067fe8c292222"
+    },
+    {
+      "path": "engravings/countries/eri-dark.webp",
+      "bytes": 272100,
+      "sha256": "b304a4efb29a843112827d8ccc266ee06e9e4a9f35b1fa0f3a18ea9e51450d19"
+    },
+    {
+      "path": "engravings/countries/eri.webp",
+      "bytes": 326882,
+      "sha256": "a9c9d5f79d3b4507ce7de3a603c20fb70fdf12b3c2e555c3b160e958fb19e9e1"
+    },
+    {
+      "path": "engravings/countries/esp-dark.webp",
+      "bytes": 95214,
+      "sha256": "b2f9946e1e27b4fe1359d700c4520ad7ef06c27012c526933e03707cd4732e17"
+    },
+    {
+      "path": "engravings/countries/esp.webp",
+      "bytes": 369836,
+      "sha256": "5f52d72481b2fcdafca97d21940e683cfc5eb42166d12bf4911b47be31ad1071"
+    },
+    {
+      "path": "engravings/countries/est-dark.webp",
+      "bytes": 357088,
+      "sha256": "388cc5bef5de889876c34bbe0b45c6c594874aacd49e760a3e7a38165b6be003"
+    },
+    {
+      "path": "engravings/countries/est.webp",
+      "bytes": 392564,
+      "sha256": "db356ac5d6d0a6373768d434e365109f1b8976f0d080ac3b0120e22953b2f4af"
+    },
+    {
+      "path": "engravings/countries/eth-dark.webp",
+      "bytes": 274058,
+      "sha256": "a0f2a8e3838b80d7618a4be3f7dd1e5e7f92c35db20b6fbf82dd6d776c35e87a"
+    },
+    {
+      "path": "engravings/countries/eth.webp",
+      "bytes": 412484,
+      "sha256": "c76b5ce38cde2f4863d8c16a2e92e2fdee40b785c29d055d68c81ebfafcac061"
+    },
+    {
+      "path": "engravings/countries/fin-dark.webp",
+      "bytes": 288840,
+      "sha256": "63b1a2e9f001b2213786711d0131cb35380061b6ee21a99890a91b27e430b160"
+    },
+    {
+      "path": "engravings/countries/fin.webp",
+      "bytes": 342188,
+      "sha256": "bd0862e15b652b691d9c7aad53fb3c773ec1b759278c6158dda4906346b0faf1"
+    },
+    {
+      "path": "engravings/countries/fji-dark.webp",
+      "bytes": 313330,
+      "sha256": "7251b0a86dc0d881c5275ecd98c53974f934a6e177d2583d2507753b3c111bb1"
+    },
+    {
+      "path": "engravings/countries/fji.webp",
+      "bytes": 374928,
+      "sha256": "e0298ff1281ae3f5d0b4f4455f339e59e854248112513d2ba72d58f5f957107d"
+    },
+    {
+      "path": "engravings/countries/fra-dark.webp",
+      "bytes": 324640,
+      "sha256": "510da0766e65835822f48b7513b5b44414c4d7af61b4ca7bfb6614504a2abab4"
+    },
+    {
+      "path": "engravings/countries/fra.webp",
+      "bytes": 257858,
+      "sha256": "4d4bf0b6ca4f0a8c39f610d2655fc3d750a0baa468707d30acf0df29a2f2ff07"
+    },
+    {
+      "path": "engravings/countries/fsm-dark.webp",
+      "bytes": 382646,
+      "sha256": "39dd47109293241e495fbed9938f4e3f8d733da00c01ccbef7fa83a1f55bc505"
+    },
+    {
+      "path": "engravings/countries/fsm.webp",
+      "bytes": 336018,
+      "sha256": "0328c90793b0056a08b30fd4fc9c98a5073d39a74f5705e25d848674e42030f3"
+    },
+    {
+      "path": "engravings/countries/gab-dark.webp",
+      "bytes": 389106,
+      "sha256": "8775acc2d49a5f89aaa5dfd6d91c535b8e582d8701433202fa7ff311803cd650"
+    },
+    {
+      "path": "engravings/countries/gab.webp",
+      "bytes": 392412,
+      "sha256": "566a63ff7e714baa833b260d0b8984abcb55f1ceb71169bafe5d0732f52e5e11"
+    },
+    {
+      "path": "engravings/countries/gbr-dark.webp",
+      "bytes": 391268,
+      "sha256": "6ad48b6038fc3b0bf17d696acf583e18e25c34a2e5ba412cdaa35df85d444b5a"
+    },
+    {
+      "path": "engravings/countries/gbr.webp",
+      "bytes": 281616,
+      "sha256": "66fcd525c54709bdf6314adc8bba5b5d17f93bdacce413d2957ac8771e524099"
+    },
+    {
+      "path": "engravings/countries/geo-dark.webp",
+      "bytes": 351802,
+      "sha256": "cf13747a3b964d893c81d98b4bd35f19951f474650805b2d7ffc425167c4baaa"
+    },
+    {
+      "path": "engravings/countries/geo.webp",
+      "bytes": 378468,
+      "sha256": "9aff89c398f5192318ea287b693ff6e4e6d0243e584b0af98be7f2c25f146d49"
+    },
+    {
+      "path": "engravings/countries/gha-dark.webp",
+      "bytes": 362042,
+      "sha256": "edfae16829dc0c38234488f81ebdf6ea5fdf2a3c13d544c32d57797b8384a4e4"
+    },
+    {
+      "path": "engravings/countries/gha.webp",
+      "bytes": 376040,
+      "sha256": "2412cf811e31c5f4a7e0b38f4fdcd61c752d3851f013d75ca0788d3a08f022b8"
+    },
+    {
+      "path": "engravings/countries/gin-dark.webp",
+      "bytes": 337818,
+      "sha256": "4a05dc004c2efec6cfeba586cb55bdafd69fa9c682027e865d978a64ffd37132"
+    },
+    {
+      "path": "engravings/countries/gin.webp",
+      "bytes": 389586,
+      "sha256": "65d7aea0cadf8a1900f04e619306344adc72f5463a1142f0b0b2c3e19d9875fe"
+    },
+    {
+      "path": "engravings/countries/gmb-dark.webp",
+      "bytes": 344420,
+      "sha256": "6634480361dd1ace8245611673f70d509235224a6c703680e6ecdce3dc09862d"
+    },
+    {
+      "path": "engravings/countries/gmb.webp",
+      "bytes": 366070,
+      "sha256": "8273e8775128c27363a32257cb7ac71a806f207e5b9e4847048a65747583d240"
+    },
+    {
+      "path": "engravings/countries/gnb-dark.webp",
+      "bytes": 319772,
+      "sha256": "6703cfb173c0f50548ea3984b73b41dfc9fc175f778e1a31984b475492e25021"
+    },
+    {
+      "path": "engravings/countries/gnb.webp",
+      "bytes": 386486,
+      "sha256": "dae51965da407a5c4b445838aed716d2a86547fff5caca20370ce2c0b35dc97c"
+    },
+    {
+      "path": "engravings/countries/gnq-dark.webp",
+      "bytes": 243250,
+      "sha256": "308c8005c30e5b94ff4df4f8cea7e4a885caac57c0e6011f5dd571a712c4c28a"
+    },
+    {
+      "path": "engravings/countries/gnq.webp",
+      "bytes": 368200,
+      "sha256": "d2d2812f365e9c3db85835963f10fffca246130817b5794da3fcfe6c23e59776"
+    },
+    {
+      "path": "engravings/countries/grc-dark.webp",
+      "bytes": 297854,
+      "sha256": "1ca3c3f861a912286b25ae3febb60e3da6ec90944dfea11a0f531e16d4280f54"
+    },
+    {
+      "path": "engravings/countries/grc.webp",
+      "bytes": 369820,
+      "sha256": "86f8c6fdc620b4c26b8c605a01fcdc0c45c52a618550efafb04b9bc65c208978"
+    },
+    {
+      "path": "engravings/countries/grd-dark.webp",
+      "bytes": 314094,
+      "sha256": "53fa7de1a36d0f5b397058e3de5322d28bd2449602c0f0805e45f8b9e79804a5"
+    },
+    {
+      "path": "engravings/countries/grd.webp",
+      "bytes": 380004,
+      "sha256": "c2de4be75f6149a48019b1e831ae8fac189ee037aa365149b4272a26f8493255"
+    },
+    {
+      "path": "engravings/countries/gtm-dark.webp",
+      "bytes": 305898,
+      "sha256": "2068dfc4b69323bc7492fc7da4a46d539dd751e9b155ff50fefc0606a0e7b1a6"
+    },
+    {
+      "path": "engravings/countries/gtm.webp",
+      "bytes": 424700,
+      "sha256": "9697f03198a07917955f55e9c84822b1494f3c513fd7136fb6a13c9dbba9f3db"
+    },
+    {
+      "path": "engravings/countries/guy-dark.webp",
+      "bytes": 341338,
+      "sha256": "bb59d5f08ed32cdbe3caafd649195b51ad0381650b9c73c87ff3565e87a189d9"
+    },
+    {
+      "path": "engravings/countries/guy.webp",
+      "bytes": 406176,
+      "sha256": "509d7b40d0ad067587d9b288a9cf156dda741c5aa6e85b00225861b8a8ffb0cb"
+    },
+    {
+      "path": "engravings/countries/hnd-dark.webp",
+      "bytes": 344820,
+      "sha256": "f054045577b1097bf698c39052bc4480246f0be2c6598cac903baa6e45fb249e"
+    },
+    {
+      "path": "engravings/countries/hnd.webp",
+      "bytes": 425252,
+      "sha256": "03e888c4d00670471c54ceb32251986d128e732af5fb1dbb7e4734c6acab9290"
+    },
+    {
+      "path": "engravings/countries/hrv-dark.webp",
+      "bytes": 232836,
+      "sha256": "7ed250660294053bc369602939de5712e2a297470130e7c32e1731762db5ccda"
+    },
+    {
+      "path": "engravings/countries/hrv.webp",
+      "bytes": 359052,
+      "sha256": "89c5fb2815f4f72f4dbe526c7b3801d260ffd3ac1af218461ba5d974a52f6a0b"
+    },
+    {
+      "path": "engravings/countries/hti-dark.webp",
+      "bytes": 260394,
+      "sha256": "ae91290c42f5394d6f80d26a66664eee923ebad82b0d32acae032bbaf7c1abcf"
+    },
+    {
+      "path": "engravings/countries/hti.webp",
+      "bytes": 370138,
+      "sha256": "e410afb862b3efef6805a2b21d294b3476c0847c2cd891c34a155dd884161398"
+    },
+    {
+      "path": "engravings/countries/hun-dark.webp",
+      "bytes": 254008,
+      "sha256": "5cee1a5639fa237e218a032cc4822c54e2164ab4b377fc26c86da0049b1ff338"
+    },
+    {
+      "path": "engravings/countries/hun.webp",
+      "bytes": 360436,
+      "sha256": "c1fbeb88903f3c02abf22922d351b10873e31cafb5dbc859d80c0229a02ade53"
+    },
+    {
+      "path": "engravings/countries/idn-dark.webp",
+      "bytes": 288094,
+      "sha256": "3ba0c0ffd7e789b1f879003b0c631fca9d1969b52ba866cc7f79e0fa33be6fe2"
+    },
+    {
+      "path": "engravings/countries/idn.webp",
+      "bytes": 371464,
+      "sha256": "cdf1551cf4afe8b05afbf7de303f9909eb1f005932dd14688d4c606a76860eb6"
+    },
+    {
+      "path": "engravings/countries/ind-dark.webp",
+      "bytes": 401818,
+      "sha256": "586b9a4eff9d3ce6084739cf141833c9090fe74022f58470356ce673e5b4fef1"
+    },
+    {
+      "path": "engravings/countries/ind.webp",
+      "bytes": 304790,
+      "sha256": "b88e2cea494d49d4ddea536b172b4b70b8f380c997cb1a55158ae794ff4ccda5"
+    },
+    {
+      "path": "engravings/countries/irl-dark.webp",
+      "bytes": 303878,
+      "sha256": "3b2265a95412ce70d12c09f69c8d0b42b30e589b561e2ac91e5ba7ac445843c0"
+    },
+    {
+      "path": "engravings/countries/irl.webp",
+      "bytes": 379328,
+      "sha256": "cf2fb2c4900f599cba204530db2377d2852c8da99059cfc6e3643a3542ee9c73"
+    },
+    {
+      "path": "engravings/countries/irn-dark.webp",
+      "bytes": 311800,
+      "sha256": "63ad66fb31aa2f796960fd94e09e4803ecf774b74e9b67f24e8032aeeaa54c9d"
+    },
+    {
+      "path": "engravings/countries/irn.webp",
+      "bytes": 365290,
+      "sha256": "b34dadd3714a20cbf1c81c829064d9a318de808e77a061a3542d7b6a6bf848f9"
+    },
+    {
+      "path": "engravings/countries/irq-dark.webp",
+      "bytes": 278950,
+      "sha256": "5ff883adc71554e0cdbcb528edf512fcfe8427161d73b6b3472c426e1a2a6e71"
+    },
+    {
+      "path": "engravings/countries/irq.webp",
+      "bytes": 381052,
+      "sha256": "3cae99d0dcb48f986d644ebacf1cb367790402c77af6d783339f0b33bd075a49"
+    },
+    {
+      "path": "engravings/countries/isl-dark.webp",
+      "bytes": 277108,
+      "sha256": "2601968ada4d694f4d11ff38aa790c2ae53bd85a169e8f2296ca09ce9c5529e7"
+    },
+    {
+      "path": "engravings/countries/isl.webp",
+      "bytes": 345486,
+      "sha256": "be545e1aa9de97cbe2250acc39b7aec92d3a34efb99a1a8770fee637472fe685"
+    },
+    {
+      "path": "engravings/countries/isr-dark.webp",
+      "bytes": 288344,
+      "sha256": "4d60cf0626cd30d14e166fa9fb8c6c0fd061a69c4738957851cb274b1e5a5de4"
+    },
+    {
+      "path": "engravings/countries/isr.webp",
+      "bytes": 416772,
+      "sha256": "38ad82242180fc40bdf0b1d67f12be5aa0c6d562344e1a2f9780f1294d105773"
+    },
+    {
+      "path": "engravings/countries/ita-dark.webp",
+      "bytes": 356356,
+      "sha256": "6c6875903947eef07fd11e15eda701d06146f181b1d6075f34cab7fea5f497ec"
+    },
+    {
+      "path": "engravings/countries/ita.webp",
+      "bytes": 287502,
+      "sha256": "d248a45cffe91ab8d3d4d3634445e5b8767ae2dd319a82d2903f4d7304c41046"
+    },
+    {
+      "path": "engravings/countries/jam-dark.webp",
+      "bytes": 348944,
+      "sha256": "3947610ca424741d30141be1b21e4c17e6e81cd2d4f4e8b531535140106f1f3c"
+    },
+    {
+      "path": "engravings/countries/jam.webp",
+      "bytes": 288694,
+      "sha256": "6160294d2c7aaceffa7a6938836cbfd4e60189d99410b050b8772fc1f19d926e"
+    },
+    {
+      "path": "engravings/countries/jor-dark.webp",
+      "bytes": 314072,
+      "sha256": "c4299c33f3bcd7c731c8a7081d6ff41cdabe3b32aefa6da3ba8e74db51bd94a6"
+    },
+    {
+      "path": "engravings/countries/jor.webp",
+      "bytes": 424880,
+      "sha256": "689ca164ca6c242553306dca39cf9fe9f3c71c65c89dcef7c9246722e56bfd81"
+    },
+    {
+      "path": "engravings/countries/jpn-dark.webp",
+      "bytes": 374902,
+      "sha256": "3e04f2c96c62ede82441366e60b8ea3fa5b4558d4ed19f4e2b9035621675eaa7"
+    },
+    {
+      "path": "engravings/countries/jpn.webp",
+      "bytes": 298482,
+      "sha256": "693729476e81c56fa6eb48ad7aead2da32d53aaaae5bf94fcfb40b1cbdd41ba2"
+    },
+    {
+      "path": "engravings/countries/kaz-dark.webp",
+      "bytes": 320096,
+      "sha256": "3a0de6210577a484a6bee2f8cf37083d0fdd15e302859fcd25b6f96f794db4b7"
+    },
+    {
+      "path": "engravings/countries/kaz.webp",
+      "bytes": 405916,
+      "sha256": "d577e548a95055f35529a8796fa442345d6394ccdcd5c561a56ff8b041ffe00e"
+    },
+    {
+      "path": "engravings/countries/ken-dark.webp",
+      "bytes": 366044,
+      "sha256": "0ee98aa9ec8be1bef0ee44ff46de39e4ed23b5f26ac68aa64b92a9a94e6efab9"
+    },
+    {
+      "path": "engravings/countries/ken.webp",
+      "bytes": 314718,
+      "sha256": "6b61ba89b72b5d2d50945360236fdc97040cfe9308d70c7dd0f35bb8a432a6f3"
+    },
+    {
+      "path": "engravings/countries/kgz-dark.webp",
+      "bytes": 252612,
+      "sha256": "2a214119b1bd94b1fef253bea4a4f0f7c2bc28b3f659b5491b9d23dab45655a4"
+    },
+    {
+      "path": "engravings/countries/kgz.webp",
+      "bytes": 402114,
+      "sha256": "97faa716300598932cdac5643e28dabe1ca44ff436c25ff005c4471591d1f1ea"
+    },
+    {
+      "path": "engravings/countries/khm-dark.webp",
+      "bytes": 226026,
+      "sha256": "3bd105d4002ce42c15a788ff5278e04e885c164fb132eccce4270e6d13e52f5a"
+    },
+    {
+      "path": "engravings/countries/khm.webp",
+      "bytes": 376022,
+      "sha256": "0b654ea268da0b70b2f26f83693a5db816a188387d08c5534538b2e3cc9abd26"
+    },
+    {
+      "path": "engravings/countries/kir-dark.webp",
+      "bytes": 229084,
+      "sha256": "2be3879a9c9cdf5ed08f0b37db6ab9af7ad16f027d094985b742ee8154ef0cb7"
+    },
+    {
+      "path": "engravings/countries/kir.webp",
+      "bytes": 379818,
+      "sha256": "e24615297ad261f0c1ba7fc629f999e700d273be6065352da35a86f80e9a2dc3"
+    },
+    {
+      "path": "engravings/countries/kna-dark.webp",
+      "bytes": 418664,
+      "sha256": "b83957aae467f7f0a6969d49bc23829ae2db854c5c6d94c168656c96eaa1a426"
+    },
+    {
+      "path": "engravings/countries/kna.webp",
+      "bytes": 314828,
+      "sha256": "a2bf4e4da91c1908d945f94b74a8e11b3494532068860d60d2852ba3660ba0d4"
+    },
+    {
+      "path": "engravings/countries/kor-dark.webp",
+      "bytes": 358454,
+      "sha256": "0ea48238b81649e6d718d1379b6598584a9c298a9947a812fdaac8994ad5a35f"
+    },
+    {
+      "path": "engravings/countries/kor.webp",
+      "bytes": 378544,
+      "sha256": "52f2170312acc3d571ecaf69ece3a0b4d31f74a66d11247e2c1c8e5c3ce77f4d"
+    },
+    {
+      "path": "engravings/countries/kwt-dark.webp",
+      "bytes": 281060,
+      "sha256": "0803003eb72ca8db8e966c54138afd38d1a94cdd0ae3aca5aa2ec928e0d643b8"
+    },
+    {
+      "path": "engravings/countries/kwt.webp",
+      "bytes": 329344,
+      "sha256": "1b0a6693256b739b1602473baeac31221fbf8b79efc51e4f7c1fd06d3ba6621d"
+    },
+    {
+      "path": "engravings/countries/lao-dark.webp",
+      "bytes": 492826,
+      "sha256": "a08375090185af026ac99a4070f303fa6ee224d394001cfd3920903c849edd61"
+    },
+    {
+      "path": "engravings/countries/lao.webp",
+      "bytes": 349390,
+      "sha256": "f3e4c69fa5fc99824a2205a90812da632f3331ee8a62ff046c4921f024c7e23f"
+    },
+    {
+      "path": "engravings/countries/lbn-dark.webp",
+      "bytes": 372050,
+      "sha256": "2231c631e0acb2820dfd583447a47b35973c957682047c7845e494f75982c0f7"
+    },
+    {
+      "path": "engravings/countries/lbn.webp",
+      "bytes": 363506,
+      "sha256": "b1e0f3847595978d42a49f25541e8e2dc2866ebe930b3918ac155acc7585e22c"
+    },
+    {
+      "path": "engravings/countries/lbr-dark.webp",
+      "bytes": 334310,
+      "sha256": "9f35c4b87ee3bc999b87943b61447372fb840c77ca242919bde0d93cfb567429"
+    },
+    {
+      "path": "engravings/countries/lbr.webp",
+      "bytes": 381980,
+      "sha256": "94049cc25b7c2c5c30c7c9dd934a3f6225e407f0208328a904d5a2d4e54aa40e"
+    },
+    {
+      "path": "engravings/countries/lby-dark.webp",
+      "bytes": 370056,
+      "sha256": "aa4004bf8ee1c04e3f256b79b4d331c815c921c018b945b2ee985a0194a1a269"
+    },
+    {
+      "path": "engravings/countries/lby.webp",
+      "bytes": 397586,
+      "sha256": "0cc9d420efe5e768d9c9013f7afd90eb003f851338a997506d432ef838cdd61b"
+    },
+    {
+      "path": "engravings/countries/lca-dark.webp",
+      "bytes": 448980,
+      "sha256": "d2d0ff2de80def96b491bef9e7b0458fafe0a30e2d60368a56bed9ca7f07e4cd"
+    },
+    {
+      "path": "engravings/countries/lca.webp",
+      "bytes": 333412,
+      "sha256": "6c2ebee0dc03b01389e405c86503171e861bd3e3fe4c2d6a5e35c952a7873334"
+    },
+    {
+      "path": "engravings/countries/lie-dark.webp",
+      "bytes": 312974,
+      "sha256": "214ef9a727b191f8d12dc2c9a8a300ab232e88670dae7439401d0300ecc043a6"
+    },
+    {
+      "path": "engravings/countries/lie.webp",
+      "bytes": 366570,
+      "sha256": "4b167bc1e5aa9ba306c76bfaf516667703f7e664e70f456a39ebb0f87432cd6f"
+    },
+    {
+      "path": "engravings/countries/lka-dark.webp",
+      "bytes": 351046,
+      "sha256": "b401688be50795d6db0552c5f1fcdc335218a418e154ce076daa8a67c9589738"
+    },
+    {
+      "path": "engravings/countries/lka.webp",
+      "bytes": 378574,
+      "sha256": "c51b350eea2c2663b2c8b1943910b061ee98fdd0529cf5ca1b54dc80d5b15503"
+    },
+    {
+      "path": "engravings/countries/lso-dark.webp",
+      "bytes": 358078,
+      "sha256": "344d57aeec278ecfd8d9db2b42c854005f66a4cb49b130cf304eb1e17dc0a758"
+    },
+    {
+      "path": "engravings/countries/lso.webp",
+      "bytes": 380768,
+      "sha256": "9e22e2986429beff9ca13d8f5f57dd54431527e3a39a3d72763206223d413fb8"
+    },
+    {
+      "path": "engravings/countries/ltu-dark.webp",
+      "bytes": 366706,
+      "sha256": "2da61cff242565ada57c9c91dace435b48f97df57ced73da013de469bc746a8c"
+    },
+    {
+      "path": "engravings/countries/ltu.webp",
+      "bytes": 322890,
+      "sha256": "e9e36369c25207899d8b68d8fe74b171b3264286d4279f9ca0edb2d714ded9a0"
+    },
+    {
+      "path": "engravings/countries/lux-dark.webp",
+      "bytes": 370170,
+      "sha256": "3d7ef3b72ad8aec66f7e7a75b0c9ffa2d3c8dd8dfd2d1d92d42d79fafbe645fb"
+    },
+    {
+      "path": "engravings/countries/lux.webp",
+      "bytes": 319946,
+      "sha256": "561ac17730931c268f9ae225423b3a2c18be4c688acd5df57606dfe755f3306e"
+    },
+    {
+      "path": "engravings/countries/lva-dark.webp",
+      "bytes": 342946,
+      "sha256": "8c2df4489574cb71fc7457f2423013156aea3b2d333dc70eaed200ced33ad1f3"
+    },
+    {
+      "path": "engravings/countries/lva.webp",
+      "bytes": 352254,
+      "sha256": "fa219ad4032d9da127119f12e6e4d357a0afe36b919d232a2e7fd7d549fcfaec"
+    },
+    {
+      "path": "engravings/countries/mar-dark.webp",
+      "bytes": 432244,
+      "sha256": "a57a20ffc72338e1c6ba0aa9df8ddc161e4aae16983341e13c88ab8090584dce"
+    },
+    {
+      "path": "engravings/countries/mar.webp",
+      "bytes": 278014,
+      "sha256": "63efdc59c1ec4bf1ed161846a5817085144723bd0f2be0b2ec31e6f9e82405cb"
+    },
+    {
+      "path": "engravings/countries/mco-dark.webp",
+      "bytes": 384470,
+      "sha256": "9472167e88ac05a460d526671487baee356ab9008adbdcff3d25e183e11786a2"
+    },
+    {
+      "path": "engravings/countries/mco.webp",
+      "bytes": 353472,
+      "sha256": "07043817cdd118d75da6447df6f357f823d6cf58bae9e9dcb08912652c455907"
+    },
+    {
+      "path": "engravings/countries/mda-dark.webp",
+      "bytes": 444692,
+      "sha256": "28f2afd13688f7e7b394d3cbfc612326778bb2440aef65ed2a82cdfbf5aad469"
+    },
+    {
+      "path": "engravings/countries/mda.webp",
+      "bytes": 327340,
+      "sha256": "1bd251f31ef72c92aefbc65a2708909292ee4aca9a279f35a93cf5db307a4826"
+    },
+    {
+      "path": "engravings/countries/mdg-dark.webp",
+      "bytes": 336474,
+      "sha256": "e37af930b2fc8408dee8096397c3ec1a2933fa8e3e2020d82c2d25b148bdd3f7"
+    },
+    {
+      "path": "engravings/countries/mdg.webp",
+      "bytes": 284582,
+      "sha256": "2abbc5a6548fd50e2cd6cf3f7c9313124ebc30da3c0d2ad57469db42d62ce167"
+    },
+    {
+      "path": "engravings/countries/mdv-dark.webp",
+      "bytes": 396368,
+      "sha256": "e163b5e8ce16b80ff7c28ce76cb0dd1a456fc5f188c21acd878f12e1e86d4e45"
+    },
+    {
+      "path": "engravings/countries/mdv.webp",
+      "bytes": 291082,
+      "sha256": "3e5984167cc9000410585aa352ed1e099ce03f59f75f69ceccf4f562b672c47d"
+    },
+    {
+      "path": "engravings/countries/mex-dark.webp",
+      "bytes": 479698,
+      "sha256": "ad053904d574d07ece42d17cc6637184bda55cbf64d50b8e0679596d7a4811c6"
+    },
+    {
+      "path": "engravings/countries/mex.webp",
+      "bytes": 352068,
+      "sha256": "04272671afff300a4369c3258d6ae25675990dd6297c924f5b52ae2d3a6e4205"
+    },
+    {
+      "path": "engravings/countries/mhl-dark.webp",
+      "bytes": 384656,
+      "sha256": "a1d87e943c4cc40c06e202323fdedfc291acb920d34e7d27c2df5ea0b981f1a3"
+    },
+    {
+      "path": "engravings/countries/mhl.webp",
+      "bytes": 319194,
+      "sha256": "f9a16073299fa8907b8cd2bbac9e71671e1a3b7215f0306466f0e18deef3a1b9"
+    },
+    {
+      "path": "engravings/countries/mkd-dark.webp",
+      "bytes": 389454,
+      "sha256": "247cb9cb37087496bc76679030f01fca1bf01959bcdbd3ae9417430efb57ace1"
+    },
+    {
+      "path": "engravings/countries/mkd.webp",
+      "bytes": 354686,
+      "sha256": "38435d7c21a355b8876beffaddd0957954be09a9efa8751b7c5323b3c8ef647e"
+    },
+    {
+      "path": "engravings/countries/mli-dark.webp",
+      "bytes": 466054,
+      "sha256": "c33a1de23e57c6fdab985bf1b1c92915f386711751cd3f2f0d62457212912bd4"
+    },
+    {
+      "path": "engravings/countries/mli.webp",
+      "bytes": 307280,
+      "sha256": "9d6446e69a720281e9b0b42d8d3a854f45f8923793fa4e897413a1d419ba0f67"
+    },
+    {
+      "path": "engravings/countries/mlt-dark.webp",
+      "bytes": 457962,
+      "sha256": "4aecd6cd5245969b146cb7d22e9563193e30552b6531e941b3f064663acbeba8"
+    },
+    {
+      "path": "engravings/countries/mlt.webp",
+      "bytes": 301622,
+      "sha256": "4f41ef897d7de54a4dc4989f7a935f1079003bf30c92e33b5c1a0bf89edd6627"
+    },
+    {
+      "path": "engravings/countries/mmr-dark.webp",
+      "bytes": 194186,
+      "sha256": "1ff74f2d2df7f14da4ffd484b6f6b478b7312dddaa76f7550e4e36605a82a28d"
+    },
+    {
+      "path": "engravings/countries/mmr.webp",
+      "bytes": 337590,
+      "sha256": "a0b2aa197626f2c5414a3c5342583491ac485663b503e5ca1c36c20620683fab"
+    },
+    {
+      "path": "engravings/countries/mne-dark.webp",
+      "bytes": 403154,
+      "sha256": "ea1974f5a951368bb364af4490fe7fa94205e83e4552aacc7e8624c7e63819ff"
+    },
+    {
+      "path": "engravings/countries/mne.webp",
+      "bytes": 347328,
+      "sha256": "ee4a0556092ce201e98f8271c4e0d59461a5569ced14f9f79a8411b714bfc851"
+    },
+    {
+      "path": "engravings/countries/mng-dark.webp",
+      "bytes": 422132,
+      "sha256": "a1fe35c4e1f744d5a55a000864f574db5b699953c8b051b975bedb854252ff37"
+    },
+    {
+      "path": "engravings/countries/mng.webp",
+      "bytes": 307800,
+      "sha256": "b8d096734a96ff334d5ecffa9c0477d3a00df5d95431ef16748224d437a4ee68"
+    },
+    {
+      "path": "engravings/countries/moz-dark.webp",
+      "bytes": 432078,
+      "sha256": "4cb676b3e459be51ccef1e45ebf326ef4af971e4746e6c038507b2d65bf36981"
+    },
+    {
+      "path": "engravings/countries/moz.webp",
+      "bytes": 306118,
+      "sha256": "c7a517a1821372257e1fc18fa59fa24092a99b487414d9573170a70ef2bc938f"
+    },
+    {
+      "path": "engravings/countries/mrt-dark.webp",
+      "bytes": 481964,
+      "sha256": "00c155a2692b8121dc151e58c029ba1fb5be749d31cfd82324fb57deea27a3c3"
+    },
+    {
+      "path": "engravings/countries/mrt.webp",
+      "bytes": 292514,
+      "sha256": "b077a124685bc19b46d34ab56ec9a451650b8a3c09f0946611414c5290245e09"
+    },
+    {
+      "path": "engravings/countries/mus-dark.webp",
+      "bytes": 446092,
+      "sha256": "e7e303f5f2bd80d13dd09943d2ea10b1d3a678f89d07e105e07c1876a16aa2c6"
+    },
+    {
+      "path": "engravings/countries/mus.webp",
+      "bytes": 294064,
+      "sha256": "c42a9faf9fb17cf9c693a81e8508a135717177a3cff8ead306d81c3cda7b43c7"
+    },
+    {
+      "path": "engravings/countries/mwi-dark.webp",
+      "bytes": 355970,
+      "sha256": "e036e169d8c5584d36c52cd7eb07a75998b88fa2650106a0725d35d22412ae45"
+    },
+    {
+      "path": "engravings/countries/mwi.webp",
+      "bytes": 290152,
+      "sha256": "912a3a3849486c1861e588eab9f4beffedc9cf7eb2f305f15ba96cbaa6a725fd"
+    },
+    {
+      "path": "engravings/countries/mys-dark.webp",
+      "bytes": 382114,
+      "sha256": "29461324975ff456c06386be410b90127355819e15e3a42fe0c09da22dcea789"
+    },
+    {
+      "path": "engravings/countries/mys.webp",
+      "bytes": 300404,
+      "sha256": "c11fd9857312eabd2c03f2f577e6ffaf08ef93a3b44b42f422aa3dc6165724ea"
+    },
+    {
+      "path": "engravings/countries/nam-dark.webp",
+      "bytes": 464308,
+      "sha256": "2f12b844a8c1688c0f54753382b27ccf539fa66cd157bb38cdab88cf193a8a95"
+    },
+    {
+      "path": "engravings/countries/nam.webp",
+      "bytes": 311054,
+      "sha256": "50ec3261961686c6464224b3c6150b45701450f6b73e291760184e0360dd8196"
+    },
+    {
+      "path": "engravings/countries/ner-dark.webp",
+      "bytes": 309536,
+      "sha256": "62db337d437a3db5f3ce2c4fd9036baeb920c2151efe75f20d63fcbe4ac4c7f1"
+    },
+    {
+      "path": "engravings/countries/ner.webp",
+      "bytes": 325890,
+      "sha256": "df95e2afc1659d95f499adc7c3bec70fa6d03ae54ab43eebe665933ab30df551"
+    },
+    {
+      "path": "engravings/countries/nga-dark.webp",
+      "bytes": 365410,
+      "sha256": "5f36095660a10f5e0e6f1454a0352a5a3292acd35442438f7bb974b4948431ce"
+    },
+    {
+      "path": "engravings/countries/nga.webp",
+      "bytes": 342330,
+      "sha256": "a68c95eeafc8fafac88b5f1bf41c3811ea472f23397d44a07bab3131f49cd965"
+    },
+    {
+      "path": "engravings/countries/nic-dark.webp",
+      "bytes": 397648,
+      "sha256": "f595fe5a169e313a9599e5ffa25dce70c10f611d4faca18548c183338271b3f5"
+    },
+    {
+      "path": "engravings/countries/nic.webp",
+      "bytes": 314396,
+      "sha256": "7c02384b296b5f6831ec4e4ad9302b9f9f482eab318199a8f6936fb98c1200ca"
+    },
+    {
+      "path": "engravings/countries/nld-dark.webp",
+      "bytes": 400052,
+      "sha256": "16691a68be9e9790cac87d86595863b0203c1c3eb6e9de86ebac8ea6a0468935"
+    },
+    {
+      "path": "engravings/countries/nld.webp",
+      "bytes": 305082,
+      "sha256": "291f26720f4001f25a18195e247dc2b7ee18b84a225baf26344cf50b563ecb42"
+    },
+    {
+      "path": "engravings/countries/nor-dark.webp",
+      "bytes": 387288,
+      "sha256": "31312c6d419a363272de6ee4b73ff1e9937fce3d970d9060353749d3086d94ac"
+    },
+    {
+      "path": "engravings/countries/nor.webp",
+      "bytes": 329792,
+      "sha256": "86af77984d36a2faa01a31959619b7d399c67da08f48947427c64dcb94048774"
+    },
+    {
+      "path": "engravings/countries/npl-dark.webp",
+      "bytes": 442714,
+      "sha256": "af89d172ec55568b0ffa50f90e79f703e7960392b82f86cd6a3a1e92942fe9fe"
+    },
+    {
+      "path": "engravings/countries/npl.webp",
+      "bytes": 339652,
+      "sha256": "1accb0b40fa3d7f6b3e56cd1c99c9095ed87e96fa2ed71229fc06f5f3262cc7b"
+    },
+    {
+      "path": "engravings/countries/nru-dark.webp",
+      "bytes": 418460,
+      "sha256": "1cb4e576af5ac27859f0a5784cafeb55451007069e349cc853c23d1aa23b8c06"
+    },
+    {
+      "path": "engravings/countries/nru.webp",
+      "bytes": 333064,
+      "sha256": "be879432c1581fa95b02a35ef2fc517342688078d59c2f8d5c93093ee110538e"
+    },
+    {
+      "path": "engravings/countries/nzl-dark.webp",
+      "bytes": 362416,
+      "sha256": "b496a4e88de70226ec50ca01c57c6c0ae235de1f5143b0127b9bb4844ee046a8"
+    },
+    {
+      "path": "engravings/countries/nzl.webp",
+      "bytes": 326882,
+      "sha256": "6e9a08c5e1d8812f1890d0e7c8de5cd1dae6751f599126305a457730aafed136"
+    },
+    {
+      "path": "engravings/countries/omn-dark.webp",
+      "bytes": 362286,
+      "sha256": "73993047b01ea27472f9a1fd4734febdda57a4e4871b0a53c23a9d21f4c12ae9"
+    },
+    {
+      "path": "engravings/countries/omn.webp",
+      "bytes": 327548,
+      "sha256": "1c34be988c652c564d07c683e3724a3d6edf5e2906a15d7793c928daf6a18c08"
+    },
+    {
+      "path": "engravings/countries/pak-dark.webp",
+      "bytes": 376314,
+      "sha256": "edaea97ca28a53ed2408e9d61c60c1ea07d011e98ffc5cdfd6f2bed607ff4ce1"
+    },
+    {
+      "path": "engravings/countries/pak.webp",
+      "bytes": 347534,
+      "sha256": "ed46343b556c6b414c9fe523b7866b4a8b1f4a4ccd838701d9cf2816c3bf54de"
+    },
+    {
+      "path": "engravings/countries/pan-dark.webp",
+      "bytes": 372638,
+      "sha256": "467c56c49163aa2f03e9ab6accee9dde94f79c82cefb3a6967e88f5f29da4ec6"
+    },
+    {
+      "path": "engravings/countries/pan.webp",
+      "bytes": 375178,
+      "sha256": "1f4722514c42901526a170a1916425cd141b39b4fb7f0ca2829fa8b7adc3455d"
+    },
+    {
+      "path": "engravings/countries/per-dark.webp",
+      "bytes": 426374,
+      "sha256": "d2af6bf1dc25709e29f19fe691f43a15787572d14a9e5ec209f7728c4d74966b"
+    },
+    {
+      "path": "engravings/countries/per.webp",
+      "bytes": 380614,
+      "sha256": "e780e60ac43aed1ad2eca320824e79ec7bdbf33cf4e4318567bc2d4081318f3f"
+    },
+    {
+      "path": "engravings/countries/phl-dark.webp",
+      "bytes": 431894,
+      "sha256": "5801033196c6525571064bd1352dbdc78b69a4849378df8bfb131fe11219e477"
+    },
+    {
+      "path": "engravings/countries/phl.webp",
+      "bytes": 377998,
+      "sha256": "fff2662eaf4c1b191cfeb4e5e5d49152a78471dae129d86832091786fa5388ab"
+    },
+    {
+      "path": "engravings/countries/plw-dark.webp",
+      "bytes": 400336,
+      "sha256": "5d46c17bd53b52bb1c94aadaa75bc4e0a57ee4757b76bd9e2507f6791ad03aa4"
+    },
+    {
+      "path": "engravings/countries/plw.webp",
+      "bytes": 342276,
+      "sha256": "47287b50b6aa07b410a4c5e1d8db7fd217744196cda7b90a25acd3fbf87198a1"
+    },
+    {
+      "path": "engravings/countries/png-dark.webp",
+      "bytes": 375212,
+      "sha256": "3612172c207655e6147bd916f3816bab5ab72f37d056affed98d6277dcfed3c2"
+    },
+    {
+      "path": "engravings/countries/png.webp",
+      "bytes": 342806,
+      "sha256": "13b8e4fe30a8e4e7f1100e4444b4fc9ece112b8f2dcd22cd85d8c69a5b6f4c07"
+    },
+    {
+      "path": "engravings/countries/pol-dark.webp",
+      "bytes": 425866,
+      "sha256": "1e6b7dea3c9f880d4cca20b6d527d6635d405b22bb3c60e91d27da4a80b1ef43"
+    },
+    {
+      "path": "engravings/countries/pol.webp",
+      "bytes": 357770,
+      "sha256": "ed5777c182d3dc9f2183ce7f3ae8061d22363866e3870137482bbf2aa22c37e6"
+    },
+    {
+      "path": "engravings/countries/prk-dark.webp",
+      "bytes": 403758,
+      "sha256": "36c8044c135a323b505376c1b5141109d3aa26d3f87873d8a038b071015dcc9f"
+    },
+    {
+      "path": "engravings/countries/prk.webp",
+      "bytes": 281142,
+      "sha256": "d5cc5b4d2c9084adb5ea58a6d9e2e21f38080ebe8e0e9a1af88332e18d297518"
+    },
+    {
+      "path": "engravings/countries/prt-dark.webp",
+      "bytes": 403950,
+      "sha256": "55667a732c1d1e343975319bedc946e95b718643c5ecc272a6652922910e0f0e"
+    },
+    {
+      "path": "engravings/countries/prt.webp",
+      "bytes": 322664,
+      "sha256": "a97abb5af8d62abca66c1fdd18cc42b956f8a0c90b85dacbdcc939867e2937f9"
+    },
+    {
+      "path": "engravings/countries/pry-dark.webp",
+      "bytes": 338294,
+      "sha256": "d09c3b2c654922096dc9ec13ef1503df0b203138e26ad25eb69d129f804ad0ae"
+    },
+    {
+      "path": "engravings/countries/pry.webp",
+      "bytes": 304814,
+      "sha256": "09bbb8ce25b7df06cb1a8dc8439751f081310870b9e6ce233746a1e39f9a9228"
+    },
+    {
+      "path": "engravings/countries/pse-dark.webp",
+      "bytes": 385702,
+      "sha256": "685e868ad87f93ee0f9477af914dd5f2da1da48322dbc13e4bef25be4558a1ea"
+    },
+    {
+      "path": "engravings/countries/pse.webp",
+      "bytes": 344848,
+      "sha256": "0518e13bc19114fd2a47c39ca081506ad74f49e3775087a6d04b2dfc4c26386d"
+    },
+    {
+      "path": "engravings/countries/qat-dark.webp",
+      "bytes": 477962,
+      "sha256": "3507bf59129f9e7bfca9f47cebfadb9157ee4c6344f7089391ec290047e9e954"
+    },
+    {
+      "path": "engravings/countries/qat.webp",
+      "bytes": 342510,
+      "sha256": "59e4fd92bcecf3f6b78d9140225a92f49aa857b17e4cc14da15207c8c08eaf6a"
+    },
+    {
+      "path": "engravings/countries/rou-dark.webp",
+      "bytes": 409566,
+      "sha256": "39b9d28651cb4fa958149acfe71dcc7d32f0aa097c1d3ebced9335d95930195b"
+    },
+    {
+      "path": "engravings/countries/rou.webp",
+      "bytes": 392494,
+      "sha256": "50cf5dd4cbac5bdb0c652aa46b0870017ede4e64e7fe1430b1d82546115e453d"
+    },
+    {
+      "path": "engravings/countries/rus-dark.webp",
+      "bytes": 431688,
+      "sha256": "54412fbff771539afdc59d44be12bf51edd83a0e7d14a64ac0434e23a4151b24"
+    },
+    {
+      "path": "engravings/countries/rus.webp",
+      "bytes": 330318,
+      "sha256": "b30661d9dd462628622031f2131820d1be6ec94181bb70cfb16329fef68e8ba8"
+    },
+    {
+      "path": "engravings/countries/rwa-dark.webp",
+      "bytes": 398794,
+      "sha256": "ed88dfc939d9ba89c4637c128b3d642b555a58dcd46687feb6c1f07df9eef0cf"
+    },
+    {
+      "path": "engravings/countries/rwa.webp",
+      "bytes": 343384,
+      "sha256": "2a34f0af78f1059c786e596dd02e11295f3292d55864e4d495d695dd68269e71"
+    },
+    {
+      "path": "engravings/countries/sau-dark.webp",
+      "bytes": 491052,
+      "sha256": "7654bef71d6ad99c7c81d21ba58b0f2a860694752a9543cb9a190189a7c0fcbd"
+    },
+    {
+      "path": "engravings/countries/sau.webp",
+      "bytes": 329206,
+      "sha256": "fd0e420ae21e6059438706b97b3325d8ef9245e1e971d09afe55f39957bb1c7a"
+    },
+    {
+      "path": "engravings/countries/sdn-dark.webp",
+      "bytes": 128784,
+      "sha256": "e1e3a56e0b772aaa54c4d42397db73c271ff3614310828b81cf54d4ced9862ae"
+    },
+    {
+      "path": "engravings/countries/sdn.webp",
+      "bytes": 331802,
+      "sha256": "c89ce41c979ef1037ef75262207ed0c397b824199c774db5919f506d9eecf8a1"
+    },
+    {
+      "path": "engravings/countries/sen-dark.webp",
+      "bytes": 313428,
+      "sha256": "d8118c9483ff933cd778c11f7c61e324990d586f9bb2f0e5bca49dafe6fa919e"
+    },
+    {
+      "path": "engravings/countries/sen.webp",
+      "bytes": 337020,
+      "sha256": "9e4034f7659aaf2de0105bcd91fefcedac9fde2a3fe6eccbc7a75790d9fc7e30"
+    },
+    {
+      "path": "engravings/countries/sgp-dark.webp",
+      "bytes": 465676,
+      "sha256": "ba88aa8977fc7d19ca5518a7ed3f3a36119f1d318863472bf1106f10f3d951e3"
+    },
+    {
+      "path": "engravings/countries/sgp.webp",
+      "bytes": 347016,
+      "sha256": "11e3eaaaf6a71afcb35806501c9753fefc9cde318b8182ddb4acf8643cee5a95"
+    },
+    {
+      "path": "engravings/countries/slb-dark.webp",
+      "bytes": 408552,
+      "sha256": "03a0181022317a4f8251b96a304e6ebf7ef13fefcd78fafb04bf67a1bbb66fd1"
+    },
+    {
+      "path": "engravings/countries/slb.webp",
+      "bytes": 362210,
+      "sha256": "5f68394b8a01bd34f78c136ad80a37c1233d98799671352861e4d0beaf5edaf4"
+    },
+    {
+      "path": "engravings/countries/sle-dark.webp",
+      "bytes": 363796,
+      "sha256": "2f7e5732dac00e57fbdd17f11708fa89248cea12b1fad2344718ef36cdb02b67"
+    },
+    {
+      "path": "engravings/countries/sle.webp",
+      "bytes": 366498,
+      "sha256": "57d669454ed3b82b66bae31d8684f6cbb563a087a9e349ee333f0c7f41dbadad"
+    },
+    {
+      "path": "engravings/countries/slv-dark.webp",
+      "bytes": 300190,
+      "sha256": "79076d9bcc34589141d10e9951682b904f85904612ac77d7623977a53397469b"
+    },
+    {
+      "path": "engravings/countries/slv.webp",
+      "bytes": 371620,
+      "sha256": "a13d5c52ee05d7421e0fc8f0099e490c269b69cb346218bea2aa6e15d03934be"
+    },
+    {
+      "path": "engravings/countries/smr-dark.webp",
+      "bytes": 480006,
+      "sha256": "2e48619b6a82b921a827d86139fee76ed9531c0f3f1bf110a989ca9aeefe746f"
+    },
+    {
+      "path": "engravings/countries/smr.webp",
+      "bytes": 375038,
+      "sha256": "a4a8056edab3d301b596d010336f816f30f176aa7beb6f73229aff2036a6af7d"
+    },
+    {
+      "path": "engravings/countries/som-dark.webp",
+      "bytes": 112412,
+      "sha256": "184639b088f11e9694a0280fa13fb2727034078df91298f8baa9be5bcc57d381"
+    },
+    {
+      "path": "engravings/countries/som.webp",
+      "bytes": 398438,
+      "sha256": "ac48eabf2f305207117a9e0cb8f55bbf21f1bc8c797d88943b74cea486720d9a"
+    },
+    {
+      "path": "engravings/countries/srb-dark.webp",
+      "bytes": 391182,
+      "sha256": "64101ef1127035fa2cd21e9dd9fbc643fff519e7e3333ddad48b6feb8b0c6def"
+    },
+    {
+      "path": "engravings/countries/srb.webp",
+      "bytes": 364368,
+      "sha256": "4e2d4da9e478d6b3941f7235e475cec2434ad3e0db5e3b5718f507595dc58fab"
+    },
+    {
+      "path": "engravings/countries/ssd-dark.webp",
+      "bytes": 121284,
+      "sha256": "26b5d6806e028d4cb41e41c5dd40cea797a80889c5901f5d6fc448f3d7e90ddd"
+    },
+    {
+      "path": "engravings/countries/ssd.webp",
+      "bytes": 365022,
+      "sha256": "327a2f182a318ed652c8843c5f13361776b0eba1d531b1edb0d2519fc3b06525"
+    },
+    {
+      "path": "engravings/countries/stp-dark.webp",
+      "bytes": 408578,
+      "sha256": "eec7cdd52e14c8a4dc5730a670e385ea812ee9805842d3cb9d98290065bb8739"
+    },
+    {
+      "path": "engravings/countries/stp.webp",
+      "bytes": 342320,
+      "sha256": "f7d036511f0f0df5f769f38560c3f254884eaa66fe1497ccfbf5327e81e83a6b"
+    },
+    {
+      "path": "engravings/countries/sur-dark.webp",
+      "bytes": 368622,
+      "sha256": "c4790fd02ac4246c7fb77009f763846764037d6b7d573bf4b7802b51e521a534"
+    },
+    {
+      "path": "engravings/countries/sur.webp",
+      "bytes": 324136,
+      "sha256": "cf85f6c81ecc66bdf58f5fe84adde19dd2dff05645e7480e5f4491330d92a7dc"
+    },
+    {
+      "path": "engravings/countries/svk-dark.webp",
+      "bytes": 361544,
+      "sha256": "58996e10def1a575d4bd81216317dbbb69df34fb85d44e8e82ce28a9d4504e8a"
+    },
+    {
+      "path": "engravings/countries/svk.webp",
+      "bytes": 360534,
+      "sha256": "8886454cfa7cff8d0e27933b84669b7b221951332826abe2689f4a63abfd1a16"
+    },
+    {
+      "path": "engravings/countries/svn-dark.webp",
+      "bytes": 396900,
+      "sha256": "316b51f315a0e348727fa3a1050076eaa53be90cf8546a498a455fc52ddf8f97"
+    },
+    {
+      "path": "engravings/countries/svn.webp",
+      "bytes": 337208,
+      "sha256": "b47c75f3e623a8b7a14686f52732b474857a0c7657ecf5a1f842bf1cc9932a01"
+    },
+    {
+      "path": "engravings/countries/swe-dark.webp",
+      "bytes": 343430,
+      "sha256": "54dab3a882f699835f0bd4a984180830c6d3d959ac8c216db91368031904a821"
+    },
+    {
+      "path": "engravings/countries/swe.webp",
+      "bytes": 341114,
+      "sha256": "9b780ee6eb4dfeab67a3628f7e58b644dae5430f1ceec05704449743982e2f7f"
+    },
+    {
+      "path": "engravings/countries/swz-dark.webp",
+      "bytes": 252260,
+      "sha256": "bb490214e3fbb9347dfbe44dc6561b57c4c3d87e34fc12f726ed73eb02ab0671"
+    },
+    {
+      "path": "engravings/countries/swz.webp",
+      "bytes": 377770,
+      "sha256": "fb26107460e9edca415341953a3d8b21260540dd3ef693c981a7e1e5225bf760"
+    },
+    {
+      "path": "engravings/countries/syc-dark.webp",
+      "bytes": 431824,
+      "sha256": "159f708232bd108c850e2ffdc639fbaa59c8af87c0431ae8ae22ddddfe1892ca"
+    },
+    {
+      "path": "engravings/countries/syc.webp",
+      "bytes": 331392,
+      "sha256": "0a64553b83fe6fdc886fb5ac044a60cdcfa7a9c5634db45b0c93034030962a85"
+    },
+    {
+      "path": "engravings/countries/syr-dark.webp",
+      "bytes": 334218,
+      "sha256": "f0a5e8797811e04644c00e5d0ee9c451b10e1752a4a8b56c548688ccc98e77d3"
+    },
+    {
+      "path": "engravings/countries/syr.webp",
+      "bytes": 346162,
+      "sha256": "f0662e246d296158c5a19ca7b754ca28a97c0da12b2de7edb2af790a7310f990"
+    },
+    {
+      "path": "engravings/countries/tcd-dark.webp",
+      "bytes": 246848,
+      "sha256": "38edd7dbdc03ae36fd0c011fe6db34f2952ed1e83b7951240bccbc7acf235bb3"
+    },
+    {
+      "path": "engravings/countries/tcd.webp",
+      "bytes": 369268,
+      "sha256": "e6f986de8b61c80214b2606076fd13a8ffba701bbbdb6fbbe0ae7327c45b9a7c"
+    },
+    {
+      "path": "engravings/countries/tgo-dark.webp",
+      "bytes": 365944,
+      "sha256": "5e87477ce154b5a1daf1bc29b0c1c58e0fb5959e5f8e085c9b1a574de0c1af78"
+    },
+    {
+      "path": "engravings/countries/tgo.webp",
+      "bytes": 412532,
+      "sha256": "f99aa04533db6b71c7142dba8db79d9e1edf576a32e11c6d6325d66047719b4c"
+    },
+    {
+      "path": "engravings/countries/tha-dark.webp",
+      "bytes": 151850,
+      "sha256": "4f1bbb4f90e2108a6a9dfced0359c0e93d3f8ca2456d150707a61a11596ff045"
+    },
+    {
+      "path": "engravings/countries/tha.webp",
+      "bytes": 328298,
+      "sha256": "5417603b09f980575318381193c0441d832d85a9756e92ff6eaf42389542a6f2"
+    },
+    {
+      "path": "engravings/countries/tjk-dark.webp",
+      "bytes": 341920,
+      "sha256": "559fb33c982a600bce2eb038b30959418a2ffb55b22fe4f5380853b68103b26f"
+    },
+    {
+      "path": "engravings/countries/tjk.webp",
+      "bytes": 373602,
+      "sha256": "054e77c21b5088ea15f577dbb70cea5424874fed5dfe0ab2ede219ada026f905"
+    },
+    {
+      "path": "engravings/countries/tkm-dark.webp",
+      "bytes": 356836,
+      "sha256": "5ab0b517ef3b9de10b48c8f44fd2d0e399b5299dbf99d6e2c6579ad5307015ac"
+    },
+    {
+      "path": "engravings/countries/tkm.webp",
+      "bytes": 357834,
+      "sha256": "12fd06d209258396731563456308c716c735e11e3f8d103dc9b2ed2d90d9d32a"
+    },
+    {
+      "path": "engravings/countries/tls-dark.webp",
+      "bytes": 318048,
+      "sha256": "99f2d00e0671c2bb8fd7f1df354aa4e05581ed005dd2fc132bdef90bacf2f6b4"
+    },
+    {
+      "path": "engravings/countries/tls.webp",
+      "bytes": 338198,
+      "sha256": "b0752ca3e534dec240788f29918e86e381b3f1bdf5de72574320f97b4d0ecc1f"
+    },
+    {
+      "path": "engravings/countries/ton-dark.webp",
+      "bytes": 335638,
+      "sha256": "038ea36f4f6c80d1b7532acfdaf26a8446a80cd99968626d74b6b2c3d947003a"
+    },
+    {
+      "path": "engravings/countries/ton.webp",
+      "bytes": 381794,
+      "sha256": "8b72878e5286d25d1e62c142d2b9e56cdaf59885f46fad7ddc9f7ccb7d427c1d"
+    },
+    {
+      "path": "engravings/countries/tto-dark.webp",
+      "bytes": 382460,
+      "sha256": "3108632f4e777c766d08f51a2478c9184e459bcd8ebdea414450b871f7882ab9"
+    },
+    {
+      "path": "engravings/countries/tto.webp",
+      "bytes": 401414,
+      "sha256": "3df3f70ede69531c446a62d8f8751c6cc4c7e76d288e347cf04a87f3d6b94b35"
+    },
+    {
+      "path": "engravings/countries/tun-dark.webp",
+      "bytes": 433276,
+      "sha256": "7515af225a41d31a6ea1b5e8b6833e0e3dda8bbc847ab79bb888cf449843e520"
+    },
+    {
+      "path": "engravings/countries/tun.webp",
+      "bytes": 361002,
+      "sha256": "67a01b70f03fed0e530ebe4f14c01c1e635e39a9a7b0c2814d2730aeca6cf4ce"
+    },
+    {
+      "path": "engravings/countries/tur-dark.webp",
+      "bytes": 385720,
+      "sha256": "4dce5d60c47c46497d8a4e2c346745623bf07c0d53dd75686d9d6321a0eb87ea"
+    },
+    {
+      "path": "engravings/countries/tur.webp",
+      "bytes": 345608,
+      "sha256": "9f57ad2e4aea58ed3809ab3e7a4637e44b3699234128e66bf11d3177a14495c1"
+    },
+    {
+      "path": "engravings/countries/tuv-dark.webp",
+      "bytes": 367980,
+      "sha256": "db519abe04d8fb9987d23a73f92b2964bdbc6320e94904c3b3d6dc13326d0c90"
+    },
+    {
+      "path": "engravings/countries/tuv.webp",
+      "bytes": 343826,
+      "sha256": "fa4d38d3c5dc58720fc92ffef583b2ce07fea5e2b324afcbe3ed4abf8ba8a807"
+    },
+    {
+      "path": "engravings/countries/twn-dark.webp",
+      "bytes": 355292,
+      "sha256": "b2c6f52b31ca3f1d96b2f41e8f6fc053a1c4c51bc0e11534135a5cea5c4baa81"
+    },
+    {
+      "path": "engravings/countries/twn.webp",
+      "bytes": 352982,
+      "sha256": "42ffd890cebb73526116f4c7546d21350cb9a330e6845f21806d74d6a347f6b8"
+    },
+    {
+      "path": "engravings/countries/tza-dark.webp",
+      "bytes": 364192,
+      "sha256": "b5af8fbd9cd760a0a6ad3cd2e6fcff163d6838d8026120b9eb8a2b3f1d455e23"
+    },
+    {
+      "path": "engravings/countries/tza.webp",
+      "bytes": 384890,
+      "sha256": "cbc080ba3ffb1f436f5fda4ee3c9e65b6889c8c5bd176d91a7dfb1674aec5aef"
+    },
+    {
+      "path": "engravings/countries/uga-dark.webp",
+      "bytes": 115984,
+      "sha256": "d461d0d2ccdb0312726281f048efd6e26cff3fc0c368060835cac723f9540742"
+    },
+    {
+      "path": "engravings/countries/uga.webp",
+      "bytes": 352640,
+      "sha256": "2060999daa5255546006d2d067623bc6355a3878406ad4f793392dd1c4989277"
+    },
+    {
+      "path": "engravings/countries/ukr-dark.webp",
+      "bytes": 371570,
+      "sha256": "a6ca7f0a2454da540352de45112bc0bd2849195caeb1d74760cc8b439837c611"
+    },
+    {
+      "path": "engravings/countries/ukr.webp",
+      "bytes": 364118,
+      "sha256": "1cd363fdc441c100ddf9d51155fcc33a7f3ae6c76e6354a892c3c6cac0d64f72"
+    },
+    {
+      "path": "engravings/countries/ury-dark.webp",
+      "bytes": 406278,
+      "sha256": "a655fcb055ffcb0330d5f4f3ee8d1b0808d5b7a8fc90a23f57663e1274490de3"
+    },
+    {
+      "path": "engravings/countries/ury.webp",
+      "bytes": 342466,
+      "sha256": "ed7911ad82a962fa006c84561a4d3b72cc89dd0387bf77420ed0a876cd5b048c"
+    },
+    {
+      "path": "engravings/countries/usa-dark.webp",
+      "bytes": 206948,
+      "sha256": "a785e6b472f915e2511b99a765d8aee674ea10030801a24dc809a8db6ce46e18"
+    },
+    {
+      "path": "engravings/countries/usa.webp",
+      "bytes": 240884,
+      "sha256": "8a76ea3395e7a6f500049d2cbea8e0ada4cc2bfb90f82d827b4bc318c36199d6"
+    },
+    {
+      "path": "engravings/countries/uzb-dark.webp",
+      "bytes": 381506,
+      "sha256": "1c6c853aeded2cac0cb297cbe65998218978c7e37c3cf4baef913ee987c9d72f"
+    },
+    {
+      "path": "engravings/countries/uzb.webp",
+      "bytes": 606168,
+      "sha256": "b19341d0fda67d1e5cd666060c9a1355d599e39c7a679e98499a56244be27bb5"
+    },
+    {
+      "path": "engravings/countries/vat-dark.webp",
+      "bytes": 387460,
+      "sha256": "d0aef4464b29ca78cfcffe853c075d9576d9e1fcc03750e27568ba52d09cfd89"
+    },
+    {
+      "path": "engravings/countries/vat.webp",
+      "bytes": 395690,
+      "sha256": "2a64e592abac8de60f68b08d42f5e36d832eaa755da50458b66b6e196e8c92be"
+    },
+    {
+      "path": "engravings/countries/vct-dark.webp",
+      "bytes": 403836,
+      "sha256": "d7b9a2ec21f6d630be78074c3e4270b4f2dca32912b4dc53d7f02cb2a8515653"
+    },
+    {
+      "path": "engravings/countries/vct.webp",
+      "bytes": 342538,
+      "sha256": "c36663a6e3d2305ea1a889186cf27cd3a358749ff0215657a419a96796521029"
+    },
+    {
+      "path": "engravings/countries/ven-dark.webp",
+      "bytes": 107278,
+      "sha256": "d1f16883069338d3ae3b04ba77e104258e799b965ad4922903ee47fb0b135dbf"
+    },
+    {
+      "path": "engravings/countries/ven.webp",
+      "bytes": 699170,
+      "sha256": "db763254afcb1bb264925a7b238312d570f287b24059a9be8ddcc3cc9eb380eb"
+    },
+    {
+      "path": "engravings/countries/vnm-dark.webp",
+      "bytes": 135176,
+      "sha256": "5b651ad80cea1d8c7546b1fdd0cd9589617fec1b5ec55b4fdc5d2bcad416bb23"
+    },
+    {
+      "path": "engravings/countries/vnm.webp",
+      "bytes": 579962,
+      "sha256": "6b31487923269922a13d0c8936876160694971554aa14febe69df05d25a9a84c"
+    },
+    {
+      "path": "engravings/countries/vut-dark.webp",
+      "bytes": 126706,
+      "sha256": "5e00f471a17046113a576690d38bd36e3f06b5de0e37d8b4974f92829842a365"
+    },
+    {
+      "path": "engravings/countries/vut.webp",
+      "bytes": 608124,
+      "sha256": "4b435b9e949d57a07fc3798161e6ef2dd4007f3c9573211cc8133c0c8cdf5576"
+    },
+    {
+      "path": "engravings/countries/wsm-dark.webp",
+      "bytes": 472024,
+      "sha256": "9dba07ad0682c3ab1d430db0fcebd6828566b2b0fb23e152ca522776c746007d"
+    },
+    {
+      "path": "engravings/countries/wsm.webp",
+      "bytes": 356798,
+      "sha256": "9e527c84360dc93ff52859051d45b56dcf1f4b9f61dd0451a0046c2db1dae61f"
+    },
+    {
+      "path": "engravings/countries/xkx-dark.webp",
+      "bytes": 304938,
+      "sha256": "980e96d4963d6c4e5ec9f2c6c7642ed589b4bc3d60793c7d0905327f843aec48"
+    },
+    {
+      "path": "engravings/countries/xkx.webp",
+      "bytes": 385830,
+      "sha256": "fd6ee1682a364beb4e6abc1523677766523dabca2bec595c16e6aac32dc38ce3"
+    },
+    {
+      "path": "engravings/countries/yem-dark.webp",
+      "bytes": 110410,
+      "sha256": "9d9ef9184f7085f31932cd2d5014ad4f5cc2225ab9c14014fd7cac93bf9a5d74"
+    },
+    {
+      "path": "engravings/countries/yem.webp",
+      "bytes": 656290,
+      "sha256": "ea3d9ef9ce0950e6998fb653091def62ec4392d63f851752795772d38e978452"
+    },
+    {
+      "path": "engravings/countries/zaf-dark.webp",
+      "bytes": 336048,
+      "sha256": "f7659c327d6c3a44fd01d44879d84f070be9bcde50f787b280a6515fb85b5090"
+    },
+    {
+      "path": "engravings/countries/zaf.webp",
+      "bytes": 326404,
+      "sha256": "f78cb8a9941b7b976b67ab9649ba10cfa7b1c53d86612377da2144c39ead5149"
+    },
+    {
+      "path": "engravings/countries/zmb-dark.webp",
+      "bytes": 144766,
+      "sha256": "5750ba6e52b5b21e570a687d16ede297e2d7ca4ba8fd81611687ee0ee94ec763"
+    },
+    {
+      "path": "engravings/countries/zmb.webp",
+      "bytes": 636510,
+      "sha256": "be755b73d47ece9cb6d2a9293d4b28b7b466324bc521a7d2122458112dbeea23"
+    },
+    {
+      "path": "engravings/countries/zwe-dark.webp",
+      "bytes": 546346,
+      "sha256": "6e8b0fef9ac3ba9948e01d440cd0d4fce8e6aff78699b54ed11959ff35038858"
+    },
+    {
+      "path": "engravings/countries/zwe.webp",
+      "bytes": 647308,
+      "sha256": "2e9cc6097df06b4be9bb46239588dbca34212ddd04905269f86345cfd7d86b09"
+    },
+    {
+      "path": "engravings/footer-trust-dark.webp",
+      "bytes": 318480,
+      "sha256": "f0994b4bae0af94c7bfb8e3ef0d0a8ff5fa8c4134471854f6f3e9fe028ea26e4"
+    },
+    {
+      "path": "engravings/footer-trust.webp",
+      "bytes": 238692,
+      "sha256": "1e9dc5e91821b96be862e6d6abe3fc680c4ec6601b7be28451f43f6b0a22d6f3"
+    },
+    {
+      "path": "engravings/hero-dark.webp",
+      "bytes": 308880,
+      "sha256": "425b2befbb50551c7fbb4efe615c660ce8837bef8572888f08cf0179737ccc48"
+    },
+    {
+      "path": "engravings/hero.webp",
+      "bytes": 165438,
+      "sha256": "3cdf3e245cbfe051042f1ddef75e005edd77e479da8be368cabf9e73845c5ea7"
+    },
+    {
+      "path": "engravings/home-governance-evidence-dark.webp",
+      "bytes": 312886,
+      "sha256": "8108d107bb99118b2ba6983701a505475db8667e354f635465172000145109b3"
+    },
+    {
+      "path": "engravings/home-governance-evidence.webp",
+      "bytes": 324948,
+      "sha256": "19200e2d3fdd7bffb2bf15aab963ac35606b7cf1e43c9e82a5c2a62384160448"
+    },
+    {
+      "path": "engravings/navigation/explore-compare-dark.webp",
+      "bytes": 7026,
+      "sha256": "65735cdaa66a655c1673343f868f63f8029e1215f0825b638024a0c6d9356e56"
+    },
+    {
+      "path": "engravings/navigation/explore-compare.webp",
+      "bytes": 8002,
+      "sha256": "1141a65020a9d809b337b9dbe1feb4fe66c882c227578cc3e880dad52fd069b4"
+    },
+    {
+      "path": "engravings/navigation/explore-constitutions-dark.webp",
+      "bytes": 11314,
+      "sha256": "15816bc31185e9e486f145ab048622148a0aa0180e083add9fd2a8381b5f58dc"
+    },
+    {
+      "path": "engravings/navigation/explore-constitutions.webp",
+      "bytes": 13680,
+      "sha256": "de282aee3e3d523e87109322a33290228441f50c91048b7f5ddd153a521a63a0"
+    },
+    {
+      "path": "engravings/navigation/explore-countries-dark.webp",
+      "bytes": 10646,
+      "sha256": "9ae950a57975714e9db83a85d8962cd7fdfb6687927a7375daee4cab7ee99529"
+    },
+    {
+      "path": "engravings/navigation/explore-countries.webp",
+      "bytes": 10028,
+      "sha256": "0f97dc977bfb0704704f51a1f0ec68b6a42a0c9463b8f9ca862ec51011e76403"
+    },
+    {
+      "path": "engravings/navigation/explore-elections-dark.webp",
+      "bytes": 5946,
+      "sha256": "58d0631b9693f9550b363d3344ec0fe4db6ddab4bda2360830888331ca1ca3ef"
+    },
+    {
+      "path": "engravings/navigation/explore-elections.webp",
+      "bytes": 9072,
+      "sha256": "983b63b0e6ecd953e558056b2ba2d44de35b005d7af83613bd582fd08ac4cdd1"
+    },
+    {
+      "path": "engravings/navigation/explore-organizations-dark.webp",
+      "bytes": 10426,
+      "sha256": "acd8b3e9f334d3800d8b3faf398eff72b778269e37693e393cca9b31b6560a2c"
+    },
+    {
+      "path": "engravings/navigation/explore-organizations.webp",
+      "bytes": 13116,
+      "sha256": "dad5cdf3efda40dbe442cc8884a0d71337937cc34d1d607e9612eb5bb5e1a2da"
+    },
+    {
+      "path": "engravings/navigation/explore-parties-dark.webp",
+      "bytes": 8820,
+      "sha256": "2683443d152fc5ab8d125ba3b30bffbeef6fbbaaf16618bb605547b8c45df55a"
+    },
+    {
+      "path": "engravings/navigation/explore-parties.webp",
+      "bytes": 11390,
+      "sha256": "9daf069333673d4cabba116417b5202acaa6a320cf8ad5ddcb6a584ac1f4fc89"
+    },
+    {
+      "path": "engravings/navigation/explore-rankings-dark.webp",
+      "bytes": 5012,
+      "sha256": "ff1ce90dc1faa32e37b4faae2559206db91ff3d6d53f592ae47d003983ca87f0"
+    },
+    {
+      "path": "engravings/navigation/explore-rankings.webp",
+      "bytes": 5654,
+      "sha256": "072cddb282441ced74dfe39a0920543ef47832b96fb0a7f23c9cb41509389a98"
+    },
+    {
+      "path": "engravings/navigation/explore-world-atlas-dark.webp",
+      "bytes": 7866,
+      "sha256": "6d2c12440a952d3ccfc901398d48f963328bf841f8680a58c90781387abde056"
+    },
+    {
+      "path": "engravings/navigation/explore-world-atlas.webp",
+      "bytes": 8680,
+      "sha256": "35c40386ca6c162294404815eb69d6fbf1cd371df50a4935b71fa46ac9d339ed"
+    },
+    {
+      "path": "engravings/navigation/spot-column-dark.webp",
+      "bytes": 1032,
+      "sha256": "58a23501c6de27becc85696a772ddfcc83f9efac2fb65721fc6b6dbcca4fad30"
+    },
+    {
+      "path": "engravings/navigation/spot-column.webp",
+      "bytes": 758,
+      "sha256": "d10c8316269ebadd070de44dfe28fd35c98a38d0fd94d70f21d0ca9badcd314c"
+    },
+    {
+      "path": "engravings/navigation/spot-compass-dark.webp",
+      "bytes": 842,
+      "sha256": "361b5d767e10d29dac4f070c7f228250ecb71d15fa152c2a4db116b634ec9e2c"
+    },
+    {
+      "path": "engravings/navigation/spot-compass.webp",
+      "bytes": 1368,
+      "sha256": "e82003fdc26c58de0a19f322bee3fb90721cbf90bf64a44d6bf9328a16f3e73e"
+    },
+    {
+      "path": "engravings/navigation/spot-globe-dark.webp",
+      "bytes": 1072,
+      "sha256": "4c71da8a44b3b08aa678f6167589746d45f42a52abb3a9f5fca28c9d520a4fa3"
+    },
+    {
+      "path": "engravings/navigation/spot-globe.webp",
+      "bytes": 1262,
+      "sha256": "055a7e4357842f84b894dc82e3517bcb9c8aa81ad47c15b65102f82582b148a8"
+    },
+    {
+      "path": "engravings/navigation/spot-laurel-dark.webp",
+      "bytes": 1260,
+      "sha256": "597ebef6a4f6df519a596cf7315856f44fa69736b1a38d939313747237e7ce23"
+    },
+    {
+      "path": "engravings/navigation/spot-laurel.webp",
+      "bytes": 980,
+      "sha256": "108d8dcc557a9194f0db4978581b7644bea8ca1b9e85a11ed3ed67182895cc4a"
+    },
+    {
+      "path": "engravings/navigation/spot-mountains-dark.webp",
+      "bytes": 820,
+      "sha256": "bdfec61b5f5cf36d526e23ac299160409a8a0df7a20d8e6da8e42be46ac64c58"
+    },
+    {
+      "path": "engravings/navigation/spot-mountains.webp",
+      "bytes": 1416,
+      "sha256": "35b205c25c4e243dc8e56bfa41df4cd868c9845d653ffd792a60a2c43b931d2b"
+    },
+    {
+      "path": "engravings/navigation/spot-ship-dark.webp",
+      "bytes": 612,
+      "sha256": "da9782a961f1663f8b4b15ca7b69d155e5179ae93dbf06502f9ba13ca5b44111"
+    },
+    {
+      "path": "engravings/navigation/spot-ship.webp",
+      "bytes": 1072,
+      "sha256": "c08b6aec9737c12a49360f986761eb1f6ded9237aa778682a5095e41db812302"
+    },
+    {
+      "path": "engravings/pages/about-dark.webp",
+      "bytes": 205078,
+      "sha256": "58a6fb2990d11d1ee7f1cfff108ec14641f7dc22f9decffea6dfb98ebbf539d2"
+    },
+    {
+      "path": "engravings/pages/about.webp",
+      "bytes": 229348,
+      "sha256": "2dd797859734dc0dc42fb05a17ccb82715eef7c01d8c2844996fa9ca7410b8dd"
+    },
+    {
+      "path": "engravings/pages/atlas-dark.webp",
+      "bytes": 397406,
+      "sha256": "3b31ce3cd25d2a10fdd8d1110394f3e9c8728a6a954dc27937713cc793ed7f97"
+    },
+    {
+      "path": "engravings/pages/atlas.webp",
+      "bytes": 251702,
+      "sha256": "1c6ae07747949fd6303c85390882a380ef34097ec90754ac82b7c9b7a22d7634"
+    },
+    {
+      "path": "engravings/pages/compare-dark.webp",
+      "bytes": 318508,
+      "sha256": "3d2d19373bffb2c1f39845691ca61f3d4df20d1e5cd985a0e98b45874fb56d6f"
+    },
+    {
+      "path": "engravings/pages/compare.webp",
+      "bytes": 258276,
+      "sha256": "a8551ebe6e95ba293d45fc4ad9d4123e9216550c2bc00ff511646690947f0c47"
+    },
+    {
+      "path": "engravings/pages/countries-dark.webp",
+      "bytes": 308386,
+      "sha256": "50863bf085f9f6111a48ba9498511f37cfe4700ae1be9b1e9cb9ce79582822ef"
+    },
+    {
+      "path": "engravings/pages/countries.webp",
+      "bytes": 190108,
+      "sha256": "428f70e87e547bb012c8a79c010dc4b98d45c3c432c50560d6661945e411b26f"
+    },
+    {
+      "path": "engravings/pages/index-dark.webp",
+      "bytes": 346104,
+      "sha256": "ec1bcc93253a275e99d6cc1ece32bc43ae48d405479f4ff68dba0ab571139c66"
+    },
+    {
+      "path": "engravings/pages/index.webp",
+      "bytes": 221986,
+      "sha256": "59f1e89880e787a6c623ea95a6345eb30727fdd27e2c70fe230462569a8ad248"
+    },
+    {
+      "path": "engravings/pages/methodology-dark.webp",
+      "bytes": 300208,
+      "sha256": "4ef97cb63ee0397a7a99b48bf472e160ceef67bdf877f7d67165c45a0e4de791"
+    },
+    {
+      "path": "engravings/pages/methodology.webp",
+      "bytes": 194318,
+      "sha256": "26d2717e18e06e496f2de652f7d07e8847e1b5d964b957fa062a1621d83008fa"
+    },
+    {
+      "path": "engravings/pages/record-dark.webp",
+      "bytes": 321788,
+      "sha256": "4d0894c4503d9a533db1c4b40fdeb53632d60bb47a67222c8932e8e4ac3363b8"
+    },
+    {
+      "path": "engravings/pages/record.webp",
+      "bytes": 234378,
+      "sha256": "aa059cb232d3b8059ef2bbcaeeb942f0beab03ca9b98d6ff4cd7eb608d575a2c"
+    },
+    {
+      "path": "engravings/spot-column-dark.webp",
+      "bytes": 145322,
+      "sha256": "5a00c5697904ab693266c8df1baca4615eb50d49adc12aad90473f48ed1a83ad"
+    },
+    {
+      "path": "engravings/spot-column.webp",
+      "bytes": 65534,
+      "sha256": "ef74c9f9b33490317b4de3763f40b287406633444841b1be4cf30a09b056ae3d"
+    },
+    {
+      "path": "engravings/spot-compass-dark.webp",
+      "bytes": 186804,
+      "sha256": "003e838f0ccfb58c31b2130c196fd8bc125cad78207ea576ec09287f6433959a"
+    },
+    {
+      "path": "engravings/spot-compass.webp",
+      "bytes": 124770,
+      "sha256": "923f878d6b4ce86991c0817d0efb43fbc9d35bb7cc1b8a02af9ff9fa6d7a974f"
+    },
+    {
+      "path": "engravings/spot-globe-dark.webp",
+      "bytes": 238076,
+      "sha256": "8ca7030939a98d997b0d32e6ff83033a4dc3b20793a5f9de117b47cd4f981ab1"
+    },
+    {
+      "path": "engravings/spot-globe.webp",
+      "bytes": 87060,
+      "sha256": "22720f06c8564c4da24edb9a5f7cb6e8d0b85e6730c2a37c57551f4ba6d3839a"
+    },
+    {
+      "path": "engravings/spot-laurel-dark.webp",
+      "bytes": 242914,
+      "sha256": "005df9b079993fa3342c9fc5f884bd4b27c0695ffc238545ed31c5313c1a512c"
+    },
+    {
+      "path": "engravings/spot-laurel.webp",
+      "bytes": 58860,
+      "sha256": "8b4cd7b5e83937ef00eb6efd93f4a68a7eba7c6ef8e3f32832b38e2b475e29e8"
+    },
+    {
+      "path": "engravings/spot-mountains-dark.webp",
+      "bytes": 238234,
+      "sha256": "6e26deafd8104e34332465e7319f69021abb5bb8ba5765f9b4d428b976887ae9"
+    },
+    {
+      "path": "engravings/spot-mountains.webp",
+      "bytes": 130246,
+      "sha256": "c07b3e73891ed8c2a30bf4b3dff9e53f3d9b701989a3e8a3d497ce4816f2427a"
+    },
+    {
+      "path": "engravings/spot-ship-dark.webp",
+      "bytes": 260456,
+      "sha256": "857e2b7f39f24b2d9c78d7d93d080e0f82b2ad6089b65a6240670c8680e80a64"
+    },
+    {
+      "path": "engravings/spot-ship.webp",
+      "bytes": 94210,
+      "sha256": "1dce6dbab8b58d2be03ec28e5fdcf55a5a71ba8d6d0576a9f05fb63803e438df"
+    },
+    {
+      "path": "engravings/territories/akrotiri-dark.webp",
+      "bytes": 664638,
+      "sha256": "e214761075d720ee2aed13e431c87096e707c147f787747311519472559c0b40"
+    },
+    {
+      "path": "engravings/territories/akrotiri.webp",
+      "bytes": 822408,
+      "sha256": "29748b26a23c7fadc48f90d22a587c498a9c3b490fb76751fa4fe5ed7c73ccd5"
+    },
+    {
+      "path": "engravings/territories/american-samoa-dark.webp",
+      "bytes": 305172,
+      "sha256": "aa5a5818b1641378f387ceba6f84be161a7470d9dab6527952d557e1f850ffa0"
+    },
+    {
+      "path": "engravings/territories/american-samoa.webp",
+      "bytes": 386350,
+      "sha256": "1d98d75fe4f446cfa17863af3b3267c5d6228232dbd431af022c5b9f8e82bec6"
+    },
+    {
+      "path": "engravings/territories/anguilla-dark.webp",
+      "bytes": 277698,
+      "sha256": "f2b05033a60216aff9078d911bedbd0e4cb6805bcf7c154137392a410cf25ccc"
+    },
+    {
+      "path": "engravings/territories/anguilla.webp",
+      "bytes": 328962,
+      "sha256": "796ded50385475788df615e253d4fe424a46c51e6af57d4d1fe7efecf0d58f5d"
+    },
+    {
+      "path": "engravings/territories/antarctica-dark.webp",
+      "bytes": 287582,
+      "sha256": "8912b81cfb8a04db99ee023eab3ae4c2cf6f8179db0bee2a6c5861d76e8ebc1f"
+    },
+    {
+      "path": "engravings/territories/antarctica.webp",
+      "bytes": 296102,
+      "sha256": "b2c0e685d165dd91db64a02e557dc08d6c0e631a5f20642604d4b6e0b956704c"
+    },
+    {
+      "path": "engravings/territories/aruba-dark.webp",
+      "bytes": 328132,
+      "sha256": "d2595f0423ac436c473369cd76721f05c70d355450d83cb94dbbf3504d911e72"
+    },
+    {
+      "path": "engravings/territories/aruba.webp",
+      "bytes": 512084,
+      "sha256": "452dfca4a9b971a04bb2360f070b86c9e33f5097aa4effbc127bc0c471fb47b1"
+    },
+    {
+      "path": "engravings/territories/ashmore-and-cartier-islands-dark.webp",
+      "bytes": 735364,
+      "sha256": "4994aa2a23c2e01dab798805dd3518addb70d073442515402ee6cb33a21713e4"
+    },
+    {
+      "path": "engravings/territories/ashmore-and-cartier-islands.webp",
+      "bytes": 836246,
+      "sha256": "659be077d09e580a7e1db37936d93dd2605ee1dfc25090c16ffad9094ebbca62"
+    },
+    {
+      "path": "engravings/territories/baker-island-howland-island-jarvis-island-johnston-atoll-kingman-reef-midway-islands-palmyra-atoll-dark.webp",
+      "bytes": 229604,
+      "sha256": "388fc9dc258488bac94f2a2164359c32facae47d3883feaa656f61668ca4b06c"
+    },
+    {
+      "path": "engravings/territories/baker-island-howland-island-jarvis-island-johnston-atoll-kingman-reef-midway-islands-palmyra-atoll.webp",
+      "bytes": 427858,
+      "sha256": "98299abcd9cdbe0f0cd37818cbb9c895a0602b6df0bb3b0826f27494479cc50c"
+    },
+    {
+      "path": "engravings/territories/bermuda-dark.webp",
+      "bytes": 328906,
+      "sha256": "f91f221b380553c6ed634630b11f3e9df597ce6a1dbde8d80223f205e44eeab2"
+    },
+    {
+      "path": "engravings/territories/bermuda.webp",
+      "bytes": 492538,
+      "sha256": "8336804d2fe20a0232a94ae7870e2ceb63d0026d847bb2d7de66421e1e75a215"
+    },
+    {
+      "path": "engravings/territories/bouvet-island-dark.webp",
+      "bytes": 688276,
+      "sha256": "713231ef477cc6061ca6b48c285e1d8fe830c2c22cc939897babab7871a8cbc6"
+    },
+    {
+      "path": "engravings/territories/bouvet-island.webp",
+      "bytes": 835452,
+      "sha256": "86c7be2b87513ff9e55cb5a62c5bd7b29d71705872b106ca456cf8285ab9425e"
+    },
+    {
+      "path": "engravings/territories/british-virgin-islands-dark.webp",
+      "bytes": 250492,
+      "sha256": "5dd7aec77443522be475df6124976699c8b681b6df000eeae5d0ee17a5a081be"
+    },
+    {
+      "path": "engravings/territories/british-virgin-islands.webp",
+      "bytes": 884224,
+      "sha256": "e72853d1ebe1dad65a99d597c0e57315cf41a850b64a31e121356aad85d9dfb5"
+    },
+    {
+      "path": "engravings/territories/cayman-islands-dark.webp",
+      "bytes": 309968,
+      "sha256": "353e6610d02f116b1348fda93cb37b8f6b8007404b5890a6e89ecfd60bdee8be"
+    },
+    {
+      "path": "engravings/territories/cayman-islands.webp",
+      "bytes": 431790,
+      "sha256": "a6ac3aac1cd0d52a2423a5e18d447c1ac472ecef81dd432607f0f3d31faa6157"
+    },
+    {
+      "path": "engravings/territories/christmas-island-dark.webp",
+      "bytes": 645970,
+      "sha256": "9ac19d9b5b7ea15496c5724fa68d93ef616fc3eee908cf910a7b61c1f6b5635c"
+    },
+    {
+      "path": "engravings/territories/christmas-island.webp",
+      "bytes": 824602,
+      "sha256": "efa1deb58dece7bc2e9021c5de5999c8119a4e892a3543ade7ddd4203f8c380d"
+    },
+    {
+      "path": "engravings/territories/clipperton-island-dark.webp",
+      "bytes": 622548,
+      "sha256": "76365b4056e5c7ae470c782232b5f8a9c8d9f33d94862818a6e75e10f795825f"
+    },
+    {
+      "path": "engravings/territories/clipperton-island.webp",
+      "bytes": 768354,
+      "sha256": "5b136f7a13059de618a683e07f58b740d05e671726f850efc1ecd66ad6eee4db"
+    },
+    {
+      "path": "engravings/territories/cocos-keeling-islands-dark.webp",
+      "bytes": 622768,
+      "sha256": "ea8018efb7a28f2afcba5fddf7fb41d970c0586b813fadf71446034d76f85ae3"
+    },
+    {
+      "path": "engravings/territories/cocos-keeling-islands.webp",
+      "bytes": 835474,
+      "sha256": "43714f0624472a6cc880db036a8970c1043b492c68336be0d1a012e6e3ff283d"
+    },
+    {
+      "path": "engravings/territories/cook-islands-dark.webp",
+      "bytes": 591878,
+      "sha256": "723173371a028f9b5d2ee7423dfd9701587b80a63f836c95353c83effa3338ac"
+    },
+    {
+      "path": "engravings/territories/cook-islands.webp",
+      "bytes": 801492,
+      "sha256": "6f50d7590f3424775266933691676998a66de6a69066182e6ddb5bc4fb599e9e"
+    },
+    {
+      "path": "engravings/territories/coral-sea-islands-dark.webp",
+      "bytes": 567104,
+      "sha256": "c0a77aaa0da825331d17c2b51f9fc3db1b73568107abb594964ef7d40bbdb6d6"
+    },
+    {
+      "path": "engravings/territories/coral-sea-islands.webp",
+      "bytes": 744524,
+      "sha256": "7307ab7bdb61625cf48fffa1ef399ff45637d3b71fa330e1988fce07fb2f88ad"
+    },
+    {
+      "path": "engravings/territories/curacao-dark.webp",
+      "bytes": 585366,
+      "sha256": "3a552778bb1c9270d76172b478f0058bb857b8e35c9b5a533ff14cd0451bec23"
+    },
+    {
+      "path": "engravings/territories/curacao.webp",
+      "bytes": 783858,
+      "sha256": "44210af2360410f0974ee100173496b6a69026a40765bcb3d580df884b11172f"
+    },
+    {
+      "path": "engravings/territories/dhekelia-dark.webp",
+      "bytes": 517780,
+      "sha256": "175072570762148cd186e67f4da37865e991ae48ca2f2aa540f0ca48a586708b"
+    },
+    {
+      "path": "engravings/territories/dhekelia.webp",
+      "bytes": 673524,
+      "sha256": "fbc5a551b8fafd19a666973a2942c0c3439895405bddbfc403273d19b993c7e0"
+    },
+    {
+      "path": "engravings/territories/falkland-islands-islas-malvinas-dark.webp",
+      "bytes": 351560,
+      "sha256": "2ec11f0389ba555e1a947b38b7c63a431cc4812e10b1c3736fc0721ee47e1203"
+    },
+    {
+      "path": "engravings/territories/falkland-islands-islas-malvinas.webp",
+      "bytes": 715438,
+      "sha256": "54aca4fde817185a6725a31bfe93648ac4791babd9691738bf0fc3097587946b"
+    },
+    {
+      "path": "engravings/territories/faroe-islands-dark.webp",
+      "bytes": 543798,
+      "sha256": "b6688c8ba3771befeb0e775889351803d4f70de6a49d511a25a40ed92b42563a"
+    },
+    {
+      "path": "engravings/territories/faroe-islands.webp",
+      "bytes": 743290,
+      "sha256": "7257c79beb9ee5dc6f3dd901b9c57df852664385cddd723fb190e8e099ec35dd"
+    },
+    {
+      "path": "engravings/territories/french-polynesia-dark.webp",
+      "bytes": 530740,
+      "sha256": "83d288394709b4eb68ebc93861a5a28eb11a3353af506530fe07d9a3540092aa"
+    },
+    {
+      "path": "engravings/territories/french-polynesia.webp",
+      "bytes": 783108,
+      "sha256": "a4a15c2e23df09d17bc47c38c5d24701133d96e3572076504424db3715bbeb63"
+    },
+    {
+      "path": "engravings/territories/french-southern-and-antarctic-lands-dark.webp",
+      "bytes": 478556,
+      "sha256": "6924d4bee17a265368edfbda96e752bc139611b3744f64a0afb82fd89c82a63a"
+    },
+    {
+      "path": "engravings/territories/french-southern-and-antarctic-lands.webp",
+      "bytes": 729976,
+      "sha256": "22b37ca30f75170a201d3c14993c972bba12b7b69fe54bcd8da0865ae829c3b7"
+    },
+    {
+      "path": "engravings/territories/gaza-gaza-strip-dark.webp",
+      "bytes": 515190,
+      "sha256": "1c5a5e2157b3bd0bc4266a883b6e072bad4543d8398a6a49d74e9035716273c0"
+    },
+    {
+      "path": "engravings/territories/gaza-gaza-strip.webp",
+      "bytes": 648498,
+      "sha256": "c0952b0ca9b441305887908c229ff6c06143d9fcbea2b6c4c1c3f21a7155f980"
+    },
+    {
+      "path": "engravings/territories/gibraltar-dark.webp",
+      "bytes": 477468,
+      "sha256": "56af5d32a562f1205a8c49210e20925912ad2114c5eb5f5678fd8189b5497fbe"
+    },
+    {
+      "path": "engravings/territories/gibraltar.webp",
+      "bytes": 532386,
+      "sha256": "6a54ad2ca9d9265a4587aee55c00342ababab382eff665fa8874afb93194d9ff"
+    },
+    {
+      "path": "engravings/territories/greenland-dark.webp",
+      "bytes": 397468,
+      "sha256": "07516904522837ad18b54550669529e213a00e0d85b7781a6503ea9bd495dba4"
+    },
+    {
+      "path": "engravings/territories/greenland.webp",
+      "bytes": 617654,
+      "sha256": "ecc0a78453eb2a133a9dd719224300d7775309e9dcdca30db87356723f9f3607"
+    },
+    {
+      "path": "engravings/territories/guam-dark.webp",
+      "bytes": 458226,
+      "sha256": "16379d25e13b139f939b73b3c30c84684593fa5a36b750b57dd5384ce961966b"
+    },
+    {
+      "path": "engravings/territories/guam.webp",
+      "bytes": 614258,
+      "sha256": "f0dbc18e1e04d64c3a2b7e748acdb45b2b4b10a87a0ced5559ae78b9711e6c29"
+    },
+    {
+      "path": "engravings/territories/guernsey-dark.webp",
+      "bytes": 309612,
+      "sha256": "a6dd35a9bc41938751bcdf220b0b92d24fd9510ef9a127aac0830ed5914f4d5e"
+    },
+    {
+      "path": "engravings/territories/guernsey.webp",
+      "bytes": 524018,
+      "sha256": "80f21b288c6cc470970ec27baf576efc38b1dfae2103bc72d45e123fef76a8f9"
+    },
+    {
+      "path": "engravings/territories/heard-island-and-mcdonald-islands-dark.webp",
+      "bytes": 297292,
+      "sha256": "5a3eeb7e222d93f6618c408f09dc43fbc0752fbc01f1fb6426c545e11ad32507"
+    },
+    {
+      "path": "engravings/territories/heard-island-and-mcdonald-islands.webp",
+      "bytes": 467660,
+      "sha256": "e6984f9f52c4814fbc272059b311db01bc2b5a4d9e17f0bde4426e98a087be50"
+    },
+    {
+      "path": "engravings/territories/hong-kong-dark.webp",
+      "bytes": 280206,
+      "sha256": "38876ba5b219c6a94947c1018fe5f8c5c9c4b2413d0641a9887f6b6e39e679b4"
+    },
+    {
+      "path": "engravings/territories/hong-kong.webp",
+      "bytes": 492588,
+      "sha256": "a57671199526e45c9f23d2f1fccc60de107c6db633ebee27e8a2c37c569f9fdf"
+    },
+    {
+      "path": "engravings/territories/isle-of-man-dark.webp",
+      "bytes": 257990,
+      "sha256": "5b610bfac86bf060305e08f784f7a72e2ed67f623a840c1e354e24d9bb7f2dfd"
+    },
+    {
+      "path": "engravings/territories/isle-of-man.webp",
+      "bytes": 279564,
+      "sha256": "6e76873113db353b56ba651438a53d58ca920e4204c07be0a8e08b814d5ccf07"
+    },
+    {
+      "path": "engravings/territories/jan-mayen-dark.webp",
+      "bytes": 332486,
+      "sha256": "0103a867d598b7b6cee1247a477d030efd66ac8121ade77359b4f5712e263e32"
+    },
+    {
+      "path": "engravings/territories/jan-mayen.webp",
+      "bytes": 167074,
+      "sha256": "b45294ed861cb927997784325a9ddf3071a5e3d4e1ce139ad431f89b7d098621"
+    },
+    {
+      "path": "engravings/territories/jersey-dark.webp",
+      "bytes": 585278,
+      "sha256": "08b1cf386bc2e3117e018ebb3e0346154c9c308b57246105a1829f76ea909e4a"
+    },
+    {
+      "path": "engravings/territories/jersey.webp",
+      "bytes": 718310,
+      "sha256": "bdd85b73e19713fcb6244fa1ce2f80b9539be3c24ef825d92375b2a0b42bdee9"
+    },
+    {
+      "path": "engravings/territories/macau-dark.webp",
+      "bytes": 604290,
+      "sha256": "f4dc673cdfa2c9b79187576f71242db53bd138303b2d3bccf5176040d4c27148"
+    },
+    {
+      "path": "engravings/territories/macau.webp",
+      "bytes": 834774,
+      "sha256": "cb3977c6b60d43930a317ab2ab0523084b5b523ba2dd15542c60df83a09fba72"
+    },
+    {
+      "path": "engravings/territories/montserrat-dark.webp",
+      "bytes": 597212,
+      "sha256": "0eda5b9f6a47ad62ce609f5bde7c0e874da2c8da18ab1a4a2b07e6ac16f91578"
+    },
+    {
+      "path": "engravings/territories/montserrat.webp",
+      "bytes": 790066,
+      "sha256": "a76267e05d7934d3e054a8503dd6c0298e246ab06b5358047c050c5f4fdc1ea2"
+    },
+    {
+      "path": "engravings/territories/navassa-island-dark.webp",
+      "bytes": 611280,
+      "sha256": "f23860576ed32efc05a0943d83bd4bdc68ed49b8654f33cf3a2abb1926f7ab43"
+    },
+    {
+      "path": "engravings/territories/navassa-island.webp",
+      "bytes": 802410,
+      "sha256": "4cc5d345700687443166627f36cdbbdb14906f99ebb79968bc212f7e03a93891"
+    },
+    {
+      "path": "engravings/territories/new-caledonia-dark.webp",
+      "bytes": 669030,
+      "sha256": "b8196bad554669713e8de1e377b4edf2870a8db355ac952d5105f8961ca95d4e"
+    },
+    {
+      "path": "engravings/territories/new-caledonia.webp",
+      "bytes": 711458,
+      "sha256": "48068978cebe7bac66f9e15bd019f2bd3e3ad5465b54229aecfbf573b1540f68"
+    },
+    {
+      "path": "engravings/territories/niue-dark.webp",
+      "bytes": 636880,
+      "sha256": "5eb860c3bc9a4378671c95c2f7a10f75dc2651274bdb0cc358e6660d8a908d2a"
+    },
+    {
+      "path": "engravings/territories/niue.webp",
+      "bytes": 757848,
+      "sha256": "e1381d50f4ee64a6fe5bef061e170b8f46173a237a832916ae859a6256bbf435"
+    },
+    {
+      "path": "engravings/territories/norfolk-island-dark.webp",
+      "bytes": 556016,
+      "sha256": "93edcaf85c593fbdeddee13a1709b3be95c7b08cf0d0a58a81ec05c45fdd2e4b"
+    },
+    {
+      "path": "engravings/territories/norfolk-island.webp",
+      "bytes": 779940,
+      "sha256": "1fc20c23f6bf52467bf0089917ef75fb2303455435bcadac9980711d8b4ed278"
+    },
+    {
+      "path": "engravings/territories/northern-mariana-islands-dark.webp",
+      "bytes": 553906,
+      "sha256": "e127b3ae637384986b5c923b3fb6b53df12032c9dd833b195faab1b427a2e1ef"
+    },
+    {
+      "path": "engravings/territories/northern-mariana-islands.webp",
+      "bytes": 723640,
+      "sha256": "217af495d03f8af47a9da1845a8728669d2942db720d7f38d66073af3f353654"
+    },
+    {
+      "path": "engravings/territories/paracel-islands-dark.webp",
+      "bytes": 603554,
+      "sha256": "5021c78c65a5f9482b5c2bdea14b476f63926334c611825d6568e8fffae7f8af"
+    },
+    {
+      "path": "engravings/territories/paracel-islands.webp",
+      "bytes": 672768,
+      "sha256": "5185962a4ef2cd3147ee797e56690d2d8b222b4940ea8cc5392a9f57895905ca"
+    },
+    {
+      "path": "engravings/territories/pitcairn-islands-dark.webp",
+      "bytes": 576332,
+      "sha256": "8f26de3b92ac21362aef3998f67a38a6d2a3f82a682a7d524d2ba8f237284add"
+    },
+    {
+      "path": "engravings/territories/pitcairn-islands.webp",
+      "bytes": 736852,
+      "sha256": "fe7258b220d13ab0ee6f8f91b1c9f4ec709a830ed44836b0d60156a8feb09e7f"
+    },
+    {
+      "path": "engravings/territories/puerto-rico-dark.webp",
+      "bytes": 601864,
+      "sha256": "129cff11dbba7cf20d1d73b0479c73a01f5e3fede9ee126175940bba50a5706f"
+    },
+    {
+      "path": "engravings/territories/puerto-rico.webp",
+      "bytes": 733586,
+      "sha256": "5cac930d0d3a36b184a31c6d2d935ff6719b2a5462e9c775b61a781dce95e0c5"
+    },
+    {
+      "path": "engravings/territories/saint-barthelemy-dark.webp",
+      "bytes": 598086,
+      "sha256": "eb910e4b50296ee6ac97b53e344bb8d90fbad38b1095b56b021df696f7850052"
+    },
+    {
+      "path": "engravings/territories/saint-barthelemy.webp",
+      "bytes": 728996,
+      "sha256": "e5d19cd55f1f7e8a839d56d2183cbadcc81720cf18a2c16ba4265259675dd409"
+    },
+    {
+      "path": "engravings/territories/saint-martin-dark.webp",
+      "bytes": 597998,
+      "sha256": "9efdbd058e5a9f445e4f3e4440ce9333bc44c87d7914c91f291bdf6d21e1b0ee"
+    },
+    {
+      "path": "engravings/territories/saint-martin.webp",
+      "bytes": 801136,
+      "sha256": "74cbc4bcf62feda5b47078074e76dccd27ea0cd92db37c5de272710ec1edeffa"
+    },
+    {
+      "path": "engravings/territories/saint-pierre-and-miquelon-dark.webp",
+      "bytes": 260572,
+      "sha256": "693af0c83178e2a72675c0ee33210d19e45d36cdfb557838c32ba37fc4c65ca0"
+    },
+    {
+      "path": "engravings/territories/saint-pierre-and-miquelon.webp",
+      "bytes": 276762,
+      "sha256": "59695e0d9a854d5c9b51f86bd23cff91aeb55c49683e2cd17c43d6791f136d35"
+    },
+    {
+      "path": "engravings/territories/sint-maarten-dark.webp",
+      "bytes": 279958,
+      "sha256": "85dd70c288b920e57856214c20d94a5660ee448b6861a867a54b82a159cb66e1"
+    },
+    {
+      "path": "engravings/territories/sint-maarten.webp",
+      "bytes": 758384,
+      "sha256": "9642eb529d9b8cf39eaa1522cff34a7f6c8de2457124c562e4d9a743b8548f35"
+    },
+    {
+      "path": "engravings/territories/south-georgia-and-south-sandwich-islands-dark.webp",
+      "bytes": 571294,
+      "sha256": "d515abc10213e0d6994dd2fab1d7490636287ff114bc6d73acc2ef9b43658bb3"
+    },
+    {
+      "path": "engravings/territories/south-georgia-and-south-sandwich-islands.webp",
+      "bytes": 849324,
+      "sha256": "b3334db21a6c3636808ac2ea030f1f18eeea243a1553ccb4b2bfe970474d4e9f"
+    },
+    {
+      "path": "engravings/territories/spratly-islands-dark.webp",
+      "bytes": 670620,
+      "sha256": "8afbee4edf4e302935e71c1fb8fe90669467ff67171be416d70faec4d48fe731"
+    },
+    {
+      "path": "engravings/territories/spratly-islands.webp",
+      "bytes": 743618,
+      "sha256": "c3df2b4b04f3cbaa41b5723c809c59c792daa4f213d1b955588fefd0214ec922"
+    },
+    {
+      "path": "engravings/territories/svalbard-sometimes-referred-to-as-spitsbergen-the-largest-island-in-the-archipelago-dark.webp",
+      "bytes": 635158,
+      "sha256": "122765591dbe25a99abfeeaa208148ca140d37bf6aba57dce06d96034cad6f2c"
+    },
+    {
+      "path": "engravings/territories/svalbard-sometimes-referred-to-as-spitsbergen-the-largest-island-in-the-archipelago.webp",
+      "bytes": 775798,
+      "sha256": "e627d5754aa0771b7f49ef7140c626b97f4bf6b849a9ad8efb51fe37621804b5"
+    },
+    {
+      "path": "engravings/territories/tokelau-dark.webp",
+      "bytes": 609764,
+      "sha256": "af0ed9efdf2063e4b85b242fab49729701ada1fcabbf35692c659044b01683d8"
+    },
+    {
+      "path": "engravings/territories/tokelau.webp",
+      "bytes": 761228,
+      "sha256": "9740f4937b8ccd5d346e40c52d8ae52a9a8a2655bd8a15d93d41f79ca36fecf4"
+    },
+    {
+      "path": "engravings/territories/turks-and-caicos-islands-dark.webp",
+      "bytes": 212954,
+      "sha256": "8101e62c3d7d87b63464c2394baeb77f5efc8a9fbe0c3938efd3679a66ef5a81"
+    },
+    {
+      "path": "engravings/territories/turks-and-caicos-islands.webp",
+      "bytes": 781574,
+      "sha256": "baa7cee5c091aee7db4260c5cf30f737ac617f3020dbffe50906c947c5f8dc76"
+    },
+    {
+      "path": "engravings/territories/virgin-islands-dark.webp",
+      "bytes": 218608,
+      "sha256": "bb7ada826f8d5903c244ec2133ff2bb16929e38914a4f466521eb2b1a607ff82"
+    },
+    {
+      "path": "engravings/territories/virgin-islands.webp",
+      "bytes": 803380,
+      "sha256": "c9886b5967e261c7c0520c49be90fce9bcb106a8be511d49f8fab5fd26fe7ad2"
+    },
+    {
+      "path": "engravings/territories/wake-island-dark.webp",
+      "bytes": 240884,
+      "sha256": "244830e1b0405ac02dc4891651e12df4fd56162f5ffabcce1e6ec90b270f1700"
+    },
+    {
+      "path": "engravings/territories/wake-island.webp",
+      "bytes": 315940,
+      "sha256": "f4435b0ae91f49c145c49f50e313e38c8196c25a76c57744a54bd63322a920ff"
+    },
+    {
+      "path": "engravings/territories/wallis-and-futuna-dark.webp",
+      "bytes": 224296,
+      "sha256": "3e9efb23a7eee3960565bbc33a60e6ecc3fd06b68634e9b2a1835eae632c6cb3"
+    },
+    {
+      "path": "engravings/territories/wallis-and-futuna.webp",
+      "bytes": 356672,
+      "sha256": "cb1cbfd5ff79c366bb873edaff82742b6dbf9db2e59a9343213894704ad8747f"
+    },
+    {
+      "path": "engravings/territories/west-bank-dark.webp",
+      "bytes": 243326,
+      "sha256": "7a71a64a60e10958ea8ca56f4e4b817eb461af52932bd714eed3fe146361d816"
+    },
+    {
+      "path": "engravings/territories/west-bank.webp",
+      "bytes": 360422,
+      "sha256": "fb8558b6fe5c73de2148517046a85d4f9cabebbaf3debfe39b4a7a733b0edea4"
+    },
+    {
+      "path": "engravings/territories/western-sahara-dark.webp",
+      "bytes": 273192,
+      "sha256": "b5f2d62e937bbb383ba855bdff28c5498bbe078b82b262dfd7aa451b26b5acf7"
+    },
+    {
+      "path": "engravings/territories/western-sahara.webp",
+      "bytes": 379968,
+      "sha256": "3a1b0ca7ad9b734336cd2988ea4b49b7d7841f83298fc78844b5278cc8803903"
+    },
+    {
+      "path": "engravings/trusted-source-logos-dark.webp",
+      "bytes": 18036,
+      "sha256": "e2f18f90c975e09c91988e7101d92df17f5ebeeba7b6348ddedc38de2003bca0"
+    },
+    {
+      "path": "engravings/trusted-source-logos.webp",
+      "bytes": 18066,
+      "sha256": "7423ddc1e4f7d32dbc20aff7fac3c41ac2de41f6fa17fef363ab2510fd6d04d5"
+    },
+    {
+      "path": "file.svg",
+      "bytes": 391,
+      "sha256": "2b67812c325c199a02536cdbeea0c593a72f707d323b72ee3e08dbab06753bd4"
+    },
+    {
+      "path": "globe.svg",
+      "bytes": 1035,
+      "sha256": "b614b9bf183925957661ac851498fe1d8029fd43a62fbfed86f9e2624a57e7cf"
+    },
+    {
+      "path": "next.svg",
+      "bytes": 1375,
+      "sha256": "55995dfad6ecb4945a1e856ddca03c5e16aa5bf13fd21b4df6a74ae79357bcfc"
+    },
+    {
+      "path": "og-default.png",
+      "bytes": 48273,
+      "sha256": "6ac9cc88e5d6894cc33d576400e8a1923445e7ffb04e265938cb2d0f51a83090"
+    },
+    {
+      "path": "vercel.svg",
+      "bytes": 128,
+      "sha256": "f081337b2fee635b455b63275406a3e7f39d6a014e25ad90dab5a67e62a12ac4"
+    },
+    {
+      "path": "window.svg",
+      "bytes": 385,
+      "sha256": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1"
+    }
+  ]
+}

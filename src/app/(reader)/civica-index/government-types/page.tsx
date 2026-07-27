@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
+export const revalidate = 0;
+
 /**
  * The peer-lens explorer depended on the superseded Civica composite.
  * Preserve its research code and release artifacts, but do not expose those

@@ -155,11 +155,16 @@ function validateStaticContract() {
   }
   const sync = read("scripts/sync-organization-memberships.ts");
   if (
-    !sync.includes("sourceFreshnessTransactionQuery") ||
+    !sync.includes("markSourcesSyncedTransactionQuery") ||
     !sync.includes("unverified_legacy") ||
-    !sync.includes("neonSql.transaction")
+    !sync.includes("neonSql.transaction") ||
+    !sync.includes("atlas_entity_change_history") ||
+    !sync.includes("resolveAtlasReleaseId") ||
+    !sync.includes("pg_advisory_xact_lock")
   ) {
-    fail("canonical writer lacks freshness stamping or legacy quarantine");
+    fail(
+      "canonical writer lacks freshness, legacy quarantine, release context, serialized identity, or atomic public history",
+    );
   }
   const queries = read("src/lib/db/queries-organizations.ts");
   if (

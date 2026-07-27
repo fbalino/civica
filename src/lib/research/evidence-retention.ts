@@ -13,6 +13,11 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "ci_composite_scores",
   "ci_dimension_scores",
   "ci_ingestion_runs",
+  "civica_conditions_calculations",
+  "civica_conditions_components",
+  "civica_conditions_normalization_parameters",
+  "civica_conditions_reference_sets",
+  "civica_conditions_releases",
   "civica_conditions_scores",
   "constitutions",
   "constitution_passages",
@@ -24,6 +29,7 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "data_facts_audit_log",
   "election_results",
   "elections",
+  "entity_name_forms",
   "government_bodies",
   "government_taxonomies",
   "indicator_history",
@@ -53,6 +59,9 @@ export const APPEND_ONLY_EVIDENCE_RELATIONS = [
   "pulse_dimensional_delta_history",
   "pulse_event_absorptions",
   "pulse_event_information_environment_pins",
+  "pulse_drift_baselines",
+  "pulse_drift_observations",
+  "pulse_drift_alerts",
   "pulse_event_decisions",
   "pulse_incident_assignments",
   "pulse_incident_resolutions",
@@ -66,8 +75,8 @@ export type RetainedEvidenceRelation =
   (typeof RETAINED_EVIDENCE_RELATIONS)[number];
 
 /** Closed inventory of checked-in code that can delete database evidence.
- * `rate_limits` is the sole exemption: it is ephemeral abuse-control state,
- * not source, interpretation, review, or evaluation evidence. */
+ * Any exemption must be explicitly documented as short-lived operational
+ * state, never source, interpretation, review, or evaluation evidence. */
 export const DESTRUCTIVE_WRITE_PATHS = [
   { path: "scripts/ingest-ci-all.ts", relations: ["ci_dimension_scores"] },
   {
@@ -75,16 +84,30 @@ export const DESTRUCTIVE_WRITE_PATHS = [
     relations: ["government_bodies", "offices", "persons", "terms"],
   },
   { path: "scripts/seed-backtest-cases.ts", relations: ["backtest_events"] },
-  { path: "scripts/sync-elections-ipu.ts", relations: ["elections"] },
   {
     path: "src/lib/constitute/sync-constitutions.ts",
     relations: ["constitution_topic_excerpts"],
   },
-  { path: "src/lib/elections/writer.ts", relations: ["election_results"] },
+  {
+    path: "src/lib/elections/writer.ts",
+    relations: ["election_results", "elections", "statements"],
+  },
   {
     path: "src/lib/api/rate-limit.ts",
     relations: ["rate_limits"],
     exemption: "ephemeral abuse-control counters expire by design",
+  },
+  {
+    path: "src/lib/platform/route-performance-telemetry.ts",
+    relations: ["route_performance_observations"],
+    exemption:
+      "short-lived privacy-bounded operational telemetry is not research evidence",
+  },
+  {
+    path: "src/lib/platform/error-monitoring.ts",
+    relations: ["error_monitoring_events"],
+    exemption:
+      "short-lived scrubbed operational error signatures are not research evidence",
   },
 ] as const;
 

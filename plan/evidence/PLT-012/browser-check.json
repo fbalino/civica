@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "plt-012-local-smoke/v1",
+  "checkedAt": "2026-07-14T12:54:59.000Z",
+  "server": {
+    "mode": "Next.js 16.2.7 production server",
+    "origin": "http://127.0.0.1:3000",
+    "worktree": "isolated clean staged checkout"
+  },
+  "inAppBrowser": {
+    "requestedBackend": "iab",
+    "attempts": 2,
+    "resetBetweenAttempts": true,
+    "result": "unavailable_before_discovery",
+    "error": "Cannot redefine property: process",
+    "troubleshooting": "Read the packaged bootstrap-troubleshooting guide directly because the agent documentation API was unavailable before setup completed.",
+    "playwrightFallbackUsed": false
+  },
+  "httpChecks": [
+    {
+      "id": "healthy-provenance-artifact",
+      "request": "GET /api/provenance-coverage",
+      "status": 200,
+      "cacheControl": "public, max-age=3600, stale-while-revalidate=86400",
+      "bodySchemaVersion": "fact-provenance-coverage/v1",
+      "result": "pass"
+    },
+    {
+      "id": "unknown-query-fails-before-work",
+      "request": "GET /api/v1/countries?as_of=live&unknown=secret",
+      "status": 503,
+      "cacheControl": "no-store",
+      "code": "RATE_LIMIT_UNAVAILABLE",
+      "result": "protected_parser_not_reached",
+      "note": "The clean checkout has no distributed rate-limit store, so the fail-closed protection boundary runs before query parsing. The INVALID_QUERY 400 path is covered by the focused integration suite."
+    },
+    {
+      "id": "invalid-path-fails-before-work",
+      "request": "GET /api/countries/UPPER/structure",
+      "status": 503,
+      "cacheControl": "no-store",
+      "code": "RATE_LIMIT_UNAVAILABLE",
+      "result": "protected_parser_not_reached",
+      "note": "The fail-closed rate-limit boundary runs before path parsing in this environment. The INVALID_PATH 400 path is covered by the focused integration suite."
+    },
+    {
+      "id": "country-read-protection-outage",
+      "request": "GET /api/v1/countries?as_of=live&limit=1",
+      "status": 503,
+      "cacheControl": "no-store",
+      "code": "RATE_LIMIT_UNAVAILABLE",
+      "result": "expected_fail_closed_local_environment"
+    }
+  ],
+  "conclusion": "Production compilation and the unprotected public artifact endpoint are healthy. Protected routes do not bypass an unavailable distributed limiter, and they return a fixed noncacheable problem. Request-contract behavior is proven by the passing focused integration and fuzz suite."
+}

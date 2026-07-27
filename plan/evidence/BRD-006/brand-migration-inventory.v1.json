@@ -1,0 +1,193 @@
+{
+  "schema": "brand-migration-inventory/v1",
+  "capturedAt": "2026-07-23",
+  "decision": "none",
+  "candidateName": null,
+  "candidateDomain": null,
+  "authorizedActions": [],
+  "treeSnapshot": {
+    "scopedTrackedFilesExcludingBrd001Brd002Packet": 353,
+    "trackedFilesContainingCivicaAtlasOrg": 189,
+    "trackedFilesContainingExactCivicaAtlas": 217,
+    "trackedFilesContainingAdminAtCivicaAtlasOrg": 12,
+    "trackedFilesContainingGithubRepo": 20,
+    "trackedFilesContainingStatusPageSlug": 13,
+    "packageManifestAndLockRootsNamedCivica": 3
+  },
+  "identityClasses": [
+    {
+      "id": "public_mutable",
+      "rule": "Current brand copy, canonical host, contact, social metadata, active docs, and current visual assets change only in the approved phase."
+    },
+    {
+      "id": "compatibility_alias",
+      "rule": "Old host, routes, API compatibility, repository redirects, and email forwarding remain for the declared window."
+    },
+    {
+      "id": "stable_technical_identifier",
+      "rule": "Schema names, cookie and local-storage keys, API schema versions, database functions and settings, and release IDs do not change in the brand cutover."
+    },
+    {
+      "id": "immutable_historical_record",
+      "rule": "Frozen release bytes, checksums, deposited citations, signed review packets, archived screenshots, filenames, and published labels are never rewritten."
+    },
+    {
+      "id": "history_only",
+      "rule": "Obsolete plans and mockups may retain the historical name with context; cosmetic rewriting is not a release requirement."
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "public_identity",
+      "anchors": [
+        "Civica Atlas",
+        "Civica Index",
+        "Civica Pulse",
+        "Civica Conditions",
+        "Ask Civica"
+      ],
+      "renameMode": "Update from one approved identity contract.",
+      "keepMode": "No change except approved risk controls.",
+      "rollback": "Restore prior identity contract."
+    },
+    {
+      "id": "canonical_domain",
+      "anchors": [
+        "src/lib/site.ts",
+        "page metadata",
+        "sitemap",
+        "robots",
+        "Open Graph",
+        "structured data"
+      ],
+      "renameMode": "Switch one canonical origin after new-host verification; old host preserves path and query.",
+      "keepMode": "Retain civicaatlas.org and www-to-apex behavior.",
+      "rollback": "Restore prior SITE_URL and disable new-host indexing."
+    },
+    {
+      "id": "repository_package",
+      "anchors": [
+        "github.com/fbalino/civica",
+        "package.json name",
+        "package-lock roots",
+        "CI workflow group"
+      ],
+      "renameMode": "Repository may change after redirect tests; package and workflow identifiers stay stable through first cutover.",
+      "keepMode": "No change.",
+      "rollback": "Restore repository/profile pointers; internal identifiers are unchanged."
+    },
+    {
+      "id": "api_downloads",
+      "anchors": [
+        "/api/v1",
+        "X-Civica-*",
+        "/embed/[slug] retired 410",
+        "/downloads/civica-atlas-2026-07-11*",
+        "civica-atlas-export/v3"
+      ],
+      "renameMode": "Keep routes, headers and frozen filenames compatible; preserve the retired embed 410 with updated successor links; future artifacts may adopt the successor slug.",
+      "keepMode": "No change.",
+      "rollback": "Old host and stable paths remain served."
+    },
+    {
+      "id": "database_and_internal_namespaces",
+      "anchors": [
+        "civica_conditions_*",
+        "civica_* database functions",
+        "civica_publication_version",
+        "civica_* cookies",
+        "civica.chat.* local storage"
+      ],
+      "renameMode": "Preserve during brand cutover.",
+      "keepMode": "No change.",
+      "rollback": "No database or client-state migration is required."
+    },
+    {
+      "id": "citation_release_doi",
+      "anchors": [
+        "CITATION.cff",
+        "frozen G2 release",
+        "review packets",
+        "release checksums",
+        "future GOV-021 DOI"
+      ],
+      "renameMode": "Keep deposited and frozen records byte-identical; apply successor identity only to new versions with backward links.",
+      "keepMode": "No change after owner disposition.",
+      "rollback": "Historical records were never changed."
+    },
+    {
+      "id": "email_auth_security",
+      "anchors": [
+        "admin@civicaatlas.org",
+        "contact form",
+        "security.txt",
+        "Google OAuth callback",
+        "crawler user agents"
+      ],
+      "renameMode": "Provision and verify successor endpoints first; retain old mail and callbacks through compatibility.",
+      "keepMode": "No change; complete existing delivery tests.",
+      "rollback": "Restore old primary endpoints; forwarding and old callbacks remain available."
+    },
+    {
+      "id": "hosting_status_monitoring",
+      "anchors": [
+        "Cloudflare domain",
+        "Vercel deployment",
+        "statuspage.incident.io/civica-atlas",
+        "/api/health",
+        "IndexNow"
+      ],
+      "renameMode": "Use an isolated preview, then staged DNS/status/monitor changes with owner authority.",
+      "keepMode": "No change; finish existing platform checks.",
+      "rollback": "Restore prior deployment/domain assignment and status links."
+    },
+    {
+      "id": "social_search",
+      "anchors": [
+        "public profiles",
+        "handles",
+        "search canonicals",
+        "sitemaps",
+        "backlinks",
+        "stale previews"
+      ],
+      "renameMode": "Reserve first, coordinate updates, request recrawl, retain former-handle pointers.",
+      "keepMode": "Verify ownership and recovery controls only.",
+      "rollback": "Restore display identity and canonical host while retaining successor reservation."
+    },
+    {
+      "id": "visual_and_legal",
+      "anchors": [
+        "public/civica-logo.svg",
+        "favicon",
+        "og-default.png",
+        "terms",
+        "privacy",
+        "licensing",
+        "accessibility",
+        "complaint handling"
+      ],
+      "renameMode": "Introduce approved assets through the design system and reconcile every legal/policy surface.",
+      "keepMode": "No speculative redesign or copy change.",
+      "rollback": "Restore prior tokens/assets/policy identity; historical assets remain untouched."
+    }
+  ],
+  "minimumCompatibility": {
+    "oldDomainMonths": 36,
+    "oldEmailMonths": 36,
+    "oldApiHostMonths": 24,
+    "frozenReleaseUrlTarget": "indefinite"
+  },
+  "externalAuthorityRequired": [
+    "professional legal disposition",
+    "owner name and cutover decision",
+    "domain acquisition and DNS",
+    "email and authentication configuration",
+    "Vercel production deployment",
+    "status-page changes",
+    "repository rename",
+    "social account changes",
+    "DOI metadata changes",
+    "public announcement"
+  ]
+}

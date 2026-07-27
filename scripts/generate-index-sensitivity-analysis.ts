@@ -1,6 +1,4 @@
-import { config } from "dotenv";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { neon } from "@neondatabase/serverless";
 import {
   CI_TOURNAMENT_PANEL_V3_RELEASE_ID,
   K1_UNCERTAINTY_INPUT_RELEASE_ID,
@@ -13,10 +11,8 @@ import {
 } from "../src/lib/ci/sensitivity-analysis";
 import { V2_WEIGHTS } from "../src/lib/ci/dimensions-v2";
 import { median, quantile } from "../src/lib/ci/longitudinal-analysis";
-config({ path: ".env.local" });
-if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL required");
-const sql = neon(process.env.DATABASE_URL),
-  features = [
+import { readIndexAnalysisReplayInputs } from "../src/lib/ci/index-analysis-inputs";
+const features = [
     "democratic_quality",
     "rule_of_law",
     "freedom_rights",
@@ -77,10 +73,21 @@ const norm = (r: Row, v: number) => {
     );
   };
 export async function buildIndexSensitivityAnalysis() {
-  const panel =
-    (await sql`SELECT j.iso3,p.dimension,p.source_id AS "sourceId",p.indicator_id AS "indicatorId",p.value,p.native_min AS "nativeMin",p.native_max AS "nativeMax",p.is_inverted AS "isInverted",NULL::real AS lower,NULL::real AS upper FROM ci_research_panel_rows p JOIN jurisdictions j ON j.id=p.jurisdiction_id WHERE p.release_id=${CI_TOURNAMENT_PANEL_V3_RELEASE_ID} AND p.period_year=2024 AND(p.source_id||':'||p.indicator_id)=ANY(${["vdem:v2x_libdem", "worldbank_wgi:va.est", "worldbank_wgi:rl.est", "freedom_house:pr_cl_total", "transparency_intl:score"]}) ORDER BY j.iso3,p.source_id,p.indicator_id`) as unknown as Row[];
-  const uncertainty =
-    (await sql`SELECT j.iso3,p.dimension,p.source_id AS "sourceId",p.indicator_id AS "indicatorId",p.value,p.native_min AS "nativeMin",p.native_max AS "nativeMax",p.is_inverted AS "isInverted",p.uncertainty_lower AS lower,p.uncertainty_upper AS upper FROM ci_research_panel_rows p JOIN jurisdictions j ON j.id=p.jurisdiction_id WHERE p.release_id=${K1_UNCERTAINTY_INPUT_RELEASE_ID} ORDER BY j.iso3,p.source_id,p.indicator_id`) as unknown as Row[];
+  const replayInputs = readIndexAnalysisReplayInputs();
+  const selected = new Set([
+    "vdem:v2x_libdem",
+    "worldbank_wgi:va.est",
+    "worldbank_wgi:rl.est",
+    "freedom_house:pr_cl_total",
+    "transparency_intl:score",
+  ]);
+  const panel = replayInputs.panel
+    .filter(
+      (row) =>
+        row.periodYear === 2024 && selected.has(`${row.sourceId}:${row.indicatorId}`),
+    )
+    .map((row) => ({ ...row, lower: null, upper: null })) as Row[];
+  const uncertainty = replayInputs.uncertainty as Row[];
   const uMap = new Map(
     uncertainty.map((r) => [`${r.iso3}:${r.sourceId}:${r.indicatorId}`, r]),
   );
@@ -372,7 +379,10 @@ export async function buildIndexSensitivityAnalysis() {
         kind === "alternating"
           ? "counter-direction dependence stress"
           : "perfect same-direction bound stress",
-      ...compareSensitivity(exactBase, scenario(kind as any)),
+      ...compareSensitivity(
+        exactBase,
+        scenario(kind as "lower" | "upper" | "alternating"),
+      ),
     }));
   const longitudinal = JSON.parse(
     readFileSync(

@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { PulseEventDetailCard } from "@/components/pulse/PulseEventDetailCard";
 import {
   PULSE_DIMENSIONS,
-  type PulseDimension,
 } from "@/lib/pulse/v2/types";
 import {
   DIMENSION_LABELS,
   SEVERITY_TIER_LABELS,
 } from "@/lib/pulse/v2/labels";
 import type { PulseV2ChangelogRow } from "@/lib/db/queries-pulse-v2";
-
-const PAGE_SIZE = 25;
+import {
+  pulseChangelogSearch,
+  type PulseChangelogPageQuery,
+} from "./query";
 
 function FilterChip({
   active,
@@ -46,46 +46,30 @@ interface Country {
 interface Props {
   events: PulseV2ChangelogRow[];
   countries: Country[];
+  query: PulseChangelogPageQuery;
+  hasMore: boolean;
 }
 
-export function PulseChangelogFilterClient({ events, countries }: Props) {
-  const searchParams = useSearchParams();
+export function PulseChangelogFilterClient({
+  events,
+  countries,
+  query,
+  hasMore,
+}: Props) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const selectedCountry = query.country;
+  const selectedDimension = query.dimension;
+  const selectedSeverity = query.severity;
 
-  const [country, setCountry] = useState<string | undefined>();
-  const [dimension, setDimension] = useState<PulseDimension | undefined>();
-  const [severity, setSeverity] = useState<string | undefined>();
-  const [showReview, setShowReview] = useState(false);
-  const [page, setPage] = useState(1);
-
-  // Read ?country=<slug> ONCE on mount to honor deep links from country
-  // pages and PulseDimensionalDeltas. Other URL params are ignored.
-  useEffect(() => {
-    const initial = searchParams.get("country")?.toLowerCase();
-    if (initial && countries.some((c) => c.slug === initial)) {
-      setCountry(initial);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const filtered = useMemo(() => {
-    return events.filter((e) => {
-      if (country && e.country?.slug?.toLowerCase() !== country) return false;
-      if (dimension && e.dimension !== dimension) return false;
-      if (severity && (e.category === "none" || e.severityTier !== severity)) {
-        return false;
-      }
-      if (!showReview && !e.published) return false;
-      return true;
-    });
-  }, [events, country, dimension, severity, showReview]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const offset = (safePage - 1) * PAGE_SIZE;
-  const slice = filtered.slice(offset, offset + PAGE_SIZE);
-  const hasMore = offset + slice.length < filtered.length;
-
-  const resetPage = () => setPage(1);
+  function navigate(next: Partial<PulseChangelogPageQuery>) {
+    const nextQuery: PulseChangelogPageQuery = {
+      ...query,
+      ...next,
+      page: next.page ?? 1,
+    };
+    router.push(`${pathname}${pulseChangelogSearch(nextQuery)}`);
+  }
 
   return (
     <>
@@ -99,32 +83,29 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
           >
             <FilterChip
               onClick={() => {
-                setCountry(undefined);
-                resetPage();
+                navigate({ country: undefined });
               }}
-              active={!country}
+              active={!selectedCountry}
             >
               All countries
             </FilterChip>
-            {country ? (
+            {selectedCountry ? (
               <FilterChip
                 onClick={() => {
-                  setCountry(undefined);
-                  resetPage();
+                  navigate({ country: undefined });
                 }}
                 active
               >
-                {countries.find((c) => c.slug === country)?.name ?? country} ✕
+                {countries.find((c) => c.slug === selectedCountry)?.name ?? selectedCountry} ✕
               </FilterChip>
             ) : null}
             <select
               className="editorial-filter-select"
               aria-label="Pick a country"
-              value={country ?? ""}
+              value={selectedCountry ?? ""}
               onChange={(e) => {
                 const next = e.target.value;
-                setCountry(next === "" ? undefined : next);
-                resetPage();
+                navigate({ country: next === "" ? undefined : next });
               }}
             >
               <option value="">— pick country —</option>
@@ -146,10 +127,9 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
           >
             <FilterChip
               onClick={() => {
-                setDimension(undefined);
-                resetPage();
+                navigate({ dimension: undefined });
               }}
-              active={!dimension}
+              active={!selectedDimension}
             >
               All
             </FilterChip>
@@ -157,10 +137,9 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
               <FilterChip
                 key={d}
                 onClick={() => {
-                  setDimension(d);
-                  resetPage();
+                  navigate({ dimension: d });
                 }}
-                active={dimension === d}
+                active={selectedDimension === d}
               >
                 {DIMENSION_LABELS[d]}
               </FilterChip>
@@ -177,10 +156,9 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
           >
             <FilterChip
               onClick={() => {
-                setSeverity(undefined);
-                resetPage();
+                navigate({ severity: undefined });
               }}
-              active={!severity}
+              active={!selectedSeverity}
             >
               Any
             </FilterChip>
@@ -188,10 +166,9 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
               <FilterChip
                 key={key}
                 onClick={() => {
-                  setSeverity(key);
-                  resetPage();
+                  navigate({ severity: key });
                 }}
-                active={severity === key}
+                active={selectedSeverity === key}
               >
                 {label}
               </FilterChip>
@@ -208,19 +185,17 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
           >
             <FilterChip
               onClick={() => {
-                setShowReview(false);
-                resetPage();
+                navigate({ showReview: false });
               }}
-              active={!showReview}
+              active={!query.showReview}
             >
               Published only
             </FilterChip>
             <FilterChip
               onClick={() => {
-                setShowReview(true);
-                resetPage();
+                navigate({ showReview: true });
               }}
-              active={showReview}
+              active={query.showReview}
             >
               Show review outcomes
             </FilterChip>
@@ -231,28 +206,29 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
       <div className="editorial-results-header-block">
         <span className="editorial-eyebrow">Events</span>
         <h2 className="editorial-results-title">
-          {slice.length === 0 && safePage === 1
+          {events.length === 0 && query.page === 1
             ? "No events match these filters"
-            : `${slice.length} event${slice.length === 1 ? "" : "s"} on this page`}
+            : `${events.length} event${events.length === 1 ? "" : "s"} on this page`}
         </h2>
         <p className="editorial-results-dek">
-          {showReview
+          {query.showReview
             ? "Including active review candidates, rejected rows, and retained pre-contract legacy-quarantine rows. Quarantined rows are not human review decisions; none of these rows affects API-only experimental deltas."
             : "Published events only. Toggle status above to include active review, rejection, and legacy-quarantine outcomes."}
         </p>
       </div>
 
-      {slice.length === 0 && safePage === 1 ? (
+      {events.length === 0 && query.page === 1 ? (
         <p className="editorial-empty">
           No events match.{" "}
           <button
             type="button"
             onClick={() => {
-              setCountry(undefined);
-              setDimension(undefined);
-              setSeverity(undefined);
-              setShowReview(false);
-              resetPage();
+              navigate({
+                country: undefined,
+                dimension: undefined,
+                severity: undefined,
+                showReview: false,
+              });
             }}
             style={{
               background: "none",
@@ -270,32 +246,32 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
         </p>
       ) : (
         <div style={{ marginBottom: "var(--space-6)" }}>
-          {slice.map((event) => (
+          {events.map((event) => (
             <PulseEventDetailCard key={event.id} event={event} />
           ))}
         </div>
       )}
 
       <nav className="editorial-pagination" aria-label="Pagination">
-        {safePage > 1 ? (
+        {query.page > 1 ? (
           <button
             type="button"
-            onClick={() => setPage(safePage - 1)}
+            onClick={() => navigate({ page: query.page - 1 })}
             className="editorial-pagination-link"
           >
-            ← Page {safePage - 1}
+            ← Page {query.page - 1}
           </button>
         ) : (
           <span>—</span>
         )}
-        <span>Page {safePage}</span>
+        <span>Page {query.page}</span>
         {hasMore ? (
           <button
             type="button"
-            onClick={() => setPage(safePage + 1)}
+            onClick={() => navigate({ page: query.page + 1 })}
             className="editorial-pagination-link"
           >
-            Page {safePage + 1} →
+            Page {query.page + 1} →
           </button>
         ) : (
           <span>—</span>

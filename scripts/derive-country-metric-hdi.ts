@@ -16,6 +16,13 @@ import { sql } from "drizzle-orm";
 import { db } from "../src/lib/db";
 import { writeCountryMetrics, type CountryMetricInput } from "../src/lib/metrics/ingest";
 const DRY_RUN = process.argv.includes("--dry-run");
+const ATLAS_RELEASE_ID =
+  process.argv
+    .find((arg) => arg.startsWith("--release-id="))
+    ?.slice("--release-id=".length)
+    .trim() ||
+  process.env.CIVICA_ATLAS_RELEASE_ID?.trim() ||
+  null;
 
 interface HdiRow {
   jurisdiction_id: string;
@@ -42,6 +49,11 @@ function competitionRanks(rows: readonly HdiRow[]): Map<string, number> {
 }
 
 async function main(): Promise<void> {
+  if (!DRY_RUN && !ATLAS_RELEASE_ID) {
+    throw new Error(
+      "A named Atlas release is required: pass --release-id=<id> or set CIVICA_ATLAS_RELEASE_ID.",
+    );
+  }
   const result = await db.execute(sql`
     SELECT DISTINCT ON (cf.jurisdiction_id)
       cf.jurisdiction_id,
@@ -88,7 +100,18 @@ async function main(): Promise<void> {
       });
     written += 1;
   }
-  await writeCountryMetrics(db, output, { dryRun: DRY_RUN, stampFreshness: false });
+  await writeCountryMetrics(db, output, {
+    dryRun: DRY_RUN,
+    stampFreshness: false,
+    history: ATLAS_RELEASE_ID
+      ? {
+          changeKind: "routine_refresh",
+          reason: "UNDP HDI canonical metric derivation refresh",
+          methodologyVersion: "undp-hdi-country-metric-derivation/v1",
+          releaseId: ATLAS_RELEASE_ID,
+        }
+      : undefined,
+  });
   console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Derived"} ${written} HDI country-metric rows from canonical facts.`);
 }
 

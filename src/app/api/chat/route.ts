@@ -1,20 +1,47 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import {
-  checkDurableRateLimit,
-  checkInMemoryRateLimit,
-  getRequestIp,
-} from "@/lib/api/rate-limit";
+  checkRequestRateLimit,
+  rateLimitResponse,
+} from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import {
+  JSON_MEDIA_TYPE,
+  parseBoundedRequestBody,
+  requestInputErrorResponse,
+} from "@/lib/api/request-body";
+import {
+  chatBodySchema,
+  REQUEST_BODY_LIMITS,
+  type ChatBody,
+} from "@/lib/api/request-body-schemas";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
+import { withResponseCacheProfile } from "@/lib/api/response-cache";
+import { getJurisdictionBySlug } from "@/lib/db/queries";
+import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
+import {
+  ASK_CIVICA_MAX_OUTPUT_TOKENS,
+  ASK_CIVICA_MODEL,
+  ASK_CIVICA_SYSTEM_PROMPT,
+  askCivicaCitationFooter,
+  askCivicaUserPayload,
+  isAskCivicaDirectInjectionAttempt,
+  loadAskCivicaEvidence,
+  recordAskCivicaAudit,
+  type AskCivicaContextRepository,
+} from "@/lib/ask-civica/contract";
+import { recordErrorMonitoringEvent } from "@/lib/platform/error-monitoring";
+import { assertModelOperationRequest } from "@/lib/model-operations/contract";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 // --- Abuse / cost controls -------------------------------------------------
 // /api/chat is a PUBLIC, unauthenticated endpoint that calls a paid Anthropic
 // model. Per the 2026-06-07 deep audit (Security #1), it previously had no
 // rate limit and no input-size cap, leaving the Anthropic budget open to a
-// curl loop (financial DoS). We bound abuse without harming a single
-// interactive reader by applying two per-IP windows via the shared in-memory
-// limiter, and by hard-capping the request payload BEFORE the model is called.
+// curl loop (financial DoS). Two shared Postgres windows run before body
+// parsing or model work, and the request payload is hard-capped before use.
 //
 // Burst window — 15 requests / 60s per IP. A human chatting interactively
 // sends at most a few messages per minute (each reply streams for several
@@ -25,232 +52,181 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 // time (≈100 completions/hr/IP worst case instead of the ≈900 the minute cap
 // alone would allow) and is still far above any real reading session.
 //
-// Two-layer enforcement (audit Security #9). The in-memory checks above are
-// per-serverless-instance: fast, free, and a good first-line pre-filter, but
-// they reset on cold start and a flood spread across instances can evade them.
-// We therefore mirror BOTH windows in a durable, cross-instance limiter backed
-// by Neon Postgres (`checkDurableRateLimit`), keyed by IP. A single normal
-// reader (well under 15/min and 100/hr) passes every layer unchanged; an
-// abuser is held to the same 15/min + 100/hr cross ALL instances, capping
-// worst-case Anthropic spend per IP regardless of how the load is distributed.
-// If the limiter's DB has a blip, the durable check degrades to the in-memory
-// limiter internally, so a database hiccup never fails a legitimate request.
-const BURST_MAX = 15;
-const BURST_WINDOW_MS = 60_000;
-const HOURLY_MAX = 100;
-const HOURLY_WINDOW_MS = 60 * 60 * 1000;
+// Both budgets are durable across instances. A limiter/configuration outage is
+// an honest fail-closed 503; it never silently becomes a process-local budget.
+const CHAT_BURST_POLICY = getRequestRateLimitPolicy("chat-burst");
+const CHAT_SUSTAINED_POLICY = getRequestRateLimitPolicy("chat-sustained");
 
-// Input bounds — reject oversized / malformed payloads before any model call.
-const MAX_BODY_CHARS = 16_384; // raw request body ceiling (~360 party rows)
-const MAX_MESSAGE_LEN = 4_000; // user message characters
-const MAX_CONTEXT_STR_LEN = 200; // country / tab / coalition / nextElection
-const MAX_PARTIES = 60; // legislatures rarely list this many parties
-const MAX_PARTY_NAME_LEN = 120;
-
-// Output cap on the Anthropic completion. Bounds per-call token spend.
-const MAX_OUTPUT_TOKENS = 1024;
-
-const TAB_LABELS: Record<string, string> = {
-  chamber: "Chamber composition",
-  bills: "Bills in motion",
-  structure: "Government structure",
-  elections: "Elections",
-  democracy: "Democracy index",
-  leaders: "Leadership",
-  constitution: "Constitution",
-  factbook: "Country factbook",
+const askCivicaRepository: AskCivicaContextRepository = {
+  getJurisdictionBySlug,
+  getCanonicalFactsForJurisdiction: (jurisdictionId, keys) =>
+    getCanonicalFactsForJurisdiction(jurisdictionId, [...keys]),
 };
 
-function jsonError(
-  message: string,
-  status: number,
-  extraHeaders?: Record<string, string>,
-) {
-  return new Response(JSON.stringify({ error: message }), {
-    status,
-    headers: { "Content-Type": "application/json; charset=utf-8", ...extraHeaders },
+function unavailableResponse(): Response {
+  return new Response("Ask Civica is temporarily unavailable. Please try again shortly.", {
+    status: 503,
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Retry-After": "60",
+      "Cache-Control": cacheControlFor("private-live"),
+    },
   });
 }
 
-export async function POST(req: NextRequest) {
-  // 1) Per-IP rate limiting BEFORE parsing or any model call. Two windows:
-  //    a short burst cap and a sustained hourly cap.
-  const ip = getRequestIp(req);
-
-  const burst = checkInMemoryRateLimit({
-    scope: "chat",
-    key: ip,
-    max: BURST_MAX,
-    windowMs: BURST_WINDOW_MS,
-  });
-  if (!burst.allowed) {
-    return jsonError("Too many requests. Please wait a moment and try again.", 429, {
-      "Retry-After": String(burst.retryAfterSeconds),
+async function handleChat(req: NextRequest) {
+  // 1) Shared limits run BEFORE parsing or any model call. The response helper
+  //    distinguishes an exhausted budget (429) from protection outage (503).
+  const burst = await checkRequestRateLimit(req, CHAT_BURST_POLICY);
+  if (burst.status !== "allowed") {
+    return rateLimitResponse(burst, CHAT_BURST_POLICY, {
+      limitedMessage: "Too many requests. Please wait a moment and try again.",
     });
   }
 
-  const hourly = checkInMemoryRateLimit({
-    scope: "chat-hourly",
-    key: ip,
-    max: HOURLY_MAX,
-    windowMs: HOURLY_WINDOW_MS,
-  });
-  if (!hourly.allowed) {
-    return jsonError("Hourly chat limit reached. Please try again later.", 429, {
-      "Retry-After": String(hourly.retryAfterSeconds),
+  const sustained = await checkRequestRateLimit(req, CHAT_SUSTAINED_POLICY);
+  if (sustained.status !== "allowed") {
+    return rateLimitResponse(sustained, CHAT_SUSTAINED_POLICY, {
+      limitedMessage: "Hourly chat limit reached. Please try again later.",
     });
   }
 
-  // 1b) Durable, cross-instance enforcement of the SAME two windows. The
-  //     in-memory checks above are per-instance; these mirror them in Neon
-  //     Postgres so a flood distributed across serverless instances is still
-  //     held to 15/min + 100/hr per IP. On a DB blip these degrade to the
-  //     in-memory limiter internally (they never throw), so a hiccup can't
-  //     fail a legitimate request.
-  const durableBurst = await checkDurableRateLimit({
-    scope: "chat-durable",
-    key: ip,
-    limit: BURST_MAX,
-    windowMs: BURST_WINDOW_MS,
+  // 2) Byte-limit and structurally validate the body before any model work.
+  const parsed = await parseBoundedRequestBody<ChatBody>(req, {
+    maxBytes: REQUEST_BODY_LIMITS.chat,
+    media: [{ mediaType: JSON_MEDIA_TYPE, schema: chatBodySchema }],
   });
-  if (!durableBurst.allowed) {
-    return jsonError("Too many requests. Please wait a moment and try again.", 429, {
-      "Retry-After": String(Math.max(1, Math.ceil(durableBurst.retryAfterMs / 1000))),
-    });
-  }
+  if (!parsed.ok) return parsed.response;
+  const { message, context } = parsed.data;
 
-  const durableHourly = await checkDurableRateLimit({
-    scope: "chat-durable-hourly",
-    key: ip,
-    limit: HOURLY_MAX,
-    windowMs: HOURLY_WINDOW_MS,
-  });
-  if (!durableHourly.allowed) {
-    return jsonError("Hourly chat limit reached. Please try again later.", 429, {
-      "Retry-After": String(Math.max(1, Math.ceil(durableHourly.retryAfterMs / 1000))),
-    });
-  }
-
-  // 2) Read and size-cap the raw body before parsing JSON.
-  let raw: string;
-  try {
-    raw = await req.text();
-  } catch {
-    return jsonError("Invalid request body.", 400);
-  }
-  if (raw.length > MAX_BODY_CHARS) {
-    return jsonError("Request body too large.", 413);
-  }
-
-  // 3) Parse JSON defensively — malformed payloads are rejected, not 500'd.
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return jsonError("Malformed JSON body.", 400);
-  }
-  if (typeof parsed !== "object" || parsed === null) {
-    return jsonError("Invalid request body.", 400);
-  }
-
-  const { message, context } = parsed as { message?: unknown; context?: unknown };
-
-  // 4) Validate + bound the user message.
-  if (typeof message !== "string" || message.trim().length === 0) {
-    return jsonError("Empty message", 400);
-  }
-  if (message.length > MAX_MESSAGE_LEN) {
-    return jsonError(
-      `Message must be ${MAX_MESSAGE_LEN} characters or fewer.`,
-      413,
-    );
+  // 3) Keep the semantic blank-message check separate from structure.
+  if (message.trim().length === 0) {
+    return requestInputErrorResponse("INVALID_REQUEST_BODY");
   }
   const userMessage = message.trim();
 
-  // 5) Normalise + bound the client-supplied context. All of `context` is
-  //    untrusted (audit Security #11): clamp every string, coerce types, and
-  //    cap the parties array so an attacker cannot inflate the system prompt.
-  //    This bounds prompt size; it is not an integrity guarantee.
-  const ctx = (typeof context === "object" && context !== null
-    ? context
-    : {}) as Record<string, unknown>;
-  const clampStr = (v: unknown, max = MAX_CONTEXT_STR_LEN) =>
-    typeof v === "string" ? v.slice(0, max) : "";
-
-  const countryName = clampStr(ctx.country) || "the selected country";
-  const tabRaw = clampStr(ctx.tab);
-  const house =
-    ctx.house === "upper" || ctx.house === "lower" ? ctx.house : undefined;
-  const coalition = clampStr(ctx.coalition);
-  const nextElection = clampStr(ctx.nextElection);
-
-  let parties: { name: string; seats: number }[] = [];
-  if (Array.isArray(ctx.parties)) {
-    parties = ctx.parties
-      .slice(0, MAX_PARTIES)
-      .map((p) => {
-        const party = (typeof p === "object" && p !== null
-          ? p
-          : {}) as Record<string, unknown>;
-        const name = clampStr(party.name, MAX_PARTY_NAME_LEN);
-        const seatsNum = Number(party.seats);
-        const seats = Number.isFinite(seatsNum) ? Math.trunc(seatsNum) : 0;
-        return { name, seats };
-      })
-      .filter((p) => p.name.length > 0);
+  // 4) Direct attacks never reach the paid model. More importantly, no
+  // browser-supplied prose is interpolated into the system prompt: the only
+  // evidence comes from the server-side country/source read below.
+  if (isAskCivicaDirectInjectionAttempt(userMessage)) {
+    recordAskCivicaAudit({ outcome: "input_rejected" });
+    return new Response(
+      "Ask Civica cannot help override its safety rules or expose protected system details. I can help with the cited country evidence.",
+      {
+        status: 400,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": cacheControlFor("private-live"),
+        },
+      },
+    );
   }
 
-  const tabLabel = TAB_LABELS[tabRaw] ?? (tabRaw || "Country");
-  // House is only meaningful on chamber/bills tabs (per memory-decisions.md).
-  const houseLabel = house
-    ? house === "upper"
-      ? "upper house"
-      : "lower house"
-    : null;
-
-  let chamberContext = "";
-  if (parties.length > 0 && houseLabel) {
-    const partyList = parties
-      .map((p) => `${p.name} (${p.seats} seats)`)
-      .join(", ");
-    chamberContext = `\nCurrent ${houseLabel} seat distribution: ${partyList}.`;
-    if (coalition) chamberContext += ` Governing coalition: ${coalition}.`;
-    if (nextElection) chamberContext += ` Next election: ${nextElection}.`;
+  let evidence;
+  try {
+    evidence = await loadAskCivicaEvidence(context, askCivicaRepository);
+  } catch {
+    recordAskCivicaAudit({ outcome: "context_unavailable" });
+    await recordErrorMonitoringEvent({
+      surface: "server",
+      routeId: "api.chat.post",
+      errorCode: "ask-civica.context-unavailable",
+    });
+    return unavailableResponse();
+  }
+  if (!evidence) {
+    recordAskCivicaAudit({ outcome: "context_unavailable" });
+    return new Response("The selected country context is unavailable. Please reopen the country profile and try again.", {
+      status: 422,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": cacheControlFor("private-live"),
+      },
+    });
   }
 
-  // Only include the Chamber line when house is genuinely relevant.
-  const chamberLine = houseLabel ? `\n- Chamber: ${houseLabel}` : "";
+  const apiKey = process.env.ANTHROPIC_API_KEY_CHAT?.trim();
+  if (!apiKey) {
+    recordAskCivicaAudit({
+      outcome: "model_unavailable",
+      evidenceFactCount: evidence.facts.length,
+    });
+    await recordErrorMonitoringEvent({
+      surface: "server",
+      routeId: "api.chat.post",
+      errorCode: "ask-civica.model-unavailable",
+    });
+    return unavailableResponse();
+  }
 
-  const systemPrompt = `You are Civica AI, an expert on global governance, legislatures, and political systems. You speak clearly, cite facts, and avoid political bias.
-
-Current user context:
-- Country: ${countryName}${chamberLine}
-- Active tab: ${tabLabel}${chamberContext}
-
-Answer questions grounded in this context. If the user asks about something on the current tab (${tabLabel}), focus your answer there. Be concise — 2-4 short paragraphs max. Use plain language. If you cite a source, say so briefly at the end.`;
+  recordAskCivicaAudit({ outcome: "started", evidenceFactCount: evidence.facts.length });
+  const userPayload = askCivicaUserPayload(userMessage, evidence);
+  try {
+    assertModelOperationRequest(
+      "ask-civica",
+      ASK_CIVICA_SYSTEM_PROMPT.length + userPayload.length,
+      ASK_CIVICA_MAX_OUTPUT_TOKENS,
+    );
+  } catch {
+    recordAskCivicaAudit({
+      outcome: "model_unavailable",
+      evidenceFactCount: evidence.facts.length,
+    });
+    await recordErrorMonitoringEvent({
+      surface: "server",
+      routeId: "api.chat.post",
+      errorCode: "ask-civica.request-over-budget",
+    });
+    return unavailableResponse();
+  }
+  const client = new Anthropic({ apiKey, maxRetries: 0 });
+  const citationFooter = askCivicaCitationFooter(evidence);
 
   const encoder = new TextEncoder();
   const readable = new ReadableStream({
     async start(controller) {
       try {
         const stream = await client.messages.stream({
-          model: "claude-sonnet-4-6",
-          max_tokens: MAX_OUTPUT_TOKENS,
-          system: systemPrompt,
-          messages: [{ role: "user", content: userMessage }],
+          model: ASK_CIVICA_MODEL,
+          max_tokens: ASK_CIVICA_MAX_OUTPUT_TOKENS,
+          system: ASK_CIVICA_SYSTEM_PROMPT,
+          messages: [{ role: "user", content: userPayload }],
         });
+        let sawText = false;
         for await (const chunk of stream) {
           if (
             chunk.type === "content_block_delta" &&
             chunk.delta.type === "text_delta"
           ) {
+            sawText = true;
             controller.enqueue(encoder.encode(chunk.delta.text));
           }
         }
+        if (!sawText) {
+          controller.enqueue(
+            encoder.encode(
+              "I could not produce a sourced answer from the current Civica evidence bundle.",
+            ),
+          );
+        }
+        controller.enqueue(encoder.encode(citationFooter));
+        recordAskCivicaAudit({
+          outcome: "completed",
+          evidenceFactCount: evidence.facts.length,
+        });
       } catch (err) {
-        // Log full detail server-side; never leak SDK errors or internal
-        // env-var names to the client (audit Security #10).
-        console.error("[/api/chat] stream error:", err);
+        // Never log the provider exception: SDK errors can include request
+        // metadata or content. PLT-018 records only a closed error identity.
+        void err;
+        recordAskCivicaAudit({
+          outcome: "provider_failure",
+          evidenceFactCount: evidence.facts.length,
+        });
+        await recordErrorMonitoringEvent({
+          surface: "server",
+          routeId: "api.chat.post",
+          errorCode: "ask-civica.provider-failure",
+        });
         controller.enqueue(
           encoder.encode(
             "\n\n_(Chat is temporarily unavailable. Please try again shortly.)_",
@@ -266,7 +242,11 @@ Answer questions grounded in this context. If the user asks about something on t
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Transfer-Encoding": "chunked",
-      "Cache-Control": "no-cache",
+      "Cache-Control": cacheControlFor("private-live"),
     },
   });
+}
+
+export async function POST(req: NextRequest) {
+  return withResponseCacheProfile("private-live", () => handleChat(req));
 }

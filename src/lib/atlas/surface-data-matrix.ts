@@ -98,11 +98,15 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
     ],
     states: serverStates({
       empty:
-        "A database failure leaves search empty, renders an em dash count, and substitutes decorative feature art.",
+        "A catalog outage renders a named temporary-unavailable state; a healthy empty catalog still renders its distinct zero-result shell without a country-count claim.",
+      error:
+        "The home module preserves a catalog outage visibly instead of presenting it as a zero-country atlas.",
     }),
     tests: [
       "src/lib/ci/quarantine-contract.test.ts",
       "src/lib/claims/__tests__/provenance-coverage.test.ts",
+      "src/lib/atlas/atl-018-country-reader.test.ts",
+      "e2e/atl-018-data-states.spec.ts",
     ],
     testGap: null,
     owner: "Atlas reference product",
@@ -147,17 +151,23 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
       "jurisdiction status label and sources",
     ],
     provenance: [
-      "Resolver-backed masthead facts carry source identity; map-layer definitions name source, unit, vintage, and availability; hover cards carry jurisdiction-status/v1 labels.",
+      "Resolver-backed masthead facts carry source identity; source-native map layers name their publisher, retained upstream vintage, legend, and explicit missing-data behavior; hover cards carry jurisdiction-status/v1 labels.",
     ],
     coverage: [
       "The map explicitly limits itself to map-eligible sovereign_state entries; the scope note links to the full reference catalog. Per-layer coverage comes from loadAtlasLayerData.",
     ],
     states: serverStates({
       empty:
-        "The map can render with no countries or no selected-layer values; no distinct catalog-outage state exists.",
+        "An empty map-eligible catalog renders a named coverage state; a selected layer with no values remains visibly available as a layer-coverage result.",
       error: "Uncaught loader failures reach the route error boundary.",
     }),
-    tests: ["src/lib/ci/quarantine-contract.test.ts"],
+    tests: [
+      "src/lib/ci/quarantine-contract.test.ts",
+      "src/lib/atlas/atl-018-country-reader.test.ts",
+      "src/lib/atlas/map-layers.test.ts",
+      "e2e/atl-018-data-states.spec.ts",
+      "e2e/atl-015-source-native-map.spec.ts",
+    ],
     testGap: null,
     owner: "Atlas reference product",
     releaseRelation: "mixed_row_level_rights",
@@ -238,10 +248,15 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
     ],
     states: serverStates({
       empty:
-        "The explorer receives empty rows/facets when queries fail and renders its no-results state.",
+        "A fulfilled empty party catalog renders a named coverage state rather than implying that no parties or legislatures exist.",
+      error:
+        "A rejected party/facet query renders a named temporarily-unavailable state rather than the empty catalog state.",
     }),
-    tests: [],
-    testGap: "No dedicated public Party Explorer route test exists.",
+    tests: [
+      "src/lib/atlas/atl-018-country-reader.test.ts",
+      "e2e/atl-018-data-states.spec.ts",
+    ],
+    testGap: null,
     owner: "Atlas institutions",
     releaseRelation: "excluded_surface_only",
     releaseReason:
@@ -311,9 +326,17 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
     ],
     states: serverStates({
       empty:
-        "No selection renders the selector; individual empty sections state or omit unavailable data.",
+        "No selection and an invalid requested selection render named next steps; governance, indicator, Conditions, chamber, election, and membership coverage remain visible by section.",
+      error:
+        "A country-catalog outage is named at the selector; independent section-query failures retain their sections and appear in a named temporarily-unavailable register.",
+      partial:
+        "Available comparison sections keep rendering when another independent query fails; the register identifies the unavailable section instead of substituting an empty result.",
     }),
-    tests: ["src/lib/ci/quarantine-contract.test.ts"],
+    tests: [
+      "src/lib/ci/quarantine-contract.test.ts",
+      "src/lib/atlas/atl-018-country-reader.test.ts",
+      "e2e/atl-018-data-states.spec.ts",
+    ],
     testGap: null,
     owner: "Atlas comparison",
     releaseRelation: "mixed_row_level_rights",
@@ -490,9 +513,15 @@ const topLevelRows: AtlasSurfaceMatrixRow[] = [
     coverage: ["Sovereign-state rows with available values per named metric."],
     states: serverStates({
       empty:
-        "An empty matrix renders the table shell/no rows; there is no dedicated outage distinction.",
+        "A fulfilled empty matrix renders a named source-coverage state rather than implying that the underlying measures do not exist.",
+      error:
+        "A rejected matrix query renders a named temporarily-unavailable state rather than the empty matrix state.",
     }),
-    tests: ["src/lib/ci/quarantine-contract.test.ts"],
+    tests: [
+      "src/lib/ci/quarantine-contract.test.ts",
+      "src/lib/atlas/atl-018-country-reader.test.ts",
+      "e2e/atl-018-data-states.spec.ts",
+    ],
     testGap: null,
     owner: "Atlas comparison",
     releaseRelation: "mixed_row_level_rights",
@@ -758,19 +787,21 @@ const factbookRows: AtlasSurfaceMatrixRow[] = factbookSections.map(
         "CIA Factbook frozen retrieval 2026-01-23 plus resolver source panels for mapped canonical values.",
       ],
       coverage: [
-        "Module is visible only when jsonbToFields finds at least one renderable field.",
+        "Every documented Factbook module remains visible. jsonbToFields selects rendered rows, while missing or structurally empty source content renders a named coverage state.",
       ],
       states: serverStates({
         empty:
-          "The section is hidden when missing, non-object, or structurally empty.",
+          "A missing, non-object, or structurally empty section remains visible as a named source-coverage state.",
         error:
-          "getFactbookSections is not soft-failed in the page and currently reaches the route error boundary.",
+          "The Factbook tab preserves a section-table outage as a named temporarily-unavailable state rather than an empty country reference.",
         noSource:
           "CIA attribution is fixed for the section; resolver-backed leaves expose alternates where mapped.",
       }),
       tests: [
         "src/lib/factbook/__tests__/read-selection.test.ts",
         "src/lib/factbook/reconcile/__tests__/resolver.test.ts",
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts",
       ],
       testGap: null,
       owner: "Country Factbook",
@@ -952,6 +983,34 @@ const civicaModules: Array<{
       "The country download includes only source rows permitted by the rights manifest and names withheld series without redistributing their observations.",
   },
   {
+    id: "conditions",
+    renderer: "src/components/conditions/CivicaConditionsPanel.tsx",
+    access: {
+      symbol: "getConditionsPublicRelease",
+      file: "src/lib/db/queries.ts",
+    },
+    storage: [
+      "civica_conditions_releases",
+      "civica_conditions_calculations",
+      "civica_conditions_scores",
+      "civica_conditions_components",
+      "sources",
+    ],
+    fields: [
+      "release identifier",
+      "component value state",
+      "reference year",
+      "source",
+      "alignment status",
+      "native unit",
+    ],
+    source:
+      "Every calculation keeps the selected release, component source, reference year, alignment state, and value-state reason visible.",
+    relation: "excluded_experimental",
+    reason:
+      "Conditions remains a secondary research surface and is excluded from the frozen Atlas canonical-fact export.",
+  },
+  {
     id: "government",
     renderer: "src/components/factbook/FactbookGovOrgChart.tsx",
     access: { symbol: "getGovernmentStructure", file: "src/lib/db/queries.ts" },
@@ -1067,7 +1126,7 @@ countryRows.push(
           ? "The section is always present. The checked DAT-005 country row supplies coverage and missingness; an absent row and a resolver outage remain explicit states."
           : module.id === "longitudinal"
             ? "The section is always present and reports every available documented series; an empty result remains visible as an availability state."
-            : "The section appears only when its prefetch returns a usable row set.",
+            : "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module.",
       ],
       states: serverStates({
         empty:
@@ -1075,28 +1134,26 @@ countryRows.push(
             ? "A missing checked country row is named explicitly and never becomes zero coverage or a country-quality judgment."
             : module.id === "longitudinal"
               ? "A named no-observations state remains visible; missing years are never rendered as zero or no change."
-              : "The section is omitted when unavailable; if all non-history modules are absent the page renders a named Civica Data empty card.",
+              : "A fulfilled empty result remains visible as a source-coverage state; it is never removed from the reader navigation.",
         error:
           module.id === "evidence-coverage"
             ? "The checked snapshot remains visible while current resolver counts render an explicit unavailable state."
             : module.id === "longitudinal"
               ? "A named temporarily-unavailable state remains visible while the rest of the tab continues to render."
-              : "The route soft-fails this section independently, preventing one query failure from taking down the tab.",
+              : "A named temporarily-unavailable state remains visible while the rest of the tab continues to render.",
       }),
-      tests:
-        module.id === "evidence-coverage"
+      tests: [
+        "src/lib/atlas/atl-018-country-reader.test.ts",
+        "e2e/atl-018-data-states.spec.ts",
+        ...(module.id === "evidence-coverage"
           ? ["src/lib/provenance/country-evidence-coverage.test.ts"]
           : module.id === "governance-evidence"
             ? ["src/lib/ci/governance-evidence.test.ts"]
             : module.id === "longitudinal"
               ? ["src/lib/indicators/history-catalog.test.ts"]
-              : [],
-      testGap:
-        module.id === "evidence-coverage" ||
-        module.id === "governance-evidence" ||
-        module.id === "longitudinal"
-          ? null
-          : `No dedicated ${module.id} country-module route test exists.`,
+              : []),
+      ],
+      testGap: null,
       owner: "Country Civica Data",
       releaseRelation: module.relation,
       releaseReason: module.reason,
@@ -1127,15 +1184,19 @@ countryRows.push(
       "Constitute Project attribution, SourceDot, and source last_sync_at.",
     ],
     coverage: [
-      "One indexed constitution per matching jurisdiction; unindexed and database-error states currently share the same empty card.",
+      "One indexed constitution per matching jurisdiction; an unindexed document and a database outage render separate named states.",
     ],
     states: serverStates({
       empty:
         "No indexed text renders a named country-specific empty state with Explorer and Factbook links.",
       error:
-        "The query soft-fails to null, so database outage and genuine absence are currently indistinguishable on this tab.",
+        "The query rethrows for this country reader, which renders a named temporarily-unavailable state rather than claiming the text is unindexed.",
     }),
-    tests: ["src/lib/db/queries-constitution-outage.test.ts"],
+    tests: [
+      "src/lib/db/queries-constitution-outage.test.ts",
+      "src/lib/atlas/atl-018-country-reader.test.ts",
+      "e2e/atl-018-data-states.spec.ts",
+    ],
     testGap: null,
     owner: "Country constitutions",
     releaseRelation: "excluded_restricted_source",
@@ -1146,7 +1207,7 @@ countryRows.push(
 
 export const ATLAS_SURFACE_DATA_MATRIX = Object.freeze({
   schemaVersion: ATLAS_SURFACE_MATRIX_VERSION,
-  auditedAt: "2026-07-12",
+  auditedAt: "2026-07-18",
   scope:
     "Public data-bearing Atlas routes and every module rendered by the unified country reader.",
   owner: "Civica Atlas",

@@ -11,6 +11,11 @@ import {
   DARK_TERRITORY_ENGRAVING_CAPTIONS,
   TERRITORY_ENGRAVING_CAPTIONS,
 } from "../src/lib/data/territory-engraving-captions";
+import {
+  EDITORIAL_ILLUSTRATION_RIGHTS_EFFECTIVE_ON,
+  EDITORIAL_ILLUSTRATION_RIGHTS_POLICY,
+  EDITORIAL_ILLUSTRATION_RIGHTS_VERSION,
+} from "../src/lib/illustrations/rights-policy";
 
 const root = process.cwd();
 const assetRoot = path.join(root, "public/engravings");
@@ -40,6 +45,38 @@ const SHARED_SUBJECTS: Record<string, { subject: string; routes: string[] }> = {
   "home-governance-evidence": {
     subject: "Archival source folios and research instruments used as a Governance Evidence editorial motif",
     routes: ["/"],
+  },
+  "explore-countries": {
+    subject: "Open civic atlas index, compass divider, and laurel editorial motif",
+    routes: ["/country", "explore-navigation"],
+  },
+  "explore-world-atlas": {
+    subject: "Terrestrial globe and meridian-stand editorial motif",
+    routes: ["/atlas", "explore-navigation"],
+  },
+  "explore-compare": {
+    subject: "Paired institutional specimen cards and surveyor's divider editorial motif",
+    routes: ["/compare", "explore-navigation"],
+  },
+  "explore-constitutions": {
+    subject: "Bound civic charter, classical column, and unmarked seal editorial motif",
+    routes: ["/constitution", "explore-navigation"],
+  },
+  "explore-parties": {
+    subject: "Semicircular assembly and neutral coalition-table editorial motif",
+    routes: ["/parties", "explore-navigation"],
+  },
+  "explore-elections": {
+    subject: "Civic ballot box, unmarked ballot, and abstract tally-sheet editorial motif",
+    routes: ["/elections", "explore-navigation"],
+  },
+  "explore-rankings": {
+    subject: "Surveyor's balance and neutral ordered-marker editorial motif",
+    routes: ["/rankings", "explore-navigation"],
+  },
+  "explore-organizations": {
+    subject: "Interlocking geographic rings and neutral globe-grid editorial motif",
+    routes: ["/organizations", "explore-navigation"],
   },
   "spot-laurel": { subject: "Laurel editorial motif", routes: ["explore-navigation"] },
   "spot-mountains": { subject: "Mountain landscape editorial motif", routes: ["explore-navigation"] },
@@ -136,9 +173,29 @@ async function loadForwardRecords() {
 }
 
 function gitIntroductions() {
+  const revisions = ["HEAD"];
+  try {
+    const mergeHead = execFileSync(
+      "git",
+      ["rev-parse", "--verify", "MERGE_HEAD"],
+      { cwd: root, encoding: "utf8" },
+    ).trim();
+    if (mergeHead) revisions.push(mergeHead);
+  } catch {
+    // Outside an in-progress merge, HEAD is the complete checked history.
+  }
   const output = execFileSync(
     "git",
-    ["log", "--reverse", "--diff-filter=A", "--format=COMMIT%x09%H%x09%aI", "--name-only", "--", "public/engravings"],
+    [
+      "log",
+      "--reverse",
+      "--diff-filter=A",
+      "--format=COMMIT%x09%H%x09%aI",
+      "--name-only",
+      ...revisions,
+      "--",
+      "public/engravings",
+    ],
     { cwd: root, encoding: "utf8" },
   );
   const introductions = new Map<string, GitIntroduction>();
@@ -298,8 +355,8 @@ async function buildManifest() {
           : deterministicLogoStrip
             ? "partial-composition-session-not-retained"
             : "partial-irrecoverable-generation-session",
-        firstTrackedCommit: forward ? null : introduction?.commit ?? null,
-        firstTrackedAt: forward ? null : introduction?.committedAt ?? null,
+        firstTrackedCommit: introduction?.commit ?? null,
+        firstTrackedAt: introduction?.committedAt ?? null,
       },
       editHistory: forward
         ? forward.record.transformations
@@ -337,6 +394,18 @@ async function buildManifest() {
     contract: "civica-editorial-illustration-manifest/v1",
     releaseDate: "2026-07-12",
     scope: "Every tracked WebP below public/engravings; README and non-WebP source files are excluded.",
+    rightsPolicy: {
+      version: EDITORIAL_ILLUSTRATION_RIGHTS_VERSION,
+      effectiveOn: EDITORIAL_ILLUSTRATION_RIGHTS_EFFECTIVE_ON,
+      operatorPolicy: "data/EDITORIAL-ILLUSTRATION-RIGHTS.md",
+      publicDisclosure: "/licensing#imagery",
+      thirdPartyReuse: EDITORIAL_ILLUSTRATION_RIGHTS_POLICY.thirdPartyReuse,
+    },
+    retention: {
+      history: "git-and-frozen-release-snapshots",
+      replacement: "superseding-record-or-tombstone",
+      publicSecretsOrUnlicensedReferenceBytes: "prohibited",
+    },
     limitations: [
       "Original generation sessions did not retain model, tool, prompt, seed, or source-reference metadata; those fields remain unknown rather than inferred.",
       "A caption identifies intended subject matter but is not evidence that every depicted landmark detail has been independently verified.",

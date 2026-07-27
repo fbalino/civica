@@ -1,36 +1,55 @@
-import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
+import {
+  apiResponse,
+  apiError,
+  corsOptions,
+  withRateLimit,
+  CI_METHODOLOGY_META,
+  CORS_HEADERS,
+} from "@/lib/api/helpers";
 import { compareCICountries } from "@/lib/db/queries";
-import { displayCiReleaseDimensionScore, resolveCiRelease } from "@/lib/ci/release-selection";
-import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
+import {
+  displayCiReleaseDimensionScore,
+  isCiReleaseConsistencyError,
+  publicCiReleaseIdentity,
+} from "@/lib/ci/release-selection";
+import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
+  INDEX_COMPOSITE_DEPRECATION_HEADERS,
   STRUCTURAL_FAMILY_DEPRECATION_META,
+  STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { shapeIndexCompareResult } from "@/lib/api/contract/shapes";
+import { parseQueryContract } from "@/lib/api/request-contract";
+import { publicCiPublicationComponents } from "@/lib/ci/publication-components";
 
 export async function GET(request: Request) {
-  const rateLimited = withRateLimit(request);
+  const rateLimited = await withRateLimit(request);
   if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const query = parseQueryContract(request, "v1-index-compare-query/v1", {
+    errorHeaders: {
+      ...CORS_HEADERS,
+      ...INDEX_COMPOSITE_DEPRECATION_HEADERS,
+      ...STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
+    },
+  });
+  if (!query.ok) return query.response;
   const retired = retiredIndexApiResponse();
   if (retired) return retired;
 
   try {
-    const url = new URL(request.url);
-    const slugsParam = url.searchParams.getAll("slug");
-    const quarter = url.searchParams.get("quarter") ?? undefined;
-    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
-
-    if (slugsParam.length === 0) {
-      return withIndexDispositionDeprecation(apiError("At least one `slug` query parameter is required", 400));
+    const { slug: slugs, quarter } = query.data;
+    const release = await loadPublishedCiRelease(query.data.release);
+    if (quarter && quarter !== release.quarter) {
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiError("The requested quarter is unavailable for this release.", 400),
+        ),
+      );
     }
-    if (slugsParam.length > 10) {
-      return withIndexDispositionDeprecation(apiError("Maximum 10 countries per comparison", 400));
-    }
-
-    const slugs = slugsParam.map((s) => s.toLowerCase());
     const rows = await compareCICountries(slugs, quarter, release.releaseId);
 
     // Curate a public response shape rather than spreading the raw DB rows.
@@ -63,25 +82,26 @@ export async function GET(request: Request) {
           ? (() => {
               const completeness = parsePublishedCiCompleteness(row.composite);
               return {
-              quarter: row.composite.quarter,
-              vintageLabel: row.composite.vintageLabel,
-              score: row.composite.score,
-              scoreLower: row.composite.scoreLower,
-              scoreUpper: row.composite.scoreUpper,
-              completenessFlag: completeness.completenessFlag,
-              rank: row.composite.rank,
-              totalRanked: row.composite.totalRanked,
-              isPartial: row.composite.isPartial,
-              missingDimensions: completeness.missingDimensions,
-              dimensionsAvailable: completeness.dimensionsAvailable,
-              methodologyVersion: row.composite.methodologyVersion,
+                quarter: row.composite.quarter,
+                vintageLabel: row.composite.vintageLabel,
+                score: row.composite.score,
+                scoreLower: row.composite.scoreLower,
+                scoreUpper: row.composite.scoreUpper,
+                completenessFlag: completeness.completenessFlag,
+                rank: row.composite.rank,
+                totalRanked: row.composite.totalRanked,
+                isPartial: row.composite.isPartial,
+                missingDimensions: completeness.missingDimensions,
+                dimensionsAvailable: completeness.dimensionsAvailable,
+                methodologyVersion: row.composite.methodologyVersion,
               };
             })()
           : null,
         dimensions: row.dimensions.map((d) => ({
           dimension: d.dimension,
           normalizedScore:
-            displayCiReleaseDimensionScore(d, release.releaseId) ?? d.normalizedScore,
+            displayCiReleaseDimensionScore(d, release.releaseId) ??
+            d.normalizedScore,
           rawValue: d.rawValue,
           sourceId: d.sourceId,
           valueStatus: "observed" as const,
@@ -93,21 +113,41 @@ export async function GET(request: Request) {
     // `structuralFamily` / `structuralSubtype` fields — attach the same
     // sunset signal the other structural surfaces use (rankings, countries,
     // index/[slug]).
-    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
-      apiResponse({
-        data: results,
-        meta: {
-          quarter: quarter ?? null,
-          count: results.length,
-          methodology: CI_METHODOLOGY_META,
-          series: release.series,
-          ...STRUCTURAL_FAMILY_DEPRECATION_META,
-        },
-      }),
-    ));
+    return withIndexDispositionDeprecation(
+      withStructuralFamilyDeprecation(
+        apiResponse({
+          data: results,
+          meta: {
+            quarter: release.quarter,
+            count: results.length,
+            methodology: CI_METHODOLOGY_META,
+            release: publicCiReleaseIdentity(release),
+            series: release.series,
+            components: publicCiPublicationComponents(release, {
+              jurisdiction: "live_current",
+              taxonomy: "live_current",
+            }),
+            deprecations: STRUCTURAL_FAMILY_DEPRECATION_META.deprecations,
+          },
+        }),
+      ),
+    );
   } catch (e) {
     console.error("API /v1/index/compare error:", e);
-    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Internal server error", 500)));
+    if (isCiReleaseConsistencyError(e)) {
+      return withIndexDispositionDeprecation(
+        withStructuralFamilyDeprecation(
+          apiError(
+            "The requested release is temporarily unavailable.",
+            503,
+            "RELEASE_INCONSISTENT",
+          ),
+        ),
+      );
+    }
+    return withIndexDispositionDeprecation(
+      withStructuralFamilyDeprecation(apiError("Internal server error", 500)),
+    );
   }
 }
 

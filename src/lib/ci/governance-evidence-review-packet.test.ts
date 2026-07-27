@@ -17,17 +17,23 @@ test("selected-product review packet closes every required section", () => {
 });
 
 test("review packet refuses aggregation, incomplete fidelity, and implied endorsement", () => {
-  const aggregated = structuredClone(GOVERNANCE_EVIDENCE_REVIEW_PACKET) as any;
+  const aggregated = structuredClone(GOVERNANCE_EVIDENCE_REVIEW_PACKET) as {
+    transformations: { aggregation: string };
+  };
   aggregated.transformations.aggregation = "weighted mean";
-  assert.ok(governanceEvidenceReviewPacketErrors(aggregated).includes("selected product gained an aggregation"));
+  assert.ok(governanceEvidenceReviewPacketErrors(aggregated as unknown as typeof GOVERNANCE_EVIDENCE_REVIEW_PACKET).includes("selected product gained an aggregation"));
 
-  const incomplete = structuredClone(GOVERNANCE_EVIDENCE_REVIEW_PACKET) as any;
+  const incomplete = structuredClone(GOVERNANCE_EVIDENCE_REVIEW_PACKET) as {
+    validation: { exactSourceFileCells: { passed: number } };
+  };
   incomplete.validation.exactSourceFileCells.passed = 969;
-  assert.ok(governanceEvidenceReviewPacketErrors(incomplete).includes("source-file fidelity is incomplete"));
+  assert.ok(governanceEvidenceReviewPacketErrors(incomplete as unknown as typeof GOVERNANCE_EVIDENCE_REVIEW_PACKET).includes("source-file fidelity is incomplete"));
 
-  const endorsed = structuredClone(GOVERNANCE_EVIDENCE_REVIEW_PACKET) as any;
+  const endorsed = structuredClone(GOVERNANCE_EVIDENCE_REVIEW_PACKET) as {
+    reviewerTerms: { publicEndorsementImplied: boolean };
+  };
   endorsed.reviewerTerms.publicEndorsementImplied = true;
-  assert.ok(governanceEvidenceReviewPacketErrors(endorsed).includes("reviewer independence terms are invalid"));
+  assert.ok(governanceEvidenceReviewPacketErrors(endorsed as unknown as typeof GOVERNANCE_EVIDENCE_REVIEW_PACKET).includes("reviewer independence terms are invalid"));
 });
 
 test("review packet makes no Civica score, grade, rank, or independent-validation claim", () => {

@@ -6,12 +6,13 @@ import {
   type ReaderSidebarItem,
 } from "@/components/editorial/ReaderSidebar";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Methodology — How Civica Builds Its Data",
@@ -61,6 +62,12 @@ const SECTIONS: MethodologySection[] = [
         blurb:
           "How Civica selects among source observations, records disputes, separates forecasts from measurements, and preserves scoped alternatives.",
         beta: true,
+      },
+      {
+        href: "/methodology/case-studies",
+        title: "Reproducible Atlas case studies",
+        blurb:
+          "Frozen examples with exact API recipes, input rows, decision trails, source rights, limitations, regenerated tables, and stable citations.",
       },
     ],
   },
@@ -250,34 +257,14 @@ export default function MethodologyHubPage() {
                           {entry.title}
                         </h3>
                         {entry.beta && (
-                          <span
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              fontFamily: "var(--font-body)",
-                              fontSize: "var(--text-12)",
-                              fontWeight: 500,
-                              letterSpacing: 0,
-                              textTransform: "none",
-                              padding: "3px 9px",
-                              background:
-                                "color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg))",
-                              border:
-                                "1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent)",
-                              color:
-                                "color-mix(in oklab, var(--color-status-warning), black 32%)",
-                              borderRadius: "var(--radius-sm)",
-                            }}
-                          >
-                            Beta
-                          </span>
+                          <BetaChip />
                         )}
                       </div>
                       <p
                         style={{
                           fontFamily: "var(--font-body)",
                           fontSize: "var(--text-15)",
-                          color: "var(--color-text-50)",
+                          color: "var(--color-text-secondary)",
                           lineHeight: "var(--leading-normal)",
                           margin: 0,
                         }}

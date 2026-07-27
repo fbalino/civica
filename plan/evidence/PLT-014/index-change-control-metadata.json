@@ -1,0 +1,24 @@
+{
+  "id": "plt-014-evidence-control-contract-test",
+  "toVersion": "civica-index-release-consistency-v35-evidence",
+  "recordKind": "evidence",
+  "categories": [],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/PLT-014/README.md",
+      "plan/evidence/PLT-014/index-change-control.md"
+    ],
+    "registry": [
+      "src/lib/ci/index-change-control.ts",
+      "scripts/generate-index-change-control.ts"
+    ],
+    "release_note": ["plan/evidence/PLT-014/release-note.md"],
+    "migration_plan": ["plan/evidence/PLT-014/migration-plan.md"],
+    "golden_test": ["src/lib/ci/index-change-control.test.ts"],
+    "contract_test": ["src/lib/ci/index-change-control.test.ts"]
+  },
+  "validations": [
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition"
+  ]
+}

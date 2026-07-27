@@ -72,18 +72,25 @@
  */
 import { sql } from "drizzle-orm";
 
-import {
-  countryFacts,
-  factSnapshots,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  resolveAtlasReleaseId,
+  routineCountryFactHistory,
+  upsertCountryFactWithHistory,
+  type CountryFactHistoryWriter,
+} from "@/lib/factbook/country-fact-history-writer";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import {
+  markExternalSourceSyncedAfterAggregateSuccess,
+  payloadHash,
+  recordRequiredSubfeedOutcome,
+  type CivicaSourceRole,
+} from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -155,7 +162,7 @@ export interface UndpHdiIndicatorConfig {
    *  `references[].civicaRole` so the methodology page rewrite
    *  (R.23) can render canonical-vs-alternate without a separate
    *  lookup. Per `~/civica/plan/undp-hdi-resolution-v1.md` §2m. */
-   civicaRole?: CivicaSourceRole;
+  civicaRole?: CivicaSourceRole;
   /** Optional explicit CSV column name. Used for `hdi_rank` which
    *  is published only at the latest year (no `hdi_rank_1990`,
    *  `hdi_rank_1991`, etc. — only `hdi_rank_2023`). When omitted,
@@ -181,8 +188,8 @@ export const UNDP_HDI_INDICATORS: readonly UndpHdiIndicatorConfig[] = [
   },
 
   // HDI rank — single-year column. Sole publisher; canonical by
-  // construction. Spot-checks (2023): USA #17, Norway #2, Brazil
-  // #84, Niger #188.
+  // construction. Spot-checks (2023): USA rank 17, Norway rank 2, Brazil
+  // rank 84, Niger rank 188.
   {
     undpCode: "hdi_rank",
     factKey: "hdi_rank",
@@ -300,6 +307,8 @@ export interface UndpHdiSyncOptions {
   jurisdictions?: UndpHdiJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
+  atlasReleaseId?: string;
+  writeFact?: CountryFactHistoryWriter;
 }
 
 export interface UndpHdiJurisdiction {
@@ -407,9 +416,7 @@ async function fetchAndParseCsv(): Promise<{
     },
   });
   if (!res.ok) {
-    throw new Error(
-      `UNDP HDR CSV fetch: ${res.status} ${res.statusText}`,
-    );
+    throw new Error(`UNDP HDR CSV fetch: ${res.status} ${res.statusText}`);
   }
   const text = await res.text();
   const lines = text.split(/\r?\n/);
@@ -470,16 +477,22 @@ export async function syncUndpHdi(
       dryRun: options.dryRun ?? false,
     };
   }
+  const atlasReleaseId = options.dryRun
+    ? undefined
+    : resolveAtlasReleaseId(options.atlasReleaseId);
+  const writeFact = options.writeFact ?? upsertCountryFactWithHistory;
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = options.jurisdictions ?? await db
-    .select({
-      id: jurisdictions.id,
-      slug: jurisdictions.slug,
-      iso3: jurisdictions.iso3,
-    })
-    .from(jurisdictions)
-    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const allJurisdictions =
+    options.jurisdictions ??
+    (await db
+      .select({
+        id: jurisdictions.id,
+        slug: jurisdictions.slug,
+        iso3: jurisdictions.iso3,
+      })
+      .from(jurisdictions)
+      .where(sql`${jurisdictions.iso3} IS NOT NULL`));
   const iso3ToJurisdiction = new Map<
     string,
     { id: string; slug: string; iso3: string | null }
@@ -495,7 +508,9 @@ export async function syncUndpHdi(
   let columnIndex: Map<string, number>;
   let countryRows: string[][];
   try {
-    ({ columnIndex, countryRows } = await (options.fetchCsv ?? fetchAndParseCsv)());
+    ({ columnIndex, countryRows } = await (
+      options.fetchCsv ?? fetchAndParseCsv
+    )());
   } catch (err) {
     errors.push(
       `CSV fetch/parse failed: ${err instanceof Error ? err.message : err}`,
@@ -514,7 +529,9 @@ export async function syncUndpHdi(
       dryRun: options.dryRun ?? false,
     };
   }
-  log(`  parsed ${columnIndex.size} columns × ${countryRows.length} country rows`);
+  log(
+    `  parsed ${columnIndex.size} columns × ${countryRows.length} country rows`,
+  );
 
   const counters = new Map<string, PerUndpCounters>();
   for (const c of targets) {
@@ -594,10 +611,14 @@ export async function syncUndpHdi(
       const env = factKeyDef.envelope;
       if (env) {
         const min = env.isPercent
-          ? (env.min !== undefined ? env.min : -1)
+          ? env.min !== undefined
+            ? env.min
+            : -1
           : env.min;
         const max = env.isPercent
-          ? (env.max !== undefined ? env.max : 101)
+          ? env.max !== undefined
+            ? env.max
+            : 101
           : env.max;
         if (
           (min !== undefined && numericValue < min) ||
@@ -677,56 +698,33 @@ export async function syncUndpHdi(
           .limit(1);
         const snapshotId = snapshotIdRow[0]?.id ?? null;
 
-        await db
-          .insert(countryFacts)
-          .values({
-            jurisdictionId: j.id,
-            factKey: config.factKey,
-            factGroup: factKeyDef.group,
-            category: factKeyDef.category,
-            sourceId: "undp_hdi",
-            sourceUrl: config.docUrl,
-            references: referencesPayload,
-            sourceHash: hash,
-            factValue: String(numericValue),
-            factValueNumeric: numericValue,
-            factUnit: factKeyDef.unit ?? null,
-            factYear,
-            valueJson: null,
-            asOf,
-            retrievedAt: new Date(),
-            upstreamVintageLabel: UNDP_HDR_VINTAGE,
-            methodologyVersion: "v0.1-beta",
-            status: "active",
-            statusReason: null,
-            snapshotId,
-            sourceNote: null,
-          })
-          .onConflictDoUpdate({
-            target: [
-              countryFacts.jurisdictionId,
-              countryFacts.factKey,
-              countryFacts.sourceId,
-            ],
-            // F.5.1 invariant: do NOT add `status` or `statusReason`
-            // to this set clause. Reviewer-demoted rows must survive
-            // a re-sync so the resolver continues to honour the
-            // human decision.
-            set: {
-              factValue: String(numericValue),
-              factValueNumeric: numericValue,
-              factUnit: factKeyDef.unit ?? null,
-              factYear,
-              asOf,
-              sourceUrl: config.docUrl,
-              references: referencesPayload,
-              sourceHash: hash,
-              retrievedAt: new Date(),
-              upstreamVintageLabel: UNDP_HDR_VINTAGE,
-              snapshotId,
-              updatedAt: new Date(),
-            },
-          });
+        const values = {
+          jurisdictionId: j.id,
+          factKey: config.factKey,
+          factGroup: factKeyDef.group,
+          category: factKeyDef.category,
+          sourceId: "undp_hdi",
+          sourceUrl: config.docUrl,
+          references: referencesPayload,
+          sourceHash: hash,
+          factValue: String(numericValue),
+          factValueNumeric: numericValue,
+          factUnit: factKeyDef.unit ?? null,
+          factYear,
+          valueJson: null,
+          asOf,
+          retrievedAt: new Date(),
+          upstreamVintageLabel: UNDP_HDR_VINTAGE,
+          methodologyVersion: "v0.1-beta",
+          status: "active",
+          statusReason: null,
+          snapshotId,
+          sourceNote: null,
+        };
+        await writeFact(db, {
+          values,
+          history: routineCountryFactHistory(values, atlasReleaseId!),
+        });
         counter.written += 1;
         totalWritten += 1;
         touchedPairs.add(`${j.id}|${config.factKey}`);
@@ -746,13 +744,13 @@ export async function syncUndpHdi(
         `no-value: ${counter.rejected_no_value}, ` +
         `envelope rejects: ${counter.rejected_envelope})`,
     );
+    recordRequiredSubfeedOutcome({
+      errors,
+      source: "UNDP HDI",
+      target: `${config.factKey} (${config.undpCode})`,
+      rowsWritten: counter.written,
+    });
   }
-
-  await (options.markSynced ?? markSourcesSynced)("undp_hdi", {
-    rowsWritten: errors.length === 0 ? totalWritten : 0,
-    dryRun: options.dryRun,
-    executor: db,
-  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:
@@ -767,13 +765,17 @@ export async function syncUndpHdi(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
-        dryRun: options.dryRun,
-        onProgress: (line) => {
-          if (line.startsWith("[DRY]")) return; // too verbose
-          log(`  ${line}`);
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(
+        db,
+        touched,
+        {
+          dryRun: options.dryRun,
+          onProgress: (line) => {
+            if (line.startsWith("[DRY]")) return; // too verbose
+            log(`  ${line}`);
+          },
         },
-      });
+      );
       for (const e of disputes.errors) errors.push(`disputes: ${e}`);
     } catch (err) {
       errors.push(
@@ -783,6 +785,15 @@ export async function syncUndpHdi(
       );
     }
   }
+
+  await markExternalSourceSyncedAfterAggregateSuccess({
+    sourceIds: "undp_hdi",
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+    errors,
+    markSynced: options.markSynced ?? markSourcesSynced,
+  });
 
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerUndpCounters> = {};

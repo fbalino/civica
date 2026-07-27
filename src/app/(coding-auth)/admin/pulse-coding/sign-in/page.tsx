@@ -4,6 +4,8 @@ import { CivicaLogo } from "@/components/CivicaLogo";
 import { Banner } from "@/components/editorial/Banner";
 import "@/app/admin.css";
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Independent coding sign in — Civica",
   robots: { index: false, follow: false },

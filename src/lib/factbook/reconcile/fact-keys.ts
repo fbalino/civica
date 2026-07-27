@@ -814,7 +814,7 @@ const GROUP_B: FactKeyInput[] = [
     unit: "rank",
     // UNDP ranks ~193 jurisdictions in the 2023 vintage; envelope
     // max 250 absorbs future expansions. lower rank = better;
-    // Norway #2, Switzerland #1, Somalia #193.
+    // Norway rank 2, Switzerland rank 1, Somalia rank 193.
     envelope: { min: 1, max: 250 },
     higherIsBetter: false,
     materialErrorPctThreshold: 0.5,

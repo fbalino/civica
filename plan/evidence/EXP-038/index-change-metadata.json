@@ -1,9 +1,8 @@
 {
-  "id": "exp-038-governance-evidence-copy-2026-07-26",
-  "toVersion": "civica-index-governance-evidence-copy-v29",
-  "categories": [
-    "presentation"
-  ],
+  "id": "main-readiness-integration-2026-07-26",
+  "toVersion": "civica-index-main-readiness-integration-v55",
+  "recordKind": "evidence",
+  "categories": [],
   "evidence": {
     "documentation": [
       "plan/EXP-038-english-copy-review-2026-07-23.md",

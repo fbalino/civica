@@ -34,7 +34,7 @@ for (const [path, tokens] of Object.entries(requiredTokens)) {
 }
 
 async function validateLive() {
-  config({ path: ".env.local", override: true });
+  config({ path: ".env.local" });
   const { neon } = await import("@neondatabase/serverless");
   assert.ok(process.env.DATABASE_URL, "DATABASE_URL is required for --live");
   const sql = neon(process.env.DATABASE_URL);

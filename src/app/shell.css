@@ -87,7 +87,7 @@
   border: 1px solid var(--atlas-rule);
   color: var(--atlas-muted);
   cursor: pointer;
-  z-index: 25;
+  z-index: var(--z-sticky);
   box-shadow: var(--shadow-hard-sm);
   /* Color/hover-only transition. Position changes (left/right) snap
    * immediately so the handle moves with the pane without lagging. */
@@ -153,7 +153,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 20;
+    z-index: var(--z-sticky);
     background: var(--atlas-paper);
     overflow-y: auto;
   }
@@ -177,7 +177,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 20;
+    z-index: var(--z-sticky);
     background: var(--atlas-paper);
   }
 
@@ -191,7 +191,7 @@
     background: var(--atlas-paper-2);
     flex-shrink: 0;
     position: relative;
-    z-index: 30;
+    z-index: var(--z-popover);
   }
   .mobile-panel-bar button {
     flex: 1;
@@ -202,7 +202,7 @@
     border: none;
     border-bottom: 3px solid transparent;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: var(--text-12);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     cursor: pointer;

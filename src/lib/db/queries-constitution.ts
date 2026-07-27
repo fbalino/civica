@@ -5,6 +5,10 @@ import {
   constitutionTopicExcerpts,
   jurisdictions,
 } from "./schema";
+import {
+  sanitizeConstitutionHtml,
+  type SanitizedConstitutionHtml,
+} from "@/lib/constitution/sanitize-html";
 
 // ---------------------------------------------------------------------------
 // Constitution Explorer — read layer (Wave 2, Phase 2b).
@@ -33,8 +37,8 @@ export interface ConstitutionArticle {
   headingLabel: string;
   /** Constitute ontology leaf keys tagged on this section (may be empty). */
   topics: string[];
-  /** The section's own inner HTML (sourced from our DB, safe to render). */
-  html: string;
+  /** Server-sanitized section HTML under the constitution-html/v1 contract. */
+  html: SanitizedConstitutionHtml;
 }
 
 /** A country whose constitution is fully indexed (has structured articles). */
@@ -73,8 +77,14 @@ export interface TopicExcerptCountry {
   excerpts: Array<{
     sectionId: string | null;
     articleLabel: string | null;
-    excerptHtml: string;
+    /** Server-sanitized excerpt HTML under the constitution-html/v1 contract. */
+    excerptHtml: SanitizedConstitutionHtml;
   }>;
+}
+
+export interface ConstitutionQueryOptions {
+  /** Re-throw database failures so an API route can return 503, not 200 + []. */
+  throwOnError?: boolean;
 }
 
 function coerceArticles(raw: unknown): ConstitutionArticle[] {
@@ -83,7 +93,9 @@ function coerceArticles(raw: unknown): ConstitutionArticle[] {
   for (const entry of raw) {
     if (!entry || typeof entry !== "object") continue;
     const e = entry as Record<string, unknown>;
-    const html = typeof e.html === "string" ? e.html : "";
+    const rawHtml = typeof e.html === "string" ? e.html : "";
+    if (!rawHtml) continue;
+    const html = sanitizeConstitutionHtml(rawHtml);
     if (!html) continue;
     out.push({
       sectionId: typeof e.sectionId === "string" ? e.sectionId : "",
@@ -102,11 +114,14 @@ function coerceArticles(raw: unknown): ConstitutionArticle[] {
 
 /**
  * Full constitution for a country by civica slug, including parsed articles.
- * Returns null when the slug is unknown, the country has no ingested
- * constitution, or the DB is unreachable.
+ * Returns null when the slug is unknown or the country has no ingested
+ * constitution. By default a database failure also soft-fails to null for the
+ * standalone Explorer; country-reader callers may request the error so they
+ * can distinguish an outage from an unindexed document.
  */
 export async function getConstitutionWithArticles(
   slug: string,
+  options: ConstitutionQueryOptions = {},
 ): Promise<ConstitutionDetail | null> {
   try {
     const rows = await db
@@ -149,6 +164,7 @@ export async function getConstitutionWithArticles(
     };
   } catch (err) {
     console.error("[queries-constitution] getConstitutionWithArticles:", err);
+    if (options.throwOnError) throw err;
     return null;
   }
 }
@@ -162,6 +178,7 @@ export async function getConstitutionWithArticles(
 export async function getTopicExcerpts(
   topicKey: string,
   jurisdictionIds: string[],
+  options: ConstitutionQueryOptions = {},
 ): Promise<TopicExcerptCountry[]> {
   if (!topicKey || jurisdictionIds.length === 0) return [];
   try {
@@ -190,6 +207,8 @@ export async function getTopicExcerpts(
     // Group by jurisdiction, keeping the caller's requested order.
     const byId = new Map<string, TopicExcerptCountry>();
     for (const r of rows) {
+      const excerptHtml = sanitizeConstitutionHtml(r.excerptHtml);
+      if (!excerptHtml) continue;
       let entry = byId.get(r.jurisdictionId);
       if (!entry) {
         entry = {
@@ -207,7 +226,7 @@ export async function getTopicExcerpts(
         entry.excerpts.push({
           sectionId: r.sectionId,
           articleLabel: r.articleLabel,
-          excerptHtml: r.excerptHtml,
+          excerptHtml,
         });
       }
     }
@@ -217,6 +236,7 @@ export async function getTopicExcerpts(
       .filter((e): e is TopicExcerptCountry => e != null);
   } catch (err) {
     console.error("[queries-constitution] getTopicExcerpts:", err);
+    if (options.throwOnError) throw err;
     return [];
   }
 }
@@ -228,11 +248,11 @@ export async function getTopicExcerpts(
  * is only the raw fetch order. Returns [] on error unless `throwOnError` is
  * requested by a caller that must distinguish outage from a genuine empty set.
  */
-export async function getIndexedConstitutionCountries(options: {
-  throwOnError?: boolean;
-} = {}): Promise<
-  IndexedConstitutionCountry[]
-> {
+export async function getIndexedConstitutionCountries(
+  options: {
+    throwOnError?: boolean;
+  } = {},
+): Promise<IndexedConstitutionCountry[]> {
   try {
     const rows = await db
       .select({
@@ -274,6 +294,7 @@ export async function getNotableTopicPeers(
   topicKey: string,
   excludeJurisdictionId: string,
   limit = 3,
+  options: ConstitutionQueryOptions = {},
 ): Promise<TopicExcerptCountry[]> {
   if (!topicKey) return [];
   try {
@@ -306,6 +327,8 @@ export async function getNotableTopicPeers(
     const byId = new Map<string, TopicExcerptCountry>();
     for (const r of rows) {
       if (byId.has(r.jurisdictionId)) continue;
+      const excerptHtml = sanitizeConstitutionHtml(r.excerptHtml);
+      if (!excerptHtml) continue;
       byId.set(r.jurisdictionId, {
         jurisdictionId: r.jurisdictionId,
         slug: r.slug,
@@ -315,7 +338,7 @@ export async function getNotableTopicPeers(
           {
             sectionId: r.sectionId,
             articleLabel: r.articleLabel,
-            excerptHtml: r.excerptHtml,
+            excerptHtml,
           },
         ],
       });
@@ -324,6 +347,7 @@ export async function getNotableTopicPeers(
     return [...byId.values()];
   } catch (err) {
     console.error("[queries-constitution] getNotableTopicPeers:", err);
+    if (options.throwOnError) throw err;
     return [];
   }
 }

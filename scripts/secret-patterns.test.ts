@@ -8,10 +8,10 @@ import {
   sha256Hex,
 } from "./secret-patterns";
 
-/**
- * Build detector inputs at runtime so the scanner's own tracked test source
- * never contains a live-shaped credential literal.
- */
+/** Build detector inputs at runtime so the scanner's own tracked test source
+ * never contains a live-shaped credential literal. This is deliberately
+ * stronger than allowlisting this file: a future accidental literal here must
+ * still fail `validate:secrets`. */
 function stitch(...parts: string[]): string {
   return parts.join("");
 }

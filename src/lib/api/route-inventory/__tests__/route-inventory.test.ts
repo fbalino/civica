@@ -3,13 +3,12 @@
  *
  * Two halves, mirroring `src/lib/api/contract/__tests__/contract.test.ts`:
  *
- *   1. Positive: the real `registry.ts` has an entry for all 100 real
+ *   1. Positive: the real `registry.ts` has an entry for all 108 real
  *      `route.ts` files under src/app, declares the same HTTP methods
  *      those files actually export, and the pure checks report zero
  *      phantom routes / zero stale entries / zero UNDOCUMENTED
- *      uncontrolled mutations against the real data (two real, disclosed
- *      findings — the admin and pulse-coding sign-out routes — are
- *      expected and asserted to carry an explanatory `note`).
+ *      uncontrolled mutations against the real data (the remaining bounded
+ *      pulse-coding logout revocation gap is expected and disclosed).
  *   2. Negative: seeded synthetic fixtures prove each pure check catches
  *      its failure mode — a phantom route, a stale entry, an uncontrolled
  *      cron route, and an uncontrolled admin route.
@@ -28,9 +27,14 @@ import {
   diffMethods,
 } from "../checks";
 import { scanExportedMethods } from "../../../../../scripts/validate-route-inventory";
+import {
+  isRepositoryOwned,
+  loadRepositoryOwnedFiles,
+} from "../../../../../scripts/repository-owned-files";
 
 const ROOT = process.cwd();
 const APP_DIR = path.join(ROOT, "src/app");
+const REPOSITORY_OWNED_FILES = loadRepositoryOwnedFiles(ROOT);
 
 async function findRouteFilesOnDisk(dir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -46,14 +50,21 @@ async function findRouteFilesOnDisk(dir: string): Promise<string[]> {
   return found;
 }
 
+async function findRepositoryRouteFilesOnDisk(): Promise<string[]> {
+  const files = await findRouteFilesOnDisk(APP_DIR);
+  return files.filter((file) =>
+    isRepositoryOwned(path.relative(ROOT, file), REPOSITORY_OWNED_FILES),
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Positive: the real registry is internally consistent and complete
 // ─────────────────────────────────────────────────────────────────────
 
-test("the real registry has exactly 100 entries, one per real route.ts file", async () => {
-  const diskFiles = await findRouteFilesOnDisk(APP_DIR);
-  assert.equal(diskFiles.length, 100, "expected exactly 100 route.ts files under src/app");
-  assert.equal(ROUTE_INVENTORY.length, 100);
+test("the real registry has exactly 109 entries, one per real route.ts file", async () => {
+  const diskFiles = await findRepositoryRouteFilesOnDisk();
+  assert.equal(diskFiles.length, 109, "expected exactly 109 route.ts files under src/app");
+  assert.equal(ROUTE_INVENTORY.length, 109);
 });
 
 test("no duplicate filePath entries in the registry", () => {
@@ -65,7 +76,7 @@ test("no duplicate filePath entries in the registry", () => {
 });
 
 test("findPhantomRoutes and findStaleEntries are both empty against the real filesystem", async () => {
-  const diskFiles = await findRouteFilesOnDisk(APP_DIR);
+  const diskFiles = await findRepositoryRouteFilesOnDisk();
   const diskPaths = diskFiles.map((f) => path.relative(APP_DIR, f).split(path.sep).join("/"));
   const registryPaths = ROUTE_INVENTORY.map((r) => r.filePath);
 
@@ -96,16 +107,12 @@ test("every uncontrolled-mutation finding on the real registry is a documented, 
     [],
     `undocumented uncontrolled mutation(s) found: ${JSON.stringify(undocumented)}`,
   );
-  // PLT-008 evidence: exactly the two benign, by-design sign-out routes
-  // (clearing a session cookie needs no prior session check) are expected
-  // to be flagged. If this count changes, the registry's `controls`/`note`
-  // fields — not this test — should be updated to explain why.
+  // Owner-admin logout now has durable revocation. The participant-coding
+  // logout still clears only its scoped cookie, so that bounded gap remains
+  // explicitly visible until its separate credential lifecycle is revised.
   assert.deepEqual(
     findings.map((f) => f.filePath).sort(),
-    [
-      "api/admin/sign-out/route.ts",
-      "api/pulse-coding/sign-out/route.ts",
-    ],
+    ["api/pulse-coding/sign-out/route.ts"],
   );
 });
 

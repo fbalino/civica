@@ -16,10 +16,7 @@
  * actions) requires a different data path we haven't identified.
  */
 
-import {
-  type JurisdictionMap,
-  resolveCountry,
-} from "../country-resolver";
+import { type JurisdictionMap, resolveCountry } from "../country-resolver";
 import type { RawEventInput } from "../types";
 
 const IPU_BASE = process.env.IPU_BASE_URL ?? "https://api.data.ipu.org/v1";
@@ -39,32 +36,63 @@ export interface IpuFetchResult {
   fetched: number;
 }
 
+export interface IpuFetchOptions {
+  sinceDays?: number;
+  baseUrl?: string;
+  fetchImpl?: typeof fetch;
+}
+
 export async function fetchIpuActions(
   map: JurisdictionMap,
-  opts: { sinceDays?: number } = {}
+  opts: IpuFetchOptions = {},
 ): Promise<IpuFetchResult> {
   const sinceDays = opts.sinceDays ?? 60;
   const since = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
 
-  const url = `${IPU_BASE}/elections?date_from=${since}&page_size=200`;
+  const baseUrl = opts.baseUrl ?? IPU_BASE;
+  const url = `${baseUrl}/elections?date_from=${since}&page_size=200`;
 
-  let elections: IpuElection[] = [];
+  let resp: Response;
   try {
-    const resp = await fetch(url, {
+    resp = await (opts.fetchImpl ?? fetch)(url, {
       headers: { Accept: "application/json" },
     });
-    if (!resp.ok) {
-      console.warn(`[ipu-actions] ${url} returned ${resp.status}`);
-      return { rows: [], unmatchedCountry: 0, fetched: 0 };
-    }
-    const json = (await resp.json()) as { results?: IpuElection[] };
-    elections = json.results ?? [];
   } catch (err) {
-    console.warn(`[ipu-actions] fetch failed: ${(err as Error).message}`);
-    return { rows: [], unmatchedCountry: 0, fetched: 0 };
+    throw new Error(
+      `IPU actions request failed (${url}): ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
   }
+  if (!resp.ok) {
+    throw new Error(
+      `IPU actions request returned HTTP ${resp.status} (${url})`,
+    );
+  }
+
+  let json: unknown;
+  try {
+    json = await resp.json();
+  } catch (err) {
+    throw new Error(
+      `IPU actions response parse failed (${url}): ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
+  }
+  if (
+    typeof json !== "object" ||
+    json === null ||
+    !("results" in json) ||
+    !Array.isArray(json.results)
+  ) {
+    throw new Error(
+      `IPU actions response parse failed (${url}): expected a results array`,
+    );
+  }
+  const elections = json.results as IpuElection[];
 
   const rows: RawEventInput[] = [];
   let unmatchedCountry = 0;
@@ -81,7 +109,7 @@ export async function fetchIpuActions(
     rows.push({
       sourceId: SOURCE_ID,
       externalId: `election-${e.id}`,
-      sourceUrl: `${IPU_BASE}/elections/${e.id}`,
+      sourceUrl: `${baseUrl}/elections/${e.id}`,
       sourceType: "specialist",
       jurisdictionId,
       rawCountryName: e.country.name ?? null,

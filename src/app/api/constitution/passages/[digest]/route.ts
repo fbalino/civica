@@ -1,23 +1,27 @@
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
+import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
+import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
+import { parsePathContract } from "@/lib/api/request-contract";
 import { evaluateInteractiveDisplay } from "@/lib/rights/manifest";
-
-const DIGEST = /^sha256:([a-f0-9]{64})$/;
+import { apiProblem } from "@/lib/api/problem-response";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ digest: string }> },
 ) {
-  const limited = enforceInMemoryRateLimit(request, {
-    scope: "constitution-passage-citation",
-    max: 60,
-  });
+  const limited = await enforceRequestRateLimit(
+    request,
+    getRequestRateLimitPolicy("public-dynamic-read"),
+  );
   if (limited) return limited;
-  const { digest } = await params;
-  const match = DIGEST.exec(digest);
-  if (!match)
-    return Response.json({ error: "Invalid passage id" }, { status: 400 });
+  const path = await parsePathContract(
+    params,
+    "constitution-passage-params/v1",
+  );
+  if (!path.ok) return path.response;
+  const { digest } = path.data;
 
   const rights = evaluateInteractiveDisplay(
     "constitution-search-display-v1",
@@ -29,12 +33,16 @@ export async function GET(
   );
   if (!rights.allowed) {
     return Response.json(
-      { error: "rights_not_ready", message: rights.reason },
+      {
+        error: "Constitution passage is unavailable.",
+        code: "RIGHTS_NOT_READY",
+        reason: rights.reason,
+      },
       { status: 503, headers: { "Cache-Control": "no-store" } },
     );
   }
 
-  const passageId = `constitution-passage/sha256:${match[1]}`;
+  const passageId = `constitution-passage/${digest}`;
   try {
     const result = await db.execute(sql`
       SELECT
@@ -53,8 +61,7 @@ export async function GET(
       LIMIT 1
     `);
     const row = result.rows[0] as Record<string, unknown> | undefined;
-    if (!row)
-      return Response.json({ error: "Passage not found" }, { status: 404 });
+    if (!row) return apiProblem("NOT_FOUND");
     const current = Boolean(row.is_current);
     return Response.json(
       {
@@ -98,19 +105,13 @@ export async function GET(
       },
       {
         headers: {
-          "Cache-Control": "public, max-age=300",
+          "Cache-Control": cacheControlFor("public-live"),
           "X-Robots-Tag": "noindex",
         },
       },
     );
   } catch (error) {
     console.error("[/api/constitution/passages]", error);
-    return Response.json(
-      {
-        error: "data_unavailable",
-        message: "Passage citation is unavailable.",
-      },
-      { status: 503, headers: { "Cache-Control": "no-store" } },
-    );
+    return apiProblem("DATA_UNAVAILABLE");
   }
 }

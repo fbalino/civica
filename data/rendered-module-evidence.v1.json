@@ -1,0 +1,645 @@
+{
+  "schemaVersion": "civica-rendered-module-evidence/v1",
+  "records": [
+    {
+      "route": "/__not_found__",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/error-404-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/__not_found__",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/error-404-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/__not_found__",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/error-404-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/__not_found__",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/error-404-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/home-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/home-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/home-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/home-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/about/advisory-board",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/advisory-board-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/about/advisory-board",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/advisory-board-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/about/advisory-board",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/advisory-board-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/about/advisory-board",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/advisory-board-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/api-docs",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/api-docs-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/api-docs",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/api-docs-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/api-docs",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/api-docs-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/api-docs",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/api-docs-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/atlas",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/atlas",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/atlas",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/atlas",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/blog",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/record-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/blog",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/record-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/blog",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/record-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/blog",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/record-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/civica-index",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/civica-index-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/civica-index",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/civica-index-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/civica-index",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/civica-index-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/civica-index",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/civica-index-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/civica-index/pulse-changelog",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/civica-index/pulse-changelog",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/civica-index/pulse-changelog",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/civica-index/pulse-changelog",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/compare",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/compare",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/compare",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/compare",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/constitution",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/constitution",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/constitution",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/constitution",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/country/[slug]",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/country/[slug]",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/country/[slug]",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/country/[slug]",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/country/[slug]/civica-data",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/country/[slug]/civica-data",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/country/[slug]/civica-data",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/country/[slug]/civica-data",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/design-system",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/design-system",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/design-system",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/design-system",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/elections",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/elections",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/elections",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/elections",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/embed/[slug]",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/embed-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/embed/[slug]",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/embed-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/embed/[slug]",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/embed-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/embed/[slug]",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/embed-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/methodology",
+      "moduleSource": "*",
+      "variant": "desktop_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/methodology-dark-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/methodology",
+      "moduleSource": "*",
+      "variant": "desktop_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/methodology-light-desktop-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/methodology",
+      "moduleSource": "*",
+      "variant": "small_mobile_dark",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/methodology-dark-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    },
+    {
+      "route": "/methodology",
+      "moduleSource": "*",
+      "variant": "small_mobile_light",
+      "evidence": {
+        "disposition": "not_observed",
+        "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/methodology-light-small-mobile-chromium-darwin.png",
+        "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+      }
+    }
+  ]
+}

@@ -21,7 +21,8 @@ import {
   releaseOrganizationMembership,
 } from "../src/lib/organizations/membership-release";
 import { jurisdictions } from "../src/lib/db/schema";
-import { sourceFreshnessTransactionQuery } from "../src/lib/db/source-freshness";
+import { markSourcesSyncedTransactionQuery } from "../src/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "../src/lib/factbook/country-fact-history-writer";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("DATABASE_URL is required");
@@ -33,6 +34,13 @@ const DRY_RUN = process.argv.includes("--dry-run") || !APPLY;
 if (APPLY && process.argv.includes("--dry-run")) {
   throw new Error("Choose either --apply or --dry-run, not both");
 }
+const ATLAS_RELEASE_ID = APPLY
+  ? resolveAtlasReleaseId(
+      process.argv
+        .find((arg) => arg.startsWith("--release-id="))
+        ?.slice("--release-id=".length),
+    )
+  : null;
 const retrievedAt = new Date(ORGANIZATION_MEMBERSHIP_RETRIEVED_AT);
 const sourceLicense =
   "Mixed official-publisher terms; factual reference only; source content is not redistributed";
@@ -262,6 +270,22 @@ async function main() {
           "hqCountry" text, "memberCount" integer, extra jsonb,
           "sourceUrl" text, "sourceLicense" text
         )
+      ), locked_input AS MATERIALIZED (
+        SELECT
+          input.*,
+          pg_advisory_xact_lock(
+            hashtextextended('atlas-organization:' || input.slug, 0)
+          ) AS lock_acquired
+        FROM input
+      ), before_rows AS MATERIALIZED (
+        SELECT o.*
+        FROM organizations o
+        JOIN locked_input input ON input.slug = o.slug
+        FOR UPDATE OF o
+      ), upsert_input AS MATERIALIZED (
+        SELECT input.*, prior.id AS prior_id
+        FROM locked_input input
+        LEFT JOIN before_rows prior ON prior.slug = input.slug
       ), upserted AS (
         INSERT INTO organizations (
           slug, name, full_name, type, founded_year, hq_country, member_count,
@@ -272,7 +296,7 @@ async function main() {
           slug, name, "fullName", type, "foundedYear", "hqCountry", "memberCount",
           extra, ${ORGANIZATION_MEMBERSHIP_SOURCE_ID}, "sourceUrl", "sourceLicense",
           ${retrievedAt}, ${ORGANIZATION_MEMBERSHIP_RELEASE_VERSION}, ${retrievedAt}
-        FROM input
+        FROM upsert_input
         ON CONFLICT (slug) DO UPDATE SET
           name = EXCLUDED.name,
           full_name = EXCLUDED.full_name,
@@ -287,8 +311,83 @@ async function main() {
           source_retrieved_at = EXCLUDED.source_retrieved_at,
           upstream_vintage = EXCLUDED.upstream_vintage,
           updated_at = EXCLUDED.updated_at
+        RETURNING *
+      ), change_payload AS (
+        SELECT
+          upserted.id,
+          (
+            CASE WHEN prior.name IS DISTINCT FROM upserted.name
+              THEN jsonb_build_array(jsonb_build_object('field', 'name', 'before', prior.name, 'after', upserted.name))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.full_name IS DISTINCT FROM upserted.full_name
+              THEN jsonb_build_array(jsonb_build_object('field', 'full_name', 'before', prior.full_name, 'after', upserted.full_name))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.type IS DISTINCT FROM upserted.type
+              THEN jsonb_build_array(jsonb_build_object('field', 'type', 'before', prior.type, 'after', upserted.type))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.founded_year IS DISTINCT FROM upserted.founded_year
+              THEN jsonb_build_array(jsonb_build_object('field', 'founded_year', 'before', prior.founded_year, 'after', upserted.founded_year))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.hq_country IS DISTINCT FROM upserted.hq_country
+              THEN jsonb_build_array(jsonb_build_object('field', 'hq_country', 'before', prior.hq_country, 'after', upserted.hq_country))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.member_count IS DISTINCT FROM upserted.member_count
+              THEN jsonb_build_array(jsonb_build_object('field', 'member_count', 'before', prior.member_count, 'after', upserted.member_count))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.wikidata_qid IS DISTINCT FROM upserted.wikidata_qid
+              THEN jsonb_build_array(jsonb_build_object('field', 'wikidata_qid', 'before', prior.wikidata_qid, 'after', upserted.wikidata_qid))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.source_id IS DISTINCT FROM upserted.source_id
+              THEN jsonb_build_array(jsonb_build_object('field', 'source_id', 'before', prior.source_id, 'after', upserted.source_id))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.source_url IS DISTINCT FROM upserted.source_url
+              THEN jsonb_build_array(jsonb_build_object('field', 'source_url', 'before', prior.source_url, 'after', upserted.source_url))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.source_license IS DISTINCT FROM upserted.source_license
+              THEN jsonb_build_array(jsonb_build_object('field', 'source_license', 'before', prior.source_license, 'after', upserted.source_license))
+              ELSE '[]'::jsonb END
+            ||
+            CASE WHEN prior.upstream_vintage IS DISTINCT FROM upserted.upstream_vintage
+              THEN jsonb_build_array(jsonb_build_object('field', 'upstream_vintage', 'before', prior.upstream_vintage, 'after', upserted.upstream_vintage))
+              ELSE '[]'::jsonb END
+          ) AS changes
+        FROM upserted
+        LEFT JOIN before_rows prior ON prior.slug = upserted.slug
+      ), history_events AS (
+        INSERT INTO atlas_entity_change_history (
+          entity_type, entity_id, entity_table, operation, change_kind, changes,
+          reason, methodology_version, release_id
+        )
+        SELECT
+          'organization',
+          id::text,
+          'organizations',
+          CASE
+            WHEN EXISTS (SELECT 1 FROM before_rows WHERE before_rows.id = change_payload.id)
+              THEN 'update'
+            ELSE 'insert'
+          END,
+          'routine_refresh',
+          changes,
+          'Checked organization roster source refresh',
+          ${ORGANIZATION_MEMBERSHIP_RELEASE_VERSION},
+          ${ATLAS_RELEASE_ID}
+        FROM change_payload
+        WHERE jsonb_array_length(changes) > 0
         RETURNING id
-      ) SELECT count(*)::int AS written FROM upserted
+      )
+      SELECT
+        (SELECT count(*)::int FROM upserted) AS written,
+        (SELECT count(*)::int FROM history_events) AS history_written
     `,
     neonSql`
       WITH input AS (
@@ -356,7 +455,7 @@ async function main() {
         RETURNING id
       ) SELECT count(*)::int AS written FROM upserted
     `,
-    sourceFreshnessTransactionQuery(
+    markSourcesSyncedTransactionQuery(
       neonSql,
       [ORGANIZATION_MEMBERSHIP_SOURCE_ID],
       rowsWritten,

@@ -6,7 +6,9 @@ import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { Pill } from "@/components/editorial/Pill";
+import { DataTable } from "@/components/editorial/DataTable";
 import { Reveal } from "@/components/motion/Reveal";
+import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import {
   getBacktestSnapshot,
   getBacktestStats,
@@ -14,7 +16,7 @@ import {
 } from "@/lib/db/queries-backtest";
 import { pulse } from "@/lib/content/site-state";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Civica Pulse Backtest Report (Beta)",
@@ -108,7 +110,7 @@ function TrajectorySparkline({
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       role="img"
-      aria-label="Dimensional trajectory"
+      aria-label={`Dimensional trajectory: ${samples.map((sample) => `day ${sample.dayOffset >= 0 ? "+" : ""}${sample.dayOffset}, delta ${sample.delta.toFixed(2)}`).join("; ")}`}
       style={{ display: "block" }}
     >
       {/* zero line */}
@@ -313,6 +315,48 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
               </div>
             ))}
           </div>
+          <ResearchVisualizationDisclosure
+            title={`${caseRow.countryName} archived trajectory`}
+            description="The small multiples show the diagnostic delta samples used by the earlier harness. The table below is the exact nonvisual equivalent, not a current-production evaluation."
+            sources={[
+              {
+                label: `Archived Pulse backtest case ${caseRow.id}`,
+                retrievedAt: caseRow.latest.ranAt,
+                upstreamVintage: caseRow.latest.ranAt,
+              },
+            ]}
+            missingData="A dimension with no retained samples has no sparkline and is not interpreted as a zero effect."
+            dataAccess={{
+              kind: "withheld",
+              reason:
+                "Raw backtest event evidence is not publicly redistributed; this archived diagnostic table exposes only the derived samples shown in the visual.",
+            }}
+            tableLabel="Show archived trajectory samples"
+          >
+            <DataTable aria-label={`${caseRow.countryName} archived trajectory sample table`}>
+              <thead>
+                <tr>
+                  <th scope="col">Dimension</th>
+                  <th scope="col">Day offset</th>
+                  <th scope="col">Derived delta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from(trajectoryByDim.entries()).flatMap(
+                  ([dimension, samples]) =>
+                    samples.map((sample) => (
+                      <tr key={`${dimension}-${sample.dayOffset}`}>
+                        <th scope="row">
+                          {DIMENSION_LABELS[dimension] ?? dimension}
+                        </th>
+                        <td>{sample.dayOffset >= 0 ? `+${sample.dayOffset}` : sample.dayOffset}</td>
+                        <td>{sample.delta.toFixed(2)}</td>
+                      </tr>
+                    )),
+                )}
+              </tbody>
+            </DataTable>
+          </ResearchVisualizationDisclosure>
         </>
       ) : null}
 

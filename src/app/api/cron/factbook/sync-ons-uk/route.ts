@@ -2,7 +2,7 @@
  * Phase R.14 — ONS-UK sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET` (per
- * `requireCronAuth`). 5 indicators × 1 jurisdiction (UK) in 5
+ * the shared cron boundary). 5 indicators × 1 jurisdiction (UK) in 5
  * unpaginated time-series fetches (~30–80KB each, ~250KB total).
  * Total wall time is dominated by upserts, not fetches; expect
  * ~5–10s on a warm DB.
@@ -32,7 +32,7 @@
  * Resolution:  ~/civica/plan/ons-uk-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { requireCronAuth } from "@/lib/api/cron-auth";
+import { withCronJob } from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import { syncOnsUk } from "@/lib/factbook/reconcile/sync-ons-uk";
 import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
@@ -42,46 +42,33 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 async function handler(request: Request) {
-  const unauthorized = requireCronAuth(request);
-  if (unauthorized) return unauthorized;
-
   const startedAt = new Date().toISOString();
 
-  try {
-    const summary = await syncOnsUk(db, {
-      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
-      // Cron always runs a full pass over all ONS indicators in scope.
-      onProgress: (line) => {
-        if (line.startsWith("!")) console.error(line);
-      },
-    });
-    assertExternalSyncSucceeded("factbook.ons-uk", summary);
+  const summary = await syncOnsUk(db, {
+    dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
+    // Cron always runs a full pass over all ONS indicators in scope.
+    onProgress: (line) => {
+      if (line.startsWith("!")) console.error(line);
+    },
+  });
+  assertExternalSyncSucceeded("factbook.ons-uk", summary);
 
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.ons-uk.sync",
-      started: startedAt,
-      finished: summary.finishedAt,
-      durationSec: Math.round(summary.durationMs / 1000),
-      jurisdictionsInScope: summary.jurisdictionsInScope,
-      vintageLabel: summary.vintageLabel,
-      totalWritten: summary.totalWritten,
-      sourceRowInserted: summary.sourceRowInserted,
-      perFact: summary.countersByFactKey,
-      disputes: summary.disputes,
-      errors: summary.errors,
-    });
-  } catch (err) {
-    console.error("[cron factbook.ons-uk.sync] failed:", err);
-    return NextResponse.json(
-      {
-        ok: false,
-        step: "factbook.ons-uk.sync",
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    step: "factbook.ons-uk.sync",
+    started: startedAt,
+    finished: summary.finishedAt,
+    durationSec: Math.round(summary.durationMs / 1000),
+    jurisdictionsInScope: summary.jurisdictionsInScope,
+    vintageLabel: summary.vintageLabel,
+    totalWritten: summary.totalWritten,
+    sourceRowInserted: summary.sourceRowInserted,
+    perFact: summary.countersByFactKey,
+    disputes: summary.disputes,
+    errorCount: summary.errors.length,
+  });
 }
 
-export { handler as GET, handler as POST };
+const cronHandler = withCronJob("factbook.ons-uk", handler);
+
+export { cronHandler as GET, cronHandler as POST };

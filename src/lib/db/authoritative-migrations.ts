@@ -10,17 +10,49 @@ export interface AuthoritativeMigration {
   baseline: boolean;
 }
 
+export const AUTHORITATIVE_SCHEMA_FINGERPRINT_VERSION =
+  "authoritative-schema-fingerprint/v1";
+
+export interface AuthoritativeManifestBinding {
+  head: {
+    id: string;
+    sha256: string;
+  };
+  sha256: string;
+}
+
+export interface AuthoritativeSchemaFingerprintArtifact {
+  schemaVersion: typeof AUTHORITATIVE_SCHEMA_FINGERPRINT_VERSION;
+  generatedAt: string;
+  authoritativeManifest: AuthoritativeManifestBinding;
+  sha256: string;
+  schema: unknown;
+}
+
 export function fileSha256(path: string): string {
   return createHash("sha256").update(readFileSync(resolve(path))).digest("hex");
 }
 
-/** PostgreSQL-aware enough for checked migrations: respects strings and dollar-quoted function bodies. */
+export function authoritativeManifestBinding(
+  migrations: readonly AuthoritativeMigration[],
+): AuthoritativeManifestBinding {
+  const head = migrations.at(-1);
+  if (!head) throw new Error("authoritative manifest must contain at least one migration");
+  return {
+    head: { id: head.id, sha256: head.sha256 },
+    sha256: createHash("sha256").update(stableStringify(migrations)).digest("hex"),
+  };
+}
+
+/** PostgreSQL-aware enough for checked migrations: respects comments, strings, and dollar-quoted function bodies. */
 export function splitPostgresStatements(source: string): string[] {
   const statements: string[] = [];
   let start = 0;
   let single = false;
   let double = false;
   let dollar: string | null = null;
+  let lineComment = false;
+  let blockCommentDepth = 0;
   for (let i = 0; i < source.length; i++) {
     if (dollar) {
       if (source.startsWith(dollar, i)) { i += dollar.length - 1; dollar = null; }
@@ -37,8 +69,19 @@ export function splitPostgresStatements(source: string): string[] {
       else if (ch === '"') double = false;
       continue;
     }
+    if (lineComment) {
+      if (ch === "\n" || ch === "\r") lineComment = false;
+      continue;
+    }
+    if (blockCommentDepth > 0) {
+      if (ch === "/" && source[i + 1] === "*") { blockCommentDepth++; i++; }
+      else if (ch === "*" && source[i + 1] === "/") { blockCommentDepth--; i++; }
+      continue;
+    }
     if (ch === "'") { single = true; continue; }
     if (ch === '"') { double = true; continue; }
+    if (ch === "-" && source[i + 1] === "-") { lineComment = true; i++; continue; }
+    if (ch === "/" && source[i + 1] === "*") { blockCommentDepth = 1; i++; continue; }
     if (ch === "$" && (source.slice(i).match(/^\$[A-Za-z0-9_]*\$/)?.[0])) {
       dollar = source.slice(i).match(/^\$[A-Za-z0-9_]*\$/)![0];
       i += dollar.length - 1;
@@ -106,4 +149,69 @@ SELECT jsonb_build_object(
 
 export function publicSchemaFingerprint(schema: unknown): string {
   return createHash("sha256").update(stableStringify(schema)).digest("hex");
+}
+
+export function buildAuthoritativeSchemaFingerprintArtifact(
+  schema: unknown,
+  migrations: readonly AuthoritativeMigration[],
+  generatedAt = new Date().toISOString(),
+): AuthoritativeSchemaFingerprintArtifact {
+  return {
+    schemaVersion: AUTHORITATIVE_SCHEMA_FINGERPRINT_VERSION,
+    generatedAt,
+    authoritativeManifest: authoritativeManifestBinding(migrations),
+    sha256: publicSchemaFingerprint(schema),
+    schema,
+  };
+}
+
+function printableArtifactValue(value: unknown): string {
+  return typeof value === "string" && value.length > 0 ? value : "<missing>";
+}
+
+export function validateAuthoritativeSchemaFingerprintArtifact(
+  artifact: unknown,
+  migrations: readonly AuthoritativeMigration[],
+): string[] {
+  if (!artifact || typeof artifact !== "object" || Array.isArray(artifact)) {
+    return ["authoritative schema fingerprint artifact must be a JSON object"];
+  }
+
+  const errors: string[] = [];
+  const record = artifact as Record<string, unknown>;
+  if (record.schemaVersion !== AUTHORITATIVE_SCHEMA_FINGERPRINT_VERSION) {
+    errors.push(
+      `schema fingerprint artifact version ${printableArtifactValue(record.schemaVersion)} differs from ${AUTHORITATIVE_SCHEMA_FINGERPRINT_VERSION}`,
+    );
+  }
+
+  const expectedManifest = authoritativeManifestBinding(migrations);
+  const manifest =
+    record.authoritativeManifest &&
+    typeof record.authoritativeManifest === "object" &&
+    !Array.isArray(record.authoritativeManifest)
+      ? (record.authoritativeManifest as Record<string, unknown>)
+      : {};
+  const head =
+    manifest.head && typeof manifest.head === "object" && !Array.isArray(manifest.head)
+      ? (manifest.head as Record<string, unknown>)
+      : {};
+  const actualHead = `${printableArtifactValue(head.id)}@${printableArtifactValue(head.sha256)}`;
+  const expectedHead = `${expectedManifest.head.id}@${expectedManifest.head.sha256}`;
+  if (actualHead !== expectedHead) {
+    errors.push(`schema fingerprint manifest head ${actualHead} differs from ${expectedHead}`);
+  }
+  if (manifest.sha256 !== expectedManifest.sha256) {
+    errors.push(
+      `schema fingerprint manifest hash ${printableArtifactValue(manifest.sha256)} differs from ${expectedManifest.sha256}`,
+    );
+  }
+
+  const actualSchemaSha256 = publicSchemaFingerprint(record.schema);
+  if (record.sha256 !== actualSchemaSha256) {
+    errors.push(
+      `schema fingerprint serialized schema hash ${printableArtifactValue(record.sha256)} differs from ${actualSchemaSha256}`,
+    );
+  }
+  return errors;
 }

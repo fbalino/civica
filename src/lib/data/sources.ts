@@ -19,6 +19,7 @@
 export const SOURCE_NAMES: Record<string, string> = {
   wikidata: "Wikidata",
   cia_factbook: "CIA World Factbook",
+  cia_world_leaders: "CIA World Leaders",
   ipu_parline: "IPU Parline",
   international_idea: "International IDEA",
   constitute_project: "Constitute Project",
@@ -102,4 +103,163 @@ export function sourceLabel(id: string): string {
 /** Whether a source is a frozen vintage (amber dot) vs a live feed (green dot). */
 export function isFrozenSource(id: string): boolean {
   return FROZEN_SOURCES.has(id);
+}
+
+/**
+ * Client-safe provenance disclosure used by the compact `<SourceDot>`.
+ *
+ * `rights/manifest.ts` intentionally imports server-only release-input
+ * validation code, so a client-rendered dot cannot import it directly. Keep
+ * the small set of verified terms that can appear in the compact control
+ * here; every other source is explicitly labelled pending rather than having
+ * a license guessed from its name. The full machine-readable registry remains
+ * authoritative at `/api/rights-manifest` and `/licensing#rights-manifest`.
+ */
+export type SourceRightsDisclosure = {
+  license: string;
+  reviewStatus: "verified" | "pending";
+  termsUrl: string;
+};
+
+const VERIFIED_SOURCE_RIGHTS: Readonly<
+  Record<string, SourceRightsDisclosure>
+> = {
+  cia_factbook: {
+    license: "US-PUBLIC-DOMAIN",
+    reviewStatus: "verified",
+    termsUrl: "https://www.cia.gov/site-policies/",
+  },
+  cia_world_leaders: {
+    license: "US-PUBLIC-DOMAIN",
+    reviewStatus: "verified",
+    termsUrl: "https://www.cia.gov/site-policies/",
+  },
+  wikidata: {
+    license: "CC0-1.0",
+    reviewStatus: "verified",
+    termsUrl: "https://www.wikidata.org/wiki/Wikidata:Licensing",
+  },
+  world_bank: {
+    license: "CC-BY-4.0",
+    reviewStatus: "verified",
+    termsUrl: "https://datacatalog.worldbank.org/public-licenses",
+  },
+  worldbank_economic: {
+    license: "CC-BY-4.0",
+    reviewStatus: "verified",
+    termsUrl: "https://datacatalog.worldbank.org/public-licenses",
+  },
+  worldbank_wgi: {
+    license: "CC-BY-4.0",
+    reviewStatus: "verified",
+    termsUrl: "https://datacatalog.worldbank.org/public-licenses",
+  },
+};
+
+const PENDING_SOURCE_RIGHTS: SourceRightsDisclosure = {
+  license: "Publisher terms pending review",
+  reviewStatus: "pending",
+  termsUrl: "/licensing#rights-manifest",
+};
+
+/** Never infer a source license: missing compact metadata is visibly pending. */
+export function sourceRightsDisclosure(sourceId: string): SourceRightsDisclosure {
+  return VERIFIED_SOURCE_RIGHTS[sourceId] ?? PENDING_SOURCE_RIGHTS;
+}
+
+export type SourcePresentationState =
+  | "live"
+  | "frozen"
+  | "experimental"
+  | "unknown";
+
+export function sourcePresentationState(
+  sourceId: string,
+  explicit?: SourcePresentationState,
+): SourcePresentationState {
+  if (explicit) return explicit;
+  return isFrozenSource(sourceId) ? "frozen" : "live";
+}
+
+export function sourcePresentationStateLabel(
+  state: SourcePresentationState,
+): string {
+  switch (state) {
+    case "live":
+      return "Live or regularly updated source";
+    case "frozen":
+      return "Frozen source vintage";
+    case "experimental":
+      return "Experimental source or method";
+    case "unknown":
+      return "Source update state not declared";
+  }
+}
+
+/**
+ * Keep timestamp precision truthful. A date-only string is never converted to
+ * a fictitious clock time, while an ISO timestamp retains seconds and UTC.
+ */
+export function formatSourceTimestamp(
+  value: string | Date | null | undefined,
+): string {
+  if (!value) return "Unknown timestamp";
+
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const date = new Date(`${value}T00:00:00.000Z`);
+    if (Number.isNaN(date.getTime())) return "Unknown timestamp";
+    return `${new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(date)} (date only)`;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "Unknown timestamp";
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(date);
+}
+
+export type SourceDotDisclosure = {
+  label: string;
+  state: SourcePresentationState;
+  stateLabel: string;
+  timestamp: string;
+  upstreamVintage: string;
+  rights: SourceRightsDisclosure;
+  rightsLabel: string;
+};
+
+export function buildSourceDotDisclosure(input: {
+  source: string;
+  retrievedAt: string | Date | null | undefined;
+  state?: SourcePresentationState;
+  upstreamVintage?: string | null;
+  rights?: SourceRightsDisclosure;
+}): SourceDotDisclosure {
+  const state = sourcePresentationState(input.source, input.state);
+  const rights = input.rights ?? sourceRightsDisclosure(input.source);
+  return {
+    label: sourceLabel(input.source),
+    state,
+    stateLabel: sourcePresentationStateLabel(state),
+    timestamp: formatSourceTimestamp(input.retrievedAt),
+    upstreamVintage:
+      input.upstreamVintage?.trim() || "Not supplied on this surface",
+    rights,
+    rightsLabel:
+      rights.reviewStatus === "verified"
+        ? `${rights.license}; rights review verified`
+        : "Publisher terms pending review; public reuse is not implied",
+  };
 }

@@ -18,22 +18,12 @@
  *      publisher's raw status text, BOTH `introducedDate` and
  *      `lastActionDate` (distinct semantics), a resolved chamber name where
  *      `bodyId` is populated (DE/FR/BR/CA), and a shown-vs-total count.
- *   3. UNSUPPORTED-COUNTRY EXPLANATION — the public API route now returns
- *      an explicit `coverage` object (naming the six supported
- *      jurisdictions) instead of a bare empty `bills: []` for a jurisdiction
- *      outside the coverage set.
- *   4. A genuine, DEFERRED gap: on the Civica Data tab itself, the whole
- *      numbered "Bills" section (sidebar entry + content block) is computed
- *      by `hasBills`/`isVisible("bills")` in
- *      `src/app/(reader)/country/[slug]/civica-data/page.tsx`, which is an
- *      Index-change-control-protected file (`src/lib/ci/index-change-control.ts`).
- *      That gate excludes the section entirely — not misleadingly-empty,
- *      but silently absent — whenever `getBillsForJurisdiction` (also
- *      protected, in `src/lib/db/queries.ts`) returns zero rows, which is
- *      every unsupported country. Neither protected file was edited here
- *      (out of scope per the task brief); this suite locks that the gate
- *      still has this exact shape so the gap stays visible and traceable to
- *      the two protected files that block an in-tab fix.
+ *   3. UNSUPPORTED-COUNTRY EXPLANATION — both the public API and Civica Data
+ *      tab publish the six-jurisdiction scope instead of treating a zero-row
+ *      result as evidence that no legislative activity exists.
+ *   4. INDEX CHANGE CONTROL — the one Atlas-only visibility line in the
+ *      protected Civica Data page is normalized exactly; unrelated edits to
+ *      that page remain protected Index drift.
  *
  * Pure + source-backed: no DB, no network. Runs under `npm test`.
  */
@@ -137,8 +127,15 @@ test("each declared sourceId is the adapter's real SOURCE_ID constant, not an in
   // real, non-placeholder label for every declared source id.
   for (const sourceId of allDeclaredSourceIds) {
     const label = BILLS_SOURCE_LABELS[sourceId];
-    assert.ok(label && label.length > 0, `missing display label for ${sourceId}`);
-    assert.notEqual(label, sourceId, `${sourceId} label must not be a raw id echo`);
+    assert.ok(
+      label && label.length > 0,
+      `missing display label for ${sourceId}`,
+    );
+    assert.notEqual(
+      label,
+      sourceId,
+      `${sourceId} label must not be a raw id echo`,
+    );
   }
 });
 
@@ -165,10 +162,8 @@ test("billsSupportedCoverageNote (supported-country copy) names all six jurisdic
   for (const name of BILLS_SUPPORTED_JURISDICTION_NAMES) {
     assert.ok(note.includes(name), `note must name ${name}`);
   }
-  // Regression lock: an earlier draft of this fix reused billsCoverageMessage
-  // inside FactbookBills.tsx, which only ever renders for a SUPPORTED
-  // country — that produced the self-contradictory "United States ... is not
-  // yet in that set" on a live United States page, caught by browser QA.
+  // A supported-country branch must never imply that the current jurisdiction
+  // falls outside the declared coverage set.
   assert.doesNotMatch(note, /not yet in that set/);
   assert.doesNotMatch(note, /is not/);
 });
@@ -192,8 +187,8 @@ test("the public bills API route returns an explicit coverage object, not a bare
   );
   assert.match(
     source,
-    /not yet in that set/,
-    "unsupported jurisdictions must get an explanatory message, not silence",
+    /billsCoverageMessage\(result\.jurisdiction\.name\)/,
+    "the API and reader UI must share the same unsupported-country explanation",
   );
 });
 
@@ -215,15 +210,19 @@ test("FactbookBills publishes source, chamber, status taxonomy, and both date fi
   assert.match(source, /Last action/);
   // Pagination — a visible shown-vs-total count, not a silent top-20 cut.
   assert.match(source, /totalCount/);
-  // Jurisdiction coverage — named in-context, linking to the domain report,
-  // using the SUPPORTED-country note (not the unsupported-country message,
-  // which would wrongly say a supported country "is not yet in that set" —
-  // this exact bug shipped once in development and was caught by browser QA).
+  // Jurisdiction coverage — both branches use the shared contract and link to
+  // the domain report. The supported branch uses the neutral scope note; the
+  // unsupported branch uses the country-specific explanation.
   assert.match(source, /billsSupportedCoverageNote/);
-  assert.doesNotMatch(
+  assert.match(
     source,
-    /not yet in that set/,
-    "FactbookBills only ever renders for a SUPPORTED country; it must never use the unsupported-country message",
+    /!isBillsSupportedSlug\(countrySlug\)/,
+    "FactbookBills must select the unsupported branch from the shared coverage contract",
+  );
+  assert.match(
+    source,
+    /billsCoverageMessage\(countryName\)/,
+    "the unsupported branch must use the country-specific explanation",
   );
   assert.match(source, /methodology\/source-coverage/);
 });
@@ -246,33 +245,58 @@ test("bills / government_bodies columns backing chamber and date semantics actua
   assert.ok(billColumns.rawStatus, "bills.raw_status must exist");
   const bodyColumns = getTableColumns(governmentBodies);
   assert.ok(bodyColumns.name, "government_bodies.name must exist");
-  assert.ok(bodyColumns.chamberType, "government_bodies.chamber_type must exist");
+  assert.ok(
+    bodyColumns.chamberType,
+    "government_bodies.chamber_type must exist",
+  );
 });
 
-test(
-  "DEFERRED: the Civica Data tab's whole-section visibility gate for Bills " +
-    "lives in two Index-change-control-protected files, which is why the " +
-    "unsupported-country explanation could not be wired into that tab here",
-  () => {
-    const protectedPaths = new Set(INDEX_PROTECTED_FILES.map((f) => f.path));
-    assert.ok(
-      protectedPaths.has(CIVICA_DATA_PAGE),
-      "civica-data/page.tsx must still be protected (confirms why it was not edited)",
-    );
-    assert.ok(
-      protectedPaths.has("src/lib/db/queries.ts"),
-      "queries.ts (getBillsForJurisdiction) must still be protected",
-    );
-    const pageSource = read(CIVICA_DATA_PAGE);
-    assert.match(
-      pageSource,
-      /hasBills\s*=\s*!!billsResult\s*&&\s*billsResult\.rows\.length\s*>\s*0/,
-      "locks the exact current gate shape: zero rows hides the whole section",
-    );
-    assert.match(
-      pageSource,
-      /case "bills":\s*\n\s*return hasBills;/,
-      "locks that section visibility (sidebar + content) is driven by that same zero-rows gate",
-    );
-  },
-);
+test("the Civica Data tab renders a Bills coverage state for valid zero-row jurisdictions", () => {
+  const protectedPaths = new Set(INDEX_PROTECTED_FILES.map((f) => f.path));
+  assert.ok(
+    protectedPaths.has(CIVICA_DATA_PAGE),
+    "the shared Civica Data page remains protected",
+  );
+  assert.ok(
+    protectedPaths.has("src/lib/db/queries.ts"),
+    "queries.ts (getBillsForJurisdiction) remains protected",
+  );
+  const pageSource = read(CIVICA_DATA_PAGE);
+  assert.match(
+    pageSource,
+    /hasBills\s*=\s*billsResult\.status === "available";/,
+    "a successful zero-row lookup must preserve the Bills query state",
+  );
+  assert.doesNotMatch(
+    pageSource,
+    /billsResult\.value\.rows\.length\s*>\s*0/,
+    "row count must not decide whether the coverage explanation exists",
+  );
+  assert.match(
+    pageSource,
+    /const visibleSections = SECTION_PLAN;/,
+    "the Bills section stays visible even when its query is unavailable",
+  );
+
+  const rendererSource = read(FACTBOOK_BILLS);
+  assert.match(
+    rendererSource,
+    /!isBillsSupportedSlug\(countrySlug\)/,
+    "unsupported jurisdictions must be identified from the shared coverage contract",
+  );
+  assert.match(
+    rendererSource,
+    /billsCoverageMessage\(countryName\)/,
+    "unsupported jurisdictions must receive the named coverage explanation",
+  );
+  assert.match(
+    rendererSource,
+    /No tracked bill records are currently\s*\n?\s*available for \{countryName\}/,
+    "supported zero-row states must remain distinct from unsupported coverage",
+  );
+  assert.match(
+    rendererSource,
+    /not a claim that no legislation is being\s*\n?\s*considered/,
+    "zero rows must never be presented as no legislative activity",
+  );
+});

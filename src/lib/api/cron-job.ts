@@ -1,0 +1,648 @@
+import { createHash } from "node:crypto";
+import { AsyncLocalStorage } from "node:async_hooks";
+
+import { NextResponse } from "next/server";
+import { unstable_rethrow } from "next/navigation";
+import { cacheControlFor } from "@/lib/platform/cache-consistency";
+
+import { requireCronAuth } from "./cron-auth";
+import { validateCronInput } from "./cron-input";
+import {
+  MAX_CRON_ATTEMPTS,
+  type CronExecutionStore,
+  postgresCronExecutionStore,
+} from "./cron-execution-store";
+import { CRON_JOB_LEASE_MS, getCronJobDefinition } from "./cron-job-registry";
+import { latestCronScheduleSlot } from "./cron-schedule";
+import {
+  jobPerformanceObservation,
+  scheduleRoutePerformanceObservation,
+  scheduleRoutePerformancePrune,
+} from "@/lib/platform/route-performance-telemetry";
+import {
+  finishPipelineRun,
+  startPipelineRun,
+  type PipelineRunHandle,
+  type PipelineRunStore,
+} from "@/lib/platform/pipeline-observability";
+import {
+  monitoringRouteId,
+  pruneErrorMonitoringEvents,
+  recordErrorMonitoringEvent,
+  type ErrorMonitoringStore,
+} from "@/lib/platform/error-monitoring";
+
+const IDEMPOTENCY_HEADER = "idempotency-key";
+const INTERNAL_EXECUTION_KEY_HEADER = "x-civica-cron-execution-key";
+
+export type CronRouteHandler = (
+  request: Request,
+) => Response | Promise<Response>;
+
+interface CronJobDependencies {
+  now?: () => Date;
+  store?: CronExecutionStore;
+  pipelineStore?: PipelineRunStore;
+  errorMonitoringStore?: ErrorMonitoringStore;
+}
+
+interface CronJobFixtureContext {
+  store: CronExecutionStore;
+  handler: (jobId: string, request: Request) => Response | Promise<Response>;
+}
+
+const cronJobFixtureContext = new AsyncLocalStorage<CronJobFixtureContext>();
+
+/**
+ * Process-local integration seam used to invoke the real route module and
+ * shared boundary without reaching production databases or paid upstreams.
+ * It cannot be enabled in a production process and is never request-driven.
+ */
+export function runWithCronJobFixture<T>(
+  fixture: CronJobFixtureContext,
+  callback: () => T,
+): T {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Cron integration fixtures are disabled in production");
+  }
+  return cronJobFixtureContext.run(fixture, callback);
+}
+
+function sha256(parts: readonly string[]): string {
+  const hash = createHash("sha256");
+  for (const part of parts) hash.update(part).update("\0");
+  return hash.digest("hex");
+}
+
+function safeJsonResponse(
+  payload: Record<string, unknown>,
+  status: number,
+  headers?: HeadersInit,
+): NextResponse {
+  const responseHeaders = new Headers(headers);
+  applyCronNoStoreHeaders(responseHeaders);
+  return NextResponse.json(payload, { status, headers: responseHeaders });
+}
+
+function applyCronNoStoreHeaders(headers: Headers): void {
+  headers.set("Cache-Control", cacheControlFor("private-live"));
+  headers.set("CDN-Cache-Control", "no-store");
+  headers.set("Vercel-CDN-Cache-Control", "no-store");
+}
+
+function withCronNoStore(response: Response): Response {
+  const headers = new Headers(response.headers);
+  applyCronNoStoreHeaders(headers);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+async function invokeHandler(
+  jobId: string,
+  route: string,
+  handler: CronRouteHandler,
+  request: Request,
+  errorMonitoringStore?: ErrorMonitoringStore,
+): Promise<Response> {
+  try {
+    return await handler(request);
+  } catch (error) {
+    unstable_rethrow(error);
+    await recordCronFailure(
+      jobId,
+      route,
+      "cron.handler_exception",
+      errorMonitoringStore,
+    );
+    console.error(`[cron ${jobId}] unhandled_failure`);
+    return safeJsonResponse(
+      { ok: false, jobId, outcome: "handler_exception" },
+      500,
+    );
+  }
+}
+
+async function recordCronFailure(
+  jobId: string,
+  route: string,
+  errorCode: string,
+  store?: ErrorMonitoringStore,
+): Promise<void> {
+  if (process.env.NODE_ENV !== "production" && !store) return;
+  await recordErrorMonitoringEvent(
+    {
+      surface: "cron",
+      routeId: monitoringRouteId(route),
+      jobId,
+      errorCode,
+    },
+    store,
+  );
+}
+
+async function normalizeHandlerResponse(response: Response): Promise<{
+  response: Response;
+  succeeded: boolean;
+}> {
+  const contentType = response.headers.get("content-type") ?? "";
+  let payload: Record<string, unknown> | null = null;
+  if (contentType.includes("application/json")) {
+    try {
+      const value = (await response.clone().json()) as unknown;
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        payload = value as Record<string, unknown>;
+      }
+    } catch {
+      payload = null;
+    }
+  }
+
+  if (response.ok && payload?.ok === false) {
+    return {
+      response: withCronNoStore(safeJsonResponse(payload, 500)),
+      succeeded: false,
+    };
+  }
+  if (!response.ok && payload?.ok === true) {
+    return {
+      response: withCronNoStore(
+        safeJsonResponse(
+          { ok: false, outcome: "invalid_handler_response" },
+          response.status,
+        ),
+      ),
+      succeeded: false,
+    };
+  }
+  return { response: withCronNoStore(response), succeeded: response.ok };
+}
+
+async function operationalResponsePayload(response: Response): Promise<unknown> {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) return null;
+  try {
+    return await response.clone().json();
+  } catch {
+    return null;
+  }
+}
+
+function requestMode(request: Request): "apply" | "dry_run" {
+  return new URL(request.url).searchParams.get("dryRun") === "1"
+    ? "dry_run"
+    : "apply";
+}
+
+function canonicalRequestSha256(request: Request): string {
+  const url = new URL(request.url);
+  const queryParts = [...url.searchParams.entries()]
+    // Key order is semantically irrelevant, but repeated values are not: the
+    // handlers use URLSearchParams.get(), whose result is the first value.
+    // Stable sort groups keys while preserving duplicate-value order.
+    .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+    .flatMap(([key, value]) => [key, value]);
+  return sha256([
+    "civica-cron-request/v1",
+    request.method.toUpperCase(),
+    url.pathname,
+    ...queryParts,
+  ]);
+}
+
+/**
+ * Read the stable logical-delivery identity that the authenticated cron
+ * boundary injects before invoking a job handler. The boundary overwrites any
+ * caller-supplied value, so downstream multi-stage writers can derive stable
+ * run identities without trusting an external header.
+ */
+export function cronExecutionKeyFromRequest(request: Request): string {
+  const executionKey = request.headers.get(INTERNAL_EXECUTION_KEY_HEADER) ?? "";
+  if (!/^[a-f0-9]{64}$/.test(executionKey)) {
+    throw new Error("Cron handler is missing its logical execution identity");
+  }
+  return executionKey;
+}
+
+function withInternalExecutionKey(
+  request: Request,
+  executionKey: string,
+): Request {
+  const headers = new Headers(request.headers);
+  headers.set(INTERNAL_EXECUTION_KEY_HEADER, executionKey);
+  return new Request(request, { headers });
+}
+
+function readIdempotencyScope(request: Request):
+  | {
+      ok: true;
+      triggerKind: "scheduled" | "manual";
+      scopeKey: string | null;
+    }
+  | { ok: false; response: NextResponse } {
+  const method = request.method.toUpperCase();
+  if (method !== "GET" && method !== "POST") {
+    return {
+      ok: false,
+      response: safeJsonResponse(
+        { ok: false, outcome: "method_not_allowed" },
+        405,
+        { Allow: "GET, POST" },
+      ),
+    };
+  }
+
+  const header = request.headers.get(IDEMPOTENCY_HEADER);
+  const hasQuery = new URL(request.url).searchParams.size > 0;
+  const requiresKey = method === "POST" || hasQuery;
+
+  if (requiresKey && !header) {
+    return {
+      ok: false,
+      response: safeJsonResponse(
+        {
+          ok: false,
+          outcome: "idempotency_key_required",
+        },
+        400,
+      ),
+    };
+  }
+  if (header && !/^[A-Za-z0-9._:-]{1,120}$/.test(header)) {
+    return {
+      ok: false,
+      response: safeJsonResponse(
+        { ok: false, outcome: "invalid_idempotency_key" },
+        400,
+      ),
+    };
+  }
+
+  return {
+    ok: true,
+    triggerKind: header ? "manual" : "scheduled",
+    scopeKey: header ? sha256(["civica-cron-scope/v1", header]) : null,
+  };
+}
+
+/**
+ * Common cron boundary: authenticate before database access, claim one
+ * schedule-slot lease, suppress completed duplicates, and persist the real
+ * HTTP outcome before returning it. Failed/stale slots remain retryable.
+ */
+export function withCronJob(
+  jobId: string,
+  handler: CronRouteHandler,
+  dependencies: CronJobDependencies = {},
+): CronRouteHandler {
+  const definition = getCronJobDefinition(jobId);
+
+  return async function guardedCronHandler(
+    request: Request,
+  ): Promise<Response> {
+    const startedAt = performance.now();
+    let response: Response | null = null;
+    try {
+      response = await (async () => {
+        const unauthorized = requireCronAuth(request);
+        if (unauthorized) return unauthorized;
+
+        const pathname = new URL(request.url).pathname;
+        if (pathname !== definition.route) {
+          await recordCronFailure(
+            jobId,
+            definition.route,
+            "cron.route_registry_mismatch",
+            dependencies.errorMonitoringStore,
+          );
+          console.error(`[cron ${jobId}] route_registry_mismatch`);
+          return safeJsonResponse(
+            { ok: false, jobId, outcome: "route_registry_mismatch" },
+            500,
+          );
+        }
+
+        const input = validateCronInput(jobId, request);
+        if (!input.ok) {
+          return safeJsonResponse(
+            {
+              ok: false,
+              jobId,
+              outcome: "invalid_request",
+              code: input.problem,
+            },
+            400,
+            { "Cache-Control": "no-store" },
+          );
+        }
+
+        const fixture = cronJobFixtureContext.getStore();
+        const activeHandler: CronRouteHandler = fixture
+          ? (fixtureRequest) => fixture.handler(jobId, fixtureRequest)
+          : handler;
+
+        // Retired v1 routes have no effect to lock, but still share the exact same
+        // authentication and response-honesty boundary.
+        if (definition.retired) {
+          return (
+            await normalizeHandlerResponse(
+              await invokeHandler(
+                jobId,
+                definition.route,
+                activeHandler,
+                request,
+                dependencies.errorMonitoringStore,
+              ),
+            )
+          ).response;
+        }
+
+        const scope = readIdempotencyScope(request);
+        if (!scope.ok) return scope.response;
+
+        const now = dependencies.now?.() ?? new Date();
+        const scheduleSlot =
+          scope.triggerKind === "scheduled"
+            ? latestCronScheduleSlot(definition.schedule!, now)
+            : null;
+        const mode = requestMode(request);
+        const requestSha256 = canonicalRequestSha256(request);
+        const executionKey =
+          scope.triggerKind === "scheduled"
+            ? sha256([
+                "civica-cron-execution/v1",
+                "scheduled",
+                definition.id,
+                definition.route,
+                scheduleSlot!.toISOString(),
+              ])
+            : sha256([
+                "civica-cron-execution/v1",
+                "manual",
+                definition.id,
+                definition.route,
+                scope.scopeKey!,
+              ]);
+        const store =
+          dependencies.store ?? fixture?.store ?? postgresCronExecutionStore;
+
+        let claim;
+        try {
+          claim = await store.acquire({
+            executionKey,
+            jobId: definition.id,
+            route: definition.route,
+            triggerKind: scope.triggerKind,
+            scheduleSlot,
+            requestMode: mode,
+            scopeKey: scope.scopeKey,
+            requestSha256,
+            leaseMs: CRON_JOB_LEASE_MS,
+            maxAttempts: MAX_CRON_ATTEMPTS,
+          });
+        } catch (error) {
+          await recordCronFailure(
+            jobId,
+            definition.route,
+            "cron.delivery_control_unavailable",
+            dependencies.errorMonitoringStore,
+          );
+          console.error(`[cron ${jobId}] delivery_control_unavailable`);
+          return safeJsonResponse(
+            { ok: false, jobId, outcome: "delivery_control_unavailable" },
+            503,
+          );
+        }
+
+        if (claim.state === "running" || claim.state === "busy") {
+          const retryAfterSeconds = Math.max(
+            1,
+            Math.ceil((claim.leaseExpiresAt.getTime() - now.getTime()) / 1_000),
+          );
+          if (claim.state === "busy") {
+            return safeJsonResponse(
+              {
+                ok: false,
+                jobId,
+                outcome: "job_busy",
+                jobStarted: false,
+                deliveryRecorded: false,
+              },
+              503,
+              { "Retry-After": String(retryAfterSeconds) },
+            );
+          }
+          return safeJsonResponse(
+            {
+              ok: true,
+              jobId,
+              outcome: "job_in_progress",
+              jobCompleted: false,
+              attemptCount: claim.attemptCount,
+            },
+            202,
+            { "Retry-After": String(retryAfterSeconds) },
+          );
+        }
+
+        if (claim.state === "succeeded") {
+          return safeJsonResponse(
+            {
+              ok: true,
+              jobId,
+              outcome: "duplicate_suppressed",
+              jobCompleted: true,
+              completedAt: claim.completedAt.toISOString(),
+              originalStatus: claim.responseStatus,
+              attemptCount: claim.attemptCount,
+            },
+            200,
+          );
+        }
+
+        if (claim.state === "conflict") {
+          return safeJsonResponse(
+            {
+              ok: false,
+              jobId,
+              outcome: "idempotency_key_conflict",
+              attemptCount: claim.attemptCount,
+            },
+            409,
+          );
+        }
+
+        if (claim.state === "exhausted") {
+          return safeJsonResponse(
+            {
+              ok: false,
+              jobId,
+              outcome: "retry_limit_exhausted",
+              attemptCount: claim.attemptCount,
+            },
+            503,
+          );
+        }
+
+        const shouldRecordPipeline =
+          process.env.NODE_ENV === "production" || Boolean(dependencies.pipelineStore);
+        let pipelineRun: PipelineRunHandle | null = null;
+        if (shouldRecordPipeline) {
+          try {
+            pipelineRun = await startPipelineRun(
+              {
+                pipelineId: definition.id,
+                triggerKind: scope.triggerKind,
+                executionKey,
+                scheduleSlot: scheduleSlot ?? undefined,
+              },
+              dependencies.pipelineStore,
+            );
+          } catch {
+            await recordCronFailure(
+              jobId,
+              definition.route,
+              "cron.pipeline_observability_start_failed",
+              dependencies.errorMonitoringStore,
+            );
+            console.error(`[cron ${jobId}] pipeline_observability_start_failed`);
+            const unavailable = safeJsonResponse(
+              { ok: false, jobId, outcome: "pipeline_observability_unavailable" },
+              503,
+            );
+            try {
+              const finished = await store.finish({
+                executionKey,
+                jobId: definition.id,
+                leaseToken: claim.leaseToken,
+                attemptId: claim.attemptId,
+                leaseFence: claim.leaseFence,
+                status: "failed",
+                responseStatus: unavailable.status,
+                resultCode: "pipeline_observability_unavailable",
+              });
+              if (!finished) {
+                throw new Error("Cron execution lost its lease before finalization");
+              }
+            } catch (error) {
+              await recordCronFailure(
+                jobId,
+                definition.route,
+                "cron.delivery_finalization_failed",
+                dependencies.errorMonitoringStore,
+              );
+              console.error(`[cron ${jobId}] delivery_finalization_failed`);
+              return safeJsonResponse(
+                { ok: false, jobId, outcome: "delivery_finalization_failed" },
+                503,
+              );
+            }
+            return unavailable;
+          }
+        }
+
+        const normalized = await normalizeHandlerResponse(
+          await invokeHandler(
+            jobId,
+            definition.route,
+            activeHandler,
+            withInternalExecutionKey(request, executionKey),
+            dependencies.errorMonitoringStore,
+          ),
+        );
+        let responseForDelivery = normalized.response;
+        let terminalStatus: "succeeded" | "failed" = normalized.succeeded
+          ? "succeeded"
+          : "failed";
+        if (!normalized.succeeded) {
+          await recordCronFailure(
+            jobId,
+            definition.route,
+            "cron.handler_failed",
+            dependencies.errorMonitoringStore,
+          );
+        }
+        if (pipelineRun) {
+          try {
+            await finishPipelineRun(
+              {
+                ...pipelineRun,
+                responseStatus: normalized.response.status,
+                succeeded: normalized.succeeded,
+                payload: await operationalResponsePayload(normalized.response),
+              },
+              dependencies.pipelineStore,
+            );
+          } catch {
+            await recordCronFailure(
+              jobId,
+              definition.route,
+              "cron.pipeline_observability_finish_failed",
+              dependencies.errorMonitoringStore,
+            );
+            console.error(`[cron ${jobId}] pipeline_observability_finish_failed`);
+            responseForDelivery = safeJsonResponse(
+              { ok: false, jobId, outcome: "pipeline_observability_unavailable" },
+              503,
+            );
+            terminalStatus = "failed";
+          }
+        }
+
+        try {
+          const finished = await store.finish({
+            executionKey,
+            jobId: definition.id,
+            leaseToken: claim.leaseToken,
+            attemptId: claim.attemptId,
+            leaseFence: claim.leaseFence,
+            status: terminalStatus,
+            responseStatus: responseForDelivery.status,
+            resultCode: terminalStatus === "succeeded"
+              ? "handler_succeeded"
+              : "handler_failed",
+          });
+          if (!finished) {
+            throw new Error(
+              "Cron execution lost its lease before finalization",
+            );
+          }
+        } catch (error) {
+          await recordCronFailure(
+            jobId,
+            definition.route,
+            "cron.delivery_finalization_failed",
+            dependencies.errorMonitoringStore,
+          );
+          console.error(`[cron ${jobId}] delivery_finalization_failed`);
+          return safeJsonResponse(
+            { ok: false, jobId, outcome: "delivery_finalization_failed" },
+            503,
+          );
+        }
+
+        return responseForDelivery;
+      })();
+      return response;
+    } finally {
+      scheduleRoutePerformanceObservation(
+        jobPerformanceObservation(
+          definition.id,
+          request.method,
+          performance.now() - startedAt,
+          response?.status ?? 500,
+        ),
+      );
+      // Every successful cron delivery is also an opportunity to enforce the
+      // fixed telemetry-retention window without creating a separate tracker.
+      if (!definition.retired) scheduleRoutePerformancePrune();
+      if (!definition.retired && process.env.NODE_ENV === "production") {
+        void pruneErrorMonitoringEvents().catch(() => {
+          console.error("[error-monitoring] prune_failed");
+        });
+      }
+    }
+  };
+}

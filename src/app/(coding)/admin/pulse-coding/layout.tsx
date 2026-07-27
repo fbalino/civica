@@ -6,6 +6,8 @@ import { getPulseCodingSession } from "@/lib/pulse/v2/coding-session";
 import { CodingNav } from "./CodingNav";
 import "@/app/admin.css";
 
+export const revalidate = 0;
+
 export default async function PulseCodingLayout({
   children,
 }: {

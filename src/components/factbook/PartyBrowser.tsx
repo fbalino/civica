@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { LegislatureParty } from "@/lib/factbook/legislature";
 import { Tooltip } from "@/components/editorial/Tooltip";
+import { comparePublicLabels } from "@/lib/i18n/presentation";
 
 /**
  * Party Browser — the deepened per-party view for the Civica Data → Legislature
@@ -75,7 +76,7 @@ export function PartyBrowser({
 
     const display =
       sort === "name"
-        ? [...parties].sort((a, b) => a.name.localeCompare(b.name))
+        ? [...parties].sort((a, b) => comparePublicLabels(a.name, b.name))
         : bySeats;
 
     return display.map((p) => ({

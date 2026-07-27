@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "civica-atl-030-release-reproduction/v1",
+  "taskId": "ATL-030",
+  "status": "pass",
+  "candidateCommit": "fb7376f3ee7990c89b9da57716b3e563924af028",
+  "release": {
+    "releaseId": "conditions-qa018-20260726-v2",
+    "methodologyVersion": "conditions-components/v1",
+    "manifestSha256": "d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b"
+  },
+  "isolatedTarget": {
+    "projectId": "ancient-art-58836757",
+    "branchId": "br-bitter-fire-amcx8asi",
+    "endpointId": "ep-sparkling-pine-amdbr4ke",
+    "hostnameSha256": "a5fb8fbdb1d9d993f39c19dc0e8e7a41c53fdf32f7fc1948b137db8f6aa71761",
+    "forbiddenProductionBranchId": "br-dawn-frog-amrf0h6a",
+    "forbiddenProductionHostnameSha256": "c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b",
+    "migrationHead": "0050_index_release_header_contract",
+    "writesPerformedByTargetChecks": 0
+  },
+  "capturedWorldBankInput": {
+    "schemaVersion": "conditions-world-bank-economic-capture/v2",
+    "dateRange": "2020:2024",
+    "fileByteLength": 1309626,
+    "fileSha256": "5fb092b6507cb86a6b3cf86e3b2f6d14eddbc88c2c21ce251fade605c13721c9",
+    "capturePayloadSha256": "eea82f9049d64bc23fbce7fcc115b04beb8f9741c7a8758d8892f1fc3b18880c",
+    "responses": 717,
+    "http200Responses": 717,
+    "requestCountryCodes": 239,
+    "indicators": [
+      "FP.CPI.TOTL.ZG",
+      "NY.GDP.MKTP.KD.ZG",
+      "SL.UEM.TOTL.ZS"
+    ],
+    "specialCountryCodeMapping": {
+      "jurisdictionIso2": "XK",
+      "requestCountryCode": "XKX",
+      "responses": 3
+    },
+    "repositoryRetention": "hashes and bounded run evidence only; raw publisher responses are not committed"
+  },
+  "expectationsArtifacts": {
+    "preWriteArtifactSha256": "e2d2b6aa2bc8a8a9489151de5c92ede67458caa0cdda11f2ba92d8750c140535",
+    "postMigrationValidationArtifactSha256": "2d82ad06635d65f6c482deec44fa03ce3beb3aaa9fe6cb66c80f0089eeec19a8",
+    "expectedCalculationCounts": {
+      "human_development": 51,
+      "peace_security": 50,
+      "economic_stability": 239
+    }
+  },
+  "liveValidation": {
+    "contract": "conditions-release-validation/v1",
+    "status": "pass",
+    "manifestReplaySha256": "d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b",
+    "counts": {
+      "calculations": 340,
+      "components": 818,
+      "scores": 101,
+      "referenceSets": 3,
+      "normalizationParameters": 5,
+      "sources": 3,
+      "retainedTablesWithTriggers": 6,
+      "mutationHistoryRows": 0
+    },
+    "dimensions": [
+      {
+        "dimension": "human_development",
+        "calculations": 51,
+        "aligned": 51,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 51,
+        "scores": 51
+      },
+      {
+        "dimension": "peace_security",
+        "calculations": 50,
+        "aligned": 50,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 50,
+        "scores": 50
+      },
+      {
+        "dimension": "economic_stability",
+        "calculations": 239,
+        "aligned": 162,
+        "mixedYearRefused": 6,
+        "missingComponent": 71,
+        "components": 717,
+        "scores": 0
+      }
+    ],
+    "sourceFreshness": {
+      "policy": "immediate-post-release-exact-created-at/v1",
+      "requiredLastSyncAt": "2026-07-26T18:23:28.103Z",
+      "exactReleaseTimestampMatches": 3,
+      "releaseTimestampMismatches": 0,
+      "allExactlyAtRelease": true
+    },
+    "replay": {
+      "calculationKeysReplayed": 340,
+      "calculationKeysMatched": 340,
+      "manifestMatched": true,
+      "retainedTablesCovered": true,
+      "mutationHistoryEmpty": true
+    },
+    "errors": []
+  },
+  "exactInputReplay": {
+    "exitCode": 0,
+    "proposedCalculations": 340,
+    "insertedScores": 0,
+    "insertedComponents": 0,
+    "releaseStateUnchanged": true,
+    "sourceFreshnessUnchanged": true
+  },
+  "alteredInputRefusal": {
+    "alteredCaptureFileSha256": "20d6762175d62a077a5c52cf328feb0b74a862a3cc229c6f391f70033dbdf2a8",
+    "alteredCapturePayloadSha256": "d2d811e1314663140b5eb1b79f45c109efd40a6090115638e3beaa8b0c20f1dd",
+    "alteredManifestSha256": "d2441092e8fccf7bafde198b99fbeffc3f74108708297a2675dbb6a2142c1f65",
+    "alteredExpectationsArtifactSha256": "08b722ea12f469008132a02be515838f0d89a437ebbdf0932d75f8d78285da47",
+    "exitCode": 1,
+    "result": "conditions_ingestion_failed_closed",
+    "releaseStateUnchanged": true,
+    "sourceFreshnessUnchanged": true
+  },
+  "beforeAfterSnapshot": {
+    "identical": true,
+    "allReleases": 2,
+    "allReferenceSets": 6,
+    "allNormalizationParameters": 10,
+    "allCalculations": 680,
+    "allComponents": 1636,
+    "allScores": 533,
+    "selectedReleaseRows": 1,
+    "selectedReleaseReferenceSets": 3,
+    "selectedReleaseNormalizationParameters": 5,
+    "selectedReleaseCalculations": 340,
+    "selectedReleaseComponents": 818,
+    "selectedReleaseScores": 101,
+    "selectedReleaseSourceFreshness": {
+      "undp_hdi": "2026-07-26T18:23:28.103Z",
+      "global_peace_index": "2026-07-26T18:23:28.103Z",
+      "worldbank_economic": "2026-07-26T18:23:28.103Z"
+    }
+  },
+  "publicReadReconciliation": "plan/evidence/ATL-029/release-reconciliation.v1.json",
+  "previewSmokeEvidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json",
+  "dedicatedFixtureCommand": "npm run validate:conditions-components",
+  "rawCaptureCommitted": false,
+  "productionDatabaseMutated": false
+}
