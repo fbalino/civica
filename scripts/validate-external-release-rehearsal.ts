@@ -117,9 +117,13 @@ interface PreviewSmokeEvidence {
     productionMigrationHeadAfter: string;
     productionDatabaseExcluded: boolean;
     deploymentScopedEnvPull: {
-      status: string;
-      attempts: string[];
-      alternativeProof: string;
+      status: "pulled" | "tooling_state_window_unavailable";
+      attempts: Array<
+        | "INITIALIZING_pulled"
+        | "BUILDING_expected_INITIALIZING"
+        | "READY_expected_INITIALIZING"
+      >;
+      alternativeProof: "" | "exact_preview_runtime_identity";
     };
   };
   database: {
@@ -326,6 +330,13 @@ const sha256 = (value: string | Uint8Array) =>
   createHash("sha256").update(value).digest("hex");
 const isSha256 = (value: string | null | undefined) =>
   /^[a-f0-9]{64}$/.test(value ?? "");
+const hostname = (value: string) => {
+  try {
+    return new URL(value).hostname;
+  } catch {
+    return null;
+  }
+};
 
 function sameRelease(
   left: ConditionsReleaseIdentity,
@@ -397,7 +408,10 @@ if (staging.status !== "pending_external_authority") {
         runtime.candidate.commit !== staging.candidate.commit ||
         runtime.candidate.deploymentId !==
           staging.isolation.vercelDeploymentId ||
+        runtime.candidate.deploymentId !== attestation.deploymentId ||
         runtime.candidate.deploymentUrl !== attestation.deploymentUrl ||
+        hostname(runtime.candidate.deploymentUrl) !==
+          attestation.deploymentHost ||
         runtime.candidate.staticAssetManifest.sha256 !==
           staging.candidate.assetManifestSha256 ||
         runtime.candidate.staticAssetManifest.files <= 0 ||
@@ -421,19 +435,33 @@ if (staging.status !== "pending_external_authority") {
           "QA-018: Preview smoke evidence does not preserve child/production isolation",
         );
       }
+      const expectedEnvPullAttempts =
+        attestation.envPullAttemptEvidence?.attempts.map((attempt) =>
+          attempt.outcome === "pulled"
+            ? "INITIALIZING_pulled"
+            : `${attempt.observedState}_expected_INITIALIZING`,
+        ) ?? [];
+      const envPullMatchesAttestation =
+        JSON.stringify(
+          [...runtime.isolation.deploymentScopedEnvPull.attempts].sort(),
+        ) === JSON.stringify([...expectedEnvPullAttempts].sort());
+      if (
+        attestation.proofMode === "deployment_env_pull" &&
+        (runtime.isolation.deploymentScopedEnvPull.status !== "pulled" ||
+          !envPullMatchesAttestation ||
+          runtime.isolation.deploymentScopedEnvPull.alternativeProof !== "")
+      ) {
+        errors.push(
+          "QA-018: preferred deployment env-pull proof does not retain the successful INITIALIZING pull",
+        );
+      }
       if (
         attestation.proofMode === "exact_preview_runtime" &&
         (runtime.isolation.deploymentScopedEnvPull.status !==
           "tooling_state_window_unavailable" ||
-          JSON.stringify(
-            [...runtime.isolation.deploymentScopedEnvPull.attempts].sort(),
-          ) !==
-            JSON.stringify(
-              (attestation.envPullUnavailable?.rejectedStates ?? [])
-                .map((state) => `${state}_expected_INITIALIZING`)
-                .sort(),
-            ) ||
-          !runtime.isolation.deploymentScopedEnvPull.alternativeProof.trim())
+          !envPullMatchesAttestation ||
+          runtime.isolation.deploymentScopedEnvPull.alternativeProof !==
+            "exact_preview_runtime_identity")
       ) {
         errors.push(
           "QA-018: exact Preview proof does not retain the bounded env-pull failure",

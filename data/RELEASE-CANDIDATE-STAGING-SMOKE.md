@@ -35,13 +35,28 @@ exact target guard. The output filename is mandatory: omitting it can overwrite
 `.env.local`, including a symlinked file. Delete the temporary file after the
 bounded identity check. Vercel currently permits that pull only while a
 deployment is `INITIALIZING`; a prebuilt deployment can pass through that state
-before the CLI can inspect it. The only accepted fallback is an exact Preview
-runtime attestation that retains the truthful nonempty set of sanitized
-`BUILDING` and/or `READY` rejections against the expected `INITIALIZING` state
-and binds the same deployment ID, Preview URL, candidate commit, child
+before the CLI can inspect it. A successful preferred proof retains exactly one
+sanitized attempt (`expectedState: INITIALIZING`, `observedState:
+INITIALIZING`, `outcome: pulled`) and no provider error body.
+
+The only accepted fallback is an exact Preview runtime attestation. It retains
+a truthful nonempty set of sanitized attempts whose expected state is
+`INITIALIZING`, whose observed state is only `BUILDING` or `READY`, and whose
+outcome is `state_window_rejected`, together with the bounded
+`deployment_state_window_unavailable` code. It does not retain the provider
+error body. The fallback binds the same deployment ID, exact
+`*.vercel.app` URL and host, target `preview`, candidate commit, child
 project/branch/endpoint/hostname hash, forbidden production
 branch/hostname hash, authoritative head, and a child-only Conditions release
-ID/method/manifest observed through that deployed host.
+ID/method/manifest observed through that deployed host. A record may use one
+proof mode only; a successful environment pull cannot also claim the fallback.
+
+The bounded runtime JSON mirrors those attempts without provider text. The
+preferred mode uses status `pulled`, attempt `INITIALIZING_pulled`, and an empty
+`alternativeProof`. The fallback uses status
+`tooling_state_window_unavailable`, attempt values
+`BUILDING_expected_INITIALIZING` and/or `READY_expected_INITIALIZING`, and
+`alternativeProof: exact_preview_runtime_identity`.
 
 Both modes must prove a newly authorized disposable Neon child, a host
 different from production, and authoritative head `0051_eminent_jocasta`.

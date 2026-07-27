@@ -66,7 +66,9 @@ function pendingStagingRecord(): StagingSmokeRecord {
   candidate.isolation.jobsQuiesced = null;
   candidate.isolation.runtimeAttestation = {
     proofMode: null,
+    deploymentId: null,
     deploymentUrl: null,
+    deploymentHost: null,
     target: null,
     candidateCommit: null,
     neonProjectId: null,
@@ -80,7 +82,7 @@ function pendingStagingRecord(): StagingSmokeRecord {
     conditionsMethodologyVersion: null,
     conditionsManifestSha256: null,
     evidencePath: null,
-    envPullUnavailable: null,
+    envPullAttemptEvidence: null,
   };
   candidate.checks = candidate.checks.map((check) => ({
     ...check,
@@ -106,7 +108,9 @@ function technicallyCompleteStagingRecord(): StagingSmokeRecord {
   candidate.isolation.jobsQuiesced = true;
   candidate.isolation.runtimeAttestation = {
     proofMode: "exact_preview_runtime",
+    deploymentId: "dpl_Test123",
     deploymentUrl: "https://civica-test.vercel.app",
+    deploymentHost: "civica-test.vercel.app",
     target: "preview",
     candidateCommit: "a".repeat(40),
     neonProjectId: "project-test",
@@ -120,10 +124,20 @@ function technicallyCompleteStagingRecord(): StagingSmokeRecord {
     conditionsMethodologyVersion: "test-method",
     conditionsManifestSha256: "e".repeat(64),
     evidencePath: "plan/evidence/QA-018/test-runtime.json",
-    envPullUnavailable: {
-      expectedState: "INITIALIZING",
-      rejectedStates: ["READY", "BUILDING"],
-      errorCode: "deployment_state_window_unavailable",
+    envPullAttemptEvidence: {
+      attempts: [
+        {
+          expectedState: "INITIALIZING",
+          observedState: "READY",
+          outcome: "state_window_rejected",
+        },
+        {
+          expectedState: "INITIALIZING",
+          observedState: "BUILDING",
+          outcome: "state_window_rejected",
+        },
+      ],
+      failureCode: "deployment_state_window_unavailable",
     },
   };
   candidate.checks = candidate.checks.map((check) => ({
@@ -198,6 +212,22 @@ test("technically complete staging requires a real owner-review blocker and no s
 });
 
 test("exact Preview runtime proof fails closed on production and state-window drift", () => {
+  const deploymentId = technicallyCompleteStagingRecord();
+  deploymentId.isolation.runtimeAttestation.deploymentId =
+    "dpl_Different123";
+  assert.match(
+    stagingSmokeErrors(deploymentId).join("\n"),
+    /not bound to a Preview deployment/,
+  );
+
+  const deploymentHost = technicallyCompleteStagingRecord();
+  deploymentHost.isolation.runtimeAttestation.deploymentHost =
+    "different-preview.vercel.app";
+  assert.match(
+    stagingSmokeErrors(deploymentHost).join("\n"),
+    /not bound to a Preview deployment/,
+  );
+
   const productionTarget = technicallyCompleteStagingRecord();
   productionTarget.isolation.runtimeAttestation.target =
     "production" as "preview";
@@ -240,37 +270,113 @@ test("exact Preview runtime proof fails closed on production and state-window dr
   );
 
   const missingStateWindow = technicallyCompleteStagingRecord();
-  missingStateWindow.isolation.runtimeAttestation.envPullUnavailable = null;
+  missingStateWindow.isolation.runtimeAttestation.envPullAttemptEvidence = null;
   assert.match(
     stagingSmokeErrors(missingStateWindow).join("\n"),
     /state-window failure/,
   );
+
+  const wrongCandidate = technicallyCompleteStagingRecord();
+  wrongCandidate.isolation.runtimeAttestation.candidateCommit = "f".repeat(40);
+  assert.match(
+    stagingSmokeErrors(wrongCandidate).join("\n"),
+    /candidate commit does not match/,
+  );
+
+  const wrongChildEndpoint = technicallyCompleteStagingRecord();
+  wrongChildEndpoint.isolation.runtimeAttestation.neonEndpointId =
+    "not-a-neon-endpoint";
+  assert.match(
+    stagingSmokeErrors(wrongChildEndpoint).join("\n"),
+    /child database identity is invalid/,
+  );
 });
 
-test("deployment environment-pull proof cannot also claim fallback", () => {
+test("deployment environment-pull proof requires one successful INITIALIZING pull", () => {
   const candidate = technicallyCompleteStagingRecord();
   candidate.isolation.runtimeAttestation.proofMode =
     "deployment_env_pull";
   assert.match(
     stagingSmokeErrors(candidate).join("\n"),
-    /cannot claim the state window was unavailable/,
+    /one successful INITIALIZING pull/,
   );
 
-  candidate.isolation.runtimeAttestation.envPullUnavailable = null;
+  candidate.isolation.runtimeAttestation.envPullAttemptEvidence = {
+    attempts: [
+      {
+        expectedState: "INITIALIZING",
+        observedState: "INITIALIZING",
+        outcome: "pulled",
+      },
+    ],
+    failureCode: null,
+  };
   assert.deepEqual(stagingSmokeErrors(candidate), []);
 });
 
 test("exact Preview fallback accepts one truthful state-window rejection", () => {
   const candidate = technicallyCompleteStagingRecord();
-  candidate.isolation.runtimeAttestation.envPullUnavailable!.rejectedStates = [
-    "READY",
+  candidate.isolation.runtimeAttestation.envPullAttemptEvidence!.attempts = [
+    {
+      expectedState: "INITIALIZING",
+      observedState: "READY",
+      outcome: "state_window_rejected",
+    },
   ];
   assert.deepEqual(stagingSmokeErrors(candidate), []);
 
-  candidate.isolation.runtimeAttestation.envPullUnavailable!.rejectedStates =
+  candidate.isolation.runtimeAttestation.envPullAttemptEvidence!.attempts =
     [];
   assert.match(
     stagingSmokeErrors(candidate).join("\n"),
+    /state-window failure/,
+  );
+});
+
+test("runtime proof rejects unsanitized or cross-mode environment-pull attempts", () => {
+  const extraErrorBody = technicallyCompleteStagingRecord();
+  const attempt = extraErrorBody.isolation.runtimeAttestation
+    .envPullAttemptEvidence!.attempts[0] as {
+    expectedState: "INITIALIZING";
+    observedState: "READY";
+    outcome: "state_window_rejected";
+    errorBody?: string;
+  };
+  attempt.errorBody = "provider response body must not be retained";
+  assert.match(
+    stagingSmokeErrors(extraErrorBody).join("\n"),
+    /lacks sanitized deployment environment-pull attempt evidence/,
+  );
+
+  const malformedAttempts = technicallyCompleteStagingRecord();
+  (
+    malformedAttempts.isolation.runtimeAttestation
+      .envPullAttemptEvidence as unknown as { attempts: string }
+  ).attempts = "READY_expected_INITIALIZING";
+  assert.match(
+    stagingSmokeErrors(malformedAttempts).join("\n"),
+    /lacks sanitized deployment environment-pull attempt evidence/,
+  );
+
+  const initializingFallback = technicallyCompleteStagingRecord();
+  initializingFallback.isolation.runtimeAttestation
+    .envPullAttemptEvidence!.attempts = [
+    {
+      expectedState: "INITIALIZING",
+      observedState: "INITIALIZING",
+      outcome: "state_window_rejected",
+    },
+  ];
+  assert.match(
+    stagingSmokeErrors(initializingFallback).join("\n"),
+    /state-window failure/,
+  );
+
+  const pulledFallback = technicallyCompleteStagingRecord();
+  pulledFallback.isolation.runtimeAttestation
+    .envPullAttemptEvidence!.attempts[0]!.outcome = "pulled";
+  assert.match(
+    stagingSmokeErrors(pulledFallback).join("\n"),
     /state-window failure/,
   );
 });

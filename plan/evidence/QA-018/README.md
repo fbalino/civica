@@ -109,6 +109,17 @@ input guard to a child-only Conditions release and head/pointer evidence
 observed from the exact Preview host. The temporary environment, automation
 token, and deployment-scoped secret were never printed or checked in.
 
+For the current `0051` candidate, the machine contract now makes the two proof
+modes exclusive. The preferred mode retains one sanitized successful
+`INITIALIZING` pull. The fallback retains only sanitized `BUILDING` and/or
+`READY` state-window rejections plus the bounded failure code; raw provider
+errors are prohibited. Either mode must bind the current candidate commit,
+deployment ID, exact Preview URL and host, target `preview`, the disposable
+child project/branch/endpoint/hostname hash, the forbidden production
+branch/hostname hash, head `0051_eminent_jocasta`, and the Conditions
+release/method/manifest pointer. The canonical record remains pending and
+contains no invented provider result.
+
 Verification:
 
 ```sh

@@ -125,6 +125,19 @@ type RecoveryRunStatus = "pending_external_authority" | "complete";
 type StagingRuntimeProofMode =
   | "deployment_env_pull"
   | "exact_preview_runtime";
+type VercelDeploymentState = "INITIALIZING" | "BUILDING" | "READY";
+type EnvPullAttemptOutcome = "pulled" | "state_window_rejected";
+
+interface SanitizedEnvPullAttempt {
+  expectedState: "INITIALIZING";
+  observedState: VercelDeploymentState;
+  outcome: EnvPullAttemptOutcome;
+}
+
+interface EnvPullAttemptEvidence {
+  attempts: SanitizedEnvPullAttempt[];
+  failureCode: "deployment_state_window_unavailable" | null;
+}
 
 interface CheckRecord {
   id: string;
@@ -152,7 +165,9 @@ export interface StagingSmokeRecord {
     jobsQuiesced: boolean | null;
     runtimeAttestation: {
       proofMode: StagingRuntimeProofMode | null;
+      deploymentId: string | null;
       deploymentUrl: string | null;
+      deploymentHost: string | null;
       target: "preview" | null;
       candidateCommit: string | null;
       neonProjectId: string | null;
@@ -166,11 +181,7 @@ export interface StagingSmokeRecord {
       conditionsMethodologyVersion: string | null;
       conditionsManifestSha256: string | null;
       evidencePath: string | null;
-      envPullUnavailable: {
-        expectedState: "INITIALIZING";
-        rejectedStates: Array<"BUILDING" | "READY">;
-        errorCode: "deployment_state_window_unavailable";
-      } | null;
+      envPullAttemptEvidence: EnvPullAttemptEvidence | null;
     };
   };
   checks: CheckRecord[];
@@ -348,22 +359,28 @@ const isNeonBranchId = (value: string | null) =>
   /^br-[a-z0-9-]+$/.test(value ?? "");
 const isNeonEndpointId = (value: string | null) =>
   /^ep-[a-z0-9-]+$/.test(value ?? "");
+const isNeonProjectId = (value: string | null) =>
+  /^[a-z][a-z0-9-]+$/.test(value ?? "");
 
-function isVercelPreviewUrl(value: string | null): boolean {
-  if (!value) return false;
+function vercelPreviewHost(value: string | null): string | null {
+  if (!value) return null;
   try {
     const parsed = new URL(value);
-    return (
+    const valid =
       parsed.protocol === "https:" &&
       parsed.pathname === "/" &&
       parsed.search === "" &&
       parsed.hash === "" &&
-      parsed.hostname.endsWith(".vercel.app")
-    );
+      parsed.hostname.endsWith(".vercel.app");
+    return valid ? parsed.hostname : null;
   } catch {
-    return false;
+    return null;
   }
 }
+
+const hasExactKeys = (value: object, expected: readonly string[]) =>
+  JSON.stringify(Object.keys(value).sort()) ===
+  JSON.stringify([...expected].sort());
 
 function runtimeAttestationErrors(
   record: StagingSmokeRecord,
@@ -376,10 +393,26 @@ function runtimeAttestationErrors(
   }
 
   if (!runCompleted) {
-    const hasEvidence =
-      Object.entries(attestation).some(
-        ([key, value]) => key !== "envPullUnavailable" && value !== null,
-      ) || attestation.envPullUnavailable !== null;
+    const hasEvidence = [
+      attestation.proofMode,
+      attestation.deploymentId,
+      attestation.deploymentUrl,
+      attestation.deploymentHost,
+      attestation.target,
+      attestation.candidateCommit,
+      attestation.neonProjectId,
+      attestation.neonBranchId,
+      attestation.neonEndpointId,
+      attestation.databaseHostnameSha256,
+      attestation.forbiddenProductionBranchId,
+      attestation.forbiddenProductionHostnameSha256,
+      attestation.migrationHead,
+      attestation.conditionsReleaseId,
+      attestation.conditionsMethodologyVersion,
+      attestation.conditionsManifestSha256,
+      attestation.evidencePath,
+      attestation.envPullAttemptEvidence,
+    ].some((value) => value !== null);
     if (hasEvidence) {
       errors.push(
         "pending staging record must not contain invented runtime attestation",
@@ -395,9 +428,13 @@ function runtimeAttestationErrors(
   ) {
     errors.push("staging runtime proof mode is invalid");
   }
+  const previewHost = vercelPreviewHost(attestation.deploymentUrl);
   if (
     !isVercelDeploymentId(record.isolation.vercelDeploymentId) ||
-    !isVercelPreviewUrl(attestation.deploymentUrl) ||
+    !isVercelDeploymentId(attestation.deploymentId) ||
+    attestation.deploymentId !== record.isolation.vercelDeploymentId ||
+    !previewHost ||
+    attestation.deploymentHost !== previewHost ||
     attestation.target !== "preview"
   ) {
     errors.push("staging runtime attestation is not bound to a Preview deployment");
@@ -409,7 +446,7 @@ function runtimeAttestationErrors(
     errors.push("staging runtime attestation candidate commit does not match");
   }
   if (
-    !attestation.neonProjectId?.trim() ||
+    !isNeonProjectId(attestation.neonProjectId) ||
     !isNeonBranchId(attestation.neonBranchId) ||
     attestation.neonBranchId !== record.isolation.neonBranchId ||
     !isNeonEndpointId(attestation.neonEndpointId)
@@ -430,8 +467,7 @@ function runtimeAttestationErrors(
     );
   }
   if (
-    attestation.migrationHead !==
-    QA_018_REQUIRED_MIGRATIONS.at(-1)?.id
+    attestation.migrationHead !== QA_018_REHEARSAL_HEAD
   ) {
     errors.push("staging runtime attestation migration head is invalid");
   }
@@ -458,22 +494,63 @@ function runtimeAttestationErrors(
     errors.push("staging runtime attestation evidence path is invalid");
   }
 
+  const envPull = attestation.envPullAttemptEvidence;
+  const attempts = Array.isArray(envPull?.attempts)
+    ? envPull.attempts
+    : [];
+  const attemptsAreSanitized =
+    envPull != null &&
+    hasExactKeys(envPull, ["attempts", "failureCode"]) &&
+    Array.isArray(envPull.attempts) &&
+    attempts.length > 0 &&
+    attempts.every(
+      (attempt) =>
+        attempt !== null &&
+        typeof attempt === "object" &&
+        hasExactKeys(attempt, [
+          "expectedState",
+          "observedState",
+          "outcome",
+        ]) &&
+        attempt.expectedState === "INITIALIZING" &&
+        ["INITIALIZING", "BUILDING", "READY"].includes(
+          attempt.observedState,
+        ) &&
+        ["pulled", "state_window_rejected"].includes(attempt.outcome),
+    ) &&
+    new Set(
+      attempts.map(
+        (attempt) =>
+          `${attempt.expectedState}:${attempt.observedState}:${attempt.outcome}`,
+      ),
+    ).size === attempts.length;
+
+  if (!attemptsAreSanitized) {
+    errors.push(
+      "runtime proof lacks sanitized deployment environment-pull attempt evidence",
+    );
+  }
+
   if (attestation.proofMode === "deployment_env_pull") {
-    if (attestation.envPullUnavailable !== null) {
+    if (
+      envPull?.failureCode !== null ||
+      attempts.length !== 1 ||
+      attempts[0]?.observedState !== "INITIALIZING" ||
+      attempts[0]?.outcome !== "pulled"
+    ) {
       errors.push(
-        "deployment environment-pull proof cannot claim the state window was unavailable",
+        "deployment environment-pull proof must retain one successful INITIALIZING pull",
       );
     }
   } else if (attestation.proofMode === "exact_preview_runtime") {
-    const fallback = attestation.envPullUnavailable;
-    const rejectedStates = fallback?.rejectedStates ?? [];
-    const allowedRejectedStates = new Set(["BUILDING", "READY"]);
     if (
-      fallback?.expectedState !== "INITIALIZING" ||
-      fallback.errorCode !== "deployment_state_window_unavailable" ||
-      rejectedStates.length === 0 ||
-      new Set(rejectedStates).size !== rejectedStates.length ||
-      rejectedStates.some((state) => !allowedRejectedStates.has(state))
+      envPull?.failureCode !== "deployment_state_window_unavailable" ||
+      attempts.length === 0 ||
+      attempts.some(
+        (attempt) =>
+          !["BUILDING", "READY"].includes(attempt.observedState) ||
+          attempt.outcome !== "state_window_rejected",
+      )
     ) {
       errors.push(
         "exact Preview runtime proof lacks the bounded Vercel state-window failure",

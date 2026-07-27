@@ -56,7 +56,9 @@
     "jobsQuiesced": null,
     "runtimeAttestation": {
       "proofMode": null,
+      "deploymentId": null,
       "deploymentUrl": null,
+      "deploymentHost": null,
       "target": null,
       "candidateCommit": null,
       "neonProjectId": null,
@@ -70,7 +72,7 @@
       "conditionsMethodologyVersion": null,
       "conditionsManifestSha256": null,
       "evidencePath": null,
-      "envPullUnavailable": null
+      "envPullAttemptEvidence": null
     }
   },
   "checks": [
