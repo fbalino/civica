@@ -171,6 +171,54 @@ const DESIGN_TOKEN_GROUPS: DesignTokenGroup[] = [
       "--width-record-body": "680px Record reading measure",
     },
   ),
+  tokenGroup(
+    "navigation-composition",
+    "Navigation composition",
+    [
+      "--width-navigation-summary",
+      "--measure-navigation-heading",
+      "--measure-navigation-summary",
+      "--aspect-square",
+      "--aspect-navigation-plate",
+      "--navigation-art-rest-scale",
+      "--navigation-art-surface-mix",
+      "--navigation-selection-border-mix",
+      "--navigation-selection-surface-mix",
+      "--navigation-mobile-divider-mix",
+      "--navigation-mobile-selection-mix",
+      "--stroke-icon-light",
+    ],
+    {
+      "--width-navigation-summary": "Explore orientation column",
+      "--measure-navigation-heading": "Short navigation heading measure",
+      "--measure-navigation-summary": "Compact navigation summary measure",
+      "--aspect-square": "Compact destination plate",
+      "--aspect-navigation-plate": "Destination image plate",
+      "--navigation-art-rest-scale": "Resting plate-art inset",
+      "--navigation-art-surface-mix": "Plate surface accent",
+      "--navigation-selection-border-mix": "Selected plate border",
+      "--navigation-selection-surface-mix": "Selected plate surface",
+      "--navigation-mobile-divider-mix": "Mobile register divider",
+      "--navigation-mobile-selection-mix": "Mobile selected row",
+      "--stroke-icon-light": "Quiet directional and close icons",
+    },
+  ),
+  tokenGroup(
+    "illustration-composition",
+    "Illustration composition",
+    [
+      "--position-home-hero-art",
+      "--position-country-hero-art",
+      "--position-country-hero-art-mobile",
+      "--position-page-hero-art",
+    ],
+    {
+      "--position-home-hero-art": "Homepage hero crop",
+      "--position-country-hero-art": "Country masthead crop",
+      "--position-country-hero-art-mobile": "Country mobile masthead crop",
+      "--position-page-hero-art": "Canonical page-hero crop",
+    },
+  ),
   tokenGroup("radii", "Radii", [
     "--radius-sm",
     "--radius-md",
@@ -889,10 +937,10 @@ export default function DesignSystemPage() {
                   maxWidth: "48ch",
                 }}
               >
-                The header&rsquo;s &ldquo;Explore&rdquo; panel, shown open.
-                Ivory paper, a terracotta hairline top rule, and destination
-                rows that pair a spot engraving with a serif name and a one-line
-                description. Rows warm on hover and keyboard focus.
+                The header&rsquo;s near-page-width Explore panel, shown open.
+                A short orientation introduces two 2 × 2 registers whose eight
+                destination-specific plates sharpen on hover and keyboard
+                focus. Artwork transfers only for the active theme.
               </p>
               <ExploreMenuDemo />
             </div>

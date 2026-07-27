@@ -44,9 +44,14 @@ import { EDITORIAL_NAV_ITEMS } from "../editorialNavItems";
 
 const NAV_LINKS_PATH = join(process.cwd(), "src/components/NavLinks.tsx");
 const MOBILE_NAV_PATH = join(process.cwd(), "src/components/MobileNav.tsx");
+const EXPLORE_PANEL_PATH = join(
+  process.cwd(),
+  "src/components/ExploreMenuPanel.tsx",
+);
 
 const navLinksSrc = readFileSync(NAV_LINKS_PATH, "utf8");
 const mobileNavSrc = readFileSync(MOBILE_NAV_PATH, "utf8");
+const explorePanelSrc = readFileSync(EXPLORE_PANEL_PATH, "utf8");
 
 const EXPLORE_ITEMS = EXPLORE_NAV_GROUPS.flatMap((g) => g.items);
 
@@ -132,6 +137,67 @@ test("mobile nav (MobileNav.tsx) imports every destination list from its one can
       `MobileNav.tsx must import ${name} from "${module}"`,
     );
   }
+});
+
+test("desktop Explore renders the shared panel with the canonical groups unmodified", () => {
+  assert.ok(
+    importsNamedFrom(
+      navLinksSrc,
+      "ExploreMenuPanel",
+      "@/components/ExploreMenuPanel",
+    ),
+    'NavLinks.tsx must import ExploreMenuPanel from "@/components/ExploreMenuPanel"',
+  );
+  assert.match(
+    navLinksSrc,
+    /<ExploreMenuPanel[\s\S]*?\bgroups=\{\s*EXPLORE_NAV_GROUPS\s*\}[\s\S]*?\/>/,
+    "NavLinks.tsx must pass the canonical Explore groups directly to the shared panel",
+  );
+  assert.ok(
+    !/<ExploreNavArtwork\b/.test(navLinksSrc),
+    "NavLinks.tsx must not recreate Explore cards or artwork outside the shared panel",
+  );
+});
+
+test("shared Explore panel maps canonical groups/items directly and derives both themed asset paths from item.art", () => {
+  assert.ok(
+    importsNamedFrom(
+      explorePanelSrc,
+      "EXPLORE_NAV_GROUPS",
+      "@/components/exploreNavItems",
+    ),
+    'ExploreMenuPanel.tsx must import EXPLORE_NAV_GROUPS from "@/components/exploreNavItems"',
+  );
+  assert.match(
+    explorePanelSrc,
+    /\bgroups\s*=\s*EXPLORE_NAV_GROUPS\b/,
+    "ExploreMenuPanel must default to the canonical Explore groups",
+  );
+  assert.match(
+    explorePanelSrc,
+    /\bgroups\.map\(/,
+    "ExploreMenuPanel must map the supplied groups directly",
+  );
+  assert.match(
+    explorePanelSrc,
+    /\bgroup\.items\.map\(/,
+    "ExploreMenuPanel must map each canonical item list directly",
+  );
+  assert.match(
+    explorePanelSrc,
+    /src=\{`\/engravings\/navigation\/explore-\$\{item\.art\}\.webp`\}/,
+    "light artwork paths must derive from the canonical item.art basename",
+  );
+  assert.match(
+    explorePanelSrc,
+    /darkSrc=\{`\/engravings\/navigation\/explore-\$\{item\.art\}-dark\.webp`\}/,
+    "dark artwork paths must derive from the same canonical item.art basename",
+  );
+  assert.match(
+    explorePanelSrc,
+    /<span className=\{className\} aria-hidden="true">/,
+    "Explore artwork must remain decorative and outside the accessible name",
+  );
 });
 
 function consumesUnmodified(src: string, ident: string): boolean {
@@ -234,7 +300,11 @@ function extractEnclosingTag(src: string, uniqueMarker: string, tag: string): st
 }
 
 test("Explore item accessible name (label then description) is built identically on both surfaces, with no aria-label override", () => {
-  const desktopBlock = extractEnclosingTag(navLinksSrc, "<ExploreEngraving", "Link");
+  const desktopBlock = extractEnclosingTag(
+    explorePanelSrc,
+    "<ExploreNavArtwork",
+    "Link",
+  );
   const mobileBlock = extractEnclosingTag(mobileNavSrc, "mobile-menu__spot", "Link");
 
   for (const [name, block] of [

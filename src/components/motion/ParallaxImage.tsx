@@ -33,8 +33,8 @@
  *   • SSR / pre-mount → render with NO transform (resting position), so first
  *     paint is correct and there is never a window read during render. The
  *     transform only attaches once mounted on the client.
- *   • When a dark-mode asset is supplied, both images keep the same hero class
- *     and the global theme-image CSS swaps them via `data-theme`.
+ *   • When a dark-mode asset is supplied, one themed background resolves via
+ *     `data-theme`, so the inactive source is not downloaded.
  */
 
 import {
@@ -44,6 +44,7 @@ import {
   type CSSProperties,
 } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { themedDecorativeImageStyle } from "@/components/ThemedDecorativeImage";
 
 /** True only on the client (false during SSR + first hydration render). Lets us
  *  keep the transform off the SSR HTML so first paint matches the resting pose. */
@@ -61,12 +62,9 @@ function useHasMounted(): boolean {
    over-scan and prevents a blank edge. 12% is a quiet, editorial amount. */
 const BASE_DRIFT_PCT = 12;
 
-function themeClassName(className: string | undefined, mode: "light" | "dark") {
-  return [className, `theme-engraving-${mode}`].filter(Boolean).join(" ");
-}
-
 function ParallaxImageLayer({
   src,
+  darkSrc,
   className,
   alt = "",
   intensity = 1,
@@ -74,6 +72,8 @@ function ParallaxImageLayer({
   ...rest
 }: {
   src: string;
+  /** A themed asset is rendered once as a CSS background, not as two images. */
+  darkSrc?: string | null;
   /** Carries the existing classes that own position/over-scan, object-fit,
    *  and object-position — always pass the hero img's original className. */
   className?: string;
@@ -87,7 +87,19 @@ function ParallaxImageLayer({
 }) {
   const reduce = useReducedMotion();
   const mounted = useHasMounted();
-  const imgRef = useRef<HTMLImageElement>(null);
+  const elementRef = useRef<HTMLElement | null>(null);
+  const themed = Boolean(darkSrc);
+  const elementClassName = [
+    themed ? "civica-themed-image" : null,
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const imageStyle = themed
+    ? themedDecorativeImageStyle(src, darkSrc, style)
+    : style;
+  const { "aria-hidden": ariaHidden = true, ...elementProps } = rest;
+
   // Scroll target = the hero SECTION (the img's parent), a stable non-moving box.
   const sectionRef = useRef<HTMLElement | null>(null);
 
@@ -96,7 +108,7 @@ function ParallaxImageLayer({
   // display:contents to preserve the hero grid.
   // on scroll/resize, so setting it here (before paint) is sufficient.
   useLayoutEffect(() => {
-    sectionRef.current = imgRef.current?.closest("section") ?? null;
+    sectionRef.current = elementRef.current?.closest("section") ?? null;
   }, []);
 
   // Track the hero section's scroll: 0 when its top meets the viewport top, 1
@@ -112,54 +124,68 @@ function ParallaxImageLayer({
   const driftPct = Math.min(18, BASE_DRIFT_PCT * intensity);
   const y = useTransform(scrollYProgress, [0, 1], ["0%", `${driftPct}%`]);
 
-  // Reduced-motion OR pre-mount → plain static <img>, no transform.
+  // Reduced-motion OR pre-mount → plain static asset, no transform.
   // (Pre-mount keeps the SSR HTML transform-free; CSS owns the resting pose.)
   if (reduce || !mounted) {
+    if (themed) {
+      return (
+        <span
+          ref={(node) => {
+            elementRef.current = node;
+          }}
+          className={elementClassName}
+          style={imageStyle}
+          aria-hidden={ariaHidden as boolean | "true" | "false"}
+          {...elementProps}
+        />
+      );
+    }
+
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        ref={imgRef}
-        className={className}
+        ref={(node) => {
+          elementRef.current = node;
+        }}
+        className={elementClassName}
         src={src}
         alt={alt}
-        style={style}
-        {...rest}
+        style={imageStyle}
+        aria-hidden={ariaHidden as boolean | "true" | "false"}
+        {...elementProps}
+      />
+    );
+  }
+
+  if (themed) {
+    return (
+      <motion.span
+        ref={(node) => {
+          elementRef.current = node;
+        }}
+        className={elementClassName}
+        style={{ y, ...imageStyle }}
+        aria-hidden={ariaHidden as boolean | "true" | "false"}
+        {...elementProps}
       />
     );
   }
 
   return (
     <motion.img
-      ref={imgRef}
-      className={className}
+      ref={(node) => {
+        elementRef.current = node;
+      }}
+      className={elementClassName}
       src={src}
       alt={alt}
-      style={{ y, ...style }}
-      {...rest}
+      style={{ y, ...imageStyle }}
+      aria-hidden={ariaHidden as boolean | "true" | "false"}
+      {...elementProps}
     />
   );
 }
 
-export function ParallaxImage({
-  darkSrc,
-  ...props
-}: Parameters<typeof ParallaxImageLayer>[0] & {
-  /** Optional dark-mode-specific asset. When present, CSS swaps by theme. */
-  darkSrc?: string | null;
-}) {
-  if (!darkSrc) return <ParallaxImageLayer {...props} />;
-
-  return (
-    <>
-      <ParallaxImageLayer
-        {...props}
-        className={themeClassName(props.className, "light")}
-      />
-      <ParallaxImageLayer
-        {...props}
-        src={darkSrc}
-        className={themeClassName(props.className, "dark")}
-      />
-    </>
-  );
+export function ParallaxImage(props: Parameters<typeof ParallaxImageLayer>[0]) {
+  return <ParallaxImageLayer {...props} />;
 }

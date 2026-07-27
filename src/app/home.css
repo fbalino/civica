@@ -35,13 +35,15 @@
   width: 100%;
   height: 120%;
   object-fit: cover;
-  object-position: center center;
+  object-position: var(--position-home-hero-art);
+  background-size: cover;
+  background-position: var(--position-home-hero-art);
   z-index: 0;
   will-change: transform;
 }
-[data-theme="dark"] .home-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark),
-[data-theme="dark"] .home-engraving img:not(.theme-engraving-light):not(.theme-engraving-dark),
-[data-theme="dark"] .country-card-img:not(.theme-engraving-light):not(.theme-engraving-dark) {
+[data-theme="dark"] .home-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image),
+[data-theme="dark"] .home-engraving img:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image),
+[data-theme="dark"] .country-card-img:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image) {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 .home-hero::before {

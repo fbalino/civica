@@ -54,7 +54,9 @@
   width: 100%;
   height: 120%;
   object-fit: cover;
-  object-position: center 28%;
+  object-position: var(--position-country-hero-art);
+  background-size: cover;
+  background-position: var(--position-country-hero-art);
   z-index: 0;
   will-change: transform;
 }
@@ -79,7 +81,7 @@
   position: relative;
   z-index: 2;
 }
-[data-theme="dark"] .factbook-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark) {
+[data-theme="dark"] .factbook-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image) {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 
@@ -611,7 +613,8 @@
     width: 100%;
     height: auto;
     aspect-ratio: 5 / 4;
-    object-position: center 30%;
+    object-position: var(--position-country-hero-art-mobile);
+    background-position: var(--position-country-hero-art-mobile);
     order: 0;
     /* This img is an in-flow banner on mobile (not an absolute over-scan), so
        the parallax translateY must NOT displace it out of the vertical stack. */
@@ -1161,12 +1164,14 @@
   width: 100%;
   height: 120%;
   object-fit: cover;
-  object-position: center 42%;
+  object-position: var(--position-page-hero-art);
+  background-size: cover;
+  background-position: var(--position-page-hero-art);
   opacity: 0.85;
   z-index: 0;
   will-change: transform;
 }
-[data-theme="dark"] .factbook-hero-art:not(.theme-engraving-light):not(.theme-engraving-dark) {
+[data-theme="dark"] .factbook-hero-art:not(.theme-engraving-light):not(.theme-engraving-dark):not(.civica-themed-image) {
   opacity: 0.42;
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }

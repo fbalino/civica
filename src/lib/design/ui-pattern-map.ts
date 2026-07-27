@@ -325,8 +325,9 @@ export const UI_PATTERN_MAP: UiPatternFamily[] = [
       {
         pattern: "Explore megamenu",
         kind: "composition",
+        primitives: ["src/components/ExploreMenuPanel.tsx"],
         classes: ["explore-menu"],
-        note: "Single Explore trigger drops the two-column browse panel; the eight hrefs live in exploreNavItems.ts, consumed by desktop and mobile.",
+        note: "Single Explore disclosure opens the near-page-width two-register image-card panel; the eight hrefs and art identities live in exploreNavItems.ts and are consumed by desktop and mobile.",
       },
       {
         pattern: "Full-screen atlas / mobile menu",

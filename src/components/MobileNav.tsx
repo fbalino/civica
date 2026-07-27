@@ -9,6 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { INDEX_NAV_ITEMS } from "@/components/indexNavItems";
@@ -17,7 +18,9 @@ import {
   EXPLORE_NAV_GROUPS,
   type ExploreNavItem,
 } from "@/components/exploreNavItems";
+import { ExploreNavArtwork } from "@/components/ExploreMenuPanel";
 import { EDITORIAL_NAV_ITEMS } from "@/components/editorialNavItems";
+import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 import {
   isGovernanceEvidenceGroupActive,
   isMethodologyGroupActive,
@@ -56,7 +59,8 @@ export function MobileNav({
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    setOpen(false);
+    const frame = requestAnimationFrame(() => setOpen(false));
+    return () => cancelAnimationFrame(frame);
   }, [pathname]);
 
   useEffect(() => {
@@ -159,19 +163,10 @@ function MenuOverlay({
       aria-label="Main menu"
     >
       <div className="mobile-menu__art" aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="theme-engraving-light"
+        <ThemedDecorativeImage
+          className="mobile-menu__art-image"
           src="/engravings/hero.webp"
-          alt=""
-          aria-hidden="true"
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="theme-engraving-dark"
-          src="/engravings/hero-dark.webp"
-          alt=""
-          aria-hidden="true"
+          darkSrc="/engravings/hero-dark.webp"
         />
       </div>
       <div className="mobile-menu__wash" aria-hidden="true" />
@@ -197,7 +192,6 @@ function MenuOverlay({
               viewBox="0 0 20 20"
               fill="none"
               stroke="currentColor"
-              strokeWidth="1.5"
               strokeLinecap="round"
             >
               <path d="M4 4l12 12M16 4L4 16" />
@@ -297,27 +291,16 @@ function ExploreLink({
       href={item.href}
       className={`mobile-menu__explore-link${active ? " is-active" : ""}`}
     >
-      <span className="mobile-menu__spot" aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="theme-engraving-light"
-          src={`/engravings/spot-${item.engraving}.webp`}
-          alt=""
-          aria-hidden="true"
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="theme-engraving-dark"
-          src={`/engravings/spot-${item.engraving}-dark.webp`}
-          alt=""
-          aria-hidden="true"
-        />
-      </span>
+      <ExploreNavArtwork item={item} className="mobile-menu__spot" />
       <span className="mobile-menu__explore-copy">
         <strong>{item.label}</strong>
         <small>{item.description}</small>
       </span>
-      <span className="mobile-menu__arrow" aria-hidden="true">↗</span>
+      <ArrowUpRight
+        className="mobile-menu__arrow"
+        aria-hidden="true"
+        focusable="false"
+      />
     </Link>
   );
 }
