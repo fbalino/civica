@@ -196,6 +196,11 @@
   min-height: 170px;
 }
 .home-engraving img { width: 60%; height: auto; opacity: 0.8; }
+.home-engraving--landscape img {
+  width: 100%;
+  aspect-ratio: 5 / 3;
+  opacity: 0.9;
+}
 
 /* Index leaderboard preview (legacy 3-col list — superseded by the
    full Index table below, kept for the empty/DB-error fallback) */

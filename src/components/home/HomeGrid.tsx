@@ -272,10 +272,10 @@ export async function HomeGrid() {
         <div className="home-feature-visual-slot">
           {/* PROVENANCE_COVERAGE: home.evidence-teaser */}
           <div className="home-feature-visual">
-            <div className="home-engraving">
+            <div className="home-engraving home-engraving--landscape">
               <SpotEngraving
-                src="/engravings/spot-globe.webp"
-                darkSrc="/engravings/spot-globe-dark.webp"
+                src="/engravings/home-governance-evidence.webp"
+                darkSrc="/engravings/home-governance-evidence-dark.webp"
               />
             </div>
           </div>
