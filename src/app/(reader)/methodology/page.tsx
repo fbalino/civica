@@ -39,7 +39,7 @@ const SECTIONS: MethodologySection[] = [
     id: "start-here",
     heading: "Start here",
     intro:
-      "If you're new to how Civica handles country data and want a plain-English walkthrough before the deep specifications, start here. Every methodology page below assumes the reader has read this one or its equivalent.",
+      "New to Civica’s data methods? Start with the plain-English overview. The technical pages below explain the individual contracts in more detail.",
     entries: [
       {
         href: "/methodology/approach",
@@ -59,7 +59,7 @@ const SECTIONS: MethodologySection[] = [
         href: "/country/methodology/reconciliation",
         title: "Reconciliation",
         blurb:
-          "The full specification of how the resolver works. Source taxonomy, the canonical-fact layer, freshness rules, editorial assertions, the dispute system, forecast vs measurement, multi-canonical with scope predicate.",
+          "How Civica selects among source observations, records disputes, separates forecasts from measurements, and preserves scoped alternatives.",
         beta: true,
       },
     ],
@@ -138,7 +138,7 @@ const SECTIONS: MethodologySection[] = [
         href: "/civica-index/methodology/peer-grouping",
         title: "Peer grouping",
         blurb:
-          "The peer-lens architecture, why government type is not a peer-grouping primitive, how the n ≥ 8 minimum-n rule works, the documented fallback chain.",
+          "How the research defines comparison groups, why government type is excluded from grouping, and what happens when a group has fewer than eight cases.",
       },
     ],
   },

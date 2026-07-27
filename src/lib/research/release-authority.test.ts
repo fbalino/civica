@@ -4,7 +4,7 @@ import { RELEASE_AUTHORITY, releaseAuthorityErrors, simulateReleaseIncident } fr
 
 test("release authority names the approver and closes version, DOI, notice, and appeal rules", () => {
   assert.deepEqual(releaseAuthorityErrors(), []);
-  assert.equal(RELEASE_AUTHORITY.approver.name, "Fernando Balino");
+  assert.equal(RELEASE_AUTHORITY.approver.name, "Fernando Baliño");
 });
 
 test("material-error tabletop produces containment, changelog, version, DOI relation, notices, and appeal", () => {

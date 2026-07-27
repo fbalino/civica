@@ -18,7 +18,7 @@ export const GOVERNANCE_DOMAINS = [
 
 export type GovernanceDomain = (typeof GOVERNANCE_DOMAINS)[number];
 
-const accountable = "Fernando Balino" as const;
+const accountable = "Fernando Baliño" as const;
 
 export const PUBLICATION_GOVERNANCE_CHARTER = Object.freeze({
   schemaVersion: PUBLICATION_GOVERNANCE_VERSION,

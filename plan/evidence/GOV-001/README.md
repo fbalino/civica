@@ -4,7 +4,7 @@ Completed 2026-07-11.
 
 ## Outcome
 
-`civica-research-publication-governance/v1` names Fernando Balino as Civica Atlas's current accountable human. It assigns all ten required decision domains directly to him:
+`civica-research-publication-governance/v1` names Fernando Baliño as Civica Atlas's current accountable human. It assigns all ten required decision domains directly to him:
 
 - data;
 - methodology;

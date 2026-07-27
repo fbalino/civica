@@ -6,7 +6,7 @@ export const RELEASE_AUTHORITY = Object.freeze({
   schemaVersion: RELEASE_AUTHORITY_VERSION,
   effectiveOn: "2026-07-11",
   approver: Object.freeze({
-    name: "Fernando Balino",
+    name: "Fernando Baliño",
     role: "Founder, publisher, and responsible human decision-maker",
     releaseAuthority: "Approve preview, frozen, DOI, superseding, retracted, rolled-back, and retired release states after applicable gates pass.",
     methodologyAuthority: "Approve methodology versions and claim standing after applicable validation and independent-review gates pass.",
@@ -25,7 +25,7 @@ export const RELEASE_AUTHORITY = Object.freeze({
     triggers: ["credible material misinformation", "active security compromise", "privacy exposure", "rights breach", "unsafe automated output"],
     immediateActions: ["stop propagation", "preserve the minimum lawful evidence", "record affected identities", "open a dated incident/correction record", "set restoration criteria"],
     reviewDeadlineHours: 72,
-    restorationRule: "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Balino's restoration decision.",
+    restorationRule: "Resolve the trigger, pass applicable checks, publish required notice, and record Fernando Baliño's restoration decision.",
   }),
   historicalPreservation: Object.freeze({
     correction: "Publish the corrected value or statement prospectively and retain the prior value/version as superseded in history.",
@@ -95,7 +95,7 @@ export function releaseAuthorityHash(value: unknown): string {
 export function releaseAuthorityErrors(record: typeof RELEASE_AUTHORITY = RELEASE_AUTHORITY): string[] {
   const errors: string[] = [];
   if (record.schemaVersion !== RELEASE_AUTHORITY_VERSION) errors.push("wrong schema version");
-  if (record.approver.name !== "Fernando Balino") errors.push("named approver missing");
+  if (record.approver.name !== "Fernando Baliño") errors.push("named approver missing");
   if (Object.keys(record.versionTriggers).sort().join(",") !== "beta,major,minor,patch") errors.push("version triggers incomplete");
   if (!record.doi.correctedRelease.includes("new version and DOI") || !record.doi.retraction.includes("continues to resolve")) errors.push("DOI policy incomplete");
   if (record.noticeLocations.length < 5 || record.reportAndAppeal.reportRoutes.length < 2) errors.push("notice or appeal routes incomplete");

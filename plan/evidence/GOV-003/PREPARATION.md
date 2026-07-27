@@ -1,6 +1,7 @@
 # GOV-003 preparation evidence
 
-Status: prepared, not complete; owner factual confirmation required
+Historical status at 2026-07-11: prepared, not complete; owner factual
+confirmation required. Current completion evidence is in `README.md`.
 
 Date: 2026-07-11
 

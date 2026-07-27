@@ -49,6 +49,13 @@ export const CLAIMS_DOCS_GATE_MANIFEST: GateManifest = {
         "Public-claims registry coverage, tier mapping, and prohibited authority/grade language.",
     },
     {
+      id: "exp-038-copy",
+      npmScript: "validate:exp-038-copy",
+      categories: ["registry-coverage", "terminology-policy"],
+      description:
+        "Owner-approved English copy is present, evidence-gated holds remain unapplied, and the independence label is backed by the canonical disclosure.",
+    },
+    {
       id: "numeric-claims",
       npmScript: "validate:numeric-claims",
       categories: ["numeric-templates"],

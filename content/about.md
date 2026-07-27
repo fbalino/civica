@@ -26,13 +26,13 @@
 
 Civica Atlas is a provenance-first comparative reference to how every country is governed. It brings country profiles, political institutions, constitutions, elections, and source-linked facts into one browsable atlas.
 
-The atlas is the primary product. Civica's original Index and Pulse outputs are secondary research experiments: they remain beta while their constructs, methods, sensitivity, incremental value, and failure modes are tested. The project publishes its methods and aims to expose source disagreement rather than hiding it, without claiming that every value is already reconciled or independently reviewed.
+The atlas is the primary product. Civica's original Index and Pulse outputs are secondary research experiments: they remain beta while their constructs, methods, sensitivity, incremental value, and failure modes are tested. The project publishes its methods and records source disagreement where the data supports it. Some values remain unreconciled, and the project has not completed independent review.
 
 ## How it works {#how-it-works}
 
-The data pipeline has three layers, each addressing a known failure mode in single-source reference works.
+Civica separates source ingestion, reconciliation, and reader presentation. Each layer has its own provenance and failure checks.
 
-**Sync orchestrators (one per source).** A dedicated module per upstream publisher pulls fresh data on a documented cadence and writes into the canonical `country_facts` table with statement-level provenance.
+**Sync orchestrators (one per source).** Each production source has a registered ingestion path and cadence. Supported observations retain source and retrieval metadata; statement-level coverage remains incomplete.
 
 **Reconciliation resolver.** When two or more sources publish a value for the same country and fact-key, the resolver picks a canonical based on freshness rules, editorial assertions, and forecast-vs-measurement distinctions. When sources disagree by more than a configurable threshold, it creates a dispute record routed to human review rather than silently picking.
 
@@ -60,7 +60,7 @@ Country and territory hero images are AI-assisted editorial illustrations, not p
 
 ## Use of models and agents {#ai-use}
 
-This disclosure follows `civica-ai-use-disclosure/v1`. Models and agents assist with several parts of Civica; Fernando Balino remains responsible for what the project publishes.
+This disclosure follows `civica-ai-use-disclosure/v1`. Models and agents assist with several parts of Civica; Fernando Baliño remains responsible for what the project publishes.
 
 **Code, planning, and internal audits.** OpenAI Codex and Anthropic Claude/Claude Code have drafted code and documentation, inspected the repository, run tests, researched candidates, and criticized methods. Fable 5 is used for consequential design choices. These systems can find defects and propose changes. Their work stays subject to version control, tests, data and claims checks, and human acceptance. Agent agreement is not independent peer review or academic validation. Historical sessions do not all have complete model/version transcripts, and missing session metadata is left unknown.
 

@@ -7,7 +7,7 @@ Completed 2026-07-11.
 `civica-advisory-board-charter/v1` is the public and machine-readable charter for Civica Atlas's planned advisory board. The charter covers:
 
 - purpose and five expertise lanes;
-- advisory-only authority, no publication veto, and Fernando Balino's final accountability;
+- advisory-only authority, no publication veto, and Fernando Baliño's final accountability;
 - 24-month terms, one possible renewal, and approximately 8–16 hours of ordinary annual service;
 - confidentiality, publicity, conflict disclosure, recusal, and removal;
 - unpaid standing service and separately scoped, optional, outcome-independent paid reviews;

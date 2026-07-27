@@ -4,7 +4,7 @@ import { AUTHORSHIP_RECORD, CONTRIBUTOR_ROLE_TAXONOMY, authorshipErrors } from "
 
 test("authorship names one accountable independent human", () => {
   assert.deepEqual(authorshipErrors(), []);
-  assert.equal(AUTHORSHIP_RECORD.responsibleAuthor.displayName, "Fernando Balino");
+  assert.equal(AUTHORSHIP_RECORD.responsibleAuthor.displayName, "Fernando Baliño");
   assert.equal(AUTHORSHIP_RECORD.responsibleAuthor.independentStatus, true);
   assert.equal(AUTHORSHIP_RECORD.responsibleAuthor.orcid, null);
 });

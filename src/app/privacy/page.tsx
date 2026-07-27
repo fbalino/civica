@@ -127,7 +127,7 @@ export default function PrivacyPage() {
               <strong>Contact form.</strong> If you use the{" "}
               <Link href="/contact">contact form</Link>, the details you type
               there (such as your message and any email address you provide)
-              are stored in the Civica project database so Fernando Balino can
+              are stored in the Civica project database so Fernando Baliño can
               read and respond. They are not used for advertising or sold.
             </li>
             <li>

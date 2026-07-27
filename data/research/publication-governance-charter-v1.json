@@ -4,7 +4,7 @@
   "status": "operative_single_owner_charter",
   "scope": "Research, data, methodology, editorial publication, software-supported release operations, and external review for Civica Atlas.",
   "accountableHuman": {
-    "name": "Fernando Balino",
+    "name": "Fernando Baliño",
     "currentCapacity": "Founder, publisher, and responsible human decision-maker",
     "concentrationDisclosure": "Civica currently has one accountable human. This is a governance limitation: separation of duties is supplied only by enforced gates, immutable records, and independent external criticism, not by an internal multi-person approval body."
   },
@@ -18,70 +18,70 @@
   "decisions": [
     {
       "domain": "data",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Approve source ingestion, reconciliation rules, derived fields, quality disposition, and inclusion in a frozen release.",
       "requiredEvidence": "Versioned source/input manifests, provenance coverage, validation results, rights state, and a release-linked decision record.",
       "stopCondition": "Unknown provenance, failed integrity gate, unresolved material discrepancy, or prohibited redistribution blocks release of the affected material."
     },
     {
       "domain": "methodology",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Approve constructs, estimands, protocols, thresholds, version changes, validation claims, and experimental disposition.",
       "requiredEvidence": "Preregistered or precommitted protocol where applicable, reproducible analysis, limitations, sensitivity results, and required independent review.",
       "stopCondition": "A required validation or external-review gate that has not passed blocks stronger claims and graduation from beta."
     },
     {
       "domain": "editorial_copy",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Approve reader-facing factual, interpretive, methodological, promotional, and correction copy.",
       "requiredEvidence": "Claim registry and source links where applicable, terminology and numeric-claim checks, and named human acceptance of final wording.",
       "stopCondition": "Unsupported certainty, concealed judgment, anonymous authorship, or mismatch with the underlying release blocks publication."
     },
     {
       "domain": "corrections",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Triage reports, classify severity, approve corrections or retractions, preserve history, and answer appeals.",
       "requiredEvidence": "Original report, affected versions and claims, investigation record, disposition, correction notice, and reporter response where possible.",
       "stopCondition": "A credible material-error report pauses promotion of the affected claim until triage; safety or legal risk may require immediate temporary suppression."
     },
     {
       "domain": "releases",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Authorize preview, frozen, DOI, superseding, rollback, or retired release states.",
       "requiredEvidence": "Named commit and data identity, bill of materials, checksums, rights state, gate report, release notes, and citation/version metadata.",
       "stopCondition": "Any applicable P0 gate failure, identity drift, missing rights decision, or incomplete required review blocks release."
     },
     {
       "domain": "security",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Accept residual security risk, restrict access, rotate credentials, disclose incidents, and approve restoration after containment.",
       "requiredEvidence": "Incident or risk record, scope, containment evidence, credential and data impact, verification, disclosure decision, and follow-up tasks.",
       "stopCondition": "Suspected active compromise or unsafe access state requires fail-closed suspension before availability goals."
     },
     {
       "domain": "source_rights",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Approve use, display, export, archive, attribution, and removal posture for each source and release surface.",
       "requiredEvidence": "Machine-readable rights manifest, exact terms and retrieval evidence, field/product posture, legal review when required, and release linkage.",
       "stopCondition": "Pending, conflicting, expired, or insufficient rights fail closed for public bulk redistribution and any disputed surface."
     },
     {
       "domain": "reviewer_independence",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Approve reviewer scope, selection process, conflict treatment, compensation, contact, and author response without controlling the reviewer's conclusion.",
       "requiredEvidence": "Predeclared criteria, recorded conflicts and recusals, version-pinned packet, outcome-independent terms, original report, and consented publication state.",
       "stopCondition": "Outcome-contingent benefit, undisclosed material conflict, answer leakage, or owner alteration of a report invalidates the review for the affected judgment."
     },
     {
       "domain": "conflicts",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Record and resolve project, author, contributor, reviewer, source-provider, funder, vendor, and competing-interest conflicts.",
       "requiredEvidence": "Dated disclosure, affected decision, materiality assessment, management/recusal/exclusion outcome, alternate decision-maker if one is appointed, and public disclosure where relevant.",
       "stopCondition": "An unmanageable conflict or refusal to disclose blocks the affected person from the decision; the sole owner's unmanageable conflict blocks the affected claim or release pending independent resolution."
     },
     {
       "domain": "emergency_action",
-      "accountable": "Fernando Balino",
+      "accountable": "Fernando Baliño",
       "decision": "Temporarily suppress a route, fact, export, credential, job, or release to contain credible harm, compromise, rights breach, or material misinformation.",
       "requiredEvidence": "Time, actor, trigger, exact action, affected scope, preservation step, user impact, review deadline, restoration criteria, and later public notice when appropriate.",
       "stopCondition": "Restoration is prohibited until the trigger is resolved, relevant checks pass, and the named accountable human records the decision."
@@ -96,7 +96,7 @@
     "endorsementNotImplied": true
   },
   "emergencyProtocol": {
-    "immediateAuthority": "Fernando Balino",
+    "immediateAuthority": "Fernando Baliño",
     "defaultReviewDeadlineHours": 72,
     "preservationBeforeDeletion": "Preserve the minimum lawful evidence and affected release identity before deletion unless doing so would extend active harm or violate law.",
     "notice": "Publish a dated notice when an emergency action materially changes a public research claim or release; delay security-sensitive detail only while disclosure would create additional risk."
@@ -109,5 +109,5 @@
     "implementation commit/data identity, public notice, review date, and supersession link"
   ],
   "amendment": "Review at least annually and after a new accountable role, legal entity, funding relationship, material incident, or publication model. Amendments are versioned, preserve prior charters, and cannot retroactively legitimize an earlier decision.",
-  "semanticSha256": "12758365255d45f3c252745fca6a3a48de242651a83372b1bea72ef22048d7f4"
+  "semanticSha256": "b671ef247fe0f9f2286fb4396c3331ce11810ae83b31f02ae260dd01f6373d81"
 }

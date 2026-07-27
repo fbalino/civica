@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 
-const manifestPath = "data/releases/governance-evidence-review-packet-2026-07-v2/manifest.v1.json";
+const manifestPath = "data/releases/governance-evidence-review-packet-2026-07-v4/manifest.v1.json";
 const packet = JSON.parse(readFileSync(manifestPath, "utf8"));
 
-assert.equal(packet.releaseId, "governance-evidence-review-packet-2026-07-v2");
+assert.equal(packet.releaseId, "governance-evidence-review-packet-2026-07-v4");
 assert.equal(packet.status, "ready_for_external_review_not_endorsed");
 assert.equal(packet.tournamentWinnerSelected, false);
 assert.ok(packet.frozenInputs?.releaseId && packet.frozenInputs?.grid?.cells === 970);
@@ -21,7 +21,15 @@ for (const key of ["package", "preregistration", "decisionTable", "disposition",
 for (const path of [packet.sensitivity.relatedCompositeAnalysis, packet.subgroupResults.coverageOwner])
   assert.ok(existsSync(path), `${path} is missing`);
 
-const inventory = readFileSync("data/releases/governance-evidence-review-packet-2026-07-v2/artifact-inventory.v1.csv", "utf8").trim().split("\n");
-assert.equal(inventory.length - 1, 49);
+const inventory = readFileSync("data/releases/governance-evidence-review-packet-2026-07-v4/artifact-inventory.v1.csv", "utf8").trim().split("\n");
+assert.equal(inventory.length - 1, packet.inventory.length);
+assert.ok(
+  packet.inventory.some(
+    ({ artifactId, path }: { artifactId: string; path: string }) =>
+      artifactId === "project-disclosure" &&
+      path === "data/research/project-disclosure-v1.json",
+  ),
+  "canonical project disclosure is not bound",
+);
 
 console.log("PASS — GOV-014 Index packet closes preregistration, candidates/baselines, frozen panel, code/environment, analyses, sensitivity/uncertainty/subgroups, thresholds, failures, disposition, misuse, and 11 bounded questions.");

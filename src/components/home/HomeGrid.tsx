@@ -169,13 +169,12 @@ export async function HomeGrid() {
         <div className="home-feature-main">
           <div className="home-eyebrow">Countries</div>
           <h2 className="home-feature-title">
-            Explore country profiles and key facts at a glance.
+            Start with a country. See its institutions, leaders, and source-linked facts.
           </h2>
           <p className="home-feature-desc">
-            Country profiles bring government, leaders, legislature, economy,
-            and society together. Resolver-backed detail pages expose source
-            context where implemented; these compact cards link onward and do
-            not claim inline provenance for each summary value.
+            Each profile brings together government structure, current leaders,
+            legislature, economy, and society. Open the profile for source details
+            and known gaps; the summary cards do not show provenance for every value.
           </p>
           <Link href="/country" className="btn btn--text">
             <span>Explore Countries</span>
@@ -213,10 +212,12 @@ export async function HomeGrid() {
         <div className="home-feature-num">02</div>
         <div className="home-feature-main">
           <div className="home-eyebrow">Atlas</div>
-          <h2 className="home-feature-title">See the world. Understand its contexts.</h2>
+          <h2 className="home-feature-title">
+            Compare political systems and institutions on one map.
+          </h2>
           <p className="home-feature-desc">
-            A connected atlas of legislatures, chambers, political systems, and the
-            institutions that hold power around the world.
+            Browse legislatures, chambers, government systems, and other institutions
+            across countries.
           </p>
           <Link href="/atlas" className="btn btn--text">
             <span>Explore Atlas</span>

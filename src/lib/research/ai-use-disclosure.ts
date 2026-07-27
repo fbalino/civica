@@ -5,7 +5,7 @@ export const AI_USE_DISCLOSURE_VERSION = "civica-ai-use-disclosure/v1" as const;
 export const AI_USE_DISCLOSURE = Object.freeze({
   schemaVersion: AI_USE_DISCLOSURE_VERSION,
   effectiveOn: "2026-07-11",
-  responsibleHuman: "Fernando Balino",
+  responsibleHuman: "Fernando Baliño",
   standing:
     "Models and agents assist production and research preparation. They are not authors, independent peer reviewers, or a substitute for qualified human validation.",
   uses: Object.freeze([

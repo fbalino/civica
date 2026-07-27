@@ -156,7 +156,7 @@ export default async function GovernanceEvidencePage({
             Release <code>{evidence.releaseId}</code>.{" "}
             {evidence.series.citationLabel}. Original publication cut:{" "}
             {evidence.series.originalPublicationCutAt ??
-              "none retained; this is not an as-published historical release"}
+              "not retained. This release was assembled later from harmonized publisher series and is not an as-published 2024 snapshot"}
             .
           </p>
         </div>

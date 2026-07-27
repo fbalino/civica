@@ -1,6 +1,6 @@
 # Civica Atlas — operational runbooks (PLT-024)
 
-Accountable owner for every runbook: **Fernando Balino** (GOV-001/002). Status
+Accountable owner for every runbook: **Fernando Baliño** (GOV-001/002). Status
 page: https://statuspage.incident.io/civica-atlas. Each runbook names
 detection, containment, rollback/correction, user communication, evidence
 preservation, and recovery verification. A tabletop review of each is recorded

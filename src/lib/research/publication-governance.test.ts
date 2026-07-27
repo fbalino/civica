@@ -16,7 +16,7 @@ test("governance charter closes every required decision domain", () => {
 
 test("every decision names Fernando and records evidence and a stop condition", () => {
   for (const row of PUBLICATION_GOVERNANCE_CHARTER.decisions) {
-    assert.equal(row.accountable, "Fernando Balino");
+    assert.equal(row.accountable, "Fernando Baliño");
     assert.ok(row.requiredEvidence.length > 40);
     assert.ok(row.stopCondition.length > 40);
   }

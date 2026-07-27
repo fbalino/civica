@@ -108,11 +108,10 @@ export default async function CountryConstitutionTab({
             <h2 id="constitution-heading">Not yet indexed</h2>
             <div className="constitution-empty-state">
               <p>
-                Civica indexes the world&rsquo;s constitutions from the
-                Constitute Project, the standard scholarly repository. We
-                haven&rsquo;t indexed {jurisdiction.name}&rsquo;s constitution
-                here yet — but you can still explore its government,
-                institutions and governance evidence.
+                Civica indexes constitution texts supplied by the Constitute
+                Project. {jurisdiction.name} is not yet in this index. Its
+                government, institutions, and governance evidence remain
+                available elsewhere in the country profile.
               </p>
               <Link className="btn btn--primary" href="/constitution">
                 Open the Constitution Explorer

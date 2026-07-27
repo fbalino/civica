@@ -2,7 +2,7 @@
 
 **Status:** Active master-plan contract
 **Established:** 2026-07-09
-**Owner:** Fernando Balino
+**Owner:** Fernando Baliño
 **Controller:** Codex
 **Canonical checklist:** `plan/MASTER-CHECKLIST.md`
 

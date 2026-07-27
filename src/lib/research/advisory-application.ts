@@ -18,7 +18,7 @@ export const ADVISORY_APPLICATION_POLICY = Object.freeze({
   purpose:
     "Assess an expression of interest for the Civica Atlas advisory board, manage recruitment, and contact the applicant only about that application or a separately accepted review opportunity.",
   access:
-    "Fernando Balino reviews applications through the protected Civica admin area. Vercel and Neon process request and database data as infrastructure providers; applications are not public and are not shared for marketing.",
+    "Fernando Baliño reviews applications through the protected Civica admin area. Vercel and Neon process request and database data as infrastructure providers; applications are not public and are not shared for marketing.",
   retention:
     "Delete the application within 18 months of receipt. If an applicant is appointed or accepts separate work, the appointment or review receives its own record and consent rather than extending the application indefinitely.",
   deletion:

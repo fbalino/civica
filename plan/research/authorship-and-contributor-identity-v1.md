@@ -6,7 +6,7 @@ Effective: 2026-07-11
 
 ## Responsible author
 
-**Fernando Balino** is the responsible human author and publisher for the current Civica Atlas project and its frozen research releases.
+**Fernando Baliño** is the responsible human author and publisher for the current Civica Atlas project and its frozen research releases.
 
 - **Status:** independent project; no institutional affiliation claimed.
 - **ORCID:** not provided. A public-name search on 2026-07-11 found no reliable matching ORCID record, so none is inferred or fabricated.
@@ -37,7 +37,7 @@ Fernando currently holds all nine roles. This reflects responsibility for a one-
 
 | Period | Contribution | Evidence |
 |---|---|---|
-| 2026-04-13 | Initiated the repository and directed the first Atlas, source-pipeline, country-page, navigation, and reconciliation foundation | Git history beginning at `0359b07`; named commits by Fernando Balino |
+| 2026-04-13 | Initiated the repository and directed the first Atlas, source-pipeline, country-page, navigation, and reconciliation foundation | Git history beginning at `0359b07`; named commits by Fernando Baliño |
 | 2026-04-14 through 2026-06-30 | Directed and accepted the comparative-reference product, integrations, methodology surfaces, Index and Pulse experiments, editorial content, and visual system | Repository history and dated plans; artifact-level history remains in Git |
 | 2026-07-01 onward | Directed the academic-readiness program across provenance, reproducibility, rights, frozen releases, Index disposition, Pulse validation preparation, governance, and review planning | `plan/MASTER-CHECKLIST.md`, `plan/DECISIONS.md`, `plan/PROGRESS.md`, and linked evidence |
 

@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { ATLAS_REVIEW_ARTIFACTS, ATLAS_REVIEW_PACKET_VERSION, ATLAS_REVIEW_QUESTIONS, atlasReviewPacketErrors } from "../src/lib/research/atlas-review-packet";
 
-const DIR = resolve("data/releases/civica-atlas-review-packet-2026-07-v1");
+const DIR = resolve("data/releases/civica-atlas-review-packet-2026-07-v2");
 const MANIFEST = resolve(DIR, "manifest.v1.json");
 const QUESTIONS = resolve(DIR, "review-questionnaire.md");
 const README = resolve(DIR, "README.md");

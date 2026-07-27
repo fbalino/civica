@@ -4,7 +4,7 @@ Completed 2026-07-11.
 
 ## Outcome
 
-`civica-release-correction-authority/v1` supplements the existing CLM-016 correction policy with named authority and frozen-release governance. Fernando Balino is the approver for releases, methodology versions, corrections, retractions, supersessions, emergency suppression, and restoration after applicable gates pass.
+`civica-release-correction-authority/v1` supplements the existing CLM-016 correction policy with named authority and frozen-release governance. Fernando Baliño is the approver for releases, methodology versions, corrections, retractions, supersessions, emergency suppression, and restoration after applicable gates pass.
 
 The policy closes:
 

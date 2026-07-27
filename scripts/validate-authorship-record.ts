@@ -12,14 +12,27 @@ assert.deepEqual(
 );
 
 const citationFiles = [
-  "CITATION.cff",
-  "data/releases/atlas-2026-07-11/g2-rc1/CITATION.cff",
-  "data/releases/governance-evidence-review-packet-2026-07-v2/CITATION.cff",
-];
-for (const path of citationFiles) {
+  { path: "CITATION.cff", familyNames: "Baliño" },
+  {
+    path: "data/releases/atlas-2026-07-11/g2-rc1/CITATION.cff",
+    familyNames: "Balino",
+  },
+  {
+    path: "data/releases/governance-evidence-review-packet-2026-07-v4/CITATION.cff",
+    familyNames: "Balino",
+  },
+] as const;
+for (const { path, familyNames } of citationFiles) {
   const citation = YAML.parse(readFileSync(path, "utf8"));
   const authors = citation.authors ?? [];
-  assert.ok(authors.some((author: Record<string, unknown>) => author["given-names"] === "Fernando" && author["family-names"] === "Balino"), `${path}: named human author missing`);
+  assert.ok(
+    authors.some(
+      (author: Record<string, unknown>) =>
+        author["given-names"] === "Fernando" &&
+        author["family-names"] === familyNames,
+    ),
+    `${path}: named human author missing`,
+  );
   assert.equal(authors.some((author: Record<string, unknown>) => author.name === "Civica Atlas"), false, `${path}: organization-only author remains`);
   assert.equal(citation.publisher, "Civica Atlas", `${path}: organizational publisher missing`);
 }

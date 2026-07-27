@@ -1,7 +1,7 @@
 {
   "schemaVersion": "civica-ai-use-disclosure/v1",
   "effectiveOn": "2026-07-11",
-  "responsibleHuman": "Fernando Balino",
+  "responsibleHuman": "Fernando Baliño",
   "standing": "Models and agents assist production and research preparation. They are not authors, independent peer reviewers, or a substitute for qualified human validation.",
   "uses": [
     {
@@ -100,5 +100,5 @@
     "Human approval alone converts model output into independently validated evidence."
   ],
   "updateRule": "Update this record when a material production model, provider, role, publication boundary, or retained-record policy changes. Runtime-specific disclosures remain versioned with their pipelines.",
-  "semanticSha256": "fcfb1d0bb0dfa989183e226f0be8d98a56f850e859f1c7c46501d24d46110c62"
+  "semanticSha256": "bffb6afd0d116cfe54a853a1e1d4ee89ca1c51f028a5addf379e2dc3803cc4d5"
 }

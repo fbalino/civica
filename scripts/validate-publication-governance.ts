@@ -15,7 +15,7 @@ assert.deepEqual(artifact, buildPublicationGovernanceArtifact());
 assert.ok(policy.includes(PUBLICATION_GOVERNANCE_CHARTER.schemaVersion));
 for (const domain of GOVERNANCE_DOMAINS) assert.ok(policy.includes(`\`${domain}\``));
 assert.equal(/accountable(?: human)?:?\s*(?:the )?Civica Team/i.test(policy), false);
-assert.ok(policy.includes("Fernando Balino"));
+assert.ok(policy.includes("Fernando Baliño"));
 assert.ok(policy.includes("Agents and models have no decision rights"));
 
 console.log(`PASS — ${artifact.schemaVersion}: all ten domains name one accountable human; anonymous-team and agent authority are absent.`);

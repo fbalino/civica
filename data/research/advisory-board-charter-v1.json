@@ -15,7 +15,7 @@
     "publicationVeto": false,
     "endorsementImplied": false,
     "claimValidationImplied": false,
-    "finalDecisionMaker": "Fernando Balino",
+    "finalDecisionMaker": "Fernando Baliño",
     "dissentRule": "Material board disagreement and the author's response remain in the review record when publication consent permits."
   },
   "appointment": {
@@ -57,7 +57,7 @@
       "harassment or unsafe conduct",
       "sustained non-participation after a private check-in"
     ],
-    "process": "Fernando Balino gives written notice and a chance to respond unless immediate access removal is needed for safety or confidentiality. The roster records the end date; private personal details are not published."
+    "process": "Fernando Baliño gives written notice and a chance to respond unless immediate access removal is needed for safety or confidentiality. The roster records the end date; private personal details are not published."
   },
   "publication": {
     "names": "Publish a member's name, affiliation, bio, photograph, and term only with item-specific consent.",
@@ -66,5 +66,5 @@
     "nonEndorsement": "Board service validates neither Civica Atlas as a whole nor every claim, dataset, method, Index/Pulse output, release, or later change."
   },
   "reviewCadence": "Review this charter annually and whenever workload, compensation, authority, confidentiality, or publication terms change.",
-  "semanticSha256": "e087560da56d948d6639c0d1e2820adf51c153f03c482be7ccc5bacb83fbc9dd"
+  "semanticSha256": "0b3d8f1a231d790f3dca0e54acb8d074fb1f90e92df3408e22a5ab760380140f"
 }

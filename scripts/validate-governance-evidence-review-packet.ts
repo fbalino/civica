@@ -51,6 +51,7 @@ for (const role of [
   "tournament-package",
   "tournament-artifact",
   "disposition",
+  "governance",
   "rights",
   "environment",
 ]) {

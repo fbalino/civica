@@ -3,6 +3,8 @@ import { REVIEWER_LONGLIST } from "./reviewer-longlist";
 import { buildReviewerRanking, REVIEWER_RANKING_VERSION } from "./reviewer-ranking";
 
 export const REVIEWER_DOSSIER_VERSION = "civica-reviewer-dossiers/v1" as const;
+export const CURRENT_REVIEWER_DRAFT_SIGNATORY = "Fernando Baliño" as const;
+export const REVIEWER_DOSSIER_V1_SIGNATORY = "Fernando Balino" as const;
 
 const LANE_SCOPE = {
   governance_measurement: {
@@ -28,7 +30,9 @@ const LANE_SCOPE = {
   },
 } as const;
 
-export function buildReviewerDossiers() {
+export function buildReviewerDossiers(
+  signatory: string = CURRENT_REVIEWER_DRAFT_SIGNATORY,
+) {
   const selected = buildReviewerRanking().lanes.flatMap((lane) =>
     lane.ranked.filter(({ disposition }) => disposition !== "reserve"),
   );
@@ -64,7 +68,16 @@ export function buildReviewerDossiers() {
         },
         contacted: false as const,
       };
-    }),
+    }).map((dossier) => ({
+      ...dossier,
+      contactDraft: {
+        ...dossier.contactDraft,
+        body: dossier.contactDraft.body.replace(
+          REVIEWER_DOSSIER_V1_SIGNATORY,
+          signatory,
+        ),
+      },
+    })),
   };
 }
 

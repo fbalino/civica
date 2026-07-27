@@ -9,6 +9,10 @@ import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
+import {
+  PROJECT_DISCLOSURE,
+  PROJECT_DISCLOSURE_PUBLIC_SECTIONS,
+} from "@/lib/research/project-disclosure";
 
 export const revalidate = 3600;
 
@@ -523,6 +527,44 @@ export default async function AboutPage() {
           stats={null}
           slice={{ from: "standing-posture" }}
         />
+      </Reveal>
+
+      <div
+        style={{
+          height: 1,
+          background: "var(--color-divider)",
+          margin: "var(--spacing-section-y) 0",
+        }}
+      />
+
+      <Reveal
+        as="section"
+        id="project-disclosure"
+        className="editorial-section"
+        amount={0.12}
+      >
+        <h2 className="page-heading">Project funding and independence</h2>
+        {PROJECT_DISCLOSURE_PUBLIC_SECTIONS.map((section) => (
+          <section
+            key={section.id}
+            aria-labelledby={`project-disclosure-${section.id}`}
+          >
+            <h3 id={`project-disclosure-${section.id}`}>{section.heading}</h3>
+            <p>{section.text}</p>
+          </section>
+        ))}
+        <p>
+          Effective {PROJECT_DISCLOSURE.effectiveOn}. The next scheduled review
+          is {PROJECT_DISCLOSURE.nextScheduledReviewOn}; the record is also
+          reviewed after any material change. The{" "}
+          <Link href="https://github.com/fbalino/civica/blob/main/data/research/project-disclosure-v1.json">
+            machine-readable disclosure
+          </Link>{" "}
+          is reused unchanged in Atlas and Index reviewer packets and is
+          mandatory when the Pulse reviewer packet is assembled. Please{" "}
+          <Link href={PROJECT_DISCLOSURE.correctionUrl}>report a correction</Link>{" "}
+          if this disclosure is incomplete or outdated.
+        </p>
       </Reveal>
 
       <div

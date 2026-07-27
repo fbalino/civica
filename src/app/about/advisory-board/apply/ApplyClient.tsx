@@ -58,7 +58,7 @@ function SuccessPanel() {
       </h2>
       <p className="contact-success-body">
         This page is your receipt; no confirmation email is sent. Fernando
-        Balino reviews applications and may write when follow-up is useful.
+        Baliño reviews applications and may write when follow-up is useful.
         Submission does not guarantee a reply, appointment, or review assignment.
       </p>
       <Button variant="secondary" size="sm" href="/about/advisory-board">
@@ -152,11 +152,11 @@ export default function ApplyClient() {
     >
       <section className="editorial-section">
         <p className="editorial-page-subtitle">
-          Civica Atlas accepts private expressions of interest across the five
-          charter areas: governance measurement, political event data,
+          Civica Atlas accepts private expressions of interest in the five areas
+          named by the charter: governance measurement, political event data,
           research-data curation, data-heavy accessibility, and source rights.
-          Fernando Balino reads each application. Applying is not an appointment,
-          a review, or an endorsement.
+          Fernando Baliño reads each application. Submission does not confer
+          membership, a review role, or endorsement.
         </p>
         <p>
           Read the <Link href="/about/advisory-board">board charter</Link> before

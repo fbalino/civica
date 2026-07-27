@@ -15,7 +15,7 @@ Completed 2026-07-11.
 - editorial and methodological prose; and
 - editorial illustrations.
 
-The public About page names exact production models where the repository preserves them. It states that historical agent sessions and launch-corpus images have incomplete model metadata rather than inventing it. Agent audits are internal QA, Spark pilot labels remain permanently non-gold, and no model is described as an author, peer reviewer, or independent validator. Fernando Balino retains publication responsibility.
+The public About page names exact production models where the repository preserves them. It states that historical agent sessions and launch-corpus images have incomplete model metadata rather than inventing it. Agent audits are internal QA, Spark pilot labels remain permanently non-gold, and no model is described as an author, peer reviewer, or independent validator. Fernando Baliño retains publication responsibility.
 
 ## Artifacts
 

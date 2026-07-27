@@ -14,7 +14,7 @@ const privacy = readFileSync("src/app/privacy/page.tsx", "utf8");
 const admin = readFileSync("src/app/(admin)/admin/advisory-applications/[id]/page.tsx", "utf8");
 const adminApi = readFileSync("src/app/api/admin/advisory-applications/[id]/route.ts", "utf8");
 
-for (const phrase of ["board charter", "charter areas", "privacyNoticeVersion", "consent", "no confirmation email", "does not guarantee"])
+for (const phrase of ["board charter", "five areas", "named by the charter", "privacyNoticeVersion", "consent", "no confirmation email", "does not guarantee"])
   assert.ok(form.includes(phrase), `application form missing: ${phrase}`);
 
 assert.ok(api.includes("checkDurableRateLimit"), "application endpoint lacks durable abuse control");
