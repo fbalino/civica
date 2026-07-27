@@ -8,8 +8,8 @@
       "id": "frozen_release",
       "path": "data/releases/atlas-2026-07-11-g2-rc1.zip",
       "role": "Frozen G2 release candidate archive",
-      "bytes": 1869782,
-      "sha256": "decc2d31fbdb7b7ef4dd0341d78ed7d5e9be1a950c223e1f3687fd9f778e0fbf"
+      "bytes": 1869784,
+      "sha256": "16c2075eb83b4239aa83698457c800dce79a6f20ba28a0442671a4137b4056da"
     },
     {
       "id": "bundle_manifest",
@@ -23,7 +23,7 @@
       "path": "data/releases/atlas-2026-07-11/g2-rc1/SHA256SUMS",
       "role": "Release checksums",
       "bytes": 1302,
-      "sha256": "ce47f55fd6b620b327af272916f500ba11e6d833acdbbcc45ee7b484e9b70edd"
+      "sha256": "cbc618a47dd6d46939c874e1d0f6bde85828738e25297f113e4f96327a8be1e6"
     },
     {
       "id": "codebook",
@@ -36,8 +36,8 @@
       "id": "data_dictionary",
       "path": "data/schema-data-dictionary.v1.json",
       "role": "Complete schema data dictionary",
-      "bytes": 1527577,
-      "sha256": "ea7f74c76d910f409ce685b6fc39da68390b2943ba0af3083f4355391e83c00f"
+      "bytes": 1950802,
+      "sha256": "d5cf8893a47c43ee5c26c51f92400e9e36b9f1a0fdb63991fcabeaaf28ff2b87"
     },
     {
       "id": "rights_manifest",
@@ -106,8 +106,8 @@
       "id": "correction_policy",
       "path": "content/policies.md",
       "role": "Correction, retraction, supersession, and preservation policy",
-      "bytes": 16004,
-      "sha256": "e4fc1bead6a6d0823800857c30e75f607d90a23ff49539b1c547694f6bd87420"
+      "bytes": 16124,
+      "sha256": "11c28a97cc291e3b7609a6639853f31f71fb71bc798e339b384da4de8c4da821"
     },
     {
       "id": "project_disclosure",
@@ -129,5 +129,5 @@
     "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
     "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
   ],
-  "semanticSha256": "56bc5b8b61e716652c46f479b4044605956e1a7cd8e5b5a7ed0e632866a6a243"
+  "semanticSha256": "c435d1e248101dc57d5d6230f678dbe8b30afec9d1aa93f1416a45da6c097795"
 }
