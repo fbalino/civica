@@ -28,8 +28,10 @@ release-specific staging criteria without claiming a production release.
 
 The integrated production workflow also fails closed before publication unless
 each World Bank economic component and the aligned all-component population
-cover at least three quarters of the ISO-coded candidate spine. This guard
-prevents a transport or publisher failure from publishing a nearly empty
-global release while preserving honest missing-country rows once the admission
-floor is met. Boundary and catastrophic-partial fixtures are retained in
+cover at least three quarters of the captured ledger's `sovereign_state`
+subset, matching the public Conditions eligibility rule. This guard prevents a
+transport or publisher failure from publishing a nearly empty global release
+while preserving every captured jurisdiction and its honest missing-country
+rows once the admission floor is met. Boundary and catastrophic-partial
+fixtures are retained in
 [`coverage-admission-guard-2026-07-27.md`](coverage-admission-guard-2026-07-27.md).

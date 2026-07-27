@@ -6,12 +6,14 @@ import { join } from "node:path";
 import test from "node:test";
 
 import {
+  CONDITIONS_COVERAGE_ADMISSION_JURISDICTION_STATUS,
   WORLD_BANK_ECONOMIC_CAPTURE_SCHEMA_VERSION,
   WORLD_BANK_ECONOMIC_DATE_RANGE,
   WORLD_BANK_ECONOMIC_INDICATORS,
   WORLD_BANK_ECONOMIC_MINIMUM_COVERAGE_RATIO,
   buildWorldBankEconomicCapture,
   captureWorldBankEconomicInputs,
+  isConditionsCoverageAdmissionEligible,
   prepareGpiConditions,
   prepareHdiConditions,
   readWorldBankEconomicCapture,
@@ -25,11 +27,13 @@ import {
 } from "../production-workflow";
 import type { ConditionsDimension } from "../contract";
 import { CONDITIONS_MISSINGNESS_POLICY } from "../release";
+import { JURISDICTION_STATUS_TYPES } from "../../jurisdictions/status-taxonomy";
 
 const jurisdiction = {
   id: "11111111-1111-4111-8111-111111111111",
   iso2: "UY",
   requestCountryCode: "URY",
+  jurisdictionStatus: "sovereign_state",
 };
 
 test("World Bank request codes use the publisher-specific Kosovo identity", () => {
@@ -165,16 +169,19 @@ const coverageJurisdictions = [
     id: "22222222-2222-4222-8222-222222222222",
     iso2: "FR",
     requestCountryCode: "FRA",
+    jurisdictionStatus: "sovereign_state",
   },
   {
     id: "33333333-3333-4333-8333-333333333333",
     iso2: "DE",
     requestCountryCode: "DEU",
+    jurisdictionStatus: "sovereign_state",
   },
   {
     id: "44444444-4444-4444-8444-444444444444",
     iso2: "JP",
     requestCountryCode: "JPN",
+    jurisdictionStatus: "sovereign_state",
   },
 ] as const;
 
@@ -556,37 +563,44 @@ test("World Bank publisher absence envelopes are retained as not observed", () =
     id: "22222222-2222-4222-8222-222222222222",
     iso2: "AQ",
     requestCountryCode: "ATA",
+    jurisdictionStatus: "dependency_or_territory",
   };
   const observedJurisdictions = [
     {
       id: "33333333-3333-4333-8333-333333333333",
       iso2: "FR",
       requestCountryCode: "FRA",
+      jurisdictionStatus: "sovereign_state",
     },
     {
       id: "44444444-4444-4444-8444-444444444444",
       iso2: "DE",
       requestCountryCode: "DEU",
+      jurisdictionStatus: "sovereign_state",
     },
     {
       id: "55555555-5555-4555-8555-555555555555",
       iso2: "JP",
       requestCountryCode: "JPN",
+      jurisdictionStatus: "sovereign_state",
     },
     {
       id: "66666666-6666-4666-8666-666666666666",
       iso2: "CA",
       requestCountryCode: "CAN",
+      jurisdictionStatus: "sovereign_state",
     },
     {
       id: "77777777-7777-4777-8777-777777777777",
       iso2: "AU",
       requestCountryCode: "AUS",
+      jurisdictionStatus: "sovereign_state",
     },
     {
       id: "88888888-8888-4888-8888-888888888888",
       iso2: "BR",
       requestCountryCode: "BRA",
+      jurisdictionStatus: "sovereign_state",
     },
   ];
   const observedBody = JSON.stringify([
@@ -872,6 +886,117 @@ test("World Bank component and aligned-reference coverage pass exactly at the ad
   assert.equal(observations[3].inflation.valueStatus, "not_observed");
   assert.equal(observations[3].unemployment.valueStatus, "not_observed");
   assert.equal(observations[3].gdpGrowth.valueStatus, "not_observed");
+});
+
+test("Conditions coverage admission matches the public sovereign-state eligibility contract", async () => {
+  assert.equal(
+    CONDITIONS_COVERAGE_ADMISSION_JURISDICTION_STATUS,
+    "sovereign_state",
+  );
+  assert.deepEqual(
+    JURISDICTION_STATUS_TYPES.filter((jurisdictionStatus) =>
+      isConditionsCoverageAdmissionEligible({ jurisdictionStatus }),
+    ),
+    ["sovereign_state"],
+  );
+
+  const querySource = await readFile("src/lib/db/queries.ts", "utf8");
+  const publicReadStart = querySource.indexOf(
+    "export async function getConditionsPublicRelease",
+  );
+  const publicReadEnd = querySource.indexOf(
+    "The non-display Conditions ledger",
+    publicReadStart,
+  );
+  assert.ok(publicReadStart >= 0);
+  assert.ok(publicReadEnd > publicReadStart);
+  const publicReadSource = querySource.slice(publicReadStart, publicReadEnd);
+  const publicEligibilityClause =
+    `AND jurisdiction.type = '${CONDITIONS_COVERAGE_ADMISSION_JURISDICTION_STATUS}'`;
+  assert.equal(
+    publicReadSource.split(publicEligibilityClause).length - 1,
+    2,
+    "public calculation and component reads must use the admission eligibility status",
+  );
+});
+
+test("non-sovereign capture rows neither help nor harm coverage admission", () => {
+  const nonSovereignJurisdictions = [
+    {
+      id: "55555555-5555-4555-8555-555555555555",
+      iso2: "PR",
+      requestCountryCode: "PRI",
+      jurisdictionStatus: "dependency_or_territory",
+    },
+    {
+      id: "66666666-6666-4666-8666-666666666666",
+      iso2: "XK",
+      requestCountryCode: "XKX",
+      jurisdictionStatus: "disputed_or_limited_recognition",
+    },
+  ] as const;
+  const mixedJurisdictions = [
+    ...coverageJurisdictions,
+    ...nonSovereignJurisdictions,
+  ];
+  const mixedCapture = (
+    observationFor: (
+      jurisdictionIndex: number,
+      indicatorId: string,
+    ) => { value: number | null; year?: string },
+  ) =>
+    buildWorldBankEconomicCapture(
+      mixedJurisdictions.flatMap((targetJurisdiction, jurisdictionIndex) =>
+        Object.values(WORLD_BANK_ECONOMIC_INDICATORS).map((indicatorId) => {
+          const observation = observationFor(jurisdictionIndex, indicatorId);
+          return capturedResponse(
+            targetJurisdiction,
+            indicatorId,
+            JSON.stringify([
+              { page: 1 },
+              [
+                {
+                  date: observation.year ?? "2024",
+                  value: observation.value,
+                },
+              ],
+            ]),
+          );
+        }),
+      ),
+    );
+
+  const passingCapture = mixedCapture((jurisdictionIndex, indicatorId) => ({
+    value:
+      jurisdictionIndex < 3 || jurisdictionIndex === 5
+        ? 1
+        : null,
+    year:
+      jurisdictionIndex === 5 &&
+      indicatorId === WORLD_BANK_ECONOMIC_INDICATORS.gdpGrowth
+        ? "2023"
+        : "2024",
+  }));
+  const observations = worldBankEconomicObservationsFromCapture(
+    passingCapture,
+    mixedJurisdictions,
+  );
+  assert.equal(observations.length, 6);
+  assert.equal(observations[4].inflation.valueStatus, "not_observed");
+  assert.equal(observations[5].inflation.valueStatus, "observed");
+  assert.equal(observations[5].gdpGrowth.referenceYear, 2023);
+
+  const failingCapture = mixedCapture((jurisdictionIndex) => ({
+    value: jurisdictionIndex < 2 || jurisdictionIndex >= 4 ? 1 : null,
+  }));
+  assert.throws(
+    () =>
+      worldBankEconomicObservationsFromCapture(
+        failingCapture,
+        mixedJurisdictions,
+      ),
+    /inflation has 2 observed jurisdictions; required at least 3 of 4 sovereign_state jurisdictions/,
+  );
 });
 
 test("World Bank component coverage fails below the adopted floor", () => {

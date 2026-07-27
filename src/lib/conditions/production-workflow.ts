@@ -56,11 +56,15 @@ const WORLD_BANK_CAPTURE_CONCURRENCY = 2;
  *
  * The existing Index ingestion contract requires broad World Bank coverage
  * (180 jurisdictions for its WGI series). Conditions uses a ratio because its
- * ISO-coded candidate spine can change as jurisdiction records are corrected.
- * Three quarters is deliberately stricter than a simple majority while still
- * retaining documented publisher noncoverage as explicit missing rows.
+ * public sovereign-state eligibility set can change as jurisdiction records
+ * are corrected. Three quarters is deliberately stricter than a simple
+ * majority while the captured and released ledger still retains documented
+ * publisher noncoverage for every ISO-coded jurisdiction as explicit missing
+ * rows.
  */
 export const WORLD_BANK_ECONOMIC_MINIMUM_COVERAGE_RATIO = 0.75;
+export const CONDITIONS_COVERAGE_ADMISSION_JURISDICTION_STATUS =
+  "sovereign_state" as const;
 export const WORLD_BANK_ECONOMIC_INDICATORS = {
   inflation: "FP.CPI.TOTL.ZG",
   unemployment: "SL.UEM.TOTL.ZS",
@@ -101,6 +105,13 @@ export interface WorldBankEconomicCapture {
   perPage: typeof WORLD_BANK_PER_PAGE;
   responses: WorldBankEconomicCaptureResponse[];
   captureSha256: string;
+}
+
+export interface ConditionsCoverageAdmissionJurisdiction {
+  id: string;
+  iso2: string;
+  requestCountryCode: string;
+  jurisdictionStatus: string;
 }
 
 interface CaptureCore {
@@ -450,6 +461,15 @@ export function worldBankRequestCountryCode(input: {
     (iso3 ? WORLD_BANK_COUNTRY_CODE_OVERRIDES[iso3] : undefined) ??
     iso3 ??
     input.iso2.toUpperCase()
+  );
+}
+
+export function isConditionsCoverageAdmissionEligible(input: {
+  jurisdictionStatus: string;
+}): boolean {
+  return (
+    input.jurisdictionStatus ===
+    CONDITIONS_COVERAGE_ADMISSION_JURISDICTION_STATUS
   );
 }
 
@@ -871,11 +891,7 @@ export async function writeWorldBankEconomicCapture(
 
 export function worldBankEconomicObservationsFromCapture(
   capture: WorldBankEconomicCapture,
-  expectedJurisdictions: readonly {
-    id: string;
-    iso2: string;
-    requestCountryCode: string;
-  }[],
+  expectedJurisdictions: readonly ConditionsCoverageAdmissionJurisdiction[],
 ): EconomicObservation[] {
   const errors = validateWorldBankEconomicCapture(
     capture,
@@ -902,17 +918,36 @@ export function worldBankEconomicObservationsFromCapture(
       byKey.get(`${id}:${WORLD_BANK_ECONOMIC_INDICATORS.gdpGrowth}`)!,
     ),
   }));
+  const coverageAdmissionJurisdictionIds = new Set(
+    expectedJurisdictions
+      .filter(isConditionsCoverageAdmissionEligible)
+      .map(({ id }) => id),
+  );
+  const coverageAdmissionObservations = observations.filter(({ jurisdictionId }) =>
+    coverageAdmissionJurisdictionIds.has(jurisdictionId),
+  );
+  if (!coverageAdmissionObservations.length) {
+    throw new Error(
+      `World Bank coverage failed closed: no ${CONDITIONS_COVERAGE_ADMISSION_JURISDICTION_STATUS} jurisdictions are eligible for coverage admission`,
+    );
+  }
   const minimumObserved = Math.max(
     1,
     Math.ceil(
-      expectedJurisdictions.length *
+      coverageAdmissionObservations.length *
         WORLD_BANK_ECONOMIC_MINIMUM_COVERAGE_RATIO,
     ),
   );
   const componentObservations = {
-    inflation: observations.map((observation) => observation.inflation),
-    unemployment: observations.map((observation) => observation.unemployment),
-    gdpGrowth: observations.map((observation) => observation.gdpGrowth),
+    inflation: coverageAdmissionObservations.map(
+      (observation) => observation.inflation,
+    ),
+    unemployment: coverageAdmissionObservations.map(
+      (observation) => observation.unemployment,
+    ),
+    gdpGrowth: coverageAdmissionObservations.map(
+      (observation) => observation.gdpGrowth,
+    ),
   };
   for (const [component, componentRows] of Object.entries(
     componentObservations,
@@ -927,18 +962,18 @@ export function worldBankEconomicObservationsFromCapture(
     }
     if (observed < minimumObserved) {
       throw new Error(
-        `World Bank coverage failed closed: ${component} has ${observed} observed jurisdictions; required at least ${minimumObserved} of ${expectedJurisdictions.length}`,
+        `World Bank coverage failed closed: ${component} has ${observed} observed jurisdictions; required at least ${minimumObserved} of ${coverageAdmissionObservations.length} ${CONDITIONS_COVERAGE_ADMISSION_JURISDICTION_STATUS} jurisdictions`,
       );
     }
   }
   const alignedJurisdictions = new Set(
-    buildEconomicReferenceSets(observations).flatMap(
+    buildEconomicReferenceSets(coverageAdmissionObservations).flatMap(
       (referenceSet) => referenceSet.jurisdictionIds,
     ),
   ).size;
   if (alignedJurisdictions < minimumObserved) {
     throw new Error(
-      `World Bank coverage failed closed: aligned all-component reference sets cover ${alignedJurisdictions} jurisdictions; required at least ${minimumObserved} of ${expectedJurisdictions.length}`,
+      `World Bank coverage failed closed: aligned all-component reference sets cover ${alignedJurisdictions} jurisdictions; required at least ${minimumObserved} of ${coverageAdmissionObservations.length} ${CONDITIONS_COVERAGE_ADMISSION_JURISDICTION_STATUS} jurisdictions`,
     );
   }
   return observations;
@@ -1041,18 +1076,27 @@ export async function prepareEconomicConditions(
       id: jurisdictions.id,
       iso2: jurisdictions.iso2,
       iso3: jurisdictions.iso3,
+      jurisdictionStatus: jurisdictions.type,
     })
     .from(jurisdictions)
     .where(isNotNull(jurisdictions.iso2));
   const expectedJurisdictions = jurisdictionRows
     .filter(
-      (row): row is { id: string; iso2: string; iso3: string | null } =>
+      (
+        row,
+      ): row is {
+        id: string;
+        iso2: string;
+        iso3: string | null;
+        jurisdictionStatus: string;
+      } =>
         typeof row.iso2 === "string" && /^[A-Za-z]{2}$/.test(row.iso2),
     )
     .map((row) => ({
       id: row.id,
       iso2: row.iso2.toUpperCase(),
       requestCountryCode: worldBankRequestCountryCode(row),
+      jurisdictionStatus: row.jurisdictionStatus,
     }));
   if (!expectedJurisdictions.length) {
     throw new Error("No jurisdictions with ISO2 codes are available");
