@@ -537,7 +537,7 @@ test("staging rejects an omitted migration or misstated owning task", () => {
   );
 });
 
-test("recovery cannot complete without a bad release and correction publication", () => {
+test("recovery cannot complete without a bad release and retained correction", () => {
   const candidate = clone(recoveryRecord) as RecoveryRehearsalRecord;
   candidate.status = "complete";
   candidate.blocker = null;
@@ -746,6 +746,27 @@ test("pending records reject fabricated provider evidence", () => {
   );
 
   const recovery = clone(recoveryRecord) as RecoveryRehearsalRecord;
+  recovery.status = "pending_external_authority";
+  recovery.blocker = "owner_platform_staging_authority";
+  recovery.candidateCommit = null;
+  recovery.stagingDeploymentId = null;
+  recovery.defectFixture = null;
+  recovery.recoveryMode = null;
+  recovery.recoveredCommit = null;
+  recovery.recoveredDeploymentId = null;
+  recovery.checks = recovery.checks.map((check) => ({
+    ...check,
+    status: "not_run",
+    evidence: null,
+  }));
+  recovery.correction = {
+    incidentId: null,
+    statusRecordId: null,
+    changelogPath: null,
+    correctionRecordId: null,
+  };
+  recovery.signoff.owner = null;
+  recovery.signoff.checkedAt = null;
   recovery.deliberatelyBadRelease = true;
   assert.match(
     recoveryRehearsalErrors(recovery).join("\n"),

@@ -2,7 +2,7 @@
 
 **Contract:** `civica-rollback-forward-fix-rehearsal/v1`
 **Task:** QA-019
-**Current status:** pending external authority
+**Current status:** isolated technical run complete; external status record and owner sign-off pending
 
 The canonical run record is
 `data/rollback-forward-fix-rehearsal.v1.json`. This drill runs only after an

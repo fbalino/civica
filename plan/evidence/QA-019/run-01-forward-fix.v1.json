@@ -1,0 +1,191 @@
+{
+  "schemaVersion": "civica-qa019-forward-fix-rehearsal-evidence/v1",
+  "taskId": "QA-019",
+  "status": "pass",
+  "checkedAt": "2026-07-27T12:46:20.069Z",
+  "fixture": {
+    "id": "qa019-isolated-preview-release-marker",
+    "contract": "civica-qa019-release-marker/v1",
+    "scope": "isolated-preview",
+    "expectedState": "recovered",
+    "productionDataOrSchemaMutation": false
+  },
+  "deliberatelyBadRelease": {
+    "commit": "e7b0f774ee513841a6104ff1615ba57380cabae6",
+    "deploymentId": "dpl_EFszKTseA9kfXjsFLPmuwm74z9hj",
+    "deploymentUrl": "https://civica-87xyv3mui-fbalinos-projects.vercel.app",
+    "readyState": "READY",
+    "target": "preview",
+    "productionAliases": [],
+    "staticAssetManifest": {
+      "files": 738,
+      "bytes": 245927032,
+      "sha256": "d6e570c4b36c85afcfe091a04c3af8a3e3437309c565c19db0ee782da81ab293"
+    },
+    "marker": {
+      "bodySha256": "27532d5f8e64233b28925f37d9a62ce12ca99b0fea22ec89f2effaa9f0f39639",
+      "expectedState": "recovered",
+      "actualState": "bad",
+      "detectedMismatch": true
+    }
+  },
+  "recovery": {
+    "mode": "forward_fix",
+    "commit": "9db1f5c82699de42487fdfbc7646eeb914cbd418",
+    "deploymentId": "dpl_49zyGJp5KPQ4qnzrG2cYxw5Qyyxu",
+    "deploymentUrl": "https://civica-c5n002xin-fbalinos-projects.vercel.app",
+    "readyState": "READY",
+    "target": "preview",
+    "productionAliases": [],
+    "staticAssetManifest": {
+      "files": 738,
+      "bytes": 245927354,
+      "sha256": "184af6beae7c169a2b2693be2fdf635c543fe03fef86c7957246a057d2d8da99"
+    },
+    "marker": {
+      "bodySha256": "32e64ed9a1fad7eb98afcf52a1d31449c2ba157397c48a65f6f974a5af18e593",
+      "expectedState": "recovered",
+      "actualState": "recovered",
+      "detectedMismatch": false
+    },
+    "smokeEvidence": {
+      "path": "plan/evidence/QA-019/recovered-preview-smoke.v1.json",
+      "sha256": "568d0b76849c0dd5fbfa50899af46a148df3d25aafd1b0d2ff4fa17b2ce03096"
+    }
+  },
+  "isolation": {
+    "neonProjectId": "ancient-art-58836757",
+    "neonBranchId": "br-gentle-paper-amsh6g7c",
+    "neonEndpointId": "ep-holy-wave-amcnk005",
+    "databaseHostnameSha256": "927dbb0aec671e18fc4b632a8e466b1e312bee6f35c1190c11084d5c5266bb79",
+    "productionDatabaseExcluded": true,
+    "childMigrationHead": "0051_eminent_jocasta",
+    "childSchemaFingerprint": "5b4e4b180158b583e4db879b4ecfcaae6c3ca81caaeea28118cd0f83b3c6bd3b",
+    "activeCronLeasesBefore": 0,
+    "activeCronLeasesAfter": 0,
+    "sourceFreshnessUnchanged": true
+  },
+  "releaseState": {
+    "conditions": {
+      "releaseId": "conditions-20260727-v1",
+      "methodologyVersion": "conditions-components/v1",
+      "manifestSha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+      "counts": {
+        "calculations": 340,
+        "components": 818,
+        "scores": 101
+      },
+      "apiStatus": 200
+    },
+    "index": {
+      "releaseId": "ci-beta-r5-2024-Q4",
+      "apiStatus": 200
+    },
+    "pulse": {
+      "runId": "ea97916f-cc5d-4a18-9795-27805c4cfe3c",
+      "runtimeMethod": "pulse-v2.15-beta",
+      "apiStatus": 200
+    }
+  },
+  "correction": {
+    "syntheticRehearsal": true,
+    "containsPersonalData": false,
+    "public": false,
+    "category": "other",
+    "correctionRecordId": "7e914c77-1727-4f85-bd41-38a2e43f43e8",
+    "correctionStatus": "resolved_no_change",
+    "monitoringEventId": "9c1a6d6c-654a-4f0f-a7ed-9f9644c997ce",
+    "monitoringStatus": "resolved",
+    "monitoringReleaseId": "dpl_EFszKTseA9kfXjsFLPmuwm74z9hj",
+    "issueLinkRecordType": "correction",
+    "resolvedAt": "2026-07-27T12:39:01.213Z",
+    "changelogPath": "plan/evidence/QA-019/correction-changelog.md",
+    "externalStatusRecordId": null,
+    "ownerSignoff": null
+  },
+  "productionReadOnlyCheck": {
+    "projectId": "ancient-art-58836757",
+    "branchId": "br-dawn-frog-amrf0h6a",
+    "endpointId": "ep-bitter-night-amod9dl6",
+    "migrationHead": "0032_sparkling_genesis",
+    "ledgerPresent": true,
+    "hostnameSha256": "c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b",
+    "writesPerformed": 0
+  },
+  "validators": [
+    {
+      "command": "npm run build",
+      "scope": "bad candidate clean Vercel build output",
+      "status": "pass"
+    },
+    {
+      "command": "npm run build",
+      "scope": "recovered candidate clean Vercel build output",
+      "status": "pass"
+    },
+    {
+      "command": "npm run validate:authoritative-migrations:live",
+      "status": "pass",
+      "result": "51/51; head 0051_eminent_jocasta"
+    },
+    {
+      "command": "npm run validate:conditions-release:live -- --release-id=conditions-20260727-v1 --expectations-input=<checked-artifact> --expected-expectations-sha256=<checked-hash> --expected-project=<child-project> --expected-branch=<child-branch> --expected-hostname-sha256=<child-host-hash> --forbidden-branch=<production-branch> --forbidden-hostname-sha256=<production-host-hash> --required-migration-head=0051_eminent_jocasta",
+      "status": "pass",
+      "result": "340 calculations; 818 components; 101 scores; manifest replay matched; zero writes"
+    },
+    {
+      "command": "npm run validate:pulse-delta-lifecycle:live",
+      "status": "pass",
+      "result": "325 rows; 65 jurisdictions; 1950 immutable outputs across 6 runs"
+    },
+    {
+      "command": "node --import tsx scripts/validate-error-monitoring.ts",
+      "status": "pass"
+    }
+  ],
+  "checks": {
+    "detect-seeded-defect": "The bad Preview returned expected=recovered and actual=bad with a content hash matching the bad marker.",
+    "quiesce-jobs": "The disposable branch had zero active cron leases before and after read-only verification.",
+    "contain-traffic": "Both deployments were protected Preview targets with no production alias.",
+    "select-compatible-recovery": "A one-line forward fix was selected; no migration, release rollback, or data deletion was used.",
+    "restore-or-forward-fix-app": "The recovered commit received a fresh full build and distinct Ready Preview deployment.",
+    "verify-data-state": "Migration ledger, schema fingerprint, Conditions, Index, Pulse, and source freshness remained exact.",
+    "verify-cache-state": "Mutable, checked, and frozen cache policies matched the QA-018 release contract.",
+    "verify-artifact-state": "Both static manifests and both marker bodies were hash-bound; the recovered marker matched.",
+    "verify-version-metadata": "Conditions, Index, Pulse, application commit, and deployment identities reconciled.",
+    "retain-correction-record": "A non-public, no-personal-data synthetic correction was retained, linked, and resolved_no_change.",
+    "retain-local-changelog": "The local correction changelog records the staging-only defect, recovery, and no-data-change outcome.",
+    "keep-jobs-quiesced": "The child remained at zero active cron leases; no job resumption or production cron action is claimed."
+  },
+  "boundaries": {
+    "badBranchMergedToMain": false,
+    "productionAliasAssigned": false,
+    "productionDatabaseMutated": false,
+    "productionDeploymentPerformed": false,
+    "externalStatusRecordCreated": false,
+    "ownerSignoffRecorded": false,
+    "paidModelCallsPerformed": false
+  },
+  "recentVercelFailureNotifications": {
+    "qa019DeploymentsInError": 0,
+    "unrelatedErrors": [
+      {
+        "kind": "superseded-main-deployment",
+        "commit": "fb8563da2504c358d681369d6f0560eb6be0d3d9",
+        "cause": "migration history absent from that Main checkout"
+      },
+      {
+        "kind": "dependabot-preview",
+        "branch": "dependabot/npm_and_yarn/typescript-7.0.2",
+        "commit": "6c42c301d170acc03bd3b9022961701f71d828e5",
+        "cause": "dependency-update build failure"
+      },
+      {
+        "kind": "dependabot-preview",
+        "branch": "dependabot/npm_and_yarn/maplibre-gl-6.0.0",
+        "commit": "335111aa2b1736434da05ed76c1006a804ed6b73",
+        "cause": "MapLibre 6 type mismatch in CountryMap dynamic import"
+      }
+    ]
+  }
+}

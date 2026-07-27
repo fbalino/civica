@@ -1,43 +1,89 @@
 {
   "schemaVersion": "civica-rollback-forward-fix-rehearsal/v1",
   "taskId": "QA-019",
-  "status": "pending_external_authority",
-  "blocker": "owner_platform_staging_authority",
-  "deliberatelyBadRelease": false,
-  "candidateCommit": null,
-  "stagingDeploymentId": null,
-  "defectFixture": null,
-  "recoveryMode": null,
-  "recoveredCommit": null,
-  "recoveredDeploymentId": null,
+  "status": "run_complete_pending_owner_signoff",
+  "blocker": "owner_status_record_and_post_run_signoff",
+  "deliberatelyBadRelease": true,
+  "candidateCommit": "e7b0f774ee513841a6104ff1615ba57380cabae6",
+  "stagingDeploymentId": "dpl_EFszKTseA9kfXjsFLPmuwm74z9hj",
+  "defectFixture": "qa019-isolated-preview-release-marker",
+  "recoveryMode": "forward_fix",
+  "recoveredCommit": "9db1f5c82699de42487fdfbc7646eeb914cbd418",
+  "recoveredDeploymentId": "dpl_49zyGJp5KPQ4qnzrG2cYxw5Qyyxu",
   "checks": [
-    { "id": "detect-seeded-defect", "status": "not_run", "evidence": null },
-    { "id": "quiesce-jobs", "status": "not_run", "evidence": null },
-    { "id": "contain-traffic", "status": "not_run", "evidence": null },
-    { "id": "select-compatible-recovery", "status": "not_run", "evidence": null },
-    { "id": "restore-or-forward-fix-app", "status": "not_run", "evidence": null },
-    { "id": "verify-data-state", "status": "not_run", "evidence": null },
-    { "id": "verify-cache-state", "status": "not_run", "evidence": null },
-    { "id": "verify-artifact-state", "status": "not_run", "evidence": null },
-    { "id": "verify-version-metadata", "status": "not_run", "evidence": null },
-    { "id": "publish-correction-record", "status": "not_run", "evidence": null },
-    { "id": "retain-local-changelog", "status": "not_run", "evidence": null },
-    { "id": "keep-jobs-quiesced", "status": "not_run", "evidence": null }
+    {
+      "id": "detect-seeded-defect",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.detect-seeded-defect"
+    },
+    {
+      "id": "quiesce-jobs",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.quiesce-jobs"
+    },
+    {
+      "id": "contain-traffic",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.contain-traffic"
+    },
+    {
+      "id": "select-compatible-recovery",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.select-compatible-recovery"
+    },
+    {
+      "id": "restore-or-forward-fix-app",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.restore-or-forward-fix-app"
+    },
+    {
+      "id": "verify-data-state",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.verify-data-state"
+    },
+    {
+      "id": "verify-cache-state",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.verify-cache-state"
+    },
+    {
+      "id": "verify-artifact-state",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.verify-artifact-state"
+    },
+    {
+      "id": "verify-version-metadata",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.verify-version-metadata"
+    },
+    {
+      "id": "retain-correction-record",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.retain-correction-record"
+    },
+    {
+      "id": "retain-local-changelog",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.retain-local-changelog"
+    },
+    {
+      "id": "keep-jobs-quiesced",
+      "status": "pass",
+      "evidence": "plan/evidence/QA-019/run-01-forward-fix.v1.json#checks.keep-jobs-quiesced"
+    }
   ],
   "correction": {
-    "incidentId": null,
+    "incidentId": "9c1a6d6c-654a-4f0f-a7ed-9f9644c997ce",
     "statusRecordId": null,
-    "changelogPath": null,
-    "correctionRecordId": null
+    "changelogPath": "plan/evidence/QA-019/correction-changelog.md",
+    "correctionRecordId": "7e914c77-1727-4f85-bd41-38a2e43f43e8"
   },
   "signoff": {
     "owner": null,
     "checkedAt": null,
     "remainingManualChecks": [
-      "Authorize a deliberately defective release only in the isolated staging environment.",
-      "Choose a harmless deterministic defect fixture that cannot touch production or retained research evidence.",
-      "Exercise detection, containment, compatible rollback or forward fix, cache/artifact/version verification, and correction publication.",
-      "Record bounded evidence and owner sign-off."
+      "Review and create the external status record without notifying subscribers.",
+      "Fernando reviews the retained recovery evidence and records approval or rejection."
     ]
   }
 }

@@ -81,15 +81,16 @@ This batch includes:
 - internationalized stored-name migration/source refresh;
 - Pulse drift, decay/lifecycle, and private-workspace migrations;
 - deployment of the locked Pulse method and one complete scheduled cycle;
-- the deliberate isolated rollback or forward-fix rehearsal.
+- QA-019's real external status record and Fernando's dated technical-run
+  disposition.
 
-The 2026-07-26 isolated run completed the then-current `0050` technical checks
-and the staging-verifiable ATL-016, ATL-029, and ATL-030 criteria while
-excluding production. The later forward-only `0051` constraint migration means
-that run is historical rather than current-candidate QA-018 evidence. ATL-026
-and ATL-027 remain open because production migration and publication need
-separate authority. The other checked plans remain zero-write or
-pending-authority records and cannot close from fixtures alone.
+The 2026-07-27 exact-candidate run completed the `0051` QA-018 technical
+checks and preserved ATL-016, ATL-029, and ATL-030 while excluding production.
+QA-018 now awaits Fernando's dated disposition. QA-019's protected
+bad-Preview → forward-fix run also completed with retained local correction
+and monitoring evidence; it now awaits a real external status record and
+Fernando's dated disposition. ATL-026 and ATL-027 remain open until their
+production migration and publication evidence exists.
 
 ### 3. Required external evidence unavailable — 1
 
@@ -148,12 +149,12 @@ release, or imply approvals that do not exist.
    EXP-025/QA-013, and PLT-029 facts.
 2. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
    IDX-034, BRD-003, BRD-010, and BRD-012.
-3. Authorize and run the exact integrated QA-018 candidate through `0051` in a
-   disposable nonproduction environment, review that new packet, then
-   separately authorize the required production Atlas, Conditions,
-   internationalization, and Pulse migrations or refreshes.
-4. Run the authorized Wikidata refreshes, deployed delivery checks, and
-   isolated QA-019 recovery rehearsal.
+3. Review the exact integrated QA-018 `0051` packet, record the owner
+   disposition, then execute and retain the authorized production Atlas,
+   Conditions, internationalization, and Pulse migrations or refreshes.
+4. Run the authorized Wikidata refreshes and deployed delivery checks; create
+   QA-019's external status record and record Fernando's retained-run
+   disposition.
 5. Deploy the locked Pulse method, complete one full scheduled cycle, record
    the non-backdated PUL-040 start, and allow PUL-026 to run for 90 days.
 6. Execute Pulse evaluation and disposition, regenerate the review packet,

@@ -192,11 +192,12 @@ Production promotion remains a separate decision.
    evidence appears at `/api/v1/pulse/source-coverage` and
    `/api/v1/pulse/cluster-coverage`; neither route proves the 90-day clock has
    started.
-6. **[QA-019 last — rehearse recovery](evidence/QA-019/README.md).** In staging
-   only, follow the [rollback/forward-fix rehearsal](../data/ROLLBACK-FORWARD-FIX-REHEARSAL.md),
-   release the prepared deliberately bad candidate, demonstrate detection and
-   containment, then rollback or forward-fix it. Retain cache, artifact,
-   version, status, and correction evidence plus the dated sign-off.
+6. **[QA-019 last — review recovery](evidence/QA-019/README.md).** The
+   isolated bad-Preview → forward-fix technical run, local correction, and
+   monitoring evidence are complete. Create the real external status record
+   without notifying subscribers, link its opaque ID in the canonical record,
+   then have Fernando approve or reject the retained packet with a date. Do
+   not relabel the local changelog as an external status publication.
 
 The remaining authority/sign-off task set is ATL-010, ATL-020, ATL-024,
 ATL-026, ATL-027, DAT-036, EXP-029, PUL-024, PUL-027, PUL-040, PUL-043,

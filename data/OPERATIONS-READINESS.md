@@ -87,18 +87,22 @@ and P1 operational finding below is closed.
 - `civica-deployment-rehearsal/v1` passes its local 18-migration staged-order,
   compatibility, abort, validation-only deployment, cache/release boundary,
   and forward-only recovery fixtures.
-- The 2026-07-26 isolated rehearsal migrated a disposable Neon child through
-  authoritative head `0050`, published the bound Conditions release there,
-  deployed exact candidate `fb7376f3` to Vercel Preview, and passed the
-  release-pointer, cache, protected-route, idempotent non-model dry-run,
-  unchanged-freshness, API, and responsive-browser checks. Exact Preview
-  runtime identity excluded the production branch and host; production was
-  untouched. The integrated candidate now adds forward migration `0051`, so
-  that run remains historical evidence and QA-018 requires a new isolated
-  technical run before Fernando has a current packet to approve or reject.
-- QA-019 still has no deliberately bad isolated release rollback or
-  forward-fix evidence. A Neon Console or browser sign-in is not an accepted
-  operator path for the remaining CLI-run work.
+- The 2026-07-27 exact-candidate rehearsal migrated a disposable Neon child
+  through authoritative head `0051`, published and replayed the bound
+  Conditions release, rebuilt the Index pointers, retained a deterministic
+  model-free Pulse successor, deployed candidate `61351a43` to a protected
+  Vercel Preview, and passed release, cache, protected-route, idempotent
+  non-model dry-run, unchanged-freshness, API, responsive-browser, migration,
+  schema, and production-build checks. Production remained read-only at
+  `0032_sparkling_genesis`. QA-018 now awaits Fernando's dated disposition.
+- QA-019's isolated technical run is complete. A deliberately mismatched
+  release marker was detected on one protected Preview, then a one-line
+  forward fix received a fresh full build and distinct Ready Preview. Both
+  deployments had no production alias; the child stayed at zero active
+  leases with unchanged release/data state. A synthetic non-public correction
+  and bounded monitoring event were linked and resolved with no Atlas data
+  change. The external status record and Fernando's dated disposition remain
+  open; no subscriber notice or owner sign-off is claimed.
 - Conditions migrations/releases, Pulse workspace reconciliation, observability
   migrations, and other production promotions remain authority-gated. This
   report does not authorize them.
@@ -124,14 +128,13 @@ and P1 operational finding below is closed.
 2. **Hosted CI — owner/platform:** observe passing pull-request and `main`
    workflows and require the canonical `verify` job through branch protection.
 3. **Isolated release disposition and production authority — owner/platform:**
-   authorize a new exact-candidate QA-018 run through `0051`, then review its
-   retained packet and record a dated approval or rejection. Separately
-   authorize or reject the prepared ATL-026/ATL-027 production Conditions
-   migration and release batch; neither the historical rehearsal nor a new
-   Preview run grants production authority.
-4. **Rollback/correction rehearsal — owner/platform:** complete QA-019 with a
-   deliberately bad staged release and verify cache, artifact, status, and
-   changelog consistency.
+   review the current QA-018 `0051` packet and record a dated approval or
+   rejection. Separately retain the production migration/release evidence for
+   the authorized ATL-026/ATL-027 batch; staging evidence is not production
+   evidence.
+4. **Rollback/correction disposition — owner/platform:** create the real
+   external status record without notifying subscribers, then review the
+   retained QA-019 packet and record Fernando's dated approval or rejection.
 5. **Cross-instance rate limiting — owner/platform:** complete the Preview
    concurrency, forwarding-header, fail-closed outage, and recovery proof.
 6. **Monitoring and status providers — owner/provider:** enable and verify

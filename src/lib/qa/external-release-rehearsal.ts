@@ -111,7 +111,7 @@ export const RECOVERY_CHECK_IDS = [
   "verify-cache-state",
   "verify-artifact-state",
   "verify-version-metadata",
-  "publish-correction-record",
+  "retain-correction-record",
   "retain-local-changelog",
   "keep-jobs-quiesced",
 ] as const;
