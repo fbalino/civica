@@ -502,13 +502,30 @@
 }
 
 html:root {
-  /* Multi-pane reference surfaces use a documented 1280px content width.
-     These are runtime layout contracts (not Tailwind utility tokens), so they
-     live in :root. The shell adds canonical gutters outside that width. */
+  /* Canonical outer page widths. Page type selects one of these four roles;
+     routes never invent a fifth width. These are runtime layout contracts
+     (not Tailwind utility tokens), so they live in :root. */
+  --width-page-reading: 760px;
+  --width-page-wide: 960px;
+  --width-page-standard: 1200px;
   --width-reference-content: 1280px;
   --width-reference-shell: calc(
     var(--width-reference-content) + var(--space-6) + var(--space-6)
   );
+
+  /* Internal tracks belong to a named shell. Keeping them separate from the
+     four outer widths lets Methodology, country reference pages, Constitution,
+     and The Record retain their deliberate reading geometry without page-local
+     magic numbers. */
+  --width-document-rail: 220px;
+  --width-document-body: 800px;
+  --width-rail-compact: 200px;
+  --width-country-rail: 240px;
+  --width-country-context: 280px;
+  --width-constitution-outline: 180px;
+  --width-constitution-context: 360px;
+  --width-record-rail: var(--width-rail-compact);
+  --width-record-body: 680px;
 }
 
 /* Dark mode override. Light mode remains the default token set above. */
@@ -2879,7 +2896,7 @@ a {
 }
 
 .record-main {
-  max-width: 1200px;
+  max-width: var(--width-page-standard);
   margin: 0 auto;
   padding: 48px var(--spacing-page-x) 120px;
 }
@@ -3325,7 +3342,7 @@ a {
 }
 
 .post-article {
-  max-width: 1180px;
+  max-width: var(--width-reference-shell);
   margin: 0 auto;
   padding: 32px var(--spacing-page-x) 120px;
 }
@@ -3474,8 +3491,11 @@ a {
 /* Body grid: rail + column */
 .post-body-grid {
   display: grid;
-  grid-template-columns: 200px minmax(0, 680px) 200px;
-  gap: 48px;
+  grid-template-columns:
+    var(--width-record-rail)
+    minmax(0, var(--width-record-body))
+    var(--width-record-rail);
+  gap: var(--space-8);
   justify-content: center;
 }
 

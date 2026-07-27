@@ -11,12 +11,13 @@
 
 .civica-data-body {
   /* GEOMETRY CLONE of .factbook-body (factbook.css) — the two country tabs
-     share one surface: same 1280px content width, same 240px sidebar column, same
-     gap and padding, the SAME <FactbookSidebar> component. Owner mandate
+     share one surface: same reference content width, same
+     --width-country-rail sidebar, same gap and padding, and the SAME
+     <FactbookSidebar> component. Owner mandate
      (2026-07-05): these tabs must never drift apart again. The only
      difference is the absent right rail (this tab has none). */
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-columns: var(--width-country-rail) minmax(0, 1fr);
   gap: var(--space-7);
   max-width: var(--width-reference-shell);
   margin: 0 auto;
@@ -319,7 +320,7 @@
  * ---------------------------------------------------------------- */
 @media (max-width: 1100px) {
   .civica-data-body {
-    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-columns: var(--width-rail-compact) minmax(0, 1fr);
     gap: var(--space-6);
   }
 }

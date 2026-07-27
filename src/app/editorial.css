@@ -18,13 +18,13 @@
 /* ── Page container ─────────────────────────────────────────────── */
 
 .editorial-page {
-  max-width: 760px;
+  max-width: var(--width-page-reading);
   margin: 0 auto;
   padding: 60px var(--space-6) 80px;
   color: var(--color-text-primary);
 }
-.editorial-page--wide  { max-width: 960px;  }
-.editorial-page--full  { max-width: 1200px; }
+.editorial-page--wide  { max-width: var(--width-page-wide); }
+.editorial-page--full  { max-width: var(--width-page-standard); }
 .editorial-page--reference { max-width: var(--width-reference-shell); }
 
 @media (max-width: 480px) {
@@ -362,8 +362,8 @@
   color: var(--color-text-40);
   border-bottom: 1px solid var(--color-card-border);
 }
-.editorial-section tbody td,
-.editorial-data-table tbody td {
+.editorial-section tbody > tr > :is(th, td),
+.editorial-data-table tbody > tr > :is(th, td) {
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-card-border);
   color: var(--color-text-primary);
@@ -373,10 +373,15 @@
      columns aligned with tabular figures. */
   font-variant-numeric: tabular-nums;
 }
-.editorial-data-table tbody tr:last-child td {
+.editorial-section tbody > tr > th[scope="row"],
+.editorial-data-table tbody > tr > th[scope="row"] {
+  text-align: left;
+  font-weight: var(--font-weight-regular);
+}
+.editorial-data-table tbody tr:last-child > :is(th, td) {
   border-bottom: 0;
 }
-.editorial-data-table tbody tr:hover td {
+.editorial-data-table tbody tr:hover > :is(th, td) {
   background: var(--color-card-hover-bg, var(--color-card-bg));
 }
 .editorial-section td.editorial-td-num,
@@ -624,11 +629,11 @@
  */
 
 .methodology-layout {
-  max-width: 1200px;
+  max-width: var(--width-page-standard);
   margin: 0 auto;
   padding: 0 var(--spacing-page-x, 40px);
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
+  grid-template-columns: var(--width-document-rail) minmax(0, 1fr);
   gap: var(--space-9);
   color: var(--color-text-primary);
   overflow-x: clip;
@@ -643,7 +648,7 @@
 
 .methodology-content {
   width: 100%;
-  max-width: 800px;
+  max-width: var(--width-document-body);
   min-width: 0;
   padding: 60px 0 80px; /* 60px/80px — no exact tokens */
 }
@@ -2127,7 +2132,7 @@ legend.editorial-filter-label {
  * the width the old picker pane used is given back to the reading column. */
 .constitution-explorer {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) var(--width-constitution-context);
   gap: var(--space-7);
   align-items: start;
 }
@@ -2404,7 +2409,7 @@ legend.editorial-filter-label {
 
 .constitution-reader-layout {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
+  grid-template-columns: var(--width-constitution-outline) minmax(0, 1fr);
   gap: var(--space-6);
   align-items: start;
 }
@@ -4747,12 +4752,12 @@ a.constitution-xref-card-country:hover {
 /* Canonical A–Z country directory. Shared by /country,
    /governance-evidence, and the design-system reference. */
 .country-directory {
-  column-count: 4;
-  column-gap: var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
 }
 .country-directory__group {
-  break-inside: avoid;
-  margin-bottom: var(--space-6);
+  scroll-margin-top: calc(var(--header-height) + var(--space-5));
 }
 .country-directory__heading {
   display: flex;
@@ -4761,6 +4766,12 @@ a.constitution-xref-card-country:hover {
   margin-bottom: var(--space-2);
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-border-default);
+}
+.country-directory__entries {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--space-6);
+  row-gap: var(--space-1);
 }
 .country-directory__letter {
   font-family: var(--font-heading);
@@ -4793,20 +4804,31 @@ a.constitution-xref-card-country:hover {
   flex-shrink: 0;
 }
 .country-directory__name {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
+  column-gap: var(--space-2);
+  row-gap: var(--space-1);
+}
+.country-directory__label {
   color: var(--color-text-primary);
   font-family: var(--font-heading);
   font-size: var(--text-15);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: var(--leading-normal);
 }
 .country-directory__status {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
   color: var(--color-text-muted);
   font-family: var(--font-body);
   font-size: var(--text-11);
   white-space: nowrap;
+}
+.country-directory__status-separator {
+  color: var(--color-border-strong);
 }
 .country-directory__dot {
   width: var(--space-3);
@@ -4879,16 +4901,19 @@ a.constitution-xref-card-country:hover {
   height: var(--space-3);
 }
 @media (max-width: 1080px) {
-  .country-directory { column-count: 3; }
+  .country-directory__entries {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 @media (max-width: 768px) {
-  .country-directory {
-    column-count: 2;
-    column-gap: var(--space-5);
+  .country-directory__entries {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 480px) {
-  .country-directory { column-count: 1; }
+  .country-directory__entries {
+    grid-template-columns: 1fr;
+  }
   .jurisdiction-status-disclosure__panel {
     inset-inline-start: auto;
     inset-inline-end: 0;

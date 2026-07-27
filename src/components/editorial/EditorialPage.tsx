@@ -7,10 +7,10 @@ interface EditorialPageProps {
   /**
    * Layout width. Maps to the global modifier classes defined in
    * `src/app/editorial.css`:
-   *   narrow → max-width 760px (short-form editorial / blog posts)
-   *   wide   → max-width 960px (changelog/list surfaces)
-   *   full   → max-width 1200px (atlas-scale layouts, no sidebar)
-   *   reference → 1280px content + gutters (multi-pane reference surfaces)
+   *   narrow → --width-page-reading (short-form editorial / blog posts)
+   *   wide   → --width-page-wide (changelog/list surfaces)
+   *   full   → --width-page-standard (atlas-scale layouts, no sidebar)
+   *   reference → --width-reference-content + gutters (multi-pane references)
    *
    * IMPORTANT — read DESIGN.md before picking a width. Methodology
    * pages do NOT use any of these widths; they use

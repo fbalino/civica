@@ -66,15 +66,22 @@ Letter-spacing uses `--tracking-*` tokens: `--tracking-tighter` (-0.04em), `--tr
 
 ## Layout
 
-Use the standard container widths:
+Use exactly four outer container widths. The CSS values live in `html:root`;
+components and page CSS consume the named tokens rather than repeating numbers:
 
-- `.editorial-page` — 760px narrow reading column.
-- `.editorial-page--wide` — 960px medium editorial/list surface.
-- `.editorial-page--full` — 1200px standard product/editorial surface. This is the default target for most pages.
+- `.editorial-page` — `--width-page-reading`, the narrow reading column.
+- `.editorial-page--wide` — `--width-page-wide`, the medium editorial/list surface.
+- `.editorial-page--full` — `--width-page-standard`, the standard product/editorial surface and default target for most pages.
 - `.editorial-page--reference` — `var(--width-reference-content)` (1280px) plus standard outer gutters for multi-pane reference surfaces such as the country tabs and Constitution Explorer. Pass `width="reference"` to `<EditorialPage>`.
-- `.methodology-layout` — 1200px methodology shell with a left `ReaderSidebar` and no country search input.
+- `.methodology-layout` — the standard page width with `--width-document-rail` and `--width-document-body`, plus a left `ReaderSidebar` and no country search input.
 - `.factbook-body` — uses the reference-width contract because it carries two sidebars. The paired `--width-reference-shell` adds the standard `--space-6` gutters outside that content width; never treat 1280px as the padded outer box.
-- **The `/country/[slug]` tabs (Factbook · Civica Data · Constitution) are ONE surface**: every tab uses the `.factbook-body` geometry (`--width-reference-content`, 240px left column, `--space-7` gap, same padding — `.civica-data-body` is a documented clone) and the SAME `<FactbookSidebar>`/`ReaderSidebar` component for its "On this page" nav, with `<CountryJumpSearch>` at the identical position above the body grid. The masthead, tab bar, body grids, sticky country search, country Constitution reading shell, and Constitution Explorer all resolve from the same reference-width tokens. Never give a country tab its own nav markup, column widths, or search placement (owner mandate 2026-07-05, after the tabs drifted).
+- **The `/country/[slug]` tabs (Factbook · Civica Data · Constitution) are ONE surface**: every tab uses the `.factbook-body` geometry (`--width-reference-content`, `--width-country-rail`, `--width-country-context`, `--space-7`, and the same padding — `.civica-data-body` is the two-track variant) and the SAME `<FactbookSidebar>`/`ReaderSidebar` component for its "On this page" nav, with `<CountryJumpSearch>` at the identical position above the body grid. The masthead, tab bar, body grids, sticky country search, country Constitution reading shell, and Constitution Explorer all resolve from the same reference-width tokens. Never give a country tab its own nav markup, column widths, or search placement (owner mandate 2026-07-05, after the tabs drifted).
+
+Outer width and internal reading geometry are separate decisions. Methodology,
+country-reference, Constitution, and Record layouts use named rail/body tokens
+inside one of the four outer containers; their narrower prose columns do not
+create additional page widths. A new layout either composes those roles or
+extends this system once in `globals.css`, `/design-system`, and this document.
 
 **Hero sections** are full-bleed bands (`width: 100vw; margin-left: calc(50% - 50vw)`) and MUST share one canonical height via **`var(--hero-height)`** (`clamp(460px, 44vw, 640px)`) so every hero reads as one design language. **The single canonical page hero is the `<PageHero>` component** (`src/components/PageHero.tsx`) — every browse/landing page uses it, never a hand-rolled hero (see the Hero subsection under "Editorial layout classes" below). It composes the `.factbook-landing-hero` / `.factbook-hero-*` class family, which the homepage (`.home-hero`) also mirrors. On mobile heroes relax to content height. The per-country factbook masthead (`.factbook-hero--art`) is a distinct engraving-overlay pattern, not a section hero. Do NOT give a new hero a one-off height, width, or markup; use `<PageHero>`. Whenever a country/territory masthead renders an engraving (`engravingSrc` set), `FactbookHeaderStrip` always renders the `.factbook-hero-caption` disclosure — the "Editorial engraving" label plus a `.factbook-hero-caption-link` linking to `/licensing#imagery` — even when no landmark caption text is available for that page. The link uses `pointer-events: auto` against the caption's own `pointer-events: none`; keep that override if you touch the caption styles.
 
@@ -153,12 +160,12 @@ Page type drives the layout, not the prose length. **Do not default to `width="n
 
 | Page type                                        | Class / prop                                                         | Width                    | Sidebar?                            | Examples                                                                                                                                                                                  |
 | ------------------------------------------------ | -------------------------------------------------------------------- | ------------------------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Methodology page or methodology subpage          | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px                   | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
-| Legal / policy / ANY multi-section document page | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px                   | Yes (left, sticky, section anchors) | `/privacy`, `/terms`                                                                                                                                                                      |
-| Filterable list / changelog                      | `<EditorialPage width="wide">`                                       | 960px                    | No                                  | `/civica-index/pulse-changelog`                                                                                                                                                           |
-| Standard product/editorial page                  | `<EditorialPage width="full">`                                       | 1200px                   | No                                  | Atlas-scale layouts                                                                                                                                                                       |
-| Multi-pane reference surface                     | `<EditorialPage width="reference">`                                  | 1280px content + gutters | Optional                            | `/constitution`, `/country/[slug]` tabs                                                                                                                                                   |
-| Short-form editorial / blog                      | `<EditorialPage>` (default `width="narrow"`)                         | 760px                    | No                                  | Single-topic blog posts, short essays                                                                                                                                                     |
+| Methodology page or methodology subpage          | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | `--width-page-standard`  | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
+| Legal / policy / ANY multi-section document page | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | `--width-page-standard`  | Yes (left, sticky, section anchors) | `/privacy`, `/terms`                                                                                                                                                                      |
+| Filterable list / changelog                      | `<EditorialPage width="wide">`                                       | `--width-page-wide`      | No                                  | `/civica-index/pulse-changelog`                                                                                                                                                           |
+| Standard product/editorial page                  | `<EditorialPage width="full">`                                       | `--width-page-standard`  | No                                  | Atlas-scale layouts                                                                                                                                                                       |
+| Multi-pane reference surface                     | `<EditorialPage width="reference">`                                  | reference + gutters      | Optional                            | `/constitution`, `/country/[slug]` tabs, Record articles                                                                                                                                 |
+| Short-form editorial / blog                      | `<EditorialPage>` (default `width="narrow"`)                         | `--width-page-reading`   | No                                  | Single-topic blog posts, short essays                                                                                                                                                     |
 
 **Default disambiguation rule**: if the URL is under `/methodology`, `/*/methodology`, or otherwise documents a methodology decision, use `methodology-layout`. Reaching for `width="narrow"` on a methodology page is wrong even if the prose feels short — methodology pages share a sidebar convention readers expect to find.
 
@@ -190,11 +197,11 @@ Props:
 
 Container classes:
 
-- `.editorial-page` — narrow column (760px), default. Applied by `<EditorialPage>` automatically when no className/width override is set.
-- `.editorial-page--wide` — 960px column for filterable lists / changelogs. Pass `width="wide"` to `<EditorialPage>`.
-- `.editorial-page--full` — 1200px standard product/editorial width. Pass `width="full"` to `<EditorialPage>`.
-- `.editorial-page--reference` — 1280px multi-pane reference width. Pass `width="reference"` to `<EditorialPage>`.
-- `.methodology-layout` — 1200px methodology shell with left sidebar (220px) + content (max 800px). Pass via `className="methodology-layout"` and pair with `<ReaderSidebar items={...} className="methodology-sidebar">` plus `<article className="methodology-content">` wrapping the prose.
+- `.editorial-page` — `--width-page-reading`, default. Applied by `<EditorialPage>` automatically when no className/width override is set.
+- `.editorial-page--wide` — `--width-page-wide` for filterable lists / changelogs. Pass `width="wide"` to `<EditorialPage>`.
+- `.editorial-page--full` — `--width-page-standard` for standard product/editorial surfaces. Pass `width="full"` to `<EditorialPage>`.
+- `.editorial-page--reference` — `--width-reference-content` plus gutters for multi-pane reference surfaces. Pass `width="reference"` to `<EditorialPage>`.
+- `.methodology-layout` — standard page shell with `--width-document-rail` + `--width-document-body`. Pass via `className="methodology-layout"` and pair with `<ReaderSidebar items={...} className="methodology-sidebar">` plus `<article className="methodology-content">` wrapping the prose.
 
 Header chrome:
 
