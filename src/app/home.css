@@ -35,9 +35,9 @@
   width: 100%;
   height: 120%;
   object-fit: cover;
-  object-position: center center;
+  object-position: var(--position-home-hero-art);
   background-size: cover;
-  background-position: center center;
+  background-position: var(--position-home-hero-art);
   z-index: 0;
   will-change: transform;
 }

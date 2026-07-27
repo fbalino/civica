@@ -31,7 +31,6 @@ export function ExploreNavArtwork({
     </span>
   );
 }
-
 export function ExploreMenuPanel({
   shouldLoadArt,
   isActiveHref = () => false,

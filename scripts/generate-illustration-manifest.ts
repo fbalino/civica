@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import sharp from "sharp";
 import {
   DARK_ENGRAVING_CAPTIONS,
@@ -222,7 +223,7 @@ async function assetFiles(directory: string): Promise<string[]> {
   return files.sort();
 }
 
-function identity(relative: string) {
+export function identity(relative: string) {
   const directory = path.posix.dirname(relative);
   const filename = path.posix.basename(relative, ".webp");
   const dark = filename.endsWith("-dark");
@@ -235,6 +236,37 @@ function identity(relative: string) {
         ? "page"
         : "shared";
   return { category, key, theme: dark ? "dark" : "light", filename } as const;
+}
+
+export function manifestKeyForAsset(relative: string, key: string) {
+  return /^public\/engravings\/navigation\/spot-[^/]+(?:-dark)?\.webp$/.test(
+    relative,
+  )
+    ? `navigation/${key}`
+    : key;
+}
+
+export function illustrationManifestAssetId(
+  category: string,
+  manifestKey: string,
+  theme: "light" | "dark",
+) {
+  return `${category}:${manifestKey}:${theme}`;
+}
+
+export function assertUniqueIllustrationManifestIds(
+  assets: Array<{ id: string; path: string }>,
+) {
+  const pathsById = new Map<string, string>();
+  for (const asset of assets) {
+    const firstPath = pathsById.get(asset.id);
+    if (firstPath) {
+      throw new Error(
+        `duplicate illustration manifest asset id ${asset.id}: ${firstPath}, ${asset.path}`,
+      );
+    }
+    pathsById.set(asset.id, asset.path);
+  }
 }
 
 function descriptiveFields(category: string, key: string, theme: "light" | "dark") {
@@ -270,6 +302,7 @@ async function buildManifest() {
   for (const file of files) {
     const relative = path.relative(root, file).split(path.sep).join("/");
     const { category, key, theme } = identity(relative);
+    const manifestKey = manifestKeyForAsset(relative, key);
     const pairRelative = relative.replace(theme === "dark" ? /-dark\.webp$/ : /\.webp$/, theme === "dark" ? ".webp" : "-dark.webp");
     const bytes = await readFile(file);
     const metadata = await sharp(bytes).metadata();
@@ -304,12 +337,18 @@ async function buildManifest() {
     const countryGrade = category === "country" && theme === "dark" && key !== "gbr";
     const deterministicLogoStrip = relative.includes("trusted-source-logos");
     assets.push({
-      id: `${category}:${key}:${theme}`,
+      id: illustrationManifestAssetId(category, manifestKey, theme),
       path: relative,
       publicUrl: `/${relative.replace(/^public\//, "")}`,
       category,
       theme,
-      pairId: fileSet.has(pairRelative) ? `${category}:${key}:${theme === "dark" ? "light" : "dark"}` : null,
+      pairId: fileSet.has(pairRelative)
+        ? illustrationManifestAssetId(
+            category,
+            manifestKey,
+            theme === "dark" ? "light" : "dark",
+          )
+        : null,
       ...description,
       caption: description.subject ?? null,
       file: {
@@ -383,6 +422,7 @@ async function buildManifest() {
       },
     });
   }
+  assertUniqueIllustrationManifestIds(assets);
   for (const relative of forwardRecords.keys()) {
     if (!consumedForwardRecords.has(relative)) {
       throw new Error(
@@ -443,7 +483,12 @@ async function main() {
   console.log(`Illustration manifest valid: ${manifest.summary.assetCount} assets, complete pairs and captions.`);
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exit(1);
-});
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+}

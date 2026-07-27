@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "civica-explore-deployment-evidence/v1",
+  "candidateId": "exp015-large-explore-2026-07-26",
+  "status": "ready",
+  "ownerRenderedMenuApproval": false,
+  "provider": "Vercel",
+  "deploymentId": "dpl_ADYsff1VDVpozAz37i1fQUFqxBSC",
+  "commitSha": "b9d19bd7bb15598fdd95f71e1055231291587b06",
+  "productionUrl": "https://civicaatlas.org/",
+  "verifiedAt": "2026-07-27T03:20:11Z",
+  "verification": {
+    "exactDeploymentReady": true,
+    "apexHtmlContainsDeploymentId": true,
+    "sampledLightAssetsHttp200": true,
+    "sampledDarkAssetsHttp200": true
+  },
+  "remainingDecision": "Fernando should approve, revise, or reject the exact rendered menu. Deployment does not supply that decision."
+}

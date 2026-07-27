@@ -445,6 +445,21 @@
 
   /* --- Rules --- */
   --border-hairline: 1px;
+  --stroke-icon-light: 1.5;
+
+  /* --- Media geometry --- */
+  --aspect-square: 1;
+  --aspect-navigation-plate: 4 / 3;
+  --navigation-art-rest-scale: 0.94;
+  --navigation-art-surface-mix: 4%;
+  --navigation-selection-border-mix: 40%;
+  --navigation-selection-surface-mix: 5%;
+  --navigation-mobile-divider-mix: 64%;
+  --navigation-mobile-selection-mix: 7%;
+  --position-home-hero-art: center center;
+  --position-country-hero-art: center 28%;
+  --position-country-hero-art-mobile: center 30%;
+  --position-page-hero-art: center 42%;
 
   /* --- Stacking order --- */
   --z-base: 1;
@@ -524,6 +539,13 @@ html:root {
   --width-constitution-context: 360px;
   --width-record-rail: var(--width-rail-compact);
   --width-record-body: 680px;
+
+  /* Explore navigation composition. These keep the archival panel's reading
+     measure and destination-plate geometry canonical across live and demo
+     renderers rather than embedding page-local literals. */
+  --width-navigation-summary: 16rem;
+  --measure-navigation-heading: 18ch;
+  --measure-navigation-summary: 44ch;
 }
 
 /* Dark mode override. Light mode remains the default token set above. */
@@ -718,11 +740,9 @@ body {
   display: block !important;
 }
 
-/* A decorative asset should not be duplicated as light + dark <img> nodes:
-   hidden images remain eligible for transfer. This shared renderer resolves
-   exactly one background image from the active color scheme instead. The
-   media-query branch covers the server's pre-hydration, system-theme paint;
-   ThemeProvider then stamps data-theme for explicit user choices. */
+/* Decorative light/dark siblings are both eligible for transfer even when one
+   is display:none. This renderer resolves exactly one background image from
+   the active color scheme; navigation mounts it only while open. */
 .civica-themed-image {
   display: block;
   background-image: var(--civica-themed-image-light);
@@ -1288,7 +1308,7 @@ a {
 
 .explore-menu__header {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+  grid-template-columns: minmax(0, 1fr) var(--width-navigation-summary);
   gap: var(--space-7);
   align-items: end;
   padding-bottom: var(--space-5);
@@ -1311,7 +1331,7 @@ a {
 }
 
 .explore-menu__header h2 {
-  max-width: 18ch;
+  max-width: var(--measure-navigation-heading);
   margin: 0;
   font-family: var(--font-heading);
   font-size: var(--text-32);
@@ -1322,7 +1342,7 @@ a {
 }
 
 .explore-menu__dek {
-  max-width: 44ch;
+  max-width: var(--measure-navigation-summary);
   margin: 0;
   font-family: var(--font-body);
   font-size: var(--text-14);
@@ -1342,7 +1362,7 @@ a {
 
 .explore-register__label {
   margin: 0 0 var(--space-3);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .explore-register__grid {
@@ -1385,12 +1405,12 @@ a {
 
 .explore-item__art {
   display: block;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: var(--aspect-navigation-plate);
   overflow: hidden;
   border-bottom: var(--border-hairline) solid var(--color-card-border);
   background: color-mix(
     in oklab,
-    var(--color-accent) 4%,
+    var(--color-accent) var(--navigation-art-surface-mix),
     var(--color-surface-secondary)
   );
 }
@@ -1399,7 +1419,7 @@ a {
   width: 100%;
   height: 100%;
   background-size: contain;
-  transform: scale(0.94);
+  transform: scale(var(--navigation-art-rest-scale));
   transition: transform var(--motion-slow) var(--motion-ease-out);
 }
 
@@ -1430,14 +1450,14 @@ a {
   font-family: var(--font-body);
   font-size: var(--text-12);
   line-height: var(--leading-normal);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .explore-item__arrow {
   width: var(--space-5);
   height: var(--space-5);
   color: var(--color-text-muted);
-  stroke-width: 1.5;
+  stroke-width: var(--stroke-icon-light);
   transition:
     color var(--motion-base) var(--motion-ease-out),
     transform var(--motion-base) var(--motion-ease-out);
@@ -1448,10 +1468,14 @@ a {
 .explore-item--active {
   border-color: color-mix(
     in oklab,
-    var(--color-accent) 40%,
+    var(--color-accent) var(--navigation-selection-border-mix),
     var(--color-card-border)
   );
-  background: color-mix(in oklab, var(--color-accent) 5%, var(--color-card-bg));
+  background: color-mix(
+    in oklab,
+    var(--color-accent) var(--navigation-selection-surface-mix),
+    var(--color-card-bg)
+  );
   box-shadow: var(--shadow-hard-md);
   transform: translateY(calc(var(--space-1) * -1));
   outline: none;
@@ -1508,7 +1532,7 @@ a {
   }
 
   .explore-item__art {
-    aspect-ratio: 1;
+    aspect-ratio: var(--aspect-square);
     border-right: var(--border-hairline) solid var(--color-card-border);
     border-bottom: 0;
   }
@@ -4442,6 +4466,7 @@ a {
 .mobile-menu__close svg {
   width: var(--space-5);
   height: var(--space-5);
+  stroke-width: var(--stroke-icon-light);
 }
 
 .mobile-menu__canvas {
@@ -4503,7 +4528,11 @@ a {
   min-height: var(--space-9);
   padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid
-    color-mix(in oklab, var(--color-border-default) 64%, transparent);
+    color-mix(
+      in oklab,
+      var(--color-border-default) var(--navigation-mobile-divider-mix),
+      transparent
+    );
   color: var(--color-text-primary);
   text-decoration: none;
   transition:
@@ -4514,7 +4543,11 @@ a {
 .mobile-menu__explore-link:hover,
 .mobile-menu__explore-link:focus-visible,
 .mobile-menu__explore-link.is-active {
-  background: color-mix(in oklab, var(--color-accent) 7%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-accent) var(--navigation-mobile-selection-mix),
+    transparent
+  );
   color: var(--color-accent);
   transform: translateX(var(--space-2));
 }
@@ -4527,7 +4560,7 @@ a {
   border-radius: var(--radius-lg);
   background: color-mix(
     in oklab,
-    var(--color-accent) 4%,
+    var(--color-accent) var(--navigation-art-surface-mix),
     var(--color-surface-secondary)
   );
 }
@@ -4535,10 +4568,12 @@ a {
   width: 100%;
   height: 100%;
   background-size: contain;
-  transform: scale(0.94);
+  transform: scale(var(--navigation-art-rest-scale));
   transition: transform var(--motion-slow) var(--motion-ease-out);
 }
-.mobile-menu__explore-link:hover .mobile-menu__spot :is(img, .civica-themed-image) {
+.mobile-menu__explore-link:hover
+  .mobile-menu__spot
+  :is(img, .civica-themed-image) {
   transform: scale(1);
 }
 .mobile-menu__explore-copy {
@@ -4560,9 +4595,10 @@ a {
   line-height: var(--leading-snug);
 }
 .mobile-menu__arrow {
+  width: var(--space-5);
+  height: var(--space-5);
   color: var(--color-text-muted);
-  font-family: var(--font-body);
-  font-size: var(--text-14);
+  stroke-width: var(--stroke-icon-light);
 }
 
 .mobile-menu__reading-room {
@@ -5570,7 +5606,7 @@ a {
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-chip);
   padding: var(--space-1) var(--space-2);
-  color: var(--color-text-60);
+  color: var(--color-text-secondary);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
   font-size: var(--text-12);

@@ -1,7 +1,7 @@
 ---
 name: Civica Design System
-version: 0.2
-updated: 2026-07-10
+version: 0.3
+updated: 2026-07-26
 source: src/app/globals.css
 canonical_preview: /design-system
 tokens:
@@ -19,6 +19,19 @@ tokens:
     mono: var(--font-mono)
   spacing:
     scale: var(--space-1) through var(--space-9)
+  navigation:
+    summary_width: var(--width-navigation-summary)
+    heading_measure: var(--measure-navigation-heading)
+    summary_measure: var(--measure-navigation-summary)
+    square_aspect: var(--aspect-square)
+    plate_aspect: var(--aspect-navigation-plate)
+    art_rest_scale: var(--navigation-art-rest-scale)
+    art_surface_mix: var(--navigation-art-surface-mix)
+    selection_border_mix: var(--navigation-selection-border-mix)
+    selection_surface_mix: var(--navigation-selection-surface-mix)
+    mobile_divider_mix: var(--navigation-mobile-divider-mix)
+    mobile_selection_mix: var(--navigation-mobile-selection-mix)
+    icon_stroke: var(--stroke-icon-light)
   radius:
     sm: var(--radius-sm)
     md: var(--radius-md)
@@ -89,6 +102,12 @@ extends this system once in `globals.css`, `/design-system`, and this document.
 
 Every `<PageHero>` with engraving art visibly renders the canonical `Editorial illustration · AI-assisted, non-documentary` policy link. Country and territory mastheads use their landmark caption plus the equivalent accessible policy disclosure. Background art remains `alt=""` and `aria-hidden="true"` because the adjacent disclosure/caption carries the meaning once. Do not remove, rename, or page-localize these disclosures.
 
+The shared theme-aware decorative renderer uses CSS background images so the
+inactive theme asset is not transferred. Hero crops remain canonical through
+`--position-home-hero-art`, `--position-country-hero-art`,
+`--position-country-hero-art-mobile`, and `--position-page-hero-art`; both
+ordinary image and themed-background renderers consume the same crop roles.
+
 ### Alternative text
 
 Every image on the site is either **meaningful** (it conveys information a screen-reader user cannot get from surrounding text) or **decorative** (adjacent visible text already names it, or it is pure ornament). This is a closed policy — every image class below resolves to exactly one treatment. Meaningful images carry a real descriptive `alt`; decorative images carry `alt=""`, and inline SVG icons additionally carry `aria-hidden="true"` paired with the existing `focusable="false"`. `npm run validate:alt-text-policy` enforces the mechanical half of this (missing `alt`, decorative images missing `aria-hidden`) with the same baseline-ratchet approach as `validate:design-tokens` — run it before any UI commit that touches an image.
@@ -104,6 +123,17 @@ Use `var(--space-*)` for new spacing decisions unless an existing component cont
 
 Hairline rules use `var(--border-hairline)`. New components must not repeat a
 raw pixel border width.
+
+The Explore composition owns a small semantic geometry set:
+`--width-navigation-summary`, `--measure-navigation-heading`,
+`--measure-navigation-summary`, `--aspect-square`,
+`--aspect-navigation-plate`, `--navigation-art-rest-scale`,
+`--navigation-art-surface-mix`, `--navigation-selection-border-mix`,
+`--navigation-selection-surface-mix`, `--navigation-mobile-divider-mix`,
+`--navigation-mobile-selection-mix`, and `--stroke-icon-light`. The live header,
+mobile register, and `/design-system` demo consume those roles; do not recreate
+their underlying lengths, character measures, aspects, selection weights,
+image inset, or icon stroke locally.
 
 ## Elevation
 
@@ -139,8 +169,8 @@ Prefer shared primitives for new editorial UI:
 - `SourceDot`
 - `Tooltip` / `InfoTip` (`src/components/editorial/Tooltip.tsx`) — the canonical INSTANT tooltip: an inverted (ink-navy in light, ivory in dark), no-arrow surface portalled to `<body>` so it escapes overflow clips, positioned above the trigger and flipping below when it would clip. `<Tooltip content={…}>{trigger}</Tooltip>` wraps any hoverable/focusable node; `<InfoTip content={…}/>` is a circled-i button carrying one (used to mark Civica-derived estimates). Styled in `editorial.css` under `.editorial-tooltip`. Use this instead of native `title` attributes.
 - `SingleSelectMenu` (`src/components/editorial/SingleSelectMenu.tsx`) — the canonical tokenised single-select filter popover: a small-caps label above a token-styled trigger button that opens a `role="listbox"` popover of options with a check on the active item. Caller owns open/close state (so a parent can enforce "one menu open at a time") and outside-click / Escape dismissal. Props: `label`, `value`, `items` (`{value,label}[]`), `open`/`onOpenChange`, `onSelect`, optional `minWidth` / `tabularNums`, `ariaLabel`. Used by the Civica Conditions explorer (`OutcomesExplorer`) and the party browser (`PartyExplorer`) for their region / country / metric / year / lens filters — one shared control, never re-implemented per page.
-- **Explore megamenu candidate** (`ExploreMenuPanel`, `.explore-menu` in `globals.css`; data in `src/components/exploreNavItems.ts`) — the current EXP-015 replacement awaiting the exact rendered owner decision. One `Explore` disclosure opens a near-page-width image-led panel with a terracotta top rule, `--radius-xl`, and restrained elevation. The two explicit registers are `Start with a place` and `Research tools`; each is a 2 × 2 grid of destination cards. Every card pairs its own contained, active-theme editorial motif (`public/engravings/navigation/explore-*.webp` + `-dark`) with a serif destination name, an Archivo description, and one restrained accent-line/arrow/scale hover and focus moment. Images are decorative and mount only while navigation is open; the text is the accessible identity. The eight hrefs — `/country`, `/atlas`, `/compare`, `/constitution`, `/parties`, `/elections`, `/rankings`, `/organizations` — are the single source consumed by both desktop `NavLinks` and the full-screen `MobileNav` browse register. Demoed on `/design-system`. Add or reorder surfaces in `exploreNavItems.ts`, never per-consumer, and render desktop cards through `ExploreMenuPanel` rather than recreating the composition.
-- **Full-screen atlas menu** (`MobileNav`, `.mobile-menu*` in `globals.css`) — the hamburger opens a full-viewport, scroll-contained navigation surface rather than a side drawer. It uses the canonical hero engraving as a quiet full-canvas plate, the shared `EXPLORE_NAV_GROUPS` spot engravings for browse destinations, a separate research/methodology register, the global search slot, operational status, and reference/legal links. The modal locks body scroll, focuses Close on entry, traps Tab, closes on Escape or navigation, restores trigger focus, respects reduced motion, and collapses from the desktop two-register composition to a single mobile reading order. The live component is demoed on `/design-system`.
+- **Explore megamenu** (`ExploreMenuPanel`, `.explore-menu` in `globals.css`; data in `src/components/exploreNavItems.ts`) — the header&rsquo;s single browse surface. One `Explore` disclosure opens a near-page-width archival index with a short orientation and two explicit 2 × 2 registers: `Start with a place` and `Research tools`. Each of the eight destinations has its own light/dark plate under `public/engravings/navigation/`; artwork mounts only while navigation is open, and the shared themed renderer transfers only the active theme. Names and descriptions remain the accessible link identity; hover/focus sharpens the selection with restrained tint, rule, image, and arrow motion. Desktop and `MobileNav` consume the same href, label, description, order, and art basename source. Demoed on `/design-system`. Add or reorder surfaces in `exploreNavItems.ts`, never per-consumer.
+- **Full-screen atlas menu** (`MobileNav`, `.mobile-menu*` in `globals.css`) — the hamburger opens a full-viewport, scroll-contained navigation surface rather than a side drawer. It uses the canonical hero engraving as a quiet full-canvas plate, the shared `EXPLORE_NAV_GROUPS` destination-specific plates for browse destinations, a separate research/methodology register, the global search slot, operational status, and reference/legal links. The modal locks body scroll, focuses Close on entry, traps Tab, closes on Escape or navigation, restores trigger focus, respects reduced motion, and collapses from the desktop two-register composition to a single mobile reading order. The live component is demoed on `/design-system`.
 
 Every visible data point should carry provenance where possible. Use `SourceDot`; do not hand-roll provenance markers.
 

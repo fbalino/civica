@@ -9,6 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { INDEX_NAV_ITEMS } from "@/components/indexNavItems";
@@ -191,7 +192,6 @@ function MenuOverlay({
               viewBox="0 0 20 20"
               fill="none"
               stroke="currentColor"
-              strokeWidth="1.5"
               strokeLinecap="round"
             >
               <path d="M4 4l12 12M16 4L4 16" />
@@ -296,7 +296,11 @@ function ExploreLink({
         <strong>{item.label}</strong>
         <small>{item.description}</small>
       </span>
-      <span className="mobile-menu__arrow" aria-hidden="true">↗</span>
+      <ArrowUpRight
+        className="mobile-menu__arrow"
+        aria-hidden="true"
+        focusable="false"
+      />
     </Link>
   );
 }

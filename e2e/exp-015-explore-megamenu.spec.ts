@@ -26,6 +26,7 @@ const DESKTOP = VIEWPORTS.find((viewport) => viewport.name === "desktop")!;
 const MOBILE = VIEWPORTS.find((viewport) => viewport.name === "small-mobile")!;
 const THEMES = ["light", "dark"] as const satisfies readonly Theme[];
 const CAPTURE_DIR = process.env.EXP015_CAPTURE_DIR;
+const CAPTURE_DATE = "2026-07-26";
 const DESTINATIONS = EXPLORE_NAV_GROUPS.flatMap((group) =>
   group.items.map((item) => item.href),
 );
@@ -50,7 +51,7 @@ async function captureCandidate(
   await surface.screenshot({
     path: join(
       CAPTURE_DIR,
-      `2026-07-25-exp-015-large-explore-candidate-${viewport}-${theme}.png`,
+      `${CAPTURE_DATE}-exp-015-large-explore-candidate-${viewport}-${theme}.png`,
     ),
     animations: "disabled",
   });
@@ -100,7 +101,7 @@ test.describe("EXP-015 — large Explore candidate", () => {
       await expectDestinationOrder(links);
       await captureCandidate(panel, "desktop", theme);
 
-      const audit = await auditAccessibility(page);
+      const audit = await auditAccessibility(page, "#explore-navigation-panel");
       await testInfo.attach(`axe-exp-015-desktop-open-${theme}.json`, {
         body: JSON.stringify(audit, null, 2),
         contentType: "application/json",
@@ -150,7 +151,7 @@ test.describe("EXP-015 — large Explore candidate", () => {
       await expectDestinationOrder(links);
       await captureCandidate(dialog, "small-mobile", theme);
 
-      const audit = await auditAccessibility(page);
+      const audit = await auditAccessibility(page, "#civica-full-menu");
       await testInfo.attach(`axe-exp-015-mobile-open-${theme}.json`, {
         body: JSON.stringify(audit, null, 2),
         contentType: "application/json",

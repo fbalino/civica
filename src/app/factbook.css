@@ -54,9 +54,9 @@
   width: 100%;
   height: 120%;
   object-fit: cover;
-  object-position: center 28%;
+  object-position: var(--position-country-hero-art);
   background-size: cover;
-  background-position: center 28%;
+  background-position: var(--position-country-hero-art);
   z-index: 0;
   will-change: transform;
 }
@@ -613,8 +613,8 @@
     width: 100%;
     height: auto;
     aspect-ratio: 5 / 4;
-    object-position: center 30%;
-    background-position: center 30%;
+    object-position: var(--position-country-hero-art-mobile);
+    background-position: var(--position-country-hero-art-mobile);
     order: 0;
     /* This img is an in-flow banner on mobile (not an absolute over-scan), so
        the parallax translateY must NOT displace it out of the vertical stack. */
@@ -1164,9 +1164,9 @@
   width: 100%;
   height: 120%;
   object-fit: cover;
-  object-position: center 42%;
+  object-position: var(--position-page-hero-art);
   background-size: cover;
-  background-position: center 42%;
+  background-position: var(--position-page-hero-art);
   opacity: 0.85;
   z-index: 0;
   will-change: transform;

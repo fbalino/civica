@@ -71,6 +71,7 @@ export function NavLinks() {
       <div
         className="nav-dropdown nav-dropdown--explore"
         onMouseEnter={openExplore}
+        onMouseLeave={closeExploreSoon}
         onFocus={(event) => {
           if (suppressFocusOpen.current) {
             suppressFocusOpen.current = false;
@@ -78,7 +79,6 @@ export function NavLinks() {
           }
           if (event.currentTarget.contains(event.target)) openExplore();
         }}
-        onMouseLeave={closeExploreSoon}
         onBlur={(e) => {
           // Close only when focus leaves the whole dropdown (trigger + panel).
           if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {

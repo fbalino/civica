@@ -1,6 +1,6 @@
 {
   "contract": "civica-editorial-illustration-forward-records/v1",
-  "updatedOn": "2026-07-25",
+  "updatedOn": "2026-07-26",
   "records": [
     {
       "id": "home-governance-evidence-2026-07-25-v1",
@@ -207,7 +207,13 @@
         "requestedOn": "2026-07-25",
         "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
         "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
-        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release.",
+        "liveCandidateReleaseInstruction": {
+          "owner": "Fernando Baliño",
+          "instructedOn": "2026-07-26",
+          "instruction": "Commit and push the finished work live while keeping exact rendered owner approval pending.",
+          "scope": "Authorizes production release of the finished candidate; does not constitute exact rendered owner approval."
+        }
       },
       "selection": {
         "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
@@ -273,15 +279,17 @@
         "independentProfessionalReview": false,
         "ownerLightMasterApproval": true,
         "ownerRenderedMenuApproval": false,
-        "releaseAuthorized": false
+        "releaseAuthorizedAtReview": false,
+        "releaseAuthorizationNote": "Accurate for the 2026-07-25 review event; superseded only for production release by the later 2026-07-26 owner instruction. Exact rendered-menu approval remains pending."
       },
       "release": {
         "releaseIdentity": "exp015-explore-countries-2026-07-25-candidate-v1",
-        "status": "candidate-pending-owner-render-approval",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": false
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -306,6 +314,12 @@
           "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
           "remainingUnknowns": "Exact marketed model release, seed, and the exact iterative correction wording remain unexposed or unretained.",
           "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        },
+        {
+          "date": "2026-07-26",
+          "stage": "live-candidate-release-instruction",
+          "action": "Recorded the owner's later instruction to commit and push the finished Explore candidate live while retaining the separate rendered-approval boundary.",
+          "releaseImpact": "Production release is authorized for the finished candidate; exact rendered owner approval remains pending and deployment is not recorded until the hosting platform reports Ready."
         }
       ]
     },
@@ -391,7 +405,13 @@
         "requestedOn": "2026-07-25",
         "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
         "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
-        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release.",
+        "liveCandidateReleaseInstruction": {
+          "owner": "Fernando Baliño",
+          "instructedOn": "2026-07-26",
+          "instruction": "Commit and push the finished work live while keeping exact rendered owner approval pending.",
+          "scope": "Authorizes production release of the finished candidate; does not constitute exact rendered owner approval."
+        }
       },
       "selection": {
         "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
@@ -451,15 +471,17 @@
         "independentProfessionalReview": false,
         "ownerLightMasterApproval": true,
         "ownerRenderedMenuApproval": false,
-        "releaseAuthorized": false
+        "releaseAuthorizedAtReview": false,
+        "releaseAuthorizationNote": "Accurate for the 2026-07-25 review event; superseded only for production release by the later 2026-07-26 owner instruction. Exact rendered-menu approval remains pending."
       },
       "release": {
         "releaseIdentity": "exp015-explore-world-atlas-2026-07-25-candidate-v1",
-        "status": "candidate-pending-owner-render-approval",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": false
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -476,6 +498,12 @@
           "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
           "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
           "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        },
+        {
+          "date": "2026-07-26",
+          "stage": "live-candidate-release-instruction",
+          "action": "Recorded the owner's later instruction to commit and push the finished Explore candidate live while retaining the separate rendered-approval boundary.",
+          "releaseImpact": "Production release is authorized for the finished candidate; exact rendered owner approval remains pending and deployment is not recorded until the hosting platform reports Ready."
         }
       ]
     },
@@ -561,7 +589,13 @@
         "requestedOn": "2026-07-25",
         "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
         "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
-        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release.",
+        "liveCandidateReleaseInstruction": {
+          "owner": "Fernando Baliño",
+          "instructedOn": "2026-07-26",
+          "instruction": "Commit and push the finished work live while keeping exact rendered owner approval pending.",
+          "scope": "Authorizes production release of the finished candidate; does not constitute exact rendered owner approval."
+        }
       },
       "selection": {
         "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
@@ -627,15 +661,17 @@
         "independentProfessionalReview": false,
         "ownerLightMasterApproval": true,
         "ownerRenderedMenuApproval": false,
-        "releaseAuthorized": false
+        "releaseAuthorizedAtReview": false,
+        "releaseAuthorizationNote": "Accurate for the 2026-07-25 review event; superseded only for production release by the later 2026-07-26 owner instruction. Exact rendered-menu approval remains pending."
       },
       "release": {
         "releaseIdentity": "exp015-explore-compare-2026-07-25-candidate-v1",
-        "status": "candidate-pending-owner-render-approval",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": false
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -660,6 +696,12 @@
           "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
           "remainingUnknowns": "Exact marketed model release, seed, and the exact iterative correction wording remain unexposed or unretained.",
           "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        },
+        {
+          "date": "2026-07-26",
+          "stage": "live-candidate-release-instruction",
+          "action": "Recorded the owner's later instruction to commit and push the finished Explore candidate live while retaining the separate rendered-approval boundary.",
+          "releaseImpact": "Production release is authorized for the finished candidate; exact rendered owner approval remains pending and deployment is not recorded until the hosting platform reports Ready."
         }
       ]
     },
@@ -745,7 +787,13 @@
         "requestedOn": "2026-07-25",
         "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
         "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
-        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release.",
+        "liveCandidateReleaseInstruction": {
+          "owner": "Fernando Baliño",
+          "instructedOn": "2026-07-26",
+          "instruction": "Commit and push the finished work live while keeping exact rendered owner approval pending.",
+          "scope": "Authorizes production release of the finished candidate; does not constitute exact rendered owner approval."
+        }
       },
       "selection": {
         "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
@@ -805,15 +853,17 @@
         "independentProfessionalReview": false,
         "ownerLightMasterApproval": true,
         "ownerRenderedMenuApproval": false,
-        "releaseAuthorized": false
+        "releaseAuthorizedAtReview": false,
+        "releaseAuthorizationNote": "Accurate for the 2026-07-25 review event; superseded only for production release by the later 2026-07-26 owner instruction. Exact rendered-menu approval remains pending."
       },
       "release": {
         "releaseIdentity": "exp015-explore-constitutions-2026-07-25-candidate-v1",
-        "status": "candidate-pending-owner-render-approval",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": false
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -830,6 +880,12 @@
           "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
           "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
           "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        },
+        {
+          "date": "2026-07-26",
+          "stage": "live-candidate-release-instruction",
+          "action": "Recorded the owner's later instruction to commit and push the finished Explore candidate live while retaining the separate rendered-approval boundary.",
+          "releaseImpact": "Production release is authorized for the finished candidate; exact rendered owner approval remains pending and deployment is not recorded until the hosting platform reports Ready."
         }
       ]
     },
@@ -915,7 +971,13 @@
         "requestedOn": "2026-07-25",
         "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
         "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
-        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release.",
+        "liveCandidateReleaseInstruction": {
+          "owner": "Fernando Baliño",
+          "instructedOn": "2026-07-26",
+          "instruction": "Commit and push the finished work live while keeping exact rendered owner approval pending.",
+          "scope": "Authorizes production release of the finished candidate; does not constitute exact rendered owner approval."
+        }
       },
       "selection": {
         "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
@@ -975,15 +1037,17 @@
         "independentProfessionalReview": false,
         "ownerLightMasterApproval": true,
         "ownerRenderedMenuApproval": false,
-        "releaseAuthorized": false
+        "releaseAuthorizedAtReview": false,
+        "releaseAuthorizationNote": "Accurate for the 2026-07-25 review event; superseded only for production release by the later 2026-07-26 owner instruction. Exact rendered-menu approval remains pending."
       },
       "release": {
         "releaseIdentity": "exp015-explore-parties-2026-07-25-candidate-v1",
-        "status": "candidate-pending-owner-render-approval",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": false
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -1000,6 +1064,12 @@
           "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
           "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
           "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        },
+        {
+          "date": "2026-07-26",
+          "stage": "live-candidate-release-instruction",
+          "action": "Recorded the owner's later instruction to commit and push the finished Explore candidate live while retaining the separate rendered-approval boundary.",
+          "releaseImpact": "Production release is authorized for the finished candidate; exact rendered owner approval remains pending and deployment is not recorded until the hosting platform reports Ready."
         }
       ]
     },
@@ -1085,7 +1155,13 @@
         "requestedOn": "2026-07-25",
         "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
         "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
-        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release.",
+        "liveCandidateReleaseInstruction": {
+          "owner": "Fernando Baliño",
+          "instructedOn": "2026-07-26",
+          "instruction": "Commit and push the finished work live while keeping exact rendered owner approval pending.",
+          "scope": "Authorizes production release of the finished candidate; does not constitute exact rendered owner approval."
+        }
       },
       "selection": {
         "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
@@ -1151,15 +1227,17 @@
         "independentProfessionalReview": false,
         "ownerLightMasterApproval": true,
         "ownerRenderedMenuApproval": false,
-        "releaseAuthorized": false
+        "releaseAuthorizedAtReview": false,
+        "releaseAuthorizationNote": "Accurate for the 2026-07-25 review event; superseded only for production release by the later 2026-07-26 owner instruction. Exact rendered-menu approval remains pending."
       },
       "release": {
         "releaseIdentity": "exp015-explore-elections-2026-07-25-candidate-v1",
-        "status": "candidate-pending-owner-render-approval",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": false
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -1184,6 +1262,12 @@
           "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
           "remainingUnknowns": "Exact marketed model release, seed, and the exact iterative correction wording remain unexposed or unretained.",
           "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        },
+        {
+          "date": "2026-07-26",
+          "stage": "live-candidate-release-instruction",
+          "action": "Recorded the owner's later instruction to commit and push the finished Explore candidate live while retaining the separate rendered-approval boundary.",
+          "releaseImpact": "Production release is authorized for the finished candidate; exact rendered owner approval remains pending and deployment is not recorded until the hosting platform reports Ready."
         }
       ]
     },
@@ -1269,7 +1353,13 @@
         "requestedOn": "2026-07-25",
         "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
         "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
-        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release.",
+        "liveCandidateReleaseInstruction": {
+          "owner": "Fernando Baliño",
+          "instructedOn": "2026-07-26",
+          "instruction": "Commit and push the finished work live while keeping exact rendered owner approval pending.",
+          "scope": "Authorizes production release of the finished candidate; does not constitute exact rendered owner approval."
+        }
       },
       "selection": {
         "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
@@ -1329,15 +1419,17 @@
         "independentProfessionalReview": false,
         "ownerLightMasterApproval": true,
         "ownerRenderedMenuApproval": false,
-        "releaseAuthorized": false
+        "releaseAuthorizedAtReview": false,
+        "releaseAuthorizationNote": "Accurate for the 2026-07-25 review event; superseded only for production release by the later 2026-07-26 owner instruction. Exact rendered-menu approval remains pending."
       },
       "release": {
         "releaseIdentity": "exp015-explore-rankings-2026-07-25-candidate-v1",
-        "status": "candidate-pending-owner-render-approval",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": false
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -1354,6 +1446,12 @@
           "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
           "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
           "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        },
+        {
+          "date": "2026-07-26",
+          "stage": "live-candidate-release-instruction",
+          "action": "Recorded the owner's later instruction to commit and push the finished Explore candidate live while retaining the separate rendered-approval boundary.",
+          "releaseImpact": "Production release is authorized for the finished candidate; exact rendered owner approval remains pending and deployment is not recorded until the hosting platform reports Ready."
         }
       ]
     },
@@ -1439,7 +1537,13 @@
         "requestedOn": "2026-07-25",
         "request": "The required replacement is a substantially larger, more beautiful Explore mega menu with custom images created specifically for the menu.",
         "specificOutputApproval": "Eight light masters explicitly owner-approved as a batch on 2026-07-25.",
-        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release."
+        "specificOutputApprovalDisclosure": "Approval covers the light-master batch. It does not approve the generated dark variants, the finished rendered menu, deployment, or production release.",
+        "liveCandidateReleaseInstruction": {
+          "owner": "Fernando Baliño",
+          "instructedOn": "2026-07-26",
+          "instruction": "Commit and push the finished work live while keeping exact rendered owner approval pending.",
+          "scope": "Authorizes production release of the finished candidate; does not constitute exact rendered owner approval."
+        }
       },
       "selection": {
         "selectedBy": "Fernando Baliño for the light-master batch; Codex implementation agent for the matched-dark candidate pair.",
@@ -1499,15 +1603,17 @@
         "independentProfessionalReview": false,
         "ownerLightMasterApproval": true,
         "ownerRenderedMenuApproval": false,
-        "releaseAuthorized": false
+        "releaseAuthorizedAtReview": false,
+        "releaseAuthorizationNote": "Accurate for the 2026-07-25 review event; superseded only for production release by the later 2026-07-26 owner instruction. Exact rendered-menu approval remains pending."
       },
       "release": {
         "releaseIdentity": "exp015-explore-organizations-2026-07-25-candidate-v1",
-        "status": "candidate-pending-owner-render-approval",
+        "status": "live-candidate-pending-rendered-owner-approval",
         "publicDisclosure": "/licensing#imagery",
         "sourceEvidence": false,
-        "deployed": false,
-        "productionAuthorized": false
+        "deployed": true,
+        "productionAuthorized": true,
+        "deploymentEvidence": "plan/evidence/EXP-015/deployment.v1.json"
       },
       "correctionHistory": [
         {
@@ -1524,6 +1630,12 @@
           "action": "Recorded the applicable consumer terms and embedded C2PA technical assertions after earlier internal evidence left those fields unresolved.",
           "remainingUnknowns": "Exact marketed model release and seed remain unexposed.",
           "releaseImpact": "None; status remains candidate-pending-owner-render-approval."
+        },
+        {
+          "date": "2026-07-26",
+          "stage": "live-candidate-release-instruction",
+          "action": "Recorded the owner's later instruction to commit and push the finished Explore candidate live while retaining the separate rendered-approval boundary.",
+          "releaseImpact": "Production release is authorized for the finished candidate; exact rendered owner approval remains pending and deployment is not recorded until the hosting platform reports Ready."
         }
       ]
     }
