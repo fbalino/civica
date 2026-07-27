@@ -1,0 +1,343 @@
+{
+  "schemaVersion": "civica-qa018-preview-smoke-evidence/v1",
+  "taskId": "QA-018",
+  "candidate": {
+    "commit": "61351a43ac4e381fd409f4939845c6aac4ef6305",
+    "deploymentId": "dpl_2qPLXMA651ixPRrKLQaM7ZizuAak",
+    "deploymentUrl": "https://civica-mdkwale4h-fbalinos-projects.vercel.app",
+    "staticAssetManifest": {
+      "files": 737,
+      "bytes": 245926508,
+      "sha256": "2a355ac33fc110eac1046810d86687b0dbca272b5e043cd6f82c642879b2ff88"
+    }
+  },
+  "isolation": {
+    "neonProjectId": "ancient-art-58836757",
+    "neonBranchId": "br-gentle-paper-amsh6g7c",
+    "neonBranchName": "qa018-attempt07-0051-20260727",
+    "neonEndpointId": "ep-holy-wave-amcnk005",
+    "databaseHostnameSha256": "927dbb0aec671e18fc4b632a8e466b1e312bee6f35c1190c11084d5c5266bb79",
+    "productionDatabaseBranchId": "br-dawn-frog-amrf0h6a",
+    "productionDatabaseHostnameSha256": "c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b",
+    "productionMigrationHeadBefore": "0032_sparkling_genesis",
+    "productionMigrationHeadAfter": "0032_sparkling_genesis",
+    "productionDatabaseExcluded": true,
+    "deploymentScopedEnvPull": {
+      "status": "tooling_state_window_unavailable",
+      "attempts": [
+        "READY_expected_INITIALIZING"
+      ],
+      "alternativeProof": "exact_preview_runtime_identity"
+    }
+  },
+  "database": {
+    "before": {
+      "sourceFreshness": {
+        "rows": 57,
+        "sha256": "53e79cf17a5956c1d2af8167af7a21494f44a7f51a6a8c9a56af7a385e16db1d"
+      },
+      "activeCronLeases": 0,
+      "migrationLedger": {
+        "rows": 51,
+        "head": "0051_eminent_jocasta",
+        "orderedIdsSha256": "7c66b7aa06ed3aacbd01c9e1bcdd73b5de3df56c71741387a0e2435d86e7e384",
+        "hashesMatchRepository": true
+      },
+      "publicSchema": {
+        "sha256": "5b4e4b180158b583e4db879b4ecfcaae6c3ca81caaeea28118cd0f83b3c6bd3b"
+      },
+      "conditions": {
+        "release": {
+          "id": "conditions-20260727-v1",
+          "methodology_version": "conditions-components/v1",
+          "manifest_sha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+          "created_at": "2026-07-27 04:46:11.578521"
+        },
+        "counts": {
+          "calculations": 340,
+          "components": 818,
+          "scores": 101
+        }
+      },
+      "indexPointer": {
+        "product": "civica_index",
+        "release_id": "ci-beta-r5-2024-Q4",
+        "updated_at": "2026-07-27 05:25:31.651673"
+      },
+      "pulsePointer": {
+        "product": "pulse_dimensions",
+        "computation_run_id": "ea97916f-cc5d-4a18-9795-27805c4cfe3c",
+        "version_key": "pulse-stage/sha256:f4241e64cd85acffcc196884fc1c63e3b0b14193d1aefa330cf228a8e1401010",
+        "score_as_of": "2026-07-27",
+        "published_at": "2026-07-27 05:28:45.866964"
+      }
+    },
+    "after": {
+      "sourceFreshness": {
+        "rows": 57,
+        "sha256": "53e79cf17a5956c1d2af8167af7a21494f44a7f51a6a8c9a56af7a385e16db1d"
+      },
+      "activeCronLeases": 0,
+      "migrationLedger": {
+        "rows": 51,
+        "head": "0051_eminent_jocasta",
+        "orderedIdsSha256": "7c66b7aa06ed3aacbd01c9e1bcdd73b5de3df56c71741387a0e2435d86e7e384",
+        "hashesMatchRepository": true
+      },
+      "publicSchema": {
+        "sha256": "5b4e4b180158b583e4db879b4ecfcaae6c3ca81caaeea28118cd0f83b3c6bd3b"
+      },
+      "conditions": {
+        "release": {
+          "id": "conditions-20260727-v1",
+          "methodology_version": "conditions-components/v1",
+          "manifest_sha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+          "created_at": "2026-07-27 04:46:11.578521"
+        },
+        "counts": {
+          "calculations": 340,
+          "components": 818,
+          "scores": 101
+        }
+      },
+      "indexPointer": {
+        "product": "civica_index",
+        "release_id": "ci-beta-r5-2024-Q4",
+        "updated_at": "2026-07-27 05:25:31.651673"
+      },
+      "pulsePointer": {
+        "product": "pulse_dimensions",
+        "computation_run_id": "ea97916f-cc5d-4a18-9795-27805c4cfe3c",
+        "version_key": "pulse-stage/sha256:f4241e64cd85acffcc196884fc1c63e3b0b14193d1aefa330cf228a8e1401010",
+        "score_as_of": "2026-07-27",
+        "published_at": "2026-07-27 05:28:45.866964"
+      }
+    },
+    "sourceFreshnessUnchanged": true,
+    "jobsQuiesced": true
+  },
+  "api": {
+    "conditions": {
+      "status": 200,
+      "cacheControl": "no-store",
+      "cdnCacheControl": null,
+      "vercelCdnCacheControl": null,
+      "xVercelCache": "MISS",
+      "contentType": "application/json",
+      "bodySha256": "c06746cb3ef8d019357dfd135df15f071d5c405eeddfa59da7acf854b87d4f6e",
+      "contract": "civica-conditions-public-release/v1",
+      "release": {
+        "releaseId": "conditions-20260727-v1",
+        "methodologyVersion": "conditions-components/v1",
+        "manifestSha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+        "createdAt": "2026-07-27T04:46:11.578Z"
+      },
+      "calculations": 295,
+      "components": 683,
+      "coverage": [
+        {
+          "dimension": "human_development",
+          "calculations": 51,
+          "aligned": 51,
+          "scored": 51,
+          "mixedYearRefused": 0,
+          "missingComponent": 0,
+          "components": 51,
+          "observedComponents": 51,
+          "unavailableComponents": 0
+        },
+        {
+          "dimension": "peace_security",
+          "calculations": 50,
+          "aligned": 50,
+          "scored": 50,
+          "mixedYearRefused": 0,
+          "missingComponent": 0,
+          "components": 50,
+          "observedComponents": 50,
+          "unavailableComponents": 0
+        },
+        {
+          "dimension": "economic_stability",
+          "calculations": 194,
+          "aligned": 160,
+          "scored": 0,
+          "mixedYearRefused": 5,
+          "missingComponent": 29,
+          "components": 582,
+          "observedComponents": 541,
+          "unavailableComponents": 41
+        }
+      ],
+      "alignmentStates": [
+        "aligned",
+        "missing_component",
+        "mixed_year_refused"
+      ],
+      "examples": {
+        "aligned": {
+          "countrySlug": "afghanistan",
+          "referenceYear": 2024,
+          "normalizedScore": null,
+          "componentYears": [
+            2024,
+            2024,
+            2024
+          ],
+          "componentStatuses": [
+            "observed",
+            "observed",
+            "observed"
+          ],
+          "inclusionDecisions": [
+            "included",
+            "included",
+            "included"
+          ]
+        },
+        "missing_component": {
+          "countrySlug": "andorra",
+          "referenceYear": null,
+          "normalizedScore": null,
+          "componentYears": [
+            2024,
+            null,
+            null
+          ],
+          "componentStatuses": [
+            "observed",
+            "not_observed",
+            "not_observed"
+          ],
+          "inclusionDecisions": [
+            "excluded_missing",
+            "excluded_missing",
+            "excluded_missing"
+          ]
+        },
+        "mixed_year_refused": {
+          "countrySlug": "bosnia-and-herzegovina",
+          "referenceYear": null,
+          "normalizedScore": null,
+          "componentYears": [
+            2024,
+            2023,
+            2024
+          ],
+          "componentStatuses": [
+            "observed",
+            "observed",
+            "observed"
+          ],
+          "inclusionDecisions": [
+            "refused_mixed_year",
+            "refused_mixed_year",
+            "refused_mixed_year"
+          ]
+        }
+      },
+      "aggregateOrRankPublished": false
+    },
+    "index": {
+      "status": 200,
+      "cacheControl": "no-store",
+      "cdnCacheControl": null,
+      "vercelCdnCacheControl": null,
+      "xVercelCache": "MISS",
+      "contentType": "application/json",
+      "bodySha256": "9901f3a9cceff882fc83c5598fc652be1b55bef3be78d3c55893ea80de91d600",
+      "releaseId": "ci-beta-r5-2024-Q4",
+      "methodologyVersion": "beta-r5",
+      "dimensionRows": 745,
+      "compositeRows": 190,
+      "countrySlug": "andorra",
+      "score": 80,
+      "rank": 22
+    },
+    "pulse": {
+      "status": 200,
+      "cacheControl": "no-store",
+      "cdnCacheControl": null,
+      "vercelCdnCacheControl": null,
+      "xVercelCache": "MISS",
+      "contentType": "application/json",
+      "bodySha256": "3c5dde39c8f150d323120ab9ce0980ff58fee723e18c78a3f268c2a4bd86b801",
+      "countrySlug": "andorra",
+      "runtimeMethod": "pulse-v2.15-beta",
+      "runId": "ea97916f-cc5d-4a18-9795-27805c4cfe3c",
+      "publishedAt": "2026-07-27T05:28:45.866Z",
+      "scoreAsOf": "2026-07-27",
+      "observabilityState": "low_coverage"
+    },
+    "cache": {
+      "mutable": {
+        "status": 200,
+        "cacheControl": "no-store",
+        "cdnCacheControl": null,
+        "vercelCdnCacheControl": null,
+        "xVercelCache": "MISS",
+        "contentType": "application/json",
+        "bodySha256": "c06746cb3ef8d019357dfd135df15f071d5c405eeddfa59da7acf854b87d4f6e"
+      },
+      "checked": {
+        "status": 200,
+        "cacheControl": "public, max-age=3600, must-revalidate",
+        "cdnCacheControl": null,
+        "vercelCdnCacheControl": null,
+        "xVercelCache": "HIT",
+        "contentType": "application/json",
+        "bodySha256": "fb116620a64c3de57f397b51018d23a5818a88aed306107b6bc92e8b7b1caff7"
+      },
+      "frozen": {
+        "status": 200,
+        "cacheControl": "public, max-age=31536000, immutable",
+        "cdnCacheControl": null,
+        "vercelCdnCacheControl": null,
+        "xVercelCache": "HIT",
+        "contentType": "application/json; charset=utf-8",
+        "bodySha256": "93e4b3fdfd2d5f2b2b7861eb271131a5a8abffd0e3d1218a304b69683cb16638"
+      }
+    },
+    "protectedUnauthorized": {
+      "status": 401,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "cdnCacheControl": null,
+      "vercelCdnCacheControl": null,
+      "xVercelCache": "MISS",
+      "contentType": "application/json",
+      "bodySha256": "3be5b8e53fdc8b0a2996590589456db33504977f3d1ce9bb75016c8a707e1a71",
+      "error": "Unauthorized"
+    },
+    "cronDryRun": {
+      "first": {
+        "status": 200,
+        "cacheControl": "private, no-store",
+        "cdnCacheControl": "no-store",
+        "vercelCdnCacheControl": null,
+        "xVercelCache": "BYPASS",
+        "contentType": "application/json",
+        "bodySha256": "29356d2b1fa65884c8eaa45cede791251e1bad4c981249bde408502b98dd441a",
+        "step": "factbook.auto-resolve-disputes",
+        "dryRun": true,
+        "outcome": null,
+        "resultCode": null
+      },
+      "duplicate": {
+        "status": 200,
+        "cacheControl": "private, no-store",
+        "cdnCacheControl": "no-store",
+        "vercelCdnCacheControl": null,
+        "xVercelCache": "BYPASS",
+        "contentType": "application/json",
+        "bodySha256": "9a9a5d6720db3e1f3f071ef313035bcc1ea4fea60f8be531300b3134eb181e4c",
+        "step": null,
+        "dryRun": null,
+        "outcome": "duplicate_suppressed",
+        "resultCode": null
+      },
+      "idempotencyKeySha256": "e0b8354390d4e9d14e04a4037d05ba71f85edfda6c6114d2558284bf0c4d3cd4"
+    }
+  },
+  "status": "pass",
+  "failures": []
+}

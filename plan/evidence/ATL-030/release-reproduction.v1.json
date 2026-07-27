@@ -2,28 +2,28 @@
   "schemaVersion": "civica-atl-030-release-reproduction/v1",
   "taskId": "ATL-030",
   "status": "pass",
-  "candidateCommit": "fb7376f3ee7990c89b9da57716b3e563924af028",
+  "candidateCommit": "61351a43ac4e381fd409f4939845c6aac4ef6305",
   "release": {
-    "releaseId": "conditions-qa018-20260726-v2",
+    "releaseId": "conditions-20260727-v1",
     "methodologyVersion": "conditions-components/v1",
-    "manifestSha256": "d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b"
+    "manifestSha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743"
   },
   "isolatedTarget": {
     "projectId": "ancient-art-58836757",
-    "branchId": "br-bitter-fire-amcx8asi",
-    "endpointId": "ep-sparkling-pine-amdbr4ke",
-    "hostnameSha256": "a5fb8fbdb1d9d993f39c19dc0e8e7a41c53fdf32f7fc1948b137db8f6aa71761",
+    "branchId": "br-gentle-paper-amsh6g7c",
+    "endpointId": "ep-holy-wave-amcnk005",
+    "hostnameSha256": "927dbb0aec671e18fc4b632a8e466b1e312bee6f35c1190c11084d5c5266bb79",
     "forbiddenProductionBranchId": "br-dawn-frog-amrf0h6a",
     "forbiddenProductionHostnameSha256": "c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b",
-    "migrationHead": "0050_index_release_header_contract",
+    "migrationHead": "0051_eminent_jocasta",
     "writesPerformedByTargetChecks": 0
   },
   "capturedWorldBankInput": {
     "schemaVersion": "conditions-world-bank-economic-capture/v2",
     "dateRange": "2020:2024",
     "fileByteLength": 1309626,
-    "fileSha256": "5fb092b6507cb86a6b3cf86e3b2f6d14eddbc88c2c21ce251fade605c13721c9",
-    "capturePayloadSha256": "eea82f9049d64bc23fbce7fcc115b04beb8f9741c7a8758d8892f1fc3b18880c",
+    "fileSha256": "8dcd03657db039941b9ca05acb1bc1a694f91d45ea3df7012d2b50aac0062e54",
+    "capturePayloadSha256": "67e55f3f5f944d7e8e3f78d5f29385cd776f240ec6f8f2337e517a9f731336b4",
     "responses": 717,
     "http200Responses": 717,
     "requestCountryCodes": 239,
@@ -32,16 +32,11 @@
       "NY.GDP.MKTP.KD.ZG",
       "SL.UEM.TOTL.ZS"
     ],
-    "specialCountryCodeMapping": {
-      "jurisdictionIso2": "XK",
-      "requestCountryCode": "XKX",
-      "responses": 3
-    },
     "repositoryRetention": "hashes and bounded run evidence only; raw publisher responses are not committed"
   },
   "expectationsArtifacts": {
-    "preWriteArtifactSha256": "e2d2b6aa2bc8a8a9489151de5c92ede67458caa0cdda11f2ba92d8750c140535",
-    "postMigrationValidationArtifactSha256": "2d82ad06635d65f6c482deec44fa03ce3beb3aaa9fe6cb66c80f0089eeec19a8",
+    "preWriteArtifactSha256": "ea707e427b1c263596a2aa67124b2018350b50c9a325f6c0b052a2412b4ed05d",
+    "postMigrationValidationArtifactSha256": "94c04098bb00e0e55e765a74681fe6a55a581fab74134f4049ecefb79c708994",
     "expectedCalculationCounts": {
       "human_development": 51,
       "peace_security": 50,
@@ -51,7 +46,7 @@
   "liveValidation": {
     "contract": "conditions-release-validation/v1",
     "status": "pass",
-    "manifestReplaySha256": "d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b",
+    "manifestReplaySha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
     "counts": {
       "calculations": 340,
       "components": 818,
@@ -70,7 +65,9 @@
         "mixedYearRefused": 0,
         "missingComponent": 0,
         "components": 51,
-        "scores": 51
+        "scores": 51,
+        "referenceSets": 1,
+        "normalizationParameters": 1
       },
       {
         "dimension": "peace_security",
@@ -79,7 +76,9 @@
         "mixedYearRefused": 0,
         "missingComponent": 0,
         "components": 50,
-        "scores": 50
+        "scores": 50,
+        "referenceSets": 1,
+        "normalizationParameters": 1
       },
       {
         "dimension": "economic_stability",
@@ -88,15 +87,22 @@
         "mixedYearRefused": 6,
         "missingComponent": 71,
         "components": 717,
-        "scores": 0
+        "scores": 0,
+        "referenceSets": 1,
+        "normalizationParameters": 3
       }
     ],
     "sourceFreshness": {
       "policy": "immediate-post-release-exact-created-at/v1",
-      "requiredLastSyncAt": "2026-07-26T18:23:28.103Z",
+      "globalMutableStateLimitation": "sources.last_sync_at is global mutable state; this gate is valid only immediately after release creation",
+      "requiredLastSyncAt": "2026-07-27T04:46:11.578Z",
+      "neverSynced": 0,
       "exactReleaseTimestampMatches": 3,
       "releaseTimestampMismatches": 0,
-      "allExactlyAtRelease": true
+      "earliestLastSyncAt": "2026-07-27T04:46:11.578Z",
+      "latestLastSyncAt": "2026-07-27T04:46:11.578Z",
+      "allExactlyAtRelease": true,
+      "allAtOrBeforeValidation": true
     },
     "replay": {
       "calculationKeysReplayed": 340,
@@ -118,8 +124,8 @@
   "alteredInputRefusal": {
     "alteredCaptureFileSha256": "20d6762175d62a077a5c52cf328feb0b74a862a3cc229c6f391f70033dbdf2a8",
     "alteredCapturePayloadSha256": "d2d811e1314663140b5eb1b79f45c109efd40a6090115638e3beaa8b0c20f1dd",
-    "alteredManifestSha256": "d2441092e8fccf7bafde198b99fbeffc3f74108708297a2675dbb6a2142c1f65",
-    "alteredExpectationsArtifactSha256": "08b722ea12f469008132a02be515838f0d89a437ebbdf0932d75f8d78285da47",
+    "alteredManifestSha256": "4b23826bea95c8df4b1ac697d82b5fbe960d4d2b27bfd7c50c097c0712814fc7",
+    "alteredExpectationsArtifactSha256": "dbeeffd2065c5ed2093cce980664a6da507fb8d8da8cb8c19efcf68eee96eaec",
     "exitCode": 1,
     "result": "conditions_ingestion_failed_closed",
     "releaseStateUnchanged": true,
@@ -127,26 +133,17 @@
   },
   "beforeAfterSnapshot": {
     "identical": true,
-    "allReleases": 2,
-    "allReferenceSets": 6,
-    "allNormalizationParameters": 10,
-    "allCalculations": 680,
-    "allComponents": 1636,
-    "allScores": 533,
-    "selectedReleaseRows": 1,
-    "selectedReleaseReferenceSets": 3,
-    "selectedReleaseNormalizationParameters": 5,
     "selectedReleaseCalculations": 340,
     "selectedReleaseComponents": 818,
     "selectedReleaseScores": 101,
     "selectedReleaseSourceFreshness": {
-      "undp_hdi": "2026-07-26T18:23:28.103Z",
-      "global_peace_index": "2026-07-26T18:23:28.103Z",
-      "worldbank_economic": "2026-07-26T18:23:28.103Z"
+      "undp_hdi": "2026-07-27T04:46:11.578Z",
+      "global_peace_index": "2026-07-27T04:46:11.578Z",
+      "worldbank_economic": "2026-07-27T04:46:11.578Z"
     }
   },
   "publicReadReconciliation": "plan/evidence/ATL-029/release-reconciliation.v1.json",
-  "previewSmokeEvidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json",
+  "previewSmokeEvidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json",
   "dedicatedFixtureCommand": "npm run validate:conditions-components",
   "rawCaptureCommitted": false,
   "productionDatabaseMutated": false

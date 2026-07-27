@@ -1,7 +1,8 @@
 # QA-018 attempt 07 — isolated Conditions release rehearsal
 
-Status: child release and immutable-replay gates passed; Preview deployment and
-owner sign-off remain pending.
+Status: child release, immutable-replay, exact Preview, API, cache, protected
+route, cron dry-run, and responsive-browser gates passed; owner sign-off
+remains pending.
 
 The guarded target was Neon project `ancient-art-58836757`, disposable branch
 `br-gentle-paper-amsh6g7c`, and endpoint `ep-holy-wave-amcnk005`. Its hostname
@@ -61,5 +62,45 @@ Final child-only gates also passed:
 - source/indicator lineage across Conditions and the retained legacy rows; and
 - the closed data-value-state contract.
 
+## Exact Preview and publication pointers
+
+Candidate `61351a43ac4e381fd409f4939845c6aac4ef6305` passed both the
+repository production build and Vercel Build Output build. The 737-file,
+245,926,508-byte static output is bound by SHA-256
+`2a355ac33fc110eac1046810d86687b0dbca272b5e043cd6f82c642879b2ff88`.
+That exact prebuilt output reached Ready as isolated Preview deployment
+`dpl_2qPLXMA651ixPRrKLQaM7ZizuAak`.
+
+The first Preview smoke correctly failed closed because migration `0050` had
+staged, but not published, the three Index release headers and the fresh child
+had no complete Pulse score publication pointer. All three Index releases
+reproduced their checked row sets and were published in dependency order
+(Beta-R3, Beta-R4, then Beta-R5). A zero-write Pulse score plan was followed by
+one deterministic child-only corroboration and score run: 380 corroboration
+rows, 13 considered events, 65 jurisdictions, and 325 dimension rows. It made
+no model or paid API calls.
+
+The passing rerun then reconciled the exact Conditions, Index, and Pulse
+publication pointers through the deployed host. Mutable, checked-artifact, and
+frozen-release cache policies passed; an unauthenticated protected route
+returned 401; the authorized cron dry run returned 200 and an identical replay
+was duplicate-suppressed. Source freshness stayed unchanged during the smoke,
+active cron leases were zero before and after, and read-only production checks
+confirmed production remained on branch `br-dawn-frog-amrf0h6a` at
+`0032_sparkling_genesis`.
+
+The deployment environment pull was attempted once after Vercel had reached
+Ready. Vercel rejected the out-of-window request and created no temporary
+environment file, so the accepted fallback is the exact-host runtime
+attestation bound to the child database, candidate commit, migration head, and
+three release pointers. No provider error body is retained.
+
+The browser matrix passed 11 checks across the Conditions explorer, three
+country panels, and the three-country comparison at desktop and 390px mobile.
+All three alignment states, sources, native units, component years,
+missingness, release identity, and the no-composite boundary were visible with
+no console errors or horizontal overflow.
+
 No production database, production deployment, production Cron job, paid
-model, or owner sign-off was changed or claimed in this phase.
+model, or owner sign-off was changed or claimed. QA-018 remains unchecked until
+Fernando records a dated approval or rejection of this exact Preview.

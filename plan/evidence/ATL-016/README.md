@@ -9,12 +9,13 @@ cross-country rank, cross-dimension aggregate, or economic-stability score.
 Mixed reference years remain visible and all three public surfaces say that no
 composite is published.
 
-The release-backed run used `conditions-qa018-20260726-v2`,
+The current release-backed run used `conditions-20260727-v1`,
 `conditions-components/v1`, and manifest
-`d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b`.
+`267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743`.
 [`release-browser-reconciliation.v1.json`](release-browser-reconciliation.v1.json)
 binds that release to the isolated Preview and to
-[`browser-evidence.v1.json`](browser-evidence.v1.json). Fourteen screenshots
+[`browser-evidence-attempt-07-0051.v1.json`](browser-evidence-attempt-07-0051.v1.json).
+Nine screenshots and 11 browser checks
 cover the explorer, country panel, and three-country comparison at desktop and
 390px mobile widths. Afghanistan proves aligned inputs, Bosnia and Herzegovina
 proves mixed-year refusal, and Andorra proves missing components. Every surface
@@ -23,7 +24,7 @@ composite or rank.
 
 Verification:
 
-- `npm run validate:conditions-components` — 46/46 focused tests and both
+- `npm run validate:conditions-components` — 51/51 focused tests and both
   source validators passed;
 - `npm run validate:design-tokens` — zero token drift;
 - API and route-I/O contracts passed for the selected-release surface.

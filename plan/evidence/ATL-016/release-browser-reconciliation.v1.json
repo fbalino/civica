@@ -2,21 +2,21 @@
   "schemaVersion": "civica-atl-016-release-browser-reconciliation/v1",
   "taskId": "ATL-016",
   "status": "pass",
-  "candidateCommit": "fb7376f3ee7990c89b9da57716b3e563924af028",
-  "deploymentId": "dpl_DuymaVKNXCiyc34cC7q9SuRW6pMw",
-  "isolationEvidence": "plan/evidence/QA-018/run-06-preview-smoke.v1.json",
+  "candidateCommit": "61351a43ac4e381fd409f4939845c6aac4ef6305",
+  "deploymentId": "dpl_2qPLXMA651ixPRrKLQaM7ZizuAak",
+  "isolationEvidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json",
   "release": {
-    "releaseId": "conditions-qa018-20260726-v2",
+    "releaseId": "conditions-20260727-v1",
     "methodologyVersion": "conditions-components/v1",
-    "manifestSha256": "d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b"
+    "manifestSha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743"
   },
   "browserEvidence": {
-    "path": "plan/evidence/ATL-016/browser-evidence.v1.json",
-    "sha256": "7b374d7820cfe2a28816f4d4d2ebd80d8954306c07951b89577bdeb2b802253f",
-    "checkedAt": "2026-07-26T19:56:33.535Z",
-    "checks": 10,
-    "screenshots": 14,
-    "screenshotInventorySha256": "9cad07c430653d6f12a7783a43729b393339f98d65aeaa15906d9bbd38ebd6b1",
+    "path": "plan/evidence/ATL-016/browser-evidence-attempt-07-0051.v1.json",
+    "sha256": "fc6a15bde8a35c3f4508c6c699978b76a9b761665507bdd693439a8e775d377c",
+    "checkedAt": "2026-07-27T12:01:37.266Z",
+    "checks": 11,
+    "screenshots": 9,
+    "screenshotInventorySha256": "df3e2dee905a4b6e22c1d0e1e8e9a6e159485301e4b002a52c2817164a68c1f0",
     "consoleErrors": 0
   },
   "coverage": {

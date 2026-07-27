@@ -1,8 +1,7 @@
 # QA-018 — Release-candidate staging and smoke evidence
 
-Status: retained historical `0050` technical-run evidence. The current
-integrated candidate now requires a new isolated run through `0051`; no new
-provider result or owner sign-off is claimed.
+Status: current `0051` technical run complete; Fernando's dated approval or
+rejection remains pending. No owner sign-off is claimed.
 
 `data/RELEASE-CANDIDATE-STAGING-SMOKE.md` defines the exact isolated run and
 `data/release-candidate-staging-smoke.v1.json` is its fail-closed record. Twelve
@@ -10,23 +9,22 @@ checks bind the candidate commit, data/method/migration/asset identities,
 isolation, job quiescence, schema/release/deployment/cache state, browser/API
 smoke, protected error handling, idempotent dry run, and unchanged freshness.
 
-The retained migration plans and replay records are historical evidence for
+The retained migration plans and replay records remain historical evidence for
 the exact candidates that produced them; they are not rewritten when the
-authoritative ledger advances. The now-deleted disposable child proves head
-`0050_index_release_header_contract`, 50 matching ledger entries, and the
-checked public-schema fingerprint. The current pending record separately binds
-the required `0033`–`0040`, `0042`–`0051` sequence, with no `0041`. A new exact
-`0051` zero-write plan and rehearsal artifact will be created during the new
-isolated run. Each migration remains machine-mapped to its actual owning task;
-one shared schema pass is not substituted for each task's product validation.
+authoritative ledger advances. Attempt 07 separately proves the exact required
+`0033`–`0040`, `0042`–`0051` sequence, with no `0041`, 51 matching ledger
+entries, and the checked public-schema fingerprint. Each migration remains
+machine-mapped to its actual owning task; one shared schema pass is not
+substituted for each task's product validation.
 
-The canonical smoke record has returned to `pending_external_authority` for the
-new exact candidate. The earlier exact candidate, disposable child, prebuilt
-Preview, release/method pointers, static manifest, twelve checks, responsive
-browser evidence, and unchanged freshness remain retained here without
-credentials. They are not relabeled as evidence for `0051`. No production
-release, production cron invocation, production database change, promotion, or
-owner sign-off is claimed.
+The canonical smoke record is now
+`run_complete_pending_owner_signoff`. It binds candidate `61351a43`, the
+disposable child, exact prebuilt Preview, Conditions/Index/Pulse pointers,
+737-file static manifest, twelve passing checks, responsive browser evidence,
+and unchanged source freshness. Production remained at
+`0032_sparkling_genesis` before and after the run. No production release,
+production cron invocation, production database change, promotion, or owner
+sign-off is claimed.
 
 After the bounded evidence and readiness reports were committed on 2026-07-26,
 the pinned Neon CLI deleted only unprotected child
@@ -76,6 +74,16 @@ candidate.
   [`run-06-preview-smoke.v1.json`](run-06-preview-smoke.v1.json),
   [`browser-smoke.v1.json`](browser-smoke.v1.json), and
   [`staging-static-assets.v1.json`](staging-static-assets.v1.json).
+- [`attempt-07-conditions-release-2026-07-27.md`](attempt-07-conditions-release-2026-07-27.md)
+  records the fresh child migration through `0051`, captured-input Conditions
+  release and replay/refusal gates, ordered Index publication, deterministic
+  model-free Pulse successor, exact prebuilt Preview, API/cache/protected-route
+  and cron dry-run checks, and responsive browser matrix. Its current machine
+  records are
+  [`run-07-preview-smoke.v1.json`](run-07-preview-smoke.v1.json),
+  [`staging-static-assets-attempt-07-0051.v1.json`](staging-static-assets-attempt-07-0051.v1.json),
+  and
+  [`../ATL-016/browser-evidence-attempt-07-0051.v1.json`](../ATL-016/browser-evidence-attempt-07-0051.v1.json).
 
 The existing automatic Preview integration still resolves the production
 branch by default, so it is not accepted as isolation evidence. The remaining
@@ -85,20 +93,17 @@ prebuilt output with a deployment-scoped `DATABASE_URL` override. This changes
 neither the project's persistent Preview environment nor the production
 deployment. Codex will not open an integration or Neon dashboard.
 
-The following retained command documents the preferred proof used for the
-historical `0050` candidate. The new isolated run must substitute its newly
-created child identity and require `0051_eminent_jocasta`; this example is not
-current-candidate authorization:
+The following retained command documents the target guard used for attempt 07:
 
 ```sh
 node --env-file=<temporary-preview-env> --import tsx \
   scripts/inspect-neon-target.ts \
   --expected-project=ancient-art-58836757 \
-  --expected-branch=br-bitter-fire-amcx8asi \
-  --expected-hostname-sha256=a5fb8fbdb1d9d993f39c19dc0e8e7a41c53fdf32f7fc1948b137db8f6aa71761 \
+  --expected-branch=br-gentle-paper-amsh6g7c \
+  --expected-hostname-sha256=927dbb0aec671e18fc4b632a8e466b1e312bee6f35c1190c11084d5c5266bb79 \
   --forbidden-branch=br-dawn-frog-amrf0h6a \
   --forbidden-hostname-sha256=c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b \
-  --required-migration-head=0050_index_release_header_contract
+  --required-migration-head=0051_eminent_jocasta
 ```
 
 When Vercel has already left `INITIALIZING`, the checked protocol permits only
@@ -109,16 +114,15 @@ input guard to a child-only Conditions release and head/pointer evidence
 observed from the exact Preview host. The temporary environment, automation
 token, and deployment-scoped secret were never printed or checked in.
 
-For the current `0051` candidate, the machine contract now makes the two proof
+For the current `0051` candidate, the machine contract makes the two proof
 modes exclusive. The preferred mode retains one sanitized successful
-`INITIALIZING` pull. The fallback retains only sanitized `BUILDING` and/or
-`READY` state-window rejections plus the bounded failure code; raw provider
-errors are prohibited. Either mode must bind the current candidate commit,
-deployment ID, exact Preview URL and host, target `preview`, the disposable
-child project/branch/endpoint/hostname hash, the forbidden production
-branch/hostname hash, head `0051_eminent_jocasta`, and the Conditions
-release/method/manifest pointer. The canonical record remains pending and
-contains no invented provider result.
+`INITIALIZING` pull. Attempt 07 truthfully uses the fallback: one sanitized
+`READY` state-window rejection plus the bounded failure code, with no provider
+error body retained. The runtime attestation binds the candidate commit,
+deployment ID, exact Preview URL and host, target `preview`, disposable-child
+project/branch/endpoint/hostname hash, forbidden production branch/hostname
+hash, head `0051_eminent_jocasta`, and the Conditions release/method/manifest
+pointer.
 
 Verification:
 

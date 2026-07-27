@@ -10,9 +10,9 @@ than a universal sovereign-state denominator. Economic rows expose source
 components only and never a stability score.
 
 [`release-reconciliation.v1.json`](release-reconciliation.v1.json) binds the
-selected public read to `conditions-qa018-20260726-v2`,
+selected public read to `conditions-20260727-v1`,
 `conditions-components/v1`, and manifest
-`d2248097a98111753ef69916a83d4e19f86861d7cd0b739fbd6bb35cabbcb53b`.
+`267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743`.
 The retained release has 340 calculations, 818 components, and 101 scores
 across all jurisdiction rows. The public API deliberately applies the closed
 `sovereign_state` filter and returns 295 calculations and 683 components; the
@@ -21,7 +21,7 @@ boundary rather than a general-country denominator.
 
 Verification:
 
-- Conditions contract: 46/46 tests passed;
+- Conditions contract: 51/51 tests passed;
 - API docs: all 20 registered v1 routes passed coverage, parameter, example,
   deprecation, rate-limit, and CSV checks;
 - route I/O: 108 files, 172 method contracts, 54 request contracts, 22

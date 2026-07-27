@@ -1,12 +1,20 @@
 {
   "schemaVersion": "civica-release-candidate-staging-smoke/v1",
   "taskId": "QA-018",
-  "status": "pending_external_authority",
-  "blocker": "owner_platform_staging_authority",
+  "status": "run_complete_pending_owner_signoff",
+  "blocker": "owner_post_run_signoff",
   "candidate": {
-    "commit": null,
-    "dataReleaseIds": [],
-    "methodVersions": [],
+    "commit": "61351a43ac4e381fd409f4939845c6aac4ef6305",
+    "dataReleaseIds": [
+      "conditions-20260727-v1",
+      "ci-beta-r5-2024-Q4",
+      "ea97916f-cc5d-4a18-9795-27805c4cfe3c"
+    ],
+    "methodVersions": [
+      "conditions-components/v1",
+      "beta-r5",
+      "pulse-v2.15-beta"
+    ],
     "migrationIds": [
       "0033_flat_hardball",
       "0034_superb_the_fallen",
@@ -47,101 +55,110 @@
       "0050_index_release_header_contract": "PLT-014",
       "0051_eminent_jocasta": "ATL-027"
     },
-    "assetManifestSha256": null
+    "assetManifestSha256": "2a355ac33fc110eac1046810d86687b0dbca272b5e043cd6f82c642879b2ff88"
   },
   "isolation": {
-    "neonBranchId": null,
-    "vercelDeploymentId": null,
-    "productionDatabaseExcluded": null,
-    "jobsQuiesced": null,
+    "neonBranchId": "br-gentle-paper-amsh6g7c",
+    "vercelDeploymentId": "dpl_2qPLXMA651ixPRrKLQaM7ZizuAak",
+    "productionDatabaseExcluded": true,
+    "jobsQuiesced": true,
     "runtimeAttestation": {
-      "proofMode": null,
-      "deploymentId": null,
-      "deploymentUrl": null,
-      "deploymentHost": null,
-      "target": null,
-      "candidateCommit": null,
-      "neonProjectId": null,
-      "neonBranchId": null,
-      "neonEndpointId": null,
-      "databaseHostnameSha256": null,
-      "forbiddenProductionBranchId": null,
-      "forbiddenProductionHostnameSha256": null,
-      "migrationHead": null,
-      "conditionsReleaseId": null,
-      "conditionsMethodologyVersion": null,
-      "conditionsManifestSha256": null,
-      "evidencePath": null,
-      "envPullAttemptEvidence": null
+      "proofMode": "exact_preview_runtime",
+      "deploymentId": "dpl_2qPLXMA651ixPRrKLQaM7ZizuAak",
+      "deploymentUrl": "https://civica-mdkwale4h-fbalinos-projects.vercel.app",
+      "deploymentHost": "civica-mdkwale4h-fbalinos-projects.vercel.app",
+      "target": "preview",
+      "candidateCommit": "61351a43ac4e381fd409f4939845c6aac4ef6305",
+      "neonProjectId": "ancient-art-58836757",
+      "neonBranchId": "br-gentle-paper-amsh6g7c",
+      "neonEndpointId": "ep-holy-wave-amcnk005",
+      "databaseHostnameSha256": "927dbb0aec671e18fc4b632a8e466b1e312bee6f35c1190c11084d5c5266bb79",
+      "forbiddenProductionBranchId": "br-dawn-frog-amrf0h6a",
+      "forbiddenProductionHostnameSha256": "c0ca2046b194c5a2a9db23679062055eb075b8183500889dde1968466be2425b",
+      "migrationHead": "0051_eminent_jocasta",
+      "conditionsReleaseId": "conditions-20260727-v1",
+      "conditionsMethodologyVersion": "conditions-components/v1",
+      "conditionsManifestSha256": "267cf0f2680bc94153a85386e08ce222c6797b2c26a6a9116de4d24573301743",
+      "evidencePath": "plan/evidence/QA-018/run-07-preview-smoke.v1.json",
+      "envPullAttemptEvidence": {
+        "attempts": [
+          {
+            "expectedState": "INITIALIZING",
+            "observedState": "READY",
+            "outcome": "state_window_rejected"
+          }
+        ],
+        "failureCode": "deployment_state_window_unavailable"
+      }
     }
   },
   "checks": [
     {
       "id": "zero-write-migration-plan",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/migration-plan-attempt-07-0051.json"
     },
     {
       "id": "authoritative-migrations",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     },
     {
       "id": "schema-fingerprint",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     },
     {
       "id": "release-data",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/ATL-027/attempt-07-release-validation.v1.json"
     },
     {
       "id": "deployment-identity",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     },
     {
       "id": "cache-headers",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     },
     {
       "id": "atlas-browser",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/ATL-016/browser-evidence-attempt-07-0051.v1.json"
     },
     {
       "id": "index-api",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     },
     {
       "id": "pulse-api",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     },
     {
       "id": "protected-error",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     },
     {
       "id": "cron-dry-run",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     },
     {
       "id": "source-freshness-unchanged",
-      "status": "not_run",
-      "evidence": null
+      "status": "pass",
+      "evidence": "plan/evidence/QA-018/run-07-preview-smoke.v1.json"
     }
   ],
   "signoff": {
     "owner": null,
     "checkedAt": null,
     "remainingManualChecks": [
-      "Run the exact integrated candidate through migration 0051 in an isolated nonproduction environment, then Fernando records a dated approval or rejection; the earlier 0050 rehearsal remains historical evidence and does not authorize production promotion."
+      "Fernando reviews the exact attempt-07 Preview, then records a dated approval or rejection before any production promotion."
     ]
   }
 }
