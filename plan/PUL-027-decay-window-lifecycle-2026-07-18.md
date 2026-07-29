@@ -1,6 +1,8 @@
 # PUL-027 — decay window and event lifecycle correction
 
-**Status:** implementation and forward migration prepared; production application remains pending.
+**Status:** complete as of 2026-07-29; production application, versioned
+recomputation, and live validation are recorded in
+`plan/evidence/PUL-027/production-closure-2026-07-29.md`.
 
 ## Problem
 
@@ -54,9 +56,9 @@ half of the declared decay curve.
 
 ## Completion boundary
 
-PUL-027 stays unchecked until the forward migration and a newly versioned
-production recomputation have completed with retained evidence. This plan does
-not authorize either production write.
+The forward migration and a newly versioned production recomputation completed
+with retained evidence on 2026-07-29. The production run was model-free and
+does not claim a prospective observation start or owner/external approval.
 
 ## Local verification recorded 2026-07-18
 

@@ -162,7 +162,7 @@ test("current contract states the non-negotiable publication boundaries", () => 
 test("the runtime snapshot distinguishes observed evidence from operating state", () => {
   assert.equal(
     CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.observedThrough,
-    "2026-07-26",
+    "2026-07-29",
   );
   assert.deepEqual(
     CURRENT_PULSE_RUNTIME_METHOD.feeds.observedEvidence.sourceIds,

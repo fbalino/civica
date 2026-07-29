@@ -24,6 +24,9 @@ import {
   PULSE_EVALUATION_BATCH_A_FRAME,
   PULSE_EVALUATION_BATCH_A_LEGACY,
   PULSE_EVALUATION_BATCH_A_RECONCILED,
+  PULSE_EVALUATION_BATCH_B_FRAME,
+  PULSE_EVALUATION_BATCH_B_LEGACY,
+  PULSE_EVALUATION_BATCH_B_RECONCILED,
   pulseEvaluationWorkspaceReconciliationPlan,
 } from "../src/lib/pulse/v2/evaluation-workspace-reconciliation";
 import {
@@ -49,12 +52,20 @@ const population = JSON.parse(
   readFileSync("data/research/pulse-evaluation-frame-population-v1.json", "utf8"),
 ) as PulseEvaluationPacketPopulationReference;
 
-const CURRENT_STUDIES: Record<
-  Exclude<PulseEvaluationPacketFrame, typeof PULSE_EVALUATION_BATCH_A_FRAME>,
-  string
-> = {
-  system_negative_probability: "pulse-evaluation-batch-b-v1",
-};
+const RECONCILIATIONS = [
+  {
+    label: "batch A",
+    frame: PULSE_EVALUATION_BATCH_A_FRAME,
+    legacy: PULSE_EVALUATION_BATCH_A_LEGACY,
+    reconciled: PULSE_EVALUATION_BATCH_A_RECONCILED,
+  },
+  {
+    label: "batch B",
+    frame: PULSE_EVALUATION_BATCH_B_FRAME,
+    legacy: PULSE_EVALUATION_BATCH_B_LEGACY,
+    reconciled: PULSE_EVALUATION_BATCH_B_RECONCILED,
+  },
+] as const;
 
 async function studySetupCounts(studyId: string) {
   const [packets, participants, assignments] = await Promise.all([
@@ -120,6 +131,7 @@ async function validateRebuiltStudy(
     assert.equal(snapshot.packetSnapshotSha256, expectedSnapshot.packetSnapshotSha256);
     assert.deepEqual(snapshot, expectedSnapshot);
   }
+  return rebuilt;
 }
 
 async function validateLiveWorkspace() {
@@ -138,61 +150,65 @@ async function validateLiveWorkspace() {
     "PUL-043 requires migration 0045_pulse_evaluation_workspace_reconciliation before live workspace validation",
   );
   const evidenceById = await loadPrivateEvidence();
-  const reconciliation = pulseEvaluationWorkspaceReconciliationPlan(
-    checked.semanticSha256,
-    checked.schemaVersion,
-    PULSE_EVALUATION_BATCH_A_LEGACY.id,
-    deterministicUuid,
-  );
   const rows = await db
     .select()
     .from(pulseCodingStudies)
     .where(
-      inArray(pulseCodingStudies.slug, [
-        PULSE_EVALUATION_BATCH_A_LEGACY.slug,
-        PULSE_EVALUATION_BATCH_A_RECONCILED.slug,
-        ...Object.values(CURRENT_STUDIES),
-      ]),
+      inArray(
+        pulseCodingStudies.slug,
+        RECONCILIATIONS.flatMap(({ legacy, reconciled }) => [
+          legacy.slug,
+          reconciled.slug,
+        ]),
+      ),
     );
-  assert.equal(rows.length, 3, "both current studies and the preserved legacy study must exist");
-  const legacy = rows.find((row) => row.slug === PULSE_EVALUATION_BATCH_A_LEGACY.slug);
-  assert.ok(legacy, "legacy batch A study is missing");
-  assert.equal(legacy.id, reconciliation.legacyStudyId, "legacy batch A identity drifted");
-  assert.equal(legacy.status, "setup", "legacy batch A study access is enabled prematurely");
-  assert.equal(legacy.packetSetSha256, PULSE_EVALUATION_BATCH_A_LEGACY.packetSetSha256);
-  assert.equal(legacy.supersedesStudyId, null, "legacy batch A must not replace another study");
-  assert.equal(legacy.supersessionReason, null, "legacy batch A supersession state drifted");
-  const legacyPackets = await studySetupCounts(legacy.id);
   assert.equal(
-    legacyPackets.length,
-    checked.packets.filter((packet) => packet.frame === PULSE_EVALUATION_BATCH_A_FRAME).length,
-    "legacy batch A packet count drifted",
+    rows.length,
+    RECONCILIATIONS.length * 2,
+    "both reconciled studies and both preserved legacy studies must exist",
   );
+  for (const spec of RECONCILIATIONS) {
+    const reconciliation = pulseEvaluationWorkspaceReconciliationPlan(
+      checked.semanticSha256,
+      checked.schemaVersion,
+      spec.legacy.id,
+      deterministicUuid,
+      spec.frame,
+      spec.reconciled.datasetVersionSuffix,
+    );
+    const legacy = rows.find((row) => row.slug === spec.legacy.slug);
+    assert.ok(legacy, `legacy ${spec.label} study is missing`);
+    assert.equal(legacy.id, reconciliation.legacyStudyId, `legacy ${spec.label} identity drifted`);
+    assert.equal(legacy.status, "setup", `legacy ${spec.label} study access is enabled prematurely`);
+    assert.equal(legacy.packetSetSha256, spec.legacy.packetSetSha256);
+    assert.equal(legacy.supersedesStudyId, null, `legacy ${spec.label} must not replace another study`);
+    assert.equal(legacy.supersessionReason, null, `legacy ${spec.label} supersession state drifted`);
+    const legacyPackets = await studySetupCounts(legacy.id);
+    assert.equal(
+      legacyPackets.length,
+      checked.packets.filter((packet) => packet.frame === spec.frame).length,
+      `legacy ${spec.label} packet count drifted`,
+    );
 
-  const successor = rows.find((row) => row.slug === PULSE_EVALUATION_BATCH_A_RECONCILED.slug);
-  assert.ok(successor, "reconciled batch A study is missing");
-  assert.equal(successor.id, reconciliation.successorStudyId, "reconciled batch A identity drifted");
-  assert.equal(successor.supersedesStudyId, legacy.id, "reconciled batch A has the wrong predecessor");
-  assert.equal(
-    successor.supersessionReason,
-    PULSE_EVALUATION_BATCH_A_RECONCILED.supersessionReason,
-    "reconciled batch A has the wrong supersession reason",
-  );
-  await validateRebuiltStudy(
-    PULSE_EVALUATION_BATCH_A_FRAME,
-    successor,
-    evidenceById,
-    {
+    const successor = rows.find((row) => row.slug === spec.reconciled.slug);
+    assert.ok(successor, `reconciled ${spec.label} study is missing`);
+    assert.equal(successor.id, reconciliation.successorStudyId, `reconciled ${spec.label} identity drifted`);
+    assert.equal(successor.supersedesStudyId, legacy.id, `reconciled ${spec.label} has the wrong predecessor`);
+    assert.equal(
+      successor.supersessionReason,
+      spec.reconciled.supersessionReason,
+      `reconciled ${spec.label} has the wrong supersession reason`,
+    );
+    const rebuilt = await validateRebuiltStudy(spec.frame, successor, evidenceById, {
       datasetVersion: reconciliation.successorDatasetVersion,
-      title: PULSE_EVALUATION_BATCH_A_RECONCILED.title,
-    },
-  );
-
-  const batchB = rows.find((row) => row.slug === CURRENT_STUDIES.system_negative_probability);
-  assert.ok(batchB, "batch B study is missing");
-  assert.equal(batchB.supersedesStudyId, null, "batch B unexpectedly supersedes a study");
-  assert.equal(batchB.supersessionReason, null, "batch B supersession state drifted");
-  await validateRebuiltStudy("system_negative_probability", batchB, evidenceById);
+      title: spec.reconciled.title,
+    });
+    assert.equal(
+      rebuilt.study.packetSetSha256,
+      spec.reconciled.packetSetSha256,
+      `reconciled ${spec.label} expected packet-set hash drifted`,
+    );
+  }
 }
 
 async function main() {
@@ -223,7 +239,7 @@ async function main() {
   );
   if (LIVE) await validateLiveWorkspace();
   console.log(
-    `PASS — ${checked.counts.totalPackets} rights-safe unlabeled packets reproduced from retained frozen inputs${LIVE ? " and two isolated setup studies" : ""}${COMPARE_CURRENT_DATABASE ? " and the current database reconstruction" : ""}; ${checked.semanticSha256}.`,
+    `PASS — ${checked.counts.totalPackets} rights-safe unlabeled packets reproduced from retained frozen inputs${LIVE ? " and two reconciled isolated setup studies with both legacy studies preserved" : ""}${COMPARE_CURRENT_DATABASE ? " and the current database reconstruction" : ""}; ${checked.semanticSha256}.`,
   );
 }
 

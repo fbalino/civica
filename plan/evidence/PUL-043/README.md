@@ -2,11 +2,15 @@
 
 ## Status
 
-Prepared on 2026-07-18. The production workspace has not been modified. This
-task remains open until the authorized migration and append-only repair run,
-then `npm run validate:pulse-evaluation-packets:live` passes.
+Completed on 2026-07-29. The guarded production repair preserved both legacy
+studies, added only isolated append-only successors, replayed with zero further
+writes, and passed `npm run validate:pulse-evaluation-packets:live`.
 
-## Read-only evidence
+The dated closure record is
+[`production-closure-2026-07-29.md`](production-closure-2026-07-29.md). The
+pre-change preparation below remains part of the audit trail.
+
+## Pre-change read-only evidence
 
 `npm run plan:pulse-evaluation-workspace-reconciliation` read the private
 workspace without writing and recorded:
@@ -22,15 +26,16 @@ workspace without writing and recorded:
   hash `100c44c3397474c3c0ef8a96879b2099aa5823e286f65806c9605e6a97285b46`
 
 The zero-write migration plan reported four additive/non-destructive statements
-against `pulse_coding_studies` and no writes. The current live validator stops
-with the expected migration prerequisite: the supersession columns do not yet
-exist, so it cannot falsely report the unrepaired workspace as valid.
+against `pulse_coding_studies` and no writes. At this checkpoint, the live
+validator stopped with the expected migration prerequisite: the supersession
+columns did not yet exist, so it could not falsely report the unrepaired
+workspace as valid.
 
 A fresh disposable PostgreSQL 17 cluster applied all 45 authoritative
 migrations and matched the checked post-migration public-schema fingerprint:
 `6c724c61b9292ea5b4a8ebc2d982c708d89035b71c0f510ef521b193411bb00a`.
 
-## Authorized execution order
+## Prepared execution order
 
 1. Run `npm run db:plan -- --id=0045_pulse_evaluation_workspace_reconciliation --live` immediately before the change and review its zero-write report.
 2. Apply the checked migration through the normal authoritative migration path.
@@ -44,3 +49,7 @@ migrations and matched the checked post-migration public-schema fingerprint:
 The successor has a restrictive `supersedes_study_id` reference and the closed
 reason `frozen_packet_hash_mismatch`. It does not alter the legacy study's
 identity, hash, packet snapshots, evidence, access state, or audit history.
+
+During production validation, a second mismatch was identified for batch B.
+The same fail-closed, append-only contract was extended to that isolated study;
+the dated closure record documents the exact resulting writes and validation.

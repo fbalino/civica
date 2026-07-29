@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 310
-- **Completed:** 252
-- **Remaining:** 58
-- **Progress:** 81.3%
+- **Completed:** 254
+- **Remaining:** 56
+- **Progress:** 81.9%
 - **Priority mix:** P0 192 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -151,7 +151,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [ ] **PUL-024** (P1) Add drift monitoring for source mix, language mix, model versions, taxonomy labels, confidence, abstention, and review overturns. _Done when: baseline distributions and alert thresholds are versioned, a seeded distribution shift triggers an alert, and alerts link to affected rows and remediation runbook._
 - [x] **PUL-025** (P0) Replace the current historical backtest with separate regression, retrospective-validity, and prospective-shadow protocols. _Done when: famous shocks are labelled regression fixtures; retrospective samples penalize spurious dimensions and missed events; a locked prospective protocol forbids tuning on future labels; the current ensemble and full pipeline are evaluated._
 - [ ] **PUL-026** (P0) Run a prospective shadow period sized by the preregistered protocol. _Done when: the locked pipeline operates for the required dates/sample, all outputs are retained before human labels, no post hoc rule is applied without a new version, and results/limitations are published regardless of outcome._
-- [ ] **PUL-027** (P1) Correct decay-window and event-lifecycle inconsistencies before any scoring experiment. _Done when: lookback windows cannot truncate events before configured half-lives, supersession/persistence/recurrence rules are explicit, deterministic fixtures cover all half-lives/bounds, and historical recomputation is versioned._
+- [x] **PUL-027** (P1) Correct decay-window and event-lifecycle inconsistencies before any scoring experiment. _Done when: lookback windows cannot truncate events before configured half-lives, supersession/persistence/recurrence rules are explicit, deterministic fixtures cover all half-lives/bounds, and historical recomputation is versioned._
 - [ ] **PUL-028** (P1) If ledger validation passes, preregister a separate numeric-signal research model and baseline contest. _Done when: the model defines the estimand, causal/non-causal claim, aggregation, observability, uncertainty, decay, source bias, and simple baselines; thresholds are locked before winner results and “no public signal” is an allowed decision._
 - [ ] **PUL-029** (P0) Publish a Pulse disposition resolution. _Done when: results decide among ledger-only, ledger plus non-comparable descriptive summaries, or a validated numeric signal; the resolution lists evidence, failed thresholds, limitations, version/migration plan, and conditions for reconsideration._
 - [ ] **PUL-030** (P0) Release the selected Pulse ledger product with operational safeguards. _Done when: versioned ledger UI/API/export, evidence/provenance, codebook, source coverage, observability, corrections, review status, limitations, tests, cron monitoring, cost controls, and reproducibility package pass their gates; any numeric layer matches PUL-029 exactly._
@@ -167,7 +167,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [ ] **PUL-040** (P1) Start the prospective shadow-period clock at the earliest protocol-valid date. _Done when: the preregistered protocol's start prerequisites are enumerated with current status, the earliest compliant start date is computed and recorded, pipeline and method versions for the window are frozen, window output retention is verified running before human labels exist, and the start decision is logged in evidence and `plan/PROGRESS.md`._
 - [x] **PUL-041** (P0) Materialize the remaining coder-ready evaluation packet releases. _Done when: the 384-item event-candidate census and 536-item system-negative draw exist as rights-safe unlabeled frozen packets with exact evidence/search context, packet/codebook/ontology hashes, analysis/reserve status, zero production/model/owner answer fields, workspace import support, and validators proving their counts and linkage to `pulse-evaluation-sampling-frame/v1` before recruitment or PUL-018 runs._
 - [x] **PUL-042** (P0) Decouple frozen evaluation-packet validation from the mutable live candidate pool. _Done when: the build validates the checked packet manifest from retained frozen population inputs rather than reconstructing it from mutable production tables; post-freeze or late-arriving live rows cannot drift the frozen packet release; seeded frozen-input or manifest tampering fails; and a separate read-only live audit reports population differences without rewriting the preregistered release._
-- [ ] **PUL-043** (P0) Reconcile the private coding workspace with the immutable checked evaluation-packet release. _Done when: the disabled setup studies' packet-set and snapshot hashes match the retained frozen inputs and checked manifest, or an append-only superseding study preserves the mismatched rows; no label, assignment, evidence, or prior study state is overwritten; a zero-write plan names the exact changes; and `npm run validate:pulse-evaluation-packets:live` passes after the authorized migration or repair._
+- [x] **PUL-043** (P0) Reconcile the private coding workspace with the immutable checked evaluation-packet release. _Done when: the disabled setup studies' packet-set and snapshot hashes match the retained frozen inputs and checked manifest, or an append-only superseding study preserves the mismatched rows; no label, assignment, evidence, or prior study state is overwritten; a zero-write plan names the exact changes; and `npm run validate:pulse-evaluation-packets:live` passes after the authorized migration or repair._
 
 ## Area 06 — Atlas Content and Research Features
 

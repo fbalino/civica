@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "992f3ee25ca794835d318dfeec554856dd39c2b6a2631a11c79eab9d10bcce20",
+  "contractHash": "890693b9702d1710ff1bb9dc7e0fab205de3c46f5ebb1f4fa0519db820a5cf61",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -324,7 +324,7 @@
       }
     ],
     "observedEvidence": {
-      "observedThrough": "2026-07-26",
+      "observedThrough": "2026-07-29",
       "sourceIds": [
         "amnesty",
         "civicus_monitor",

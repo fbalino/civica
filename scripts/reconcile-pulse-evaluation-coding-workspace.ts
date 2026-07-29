@@ -13,9 +13,14 @@ import {
   PULSE_EVALUATION_BATCH_A_FRAME,
   PULSE_EVALUATION_BATCH_A_LEGACY,
   PULSE_EVALUATION_BATCH_A_RECONCILED,
+  PULSE_EVALUATION_BATCH_B_FRAME,
+  PULSE_EVALUATION_BATCH_B_LEGACY,
+  PULSE_EVALUATION_BATCH_B_RECONCILED,
+  PULSE_EVALUATION_BATCH_B_WORKSPACE_RECONCILIATION_VERSION,
   PULSE_EVALUATION_WORKSPACE_RECONCILIATION_VERSION,
   pulseEvaluationWorkspaceReconciliationPlan,
 } from "../src/lib/pulse/v2/evaluation-workspace-reconciliation";
+import type { PulseEvaluationPacketFrame } from "../src/lib/pulse/v2/evaluation-packets";
 import { pulseCodingHash } from "../src/lib/pulse/v2/coding-workspace";
 import {
   buildSnapshots,
@@ -27,6 +32,42 @@ import {
 config({ path: ".env.local" });
 
 const APPLY = process.argv.includes("--apply");
+
+type ReconciliationSpec = {
+  label: string;
+  frame: PulseEvaluationPacketFrame;
+  legacy: {
+    slug: string;
+    id: string;
+    packetSetSha256: string;
+  };
+  reconciled: {
+    slug: string;
+    datasetVersionSuffix: string;
+    title: string;
+    packetSetSha256: string;
+    supersessionReason: "frozen_packet_hash_mismatch";
+  };
+  reconciliationVersion: string;
+};
+
+const RECONCILIATIONS: readonly ReconciliationSpec[] = [
+  {
+    label: "batch A",
+    frame: PULSE_EVALUATION_BATCH_A_FRAME,
+    legacy: PULSE_EVALUATION_BATCH_A_LEGACY,
+    reconciled: PULSE_EVALUATION_BATCH_A_RECONCILED,
+    reconciliationVersion: PULSE_EVALUATION_WORKSPACE_RECONCILIATION_VERSION,
+  },
+  {
+    label: "batch B",
+    frame: PULSE_EVALUATION_BATCH_B_FRAME,
+    legacy: PULSE_EVALUATION_BATCH_B_LEGACY,
+    reconciled: PULSE_EVALUATION_BATCH_B_RECONCILED,
+    reconciliationVersion:
+      PULSE_EVALUATION_BATCH_B_WORKSPACE_RECONCILIATION_VERSION,
+  },
+];
 
 const studyFields = {
   id: pulseCodingStudies.id,
@@ -40,22 +81,27 @@ const studyFields = {
   datasetVersion: pulseCodingStudies.datasetVersion,
   packetSetSha256: pulseCodingStudies.packetSetSha256,
   traceSetSha256: pulseCodingStudies.traceSetSha256,
+  supersedesStudyId: pulseCodingStudies.supersedesStudyId,
+  supersessionReason: pulseCodingStudies.supersessionReason,
   status: pulseCodingStudies.status,
   createdBy: pulseCodingStudies.createdBy,
+  createdAt: pulseCodingStudies.createdAt,
   closedAt: pulseCodingStudies.closedAt,
 };
 
 type StudyRow = Awaited<ReturnType<typeof getStudy>>;
 
-function expectedSuccessor() {
+function expectedSuccessor(spec: ReconciliationSpec) {
   const plan = pulseEvaluationWorkspaceReconciliationPlan(
     evaluationPacketManifest.semanticSha256,
     evaluationPacketManifest.schemaVersion,
-    PULSE_EVALUATION_BATCH_A_LEGACY.id,
+    spec.legacy.id,
     deterministicUuid,
+    spec.frame,
+    spec.reconciled.datasetVersionSuffix,
   );
   const packets = evaluationPacketManifest.packets.filter(
-    (packet) => packet.frame === PULSE_EVALUATION_BATCH_A_FRAME,
+    (packet) => packet.frame === spec.frame,
   );
   return {
     ...plan,
@@ -73,19 +119,14 @@ async function getStudy(slug: string) {
   )[0];
 }
 
-async function studyCounts(studyId: string) {
-  const [packets, participants, assignments] = await Promise.all([
+async function studyState(studyId: string) {
+  const [packets, participants, assignments, auditRows] = await Promise.all([
     db
-      .select({
-        packetKey: pulseCodingPackets.packetKey,
-        analysisStatus: pulseCodingPackets.analysisStatus,
-        packetSnapshot: pulseCodingPackets.packetSnapshot,
-        packetSnapshotSha256: pulseCodingPackets.packetSnapshotSha256,
-      })
+      .select()
       .from(pulseCodingPackets)
       .where(eq(pulseCodingPackets.studyId, studyId)),
     db
-      .select({ id: pulseCodingParticipants.id })
+      .select()
       .from(pulseCodingParticipants)
       .where(eq(pulseCodingParticipants.studyId, studyId)),
     db
@@ -98,133 +139,211 @@ async function studyCounts(studyId: string) {
           eq(pulseCodingPackets.studyId, studyId),
         ),
       ),
+    db
+      .select()
+      .from(pulseCodingAuditLog)
+      .where(eq(pulseCodingAuditLog.studyId, studyId)),
   ]);
-  return { packets, participants, assignments };
+  return { packets, participants, assignments, auditRows };
 }
 
-function immutableStudyFingerprint(study: NonNullable<StudyRow>, counts: Awaited<ReturnType<typeof studyCounts>>) {
+function immutableStudyFingerprint(
+  study: NonNullable<StudyRow>,
+  state: Awaited<ReturnType<typeof studyState>>,
+) {
   return pulseCodingHash({
     study,
-    packets: [...counts.packets].sort((left, right) =>
-      left.packetKey.localeCompare(right.packetKey),
+    packets: [...state.packets].sort((left, right) =>
+      left.id.localeCompare(right.id),
     ),
-    participants: counts.participants.map(({ id }) => id).sort(),
-    assignments: counts.assignments.map(({ id }) => id).sort(),
+    participants: [...state.participants].sort((left, right) =>
+      left.id.localeCompare(right.id),
+    ),
+    assignments: [...state.assignments].sort((left, right) =>
+      left.id.localeCompare(right.id),
+    ),
+    auditRows: [...state.auditRows].sort((left, right) =>
+      left.id.localeCompare(right.id),
+    ),
   });
 }
 
-async function validateLegacy() {
-  const plan = expectedSuccessor();
-  const legacy = await getStudy(PULSE_EVALUATION_BATCH_A_LEGACY.slug);
-  assert.ok(legacy, "legacy batch A study is missing");
-  assert.equal(legacy.id, PULSE_EVALUATION_BATCH_A_LEGACY.id, "legacy batch A identity drifted");
-  assert.equal(legacy.status, "setup", "legacy batch A study access is enabled");
-  assert.equal(legacy.purpose, "evaluation", "legacy batch A purpose drifted");
+async function validateLegacy(spec: ReconciliationSpec) {
+  const plan = expectedSuccessor(spec);
+  const legacy = await getStudy(spec.legacy.slug);
+  assert.ok(legacy, `legacy ${spec.label} study is missing`);
+  assert.equal(
+    legacy.id,
+    spec.legacy.id,
+    `legacy ${spec.label} identity drifted`,
+  );
+  assert.equal(
+    legacy.status,
+    "setup",
+    `legacy ${spec.label} study access is enabled`,
+  );
+  assert.equal(
+    legacy.purpose,
+    "evaluation",
+    `legacy ${spec.label} purpose drifted`,
+  );
   assert.equal(
     legacy.packetSetSha256,
-    PULSE_EVALUATION_BATCH_A_LEGACY.packetSetSha256,
-    "legacy batch A packet-set hash was rewritten instead of preserved",
+    spec.legacy.packetSetSha256,
+    `legacy ${spec.label} packet-set hash was rewritten instead of preserved`,
   );
-  const counts = await studyCounts(legacy.id);
   assert.equal(
-    counts.packets.length,
-    plan.packets.length,
-    "legacy batch A packet count drifted",
+    legacy.supersedesStudyId,
+    null,
+    `legacy ${spec.label} unexpectedly supersedes another study`,
   );
-  assert.equal(counts.participants.length, 0, "legacy batch A gained participants");
-  assert.equal(counts.assignments.length, 0, "legacy batch A gained assignments");
-  return { legacy, counts, fingerprint: immutableStudyFingerprint(legacy, counts) };
+  assert.equal(
+    legacy.supersessionReason,
+    null,
+    `legacy ${spec.label} supersession state drifted`,
+  );
+  const state = await studyState(legacy.id);
+  assert.equal(
+    state.packets.length,
+    plan.packets.length,
+    `legacy ${spec.label} packet count drifted`,
+  );
+  assert.equal(
+    state.participants.length,
+    0,
+    `legacy ${spec.label} gained participants`,
+  );
+  assert.equal(
+    state.assignments.length,
+    0,
+    `legacy ${spec.label} gained assignments`,
+  );
+  return {
+    legacy,
+    state,
+    fingerprint: immutableStudyFingerprint(legacy, state),
+  };
 }
 
 async function validateSuccessor(
+  spec: ReconciliationSpec,
   plan: ReturnType<typeof expectedSuccessor>,
   legacyId: string,
 ) {
-  const row = (
-    await db
-      .select({
-        ...studyFields,
-        supersedesStudyId: pulseCodingStudies.supersedesStudyId,
-        supersessionReason: pulseCodingStudies.supersessionReason,
-      })
-      .from(pulseCodingStudies)
-      .where(eq(pulseCodingStudies.slug, PULSE_EVALUATION_BATCH_A_RECONCILED.slug))
-      .limit(1)
-  )[0];
-  assert.ok(row, "reconciled batch A study is missing");
-  assert.equal(row.id, plan.successorStudyId, "reconciled batch A identity drifted");
-  assert.equal(row.status, "setup", "reconciled batch A study access is enabled");
-  assert.equal(row.purpose, "evaluation", "reconciled batch A purpose drifted");
-  assert.equal(row.supersedesStudyId, legacyId, "reconciled batch A has the wrong predecessor");
+  const row = await getStudy(spec.reconciled.slug);
+  assert.ok(row, `reconciled ${spec.label} study is missing`);
+  assert.equal(
+    row.id,
+    plan.successorStudyId,
+    `reconciled ${spec.label} identity drifted`,
+  );
+  assert.equal(
+    row.status,
+    "setup",
+    `reconciled ${spec.label} study access is enabled`,
+  );
+  assert.equal(
+    row.purpose,
+    "evaluation",
+    `reconciled ${spec.label} purpose drifted`,
+  );
+  assert.equal(
+    row.supersedesStudyId,
+    legacyId,
+    `reconciled ${spec.label} has the wrong predecessor`,
+  );
   assert.equal(
     row.supersessionReason,
-    PULSE_EVALUATION_BATCH_A_RECONCILED.supersessionReason,
-    "reconciled batch A has the wrong supersession reason",
+    spec.reconciled.supersessionReason,
+    `reconciled ${spec.label} has the wrong supersession reason`,
   );
   const evidenceById = await loadPrivateEvidence();
   const rebuilt = buildSnapshots(
-    PULSE_EVALUATION_BATCH_A_FRAME,
+    spec.frame,
     plan.successorStudyId,
     plan.packets,
     evidenceById,
     {
       datasetVersion: plan.successorDatasetVersion,
-      title: PULSE_EVALUATION_BATCH_A_RECONCILED.title,
+      title: spec.reconciled.title,
     },
+  );
+  assert.equal(
+    rebuilt.study.packetSetSha256,
+    spec.reconciled.packetSetSha256,
+    `reconciled ${spec.label} expected packet-set hash drifted`,
   );
   assert.equal(
     row.packetSetSha256,
     rebuilt.study.packetSetSha256,
-    "reconciled batch A packet-set hash drifted",
+    `reconciled ${spec.label} packet-set hash drifted`,
   );
   assert.equal(
     row.datasetVersion,
     plan.successorDatasetVersion,
-    "reconciled batch A dataset version drifted",
+    `reconciled ${spec.label} dataset version drifted`,
   );
-  assert.equal(row.title, PULSE_EVALUATION_BATCH_A_RECONCILED.title);
-  const counts = await studyCounts(row.id);
-  assert.equal(counts.packets.length, rebuilt.snapshots.length, "reconciled batch A packet count drifted");
-  assert.equal(counts.participants.length, 0, "reconciled batch A gained participants");
-  assert.equal(counts.assignments.length, 0, "reconciled batch A gained assignments");
-  const actualByKey = new Map(counts.packets.map((packet) => [packet.packetKey, packet]));
+  assert.equal(row.title, spec.reconciled.title);
+  const state = await studyState(row.id);
+  assert.equal(
+    state.packets.length,
+    rebuilt.snapshots.length,
+    `reconciled ${spec.label} packet count drifted`,
+  );
+  assert.equal(
+    state.participants.length,
+    0,
+    `reconciled ${spec.label} gained participants`,
+  );
+  assert.equal(
+    state.assignments.length,
+    0,
+    `reconciled ${spec.label} gained assignments`,
+  );
+  const actualByKey = new Map(
+    state.packets.map((packet) => [packet.packetKey, packet]),
+  );
   for (const snapshot of rebuilt.snapshots) {
     const actual = actualByKey.get(snapshot.id);
-    assert.ok(actual, `reconciled batch A/${snapshot.id}: packet is missing`);
+    assert.ok(
+      actual,
+      `reconciled ${spec.label}/${snapshot.id}: packet is missing`,
+    );
     assert.equal(actual.packetSnapshotSha256, snapshot.packetSnapshotSha256);
     assert.deepEqual(actual.packetSnapshot, snapshot);
   }
-  return { row, rebuilt, counts };
+  return { row, rebuilt, state };
 }
 
 async function applySuccessor(
+  spec: ReconciliationSpec,
   plan: ReturnType<typeof expectedSuccessor>,
   legacyId: string,
 ) {
   const evidenceById = await loadPrivateEvidence();
   const rebuilt = buildSnapshots(
-    PULSE_EVALUATION_BATCH_A_FRAME,
+    spec.frame,
     plan.successorStudyId,
     plan.packets,
     evidenceById,
     {
       datasetVersion: plan.successorDatasetVersion,
-      title: PULSE_EVALUATION_BATCH_A_RECONCILED.title,
+      title: spec.reconciled.title,
     },
   );
   const successorHash = pulseCodingHash({
     ...rebuilt.study,
     supersedesStudyId: legacyId,
-    supersessionReason: PULSE_EVALUATION_BATCH_A_RECONCILED.supersessionReason,
+    supersessionReason: spec.reconciled.supersessionReason,
   });
   await db
     .insert(pulseCodingStudies)
     .values({
       ...rebuilt.study,
-      slug: PULSE_EVALUATION_BATCH_A_RECONCILED.slug,
+      slug: spec.reconciled.slug,
       createdBy: "PUL-043 append-only reconciliation",
       supersedesStudyId: legacyId,
-      supersessionReason: PULSE_EVALUATION_BATCH_A_RECONCILED.supersessionReason,
+      supersessionReason: spec.reconciled.supersessionReason,
     })
     .onConflictDoNothing();
   await db
@@ -239,20 +358,22 @@ async function applySuccessor(
       requestId: `pul-043-study-${plan.successorStudyId}`,
       afterSha256: successorHash,
       details: {
-        reconciliationVersion: PULSE_EVALUATION_WORKSPACE_RECONCILIATION_VERSION,
+        reconciliationVersion: spec.reconciliationVersion,
         manifestSha256: evaluationPacketManifest.semanticSha256,
         supersedesStudyId: legacyId,
-        supersessionReason: PULSE_EVALUATION_BATCH_A_RECONCILED.supersessionReason,
+        supersessionReason: spec.reconciled.supersessionReason,
         labelStatus: "unlabeled",
         participantAccess: "disabled_while_setup",
       },
     })
     .onConflictDoNothing();
   for (let offset = 0; offset < rebuilt.snapshots.length; offset += 50) {
-    const chunk = rebuilt.snapshots.slice(offset, offset + 50).map((snapshot) => ({
-      recordId: deterministicUuid(`${plan.successorStudyId}|${snapshot.id}`),
-      snapshot,
-    }));
+    const chunk = rebuilt.snapshots
+      .slice(offset, offset + 50)
+      .map((snapshot) => ({
+        recordId: deterministicUuid(`${plan.successorStudyId}|${snapshot.id}`),
+        snapshot,
+      }));
     await db.batch([
       db
         .insert(pulseCodingPackets)
@@ -283,7 +404,7 @@ async function applySuccessor(
             details: {
               packetKey: snapshot.id,
               manifestSha256: evaluationPacketManifest.semanticSha256,
-              reconciliationVersion: PULSE_EVALUATION_WORKSPACE_RECONCILIATION_VERSION,
+              reconciliationVersion: spec.reconciliationVersion,
             },
           })),
         )
@@ -293,74 +414,112 @@ async function applySuccessor(
   return rebuilt;
 }
 
-async function main() {
-  const plan = expectedSuccessor();
-  const before = await validateLegacy();
-  const existingSuccessor = await getStudy(PULSE_EVALUATION_BATCH_A_RECONCILED.slug);
-  if (!APPLY) {
-    console.log(
-      JSON.stringify(
-        {
-          mode: "dry_run",
-          writesPerformed: 0,
-          migrationRequired: "0045_pulse_evaluation_workspace_reconciliation",
-          reconciliationVersion: PULSE_EVALUATION_WORKSPACE_RECONCILIATION_VERSION,
-          legacy: {
-            slug: before.legacy.slug,
-            id: before.legacy.id,
-            packetSetSha256: before.legacy.packetSetSha256,
-            immutableFingerprint: before.fingerprint,
-            packets: before.counts.packets.length,
-            participants: before.counts.participants.length,
-            assignments: before.counts.assignments.length,
-            operations: [],
-          },
-          successor: {
-            slug: PULSE_EVALUATION_BATCH_A_RECONCILED.slug,
-            id: plan.successorStudyId,
-            supersedesStudyId: plan.legacyStudyId,
-            datasetVersion: plan.successorDatasetVersion,
-            packetSetSha256: buildSnapshots(
-              PULSE_EVALUATION_BATCH_A_FRAME,
-              plan.successorStudyId,
-              plan.packets,
-              await loadPrivateEvidence(),
-              {
-                datasetVersion: plan.successorDatasetVersion,
-                title: PULSE_EVALUATION_BATCH_A_RECONCILED.title,
-              },
-            ).study.packetSetSha256,
-            packetsToInsert: plan.packets.length,
-            studyAlreadyPresent: !!existingSuccessor,
-            operations: ["insert_study", "insert_audit_log", "insert_packets"],
-          },
-        },
-        null,
-        2,
-      ),
+async function dryRun() {
+  const evidenceById = await loadPrivateEvidence();
+  const reconciliations = [];
+  for (const spec of RECONCILIATIONS) {
+    const plan = expectedSuccessor(spec);
+    const before = await validateLegacy(spec);
+    const existingSuccessor = await getStudy(spec.reconciled.slug);
+    const rebuilt = buildSnapshots(
+      spec.frame,
+      plan.successorStudyId,
+      plan.packets,
+      evidenceById,
+      {
+        datasetVersion: plan.successorDatasetVersion,
+        title: spec.reconciled.title,
+      },
     );
-    return;
-  }
-  if (existingSuccessor) {
-    await validateSuccessor(plan, before.legacy.id);
-    console.log(
-      `PASS — ${PULSE_EVALUATION_BATCH_A_RECONCILED.slug} is already a valid ` +
-        "append-only successor; no workspace rows were changed.",
+    assert.equal(
+      rebuilt.study.packetSetSha256,
+      spec.reconciled.packetSetSha256,
+      `reconciled ${spec.label} expected packet-set hash drifted`,
     );
-    return;
+    if (existingSuccessor)
+      await validateSuccessor(spec, plan, before.legacy.id);
+    reconciliations.push({
+      reconciliationVersion: spec.reconciliationVersion,
+      legacy: {
+        slug: before.legacy.slug,
+        id: before.legacy.id,
+        packetSetSha256: before.legacy.packetSetSha256,
+        immutableFingerprint: before.fingerprint,
+        packets: before.state.packets.length,
+        participants: before.state.participants.length,
+        assignments: before.state.assignments.length,
+        auditRows: before.state.auditRows.length,
+        operations: [],
+      },
+      successor: {
+        slug: spec.reconciled.slug,
+        id: plan.successorStudyId,
+        supersedesStudyId: plan.legacyStudyId,
+        datasetVersion: plan.successorDatasetVersion,
+        packetSetSha256: rebuilt.study.packetSetSha256,
+        packetsToInsert: existingSuccessor ? 0 : plan.packets.length,
+        auditRowsToInsert: existingSuccessor ? 0 : plan.packets.length + 1,
+        participantsToInsert: 0,
+        assignmentsToInsert: 0,
+        studyAlreadyPresent: !!existingSuccessor,
+        operations: existingSuccessor
+          ? []
+          : ["insert_study", "insert_audit_log", "insert_packets"],
+      },
+    });
   }
-  await applySuccessor(plan, before.legacy.id);
-  const after = await validateLegacy();
-  assert.equal(
-    after.fingerprint,
-    before.fingerprint,
-    "legacy batch A changed during append-only reconciliation",
-  );
-  await validateSuccessor(plan, before.legacy.id);
   console.log(
-    `PASS — appended ${PULSE_EVALUATION_BATCH_A_RECONCILED.slug}; ` +
-      `${PULSE_EVALUATION_BATCH_A_LEGACY.slug} remains unchanged and disabled.`,
+    JSON.stringify(
+      {
+        mode: "dry_run",
+        writesPerformed: 0,
+        migrationRequired: "0045_pulse_evaluation_workspace_reconciliation",
+        reconciliations,
+      },
+      null,
+      2,
+    ),
   );
+}
+
+async function apply() {
+  const results = [];
+  for (const spec of RECONCILIATIONS) {
+    const plan = expectedSuccessor(spec);
+    const before = await validateLegacy(spec);
+    const existingSuccessor = await getStudy(spec.reconciled.slug);
+    if (!existingSuccessor) await applySuccessor(spec, plan, before.legacy.id);
+    const after = await validateLegacy(spec);
+    assert.equal(
+      after.fingerprint,
+      before.fingerprint,
+      `legacy ${spec.label} changed during append-only reconciliation`,
+    );
+    await validateSuccessor(spec, plan, before.legacy.id);
+    results.push({
+      legacy: spec.legacy.slug,
+      successor: spec.reconciled.slug,
+      appended: !existingSuccessor,
+    });
+  }
+  console.log(
+    JSON.stringify(
+      {
+        mode: "apply",
+        writesPerformed: results.some(({ appended }) => appended)
+          ? "append_only_successors"
+          : 0,
+        results,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
+async function main() {
+  if (APPLY) await apply();
+  else await dryRun();
 }
 
 main().catch((error) => {

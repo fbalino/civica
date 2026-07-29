@@ -1,7 +1,8 @@
 # PUL-027 — decay window and lifecycle correction
 
-**Status:** prepared, not complete. Production migration and the required
-fresh score recomputation have not been authorized or run.
+**Status:** complete as of 2026-07-29. Production migration, a fresh versioned
+model-free score recomputation, and the required live validators are recorded
+in `production-closure-2026-07-29.md`.
 
 ## Local verification — 2026-07-18
 
@@ -25,14 +26,13 @@ rows. The four-statement migration affects only those two relations, drops no
 relation or data, and replaces the fixed window check with the closed
 `{365, 730}` set plus unchanged date arithmetic.
 
-## Remaining release evidence
+## Production closure — 2026-07-29
 
-1. Confirm isolated backup/restore readiness and apply the forward migration
-   through the approved production workflow.
-2. Run a fresh score computation under the v2.5 decay algorithm. It must write
-   730-day current rows and append new history without rewriting 365-day rows.
-3. Record live lifecycle/runtime validation and the post-score publication
-   pointer before checking PUL-027 in the master checklist.
+Production applied the authoritative migration tail through `0051`, including
+the PUL-027 lifecycle migration. A fresh model-free score run then published a
+new pointer while retaining the append-only output history. Both required live
+validators passed. The dated production record contains the run identities,
+row counts, runtime hash, and explicit nonclaims.
 
 ## Isolated QA-018 rehearsal — 2026-07-26
 

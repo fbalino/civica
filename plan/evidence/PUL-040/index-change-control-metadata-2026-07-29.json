@@ -1,0 +1,32 @@
+{
+  "id": "pul-040-runtime-evidence-cut-2026-07-29",
+  "toVersion": "civica-index-pulse-runtime-evidence-cut-v56",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/PUL-040/protected-contract-rollup-2026-07-29.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json"
+    ],
+    "release_note": [
+      "plan/evidence/PUL-040/runtime-evidence-cut-release-note-2026-07-29.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-040/runtime-evidence-cut-migration-plan-2026-07-29.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pulse-runtime-method.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:pulse-runtime"
+  ]
+}

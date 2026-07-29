@@ -106,7 +106,7 @@ import {
 export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.14.0" as const;
 export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.15-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
-export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-26" as const;
+export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-29" as const;
 
 export type PulseMethodStatus = "experimental";
 export type PulseSourceRole = "specialist" | "news";
