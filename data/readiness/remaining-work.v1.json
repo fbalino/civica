@@ -1,18 +1,18 @@
 {
   "schemaVersion": "civica-remaining-work/v1",
-  "reviewedAt": "2026-07-26",
+  "reviewedAt": "2026-07-29",
   "checklist": {
     "total": 310,
-    "completed": 252,
-    "remaining": 58,
-    "progressPercent": 81.3
+    "completed": 256,
+    "remaining": 54,
+    "progressPercent": 82.6
   },
   "agentExecutableNow": [],
   "categories": [
     {
       "id": "direct-human-owner-professional",
       "label": "Direct human, owner, or professional review",
-      "count": 14,
+      "count": 15,
       "taskIds": [
         "BRD-003",
         "BRD-010",
@@ -27,30 +27,26 @@
         "IDX-034",
         "PLT-029",
         "QA-012",
-        "QA-013"
+        "QA-013",
+        "QA-018"
       ],
-      "nextStep": "Obtain the exact rendered Explore disposition; the four residual EXP-038 dispositions; owner spend and honorarium facts; and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
+      "nextStep": "Obtain the exact rendered Explore disposition; the three residual EXP-038 dispositions; owner spend and honorarium facts; Fernando's dated QA-018 disposition; and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
     },
     {
       "id": "production-staging-external-authority",
       "label": "Production, staging, or external-system authority",
-      "count": 13,
+      "count": 8,
       "taskIds": [
         "ATL-010",
         "ATL-020",
         "ATL-024",
-        "ATL-026",
-        "ATL-027",
         "DAT-036",
         "EXP-029",
         "PUL-024",
-        "PUL-027",
         "PUL-040",
-        "PUL-043",
-        "QA-018",
         "QA-019"
       ],
-      "nextStep": "Authorize a new exact-candidate QA-018 run through 0051 plus the remaining production migrations and source refreshes; retain bounded live evidence without treating the historical 0050 run as proof of the new head."
+      "nextStep": "Authorize only the remaining real production or external actions: Atlas history/correction journeys, the named source refreshes and internationalization run, a Pulse drift baseline and complete scheduled cycle, and QA-019's external status record."
     },
     {
       "id": "external-evidence-unavailable",

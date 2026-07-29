@@ -1,15 +1,15 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "2ee0a9bc376fdbebd6945a4f10389e75b747856da534ef8f37b36dc77d94a06f",
-    "plan/PROGRESS.md": "52276ad391292292835e0b9a4e5db6d7f573f1875b145dcfe55a5f9e2d5bb1c2",
-    "plan/MANUAL-CHECKS.md": "83f6fd3390f482c01eca8c15b3b5f2b52f0191b4032644892ac56705202d120d",
+    "plan/MASTER-CHECKLIST.md": "360496c3657b4b6bd76ca88df350bb8204fe93694115e9a6d4982fb7ef72f04a",
+    "plan/PROGRESS.md": "c8373002a0a95be716af0ea8aede2a5313cc2e96e2c6e9a8d933f068b38409ba",
+    "plan/MANUAL-CHECKS.md": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "d8e19b6dadb22036d58240748581a45711840bfdb48fc9fd3bc29df1cb10d293",
     "plan/04-civica-index-research-program.md": "6d879a9fecefeda072af4a41ccde7d8be1b77a555f42f9ebece4c38e01343b4b",
-    "plan/05-pulse-event-ledger-and-validation.md": "2da9497d318e9476f0a956d102ec5d35a1b8d387f802b67af3463dc425c5cb7b",
-    "plan/06-atlas-content-and-research-features.md": "4743c3ef0e02febd5afabe269c85758ef6b84afd3268c1ddc45055ce1bbb70eb",
+    "plan/05-pulse-event-ledger-and-validation.md": "469c04ca66b439905a60c39c69e1a8e20b55e4d0ec9e6c9482b8987da64d64d7",
+    "plan/06-atlas-content-and-research-features.md": "ab3a23e85d0737cc18d2e72fb6baaf0164d4c799c80c2cb5288fd03fa7a36f8e",
     "plan/07-design-system-assets-and-reader-experience.md": "1c35dba50ace06d4de0fc57968ca6a0486f2abe3bdfe2f6f44cdaf423ee7aa93",
     "plan/08-platform-security-performance-and-operations.md": "f7fa9d0651a83c408b8211397e244d8fb71b88a1aee9939cb987f53e5df4738b",
     "plan/09-testing-qa-and-release.md": "cca051890a0c5c06b444e2474dc0c3824025a5c213c67fbfda16f83491cfd69d",
@@ -23,16 +23,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 252,
-        "remaining": 58,
+        "completed": 256,
+        "remaining": 54,
         "byPriority": {
           "P0": {
             "total": 192,
-            "completed": 166
+            "completed": 169
           },
           "P1": {
             "total": 113,
-            "completed": 85
+            "completed": 86
           },
           "P2": {
             "total": 5,
@@ -42,7 +42,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 26
+            "completed": 28
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -74,7 +74,7 @@
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 43,
-            "completed": 29
+            "completed": 31
           },
           "09-testing-qa-and-release.md": {
             "total": 22,
@@ -83,8 +83,6 @@
         }
       },
       "openP0": [
-        "ATL-026",
-        "ATL-027",
         "ATL-028",
         "BRD-003",
         "BRD-010",
@@ -107,14 +105,11 @@
         "PUL-026",
         "PUL-029",
         "PUL-030",
-        "PUL-043",
         "QA-018"
       ],
       "openP0P1": [
         "ATL-020",
         "ATL-024",
-        "ATL-026",
-        "ATL-027",
         "ATL-028",
         "BRD-003",
         "BRD-010",
@@ -155,12 +150,10 @@
         "PUL-023",
         "PUL-024",
         "PUL-026",
-        "PUL-027",
         "PUL-028",
         "PUL-029",
         "PUL-030",
         "PUL-040",
-        "PUL-043",
         "QA-012",
         "QA-013",
         "QA-018",
@@ -170,7 +163,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "83f6fd3390f482c01eca8c15b3b5f2b52f0191b4032644892ac56705202d120d",
+        "sha256": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -212,7 +205,8 @@
           "PUL-040",
           "PUL-041",
           "QA-013",
-          "QA-018"
+          "QA-018",
+          "QA-019"
         ]
       },
       "waivers": [],
@@ -254,7 +248,7 @@
         }
       ],
       "blockers": [
-        "26 unchecked P0 tasks prevent a green report"
+        "23 unchecked P0 tasks prevent a green report"
       ]
     },
     {
@@ -263,16 +257,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 252,
-        "remaining": 58,
+        "completed": 256,
+        "remaining": 54,
         "byPriority": {
           "P0": {
             "total": 192,
-            "completed": 166
+            "completed": 169
           },
           "P1": {
             "total": 113,
-            "completed": 85
+            "completed": 86
           },
           "P2": {
             "total": 5,
@@ -282,7 +276,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 26
+            "completed": 28
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -314,7 +308,7 @@
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 43,
-            "completed": 29
+            "completed": 31
           },
           "09-testing-qa-and-release.md": {
             "total": 22,
@@ -323,8 +317,6 @@
         }
       },
       "openP0": [
-        "ATL-026",
-        "ATL-027",
         "ATL-028",
         "BRD-003",
         "BRD-010",
@@ -347,14 +339,11 @@
         "PUL-026",
         "PUL-029",
         "PUL-030",
-        "PUL-043",
         "QA-018"
       ],
       "openP0P1": [
         "ATL-020",
         "ATL-024",
-        "ATL-026",
-        "ATL-027",
         "ATL-028",
         "BRD-003",
         "BRD-010",
@@ -395,12 +384,10 @@
         "PUL-023",
         "PUL-024",
         "PUL-026",
-        "PUL-027",
         "PUL-028",
         "PUL-029",
         "PUL-030",
         "PUL-040",
-        "PUL-043",
         "QA-012",
         "QA-013",
         "QA-018",
@@ -410,7 +397,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "83f6fd3390f482c01eca8c15b3b5f2b52f0191b4032644892ac56705202d120d",
+        "sha256": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -452,7 +439,8 @@
           "PUL-040",
           "PUL-041",
           "QA-013",
-          "QA-018"
+          "QA-018",
+          "QA-019"
         ]
       },
       "waivers": [],
@@ -501,8 +489,8 @@
         }
       ],
       "blockers": [
-        "26 unchecked P0 tasks prevent a green report",
-        "54 unchecked P0/P1 tasks prevent G4"
+        "23 unchecked P0 tasks prevent a green report",
+        "50 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -511,16 +499,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 252,
-        "remaining": 58,
+        "completed": 256,
+        "remaining": 54,
         "byPriority": {
           "P0": {
             "total": 192,
-            "completed": 166
+            "completed": 169
           },
           "P1": {
             "total": 113,
-            "completed": 85
+            "completed": 86
           },
           "P2": {
             "total": 5,
@@ -530,7 +518,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 26
+            "completed": 28
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -562,7 +550,7 @@
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 43,
-            "completed": 29
+            "completed": 31
           },
           "09-testing-qa-and-release.md": {
             "total": 22,
@@ -571,8 +559,6 @@
         }
       },
       "openP0": [
-        "ATL-026",
-        "ATL-027",
         "ATL-028",
         "BRD-003",
         "BRD-010",
@@ -595,14 +581,11 @@
         "PUL-026",
         "PUL-029",
         "PUL-030",
-        "PUL-043",
         "QA-018"
       ],
       "openP0P1": [
         "ATL-020",
         "ATL-024",
-        "ATL-026",
-        "ATL-027",
         "ATL-028",
         "BRD-003",
         "BRD-010",
@@ -643,12 +626,10 @@
         "PUL-023",
         "PUL-024",
         "PUL-026",
-        "PUL-027",
         "PUL-028",
         "PUL-029",
         "PUL-030",
         "PUL-040",
-        "PUL-043",
         "QA-012",
         "QA-013",
         "QA-018",
@@ -658,7 +639,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "83f6fd3390f482c01eca8c15b3b5f2b52f0191b4032644892ac56705202d120d",
+        "sha256": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -700,7 +681,8 @@
           "PUL-040",
           "PUL-041",
           "QA-013",
-          "QA-018"
+          "QA-018",
+          "QA-019"
         ]
       },
       "waivers": [],
@@ -735,7 +717,7 @@
         }
       ],
       "blockers": [
-        "26 unchecked P0 tasks prevent a green report",
+        "23 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
     },
@@ -745,16 +727,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 252,
-        "remaining": 58,
+        "completed": 256,
+        "remaining": 54,
         "byPriority": {
           "P0": {
             "total": 192,
-            "completed": 166
+            "completed": 169
           },
           "P1": {
             "total": 113,
-            "completed": 85
+            "completed": 86
           },
           "P2": {
             "total": 5,
@@ -764,7 +746,7 @@
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 26
+            "completed": 28
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -796,7 +778,7 @@
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 43,
-            "completed": 29
+            "completed": 31
           },
           "09-testing-qa-and-release.md": {
             "total": 22,
@@ -805,8 +787,6 @@
         }
       },
       "openP0": [
-        "ATL-026",
-        "ATL-027",
         "ATL-028",
         "BRD-003",
         "BRD-010",
@@ -829,14 +809,11 @@
         "PUL-026",
         "PUL-029",
         "PUL-030",
-        "PUL-043",
         "QA-018"
       ],
       "openP0P1": [
         "ATL-020",
         "ATL-024",
-        "ATL-026",
-        "ATL-027",
         "ATL-028",
         "BRD-003",
         "BRD-010",
@@ -877,12 +854,10 @@
         "PUL-023",
         "PUL-024",
         "PUL-026",
-        "PUL-027",
         "PUL-028",
         "PUL-029",
         "PUL-030",
         "PUL-040",
-        "PUL-043",
         "QA-012",
         "QA-013",
         "QA-018",
@@ -892,7 +867,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "83f6fd3390f482c01eca8c15b3b5f2b52f0191b4032644892ac56705202d120d",
+        "sha256": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -934,7 +909,8 @@
           "PUL-040",
           "PUL-041",
           "QA-013",
-          "QA-018"
+          "QA-018",
+          "QA-019"
         ]
       },
       "waivers": [],
@@ -969,7 +945,7 @@
         }
       ],
       "blockers": [
-        "26 unchecked P0 tasks prevent a green report",
+        "23 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
     }

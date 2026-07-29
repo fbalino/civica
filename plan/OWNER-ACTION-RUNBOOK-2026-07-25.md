@@ -1,7 +1,7 @@
 # Civica remaining-work owner action runbook
 
-**Reviewed:** 2026-07-26
-**Scope:** the 61 unchecked tasks in `plan/MASTER-CHECKLIST.md`
+**Reviewed:** 2026-07-29
+**Scope:** the 54 unchecked tasks in `plan/MASTER-CHECKLIST.md`
 
 ## Open the review material
 
@@ -59,14 +59,15 @@ Approval closes the visual gate but does not authorize deployment.
 Open the [itemized copy approval deck](EXP-038-english-copy-review-2026-07-23.md#proposed-edits).
 It contains the current wording, proposed wording, reason, and
 [2026-07-25 approval record](EXP-038-english-copy-review-2026-07-23.md#approval-record).
-The unambiguous approved edits have been applied. A4 remains held while Fernando
-decides whether and how the About narrative should name him; H5, T3, and T4
-retain their separate factual or operating gates.
+The unambiguous approved edits, including H5 after the GOV-003 disclosure was
+confirmed, have been applied. A4 remains held while Fernando decides whether
+and how the About narrative should name him; T3 and T4 retain their separate
+operating gates.
 
 The website routes named in the deck show the **current** copy; they do not show
-an unpublished alternate version. GOV-003 is now answered and published, so
-H5 can be decided. Do not approve T3 unless a monitored response target is real,
-or T4 until ATL-024 is active.
+an unpublished alternate version. Do not approve T3 unless a monitored response
+target is real. ATL-024's production form is active, but T4 still needs
+Fernando's explicit choice before the standing GitHub instruction changes.
 For context, browse the current [home](http://localhost:3002/),
 [About](http://localhost:3002/about),
 [Methodology](http://localhost:3002/methodology),
@@ -99,7 +100,8 @@ These require no external contact before a decision is recorded.
 | Task | Open first | Fernando decides or supplies | What to return to Codex |
 | --- | --- | --- | --- |
 | EXP-015 | [Local rendered candidate](http://localhost:3002/), [design-system rendering](http://localhost:3002/design-system#explore-concepts), [dated captures and verification](evidence/EXP-015/RENDERED-CANDIDATE.md), [approved light masters](evidence/EXP-015/GENERATED-LIGHT-MASTERS.md), [dark masters](evidence/EXP-015/GENERATED-DARK-MASTERS.md), and [replacement preparation](evidence/EXP-015/PREPARATION.md) | Approve, revise, or reject the exact desktop/mobile and light/dark rendered result. | One rendered-candidate disposition and any specific revisions. Approval is not deployment authority. |
-| EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#approval-record) | Choose A4 naming and H5 now that GOV-003 is complete; choose T3 only if a real response posture exists, and T4 when the interim or live correction route is selected. | The four remaining dispositions. The approved subset is already applied; no translation or deployment is implied. |
+| EXP-038 | [Copy approval deck](EXP-038-english-copy-review-2026-07-23.md#approval-record) | Choose A4 naming; choose T3 only if a real response posture exists; and choose T4 now that the dedicated production correction form is active. | The three remaining dispositions. The approved subset, including H5, is already applied; no translation or deployment is implied. |
+| QA-018 | [Current staging and smoke packet](evidence/QA-018/README.md) and [attempt-07 narrative](evidence/QA-018/attempt-07-conditions-release-2026-07-27.md) | Approve or reject the retained exact-candidate technical run and date the decision. | One dated disposition and any specific follow-up. The technical run is complete; this is not a request for a new run or production authority. |
 | PLT-029 | [Telemetry procedure](PLT-029-program-cost-effort-telemetry-2026-07-23.md) and [current ledger](../data/program-cost-effort-ledger.v1.json) | Supply exact subscription tiers, actual invoices or paid-API spend, committed external-human spend, and reliable effort records if they exist. | Source-backed figures and periods. Unavailable effort remains `null`; Codex will not infer it. |
 
 [GOV-012](research/reviewer-honorarium-decision-brief-v1.md#decision-requested)
@@ -133,75 +135,63 @@ qualified human testing at G5. Do not recruit those participants yet. The
 protocol must stay frozen before recruitment. IDX-034 has no G5 dependency and
 may proceed now with the qualified roles and frozen constraints listed above.
 
-## Phase 3 — one isolated staging and external-authority wave
+## Phase 3 — remaining production and external-authority wave
 
 The platform operator may be Fernando if he controls the relevant accounts.
 Otherwise use the person responsible for the Civica Vercel and Neon projects.
 Production promotion remains a separate decision.
 
-1. **[QA-018 first — wait for the new 0051 packet](evidence/QA-018/README.md).**
-   Attempt 06 is valid historical evidence for the earlier candidate through
-   migration `0050`; it does not prove the current `0051` candidate. Codex can
-   run the newly authorized CLI-only isolated rehearsal and will prepare a new
-   attempt-07 narrative and bounded machine record without changing persistent
-   Preview settings or opening Neon in a browser. After that exact run passes,
-   confirm or reject the new packet and record the date. Until then, do not
-   sign off attempt 06 as the current QA-018 candidate.
-2. **Conditions production batch — ATL-026 and ATL-027.** The isolated run
-   completed the staging-verifiable ATL-016, ATL-029, and ATL-030 criteria.
-   Production still needs explicit authority to apply the additive Conditions
-   migrations and publish a named immutable release. Open the completed
-   staging records for [ATL-016](ATL-016-conditions-comparison-2026-07-18.md),
-   [ATL-026](ATL-026-conditions-components-2026-07-18.md),
-   [ATL-027](ATL-027-conditions-release-freezing-2026-07-18.md),
-   [ATL-029](ATL-029-versioned-conditions-public-read-2026-07-18.md), and
-   [ATL-030](ATL-030-conditions-codebook-replication-2026-07-18.md). If you
-   authorize production, state that explicitly; the staging run itself does
-   not grant that authority.
-3. **Atlas history and corrections — ATL-020 and ATL-024.** Apply additive
-   migrations 0046 and 0047 through the approved flow, then retain the stored
-   history journey, opaque correction receipt, authenticated triage,
-   correction linkage, and delivery evidence. Start with the
+The production ledger is already reconciled through
+`0051_eminent_jocasta`. ATL-026 and ATL-027 are complete against the named
+immutable Conditions release; PUL-027 and PUL-043 are also complete. Do not
+request another migration or publication merely because an older version of
+this runbook listed them as pending.
+
+1. **Atlas history and corrections — ATL-020 and ATL-024.** The additive
+   schemas are active. Completion now needs real, supportable production
+   evidence: a source-backed Atlas change that readers can inspect and a
+   genuine data-error report with opaque receipt and authenticated triage,
+   linked to ATL-020 if the report produces a correction. Start with the
    [ATL-020 plan](ATL-020-atlas-change-history-2026-07-22.md),
    [ATL-020 evidence](evidence/ATL-020/README.md), and
    [ATL-024 staging packet](evidence/ATL-024/README.md). The relevant routes
    are `/api/citations/[entityType]/[id]/history`, `/report-data-issue`,
-   `/admin/corrections`, and `/admin/corrections/[id]`; several intentionally
-   fail closed until the staging schema exists.
-4. **Source refreshes — ATL-010, DAT-036, EXP-029.** Authorize named-release
-   Wikidata refreshes and migration 0048 where required. Retain input release,
-   adapter/version, row counts, discrepancy report, representative stored
-   forms, and browser review. Never rewrite the immutable G2 release. Use the
+   `/admin/corrections`, and `/admin/corrections/[id]`. Do not submit a
+   synthetic report or manufacture a correction merely to close the task.
+2. **Source refreshes — ATL-010, DAT-036, EXP-029.** The stored-name schema is
+   already active. Authorize the remaining named-release Wikidata refreshes
+   and retain input release, adapter/version, row counts, discrepancy report,
+   representative stored forms, and browser review. Never rewrite the
+   immutable G2 release. Use the
    [ATL-010 refresh plan](ATL-010-world-leaders-directory-readiness-2026-07-18.md)
    and [browser checklist](evidence/ATL-010/browser-verification.md), the
    [DAT-036 repair runbook](evidence/DAT-036/repair-runbook.md), and the
    [EXP-029 internationalization plan](EXP-029-internationalization-readiness-2026-07-18.md).
    `/leaders` remains publication-paused until the refresh; `/about#language`
    is the EXP-029 reader surface.
-5. **Pulse setup — PUL-043, PUL-024, PUL-027, then PUL-040.** Apply and
-   reconcile the prepared additive migrations, deploy the exact locked
+3. **Pulse setup — PUL-024, then PUL-040.** The decay/lifecycle and private
+   workspace work is complete. Authorize the explicit frozen-method drift
+   baseline and its next eligible observation, deploy the exact locked
    `pulse-v2.15-beta` method, and permit one complete scheduled
    ingest → cluster → classify → corroborate/score cycle. Only then may Codex
    calculate and record the first compliant, non-backdated PUL-040 start.
    Any paid manual classifier run needs separate written provider/model,
    maximum-volume, and hard-USD-cap authority. Open the
-   [PUL-043 migration packet](evidence/PUL-043/README.md),
    [PUL-024 drift plan](PUL-024-drift-monitoring-2026-07-18.md),
-   [PUL-027 lifecycle plan](PUL-027-decay-window-lifecycle-2026-07-18.md), and
    [PUL-040 start-readiness packet](evidence/PUL-040/README.md). Operating
    evidence appears at `/api/v1/pulse/source-coverage` and
    `/api/v1/pulse/cluster-coverage`; neither route proves the 90-day clock has
    started.
-6. **[QA-019 last — review recovery](evidence/QA-019/README.md).** The
+4. **[QA-019 last — review recovery](evidence/QA-019/README.md).** The
    isolated bad-Preview → forward-fix technical run, local correction, and
    monitoring evidence are complete. Create the real external status record
    without notifying subscribers, link its opaque ID in the canonical record,
    then have Fernando approve or reject the retained packet with a date. Do
    not relabel the local changelog as an external status publication.
 
-The remaining authority/sign-off task set is ATL-010, ATL-020, ATL-024,
-ATL-026, ATL-027, DAT-036, EXP-029, PUL-024, PUL-027, PUL-040, PUL-043,
-QA-018, and QA-019.
+The remaining external-authority task set is ATL-010, ATL-020, ATL-024,
+DAT-036, EXP-029, PUL-024, PUL-040, and QA-019. QA-018 is separate: its
+technical run is complete and only Fernando's dated disposition remains.
 
 ## Phase 4 — blockers that cannot be simulated
 
@@ -225,7 +215,7 @@ QA-018, and QA-019.
    completed fixes, promoted baselines, and the module review then unlock
    EXP-028. **No standalone EXP-016 or EXP-028 packet exists yet; Codex creates
    those bounded work records only after the decisions above.**
-2. A real frozen Conditions staging/release unlocks
+2. A real frozen **longitudinal** Conditions release unlocks
    [ATL-028](ATL-028-economic-stability-construct-2026-07-18.md); its current
    [evidence note](evidence/ATL-028/README.md) prohibits publishing an economic
    composite before that gate.

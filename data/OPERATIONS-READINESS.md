@@ -1,7 +1,7 @@
 # Civica G4 operations-readiness report
 
 **Contract:** `civica-g4-operations-readiness/v1`
-**Reviewed:** 2026-07-26
+**Reviewed:** 2026-07-29
 **Status:** blocked
 **Waivers:** none
 
@@ -27,11 +27,14 @@ and P1 operational finding below is closed.
 ## Security and access controls
 
 - The current tracked tree passes `npm run validate:secrets` with zero
-  findings across 3,969 files.
+  findings.
 - The history scanner distinguishes 28 exact non-secret historical fixture
   hashes from the one real historical Neon connection-string exposure. The
-  latter remains recoverable from Git history and must be rotated by the owner;
-  it is not waived or reclassified.
+  exposed owner credential was rotated independently on production main and
+  the retained recovery branch on 2026-07-29; fresh old credentials are
+  rejected and replacement owner access works. The invalid bytes remain
+  recoverable from Git history and registered by non-reversible hash pending
+  Fernando's separate history-purge decision.
 - Route authorization, same-origin mutation controls, durable rate limiting,
   security headers/CSP, SSRF-safe public HTTP, cron authentication,
   idempotency, signed admin sessions, revocation, and audit identity have
@@ -53,8 +56,8 @@ and P1 operational finding below is closed.
   dependency-tree limitation are retained under `plan/evidence/QA-021/`.
 - Hosted pull-request/main runs and branch-protection enforcement have not been
   observed in this report. PLT-001's owner/platform check remains open.
-- The current G4 readiness record reports 252 of 310 tasks complete, 26 open P0 tasks,
-  54 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
+- The current G4 readiness record reports 256 of 310 tasks complete, 23 open P0 tasks,
+  50 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 
 ## Jobs, freshness, and error monitoring
@@ -95,6 +98,12 @@ and P1 operational finding below is closed.
   non-model dry-run, unchanged-freshness, API, responsive-browser, migration,
   schema, and production-build checks. Production remained read-only at
   `0032_sparkling_genesis`. QA-018 now awaits Fernando's dated disposition.
+- On 2026-07-29, production advanced through authoritative migration head
+  `0051_eminent_jocasta` after a retained recovery branch and zero-write
+  preflight. The named immutable Conditions release passed exact manifest,
+  replay, component, freshness-at-release, API, and browser checks; the
+  model-free Pulse lifecycle/workspace repairs passed their retained-ledger
+  validators. Cron jobs remained disabled.
 - QA-019's isolated technical run is complete. A deliberately mismatched
   release marker was detected on one protected Preview, then a one-line
   forward fix received a fresh full build and distinct Ready Preview. Both
@@ -103,9 +112,10 @@ and P1 operational finding below is closed.
   and bounded monitoring event were linked and resolved with no Atlas data
   change. The external status record and Fernando's dated disposition remain
   open; no subscriber notice or owner sign-off is claimed.
-- Conditions migrations/releases, Pulse workspace reconciliation, observability
-  migrations, and other production promotions remain authority-gated. This
-  report does not authorize them.
+- Conditions release freezing and the Pulse lifecycle/workspace reconciliation
+  are complete. The remaining production/external actions are the explicitly
+  listed Atlas history/correction journeys, source refreshes, Pulse drift/cycle,
+  and provider checks. This report does not authorize them.
 
 ## Performance and browser support
 
@@ -121,17 +131,14 @@ and P1 operational finding below is closed.
 
 ## Open incidents and unwaived operational blockers
 
-1. **Credential incident — owner:** rotate the historically exposed Neon
-   password, update deployed/local configuration, and decide whether to purge
-   shared Git history. The current tree is clean; the historical exposure is
-   not.
-2. **Hosted CI — owner/platform:** observe passing pull-request and `main`
+1. **Hosted CI — owner/platform:** observe passing pull-request and `main`
    workflows and require the canonical `verify` job through branch protection.
-3. **Isolated release disposition and production authority — owner/platform:**
-   review the current QA-018 `0051` packet and record a dated approval or
-   rejection. Separately retain the production migration/release evidence for
-   the authorized ATL-026/ATL-027 batch; staging evidence is not production
-   evidence.
+2. **Isolated release disposition — owner:** review the completed QA-018
+   `0051` packet and record a dated approval or rejection.
+3. **Atlas history and corrections — owner/platform:** complete only a real,
+   supportable ATL-020 change-history journey and ATL-024 report/receipt/triage
+   journey, linking a correction when one is actually warranted. Synthetic
+   production records do not satisfy this blocker.
 4. **Rollback/correction disposition — owner/platform:** create the real
    external status record without notifying subscribers, then review the
    retained QA-019 packet and record Fernando's dated approval or rejection.
@@ -149,10 +156,14 @@ and P1 operational finding below is closed.
 10. **Visual and release gates:** close EXP-001/015/028 and all other open P0/P1
     release blockers before G4 can pass.
 
+The rotated historical credential is no longer an active incident. Its
+registered hash and the optional shared-history purge remain documented under
+PLT-007, without being treated as a waiver or open credential.
+
 ## Decision
 
 G4 operations readiness is **blocked**. Local contracts and rehearsals are
-substantial and currently reproducible, but external credentials, hosted
-enforcement, staging, provider controls, recovery, rollback, and owner review
-remain unverified. There are zero waivers. Rerun the exact validators and
-regenerate the G4 readiness report after each blocker closes.
+substantial and currently reproducible, but hosted enforcement, provider
+controls, recovery, rollback, real production journeys, and owner review remain
+unverified. There are zero waivers. Rerun the exact validators and regenerate
+the G4 readiness report after each blocker closes.

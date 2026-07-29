@@ -5,7 +5,7 @@ open because G4 is blocked.
 
 The canonical report is `data/OPERATIONS-READINESS.md`.
 
-## Current refresh — 2026-07-26
+## Current refresh — 2026-07-29
 
 A clean detached source checkout at `b327cfff` reran the fixed G4 matrix. All six
 commands passed: master-plan integrity, verification-matrix validation, the
@@ -15,20 +15,27 @@ source checkout used a local hard-linked copy of the repository's
 already-installed dependency tree rather than performing a new network
 install, so QA-017 remains the separate clean-install proof.
 
-The current tracked-tree secret scan reports zero findings across 3,969 files.
-The generated readiness state is correctly blocked at 252/310 tasks, with 58
-remaining, 26 open P0, 54 open P0/P1, zero evidence gaps, zero master-mirror
+The current tracked-tree secret scan reports zero findings. The known
+historical Neon owner credential is rotated and freshly rejected on production
+main and the retained recovery branch; its invalid bytes remain registered by
+hash pending an owner decision on shared-history rewriting.
+
+The generated readiness state is correctly blocked at 256/310 tasks, with 54
+remaining, 23 open P0, 50 open P0/P1, zero evidence gaps, zero master-mirror
 errors, and zero waivers.
 
-The 2026-07-26 QA-018 technical run completed against a disposable Neon child
+The current QA-018 technical run completed against a disposable Neon child
 and exact Vercel Preview candidate, with production explicitly excluded and
 untouched. The retained migration, release, cache, protected-route,
 idempotent dry-run, freshness, API, and responsive-browser checks passed.
 QA-018 remains unchecked only for Fernando's dated approval or rejection.
-ATL-026/ATL-027 production migration and release work still require separate
-production authority. No Neon Console sign-in, production mutation, paid model
-call, status notification, external review, elapsed observation, or waiver is
-claimed here.
+
+Production subsequently advanced through authoritative head `0051` with a
+retained recovery branch. ATL-026 and ATL-027 now have named production release,
+exact replay/freshness, public API, and browser evidence; PUL-027 and PUL-043
+also have their bounded production closures. Cron remained disabled. No paid
+model call, status notification, external review, owner disposition, elapsed
+observation, or waiver is claimed here.
 
 ## Initial preparation — 2026-07-23
 
