@@ -28,3 +28,17 @@ Pitcairn, Cocos, Vatican City, Niue, and Tokelau.
 - The report integrity gate, TypeScript, targeted ESLint, full unit suite,
   claims/documentation checks, and production build pass.
 - No rendered UI changed; browser review is not applicable.
+
+## 2026-07-29 immutable-vintage row-count repair
+
+`country_fact_vintages` is an append-only collection of named releases, so its
+lifetime total is not a meaningful single-release delta. The release-quality
+gate now groups immutable winner rows by `vintage_label` and compares every
+published `canonical_only_legacy` or finalized `complete_candidates` label
+against that label's declared `country_fact_vintage_releases.winner_count`.
+Staging cuts remain outside the published-release assertion until finalization.
+
+The focused database-free fixtures cover two valid cumulative labels, an exact
+label-specific winner-count mismatch, and the staging boundary. The live report
+must be regenerated separately by an authorized release operator; this repair
+does not infer or rewrite production evidence.

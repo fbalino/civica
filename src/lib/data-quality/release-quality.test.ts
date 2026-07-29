@@ -5,6 +5,7 @@ import {
   evaluateReleaseQuality,
   formatQualityIssue,
   type QualityFact,
+  type QualityVintage,
   type ReleaseQualityPolicy,
   type ReleaseQualitySnapshot,
 } from "./release-quality";
@@ -17,6 +18,10 @@ function policy(): ReleaseQualityPolicy {
     sourceMaxAgeDays: 180,
     minimumVintageYear: 1500,
     maximumFutureYears: 10,
+    publishedVintageStatuses: [
+      "canonical_only_legacy",
+      "complete_candidates",
+    ],
     rowCounts: {},
   };
 }
@@ -41,6 +46,7 @@ function snapshot(): ReleaseQualitySnapshot {
     ],
     facts: [],
     vintages: [],
+    vintageReleases: [],
     statements: [],
     sources: [
       {
@@ -54,6 +60,21 @@ function snapshot(): ReleaseQualitySnapshot {
     ],
     subjectIds: { jurisdictions: ["j1"] },
     rowCounts: {},
+  };
+}
+
+function vintage(overrides: Partial<QualityVintage> = {}): QualityVintage {
+  return {
+    id: "vintage-1",
+    jurisdictionId: "j1",
+    factKey: "population_total",
+    vintageLabel: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+    canonicalFactId: "fact-1",
+    canonicalFactExists: true,
+    sourceId: "source-1",
+    methodologyVersion: "v0.2-beta",
+    derivationVersionKey: "derivation-1",
+    ...overrides,
   };
 }
 
@@ -148,6 +169,76 @@ test("seeded row-count drop fails the reviewed window", () => {
     input.rowCounts.country_facts = 5;
     configured.rowCounts.country_facts = { baseline: 100, minimum: 90, maximum: 110 };
   });
+});
+
+test("published immutable vintages reconcile by label instead of one lifetime-table window", () => {
+  const input = snapshot();
+  input.vintages.push(
+    vintage(),
+    vintage({
+      id: "vintage-2",
+      vintageLabel: "Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2",
+      methodologyVersion: "v0.3-beta",
+    }),
+    vintage({
+      id: "vintage-3",
+      factKey: "gdp",
+      canonicalFactId: "fact-2",
+      vintageLabel: "Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2",
+      methodologyVersion: "v0.3-beta",
+    }),
+  );
+  input.vintageReleases.push(
+    {
+      vintageLabel: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+      completenessStatus: "canonical_only_legacy",
+      winnerCount: 1,
+    },
+    {
+      vintageLabel: "Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2",
+      completenessStatus: "complete_candidates",
+      winnerCount: 2,
+    },
+  );
+  input.rowCounts.country_fact_vintages = 3;
+
+  const report = evaluateReleaseQuality(input, policy());
+  assert.equal(report.status, "pass");
+  assert.equal(
+    report.checks.find((check) => check.category === "unexpected_row_delta")?.status,
+    "pass",
+  );
+});
+
+test("published vintage winner-count drift fails with its exact release label", () => {
+  const input = snapshot();
+  input.vintages.push(vintage());
+  input.vintageReleases.push({
+    vintageLabel: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+    completenessStatus: "canonical_only_legacy",
+    winnerCount: 2,
+  });
+
+  const report = evaluateReleaseQuality(input, policy());
+  const issue = report.issues.find(
+    (row) => row.checkId === "rows.vintage_release_winners",
+  );
+  assert.equal(report.status, "fail");
+  assert.equal(issue?.entity, input.vintages[0].vintageLabel);
+  assert.equal(issue?.observed, 1);
+  assert.equal(issue?.expected, 2);
+  assert.match(issue?.remediation ?? "", /do not widen a lifetime table threshold/);
+});
+
+test("staging vintage rows are excluded until their release is finalized", () => {
+  const input = snapshot();
+  input.vintages.push(vintage());
+  input.vintageReleases.push({
+    vintageLabel: input.vintages[0].vintageLabel,
+    completenessStatus: "staging",
+    winnerCount: 2,
+  });
+  assert.equal(evaluateReleaseQuality(input, policy()).status, "pass");
 });
 
 test("seeded stale production source fails", () => {

@@ -14,6 +14,7 @@ import {
   type QualitySource,
   type QualityStatement,
   type QualityVintage,
+  type QualityVintageRelease,
   type ReleaseQualitySnapshot,
 } from "../src/lib/data-quality/release-quality";
 import { RELEASE_QUALITY_POLICY } from "../src/lib/data-quality/release-quality-policy";
@@ -33,6 +34,7 @@ async function collectSnapshot(): Promise<ReleaseQualitySnapshot> {
     jurisdictionRows,
     factRows,
     vintageRows,
+    vintageReleaseRows,
     statementRows,
     sourceRows,
     organizationRows,
@@ -84,6 +86,11 @@ async function collectSnapshot(): Promise<ReleaseQualitySnapshot> {
                derivation_version_key AS "derivationVersionKey"
         FROM country_fact_vintages
         ORDER BY jurisdiction_id, fact_key, vintage_label`,
+    sql`SELECT vintage_label AS "vintageLabel",
+               completeness_status AS "completenessStatus",
+               winner_count AS "winnerCount"
+        FROM country_fact_vintage_releases
+        ORDER BY vintage_label`,
     sql`SELECT id,
                subject_table AS "subjectTable",
                subject_id AS "subjectId",
@@ -163,6 +170,7 @@ async function collectSnapshot(): Promise<ReleaseQualitySnapshot> {
     jurisdictions,
     facts: factRows as QualityFact[],
     vintages: vintageRows as QualityVintage[],
+    vintageReleases: vintageReleaseRows as QualityVintageRelease[],
     statements: statementRows as QualityStatement[],
     sources: (sourceRows as Omit<QualitySource, "frozen">[]).map((source) => ({
       ...source,

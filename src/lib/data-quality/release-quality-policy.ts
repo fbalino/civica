@@ -6,11 +6,16 @@ export const RELEASE_QUALITY_POLICY: ReleaseQualityPolicy = {
   sourceMaxAgeDays: 180,
   minimumVintageYear: 1500,
   maximumFutureYears: 10,
+  publishedVintageStatuses: [
+    "canonical_only_legacy",
+    "complete_candidates",
+  ],
   rowCounts: {
     jurisdictions: { baseline: 253, minimum: 250, maximum: 260 },
     sources: { baseline: 56, minimum: 50, maximum: 70 },
     country_facts: { baseline: 25_827, minimum: 20_000, maximum: 35_000 },
-    country_fact_vintages: { baseline: 17_506, minimum: 15_000, maximum: 25_000 },
+    // Frozen vintages accumulate by design. Their rows are checked per
+    // published label against the immutable release manifest's winner count.
     statements: { baseline: 7_891, minimum: 6_000, maximum: 12_000 },
     elections: { baseline: 916, minimum: 750, maximum: 1_200 },
     constitutions: { baseline: 186, minimum: 175, maximum: 210 },

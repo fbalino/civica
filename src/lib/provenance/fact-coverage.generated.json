@@ -1,6 +1,6 @@
 {
   "schemaVersion": "fact-provenance-coverage/v1",
-  "generatedAt": "2026-07-11T05:49:54.987Z",
+  "generatedAt": "2026-07-29T13:22:49.253Z",
   "staleness": {
     "liveRowThresholdDays": 180,
     "frozenSourcesExcluded": true,
@@ -16,10 +16,10 @@
     "limitation": "The checked lineage registry covers every active source/fact relationship. New or unmapped relationships remain visible but cannot add an independent family until reviewed."
   },
   "facts": {
-    "activeRows": 25823,
-    "total": 17515,
-    "sourceLinked": 17515,
-    "oneSource": 13200,
+    "activeRows": 25825,
+    "total": 17517,
+    "sourceLinked": 17517,
+    "oneSource": 13202,
     "twoPlusIndependentSources": 458,
     "unresolvedDisputes": 0,
     "staleRows": 0,
@@ -27,10 +27,10 @@
     "distinctFactKeys": 88
   },
   "statements": {
-    "total": 6768,
-    "sourceLinked": 6768,
+    "total": 7158,
+    "sourceLinked": 7158,
     "unlinked": 0,
-    "distinctGroups": 6759,
+    "distinctGroups": 7149,
     "bySubjectTable": [
       {
         "subjectTable": "constitutions",
@@ -54,8 +54,8 @@
       },
       {
         "subjectTable": "terms",
-        "total": 5013,
-        "sourceLinked": 5013
+        "total": 5403,
+        "sourceLinked": 5403
       }
     ]
   },
@@ -803,9 +803,9 @@
     {
       "id": "ethiopia",
       "label": "Ethiopia",
-      "facts": 83,
-      "sourceLinkedFacts": 83,
-      "oneSourceFacts": 60,
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
       "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
@@ -2493,9 +2493,9 @@
     {
       "id": "venezuela",
       "label": "Venezuela",
-      "facts": 83,
-      "sourceLinkedFacts": 83,
-      "oneSourceFacts": 60,
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
       "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
@@ -3455,9 +3455,9 @@
     {
       "id": "world_bank_income_group",
       "label": "world_bank_income_group",
-      "facts": 193,
-      "sourceLinkedFacts": 193,
-      "oneSourceFacts": 193,
+      "facts": 195,
+      "sourceLinkedFacts": 195,
+      "oneSourceFacts": 195,
       "twoPlusIndependentSourceFacts": 0,
       "unresolvedDisputes": 0,
       "staleRows": 0

@@ -78,6 +78,12 @@ export type QualityVintage = {
   derivationVersionKey: string;
 };
 
+export type QualityVintageRelease = {
+  vintageLabel: string;
+  completenessStatus: string;
+  winnerCount: number;
+};
+
 export type QualityStatement = {
   id: string;
   subjectTable: string;
@@ -100,6 +106,7 @@ export type ReleaseQualitySnapshot = {
   jurisdictions: QualityJurisdiction[];
   facts: QualityFact[];
   vintages: QualityVintage[];
+  vintageReleases: QualityVintageRelease[];
   statements: QualityStatement[];
   sources: QualitySource[];
   subjectIds: Record<string, string[]>;
@@ -110,6 +117,7 @@ export type ReleaseQualityPolicy = {
   sourceMaxAgeDays: number;
   minimumVintageYear: number;
   maximumFutureYears: number;
+  publishedVintageStatuses: readonly string[];
   rowCounts: Record<
     string,
     { baseline: number; minimum: number; maximum: number }
@@ -397,11 +405,16 @@ export function evaluateReleaseQuality(
   }
 
   const vintageKeys = new Map<string, QualityVintage[]>();
+  const vintageRowCounts = new Map<string, number>();
   for (const vintage of snapshot.vintages) {
     const key = `${vintage.jurisdictionId}\u0000${vintage.factKey}\u0000${vintage.vintageLabel}`;
     const group = vintageKeys.get(key) ?? [];
     group.push(vintage);
     vintageKeys.set(key, group);
+    vintageRowCounts.set(
+      vintage.vintageLabel,
+      (vintageRowCounts.get(vintage.vintageLabel) ?? 0) + 1,
+    );
     if (!vintage.canonicalFactExists || !sourceIds.has(vintage.sourceId)) {
       add({
         checkId: "vintage.provenance_fk",
@@ -439,6 +452,32 @@ export function evaluateReleaseQuality(
       observed: vintages.length,
       expected: 1,
       remediation: "Keep one immutable canonical cut and remove the duplicate release row.",
+    });
+  }
+  const publishedVintageStatuses = new Set(policy.publishedVintageStatuses);
+  for (const release of snapshot.vintageReleases) {
+    if (!publishedVintageStatuses.has(release.completenessStatus)) continue;
+    const observed = vintageRowCounts.get(release.vintageLabel) ?? 0;
+    if (
+      Number.isSafeInteger(release.winnerCount) &&
+      release.winnerCount > 0 &&
+      observed === release.winnerCount
+    ) {
+      continue;
+    }
+    add({
+      checkId: "rows.vintage_release_winners",
+      category: "unexpected_row_delta",
+      severity: "error",
+      entity: release.vintageLabel,
+      detail: `Published vintage ${release.vintageLabel} has ${observed} immutable winner rows, but its ${release.completenessStatus} release manifest declares ${release.winnerCount}.`,
+      observed,
+      expected:
+        Number.isSafeInteger(release.winnerCount) && release.winnerCount > 0
+          ? release.winnerCount
+          : "positive declared winner count",
+      remediation:
+        "Reconcile this label's immutable winner rows with its release manifest; do not widen a lifetime table threshold.",
     });
   }
 

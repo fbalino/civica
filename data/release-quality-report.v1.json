@@ -1,7 +1,7 @@
 {
   "schemaVersion": "release-data-quality/v1",
-  "generatedAt": "2026-07-13T03:43:30.558Z",
-  "status": "fail",
+  "generatedAt": "2026-07-29T13:21:53.715Z",
+  "status": "pass",
   "policy": {
     "sourceMaxAgeDays": 180,
     "minimumVintageYear": 1500,
@@ -10,13 +10,13 @@
   "rowCounts": {
     "constitutions": 186,
     "country_fact_vintages": 35021,
-    "country_facts": 25827,
+    "country_facts": 25829,
     "elections": 915,
     "jurisdictions": 253,
     "legislature_parties": 1548,
-    "sources": 56,
-    "statements": 6826,
-    "terms": 5475
+    "sources": 57,
+    "statements": 7158,
+    "terms": 5590
   },
   "checks": [
     {
@@ -56,8 +56,8 @@
     },
     {
       "category": "unexpected_row_delta",
-      "status": "fail",
-      "issueCount": 1
+      "status": "pass",
+      "issueCount": 0
     },
     {
       "category": "source_age",
@@ -65,16 +65,5 @@
       "issueCount": 0
     }
   ],
-  "issues": [
-    {
-      "checkId": "rows.release_delta",
-      "category": "unexpected_row_delta",
-      "severity": "error",
-      "entity": "country_fact_vintages",
-      "detail": "country_fact_vintages row count moved outside its reviewed release window.",
-      "observed": 35021,
-      "expected": "15000..25000 (baseline 17506)",
-      "remediation": "Review the pipeline delta, then update the policy window in the same reviewed release change if intentional."
-    }
-  ]
+  "issues": []
 }

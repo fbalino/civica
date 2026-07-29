@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas-domain-coverage/v1",
-  "generatedAt": "2026-07-13T04:24:30.570Z",
+  "generatedAt": "2026-07-29T13:20:17.575Z",
   "scope": {
     "jurisdictionTaxonomy": "jurisdiction-status/v1",
     "eligibleClass": "sovereign_state",
@@ -72,28 +72,28 @@
       "id": "facts",
       "label": "Canonical facts",
       "recordLabel": "active source-fact observations",
-      "recordCount": 23985,
+      "recordCount": 23987,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "source_id",
           "label": "Source identifier",
-          "complete": 23985,
-          "total": 23985,
+          "complete": 23987,
+          "total": 23987,
           "percent": 100
         },
         {
           "field": "value_state",
           "label": "Valid value or absence state",
-          "complete": 23985,
-          "total": 23985,
+          "complete": 23987,
+          "total": 23987,
           "percent": 100
         },
         {
           "field": "as_of",
           "label": "Observation/reference date",
-          "complete": 16590,
-          "total": 23985,
+          "complete": 16592,
+          "total": 23987,
           "percent": 69.2
         }
       ],
@@ -102,7 +102,7 @@
           "id": "cia_factbook",
           "label": "CIA World Factbook",
           "family": "cia_factbook",
-          "lastSuccessfulRun": "2026-05-04T19:07:06.840Z"
+          "lastSuccessfulRun": "2026-07-15T07:00:32.564Z"
         },
         {
           "id": "eurostat",
@@ -174,7 +174,7 @@
           "id": "undp_hdi",
           "label": "UNDP Human Development Reports",
           "family": "undp_hdi",
-          "lastSuccessfulRun": "2026-07-06T13:01:02.332Z"
+          "lastSuccessfulRun": "2026-07-29T13:05:02.240Z"
         },
         {
           "id": "unesco_uis",
@@ -192,7 +192,7 @@
           "id": "vdem",
           "label": "V-Dem (Varieties of Democracy)",
           "family": "vdem",
-          "lastSuccessfulRun": "2026-07-11T08:37:52.070Z"
+          "lastSuccessfulRun": "2026-07-15T07:00:28.516Z"
         },
         {
           "id": "who_gho",
@@ -210,7 +210,7 @@
           "id": "world_bank",
           "label": "World Bank Open Data",
           "family": "world_bank",
-          "lastSuccessfulRun": "2026-05-04T18:49:56.252Z"
+          "lastSuccessfulRun": "2026-07-15T07:00:25.260Z"
         },
         {
           "id": "wto_stats",
@@ -219,7 +219,7 @@
           "lastSuccessfulRun": "2026-05-05T01:13:11.931Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-11T23:02:07.293Z",
+      "lastSuccessfulRun": "2026-07-29T13:05:02.240Z",
       "knownGaps": [
         "Record presence is not equivalent to canonical selection or independent corroboration; the separate fact-provenance report measures resolver support, source depth, disputes, and staleness by fact key."
       ],
@@ -282,7 +282,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
+          "lastSuccessfulRun": "2026-07-29T01:01:52.668Z"
         },
         {
           "id": "wikidata",
@@ -297,7 +297,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
+      "lastSuccessfulRun": "2026-07-29T01:01:52.668Z",
       "knownGaps": [
         "Coverage counts any stored body and does not establish that every constitutional branch, subnational body, or reporting relationship is complete."
       ],
@@ -317,28 +317,28 @@
       "id": "offices",
       "label": "Offices",
       "recordLabel": "office records",
-      "recordCount": 5181,
+      "recordCount": 5184,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "name",
           "label": "Office name",
-          "complete": 5181,
-          "total": 5181,
+          "complete": 5184,
+          "total": 5184,
           "percent": 100
         },
         {
           "field": "office_type",
           "label": "Office type",
-          "complete": 5181,
-          "total": 5181,
+          "complete": 5184,
+          "total": 5184,
           "percent": 100
         },
         {
           "field": "wikidata_qid",
           "label": "Wikidata identifier",
           "complete": 9,
-          "total": 5181,
+          "total": 5184,
           "percent": 0.2
         }
       ],
@@ -347,7 +347,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
+          "lastSuccessfulRun": "2026-07-29T01:01:52.668Z"
         },
         {
           "id": "wikidata",
@@ -362,7 +362,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
+      "lastSuccessfulRun": "2026-07-29T01:01:52.668Z",
       "knownGaps": [
         "Cabinet depth varies by publisher and office identifiers remain incomplete; coverage counts any jurisdiction with at least one office."
       ],
@@ -388,22 +388,22 @@
       "id": "people",
       "label": "People",
       "recordLabel": "person records",
-      "recordCount": 4870,
+      "recordCount": 4878,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "wikidata_qid",
           "label": "Wikidata identifier",
           "complete": 2389,
-          "total": 4870,
-          "percent": 49.1
+          "total": 4878,
+          "percent": 49
         },
         {
           "field": "date_of_birth",
           "label": "Date of birth",
           "complete": 1812,
-          "total": 4870,
-          "percent": 37.2
+          "total": 4878,
+          "percent": 37.1
         }
       ],
       "sources": [
@@ -411,7 +411,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
+          "lastSuccessfulRun": "2026-07-29T01:01:52.668Z"
         },
         {
           "id": "wikidata",
@@ -426,7 +426,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
+      "lastSuccessfulRun": "2026-07-29T01:01:52.668Z",
       "knownGaps": [
         "The denominator is people linked to an office term, not every politically relevant person; birth dates and stable identifiers are publisher-dependent."
       ],
@@ -441,12 +441,12 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "People: Wikidata identifier is 49.1% complete; alert threshold is 80%."
+          "message": "People: Wikidata identifier is 49% complete; alert threshold is 80%."
         },
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "People: Date of birth is 37.2% complete; alert threshold is 80%."
+          "message": "People: Date of birth is 37.1% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -798,29 +798,29 @@
       "id": "bills",
       "label": "Bills",
       "recordLabel": "bill records",
-      "recordCount": 7032,
+      "recordCount": 8016,
       "jurisdictionsCovered": 6,
       "completeness": [
         {
           "field": "url",
           "label": "Source URL",
-          "complete": 7032,
-          "total": 7032,
+          "complete": 8016,
+          "total": 8016,
           "percent": 100
         },
         {
           "field": "raw_status",
           "label": "Publisher status",
-          "complete": 5135,
-          "total": 7032,
-          "percent": 73
+          "complete": 5767,
+          "total": 8016,
+          "percent": 71.9
         },
         {
           "field": "introduced_date",
           "label": "Introduction date",
-          "complete": 537,
-          "total": 7032,
-          "percent": 7.6
+          "complete": 546,
+          "total": 8016,
+          "percent": 6.8
         }
       ],
       "sources": [
@@ -834,13 +834,13 @@
           "id": "camara_br",
           "label": "Câmara dos Deputados",
           "family": "camara_br",
-          "lastSuccessfulRun": "2026-07-12T04:30:14.848Z"
+          "lastSuccessfulRun": "2026-07-29T04:30:23.664Z"
         },
         {
           "id": "congress_gov",
           "label": "Congress.gov",
           "family": "congress_gov",
-          "lastSuccessfulRun": "2026-07-13T03:01:27.228Z"
+          "lastSuccessfulRun": "2026-07-29T03:01:33.832Z"
         },
         {
           "id": "data_assemblee_fr",
@@ -858,7 +858,7 @@
           "id": "senado_br",
           "label": "Senado Federal",
           "family": "senado_br",
-          "lastSuccessfulRun": "2026-07-12T04:30:14.848Z"
+          "lastSuccessfulRun": "2026-07-29T04:30:23.664Z"
         },
         {
           "id": "senat_fr",
@@ -870,10 +870,10 @@
           "id": "uk_parliament",
           "label": "UK Parliament",
           "family": "uk_parliament",
-          "lastSuccessfulRun": "2026-07-12T03:30:38.614Z"
+          "lastSuccessfulRun": "2026-07-25T03:30:50.496Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-13T03:01:27.228Z",
+      "lastSuccessfulRun": "2026-07-29T04:30:23.664Z",
       "knownGaps": [
         "Production bill adapters currently cover six legislatures; summaries and vote fields are not consistently available from publishers."
       ],
@@ -893,12 +893,12 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Publisher status is 73% complete; alert threshold is 80%."
+          "message": "Bills: Publisher status is 71.9% complete; alert threshold is 80%."
         },
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Introduction date is 7.6% complete; alert threshold is 80%."
+          "message": "Bills: Introduction date is 6.8% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -944,19 +944,19 @@
           "id": "undp_hdi",
           "label": "UNDP Human Development Reports",
           "family": "undp_hdi",
-          "lastSuccessfulRun": "2026-07-06T13:01:02.332Z"
+          "lastSuccessfulRun": "2026-07-29T13:05:02.240Z"
         },
         {
           "id": "vdem",
           "label": "V-Dem (Varieties of Democracy)",
           "family": "vdem",
-          "lastSuccessfulRun": "2026-07-11T08:37:52.070Z"
+          "lastSuccessfulRun": "2026-07-15T07:00:28.516Z"
         },
         {
           "id": "world_bank",
           "label": "World Bank Open Data",
           "family": "world_bank",
-          "lastSuccessfulRun": "2026-05-04T18:49:56.252Z"
+          "lastSuccessfulRun": "2026-07-15T07:00:25.260Z"
         },
         {
           "id": "worldbank_wgi",
@@ -965,7 +965,7 @@
           "lastSuccessfulRun": "2026-07-11T08:37:52.070Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-11T08:37:52.070Z",
+      "lastSuccessfulRun": "2026-07-29T13:05:02.240Z",
       "knownGaps": [
         "This combines Atlas country metrics and research indicator history; source vintages and product eligibility differ, and presence does not imply inclusion in the Civica Index."
       ],
@@ -1037,42 +1037,42 @@
       "id": "citations",
       "label": "Statement citations",
       "recordLabel": "statement-level provenance records",
-      "recordCount": 6669,
+      "recordCount": 6946,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "source_id",
           "label": "Source identifier",
-          "complete": 6669,
-          "total": 6669,
+          "complete": 6946,
+          "total": 6946,
           "percent": 100
         },
         {
           "field": "source_url",
           "label": "Source URL",
-          "complete": 6478,
-          "total": 6669,
-          "percent": 97.1
+          "complete": 6755,
+          "total": 6946,
+          "percent": 97.3
         },
         {
           "field": "source_license",
           "label": "Captured source license",
-          "complete": 6669,
-          "total": 6669,
+          "complete": 6946,
+          "total": 6946,
           "percent": 100
         },
         {
           "field": "retrieved_at",
           "label": "Retrieval time",
-          "complete": 6669,
-          "total": 6669,
+          "complete": 6946,
+          "total": 6946,
           "percent": 100
         },
         {
           "field": "source_hash",
           "label": "Source hash",
           "complete": 0,
-          "total": 6669,
+          "total": 6946,
           "percent": 0
         }
       ],
@@ -1081,13 +1081,13 @@
           "id": "cia_factbook",
           "label": "CIA World Factbook",
           "family": "cia_factbook",
-          "lastSuccessfulRun": "2026-05-04T19:07:06.840Z"
+          "lastSuccessfulRun": "2026-07-15T07:00:32.564Z"
         },
         {
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-13T01:02:00.943Z"
+          "lastSuccessfulRun": "2026-07-29T01:01:52.668Z"
         },
         {
           "id": "constitute_project",
@@ -1114,7 +1114,7 @@
           "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-13T01:02:00.943Z",
+      "lastSuccessfulRun": "2026-07-29T01:01:52.668Z",
       "knownGaps": [
         "Statement rows currently cover the closed polymorphic subject set only; canonical country facts use their own row-level provenance and are measured separately rather than being double-counted here."
       ],
