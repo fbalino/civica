@@ -5,7 +5,7 @@ import test from "node:test";
 const globals = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
 
 test("the shared sr-only utility keeps content off the visual canvas", () => {
-  const block = globals.match(/\.sr-only\s*\{(?<body>[^}]+)\}/)?.groups?.body;
+  const block = globals.match(/\.sr-only\s*\{([^}]+)\}/)?.[1];
 
   assert.ok(block, "globals.css must define the shared .sr-only utility");
   assert.match(block, /position:\s*absolute/);
