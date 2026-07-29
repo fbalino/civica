@@ -84,7 +84,18 @@ const SHARED_SUBJECTS: Record<string, { subject: string; routes: string[] }> = {
   "spot-ship": { subject: "Historical ship editorial motif", routes: ["explore-navigation"] },
 };
 
-type GitIntroduction = { commit: string; committedAt: string };
+export type GitIntroduction = { commit: string; committedAt: string };
+
+type CheckedManifestAsset = {
+  path: string;
+  file?: {
+    sha256?: unknown;
+  };
+  origin?: {
+    firstTrackedCommit?: unknown;
+    firstTrackedAt?: unknown;
+  };
+};
 
 type ForwardAssetRecord = {
   theme: "light" | "dark";
@@ -179,7 +190,11 @@ function gitIntroductions() {
     const mergeHead = execFileSync(
       "git",
       ["rev-parse", "--verify", "MERGE_HEAD"],
-      { cwd: root, encoding: "utf8" },
+      {
+        cwd: root,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      },
     ).trim();
     if (mergeHead) revisions.push(mergeHead);
   } catch {
@@ -210,6 +225,97 @@ function gitIntroductions() {
     }
   }
   return introductions;
+}
+
+function isShallowRepository() {
+  return (
+    execFileSync("git", ["rev-parse", "--is-shallow-repository"], {
+      cwd: root,
+      encoding: "utf8",
+    }).trim() === "true"
+  );
+}
+
+async function loadCheckedManifestAssets() {
+  let parsed: { contract?: unknown; assets?: unknown };
+  try {
+    parsed = JSON.parse(await readFile(outputFile, "utf8")) as {
+      contract?: unknown;
+      assets?: unknown;
+    };
+  } catch (error) {
+    throw new Error(
+      `shallow repository requires a readable checked illustration manifest: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
+  if (
+    parsed.contract !== "civica-editorial-illustration-manifest/v1" ||
+    !Array.isArray(parsed.assets)
+  ) {
+    throw new Error(
+      "shallow repository requires a valid checked illustration manifest",
+    );
+  }
+  const byPath = new Map<string, CheckedManifestAsset>();
+  for (const candidate of parsed.assets) {
+    if (
+      !candidate ||
+      typeof candidate !== "object" ||
+      typeof (candidate as CheckedManifestAsset).path !== "string"
+    ) {
+      throw new Error("checked illustration manifest contains an invalid asset");
+    }
+    const asset = candidate as CheckedManifestAsset;
+    if (byPath.has(asset.path)) {
+      throw new Error(
+        `checked illustration manifest contains duplicate asset path: ${asset.path}`,
+      );
+    }
+    byPath.set(asset.path, asset);
+  }
+  return byPath;
+}
+
+export function resolveGitIntroduction({
+  relative,
+  sha256,
+  gitIntroduction,
+  shallow,
+  checkedAsset,
+}: {
+  relative: string;
+  sha256: string;
+  gitIntroduction?: GitIntroduction;
+  shallow: boolean;
+  checkedAsset?: CheckedManifestAsset;
+}): GitIntroduction | undefined {
+  if (!shallow) return gitIntroduction;
+  if (!checkedAsset) {
+    // A shallow boundary can make every file look newly introduced. Do not use
+    // that synthetic history to exempt an asset from a forward record.
+    return undefined;
+  }
+  if (checkedAsset.file?.sha256 !== sha256) {
+    throw new Error(
+      `${relative}: shallow clone cannot verify checked illustration provenance because the asset hash drifted`,
+    );
+  }
+  const commit = checkedAsset.origin?.firstTrackedCommit;
+  const committedAt = checkedAsset.origin?.firstTrackedAt;
+  if (commit === null && committedAt === null) return undefined;
+  if (
+    typeof commit !== "string" ||
+    !/^[0-9a-f]{40}$/.test(commit) ||
+    typeof committedAt !== "string" ||
+    Number.isNaN(Date.parse(committedAt))
+  ) {
+    throw new Error(
+      `${relative}: checked illustration manifest has incomplete Git introduction provenance`,
+    );
+  }
+  return { commit, committedAt };
 }
 
 async function assetFiles(directory: string): Promise<string[]> {
@@ -293,7 +399,13 @@ function descriptiveFields(category: string, key: string, theme: "light" | "dark
 }
 
 async function buildManifest() {
-  const introductions = gitIntroductions();
+  const shallow = isShallowRepository();
+  const introductions = shallow
+    ? new Map<string, GitIntroduction>()
+    : gitIntroductions();
+  const checkedAssets = shallow
+    ? await loadCheckedManifestAssets()
+    : new Map<string, CheckedManifestAsset>();
   const forwardRecords = await loadForwardRecords();
   const consumedForwardRecords = new Set<string>();
   const files = await assetFiles(assetRoot);
@@ -307,14 +419,20 @@ async function buildManifest() {
     const bytes = await readFile(file);
     const metadata = await sharp(bytes).metadata();
     const description = descriptiveFields(category, key, theme);
-    const introduction = introductions.get(relative);
     const forward = forwardRecords.get(relative);
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
+    const introduction = resolveGitIntroduction({
+      relative,
+      sha256,
+      gitIntroduction: introductions.get(relative),
+      shallow,
+      checkedAsset: checkedAssets.get(relative),
+    });
     if (!introduction && !forward) {
       throw new Error(
         `${relative}: new illustration is missing a forward generation record`,
       );
     }
-    const sha256 = createHash("sha256").update(bytes).digest("hex");
     if (forward) {
       consumedForwardRecords.add(relative);
       if (forward.record.assetKey !== key) {
