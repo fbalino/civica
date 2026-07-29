@@ -767,6 +767,22 @@ body {
   box-sizing: border-box;
 }
 
+/* Canonical screen-reader-only utility. Keep semantic text in the accessibility
+   tree while clipping it from the visual canvas; add aria-hidden only when the
+   content (such as a bot trap) must also be hidden from assistive technology. */
+.sr-only {
+  position: absolute;
+  width: var(--border-hairline);
+  height: var(--border-hairline);
+  padding: 0;
+  margin: calc(var(--border-hairline) * -1);
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);

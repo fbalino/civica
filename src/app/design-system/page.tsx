@@ -460,7 +460,9 @@ export default function DesignSystemPage() {
           <Link href="https://github.com/fbalino/civica/blob/main/DESIGN.md">
             DESIGN.md
           </Link>
-          . No hardcoded colors, fonts, or sizes elsewhere.
+          . No hardcoded colors, fonts, or sizes elsewhere. This page&rsquo;s
+          accessible title also exercises the canonical <code>.sr-only</code>
+          utility used for visually hidden labels and bot traps.
         </div>
 
         {/* 00 Foundation */}
