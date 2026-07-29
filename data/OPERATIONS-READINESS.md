@@ -48,10 +48,10 @@ and P1 operational finding below is closed.
   accessibility, performance, secret, lint, type, and module gates.
 - Clean-checkout evidence installed the lockfile-pinned dependencies, completed
   the production build, and passed the fixture-only test suite.
-- The fixed local G4 matrix was rerun on 2026-07-26 from a clean source
-  checkout at `b327cfff`: master-plan integrity, verification-matrix
+- The fixed local G4 matrix was rerun on 2026-07-29 from the dedicated release
+  worktree at `b8351519`: master-plan integrity, verification-matrix
   validation, the unit suite, typecheck, lint, and the canonical
-  credential-free production build all passed. The checkout had no
+  credential-free production build all passed. The worktree had no
   `.env.local` or database variable; exact command durations and the local
   dependency-tree limitation are retained under `plan/evidence/QA-021/`.
 - Hosted pull-request/main runs and branch-protection enforcement have not been

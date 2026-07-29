@@ -7,13 +7,14 @@ The canonical report is `data/OPERATIONS-READINESS.md`.
 
 ## Current refresh — 2026-07-29
 
-A clean detached source checkout at `b327cfff` reran the fixed G4 matrix. All six
+The dedicated release worktree at `b8351519` reran the fixed G4 matrix. All six
 commands passed: master-plan integrity, verification-matrix validation, the
 unit suite, typecheck, lint, and `npm run build:ci`. The build path was
-credential-free; the checkout had no `.env.local` or database variable. The
-source checkout used a local hard-linked copy of the repository's
-already-installed dependency tree rather than performing a new network
-install, so QA-017 remains the separate clean-install proof.
+credential-free; the worktree had no `.env.local` or database variable. It
+used the repository's already-installed dependency tree rather than performing
+a new network install, so QA-017 remains the separate clean-install proof.
+Exact command results and durations are retained in
+`plan/evidence/QA-021/g4-runtime-2026-07-29.v1.json`.
 
 The current tracked-tree secret scan reports zero findings. The known
 historical Neon owner credential is rotated and freshly rejected on production

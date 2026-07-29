@@ -1,32 +1,32 @@
 # QA-021 — G4 local gate repair
 
-## Current result — 2026-07-26
+## Current result — 2026-07-29
 
 The fixed G4 command matrix passes all six local commands at source commit
-`b327cfff`. Its overall status remains correctly `blocked`: 252/310 tasks are
-complete, 58 remain, and 26 P0 plus 54 P0/P1 tasks still require human
+`b8351519`. Its overall status remains correctly `blocked`: 256/310 tasks are
+complete, 54 remain, and 23 P0 plus 50 P0/P1 tasks still require human
 decisions, external review, production or staging authority, unavailable
 publisher evidence, elapsed observation time, or completion of those
 dependencies. It reports zero evidence gaps, zero master-mirror errors, and
 zero waivers.
 
-The run used a clean detached source checkout with no `.env.local` and no
-database variable. It used a local hard-linked copy of the repository's
-existing dependency tree rather than a network install; QA-017 remains the
-clean-install proof. The dependency tree was placed inside the checkout so
-Turbopack did not rely on an out-of-root symlink. The G4 production command is
-the canonical credential-free `npm run build:ci`, so no Neon, Vercel, provider
-credential, migration, deployment, production mutation, paid model call,
-external review, or elapsed observation was used or claimed.
+The run used the dedicated release worktree with no `.env.local` and no
+`DATABASE_URL`. It reused the repository's existing dependency tree rather
+than performing a network install; QA-017 remains the clean-install proof. The
+G4 production command is the canonical credential-free `npm run build:ci`, so
+no Neon, Vercel, provider credential, migration, deployment, production
+mutation, paid model call, external review, or elapsed observation was used or
+claimed. The machine-readable runtime record is
+`plan/evidence/QA-021/g4-runtime-2026-07-29.v1.json`.
 
 | Command | Result | Duration |
 | --- | --- | ---: |
-| `node plan/tools/validate-master-plan.mjs` | passed | 36 ms |
-| `npm run validate:verification-matrix` | passed | 3,112 ms |
-| `npm test` | passed | 36,809 ms |
-| `npm run typecheck` | passed | 22,538 ms |
-| `npm run lint` | passed | 26,053 ms |
-| `npm run build:ci` | passed | 192,895 ms |
+| `node plan/tools/validate-master-plan.mjs` | passed | 39 ms |
+| `npm run validate:verification-matrix` | passed | 2,999 ms |
+| `npm test` | passed | 43,110 ms |
+| `npm run typecheck` | passed | 3,688 ms |
+| `npm run lint` | passed | 28,584 ms |
+| `npm run build:ci` | passed | 156,524 ms |
 
 ## Additional repairs found by the fresh run
 

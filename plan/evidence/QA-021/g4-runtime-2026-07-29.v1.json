@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "civica-g4-runtime-evidence/v1",
+  "observedAt": "2026-07-29T14:38:01Z",
+  "sourceCommit": "b8351519856441802bf00e96c4a12912dc638b63",
+  "command": "npm run run:readiness-reports -- --gate=G4 --execute",
+  "environment": {
+    "checkout": "dedicated release worktree",
+    "envLocalPresent": false,
+    "databaseUrlPresent": false,
+    "dependencyInstall": "existing repository dependency tree",
+    "externalMutationsPerformed": false
+  },
+  "result": {
+    "gate": "G4",
+    "status": "blocked",
+    "tasks": {
+      "total": 310,
+      "completed": 256,
+      "remaining": 54,
+      "openP0": 23,
+      "openP0P1": 50
+    },
+    "evidenceGaps": 0,
+    "masterMirrorErrors": 0,
+    "waivers": 0,
+    "commands": [
+      {
+        "id": "master-plan",
+        "command": "node plan/tools/validate-master-plan.mjs",
+        "status": "passed",
+        "exitCode": 0,
+        "durationMs": 39
+      },
+      {
+        "id": "verification-matrix",
+        "command": "npm run validate:verification-matrix",
+        "status": "passed",
+        "exitCode": 0,
+        "durationMs": 2999
+      },
+      {
+        "id": "unit-suite",
+        "command": "npm test",
+        "status": "passed",
+        "exitCode": 0,
+        "durationMs": 43110
+      },
+      {
+        "id": "typecheck",
+        "command": "npm run typecheck",
+        "status": "passed",
+        "exitCode": 0,
+        "durationMs": 3688
+      },
+      {
+        "id": "lint",
+        "command": "npm run lint",
+        "status": "passed",
+        "exitCode": 0,
+        "durationMs": 28584
+      },
+      {
+        "id": "production-build",
+        "command": "npm run build:ci",
+        "status": "passed",
+        "exitCode": 0,
+        "durationMs": 156524
+      }
+    ],
+    "blockers": [
+      "23 unchecked P0 tasks prevent a green report",
+      "50 unchecked P0/P1 tasks prevent G4"
+    ]
+  },
+  "claimsBoundary": [
+    "A passed command matrix does not convert the blocked G4 gate to pass.",
+    "No owner decision, external review, provider approval, deployment, paid activity, or elapsed observation is claimed by this runtime record."
+  ]
+}
