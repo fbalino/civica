@@ -26,7 +26,9 @@ if (errors.length === 0) {
   const monitor = read(files.monitor);
   const registry = read(files.registry);
   const inventory = read(files.inventory);
-  const vercel = read(files.vercel);
+  const vercel = JSON.parse(read(files.vercel)) as {
+    crons?: Array<{ path?: unknown; schedule?: unknown }>;
+  };
   const docs = read(files.docs);
   const runbooks = read(files.runbooks);
   const evidence = JSON.parse(read(files.evidence)) as Record<string, unknown>;
@@ -84,10 +86,13 @@ if (errors.length === 0) {
   ]) {
     if (!inventory.includes(token)) errors.push(`route inventory omits ${token}`);
   }
-  if (!vercel.includes('"path": "/api/cron/operations/health-alerts"')) {
+  const healthMonitorSchedule = vercel.crons?.find(
+    (cron) => cron.path === "/api/cron/operations/health-alerts",
+  );
+  if (!healthMonitorSchedule) {
     errors.push("vercel schedule omits health monitor");
   }
-  if (!vercel.includes('"schedule": "*/15 * * * *"')) {
+  if (healthMonitorSchedule?.schedule !== "*/15 * * * *") {
     errors.push("health monitor must run every 15 minutes");
   }
   for (const token of [
