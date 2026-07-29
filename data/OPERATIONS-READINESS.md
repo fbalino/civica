@@ -104,6 +104,14 @@ and P1 operational finding below is closed.
   replay, component, freshness-at-release, API, and browser checks; the
   model-free Pulse lifecycle/workspace repairs passed their retained-ledger
   validators. Cron jobs remained disabled.
+- The reviewed release source `f57feca0` then reached Ready in production as
+  deployment `dpl_6BeqkVNr4uMDhrS4gxD3uERxmqdZ`, with the canonical domains
+  attached and no alias error. The application, database, and critical assets
+  were operational; the health contract remained honestly degraded only
+  because scheduled-data freshness alerts are open. The named Conditions
+  release, corrected data-error form, Explore artwork, and homepage governance
+  artwork passed read-only browser checks, the deployment had no observed 5xx
+  runtime log, and Vercel Cron Jobs remained disabled.
 - QA-019's isolated technical run is complete. A deliberately mismatched
   release marker was detected on one protected Preview, then a one-line
   forward fix received a fresh full build and distinct Ready Preview. Both

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "civica-production-release-smoke/v1",
+  "checkedAt": "2026-07-29T14:53:41Z",
+  "source": {
+    "commit": "f57feca0177320706ae9edeaad2b7cf127e67080",
+    "branch": "main"
+  },
+  "deployment": {
+    "id": "dpl_6BeqkVNr4uMDhrS4gxD3uERxmqdZ",
+    "url": "civica-4w9s4f2uz-fbalinos-projects.vercel.app",
+    "target": "production",
+    "state": "READY",
+    "readyAt": "2026-07-29T14:49:29.688Z",
+    "aliasError": null,
+    "aliases": [
+      "civicaatlas.org",
+      "www.civicaatlas.org",
+      "civica-kappa.vercel.app",
+      "civica-fbalinos-projects.vercel.app",
+      "civica-git-main-fbalinos-projects.vercel.app"
+    ]
+  },
+  "http": {
+    "pages": [
+      {
+        "url": "https://civicaatlas.org/",
+        "status": 200
+      },
+      {
+        "url": "https://civicaatlas.org/civica-conditions",
+        "status": 200
+      },
+      {
+        "url": "https://civicaatlas.org/report-data-issue",
+        "status": 200
+      }
+    ],
+    "health": {
+      "url": "https://civicaatlas.org/api/health",
+      "version": "civica-health-status/v1",
+      "checkedAt": "2026-07-29T14:50:39.302Z",
+      "overall": "degraded",
+      "components": {
+        "application": "operational",
+        "database": "operational",
+        "critical_assets": "operational",
+        "scheduled_data_freshness": "degraded",
+        "model_dependent_optional_services": "operational"
+      },
+      "degradationSummary": "freshness_alerts_open"
+    },
+    "conditions": {
+      "url": "https://civicaatlas.org/api/v1/conditions?release=conditions-production-20260729-v1",
+      "contract": "civica-conditions-public-release/v1",
+      "releaseId": "conditions-production-20260729-v1",
+      "methodologyVersion": "conditions-components/v1",
+      "manifestSha256": "fdf73809e649c343d0f558a23438eb6fa41d74e788d4bdf927b386da90f36373",
+      "publicCalculationCount": 295,
+      "coverage": {
+        "human_development": {
+          "calculations": 51,
+          "scored": 51
+        },
+        "peace_security": {
+          "calculations": 50,
+          "scored": 50
+        },
+        "economic_stability": {
+          "calculations": 194,
+          "aligned": 160,
+          "mixedYearRefused": 5,
+          "missingComponent": 29,
+          "scored": 0
+        }
+      }
+    }
+  },
+  "browser": {
+    "reportDataIssue": {
+      "url": "https://civicaatlas.org/report-data-issue",
+      "title": "Report a Data Issue · Civica Atlas",
+      "formCount": 1,
+      "honeypot": {
+        "selector": "#report-website",
+        "wrapperClass": "sr-only",
+        "ariaHidden": true,
+        "tabIndex": -1,
+        "autocomplete": "off",
+        "computedStyle": {
+          "position": "absolute",
+          "width": "1px",
+          "height": "1px",
+          "margin": "-1px",
+          "overflow": "hidden",
+          "clip": "rect(0px, 0px, 0px, 0px)",
+          "clipPath": "inset(50%)",
+          "whiteSpace": "nowrap"
+        }
+      },
+      "screenshot": {
+        "path": "plan/evidence/ATL-024/production-active-form-post-sr-only-fix-2026-07-29.jpg",
+        "bytes": 63669,
+        "sha256": "ed7f8dfdf0617207acec447e7b2bece6130a22cada62890fe70e34ed9bd3d342"
+      },
+      "formSubmissionPerformed": false
+    },
+    "conditions": {
+      "url": "https://civicaatlas.org/civica-conditions",
+      "h1": "Civica Conditions",
+      "releaseMentionPresent": true,
+      "applicationErrorPresent": false
+    },
+    "homeAndExplore": {
+      "url": "https://civicaatlas.org/",
+      "h1": "Civica Atlas",
+      "exploreExpanded": true,
+      "navigationArtworkBackgroundsVisible": 8,
+      "governanceEvidenceArtworkVisible": true,
+      "applicationErrorPresent": false
+    },
+    "errorLogCount": 0
+  },
+  "runtime": {
+    "deploymentScoped5xxLogs": 0,
+    "queryWindow": "30m ending 2026-07-29T14:53:31.344Z"
+  },
+  "cronJobs": {
+    "settingsUrl": "https://vercel.com/fbalinos-projects/civica/settings/cron-jobs",
+    "state": "Disabled",
+    "verifiedAfterDeployment": true,
+    "reactivated": false
+  },
+  "claimsBoundary": [
+    "The health endpoint remains degraded because scheduled-data freshness alerts are open; this record does not relabel that state as operational.",
+    "No form submission, synthetic correction, cron run, model call, paid activity, owner approval, external review, notification, or elapsed observation is claimed."
+  ]
+}

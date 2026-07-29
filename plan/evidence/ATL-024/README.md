@@ -47,7 +47,15 @@ read-only browser pass found that the shared `.sr-only` utility was missing, so
 the bot-trap field was visibly rendered. The pre-fix production state is
 retained in `production-active-form-pre-sr-only-fix-2026-07-29.jpg`. The fix
 adds one canonical design-system utility, its design-system documentation, and
-a regression test; it must be rechecked after the final production deployment.
+a regression test.
+
+Production deployment `dpl_6BeqkVNr4uMDhrS4gxD3uERxmqdZ` reached Ready on
+2026-07-29 at source `f57feca0`. The post-deploy browser check confirms the
+trap is clipped to a 1×1px absolute box with zero visible overflow, hidden from
+assistive technology, and removed from the tab order. The corrected viewport is
+retained in `production-active-form-post-sr-only-fix-2026-07-29.jpg`; the
+machine-readable smoke record is
+`plan/evidence/QA-021/production-release-smoke-2026-07-29.v1.json`.
 
 ## Browser verification
 
@@ -56,6 +64,7 @@ data:
 
 - HTTP 200 with the intended report fields and privacy/consent copy;
 - the footer route and on-screen receipt contract are present;
+- the hidden bot trap is visually clipped, `aria-hidden`, and `tabIndex=-1`;
 - no console error appeared; and
 - no POST, admin mutation, report, receipt, or correction was fabricated.
 

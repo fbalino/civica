@@ -19,6 +19,10 @@ mutation, paid model call, external review, or elapsed observation was used or
 claimed. The machine-readable runtime record is
 `plan/evidence/QA-021/g4-runtime-2026-07-29.v1.json`.
 
+The reviewed release later reached Ready on the canonical production domains.
+Its read-only HTTP, browser, runtime-log, and disabled-cron proof is retained in
+`plan/evidence/QA-021/production-release-smoke-2026-07-29.v1.json`.
+
 | Command | Result | Duration |
 | --- | --- | ---: |
 | `node plan/tools/validate-master-plan.mjs` | passed | 39 ms |
