@@ -27,18 +27,25 @@ migration `0036`; no `0036` migration source was changed for ATL-026. This
 repairs a previously stale checked fingerprint while preserving the actual
 authoritative migration chain.
 
-## Rollout boundary
+## Production completion — 2026-07-29
 
-The disposable QA-018 attempt-07 branch has now applied the complete
-authoritative tail through `0051_eminent_jocasta` and retained release
-`conditions-20260727-v1`: 340 calculations, 818 exact component rows, and 101
-scores, including 162 aligned, six mixed-year-refused, and 71 missing-component
-economic calculations. The immutable replay wrote zero score/component rows,
-and the post-refusal live validator remained unchanged. Bounded evidence is in
-[`../QA-018/attempt-07-conditions-release-2026-07-27.md`](../QA-018/attempt-07-conditions-release-2026-07-27.md)
-and
-[`../ATL-027/attempt-07-release-validation.v1.json`](../ATL-027/attempt-07-release-validation.v1.json).
+Production release `conditions-production-20260729-v1` passed its guarded live
+validation and exact replay at authoritative migration head
+`0051_eminent_jocasta`: 340 calculations, 818 component rows, 101 scores,
+three source records, and zero retained-ledger mutation-history rows. The
+economic ledger preserves 162 aligned calculations, six mixed-year refusals,
+and 71 missing-component calculations; it has no economic composite score.
+All three release sources had `last_sync_at` exactly equal to the release
+creation time, under the immediate-post-release freshness policy.
 
-Production remains separately authority-gated. ATL-026 stays unchecked until
-the production ledger and selected public release pass the same live
-decomposition and public-read gates.
+The public API selected the exact immutable release and manifest, returned
+observed component values with years and unavailable components with null plus
+a reason, and confirmed no economic composite. Production browser evidence
+covers the explorer plus aligned Afghanistan, mixed-year-refused Bosnia and
+Herzegovina, missing-component Andorra, and their comparison; each showed the
+corresponding state without rendering a missing value as zero or an economic
+composite.
+
+Evidence: [`../ATL-027/production-release-validation-2026-07-29.v1.json`](../ATL-027/production-release-validation-2026-07-29.v1.json),
+[`production-public-api-2026-07-29.v1.json`](production-public-api-2026-07-29.v1.json),
+and [`production-browser-evidence-2026-07-29.v1.json`](production-browser-evidence-2026-07-29.v1.json).

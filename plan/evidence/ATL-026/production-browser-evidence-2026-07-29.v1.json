@@ -1,0 +1,122 @@
+{
+  "contract": "civica-conditions-production-browser-evidence/v1",
+  "observedAt": "2026-07-29T14:11:50Z",
+  "deployment": {
+    "id": "dpl_CciNVV24yuMyD2soysr1MtTzCLpr",
+    "commit": "712e6ae81ab350eb61f0a06de3d3f37c963881a5",
+    "url": "https://civica-dwtkjct72-fbalinos-projects.vercel.app",
+    "target": "production",
+    "state": "READY",
+    "createdAt": "2026-07-29T13:57:17.927Z",
+    "observedReadyAt": "2026-07-29T14:11:50Z"
+  },
+  "browser": {
+    "surface": "Codex in-app browser",
+    "viewport": {
+      "width": 1280,
+      "height": 720,
+      "devicePixelRatio": 1
+    },
+    "theme": "dark"
+  },
+  "checks": [
+    {
+      "id": "release-explorer",
+      "url": "https://civicaatlas.org/civica-conditions?release=conditions-production-20260729-v1",
+      "httpStatus": 200,
+      "assertions": {
+        "releaseIdVisible": true,
+        "methodologyVersionVisible": true,
+        "manifestPrefixVisible": true,
+        "coverageDerivedFromStoredRelease": true,
+        "sourceNativeComponentsAndYearsVisible": true,
+        "noEconomicCompositeVisible": true,
+        "consoleErrors": 0
+      },
+      "screenshot": {
+        "path": "production-conditions-explorer-2026-07-29.jpg",
+        "format": "jpeg",
+        "width": 1269,
+        "height": 714,
+        "sha256": "002df11264c4a010444d5efdab0ab8d5b78c7bf8a33c08321add4a9870cc0923"
+      }
+    },
+    {
+      "id": "aligned-inputs",
+      "url": "https://civicaatlas.org/country/afghanistan/civica-data",
+      "httpStatus": 200,
+      "assertions": {
+        "alignedInputsVisible": true,
+        "commonReferenceYear2024Visible": true,
+        "noEconomicCompositeVisible": true,
+        "consoleErrors": 0
+      },
+      "screenshot": {
+        "path": "production-afghanistan-aligned-2026-07-29.jpg",
+        "format": "jpeg",
+        "width": 1269,
+        "height": 714,
+        "sha256": "e7e56244c26380081f8ecdfe7e869f80cb06b9addee1ad69dbfe45761e94f142"
+      }
+    },
+    {
+      "id": "mixed-year-refused",
+      "url": "https://civicaatlas.org/country/bosnia-and-herzegovina/civica-data",
+      "httpStatus": 200,
+      "assertions": {
+        "mixedYearsRefusedVisible": true,
+        "componentYears2024And2023Visible": true,
+        "commonReferenceYearAbsent": true,
+        "noEconomicCompositeVisible": true,
+        "consoleErrors": 0
+      },
+      "screenshot": {
+        "path": "production-bosnia-mixed-year-refused-2026-07-29.jpg",
+        "format": "jpeg",
+        "width": 1269,
+        "height": 714,
+        "sha256": "5c28079e421c4dacdb72ba613f4faea9f41358df3a510380e8efd824b4a74de6"
+      }
+    },
+    {
+      "id": "missing-component",
+      "url": "https://civicaatlas.org/country/andorra/civica-data",
+      "httpStatus": 200,
+      "assertions": {
+        "componentUnavailableVisible": true,
+        "notObservedReasonsVisible": true,
+        "missingValueNotRenderedAsZero": true,
+        "noEconomicCompositeVisible": true,
+        "consoleErrors": 0
+      },
+      "screenshot": {
+        "path": "production-andorra-missing-component-2026-07-29.jpg",
+        "format": "jpeg",
+        "width": 1269,
+        "height": 714,
+        "sha256": "f58bc91b2b5ef0874f88a8f0400a404be2ad24818b06c7376d99d0f0d5168c31"
+      }
+    },
+    {
+      "id": "three-country-comparison",
+      "url": "https://civicaatlas.org/compare?c=afghanistan&c=bosnia-and-herzegovina&c=andorra#conditions",
+      "httpStatus": 200,
+      "assertions": {
+        "allThreeCountriesVisible": true,
+        "alignedStateVisible": true,
+        "mixedYearRefusedStateVisible": true,
+        "missingComponentStateVisible": true,
+        "noEconomicCompositeVisible": true,
+        "consoleErrors": 0
+      },
+      "screenshot": {
+        "path": "production-compare-three-conditions-2026-07-29.jpg",
+        "format": "jpeg",
+        "width": 1269,
+        "height": 714,
+        "sha256": "e344e51dfa464819f0b0f5133c6037e80d563bbe1fd048380a174f60b0b5fe60"
+      }
+    }
+  ],
+  "result": "pass"
+}

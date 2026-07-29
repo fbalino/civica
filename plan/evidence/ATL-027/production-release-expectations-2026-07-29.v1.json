@@ -1,0 +1,19 @@
+{
+  "contract": "civica-conditions-release-expectations/v1",
+  "releaseId": "conditions-production-20260729-v1",
+  "releaseManifestSha256": "fdf73809e649c343d0f558a23438eb6fa41d74e788d4bdf927b386da90f36373",
+  "expectedCalculationCounts": {
+    "human_development": 51,
+    "peace_security": 50,
+    "economic_stability": 239
+  },
+  "databaseTarget": {
+    "projectId": "ancient-art-58836757",
+    "branchId": "br-dawn-frog-amrf0h6a",
+    "endpointId": "ep-bitter-night-amod9dl6",
+    "hostnameSha256": "a3ffcc8fd9af05a36aa03df1b2cb879ddfdfeda3f2589ab41e343782ccd03002",
+    "migrationHead": "0051_eminent_jocasta",
+    "ledgerPresent": true,
+    "writesPerformed": 0
+  }
+}

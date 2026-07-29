@@ -1,0 +1,111 @@
+{
+  "contract": "civica-conditions-production-public-api-evidence/v1",
+  "observedAt": "2026-07-29T14:07:59.491Z",
+  "request": {
+    "url": "https://civicaatlas.org/api/v1/conditions?release=conditions-production-20260729-v1",
+    "httpStatus": 200,
+    "bodySha256": "d5a0539ed29e809a1dc50739a8d619b50aa63c937c060ac6cb7aa3d99c1efc2b"
+  },
+  "response": {
+    "contract": "civica-conditions-public-release/v1",
+    "release": {
+      "releaseId": "conditions-production-20260729-v1",
+      "methodologyVersion": "conditions-components/v1",
+      "manifestSha256": "fdf73809e649c343d0f558a23438eb6fa41d74e788d4bdf927b386da90f36373",
+      "createdAt": "2026-07-29T13:05:02.240Z"
+    },
+    "coverage": [
+      {
+        "dimension": "human_development",
+        "calculations": 51,
+        "aligned": 51,
+        "scored": 51,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 51,
+        "observedComponents": 51,
+        "unavailableComponents": 0
+      },
+      {
+        "dimension": "peace_security",
+        "calculations": 50,
+        "aligned": 50,
+        "scored": 50,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 50,
+        "observedComponents": 50,
+        "unavailableComponents": 0
+      },
+      {
+        "dimension": "economic_stability",
+        "calculations": 194,
+        "aligned": 160,
+        "scored": 0,
+        "mixedYearRefused": 5,
+        "missingComponent": 29,
+        "components": 582,
+        "observedComponents": 541,
+        "unavailableComponents": 41
+      }
+    ],
+    "returnedCalculations": 295,
+    "returnedComponents": 683
+  },
+  "assertions": {
+    "exactReleaseSelected": true,
+    "manifestMatched": true,
+    "componentLineageComplete": true,
+    "observedComponentsCarryValueAndYear": true,
+    "unavailableComponentsCarryNullAndReason": true,
+    "noEconomicComposite": true,
+    "alignedCase": {
+      "country": "Afghanistan",
+      "status": "aligned",
+      "referenceYear": 2024,
+      "componentYears": [
+        2024
+      ]
+    },
+    "mixedYearRefusedCase": {
+      "country": "Bosnia and Herzegovina",
+      "status": "mixed_year_refused",
+      "referenceYear": null,
+      "componentYears": [
+        2024,
+        2023
+      ],
+      "normalizedScore": null
+    },
+    "missingComponentCase": {
+      "country": "Andorra",
+      "status": "missing_component",
+      "referenceYear": null,
+      "componentStates": [
+        {
+          "componentId": "gdp_growth",
+          "valueStatus": "observed",
+          "valueStatusReason": null,
+          "inclusionDecision": "excluded_missing"
+        },
+        {
+          "componentId": "inflation",
+          "valueStatus": "not_observed",
+          "valueStatusReason": "World Bank returned no non-null observation in the requested period",
+          "inclusionDecision": "excluded_missing"
+        },
+        {
+          "componentId": "unemployment",
+          "valueStatus": "not_observed",
+          "valueStatusReason": "World Bank returned no non-null observation in the requested period",
+          "inclusionDecision": "excluded_missing"
+        }
+      ]
+    }
+  },
+  "failures": {
+    "missingText": [],
+    "badObserved": 0,
+    "badUnavailable": 0
+  }
+}

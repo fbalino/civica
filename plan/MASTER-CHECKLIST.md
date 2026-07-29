@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 310
-- **Completed:** 254
-- **Remaining:** 56
-- **Progress:** 81.9%
+- **Completed:** 256
+- **Remaining:** 54
+- **Progress:** 82.6%
 - **Priority mix:** P0 192 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -213,8 +213,8 @@ Source: `plan/06-atlas-content-and-research-features.md`
   triage, linkage, and delivery verification. Evidence:
   `plan/evidence/ATL-024/`.
 - [x] **ATL-025** (P1) Reconcile every older roadmap/mockup promise with the atlas-first release. _Done when: each existing dated plan/mockup is tagged imported/completed/superseded/deferred/post-release with evidence and any still-valid open work has a task ID in this master plan; no active pointer targets a noncanonical plan._
-- [ ] **ATL-026** (P0) Persist every Civica Conditions component value, reference year, source, missingness, and inclusion decision. _Done when: economic/HDI/security rows can be decomposed into exact components and years, mixed-year inputs follow an adopted alignment rule or are refused/flagged, and no composite is labelled solely with the newest component year._
-- [ ] **ATL-027** (P0) Freeze Conditions reference distributions and transformations by release. _Done when: reference population/period, means/SDs or other normalization parameters, direction, included components, and missingness are stored/queryable; rerunning a release is deterministic and cannot shift prior values silently._
+- [x] **ATL-026** (P0) Persist every Civica Conditions component value, reference year, source, missingness, and inclusion decision. _Done when: economic/HDI/security rows can be decomposed into exact components and years, mixed-year inputs follow an adopted alignment rule or are refused/flagged, and no composite is labelled solely with the newest component year. Production release `conditions-production-20260729-v1` passed exact component/replay/freshness validation and public API/browser state evidence; see `plan/evidence/ATL-026/`._
+- [x] **ATL-027** (P0) Freeze Conditions reference distributions and transformations by release. _Done when: reference population/period, means/SDs or other normalization parameters, direction, included components, and missingness are stored/queryable; rerunning a release is deterministic and cannot shift prior values silently. Production release `conditions-production-20260729-v1` passed manifest, replay, source-freshness, and public-release evidence; see `plan/evidence/ATL-027/`._
 - [ ] **ATL-028** (P0) Validate or redesign the “economic stability” construct. _Done when: a cited theory distinguishes stable growth from boom/rebound/volatility, candidate definitions and sensitivity are tested on frozen longitudinal data, external/native baselines are compared, and a resolution permits separate indicators/no composite if no construct passes._
 - [x] **ATL-029** (P0) Wire the public Conditions experience to the actual versioned Conditions data and honest coverage. _Done when: country/explorer/API read one selected release, show component years/sources/missingness, counts derive from actual rows, sparse domains do not inherit a “195 countries” claim, and fixtures match DB/export values._
 - [x] **ATL-030** (P1) Publish a Conditions codebook, replication artifact, and dedicated tests. _Done when: definitions, inputs, transformations, reference distributions, missingness, uncertainty/nonclaims, version, code/fixtures, sensitivity, coverage, and one-command reproduction are complete; no Conditions task relies on generic Index tests._

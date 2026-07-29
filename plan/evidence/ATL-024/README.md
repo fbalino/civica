@@ -1,10 +1,10 @@
 # ATL-024 evidence — Atlas data-error intake preparation
 
-Date: 2026-07-23
+Date: 2026-07-29
 
 Contract: `civica-atlas-data-error-report/v1`
 
-Status: agent preparation complete; production activation pending
+Status: production intake active; real report, triage, and correction-link proof pending
 
 ## What is complete
 
@@ -27,39 +27,37 @@ Status: agent preparation complete; production activation pending
 - Footer, policy, sitemap, and the existing Index/Pulse correction page route
   readers to the Atlas-specific form.
 
-## Why activation is pending
+## Production state
 
 Authoritative migration `0047_atlas_data_error_reports` is additive, contains
 22 statements and no destructive statement, and has SHA-256
 `e36e87c298ac19a50e9a65c7438e51e33b1f849b424c796a3e362a893cd86dfc`.
-It has not been applied to production because this run has no authority for a
-production database mutation.
+It is now applied in production as part of the complete checked migration
+history through `0051_eminent_jocasta`.
 
-The public page checks schema readiness. Until all required columns exist it
-renders a clear unavailable notice and no form; the API returns the stable
-non-cacheable `ATLAS_REPORT_SCHEMA_PENDING` 503 before attempting a write.
-This avoids accepting and losing a report.
+The guarded zero-write production audit in
+`production-live-audit-2026-07-29.v1.json` confirms the schema is ready, the
+migration head remained `0051` before and after, no invalid status or resolution
+rows exist, and no Atlas report has been submitted. The one pre-existing
+correction row is not an Atlas data-error report.
 
-The 2026-07-23 zero-write audit found one existing correction row, no invalid
-status or resolution rows, no Atlas report rows, and `schemaReady: false`.
-The migration plan found `correction_log` at one row,
-`research_evidence_history` at 83,354 rows, and the ATL-020 history relation
-absent. See `live-preflight.json`.
+The public page returns HTTP 200 with the active form, exact fields, privacy and
+consent boundaries, receipt wording, and the required footer route. A
+read-only browser pass found that the shared `.sr-only` utility was missing, so
+the bot-trap field was visibly rendered. The pre-fix production state is
+retained in `production-active-form-pre-sr-only-fix-2026-07-29.jpg`. The fix
+adds one canonical design-system utility, its design-system documentation, and
+a regression test; it must be rechecked after the final production deployment.
 
 ## Browser verification
 
-System Chrome against the real Next.js app passed the current fail-closed state:
+System Chrome against production verified the active intake without submitting
+data:
 
-- HTTP 200, correct title/H1, schema-pending banner, and zero forms;
-- a valid direct POST returned 503 `ATLAS_REPORT_SCHEMA_PENDING`;
-- the footer route was present;
-- desktop and 360 × 800 dark mode had no document-level horizontal overflow;
-  and
-- no page errors appeared. The only console error was the expected failed
-  resource from the deliberate 503 API probe.
-
-The inspected local image is
-`output/playwright/atl-024-mobile-dark.png`.
+- HTTP 200 with the intended report fields and privacy/consent copy;
+- the footer route and on-screen receipt contract are present;
+- no console error appeared; and
+- no POST, admin mutation, report, receipt, or correction was fabricated.
 
 ## Verification
 
@@ -77,7 +75,9 @@ npm run validate:design-tokens
 npx tsc --noEmit
 ```
 
-ATL-024 remains open until migrations 0046 and 0047 are applied through the
-authorized production process and the active form, durable receipt, admin
-triage, correction linkage, and delivery behavior are verified against the
-stored production schema. No production write or external delivery is claimed.
+ATL-024 remains open until a genuine independently supportable data issue
+produces a real durable receipt, authenticated reviewer triage, and, if
+confirmed, an ATL-020-linked correction. Even an invalid POST would mutate the
+production rate-limit ledger, and a synthetic valid report would pollute the
+retained correction ledger without proving a real correction. No production
+submission, triage, correction, or external delivery is claimed.

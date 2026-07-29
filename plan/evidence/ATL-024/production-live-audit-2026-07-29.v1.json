@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "civica-atlas-data-error-report-production-audit/v1",
+  "capturedAt": "2026-07-29T14:17:05.958Z",
+  "execution": {
+    "mode": "guarded-zero-write",
+    "role": "civica_app_20260727",
+    "projectId": "ancient-art-58836757",
+    "branchId": "br-dawn-frog-amrf0h6a",
+    "endpointId": "ep-bitter-night-amod9dl6",
+    "hostnameSha256": "a3ffcc8fd9af05a36aa03df1b2cb879ddfdfeda3f2589ab41e343782ccd03002",
+    "migrationHeadBefore": "0051_eminent_jocasta",
+    "migrationHeadAfter": "0051_eminent_jocasta",
+    "migrationCountBefore": 51,
+    "migrationCountAfter": 51,
+    "writesPerformed": 0
+  },
+  "audit": {
+    "contract": "civica-atlas-data-error-report-live-audit/v1",
+    "schemaReady": true,
+    "correctionRows": 1,
+    "invalidStatusRows": 0,
+    "invalidResolutionShapeRows": 0,
+    "atlasReportRows": 0
+  },
+  "result": "pass"
+}

@@ -1,0 +1,109 @@
+{
+  "contract": "civica-conditions-production-release-evidence/v1",
+  "observedAt": "2026-07-29T14:01:41Z",
+  "execution": {
+    "mode": "guarded-read-only",
+    "role": "civica_app_20260727",
+    "migrationHeadBefore": "0051_eminent_jocasta",
+    "migrationHeadAfter": "0051_eminent_jocasta",
+    "migrationCountBefore": 51,
+    "migrationCountAfter": 51,
+    "writesPerformed": 0
+  },
+  "validation": {
+    "contract": "conditions-release-validation/v1",
+    "status": "pass",
+    "releaseId": "conditions-production-20260729-v1",
+    "methodologyVersion": "conditions-components/v1",
+    "manifestSha256": "fdf73809e649c343d0f558a23438eb6fa41d74e788d4bdf927b386da90f36373",
+    "manifestReplaySha256": "fdf73809e649c343d0f558a23438eb6fa41d74e788d4bdf927b386da90f36373",
+    "counts": {
+      "calculations": 340,
+      "components": 818,
+      "scores": 101,
+      "referenceSets": 3,
+      "normalizationParameters": 5,
+      "sources": 3,
+      "retainedTablesWithTriggers": 6,
+      "mutationHistoryRows": 0
+    },
+    "dimensions": [
+      {
+        "dimension": "human_development",
+        "calculations": 51,
+        "aligned": 51,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 51,
+        "scores": 51,
+        "referenceSets": 1,
+        "normalizationParameters": 1
+      },
+      {
+        "dimension": "peace_security",
+        "calculations": 50,
+        "aligned": 50,
+        "mixedYearRefused": 0,
+        "missingComponent": 0,
+        "components": 50,
+        "scores": 50,
+        "referenceSets": 1,
+        "normalizationParameters": 1
+      },
+      {
+        "dimension": "economic_stability",
+        "calculations": 239,
+        "aligned": 162,
+        "mixedYearRefused": 6,
+        "missingComponent": 71,
+        "components": 717,
+        "scores": 0,
+        "referenceSets": 1,
+        "normalizationParameters": 3
+      }
+    ],
+    "externalExpectations": {
+      "releaseManifestSha256": "fdf73809e649c343d0f558a23438eb6fa41d74e788d4bdf927b386da90f36373",
+      "expectedCalculationCounts": {
+        "human_development": 51,
+        "peace_security": 50,
+        "economic_stability": 239
+      },
+      "storedManifestMatched": true,
+      "replayManifestMatched": true,
+      "calculationCountsMatched": true
+    },
+    "sourceFreshness": {
+      "policy": "immediate-post-release-exact-created-at/v1",
+      "globalMutableStateLimitation": "sources.last_sync_at is global mutable state; this gate is valid only immediately after release creation",
+      "requiredLastSyncAt": "2026-07-29T13:05:02.240Z",
+      "neverSynced": 0,
+      "exactReleaseTimestampMatches": 3,
+      "releaseTimestampMismatches": 0,
+      "earliestLastSyncAt": "2026-07-29T13:05:02.240Z",
+      "latestLastSyncAt": "2026-07-29T13:05:02.240Z",
+      "allExactlyAtRelease": true,
+      "allAtOrBeforeValidation": true
+    },
+    "replay": {
+      "calculationKeysReplayed": 340,
+      "calculationKeysMatched": 340,
+      "manifestMatched": true,
+      "retainedTablesCovered": true,
+      "mutationHistoryEmpty": true
+    },
+    "errorCount": 0,
+    "errorsTruncated": false,
+    "errors": [],
+    "expectationsArtifactSha256": "c7fdd2155ca86511f38b4770992415b77faf1e11a822e140803e7900a5d60ffb",
+    "databaseTarget": {
+      "projectId": "ancient-art-58836757",
+      "branchId": "br-dawn-frog-amrf0h6a",
+      "endpointId": "ep-bitter-night-amod9dl6",
+      "hostnameSha256": "a3ffcc8fd9af05a36aa03df1b2cb879ddfdfeda3f2589ab41e343782ccd03002",
+      "migrationHead": "0051_eminent_jocasta",
+      "ledgerPresent": true,
+      "writesPerformed": 0
+    }
+  }
+}

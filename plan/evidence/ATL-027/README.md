@@ -22,19 +22,23 @@ year, never pooled across years.
 - `npm run validate:conditions-components` proves release manifests,
   migration application, no-op reruns, and changed-rerun refusal.
 
-## Rollout boundary
+## Production completion — 2026-07-29
 
-The disposable QA-018 attempt-07 branch has now applied the complete
-authoritative tail through `0051_eminent_jocasta` and retained immutable
-release `conditions-20260727-v1`. The bound expectations artifact, stored and
-replayed manifest, three reference sets, five normalization-parameter rows,
-identical-input zero-write replay, and changed-manifest refusal all passed.
-See
-[`attempt-07-release-expectations-2026-07-27.v1.json`](attempt-07-release-expectations-2026-07-27.v1.json),
-[`attempt-07-release-validation.v1.json`](attempt-07-release-validation.v1.json),
-and
-[`../QA-018/attempt-07-conditions-release-2026-07-27.md`](../QA-018/attempt-07-conditions-release-2026-07-27.md).
+Production release `conditions-production-20260729-v1` passed full guarded
+live validation at authoritative migration head `0051_eminent_jocasta`. Its
+stored manifest and exact replay have the same SHA-256; the external
+expectations artifact matched the stored manifest and all 340 calculation
+counts. The release contains three frozen reference sets and five
+normalization-parameter rows, while the immutable replay matched all 340
+calculation keys without changing retained tables or writing mutation history.
 
-Production remains separately authority-gated. ATL-027 stays unchecked until
-the production ledger and public release pass the same manifest, replay,
-freshness, and immutability gates.
+The immediate-post-release source-freshness gate also passed: all three
+release sources were synced exactly at the release creation time. The public
+API and browser evidence identify this exact release and manifest rather than
+a mutable current aggregate; their Conditions surfaces expose the frozen
+release with its components, years, and unavailable/refused states.
+
+Evidence: [`production-release-expectations-2026-07-29.v1.json`](production-release-expectations-2026-07-29.v1.json),
+[`production-release-validation-2026-07-29.v1.json`](production-release-validation-2026-07-29.v1.json),
+[`../ATL-026/production-public-api-2026-07-29.v1.json`](../ATL-026/production-public-api-2026-07-29.v1.json),
+and [`../ATL-026/production-browser-evidence-2026-07-29.v1.json`](../ATL-026/production-browser-evidence-2026-07-29.v1.json).

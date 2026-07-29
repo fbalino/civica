@@ -60,24 +60,31 @@ at the end.
 
 - **Detection:** `npm run validate:secrets` / `validate:secrets:history`
   (PLT-007) flags a key in the tree or history; or a provider alerts.
-  **A live Neon `DATABASE_URL` is currently flagged in git history** (see
-  `plan/MANUAL-CHECKS.md`, PLT-007).
+  The known Neon owner URL remains flagged by non-reversible hash in Git
+  history, but its credential was rotated and verified inert on 2026-07-29
+  (see `plan/evidence/PLT-007/`).
 - **Containment:** treat the credential as burned immediately.
 - **Owner:** Fernando.
 - **Rollback/correction:** rotate at the source — Neon (reset the role
   password), Anthropic/DeepSeek/GLM/OpenAI (revoke + reissue the key),
   `ADMIN_SESSION_SECRET`/`ADMIN_PASSWORD_HASH` (`npm run admin:set-password`,
   new `openssl rand -hex 32` — this signs out all admin sessions),
-  `CRON_SECRET`. Update the value in Vercel (REST or CLI) and `.env.local`, then
-  `vercel redeploy` (env changes only affect new deployments). If the secret is
-  in git history, decide on a history purge (`git filter-repo`/BFG — a
-  force-push that rewrites shared history).
+  `CRON_SECRET`. Update only the environments that actually use the affected
+  credential; a deployed-secret change requires a new deployment because
+  environment changes affect only new deployments. If the secret is in Git
+  history, retain its non-reversible scanner hash after rotation and decide
+  separately on a history purge (`git filter-repo`/BFG — a force-push that
+  rewrites shared history).
 - **User communication:** internal unless data was exfiltrated; a data breach
   triggers the correction/notification policy.
 - **Evidence preservation:** the scanner's non-reversible hash record in
   `scripts/secret-scan-allowlist.json`; never re-commit the plaintext.
 - **Recovery verification:** the old credential is rejected by the provider;
   `validate:secrets` clean on the current tree; app functions on the new value.
+  For the 2026-07-29 Neon incident, independent main/recovery owner resets,
+  fresh old-credential rejection, fresh new-owner access, mode `0600` local
+  storage, and an untouched Vercel application role are recorded in
+  `plan/evidence/PLT-007/owner-credential-rotation-2026-07-29.v1.json`.
 
 ## 4. Model/provider outage
 
@@ -205,9 +212,11 @@ at the end.
 
 Each runbook was walked through against the current implementation.
 
-- **#3 compromised key — LIVE GAP:** a real leaked Neon credential is in git
-  history and **not yet rotated** (queued in `plan/MANUAL-CHECKS.md`). This is
-  the one runbook with an open, unresolved incident.
+- **#3 compromised key — historical gap closed 2026-07-29:** the leaked Neon
+  owner credential was rotated on production main and the retained recovery
+  branch, and fresh old credentials are rejected. The invalid historical bytes
+  remain registered by hash pending Fernando's separate history-purge
+  decision.
 - **PLT-020 health/status contract:** `data/HEALTH-STATUS.md` now makes the
   public `/api/health` component probes, 15-minute owner monitor, fixed
   Incident.io publication thresholds, and Fernando’s status-page responsibility
