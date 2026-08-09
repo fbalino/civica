@@ -9,6 +9,7 @@ import { OG_IMAGES, OG_DEFAULT_IMAGE } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildOrganization, buildWebSite } from "@/lib/seo/jsonld";
 import { SITE_URL } from "@/lib/site";
+import { TypeLab } from "@/components/type-lab/TypeLab";
 import "./globals.css";
 import "./editorial.css";
 import "./atlas.css";
@@ -105,7 +106,9 @@ export default function RootLayout({
       // navigation (observed on both mobile and desktop).
       suppressHydrationWarning
     >
-      <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <body
+        style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+      >
         {/* The Civica mark geometry, emitted once per document as a hidden
             <symbol>. Every <CivicaLogo> below is a lightweight <use> reference,
             so the ~228 KB vector is inlined once instead of ~3× per view. */}
@@ -124,6 +127,7 @@ export default function RootLayout({
           <main style={{ flex: 1 }}>{children}</main>
 
           <SiteFooter />
+          {process.env.NODE_ENV === "development" ? <TypeLab /> : null}
         </ThemeProvider>
       </body>
     </html>

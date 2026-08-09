@@ -199,7 +199,7 @@ test("provider roles distinguish current ensemble, subject pass, review aid, and
   });
   assert.equal(
     providers.subject.responseValidation,
-    "strict_scope_roles_iso3_rationale_and_evidence_shape",
+    "strict_scope_roles_iso3_rationale_exact_retained_quote_and_entity_match",
   );
   assert.equal(
     providers.subject.failurePolicy,
@@ -232,7 +232,15 @@ test("provider roles distinguish current ensemble, subject pass, review aid, and
   assert.equal(providers.classify.singleEnginePublication, "queue_only");
   assert.equal(
     CURRENT_PULSE_RUNTIME_METHOD.publicationPolicy.automaticEligibility,
-    "stored_ensemble_and_gate_and_resolved_subject",
+    "stored_ensemble_gate_resolved_subject_and_deterministic_retained_evidence",
+  );
+  assert.equal(
+    providers.classify.publisherInputBoundary,
+    "explicit_untrusted_json_evidence_never_instructions",
+  );
+  assert.equal(
+    providers.classify.automaticEvidenceBinding,
+    "exact_retained_quote_per_supporting_classifier",
   );
   assert.equal(
     providers.classify.stateSchemaVersion,
@@ -266,6 +274,14 @@ test("provider roles distinguish current ensemble, subject pass, review aid, and
 
 test("review gates encode the actual ensemble boolean logic", () => {
   const policy = CURRENT_PULSE_RUNTIME_METHOD.publicationPolicy;
+  assert.equal(
+    policy.indirectInstructionSignal,
+    "non_none_queue_none_retry_then_terminal_failure",
+  );
+  assert.equal(
+    policy.majorityNone,
+    "drop_only_without_indirect_instruction_signal",
+  );
   assert.deepEqual(policy.reviewGates.absoluteSeverityTiers, [
     "catastrophic_neg",
     "high_pos",

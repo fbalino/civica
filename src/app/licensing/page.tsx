@@ -97,7 +97,11 @@ export default function LicensingPage() {
                 </td>
                 <td>{source.publicExport}</td>
                 <td>
-                  <a href={source.termsUrl} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={source.termsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Publisher terms
                   </a>
                 </td>
@@ -195,8 +199,8 @@ export default function LicensingPage() {
           </li>
           <li>
             Cite Civica Atlas when reusing Civica Index, Civica Pulse, or
-            reconciliation-derived outputs — citing is a request for credit,
-            not a grant of reuse permission.
+            reconciliation-derived outputs — citing is a request for credit, not
+            a grant of reuse permission.
           </li>
           <li>
             Do not treat restricted upstream sources as open data just because
@@ -212,24 +216,26 @@ export default function LicensingPage() {
       <section id="imagery" className="editorial-section">
         <SectionHeader
           eyebrow="Imagery"
-          title="Editorial illustrations"
-          dek="Civica's engravings are AI-assisted editorial illustrations, not documentary photographs or source evidence."
+          title="Editorial images"
+          dek="Civica's engravings and photographic treatments are AI-assisted editorial images, not documentary photographs or source evidence."
         />
 
         {/* PUBLIC_CLAIM: licensing.imagery-policy */}
         <p>
-          Country and territory mastheads use antique-style scenes of named
-          landmarks or landscapes. Landing-page engravings use broader civic
-          and archival motifs. All are AI-assisted editorial illustrations.
-          They are not photographs, source evidence, or claims about what a
-          place currently looks like. Each surface links back to this section.
+          Most country and territory mastheads use antique-style scenes of named
+          landmarks or landscapes. A limited trial set uses full-color
+          photographic treatments in the same editorial role. Landing-page
+          engravings use broader civic and archival motifs. All are AI-assisted
+          editorial images. They are not documentary photographs, source
+          evidence, or claims about what a place currently looks like. Each
+          surface links back to this section.
         </p>
 
-        <SectionHeader eyebrow="Tools" title="How the engravings are made" />
+        <SectionHeader eyebrow="Tools" title="How the imagery is made" />
         <p>
           Assets are produced with AI image-generation tooling (Codex-driven
-          generation), exported as source images, then converted to release
-          WebP before being committed. Existing country files use exact 3:2
+          generation), exported as source images, then converted to release WebP
+          before being committed. Existing country files use exact 3:2
           dimensions and pass the checked format, size, caption, pair, and
           color-state gate. See{" "}
           <a
@@ -255,33 +261,31 @@ export default function LicensingPage() {
           covers every published engraving with its route, intended subject,
           caption, light/dark partner, dimensions, hash, rights note, and QA
           state. Historical generation records remain incomplete: the launch
-          sessions did not retain prompt text, reference imagery, model
-          version, or seed. Assets created or replaced going forward retain
-          that record. A Git capture date is not presented as a generation
-          date.
+          sessions did not retain prompt text, reference imagery, model version,
+          or seed. Assets created or replaced going forward retain that record.
+          A Git capture date is not presented as a generation date.
         </p>
 
         <SectionHeader eyebrow="Quality" title="Review and correction" />
         <p>
           Automated checks cover inventory, hashes, exact pairing, captions,
           format, dimensions, file bounds, color policy, manifest drift, and
-          raw-file release risk. Human visual
-          review of what each engraving depicts and whether its caption
-          correctly names the landmark is being strengthened over time; it is
-          not yet complete or independently audited. If you notice a wrong
-          landmark, an inaccurate caption, or anything else off about an
-          engraving, use the{" "}
-          <Link href="/contact">contact form</Link> and we will investigate
-          and correct it.
+          raw-file release risk. Human visual review of what each engraving
+          depicts and whether its caption correctly names the landmark is being
+          strengthened over time; it is not yet complete or independently
+          audited. If you notice a wrong landmark, an inaccurate caption, or
+          anything else off about an engraving, use the{" "}
+          <Link href="/contact">contact form</Link> and we will investigate and
+          correct it.
         </p>
 
         <SectionHeader eyebrow="Rights" title="Reuse rights" />
         <p>
-          Display of these engravings on Civica Atlas is authorized by
+          Display of these editorial images on Civica Atlas is authorized by
           Civica. Civica does not currently grant a separate license for
-          third-party reuse of editorial illustrations outside the site;
-          provenance and legal review of this imagery is pending. Contact us
-          before reusing an engraving anywhere else.
+          third-party reuse of editorial imagery outside the site; provenance
+          and legal review of this imagery is pending. Contact us before reusing
+          an image anywhere else.
         </p>
       </section>
 

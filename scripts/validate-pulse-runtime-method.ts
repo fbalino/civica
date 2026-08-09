@@ -295,6 +295,9 @@ function validateClassifierAndReview(
 ): void {
   const classify = relative("src/lib/pulse/v2/classify.ts");
   const classifierPrompt = relative("src/lib/pulse/v2/classifier-prompt.ts");
+  const retainedEvidence = relative(
+    "src/lib/pulse/v2/retained-source-evidence.ts",
+  );
   const ensemble = relative("src/lib/pulse/v2/ensemble.ts");
   const publicationGate = relative("src/lib/pulse/v2/publication-gate.ts");
   const subject = relative("src/lib/pulse/v2/country-attribution.ts");
@@ -372,12 +375,39 @@ function validateClassifierAndReview(
   );
   check(
     state,
+    classifierPrompt.includes("SECURITY BOUNDARY:") &&
+      classifierPrompt.includes("evidence_quote") &&
+      retainedEvidence.includes("publisherTextHasIndirectInstruction") &&
+      retainedEvidence.includes("retainedEvidenceQuoteMatches") &&
+      snapshot.providers.classify.publisherInputBoundary ===
+        "explicit_untrusted_json_evidence_never_instructions" &&
+      snapshot.providers.classify.automaticEvidenceBinding ===
+        "exact_retained_quote_per_supporting_classifier",
+    "Classifier prompts and contract must treat publisher text as untrusted data and bind supporting runs to exact retained evidence",
+  );
+  check(
+    state,
     subject.includes("export function parseSubjectVerdict") &&
       subject.includes("/^[A-Z]{3}$/") &&
       subject.includes('candidate.evidence_refs.length === 0') &&
+      subject.includes("retainedEvidenceQuoteMatches") &&
+      subject.includes("findJurisdictionEntityCandidates") &&
       snapshot.providers.subject.responseValidation ===
-        "strict_scope_roles_iso3_rationale_and_evidence_shape",
-    "Subject attribution must validate scope, roles, ISO3, rationale, and evidence references",
+        "strict_scope_roles_iso3_rationale_exact_retained_quote_and_entity_match",
+    "Subject attribution must validate scope, roles, ISO3, rationale, and exact retained evidence that names the entity",
+  );
+
+  check(
+    state,
+    classify.includes("automaticPublicationHasRetainedEvidence") &&
+      classify.includes("deterministic retained-source evidence") &&
+      snapshot.publicationPolicy.automaticEligibility ===
+        "stored_ensemble_gate_resolved_subject_and_deterministic_retained_evidence" &&
+      snapshot.publicationPolicy.indirectInstructionSignal ===
+        "non_none_queue_none_retry_then_terminal_failure" &&
+      snapshot.publicationPolicy.majorityNone ===
+        "drop_only_without_indirect_instruction_signal",
+    "Automatic publication must fail closed unless classification and subject-country outputs bind to retained evidence, including instruction-signal handling",
   );
 
   for (const [fragment, message] of [

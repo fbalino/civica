@@ -486,12 +486,19 @@ and V2.
 
 Items approved as retained without source changes: C2, G1–G2, L1, and V1.
 
-Items held: A4 pending the naming decision; H5 pending the completed GOV-003
+Items held: H5 pending the completed GOV-003
 disclosure; T3 pending a choice between the no-guarantee text and a genuinely
 monitored target; T4 pending an explicit choice of the interim instruction or
 ATL-024 production activation.
 
-Decision date: 2026-07-25
+A4 update on 2026-08-09: Fernando approved naming him in the About narrative
+("about page can mention me, yes"). The applied wording is the deck's safer
+naming alternative — "Civica is independently maintained by Fernando Baliño,
+who has final editorial responsibility." followed by the review-boundary and
+inspectability sentences — replacing the "We are not these institutions"
+paragraph in `content/about.md`.
+
+Decision date: 2026-07-25 (bundle); 2026-08-09 (A4)
 
 Approved source baseline: `cd9ed1e64d499100fb5951fd18091a49584710d5`.
 The L2 sentence was separately re-read against the working tree because the

@@ -114,6 +114,7 @@
     "validate:index-change-control": "tsx scripts/validate-index-change-control.ts",
     "validate:index-change-control:run": "tsx scripts/validate-index-change-control.ts --run",
     "validate:index-pulse-cron-recovery": "node --import tsx --test src/lib/pulse/v2/classification-publication.test.ts src/lib/pulse/v2/classify-cron-retry.test.ts src/lib/pulse/v2/score-cron-retry.test.ts",
+    "validate:index-pulse-retained-evidence": "tsx scripts/validate-index-pulse-retained-evidence.ts",
     "validate:index-pulse-stable-incidents": "tsx scripts/validate-index-pulse-stable-incidents.ts",
     "validate:ci-release-selection": "tsx scripts/validate-ci-release-selection.ts",
     "validate:index-release-selection": "tsx scripts/validate-ci-release-selection.ts",

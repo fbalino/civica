@@ -48,10 +48,7 @@ export function ExploreMenuPanel({
   return (
     <>
       <header className="explore-menu__header">
-        <div>
-          <p className="explore-menu__eyebrow">Explore Civica Atlas</p>
-          <h2>Start with a place. Follow the evidence.</h2>
-        </div>
+        <p className="explore-menu__eyebrow">Explore Civica Atlas</p>
         <p className="explore-menu__dek">
           Move from country profiles to the institutions, elections, and
           source trails that explain how government works.

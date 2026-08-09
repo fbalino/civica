@@ -21,6 +21,7 @@ const VALID_CLASSIFICATION = {
   severity_value: -4,
   self_confidence: 0.8,
   rationale: "test",
+  evidence_quote: "The court removed the election commissioner",
 };
 
 const CONFIRMED_VERIFY: VerifyResultLite = {
@@ -69,6 +70,22 @@ test("classify parser accepts both declared self-confidence boundaries", () => {
     );
     assert.equal(parsed?.selfConfidence, selfConfidence);
   }
+});
+
+test("classify parser requires a retained-source evidence quote", () => {
+  const missing = { ...VALID_CLASSIFICATION } as Record<string, unknown>;
+  delete missing.evidence_quote;
+  assert.equal(parseClassify(JSON.stringify(missing)), null);
+  assert.equal(
+    parseClassify(
+      JSON.stringify({ ...VALID_CLASSIFICATION, evidence_quote: "short" }),
+    ),
+    null,
+  );
+  assert.equal(
+    parseClassify(JSON.stringify(VALID_CLASSIFICATION))?.evidenceQuote,
+    VALID_CLASSIFICATION.evidence_quote,
+  );
 });
 
 test("classify parser rejects missing, non-finite, and nonnumeric severity", () => {

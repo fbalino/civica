@@ -224,6 +224,8 @@ export interface PulseRuntimeMethodContract {
       categoryConsensus: "strict_majority_of_successful_voters";
       minimumQuorum: 2;
       agreementEvidence: "stored_provider_distinct_prompt_versioned_classify_runs";
+      publisherInputBoundary: "explicit_untrusted_json_evidence_never_instructions";
+      automaticEvidenceBinding: "exact_retained_quote_per_supporting_classifier";
       singleEnginePublication: "queue_only";
       legacyAgreementPolicy: "unsupported_labels_cleared_and_automatic_rows_quarantined";
       selfConfidenceRange: { lower: 0; upper: 1 };
@@ -265,8 +267,8 @@ export interface PulseRuntimeMethodContract {
       aliasVersion: typeof PULSE_JURISDICTION_ALIAS_VERSION;
       inputContext: "human_readable_versioned_entity_candidates";
       acceptedScopes: ["single", "multi"];
-      output: "one_primary_zero_or_more_affected_with_rationales_and_evidence_refs";
-      responseValidation: "strict_scope_roles_iso3_rationale_and_evidence_shape";
+      output: "one_primary_zero_or_more_affected_with_rationales_evidence_refs_and_exact_quotes";
+      responseValidation: "strict_scope_roles_iso3_rationale_exact_retained_quote_and_entity_match";
       failurePolicy: "unresolved_no_automatic_publication";
       projectionRule: "primary_only_affected_are_descriptive_not_scored";
       legacyRule: string;
@@ -411,8 +413,9 @@ export interface PulseRuntimeMethodContract {
     };
   };
   publicationPolicy: {
-    automaticEligibility: "stored_ensemble_and_gate_and_resolved_subject";
-    majorityNone: "drop_not_governance_event";
+    automaticEligibility: "stored_ensemble_gate_resolved_subject_and_deterministic_retained_evidence";
+    indirectInstructionSignal: "non_none_queue_none_retry_then_terminal_failure";
+    majorityNone: "drop_only_without_indirect_instruction_signal";
     severityAggregation: "majority_with_ties_to_more_severe";
     numericSeverityAggregation: "median_of_winning_category_voters_then_tier_clamp";
     reviewGates: {
@@ -639,6 +642,10 @@ export function buildPulseRuntimeMethod(
         minimumQuorum: 2,
         agreementEvidence:
           "stored_provider_distinct_prompt_versioned_classify_runs",
+        publisherInputBoundary:
+          "explicit_untrusted_json_evidence_never_instructions",
+        automaticEvidenceBinding:
+          "exact_retained_quote_per_supporting_classifier",
         singleEnginePublication: "queue_only",
         legacyAgreementPolicy:
           "unsupported_labels_cleared_and_automatic_rows_quarantined",
@@ -684,9 +691,9 @@ export function buildPulseRuntimeMethod(
         inputContext: "human_readable_versioned_entity_candidates",
         acceptedScopes: ["single", "multi"],
         output:
-          "one_primary_zero_or_more_affected_with_rationales_and_evidence_refs",
+          "one_primary_zero_or_more_affected_with_rationales_evidence_refs_and_exact_quotes",
         responseValidation:
-          "strict_scope_roles_iso3_rationale_and_evidence_shape",
+          "strict_scope_roles_iso3_rationale_exact_retained_quote_and_entity_match",
         failurePolicy: "unresolved_no_automatic_publication",
         projectionRule: "primary_only_affected_are_descriptive_not_scored",
         legacyRule:
@@ -824,8 +831,11 @@ export function buildPulseRuntimeMethod(
       },
     },
     publicationPolicy: {
-      automaticEligibility: "stored_ensemble_and_gate_and_resolved_subject",
-      majorityNone: "drop_not_governance_event",
+      automaticEligibility:
+        "stored_ensemble_gate_resolved_subject_and_deterministic_retained_evidence",
+      indirectInstructionSignal:
+        "non_none_queue_none_retry_then_terminal_failure",
+      majorityNone: "drop_only_without_indirect_instruction_signal",
       severityAggregation: "majority_with_ties_to_more_severe",
       numericSeverityAggregation:
         "median_of_winning_category_voters_then_tier_clamp",

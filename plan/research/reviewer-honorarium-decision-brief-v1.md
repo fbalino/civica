@@ -76,14 +76,27 @@ Published university honoraria are imperfect comparators: their scope, instituti
 
 ## Approval record
 
-Owner selection: **pending**
+Owner selection: **Option A — unpaid ("no honoraria (for now)")**. Fernando
+selected the no-honorarium posture explicitly on budget grounds; the project
+currently has no compensation budget. The posture may be revisited before
+outreach if funds become available; the recommended Option B remains the
+documented alternative.
 
-Approved ceiling: **pending**
+Approved ceiling: **$0 base. No standing reimbursement ceiling; any direct
+cost (accessibility accommodation, required institutional fee) returns for
+case-specific owner approval before it is offered.**
 
-Paying person/entity and jurisdiction: **pending**
+Paying person/entity and jurisdiction: **not applicable while the posture is
+unpaid; must be identified before any future paid revision.**
 
-Accounting/tax workflow checked by: **pending**
+Accounting/tax workflow checked by: **not required for the unpaid posture; no
+payment, withholding, or form workflow exists. Required again if the posture
+changes.**
 
-Approval date: **pending**
+Approval date: **2026-08-09** (recorded from the owner's written decision in
+the working session).
 
-Any deviation from equal scope-band offers: **pending; must be justified before contact**
+Any deviation from equal scope-band offers: **none — every reviewer in every
+lane receives the same unpaid terms. The independence safeguards that do not
+concern payment (criticism-safe deliverables, consent to naming, recusal,
+no-endorsement) remain binding on outreach copy.**

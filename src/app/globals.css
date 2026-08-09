@@ -1032,8 +1032,8 @@ a {
   opacity: 0;
   pointer-events: none;
   transition:
-    opacity 140ms ease,
-    transform 140ms ease;
+    opacity var(--motion-fast) var(--motion-ease-out),
+    transform var(--motion-fast) var(--motion-ease-out);
   z-index: var(--z-popover);
 }
 
@@ -1125,12 +1125,31 @@ a {
 }
 
 .explore-menu__header {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
-  gap: var(--space-7);
-  align-items: end;
-  padding-bottom: var(--space-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-7);
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--space-4);
   border-bottom: var(--border-hairline) solid var(--color-border-default);
+}
+
+/* The panel mounts already open (conditional render), so entry motion comes
+   from @starting-style: a short settle down from the header with a fade.
+   Exit is an instant unmount, which is correct for a hover-dismissed menu. */
+.nav-dropdown-menu.explore-menu--open {
+  transform-origin: top center;
+  transition:
+    opacity var(--motion-fast) var(--motion-ease-out),
+    transform var(--motion-base) var(--motion-ease-out);
+}
+
+@starting-style {
+  .nav-dropdown-menu.explore-menu--open {
+    opacity: 0;
+    transform: translateX(-50%) translateY(calc(var(--space-2) * -1))
+      scale(0.98);
+  }
 }
 
 .explore-menu__eyebrow,
@@ -1144,19 +1163,8 @@ a {
 }
 
 .explore-menu__eyebrow {
-  margin: 0 0 var(--space-3);
-  color: var(--color-accent);
-}
-
-.explore-menu__header h2 {
-  max-width: 18ch;
   margin: 0;
-  font-family: var(--font-heading);
-  font-size: var(--text-32);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  color: var(--color-text-primary);
+  color: var(--color-accent);
 }
 
 .explore-menu__dek {
@@ -1171,7 +1179,9 @@ a {
 .explore-menu__registers {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6);
+  /* Match the card gutter so the two registers read as one even
+     four-column rhythm; the register labels carry the grouping. */
+  gap: var(--space-3);
 }
 
 .explore-register {
@@ -1202,28 +1212,15 @@ a {
   text-decoration: none;
   box-shadow: var(--shadow-hard-sm);
   transition:
-    background var(--motion-base) var(--motion-ease-out),
-    border-color var(--motion-base) var(--motion-ease-out),
-    box-shadow var(--motion-base) var(--motion-ease-out),
-    transform var(--motion-base) var(--motion-ease-out);
-}
-
-.explore-item::after {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: var(--border-hairline);
-  background: var(--color-accent);
-  content: "";
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--motion-slow) var(--motion-ease-out);
+    background var(--motion-fast) var(--motion-ease-out),
+    border-color var(--motion-fast) var(--motion-ease-out);
 }
 
 .explore-item__art {
   display: block;
-  aspect-ratio: 4 / 3;
+  /* The navigation engravings are square masters; a square tile lets them
+     fill edge to edge instead of letterboxing inside a wider frame. */
+  aspect-ratio: 1;
   overflow: hidden;
   border-bottom: var(--border-hairline) solid var(--color-card-border);
   background: color-mix(
@@ -1236,9 +1233,6 @@ a {
 .explore-item__art-image {
   width: 100%;
   height: 100%;
-  background-size: contain;
-  transform: scale(0.94);
-  transition: transform var(--motion-slow) var(--motion-ease-out);
 }
 
 .explore-item__body {
@@ -1281,6 +1275,9 @@ a {
     transform var(--motion-base) var(--motion-ease-out);
 }
 
+/* One quiet hover response: the card warms toward the accent and the arrow
+   confirms the target. No lift, zoom, or underline choreography — this is a
+   navigation surface readers hit constantly. */
 .explore-item:hover,
 .explore-item:focus-visible,
 .explore-item--active {
@@ -1290,21 +1287,7 @@ a {
     var(--color-card-border)
   );
   background: color-mix(in oklab, var(--color-accent) 5%, var(--color-card-bg));
-  box-shadow: var(--shadow-hard-md);
-  transform: translateY(calc(var(--space-1) * -1));
   outline: none;
-}
-
-.explore-item:hover::after,
-.explore-item:focus-visible::after,
-.explore-item--active::after {
-  transform: scaleX(1);
-}
-
-.explore-item:hover .explore-item__art-image,
-.explore-item:focus-visible .explore-item__art-image,
-.explore-item--active .explore-item__art-image {
-  transform: scale(1);
 }
 
 .explore-item:hover .explore-item__arrow,
@@ -1314,25 +1297,10 @@ a {
   color: var(--color-accent);
 }
 
-.explore-item:hover .explore-item__arrow,
-.explore-item:focus-visible .explore-item__arrow {
-  transform: translate(var(--space-1), calc(var(--space-1) * -1));
-}
-
 @media (max-width: 960px) {
   .explore-menu {
     width: calc(100vw - var(--space-5) - var(--space-5));
     padding: var(--space-5);
-  }
-
-  .explore-menu__header {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-3);
-  }
-
-  .explore-menu__header h2 {
-    max-width: none;
-    font-size: var(--text-28);
   }
 
   .explore-menu__registers {
@@ -1353,22 +1321,15 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .explore-item,
-  .explore-item::after,
-  .explore-item__art-image,
-  .explore-item__arrow {
-    transition: none;
+  /* Keep the entry fade for comprehension; drop the positional settle. */
+  .nav-dropdown-menu.explore-menu--open {
+    transition: opacity var(--motion-fast) var(--motion-ease-out);
   }
 
-  .explore-item:hover,
-  .explore-item:focus-visible,
-  .explore-item--active,
-  .explore-item:hover .explore-item__art-image,
-  .explore-item:focus-visible .explore-item__art-image,
-  .explore-item--active .explore-item__art-image,
-  .explore-item:hover .explore-item__arrow,
-  .explore-item:focus-visible .explore-item__arrow {
-    transform: none;
+  @starting-style {
+    .nav-dropdown-menu.explore-menu--open {
+      transform: translateX(-50%);
+    }
   }
 }
 
