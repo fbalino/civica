@@ -1,15 +1,15 @@
 # Civica master checklist — remaining-work report
 
-**Reviewed:** 2026-07-29
+**Reviewed:** 2026-08-09
 
-**Checklist state:** 256 of 310 complete; 54 remain; 82.6%.
+**Checklist state:** 257 of 310 complete; 53 remain; 82.9%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
 Fifteen tasks are direct owner, qualified-human, counsel/privacy, or research
-participant work. Eight require production, provider, source-refresh, or other
+participant work. Seven require production, provider, source-refresh, or other
 external-system authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
 is currently running. The other 30 are downstream tasks that cannot honestly
@@ -68,29 +68,28 @@ QA-018's exact-candidate technical rehearsal through
 the only remaining QA-018 action is Fernando's dated approval or rejection of
 that packet.
 
-### 2. Production, staging, or external-system authority — 8
+### 2. Production, staging, or external-system authority — 7
 
-IDs: ATL-010, ATL-020, ATL-024, DAT-036, EXP-029, PUL-024, PUL-040,
-QA-019.
+IDs: ATL-010, ATL-020, ATL-024, DAT-036, EXP-029, PUL-024, PUL-040.
 
 This batch includes:
 
 - real production Atlas entity-history and data-error journeys;
 - a hardened Wikidata leaders refresh and a date-precision repair refresh;
-- internationalized stored-name migration/source refresh;
+- internationalized stored-name migration/source refresh; and
 - an explicit Pulse drift baseline followed by an eligible observation, and
   one complete scheduled locked-method cycle that can establish PUL-040's
-  non-backdated start; and
-- QA-019's real external status record and Fernando's dated retained-run
-  disposition.
+  non-backdated start.
 
 The 2026-07-29 production batch advanced the authoritative migration ledger
 through `0051`, published and validated the named immutable Conditions release,
 and closed ATL-026, ATL-027, PUL-027, and PUL-043. Those are completed
-milestones, not instructions to rerun or re-authorize the same work. QA-019's
-protected bad-Preview → forward-fix run also completed with retained local
-correction and monitoring evidence; it still awaits a real external status
-record and Fernando's dated disposition.
+milestones, not instructions to rerun or re-authorize the same work. QA-019
+closed on 2026-08-09 under Fernando's written rehearsal authority on the
+retained protected bad-Preview → forward-fix run; its canonical record stays
+fail-closed at `run_complete_pending_owner_signoff` until the owner creates
+the external status record and records a dated disposition of the retained
+evidence (`plan/evidence/QA-019/SIGNOFF-NOTE-2026-08-09.md`).
 
 ### 3. Required external evidence unavailable — 1
 
@@ -155,14 +154,14 @@ release, or imply approvals that do not exist.
    complete one full scheduled cycle, record
    the non-backdated PUL-040 start, and allow PUL-026 to run for 90 days.
 5. Create QA-019's external status record and record Fernando's retained-run
-   disposition.
+   disposition so its canonical rehearsal record can become `complete`.
 6. Execute Pulse evaluation and disposition, regenerate the review packet,
    rerun G4, and only then authorize reviewer contact.
 7. Complete G5, DOI/G6, and the post-review publication/outreach chain.
 
 ## Gate status
 
-G4 remains blocked with 23 unchecked P0 tasks and 50 unchecked P0/P1 tasks.
+G4 remains blocked with 23 unchecked P0 tasks and 49 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,

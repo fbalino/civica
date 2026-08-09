@@ -2,7 +2,10 @@
 
 **Contract:** `civica-rollback-forward-fix-rehearsal/v1`
 **Task:** QA-019
-**Current status:** isolated technical run complete; external status record and owner sign-off pending
+**Current status:** isolated technical run complete and closed against the
+checklist on 2026-08-09 under the owner's written rehearsal authority
+(`plan/evidence/QA-018/OWNER-SIGNOFF-2026-08-09.md`); the external status
+record and the owner's dated disposition of the retained run remain pending
 
 The canonical run record is
 `data/rollback-forward-fix-rehearsal.v1.json`. This drill runs only after an

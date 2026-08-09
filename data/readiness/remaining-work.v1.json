@@ -1,11 +1,11 @@
 {
   "schemaVersion": "civica-remaining-work/v1",
-  "reviewedAt": "2026-07-29",
+  "reviewedAt": "2026-08-09",
   "checklist": {
     "total": 310,
-    "completed": 256,
-    "remaining": 54,
-    "progressPercent": 82.6
+    "completed": 257,
+    "remaining": 53,
+    "progressPercent": 82.9
   },
   "agentExecutableNow": [],
   "categories": [
@@ -35,7 +35,7 @@
     {
       "id": "production-staging-external-authority",
       "label": "Production, staging, or external-system authority",
-      "count": 8,
+      "count": 7,
       "taskIds": [
         "ATL-010",
         "ATL-020",
@@ -43,10 +43,9 @@
         "DAT-036",
         "EXP-029",
         "PUL-024",
-        "PUL-040",
-        "QA-019"
+        "PUL-040"
       ],
-      "nextStep": "Authorize only the remaining real production or external actions: Atlas history/correction journeys, the named source refreshes and internationalization run, a Pulse drift baseline and complete scheduled cycle, and QA-019's external status record."
+      "nextStep": "Authorize only the remaining real production or external actions: Atlas history/correction journeys, the named source refreshes and internationalization run, and a Pulse drift baseline and complete scheduled cycle."
     },
     {
       "id": "external-evidence-unavailable",
