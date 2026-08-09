@@ -27,7 +27,7 @@ const expectations: Expectation[] = [
       "The project publishes its methods and records source disagreement where the data supports it. Some values remain unreconciled, and the project has not completed independent review.",
       "Civica separates source ingestion, reconciliation, and reader presentation. Each layer has its own provenance and failure checks.",
       "Supported observations retain source and retrieval metadata; statement-level coverage remains incomplete.",
-      "We are not these institutions.",
+      "Civica is independently maintained by Fernando Baliño, who has final editorial responsibility.",
     ],
     absent: ["Civica is a small project led by Fernando Baliño."],
   },
