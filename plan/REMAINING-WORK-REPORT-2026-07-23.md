@@ -2,13 +2,13 @@
 
 **Reviewed:** 2026-08-09
 
-**Checklist state:** 257 of 310 complete; 53 remain; 82.9%.
+**Checklist state:** 258 of 310 complete; 52 remain; 83.2%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
-Fifteen tasks are direct owner, qualified-human, counsel/privacy, or research
+Fourteen tasks are direct owner, qualified-human, counsel/privacy, or research
 participant work. Seven require production, provider, source-refresh, or other
 external-system authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
@@ -35,16 +35,16 @@ must wait for G4 or G5.
 
 ## What needs action now
 
-### 1. Direct human, owner, or professional review — 15
+### 1. Direct human, owner, or professional review — 14
 
 IDs: BRD-003, BRD-010, BRD-012, EXP-001, EXP-009, EXP-015, EXP-025,
-EXP-038, GOV-012, IDX-022, IDX-034, PLT-029, QA-012, QA-013, QA-018.
+EXP-038, GOV-012, IDX-022, IDX-034, PLT-029, QA-012, QA-013.
 
 The prepared decisions and reviews are:
 
 - owner approval, revision, or rejection of the exact rendered Explore
   candidate, the three remaining English-copy dispositions (A4, T3, and T4),
-  the completed QA-018 packet, and reviewer compensation posture;
+  and reviewer compensation posture;
 - qualified review of the rendered-module ledger, illustration candidates,
   visual baselines, screen-reader journeys, Index reader tasks, and
   constitution-to-practice coding;
@@ -63,10 +63,10 @@ all seven owner fields are confirmed, the canonical disclosure is published in
 the source tree, and the current reviewer packets bind it unchanged. This does
 not supply any remaining EXP-038 disposition or authorize deployment.
 
-QA-018's exact-candidate technical rehearsal through
-`0051_eminent_jocasta` is complete and retained. No replacement run is queued:
-the only remaining QA-018 action is Fernando's dated approval or rejection of
-that packet.
+QA-018 is closed: Fernando's written confirmation of the isolated attempt-06
+run is preserved with a date-correction note, and the exact-candidate
+attempt-07 technical rehearsal through `0051_eminent_jocasta` is complete and
+retained (`plan/evidence/QA-018/`).
 
 ### 2. Production, staging, or external-system authority — 7
 
@@ -144,8 +144,7 @@ release, or imply approvals that do not exist.
 ## Recommended order
 
 1. Resolve the owner-review bundle: GOV-012, the exact EXP-015 rendered result,
-   EXP-009, EXP-038 A4/T3/T4, EXP-025/QA-013, PLT-029 facts, and Fernando's
-   dated QA-018 disposition.
+   EXP-009, EXP-038 A4/T3/T4, EXP-025/QA-013, and PLT-029 facts.
 2. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
    IDX-034, BRD-003, BRD-010, and BRD-012.
 3. Execute and retain only the remaining authorized Atlas-history,
@@ -161,7 +160,7 @@ release, or imply approvals that do not exist.
 
 ## Gate status
 
-G4 remains blocked with 23 unchecked P0 tasks and 49 unchecked P0/P1 tasks.
+G4 remains blocked with 22 unchecked P0 tasks and 48 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,

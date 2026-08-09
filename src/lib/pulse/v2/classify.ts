@@ -76,6 +76,7 @@ import {
 } from "./classifier-prompt";
 import {
   resolveSubjectJurisdiction,
+  subjectAttributionSupportsAutomaticPublication,
   subjectAttributionDecisionPayload,
   SUBJECT_ATTRIBUTION_MODEL,
   SUBJECT_ATTRIBUTION_PROMPT_VERSION,
@@ -153,6 +154,11 @@ import {
   deriveStoredEnsemble,
   storedRunsPermitAutomaticPublication,
 } from "./stored-ensemble";
+import {
+  publisherTextHasIndirectInstruction,
+  renderUntrustedPublisherEvidence,
+  retainedEvidenceQuoteMatches,
+} from "./retained-source-evidence";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
@@ -935,6 +941,12 @@ export async function classifyClusters(
       } else {
         ok.autoPublished = false;
       }
+      if (
+        ok.autoPublished &&
+        !automaticPublicationHasRetainedEvidence(cluster, ok)
+      ) {
+        ok.autoPublished = false;
+      }
       attemptedOutcome = { kind: "classified", result: ok };
       summary.planned.push({
         clusterId: cluster.clusterId,
@@ -1126,11 +1138,17 @@ async function classifyOneSingle(
   cluster: ClusterToClassify,
 ): Promise<ClassifyOneResult | { category: "none" } | null> {
   const userContent = buildUserContent(cluster);
+  const sourceHasIndirectInstruction = publisherTextHasIndirectInstruction({
+    headline: cluster.title,
+    description: cluster.body,
+  });
 
   // Pass 1 — classify (category, severity, runner-up).
   const first = await runClassify(CLASSIFY_CONFIG, userContent);
   if (!first) return null;
-  if (first.category === "none") return { category: "none" };
+  if (first.category === "none") {
+    return sourceHasIndirectInstruction ? null : { category: "none" };
+  }
 
   const cat = EVENT_CATEGORY_INDEX[first.category];
   if (!cat) {
@@ -1212,7 +1230,13 @@ async function classifyOneSingle(
   // Auto-publish gate: every verifier objection and review-gated severity
   // tier routes to the human review queue. Single-engine mode has no
   // independent majority signal that can outweigh an objection.
-  const requiresReview = singleEngineRequiresReview(first.severityTier, verify);
+  const requiresReview =
+    singleEngineRequiresReview(first.severityTier, verify) ||
+    !classifierRunsHaveRetainedSourceEvidence(
+      cluster,
+      first.category,
+      [classifyRun],
+    );
 
   return {
     classified,
@@ -1242,6 +1266,10 @@ async function classifyOneEnsemble(
   cluster: ClusterToClassify,
 ): Promise<ClassifyOneResult | { category: "none" } | null> {
   const userContent = buildUserContent(cluster);
+  const sourceHasIndirectInstruction = publisherTextHasIndirectInstruction({
+    headline: cluster.title,
+    description: cluster.body,
+  });
 
   // --- Fan out one classify call per engine, in parallel ---
   const settled = await Promise.allSettled(
@@ -1296,7 +1324,7 @@ async function classifyOneEnsemble(
   // agreement "none"; those must NOT be silently dropped — they route to
   // review below.)
   if (consensus.category === "none" && consensus.agreement !== "none") {
-    return { category: "none" };
+    return sourceHasIndirectInstruction ? null : { category: "none" };
   }
 
   // Deadlock / no quorum → straight to review, verify skipped.
@@ -1438,7 +1466,13 @@ function buildEnsembleResult(
   // severe-tier human gate stays absolute (published methodology promise),
   // as do deadlock/no-quorum routes.
   const requiresReview = ensembleRequiresReview(consensus, verify, {
-    forceReview: opts.forceReview,
+    forceReview:
+      opts.forceReview ||
+      !classifierRunsHaveRetainedSourceEvidence(
+        cluster,
+        consensus.category,
+        classifyRuns,
+      ),
     verifySkipped: opts.verifySkipped,
   });
 
@@ -1536,16 +1570,78 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
   return parsed;
 }
 
-function buildUserContent(cluster: ClusterToClassify): string {
+export function buildUserContent(cluster: ClusterToClassify): string {
   const sourcesLine = cluster.sourceIds.join(", ");
-  return `Provisional ingest jurisdiction id (do not treat as subject-country evidence): ${cluster.jurisdictionId}
+  return `TRUSTED PIPELINE METADATA
+Provisional ingest jurisdiction id (do not treat as subject-country evidence): ${cluster.jurisdictionId}
 Event date: ${cluster.eventDate}
 Sources: ${sourcesLine}
 
-Headline: ${cluster.title}
+${renderUntrustedPublisherEvidence({
+  headline: cluster.title,
+  description: cluster.body,
+})}`;
+}
 
-Body / context:
-${cluster.body}`;
+function runEvidenceQuote(run: ClassifierRun): string | null {
+  try {
+    const parsed = JSON.parse(run.raw) as {
+      evidenceQuote?: unknown;
+      evidence_quote?: unknown;
+    };
+    const quote = parsed.evidenceQuote ?? parsed.evidence_quote;
+    return typeof quote === "string" ? quote : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Deterministic source binding required for any automatic classification. */
+export function classifierRunsHaveRetainedSourceEvidence(
+  cluster: ClusterToClassify,
+  category: string,
+  runs: readonly ClassifierRun[],
+): boolean {
+  const evidence = { headline: cluster.title, description: cluster.body };
+  if (publisherTextHasIndirectInstruction(evidence)) return false;
+  const supportingRuns = runs.filter(
+    (run) => run.role === "classify" && run.category === category,
+  );
+  return (
+    supportingRuns.length > 0 &&
+    supportingRuns.every((run) => {
+      const quote = runEvidenceQuote(run);
+      return (
+        quote !== null &&
+        retainedEvidenceQuoteMatches({
+          evidence,
+          quote,
+          refs: ["headline", "description"],
+        })
+      );
+    })
+  );
+}
+
+/** Final fail-closed guard immediately before automatic publication. */
+export function automaticPublicationHasRetainedEvidence(
+  cluster: ClusterToClassify,
+  result: ClassifyOneResult,
+): boolean {
+  return (
+    classifierRunsHaveRetainedSourceEvidence(
+      cluster,
+      result.classified.category,
+      result.classified.classifierRuns,
+    ) &&
+    subjectAttributionSupportsAutomaticPublication(
+      result.subjectAttribution,
+      {
+        headline: result.classified.headline,
+        description: result.classified.description,
+      },
+    )
+  );
 }
 
 export interface LoadClassificationClustersOptions {
@@ -2092,10 +2188,10 @@ export async function writeEvent(
     result.autoPublished &&
     (!storedRunsPermitAutomaticPublication(result.classified.classifierRuns) ||
       gateRequiresReview ||
-      !result.subjectAttribution?.primaryJurisdictionId)
+      !automaticPublicationHasRetainedEvidence(cluster, result))
   ) {
     throw new Error(
-      "Automatic publication requires stored provider-distinct versioned votes, the publication gate, and resolved subject attribution.",
+      "Automatic publication requires stored provider-distinct versioned votes, the publication gate, and deterministic retained-source evidence for classification and subject attribution.",
     );
   }
   // Initial corroborationConfidence — provisional. Phase 5.7's

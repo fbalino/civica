@@ -3,11 +3,13 @@
 ## Authority
 
 Fernando authorized the QA-019 staging rollback/forward-fix rehearsal in
-writing in the 2026-08-09 working session. The written record is
+writing. The written record is
 [`plan/evidence/QA-018/OWNER-SIGNOFF-2026-08-09.md`](../QA-018/OWNER-SIGNOFF-2026-08-09.md),
 which names the QA-019 rehearsal as one of the distinct authorized operator
-runs. Staging only; no production authority is granted or claimed by this
-note.
+runs; per that record's date-correction note, the authorizing statements were
+made in the late-July 2026 working sessions and the record was written on
+2026-08-09. Staging only; no production authority is granted or claimed by
+this note.
 
 ## The run this note closes against
 

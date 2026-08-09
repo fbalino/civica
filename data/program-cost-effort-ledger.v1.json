@@ -1,141 +1,173 @@
 {
-  "schemaVersion": "civica-program-cost-effort-ledger/v1",
-  "status": "blocked_owner_confirmation",
-  "currency": "USD",
-  "reportingPolicy": {
-    "cadence": "At every G0-G6 gate decision and at least once per seven calendar days while the academic-readiness program is active.",
-    "nextReviewDue": "2026-07-30",
-    "instructions": [
-      "Append a snapshot; never rewrite a prior snapshot to make later information look contemporaneous.",
-      "Record subscription access separately from metered API billing.",
-      "Treat worker result costUSD fields as accounting estimates, not invoices or proof of payment.",
-      "Record actual paid API spend only from owner/provider billing evidence and compare it with the approved cap.",
-      "Record committed external-human spend only after the owner authorizes it.",
-      "Use commit counts and active commit days only as activity proxies; never relabel them as labor hours."
-    ]
-  },
-  "budgetContract": {
-    "source": ".orchestrator/state.json",
-    "mode": "subscription_only",
-    "apiApproved": false,
-    "capUSD": 0,
-    "provider": null,
-    "model": null
-  },
-  "subscriptionAccess": [
-    {
-      "provider": "OpenAI",
-      "route": "Codex subscription-authenticated work",
-      "planName": null,
-      "confirmation": "owner_required"
-    },
-    {
-      "provider": "Anthropic",
-      "route": "Claude Code subscription-authenticated work",
-      "planName": null,
-      "confirmation": "owner_required"
-    }
-  ],
-  "billingReconciliation": {
-    "actualPaidApiSpendUSD": null,
-    "externalHumanSpendCommittedUSD": null,
-    "ownerBillingEvidenceReviewed": false,
-    "ownerHumanSpendConfirmed": false,
-    "status": "owner_required",
-    "modelAccountingEstimates": {
-      "artifactCount": 17,
-      "reportedUSD": 34.811507,
-      "classification": "non_billing_telemetry",
-      "note": "These costUSD values are retained worker/result accounting estimates. The orchestrator records subscription-only routing and no API authorization, but only owner/provider billing evidence can prove actual paid API spend."
-    }
-  },
-  "gateRegister": [
-    {
-      "gate": "G0",
-      "currentState": "established",
-      "evidence": "plan/00-mission-and-operating-rules.md",
-      "note": "The master plan and gate definitions were established on 2026-07-09. This ledger does not retrospectively invent a billing snapshot for that date."
-    },
-    {
-      "gate": "G1",
-      "currentState": "historical_work_recorded",
-      "evidence": "plan/PROGRESS.md",
-      "note": "Truthful-beta work is recorded task by task. No standalone historical cost attestation exists."
-    },
-    {
-      "gate": "G2",
-      "currentState": "blocked",
-      "evidence": "data/readiness/gate-reports.v1.json",
-      "note": "The current generated report is blocked."
-    },
-    {
-      "gate": "G3",
-      "currentState": "blocked",
-      "evidence": "plan/MASTER-CHECKLIST.md",
-      "note": "The Pulse disposition and dependent evaluation work remain open."
-    },
-    {
-      "gate": "G4",
-      "currentState": "blocked",
-      "evidence": "data/readiness/gate-reports.v1.json",
-      "note": "The current generated report is blocked."
-    },
-    {
-      "gate": "G5",
-      "currentState": "blocked",
-      "evidence": "data/readiness/gate-reports.v1.json",
-      "note": "External review has not occurred."
-    },
-    {
-      "gate": "G6",
-      "currentState": "blocked",
-      "evidence": "data/readiness/gate-reports.v1.json",
-      "note": "Release, DOI, legal readiness, and outreach gates remain open."
-    }
-  ],
-  "weeklySnapshots": [
-    {
-      "periodStart": "2026-07-09",
-      "periodEnd": "2026-07-16",
-      "throughCommit": "d5b744d2d2f0c65b2547fcd3ed0932aad21d0c94",
-      "commitsSinceProgramStart": 265,
-      "activeCommitDays": 8,
-      "apiAuthorization": "not_approved",
-      "apiCapUSD": 0,
-      "actualPaidApiSpendUSD": null,
-      "externalHumanSpendCommittedUSD": null,
-      "effortHours": null,
-      "ownerConfirmation": "missing",
-      "notableEvents": [
-        "Academic-readiness plan established.",
-        "Subscription-first orchestration used.",
-        "No historical billing or labor-hours attestation was retained for this interval."
-      ]
-    },
-    {
-      "periodStart": "2026-07-17",
-      "periodEnd": "2026-07-23",
-      "throughCommit": "0b621ac060b8a6dd305048439dc7d7f19e7c107a",
-      "commitsInPeriod": 152,
-      "activeCommitDays": 3,
-      "apiAuthorization": "not_approved",
-      "apiCapUSD": 0,
-      "actualPaidApiSpendUSD": null,
-      "externalHumanSpendCommittedUSD": null,
-      "effortHours": null,
-      "ownerConfirmation": "missing",
-      "notableEvents": [
-        "G4 operations-readiness report generated and remains blocked.",
-        "Seventeen result artifacts contain 34.811507 USD of non-billing model accounting estimates.",
-        "Owner/provider billing, subscription-tier, external-human-spend, and effort-hour confirmation remain outstanding."
-      ]
-    }
-  ],
-  "unresolvedOwnerFacts": [
-    "Exact OpenAI subscription plan in use.",
-    "Exact Anthropic subscription plan in use.",
-    "Provider billing confirmation that actual paid API spend is zero or an explanation of any charge.",
-    "Committed external-human spend to date, including an explicit zero if none.",
-    "Actual owner/worker effort hours, or an explicit decision that hours are not reliably recoverable."
+ "schemaVersion": "civica-program-cost-effort-ledger/v1",
+ "status": "blocked_owner_confirmation",
+ "currency": "USD",
+ "reportingPolicy": {
+  "cadence": "At every G0-G6 gate decision and at least once per seven calendar days while the academic-readiness program is active.",
+  "nextReviewDue": "2026-07-30",
+  "instructions": [
+   "Append a snapshot; never rewrite a prior snapshot to make later information look contemporaneous.",
+   "Record subscription access separately from metered API billing.",
+   "Treat worker result costUSD fields as accounting estimates, not invoices or proof of payment.",
+   "Record actual paid API spend only from owner/provider billing evidence and compare it with the approved cap.",
+   "Record committed external-human spend only after the owner authorizes it.",
+   "Use commit counts and active commit days only as activity proxies; never relabel them as labor hours."
   ]
+ },
+ "budgetContract": {
+  "source": ".orchestrator/state.json",
+  "mode": "subscription_only",
+  "apiApproved": false,
+  "capUSD": 0,
+  "provider": null,
+  "model": null
+ },
+ "subscriptionAccess": [
+  {
+   "provider": "OpenAI",
+   "route": "Codex subscription-authenticated work",
+   "planName": "Codex $200/month plan",
+   "monthlyBaseUSD": 200.0,
+   "taxNote": "plus applicable New York City sales tax",
+   "confirmation": "owner_confirmed",
+   "confirmedOn": "2026-08-09"
+  },
+  {
+   "provider": "Anthropic",
+   "route": "Claude Code subscription-authenticated work",
+   "planName": "Two Claude $200/month plans",
+   "monthlyBaseUSD": 400.0,
+   "taxNote": "plus applicable New York City sales tax",
+   "confirmation": "owner_confirmed",
+   "confirmedOn": "2026-08-09"
+  },
+  {
+   "provider": "xAI",
+   "route": "Grok subscription-authenticated work",
+   "planName": "Grok $30/month plan",
+   "monthlyBaseUSD": 30.0,
+   "taxNote": "plus applicable New York City sales tax",
+   "confirmation": "owner_confirmed",
+   "confirmedOn": "2026-08-09"
+  },
+  {
+   "provider": "Moonshot",
+   "route": "Kimi subscription-authenticated work",
+   "planName": "Kimi $199/month plan",
+   "monthlyBaseUSD": 199.0,
+   "taxNote": "plus applicable New York City sales tax",
+   "confirmation": "owner_confirmed",
+   "confirmedOn": "2026-08-09"
+  },
+  {
+   "provider": "Cursor",
+   "route": "Cursor editor subscription",
+   "planName": "Cursor Pro+ $60/month plan",
+   "monthlyBaseUSD": 60.0,
+   "taxNote": "plus applicable New York City sales tax",
+   "confirmation": "owner_confirmed",
+   "confirmedOn": "2026-08-09"
+  }
+ ],
+ "billingReconciliation": {
+  "actualPaidApiSpendUSD": null,
+  "externalHumanSpendCommittedUSD": null,
+  "ownerBillingEvidenceReviewed": false,
+  "ownerHumanSpendConfirmed": false,
+  "status": "owner_required",
+  "modelAccountingEstimates": {
+   "artifactCount": 17,
+   "reportedUSD": 34.811507,
+   "classification": "non_billing_telemetry",
+   "note": "These costUSD values are retained worker/result accounting estimates. The orchestrator records subscription-only routing and no API authorization, but only owner/provider billing evidence can prove actual paid API spend."
+  }
+ },
+ "gateRegister": [
+  {
+   "gate": "G0",
+   "currentState": "established",
+   "evidence": "plan/00-mission-and-operating-rules.md",
+   "note": "The master plan and gate definitions were established on 2026-07-09. This ledger does not retrospectively invent a billing snapshot for that date."
+  },
+  {
+   "gate": "G1",
+   "currentState": "historical_work_recorded",
+   "evidence": "plan/PROGRESS.md",
+   "note": "Truthful-beta work is recorded task by task. No standalone historical cost attestation exists."
+  },
+  {
+   "gate": "G2",
+   "currentState": "blocked",
+   "evidence": "data/readiness/gate-reports.v1.json",
+   "note": "The current generated report is blocked."
+  },
+  {
+   "gate": "G3",
+   "currentState": "blocked",
+   "evidence": "plan/MASTER-CHECKLIST.md",
+   "note": "The Pulse disposition and dependent evaluation work remain open."
+  },
+  {
+   "gate": "G4",
+   "currentState": "blocked",
+   "evidence": "data/readiness/gate-reports.v1.json",
+   "note": "The current generated report is blocked."
+  },
+  {
+   "gate": "G5",
+   "currentState": "blocked",
+   "evidence": "data/readiness/gate-reports.v1.json",
+   "note": "External review has not occurred."
+  },
+  {
+   "gate": "G6",
+   "currentState": "blocked",
+   "evidence": "data/readiness/gate-reports.v1.json",
+   "note": "Release, DOI, legal readiness, and outreach gates remain open."
+  }
+ ],
+ "weeklySnapshots": [
+  {
+   "periodStart": "2026-07-09",
+   "periodEnd": "2026-07-16",
+   "throughCommit": "d5b744d2d2f0c65b2547fcd3ed0932aad21d0c94",
+   "commitsSinceProgramStart": 265,
+   "activeCommitDays": 8,
+   "apiAuthorization": "not_approved",
+   "apiCapUSD": 0,
+   "actualPaidApiSpendUSD": null,
+   "externalHumanSpendCommittedUSD": null,
+   "effortHours": null,
+   "ownerConfirmation": "missing",
+   "notableEvents": [
+    "Academic-readiness plan established.",
+    "Subscription-first orchestration used.",
+    "No historical billing or labor-hours attestation was retained for this interval."
+   ]
+  },
+  {
+   "periodStart": "2026-07-17",
+   "periodEnd": "2026-07-23",
+   "throughCommit": "0b621ac060b8a6dd305048439dc7d7f19e7c107a",
+   "commitsInPeriod": 152,
+   "activeCommitDays": 3,
+   "apiAuthorization": "not_approved",
+   "apiCapUSD": 0,
+   "actualPaidApiSpendUSD": null,
+   "externalHumanSpendCommittedUSD": null,
+   "effortHours": null,
+   "ownerConfirmation": "missing",
+   "notableEvents": [
+    "G4 operations-readiness report generated and remains blocked.",
+    "Seventeen result artifacts contain 34.811507 USD of non-billing model accounting estimates.",
+    "Owner/provider billing, subscription-tier, external-human-spend, and effort-hour confirmation remain outstanding."
+   ]
+  }
+ ],
+ "unresolvedOwnerFacts": [
+  "Provider billing confirmation that actual paid API spend is zero or an explanation of any charge.",
+  "Committed external-human spend to date, including an explicit zero if none (the 2026-08-09 GOV-012 no-honorarium decision implies none is planned, but no explicit zero attestation has been recorded).",
+  "Actual owner/worker effort hours, or an explicit decision that hours are not reliably recoverable."
+ ],
+ "subscriptionAccessNote": "Owner-stated base subscription prices recorded 2026-08-09 from Fernando's written statement; amounts are USD per month before New York City sales tax. Combined base is $889/month. These are access costs, not metered API billing; the zero-dollar paid-API contract is unchanged."
 }

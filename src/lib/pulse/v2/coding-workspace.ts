@@ -417,6 +417,54 @@ export function pulseCodingCanReadPeerSubmission(
   return false;
 }
 
+/**
+ * Whole-study exports contain every coder draft and submission, so their
+ * disclosure boundary is stricter than the per-packet adjudication workspace:
+ * the study must be closed, every packet must have exactly one comparison,
+ * and every disagreement must have a terminal adjudication.
+ */
+export function pulseCodingStudyExportIsTerminal(input: {
+  studyStatus: string;
+  packetIds: readonly string[];
+  comparisons: ReadonlyArray<{
+    id: string;
+    packetId: string;
+    disagreementAxes: readonly unknown[];
+  }>;
+  adjudications: ReadonlyArray<{
+    comparisonId: string;
+    status: string;
+  }>;
+}): boolean {
+  if (input.studyStatus !== "closed") return false;
+
+  const packetIds = new Set(input.packetIds);
+  if (packetIds.size !== input.packetIds.length) return false;
+  if (input.comparisons.length !== packetIds.size) return false;
+
+  const comparedPacketIds = new Set<string>();
+  for (const comparison of input.comparisons) {
+    if (
+      !packetIds.has(comparison.packetId) ||
+      comparedPacketIds.has(comparison.packetId)
+    ) {
+      return false;
+    }
+    comparedPacketIds.add(comparison.packetId);
+  }
+
+  const terminalComparisonIds = new Set(
+    input.adjudications
+      .filter(
+        ({ status }) => status === "resolved" || status === "unresolved",
+      )
+      .map(({ comparisonId }) => comparisonId),
+  );
+  return input.comparisons
+    .filter(({ disagreementAxes }) => disagreementAxes.length > 0)
+    .every(({ id }) => terminalComparisonIds.has(id));
+}
+
 export function pulseCodingCanAdjudicate(
   context: PulseCodingAccessContext,
 ): boolean {
