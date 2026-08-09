@@ -33,12 +33,14 @@ function MetaPill({
   // government-type fact readable on hover without the slow native `title`.
   // Short numeric pills (Pop/GDP) never truncate, so no tooltip is added there.
   const valueCanTruncate = (className ?? "").includes(
-    "factbook-meta-pill--government"
+    "factbook-meta-pill--government",
   );
   const valueSpan = (
     <span
       className="factbook-meta-pill-value"
-      style={{ color: valueCanTruncate ? "inherit" : "var(--color-text-primary)" }}
+      style={{
+        color: valueCanTruncate ? "inherit" : "var(--color-text-primary)",
+      }}
     >
       {value}
     </span>
@@ -68,7 +70,9 @@ function MetaPill({
         }}
       />
       {label && (
-        <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}>
+        <span
+          style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}
+        >
           {label}
         </span>
       )}
@@ -98,9 +102,12 @@ function MetaPill({
 
 function governmentTypeClass(label: string): string {
   const normalized = label.toLowerCase();
-  if (normalized.includes("semi-presidential")) return "factbook-meta-pill--gov-semi";
-  if (normalized.includes("parliamentary")) return "factbook-meta-pill--gov-parliamentary";
-  if (normalized.includes("presidential")) return "factbook-meta-pill--gov-presidential";
+  if (normalized.includes("semi-presidential"))
+    return "factbook-meta-pill--gov-semi";
+  if (normalized.includes("parliamentary"))
+    return "factbook-meta-pill--gov-parliamentary";
+  if (normalized.includes("presidential"))
+    return "factbook-meta-pill--gov-presidential";
   if (normalized.includes("theocr")) return "factbook-meta-pill--gov-theocracy";
   if (normalized.includes("monarch")) return "factbook-meta-pill--gov-monarchy";
   return "factbook-meta-pill--gov-neutral";
@@ -109,7 +116,11 @@ function governmentTypeClass(label: string): string {
 function BetaTag() {
   return (
     <BetaChip
-      style={{ marginLeft: "var(--space-1)", alignSelf: "center", lineHeight: 1 }}
+      style={{
+        marginLeft: "var(--space-1)",
+        alignSelf: "center",
+        lineHeight: 1,
+      }}
     />
   );
 }
@@ -147,6 +158,9 @@ interface FactbookHeaderStripProps {
   engravingSrc?: string | null;
   /** Optional dark-mode version of `engravingSrc`, swapped in by theme. */
   engravingDarkSrc?: string | null;
+  /** Disclosure variant for the shared hero-art shell. Photographic assets are
+   *  still AI-assisted, non-documentary editorial images. */
+  heroArtKind?: "engraving" | "photographic";
   /** Short description of what the engraving depicts (e.g. "Mount Fuji with a
    *  five-storied pagoda…"). Rendered as a subtle caption over the hero scrim.
    *  Only passed when an engraving actually exists; null → no caption. */
@@ -206,6 +220,7 @@ export function FactbookHeaderStrip({
   gdpResolver,
   engravingSrc = null,
   engravingDarkSrc = null,
+  heroArtKind = "engraving",
   heroCaption = null,
   heroDarkCaption = null,
   reconciliationNotice,
@@ -233,25 +248,19 @@ export function FactbookHeaderStrip({
   // Argentina population will flip from the IMF 2030 forecast (50.4 M) to
   // the UN/WB 2023 measurement (~45.7 M). This component is agnostic to
   // that — it just consumes whatever the resolver returns.
-  const resolvedPop =
-    populationResolver?.canonical?.factValueNumeric ?? null;
-  const resolvedGdpBillions =
-    gdpResolver?.canonical?.factValueNumeric ?? null;
+  const resolvedPop = populationResolver?.canonical?.factValueNumeric ?? null;
+  const resolvedGdpBillions = gdpResolver?.canonical?.factValueNumeric ?? null;
 
   const popStr = formatPop(resolvedPop !== null ? resolvedPop : population);
   const gdpStr = formatGdp(
-    resolvedGdpBillions !== null
-      ? resolvedGdpBillions * 1_000_000_000
-      : gdp
+    resolvedGdpBillions !== null ? resolvedGdpBillions * 1_000_000_000 : gdp,
   );
 
   // Numeric research estimate: neutral ink, never a qualitative tier color.
-  const ciScoreColor = ciScore != null ? "var(--color-text-primary)" : "var(--color-accent)";
+  const ciScoreColor =
+    ciScore != null ? "var(--color-text-primary)" : "var(--color-accent)";
 
-  const lightboxImages: LightboxImage[] =
-    lbMode === "map"
-      ? mapImages
-      : photos;
+  const lightboxImages: LightboxImage[] = lbMode === "map" ? mapImages : photos;
 
   const coverMap = mapImages[0];
   const coverPhoto = photos[0];
@@ -278,7 +287,11 @@ export function FactbookHeaderStrip({
                   {reconciliationNotice}
                 </span>
               ) : null}
-              <span className="factbook-hero-caption-label">Editorial engraving</span>
+              <span className="factbook-hero-caption-label">
+                {heroArtKind === "photographic"
+                  ? "Editorial image"
+                  : "Editorial engraving"}
+              </span>
               {heroCaption ? (
                 engravingDarkSrc && heroDarkCaption ? (
                   <>
@@ -290,16 +303,28 @@ export function FactbookHeaderStrip({
                     </span>
                   </>
                 ) : (
-                  <span className="factbook-hero-caption-text">{heroCaption}</span>
+                  <span className="factbook-hero-caption-text">
+                    {heroCaption}
+                  </span>
                 )
               ) : null}
-              <Link
-                href="/licensing#imagery"
-                className="factbook-hero-caption-link"
-                aria-label="AI-assisted illustration; non-documentary editorial art"
-              >
-                AI-assisted illustration
-              </Link>
+              {heroArtKind === "photographic" ? (
+                <Link
+                  href="/licensing#imagery"
+                  className="factbook-hero-caption-link"
+                  aria-label="AI-assisted image; non-documentary editorial art"
+                >
+                  AI-assisted image
+                </Link>
+              ) : (
+                <Link
+                  href="/licensing#imagery"
+                  className="factbook-hero-caption-link"
+                  aria-label="AI-assisted illustration; non-documentary editorial art"
+                >
+                  AI-assisted illustration
+                </Link>
+              )}
             </figcaption>
           </figure>
         )}
@@ -317,7 +342,7 @@ export function FactbookHeaderStrip({
                 value={governmentTypeDisplay.value}
                 note={governmentTypeDisplay.note}
                 className={`factbook-meta-pill--government ${governmentTypeClass(
-                  governmentTypeDisplay.value
+                  governmentTypeDisplay.value,
                 )}`}
               />
             ) : null}
@@ -396,9 +421,7 @@ export function FactbookHeaderStrip({
                     factKey="gdp_ppp_usd_billions"
                     factLabel="GDP (PPP)"
                     resolverOutput={gdpResolver}
-                    canonicalSourceId={
-                      gdpResolver.canonical?.sourceId ?? null
-                    }
+                    canonicalSourceId={gdpResolver.canonical?.sourceId ?? null}
                     ariaLabel={`GDP (PPP) ${gdpStr}, see sources`}
                   />
                 </span>
@@ -412,37 +435,43 @@ export function FactbookHeaderStrip({
             )}
             {ciScore != null && (
               <Tooltip content="View Civica Index detail">
-              <Link
-                href={`/country/${slug}/civica-data`}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontSize: "var(--text-15)",
-                  lineHeight: 1,
-                  color: "var(--color-text-60)",
-                  textDecoration: "none",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}>CI</span>
-                <span
+                <Link
+                  href={`/country/${slug}/civica-data`}
                   style={{
-                    fontFamily: "var(--font-heading)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
                     fontSize: "var(--text-15)",
-                    fontWeight: 400,
                     lineHeight: 1,
-                    color: ciScoreColor,
+                    color: "var(--color-text-60)",
+                    textDecoration: "none",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  {Math.round(ciScore)}
-                </span>
-                <BetaTag />
-              </Link>
+                  <span
+                    style={{
+                      color: "var(--color-text-40)",
+                      fontSize: "var(--text-15)",
+                    }}
+                  >
+                    CI
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "var(--text-15)",
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      color: ciScoreColor,
+                    }}
+                  >
+                    {Math.round(ciScore)}
+                  </span>
+                  <BetaTag />
+                </Link>
               </Tooltip>
             )}
           </div>
-
         </div>
 
         <div className="factbook-hero-boxes">

@@ -50,7 +50,7 @@ Browse the full set at [/methodology](/methodology).
 
 Civica's approach is shaped by the institutions and data publishers it cites. Our World in Data is an important reference for transparent public-data presentation. V-Dem supplies a widely used comparative-politics regime classification. The World Bank, IMF, UN agencies, OECD, and other established publishers form the backbone of the data layer.
 
-We are not these institutions. We do not have their funding, their staff, their decades of accumulated trust, or their formal review processes. Civica instead keeps versioned methodology records, labels novel work as beta, and aims to surface disagreement rather than hiding it.
+Civica is independently maintained by Fernando Baliño, who has final editorial responsibility. It does not have the formal review structures of the institutions it cites. Versioned methods, visible beta labels, source records, and correction history make the project's own work inspectable while external review remains pending.
 
 ## Language scope {#language}
 
