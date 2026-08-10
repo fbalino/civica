@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "civica-atlas-data-error-report-live-audit/v1",
+  "capturedAt": "2026-08-09T21:41:21.625Z",
+  "mode": "zero_write",
+  "schemaReady": true,
+  "correctionRows": 2,
+  "invalidStatusRows": 0,
+  "invalidResolutionShapeRows": 0,
+  "atlasReportRows": 0
+}

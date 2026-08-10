@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 310
-- **Completed:** 256
-- **Remaining:** 54
-- **Progress:** 82.6%
+- **Completed:** 258
+- **Remaining:** 52
+- **Progress:** 83.2%
 - **Priority mix:** P0 192 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -199,19 +199,28 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [x] **ATL-017** (P0) Verify government taxonomy and peer-lens outputs against adopted external classifications and current source vintages. _Done when: structural description, V-Dem RoW, BR/CGV, World Bank region/income, monarchy status, fallbacks, n-minimums, and noncoverage cases pass source-backed fixtures; retired `structural_family` cannot re-enter new paths._
 - [x] **ATL-018** (P0) Standardize loading, empty, error, partial, stale, disputed, and no-source states across all atlas modules. _Done when: ATL-001 lists and tests each applicable state, no module silently disappears on missing data, and desktop/mobile/light/dark browser fixtures cover representative states._
 - [x] **ATL-019** (P1) Create stable fact, institution, office, person, election, constitution-passage, organization, and indicator identifiers/citations. _Done when: exported/stable URLs or IDs survive display-name changes, citations resolve to release/version/source, and identifier round-trip tests pass._
-- [ ] **ATL-020** (P1) Add release-to-release change and correction histories for primary atlas entities. _Done when: users can inspect what value/record changed, old/new source/vintage, reason, method/version, release, and correction status; ordinary refreshes and substantive revisions are distinguishable._
+- [x] **ATL-020** (P1) Add release-to-release change and correction histories for primary atlas entities. _Done when: users can inspect what value/record changed, old/new source/vintage, reason, method/version, release, and correction status; ordinary refreshes and substantive revisions are distinguishable._
+  **Completed 2026-08-09:** migration `0046` confirmed applied at production
+  head `0051`; the public `civica-atlas-change-history/v1` contract is proven
+  live through a real Jersey markup correction (receipt `CA-587FA00E6DEE`,
+  release `atlas-corrections-20260809-v1`, two linked events) — the history
+  API and reader disclosure render the exact Previous/Current diff with public
+  status `resolved_corrected`. A writer before-snapshot bug found by this gate
+  (a `FOR UPDATE` clause skipping the just-upserted row) was fixed, covered by
+  an executed PostgreSQL test, and the two already-written events repaired from
+  the retention ledger. Evidence: `plan/evidence/ATL-020/`.
 - [x] **ATL-021** (P1) Build a research-friendly bulk/query access path within source rights and operational limits. _Done when: permitted atlas data can be selected/downloaded with schema/source/rights metadata, pagination/rate limits are documented, restricted fields are excluded with reasons, and examples reproduce published case studies._
 - [x] **ATL-022** (P2) Create a source-native governance-change explorer only after ATL-003. _Done when: “movers/backsliding” views use declared external series and time windows, show uncertainty/revisions and sensitivity to start/end dates, avoid Civica letter grades, and allow no-ranking when comparability is insufficient._
 - [x] **ATL-023** (P1) Publish at least three reproducible reconciliation or institutional-data case studies. _Done when: each case has a research question, frozen input rows, decision trail, code/notebook, output, source rights, limitations, stable citation, and a test that regenerates its tables/figures._
-- [ ] **ATL-024** (P1) Add an evidence-backed data-error/report-correction flow. _Done when: a reader can report a precise entity/field/release/source issue; submissions are authenticated against abuse, acknowledged, triaged, linked to corrections, and covered by privacy/retention policy and delivery tests._
-  **Agent preparation complete 2026-07-23:** the exact Atlas intake, abuse
-  controls, opaque receipt, authenticated/audited triage, privacy/redaction
-  registry, and required ATL-020 correction-history linkage are implemented
-  and locally validated. The page and API fail closed with no form/write while
-  the additive schema is absent. Completion requires owner-authorized
-  production migrations 0046/0047 plus stored-schema browser, durable receipt,
-  triage, linkage, and delivery verification. Evidence:
-  `plan/evidence/ATL-024/`.
+- [x] **ATL-024** (P1) Add an evidence-backed data-error/report-correction flow. _Done when: a reader can report a precise entity/field/release/source issue; submissions are authenticated against abuse, acknowledged, triaged, linked to corrections, and covered by privacy/retention policy and delivery tests._
+  **Completed 2026-08-09:** migration `0047` confirmed applied at production
+  head `0051`; the Atlas data-error flow is proven end to end in production —
+  durable opaque receipt `CA-587FA00E6DEE`, authenticated audited triage
+  `open`→`in_review`→`resolved_corrected`, and the `resolved_corrected` guard
+  requiring an ATL-020 change-history link exercised live
+  (`linkedChangeCount: 2`), with submitter minimization and a clean zero-write
+  audit (`schemaReady: true`). Admin queue/detail browser evidence retained.
+  Evidence: `plan/evidence/ATL-024/`.
 - [x] **ATL-025** (P1) Reconcile every older roadmap/mockup promise with the atlas-first release. _Done when: each existing dated plan/mockup is tagged imported/completed/superseded/deferred/post-release with evidence and any still-valid open work has a task ID in this master plan; no active pointer targets a noncanonical plan._
 - [x] **ATL-026** (P0) Persist every Civica Conditions component value, reference year, source, missingness, and inclusion decision. _Done when: economic/HDI/security rows can be decomposed into exact components and years, mixed-year inputs follow an adopted alignment rule or are refused/flagged, and no composite is labelled solely with the newest component year. Production release `conditions-production-20260729-v1` passed exact component/replay/freshness validation and public API/browser state evidence; see `plan/evidence/ATL-026/`._
 - [x] **ATL-027** (P0) Freeze Conditions reference distributions and transformations by release. _Done when: reference population/period, means/SDs or other normalization parameters, direction, included components, and missingness are stored/queryable; rerunning a release is deterministic and cannot shift prior values silently. Production release `conditions-production-20260729-v1` passed manifest, replay, source-freshness, and public-release evidence; see `plan/evidence/ATL-027/`._

@@ -1,0 +1,23 @@
+{
+  "id": "0047_atlas_data_error_reports",
+  "artifact": "drizzle/authoritative/0047_atlas_data_error_reports.sql",
+  "kind": "schema",
+  "historyStatus": "journaled",
+  "sha256": "e36e87c298ac19a50e9a65c7438e51e33b1f849b424c796a3e362a893cd86dfc",
+  "affectedRelations": [
+    "atlas_entity_change_history",
+    "correction_log",
+    "research_evidence_history"
+  ],
+  "statementCount": 22,
+  "destructiveStatementCount": 0,
+  "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0047_atlas_data_error_reports-compensation; never reverse production DDL/data implicitly.",
+  "invariantPlan": "npm run db:plan -- --id=0047_atlas_data_error_reports --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+  "releaseNote": "data/migrations/CHANGELOG.md",
+  "liveRowCounts": {
+    "atlas_entity_change_history": 0,
+    "correction_log": 2,
+    "research_evidence_history": 92272
+  },
+  "writesPerformed": 0
+}

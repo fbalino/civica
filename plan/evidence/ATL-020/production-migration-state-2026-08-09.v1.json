@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "civica-atl-020-024-migration-state/v1",
+  "capturedAt": "2026-08-09T21:41:20.426Z",
+  "mode": "zero_write",
+  "note": "Migrations 0046 and 0047 were applied to production on 2026-07-29 as part of the checked authoritative bulk apply through 0051_eminent_jocasta. This wave verified rather than re-applied them.",
+  "ledger": [
+    {
+      "id": "0046_little_mulholland_black",
+      "sha256": "78c86331e815fbd799fdcfc51e6d2f569bf66f06ac97c771edde226365eb75cb",
+      "mode": "executed",
+      "appliedAt": "2026-07-29T13:02:54.716Z"
+    },
+    {
+      "id": "0047_atlas_data_error_reports",
+      "sha256": "e36e87c298ac19a50e9a65c7438e51e33b1f849b424c796a3e362a893cd86dfc",
+      "mode": "executed",
+      "appliedAt": "2026-07-29T13:02:54.874Z"
+    }
+  ],
+  "ledgerHead": "0051_eminent_jocasta",
+  "appliedCount": 51,
+  "migratePlan": {
+    "applied": 51,
+    "pending": 0,
+    "publicTables": 103,
+    "writesPerformed": 0
+  }
+}

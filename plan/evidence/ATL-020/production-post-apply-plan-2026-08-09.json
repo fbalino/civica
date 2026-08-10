@@ -1,0 +1,21 @@
+{
+  "id": "0046_little_mulholland_black",
+  "artifact": "drizzle/authoritative/0046_little_mulholland_black.sql",
+  "kind": "schema",
+  "historyStatus": "journaled",
+  "sha256": "78c86331e815fbd799fdcfc51e6d2f569bf66f06ac97c771edde226365eb75cb",
+  "affectedRelations": [
+    "atlas_entity_change_history",
+    "correction_log"
+  ],
+  "statementCount": 4,
+  "destructiveStatementCount": 0,
+  "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0046_little_mulholland_black-compensation; never reverse production DDL/data implicitly.",
+  "invariantPlan": "npm run db:plan -- --id=0046_little_mulholland_black --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+  "releaseNote": "data/migrations/CHANGELOG.md",
+  "liveRowCounts": {
+    "atlas_entity_change_history": 0,
+    "correction_log": 2
+  },
+  "writesPerformed": 0
+}

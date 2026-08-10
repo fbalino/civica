@@ -69,6 +69,12 @@ export function routineCountryFactHistory(
  * row, upserts the current source observation, and appends the bounded public
  * history event. Neon HTTP has no interactive transactions, so the CTE is the
  * transaction boundary.
+ *
+ * `before_row` must read the statement snapshot WITHOUT `FOR UPDATE`: a
+ * locking scan follows the tuple's update chain and silently skips a row this
+ * same statement's `ON CONFLICT DO UPDATE` already modified, so the before
+ * snapshot comes back empty and the event misreports an update as an insert
+ * with null befores. Write serialization is owned by the advisory lock alone.
  */
 export function buildCountryFactHistoryStatement(
   input: CountryFactHistoryWrite,
@@ -102,7 +108,6 @@ export function buildCountryFactHistoryStatement(
       WHERE cf.jurisdiction_id = ${values.jurisdictionId}::uuid
         AND cf.fact_key = ${values.factKey}
         AND cf.source_id = ${values.sourceId}
-      FOR UPDATE OF cf
     ),
     before_marker AS (
       SELECT EXISTS (SELECT 1 FROM before_row) AS existed
