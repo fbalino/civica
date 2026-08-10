@@ -3,9 +3,9 @@
   "reviewedAt": "2026-08-09",
   "checklist": {
     "total": 310,
-    "completed": 258,
-    "remaining": 52,
-    "progressPercent": 83.2
+    "completed": 260,
+    "remaining": 50,
+    "progressPercent": 83.9
   },
   "agentExecutableNow": [],
   "categories": [
@@ -34,17 +34,15 @@
     {
       "id": "production-staging-external-authority",
       "label": "Production, staging, or external-system authority",
-      "count": 7,
+      "count": 5,
       "taskIds": [
         "ATL-010",
-        "ATL-020",
-        "ATL-024",
         "DAT-036",
         "EXP-029",
         "PUL-024",
         "PUL-040"
       ],
-      "nextStep": "Authorize only the remaining real production or external actions: Atlas history/correction journeys, the named source refreshes and internationalization run, and a Pulse drift baseline and complete scheduled cycle."
+      "nextStep": "Authorize only the remaining real production or external actions: the named source refreshes and internationalization run, and a Pulse drift baseline and complete scheduled cycle."
     },
     {
       "id": "external-evidence-unavailable",

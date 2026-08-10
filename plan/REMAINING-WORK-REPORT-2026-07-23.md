@@ -2,7 +2,7 @@
 
 **Reviewed:** 2026-08-09
 
-**Checklist state:** 258 of 310 complete; 52 remain; 83.2%.
+**Checklist state:** 260 of 310 complete; 50 remain; 83.9%.
 
 ## Bottom line
 
@@ -68,13 +68,12 @@ run is preserved with a date-correction note, and the exact-candidate
 attempt-07 technical rehearsal through `0051_eminent_jocasta` is complete and
 retained (`plan/evidence/QA-018/`).
 
-### 2. Production, staging, or external-system authority — 7
+### 2. Production, staging, or external-system authority — 5
 
-IDs: ATL-010, ATL-020, ATL-024, DAT-036, EXP-029, PUL-024, PUL-040.
+IDs: ATL-010, DAT-036, EXP-029, PUL-024, PUL-040.
 
 This batch includes:
 
-- real production Atlas entity-history and data-error journeys;
 - a hardened Wikidata leaders refresh and a date-precision repair refresh;
 - internationalized stored-name migration/source refresh; and
 - an explicit Pulse drift baseline followed by an eligible observation, and
@@ -89,7 +88,12 @@ closed on 2026-08-09 under Fernando's written rehearsal authority on the
 retained protected bad-Preview → forward-fix run; its canonical record stays
 fail-closed at `run_complete_pending_owner_signoff` until the owner creates
 the external status record and records a dated disposition of the retained
-evidence (`plan/evidence/QA-019/SIGNOFF-NOTE-2026-08-09.md`).
+evidence (`plan/evidence/QA-019/SIGNOFF-NOTE-2026-08-09.md`). ATL-020 and
+ATL-024 closed on 2026-08-09 under the same written authority: migrations
+`0046`/`0047` were confirmed applied at head `0051`, and a real reported and
+corrected Atlas data error exercised the public change-history contract, the
+durable receipt, authenticated triage, and correction linkage end to end
+(`plan/evidence/ATL-020/`, `plan/evidence/ATL-024/`).
 
 ### 3. Required external evidence unavailable — 1
 
@@ -160,7 +164,7 @@ release, or imply approvals that do not exist.
 
 ## Gate status
 
-G4 remains blocked with 22 unchecked P0 tasks and 48 unchecked P0/P1 tasks.
+G4 remains blocked with 22 unchecked P0 tasks and 46 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,
