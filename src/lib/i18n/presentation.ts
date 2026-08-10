@@ -41,3 +41,22 @@ export function formatPublicDate(
     ...options,
   }).format(date);
 }
+
+/**
+ * English display name for a publisher-supplied BCP-47 language tag, for
+ * visible source-language labels. Mechanical `Intl.DisplayNames` lookup in the
+ * public presentation locale; an unrecognized tag is shown verbatim rather
+ * than being guessed.
+ */
+export function publicLanguageName(languageTag: string): string {
+  try {
+    const display = new Intl.DisplayNames(PUBLIC_PRESENTATION_LOCALE, {
+      type: "language",
+    }).of(languageTag);
+    return display && display !== languageTag.toLowerCase()
+      ? display
+      : languageTag;
+  } catch {
+    return languageTag;
+  }
+}

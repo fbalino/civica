@@ -86,7 +86,7 @@
       "path": "data/release-quality-report.v1.json",
       "role": "Release-quality and anomaly report",
       "bytes": 1404,
-      "sha256": "261810b0dea8a9ee921a68168fcccdb3bf0174e8cdfe23cf54f8b7a7d6f97fd4"
+      "sha256": "ffc6c3c28419b8a37c6d31cd60576e54399aef3b98f9ddec02658b517d712c0d"
     },
     {
       "id": "limitations",
@@ -129,5 +129,5 @@
     "Would the correction/retraction process preserve the scholarly record and make material changes discoverable to data users?",
     "Which blocking or major change is required before external academic outreach, and which claims should remain narrower even after that change?"
   ],
-  "semanticSha256": "d00c807033829e412ddd1afdcc25528862e9c064ccb049a330904d4e61afc814"
+  "semanticSha256": "c230fc4c695aebda8f6f08956d932a1d4c3d4341baec00e5e6f568ea9bcce603"
 }

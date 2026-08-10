@@ -33,6 +33,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/", changeFrequency: "weekly", priority: 1.0 },
   { path: "/atlas", changeFrequency: "weekly", priority: 0.95 },
   { path: "/country", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/leaders", changeFrequency: "daily", priority: 0.7 },
   { path: "/parties", changeFrequency: "weekly", priority: 0.8 },
   { path: "/compare", changeFrequency: "monthly", priority: 0.6 },
   { path: "/civica-index", changeFrequency: "monthly", priority: 0.5 },

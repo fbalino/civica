@@ -1,0 +1,27 @@
+{
+  "id": "wikidata-refresh-wave-2026-08-09",
+  "toVersion": "civica-index-wikidata-refresh-wave-v58",
+  "categories": ["input", "presentation"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/ATL-010/production-refresh-2026-08-09.md",
+      "plan/evidence/EXP-029/production-activation-2026-08-09.md"
+    ],
+    "registry": [
+      "src/lib/data/production-adapter-registry.ts"
+    ],
+    "release_note": [
+      "plan/evidence/DAT-036/release-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/DAT-036/repair-runbook.md",
+      "plan/evidence/DAT-036/refresh-dry-run-deltas.json"
+    ],
+    "golden_test": [
+      "src/lib/i18n/name-form-sync.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-leaders-directory.ts"
+    ]
+  }
+}

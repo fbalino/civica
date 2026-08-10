@@ -12,6 +12,7 @@ import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { BetaChip } from "@/components/editorial/BetaChip";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import type { CountryBounds } from "@/lib/data/country-bounds";
+import { SourceText } from "@/components/editorial/SourceText";
 import { JurisdictionStatusDisclosure } from "@/components/jurisdiction/JurisdictionStatusDisclosure";
 import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
@@ -128,6 +129,10 @@ function BetaTag() {
 interface FactbookHeaderStripProps {
   slug: string;
   countryName: string;
+  /** EXP-029 — stored, source-backed official name forms (value + explicit
+   *  publisher language tag). Empty → the row is omitted entirely; the
+   *  English display name never fabricates a source form. */
+  officialNameForms?: { value: string; languageTag: string }[];
   iso2: string | null;
   governmentTypeLabel: string;
   jurisdictionStatus: JurisdictionStatusPresentation;
@@ -206,6 +211,7 @@ function splitGovernmentTypeLabel(label: string): {
 export function FactbookHeaderStrip({
   slug,
   countryName,
+  officialNameForms = [],
   iso2,
   governmentTypeLabel,
   jurisdictionStatus,
@@ -335,6 +341,23 @@ export function FactbookHeaderStrip({
             </div>
             <h1 className="factbook-hero-name">{countryName}</h1>
           </div>
+
+          {officialNameForms.length > 0 ? (
+            <p className="factbook-hero-official-names">
+              <span className="factbook-hero-official-names__label">
+                Official name{officialNameForms.length > 1 ? "s" : ""} (source
+                language) ·{" "}
+              </span>
+              {officialNameForms.map((form, index) => (
+                <span key={`${form.languageTag}-${form.value}`}>
+                  {index > 0 ? " · " : null}
+                  <SourceText languageTag={form.languageTag}>
+                    {form.value}
+                  </SourceText>
+                </span>
+              ))}
+            </p>
+          ) : null}
 
           <div className="factbook-government-type-row">
             {governmentTypeLabel ? (

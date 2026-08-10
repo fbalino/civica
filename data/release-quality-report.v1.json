@@ -1,6 +1,6 @@
 {
   "schemaVersion": "release-data-quality/v1",
-  "generatedAt": "2026-07-29T13:21:53.715Z",
+  "generatedAt": "2026-08-10T02:57:30.622Z",
   "status": "pass",
   "policy": {
     "sourceMaxAgeDays": 180,
@@ -15,8 +15,8 @@
     "jurisdictions": 253,
     "legislature_parties": 1548,
     "sources": 57,
-    "statements": 7158,
-    "terms": 5590
+    "statements": 7251,
+    "terms": 5611
   },
   "checks": [
     {

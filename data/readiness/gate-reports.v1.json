@@ -1,16 +1,16 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "fdec2347d485dd550d406e28128306db92ca6ea9a8f2ef8566373da9d20569be",
-    "plan/PROGRESS.md": "18e8a92c3129f5f58004d11bc18c191ad26441cfcdf34e1165a13081ff100d08",
-    "plan/MANUAL-CHECKS.md": "d4d536007cca1921b9fe754cbad7e2a5639231a6a16179bce2777c449594bbe9",
+    "plan/MASTER-CHECKLIST.md": "d06c646b64596d80e03c205e0f06e38ac4942de7b48d18d3a01db3125d815c70",
+    "plan/PROGRESS.md": "360ed6c2f7181151e7dd91b6a84543b85b2c28463cab61589acc88ebe38de39a",
+    "plan/MANUAL-CHECKS.md": "d8a25367af51ff508d9630bb09a83fb25ea2f8119b250a2b5c32abe24f5e2c18",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
-    "plan/03-data-provenance-and-reproducibility.md": "d8e19b6dadb22036d58240748581a45711840bfdb48fc9fd3bc29df1cb10d293",
+    "plan/03-data-provenance-and-reproducibility.md": "8ce0389812f14fe7a12afd6ca3b0752b53578db2134a99045cd66d42d21bedf6",
     "plan/04-civica-index-research-program.md": "6d879a9fecefeda072af4a41ccde7d8be1b77a555f42f9ebece4c38e01343b4b",
     "plan/05-pulse-event-ledger-and-validation.md": "469c04ca66b439905a60c39c69e1a8e20b55e4d0ec9e6c9482b8987da64d64d7",
-    "plan/06-atlas-content-and-research-features.md": "91459842393a3c9dbfe849d73b97d1f1be41b53b7d70179cade2707d44d9767b",
-    "plan/07-design-system-assets-and-reader-experience.md": "1c35dba50ace06d4de0fc57968ca6a0486f2abe3bdfe2f6f44cdaf423ee7aa93",
+    "plan/06-atlas-content-and-research-features.md": "73c404cb712e67de4230b17b5b8790051eae8f3f909e3d92e4ecdb789c886fd4",
+    "plan/07-design-system-assets-and-reader-experience.md": "037c123e58a9e877fc3f41d6a76e2e2edb31ff2d142f94c594c4bfb2c347e07c",
     "plan/08-platform-security-performance-and-operations.md": "f7fa9d0651a83c408b8211397e244d8fb71b88a1aee9939cb987f53e5df4738b",
     "plan/09-testing-qa-and-release.md": "2a2a7d2d6bd8fae6efab1d02b17cbc00ddb67e6374f81fe7d5dfb3d26f872014",
     "plan/10-academic-governance-review-and-outreach.md": "d92e4b4bc3392dccd81ad135c257304ed60edaece5d2cd7f28a6123a5e02baa6",
@@ -23,8 +23,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 260,
-        "remaining": 50,
+        "completed": 263,
+        "remaining": 47,
         "byPriority": {
           "P0": {
             "total": 192,
@@ -32,17 +32,17 @@
           },
           "P1": {
             "total": 113,
-            "completed": 89
+            "completed": 91
           },
           "P2": {
             "total": 5,
-            "completed": 1
+            "completed": 2
           }
         },
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 30
+            "completed": 31
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -54,11 +54,11 @@
           },
           "03-data-provenance-and-reproducibility.md": {
             "total": 36,
-            "completed": 34
+            "completed": 35
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 44,
-            "completed": 36
+            "completed": 37
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -113,13 +113,11 @@
         "BRD-012",
         "BRD-016",
         "DAT-034",
-        "DAT-036",
         "EXP-001",
         "EXP-015",
         "EXP-016",
         "EXP-025",
         "EXP-028",
-        "EXP-029",
         "EXP-038",
         "GOV-012",
         "GOV-015",
@@ -158,7 +156,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "d4d536007cca1921b9fe754cbad7e2a5639231a6a16179bce2777c449594bbe9",
+        "sha256": "d8a25367af51ff508d9630bb09a83fb25ea2f8119b250a2b5c32abe24f5e2c18",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -251,8 +249,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 260,
-        "remaining": 50,
+        "completed": 263,
+        "remaining": 47,
         "byPriority": {
           "P0": {
             "total": 192,
@@ -260,17 +258,17 @@
           },
           "P1": {
             "total": 113,
-            "completed": 89
+            "completed": 91
           },
           "P2": {
             "total": 5,
-            "completed": 1
+            "completed": 2
           }
         },
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 30
+            "completed": 31
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -282,11 +280,11 @@
           },
           "03-data-provenance-and-reproducibility.md": {
             "total": 36,
-            "completed": 34
+            "completed": 35
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 44,
-            "completed": 36
+            "completed": 37
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -341,13 +339,11 @@
         "BRD-012",
         "BRD-016",
         "DAT-034",
-        "DAT-036",
         "EXP-001",
         "EXP-015",
         "EXP-016",
         "EXP-025",
         "EXP-028",
-        "EXP-029",
         "EXP-038",
         "GOV-012",
         "GOV-015",
@@ -386,7 +382,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "d4d536007cca1921b9fe754cbad7e2a5639231a6a16179bce2777c449594bbe9",
+        "sha256": "d8a25367af51ff508d9630bb09a83fb25ea2f8119b250a2b5c32abe24f5e2c18",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -478,7 +474,7 @@
       ],
       "blockers": [
         "22 unchecked P0 tasks prevent a green report",
-        "46 unchecked P0/P1 tasks prevent G4"
+        "44 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -487,8 +483,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 260,
-        "remaining": 50,
+        "completed": 263,
+        "remaining": 47,
         "byPriority": {
           "P0": {
             "total": 192,
@@ -496,17 +492,17 @@
           },
           "P1": {
             "total": 113,
-            "completed": 89
+            "completed": 91
           },
           "P2": {
             "total": 5,
-            "completed": 1
+            "completed": 2
           }
         },
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 30
+            "completed": 31
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -518,11 +514,11 @@
           },
           "03-data-provenance-and-reproducibility.md": {
             "total": 36,
-            "completed": 34
+            "completed": 35
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 44,
-            "completed": 36
+            "completed": 37
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -577,13 +573,11 @@
         "BRD-012",
         "BRD-016",
         "DAT-034",
-        "DAT-036",
         "EXP-001",
         "EXP-015",
         "EXP-016",
         "EXP-025",
         "EXP-028",
-        "EXP-029",
         "EXP-038",
         "GOV-012",
         "GOV-015",
@@ -622,7 +616,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "d4d536007cca1921b9fe754cbad7e2a5639231a6a16179bce2777c449594bbe9",
+        "sha256": "d8a25367af51ff508d9630bb09a83fb25ea2f8119b250a2b5c32abe24f5e2c18",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -709,8 +703,8 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 260,
-        "remaining": 50,
+        "completed": 263,
+        "remaining": 47,
         "byPriority": {
           "P0": {
             "total": 192,
@@ -718,17 +712,17 @@
           },
           "P1": {
             "total": 113,
-            "completed": 89
+            "completed": 91
           },
           "P2": {
             "total": 5,
-            "completed": 1
+            "completed": 2
           }
         },
         "byArea": {
           "06-atlas-content-and-research-features.md": {
             "total": 32,
-            "completed": 30
+            "completed": 31
           },
           "11-brand-legal-and-licensing.md": {
             "total": 16,
@@ -740,11 +734,11 @@
           },
           "03-data-provenance-and-reproducibility.md": {
             "total": 36,
-            "completed": 34
+            "completed": 35
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 44,
-            "completed": 36
+            "completed": 37
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -799,13 +793,11 @@
         "BRD-012",
         "BRD-016",
         "DAT-034",
-        "DAT-036",
         "EXP-001",
         "EXP-015",
         "EXP-016",
         "EXP-025",
         "EXP-028",
-        "EXP-029",
         "EXP-038",
         "GOV-012",
         "GOV-015",
@@ -844,7 +836,7 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "d4d536007cca1921b9fe754cbad7e2a5639231a6a16179bce2777c449594bbe9",
+        "sha256": "d8a25367af51ff508d9630bb09a83fb25ea2f8119b250a2b5c32abe24f5e2c18",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",

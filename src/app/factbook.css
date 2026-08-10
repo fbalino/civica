@@ -152,6 +152,19 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+/* EXP-029 — stored source-language official names under the masthead title. */
+.factbook-hero-official-names {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+  margin: var(--space-2) 0 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.factbook-hero-official-names__label {
+  color: var(--color-text-muted);
+}
 .factbook-hero-pills {
   display: flex;
   flex-wrap: wrap;

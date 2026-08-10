@@ -10,6 +10,7 @@ type Artifact = {
   examinedRows: number;
   repairCount: number;
   requiresPublisherRefreshCount: number;
+  alreadyCorrectCount: number;
   rows: Array<{
     jurisdiction: string;
     factKey: string;
@@ -56,9 +57,13 @@ if (artifact.examinedRows < artifact.repairCount) {
 }
 if (
   artifact.examinedRows !==
-  artifact.repairCount + artifact.requiresPublisherRefreshCount
+  artifact.repairCount +
+    artifact.requiresPublisherRefreshCount +
+    artifact.alreadyCorrectCount
 ) {
-  errors.push("every examined row must be repairable or publisher-refresh-bound");
+  errors.push(
+    "every examined row must be repairable, publisher-refresh-bound, or already correct",
+  );
 }
 if (
   artifact.requiresPublisherRefreshCount !==

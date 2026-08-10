@@ -266,10 +266,10 @@ export function buildOfficeHistoryStatement(
     possible_title_rename AS (
       SELECT o.id
       FROM offices o
-      WHERE ${input.identityMode} = 'exact_title'
-        AND ${input.stableId ?? null} IS NULL
+      WHERE ${input.identityMode}::text = 'exact_title'
+        AND ${input.stableId ?? null}::uuid IS NULL
         AND NOT EXISTS (SELECT 1 FROM before_row)
-        AND ${input.displayOrder ?? null} IS NOT NULL
+        AND ${input.displayOrder ?? null}::integer IS NOT NULL
         AND o.body_id = ${input.bodyId}::uuid
         AND o.display_order = ${input.displayOrder ?? null}
       LIMIT 1

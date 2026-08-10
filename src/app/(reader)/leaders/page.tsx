@@ -64,9 +64,11 @@ export default async function WorldLeadersDirectoryPage() {
           labels appear only when the retained source office title says so.
           Multiple people in the same principal role are marked as
           co-leadership; one person holding both principal roles is marked
-          separately as dual office. Wikidata does not publish a named dataset
-          vintage for this pipeline, so each record exposes its retained
-          retrieval date instead.
+          separately as dual office. When the source retains conflicting
+          un-ended claims for a role, that role is excluded as explicit
+          noncoverage rather than shown from a stale roster.
+          {" "}Wikidata does not publish a named dataset vintage for this
+          pipeline, so each record exposes its retained retrieval date instead.
         </Banner>
         {!publicationReady ? (
           <Banner variant="warn">

@@ -1,8 +1,10 @@
 # DAT-036 — Wikidata publisher-date precision
 
-Status: agent implementation and zero-write production planning complete;
-production repair remains open pending an authorized Wikidata refresh and a
-retained correction-log record.
+Status: complete — the authorized publisher refresh ran 2026-08-09/10 under
+named release `atlas-wikidata-refresh-20260809-v1` with retained public
+correction record `4ffdc3a2-012a-4256-ba0c-c4395aab7a4b`; 1,269 of 1,270
+affected rows are repaired and one residual row remains disclosed as
+publisher-refresh-bound. See `production-repair-2026-08-09.md`.
 
 ## What is fixed
 

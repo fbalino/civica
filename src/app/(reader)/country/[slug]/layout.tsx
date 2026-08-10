@@ -26,6 +26,8 @@ import { CountryTabBar } from "@/components/country/CountryTabBar";
 import { BetaChip } from "@/components/editorial/BetaChip";
 import type { LightboxImage } from "@/components/factbook/FactbookLightbox";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
+import { db } from "@/lib/db";
+import { getCurrentEntityNameForms } from "@/lib/i18n/name-form-store";
 import { classifyGovernment } from "@/lib/data/government-category";
 import { formatGovernmentType } from "@/lib/text/clean";
 import { getCountryGallery, wikimediaUrl } from "@/lib/data/country-photos";
@@ -193,6 +195,22 @@ export default async function CountryLayout({
   // Structured data: Home → Countries & areas → {Name} breadcrumb, plus a
   // Country node only for the closed sovereign-state class and a neutral Place
   // for other sourced jurisdiction types. No extra DB query is required.
+  // EXP-029: stored, source-backed official name forms for the masthead.
+  // Absent forms stay absent — never derived from the English display name.
+  let officialNameForms: { value: string; languageTag: string }[] = [];
+  try {
+    const storedForms = await getCurrentEntityNameForms(
+      db,
+      "jurisdiction",
+      jurisdiction.id,
+    );
+    officialNameForms = storedForms
+      .filter((form) => form.nameRole === "official")
+      .map((form) => ({ value: form.value, languageTag: form.languageTag }));
+  } catch {
+    // An outage renders the masthead without source forms; nothing is implied.
+  }
+
   const countryPath = `/country/${slug}`;
   const seoNodes: JsonLdNode[] = [
     buildBreadcrumbList([
@@ -217,6 +235,7 @@ export default async function CountryLayout({
       <FactbookHeaderStrip
         slug={slug}
         countryName={jurisdiction.name}
+        officialNameForms={officialNameForms}
         iso2={jurisdiction.iso2}
         governmentTypeLabel={govLabel}
         jurisdictionStatus={jurisdiction.jurisdictionStatus}

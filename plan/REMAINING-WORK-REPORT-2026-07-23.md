@@ -1,16 +1,16 @@
 # Civica master checklist — remaining-work report
 
-**Reviewed:** 2026-08-09
+**Reviewed:** 2026-08-10
 
-**Checklist state:** 260 of 310 complete; 50 remain; 83.9%.
+**Checklist state:** 263 of 310 complete; 47 remain; 84.8%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
 Fourteen tasks are direct owner, qualified-human, counsel/privacy, or research
-participant work. Seven require production, provider, source-refresh, or other
-external-system authority. One requires unavailable publisher evidence and
+participant work. Two require production, provider, or other external-system
+authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
 is currently running. The other 30 are downstream tasks that cannot honestly
 start until an earlier gate produces real evidence.
@@ -68,14 +68,12 @@ run is preserved with a date-correction note, and the exact-candidate
 attempt-07 technical rehearsal through `0051_eminent_jocasta` is complete and
 retained (`plan/evidence/QA-018/`).
 
-### 2. Production, staging, or external-system authority — 5
+### 2. Production, staging, or external-system authority — 2
 
-IDs: ATL-010, DAT-036, EXP-029, PUL-024, PUL-040.
+IDs: PUL-024, PUL-040.
 
 This batch includes:
 
-- a hardened Wikidata leaders refresh and a date-precision repair refresh;
-- internationalized stored-name migration/source refresh; and
 - an explicit Pulse drift baseline followed by an eligible observation, and
   one complete scheduled locked-method cycle that can establish PUL-040's
   non-backdated start.
@@ -93,7 +91,9 @@ ATL-024 closed on 2026-08-09 under the same written authority: migrations
 `0046`/`0047` were confirmed applied at head `0051`, and a real reported and
 corrected Atlas data error exercised the public change-history contract, the
 durable receipt, authenticated triage, and correction linkage end to end
-(`plan/evidence/ATL-020/`, `plan/evidence/ATL-024/`).
+(`plan/evidence/ATL-020/`, `plan/evidence/ATL-024/`). ATL-010, DAT-036, and
+EXP-029 closed on 2026-08-10 under the same authority through the named
+`atlas-wikidata-refresh-20260809-v1` release.
 
 ### 3. Required external evidence unavailable — 1
 
@@ -151,20 +151,18 @@ release, or imply approvals that do not exist.
    EXP-009, EXP-038 A4/T3/T4, EXP-025/QA-013, and PLT-029 facts.
 2. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
    IDX-034, BRD-003, BRD-010, and BRD-012.
-3. Execute and retain only the remaining authorized Atlas-history,
-   correction, internationalization, and Wikidata refresh journeys.
-4. Establish the explicit Pulse drift baseline, deploy the locked method,
+3. Establish the explicit Pulse drift baseline, deploy the locked method,
    complete one full scheduled cycle, record
    the non-backdated PUL-040 start, and allow PUL-026 to run for 90 days.
-5. Create QA-019's external status record and record Fernando's retained-run
+4. Create QA-019's external status record and record Fernando's retained-run
    disposition so its canonical rehearsal record can become `complete`.
-6. Execute Pulse evaluation and disposition, regenerate the review packet,
+5. Execute Pulse evaluation and disposition, regenerate the review packet,
    rerun G4, and only then authorize reviewer contact.
-7. Complete G5, DOI/G6, and the post-review publication/outreach chain.
+6. Complete G5, DOI/G6, and the post-review publication/outreach chain.
 
 ## Gate status
 
-G4 remains blocked with 22 unchecked P0 tasks and 46 unchecked P0/P1 tasks.
+G4 remains blocked with 22 unchecked P0 tasks and 44 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,

@@ -1,48 +1,57 @@
 # Current handoff — Civica
 
-**Updated:** 2026-08-09 (post main-branch integration)
+**Updated:** 2026-08-10 (Wikidata refresh wave merged into the main lineage)
 **Current objective:** main is the single working lineage; complete the
 remaining owner-gated and dependency-blocked tasks from the master checklist.
 
 ## Verified state
 
 - Active branch: `main`. The former `codex/civica-academic-readiness` working
-  tree is fully merged; that branch is retired. Plan is 257/310 complete.
-- Production Neon is at authoritative migration head `0051_eminent_jocasta`
-  (applied 2026-07-29). The named immutable Conditions release
-  `conditions-production-20260729-v1` is live and verified (ATL-026/ATL-027
-  complete). PUL-027 and PUL-043 production closures, the PLT-007 credential
-  rotation, and the 2026-07-29 production release smoke are recorded in
-  `plan/PROGRESS.md`.
-- QA-018 is complete: owner confirmation of the attempt-06 isolated run plus
-  the passing exact-candidate attempt-07 packet through `0051`. Owner-session
-  records created with a wrong 2026-08-09 date carry explicit date-correction
-  notes (the sessions occurred in late July 2026).
-- On 2026-08-09 Fernando directed, in writing, that all outstanding work be
-  committed, merged to `main`, and deployed. That integration is this state.
-- EXP-015: the owner-directed revisions (no headline, square full-bleed art,
-  even register gutter, single quiet hover, `@starting-style` entrance) are
-  merged; owner re-review of the rendered panel is still open.
-- EXP-038: A4 About naming is approved and applied; T3 was decided on
-  2026-08-09 (no-guarantee response copy, applied). T4 (correction route) is
-  the only held copy decision.
+  tree was fully merged on 2026-08-09 at Fernando's written instruction
+  ("i want everything committed and on the main branch and live"); this
+  update merges the completed Wikidata refresh wave from
+  `claude/serene-wilbur-375a03` on top. Plan is 261/310 complete.
+- Production Neon is at authoritative migration head `0051_eminent_jocasta`.
+  The named Conditions release `conditions-production-20260729-v1` is live
+  (ATL-026/ATL-027 complete); QA-018 and QA-019 are complete per the 2026-08-09
+  accounting (owner-session records carry date-correction notes — the
+  sessions occurred in late July 2026).
+- The Wikidata refresh wave (2026-08-09/10, named release
+  `atlas-wikidata-refresh-20260809-v1`) completed **ATL-010** (roster
+  refreshed, release `leaders-2026-08-10` ready, `/leaders` live in footer +
+  sitemap, Samoa HoG a disclosed upstream-ambiguous exclusion, Russia's
+  jurisdiction QID repaired to Q159 with new dissolved-state and identity
+  guards), **DAT-036** (1,269/1,270 facts repaired append-only under public
+  correction record `4ffdc3a2-012a-4256-ba0c-c4395aab7a4b`; one disclosed
+  residual; strict live release-quality gate green), and **EXP-029**
+  (registered `atlas.entity-name-forms` pipeline wrote 1,184 source-backed
+  forms; masthead and directory render labeled source forms; parties remain
+  an explicit zero scope). The G2 release was untouched; no new frozen
+  vintage was cut.
+- EXP-015: the owner-directed Explore-panel revisions are merged; owner
+  re-review of the rendered panel is still open. EXP-038: A4 and T3 are
+  applied; T4 (correction route) is the only held copy decision.
 
 ## Next actions
 
-1. ATL-020/ATL-024: complete the stored history journey, opaque correction
+1. Deploy the merged tree to production (the wave's database changes are
+   already live; `/leaders`, the masthead name forms, and release artifacts
+   go live with the deployment).
+2. ATL-020/ATL-024: complete the stored history journey, opaque correction
    receipt, authenticated triage, correction linkage, and delivery evidence
-   against the live schema (migrations 0046/0047 are already active).
-2. Run the authorized named-release Wikidata refresh; complete ATL-010
-   (unpause `/leaders`), DAT-036, and EXP-029 verification (migration 0048 is
-   already active).
-3. QA-019: create one real non-notifying external status record and obtain
-   Fernando's dated disposition of the rehearsal packet.
+   against the live schema (migrations 0046/0047 are active).
+3. QA-019 residuals: the owner-created external status record and Fernando's
+   dated disposition of the retained rehearsal run (itemized in
+   `plan/evidence/QA-019/SIGNOFF-NOTE-2026-08-09.md`).
 4. Obtain Fernando's re-review of the revised EXP-015 Explore panel and his
    T4 copy decision (EXP-038).
 5. Pulse wave (PUL-043/024/027 → PUL-040 start): still requires the owner's
    written provider/model, volume, and hard-USD-cap authority. Raw-event
    ingestion showed no rows after 2026-07-29 — diagnose cron health as part
    of any Pulse setup.
+6. Denmark's jurisdiction QID (`Q756617`, Kingdom of Denmark) was reviewed
+   during the wave's QID audit and deliberately retained; revisit only if a
+   Denmark-scoped data question arises.
 
 ## Boundaries
 

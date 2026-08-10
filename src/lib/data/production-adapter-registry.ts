@@ -353,6 +353,18 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
       ],
     },
     {
+      id: "atlas.entity-name-forms",
+      product: "atlas",
+      sources: ["wikidata"],
+      canonicalNpmScript: "sync:entity-name-forms",
+      entrypoint: "scripts/sync-entity-name-forms.ts",
+      implementationPaths: [
+        "scripts/sync-entity-name-forms.ts",
+        "src/lib/i18n/name-form-sync.ts",
+        "src/lib/i18n/name-form-store.ts",
+      ],
+    },
+    {
       id: "atlas.constitutions",
       product: "atlas",
       sources: ["constitute_project"],
