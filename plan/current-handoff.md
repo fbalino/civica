@@ -23,8 +23,9 @@ remaining owner-gated and dependency-blocked tasks from the master checklist.
 - EXP-015: the owner-directed revisions (no headline, square full-bleed art,
   even register gutter, single quiet hover, `@starting-style` entrance) are
   merged; owner re-review of the rendered panel is still open.
-- EXP-038: A4 About naming is approved and applied; T3 (response time) and
-  T4 (correction route) remain the only held copy decisions.
+- EXP-038: A4 About naming is approved and applied; T3 was decided on
+  2026-08-09 (no-guarantee response copy, applied). T4 (correction route) is
+  the only held copy decision.
 
 ## Next actions
 
@@ -37,7 +38,7 @@ remaining owner-gated and dependency-blocked tasks from the master checklist.
 3. QA-019: create one real non-notifying external status record and obtain
    Fernando's dated disposition of the rehearsal packet.
 4. Obtain Fernando's re-review of the revised EXP-015 Explore panel and his
-   T3/T4 copy decisions (EXP-038).
+   T4 copy decision (EXP-038).
 5. Pulse wave (PUL-043/024/027 → PUL-040 start): still requires the owner's
    written provider/model, volume, and hard-USD-cap authority. Raw-event
    ingestion showed no rows after 2026-07-29 — diagnose cron health as part

@@ -1,7 +1,7 @@
 # EXP-038 — English-first editorial copy review
 
-Status: approved bundle applied and browser-checked; two explicitly gated
-copy decisions remain (T3, T4)
+Status: approved bundle applied and browser-checked; one explicitly gated
+copy decision remains (T4)
 
 Owner decision: Fernando Baliño approved the prepared English copy bundle on
 2026-07-25. In a later late-July 2026 session he additionally approved naming
@@ -35,12 +35,16 @@ vendor-relationship, and editorial-control facts that support it.
 
 ## Explicit holds
 
-- **T3 — response time.** The existing three-business-day wording remains
-  unchanged pending an owner choice between a monitored target and
-  no-guarantee language.
 - **T4 — correction route.** The existing GitHub instruction remains unchanged
   pending an owner choice of interim copy or activation of the dedicated
   production correction flow.
+
+**T3 resolved on 2026-08-09:** Fernando chose the no-guarantee wording
+("contact: no guarantee wording."). The success panel now reads "Messages are
+reviewed manually and a reply is not guaranteed." and the Response tile reads
+"Messages are reviewed manually. A reply is not guaranteed."; the former
+"SLA · Response" tile label is now "Response" because no service level is
+promised.
 
 These holds are recorded rather than inferred. No external review, endorsement,
 service-level observation, or production correction-flow activation is

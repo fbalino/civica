@@ -95,13 +95,12 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 - **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.
 - **GOV-012 · Owner — DECIDED 2026-08-09 (Option A, revisitable):** Fernando selected the no-honorarium posture on budget grounds ("no honoraria (for now)"); the completed approval record is in `plan/research/reviewer-honorarium-decision-brief-v1.md`. No paying entity or accounting/tax workflow is required while the posture is unpaid; if funds become available before outreach, the recommended Option B bands remain documented for a revisited decision. Contact still waits for GOV-016 and G4.
 - **EXP-038 · Owner:** the approved subset in
-  `plan/EXP-038-english-copy-review-2026-07-23.md` is already applied. Record
-  only the four remaining dispositions: retain or replace A4 after deciding
-  how prominently to name Fernando; approve H5 only after GOV-003 closes;
-  choose the no-guarantee T3 response copy or adopt a genuinely monitored
-  response target; and choose the interim T4 correction instruction or wait
-  for ATL-024 activation. These decisions authorize only the named English
-  copy; they do not authorize translation, deployment, a legal conclusion, or
+  `plan/EXP-038-english-copy-review-2026-07-23.md` is already applied. A4
+  (About naming) and H5 (independence label after GOV-003) are resolved, and
+  T3 was decided on 2026-08-09 (no-guarantee response copy, applied). One
+  disposition remains: choose the interim T4 correction instruction or wait
+  for ATL-024 activation. That decision authorizes only the named English
+  copy; it does not authorize translation, deployment, a legal conclusion, or
   an external message.
 - Approve the final public disposition of each experimental measurement after its resolution and external review are complete.
 - **EXP-030 / EXP-031 · Owner decision — embed disposition (found 2026-07-12):** the Civica Index score embed (`/embed/[slug]`) is retired (HTTP 410 stub) under the atlas-first decision, so there are no live size presets to repair, and the old preset builder (`src/components/widget/WidgetBuilder.tsx` + `WidgetCopyButton.tsx`) is **orphaned dead code — mounted in no route** and still points its generated iframes at the 410 endpoint. Hardening the retired stub's HTML (add `<h1>`, `robots noindex`) is blocked because the route is an Index-change-control **protected presentation file**, so any edit requires the full methodology-change ceremony (version advance + all six evidence roles) — disproportionate for a cosmetic fix to a retired page. Decide the structural path: (a) formally **de-protect** the retired embed route from `INDEX_PROTECTED_FILES` via a proper change-control record, then harden its document, or (b) fold EXP-030 into **EXP-031** (source-native embed redesign), which will rebuild or remove the route and the orphaned builder through the same ceremony. Until then EXP-030 stays open.
