@@ -903,3 +903,27 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   Country-versus-Place JSON-LD use the same contract.
 - Politically sensitive fixtures and desktop/mobile browser QA passed. Index
   change-control v26, all 949 tests, and the 105-page production build passed.
+
+## 2026-08-10 — Wikidata refresh wave gotchas (would silently re-break)
+
+- **Neon HTTP has NO interactive `db.transaction()` — and unit tests won't
+  catch it.** Fixture suites pass because they run PGlite/mocks; the first
+  production call throws "No transactions support in neon-http driver". Any
+  NEW writer must use a single data-modifying CTE statement (one statement =
+  one implicit transaction) or `sql.transaction([...])` batches. Bit the
+  EXP-029 name-form writer; same class as the earlier `42P18` untyped-null
+  crash (a parameter used ONLY in `IS NULL` predicates needs an explicit
+  `::type` cast over Neon HTTP).
+- **Wikidata "sovereign state" (P31 Q3624078) includes DISSOLVED states**, and
+  their short names collide with current countries (Russian Empire → short
+  name "Russia"). The officeholder sync now filters `wdt:P576` and fails
+  closed instead of overwriting a differing retained jurisdiction QID; never
+  remove either guard. A jurisdiction QID change is a deliberate, evidenced
+  repair — never a sync side effect.
+- **Anything computed with `Intl` in a client component must be computed at
+  the server boundary and shipped in props** (e.g. `publicLanguageName`); the
+  embedded/browser ICU can lack languages Node knows (bit `bo`/Tibetan as a
+  hydration mismatch on /leaders).
+- **The Index change-control append pins evidence-file hashes at append
+  time** — append the record only after every referenced evidence file is
+  final, or the build fails with "documentation evidence drifted".
