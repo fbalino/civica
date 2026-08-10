@@ -27,7 +27,7 @@ const expectations: Expectation[] = [
       "The project publishes its methods and records source disagreement where the data supports it. Some values remain unreconciled, and the project has not completed independent review.",
       "Civica separates source ingestion, reconciliation, and reader presentation. Each layer has its own provenance and failure checks.",
       "Supported observations retain source and retrieval metadata; statement-level coverage remains incomplete.",
-      "We are not these institutions.",
+      "Civica is independently maintained by Fernando Baliño, who has final editorial responsibility.",
     ],
     absent: ["Civica is a small project led by Fernando Baliño."],
   },
@@ -78,9 +78,8 @@ const expectations: Expectation[] = [
     present: [
       'title="Contact the editors"',
       "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Baliño reviews submissions manually.",
-      "The editors usually reply within <strong>3 business days</strong>.",
+      "Messages are reviewed manually. We&rsquo;ll get back to you as soon as",
       "urgent data corrections, open an issue on GitHub.",
-      "We usually reply within <strong>3 business days</strong>.",
     ],
   },
   {

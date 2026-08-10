@@ -32,6 +32,7 @@ import { classifyGovernment } from "@/lib/data/government-category";
 import { formatGovernmentType } from "@/lib/text/clean";
 import { getCountryGallery, wikimediaUrl } from "@/lib/data/country-photos";
 import { getCountryBounds } from "@/lib/data/country-bounds";
+import { countryHeroPhoto } from "@/lib/data/country-hero-photos";
 
 export const revalidate = 3600;
 
@@ -173,16 +174,23 @@ export default async function CountryLayout({
     : territoryEngravingSrc
       ? territoryEngravingDarkSrc
       : null;
-  const heroCaption = iso3EngravingSrc
-    ? engravingCaption(jurisdiction.iso3)
-    : territoryEngravingSrc
-      ? territoryEngravingCaption(slug)
-      : null;
-  const heroDarkCaption = iso3EngravingDarkSrc
-    ? (darkEngravingCaption(jurisdiction.iso3) ?? heroCaption)
-    : territoryEngravingDarkSrc
-      ? (darkTerritoryEngravingCaption(slug) ?? heroCaption)
-      : null;
+  const photoHero = countryHeroPhoto(jurisdiction.iso3);
+  const countryHeroSrc = photoHero?.lightSrc ?? countryEngravingSrc;
+  const countryHeroDarkSrc = photoHero?.darkSrc ?? countryEngravingDarkSrc;
+  const heroCaption =
+    photoHero?.lightCaption ??
+    (iso3EngravingSrc
+      ? engravingCaption(jurisdiction.iso3)
+      : territoryEngravingSrc
+        ? territoryEngravingCaption(slug)
+        : null);
+  const heroDarkCaption =
+    photoHero?.darkCaption ??
+    (iso3EngravingDarkSrc
+      ? (darkEngravingCaption(jurisdiction.iso3) ?? heroCaption)
+      : territoryEngravingDarkSrc
+        ? (darkTerritoryEngravingCaption(slug) ?? heroCaption)
+        : null);
 
   // Structured data: Home → Countries & areas → {Name} breadcrumb, plus a
   // Country node only for the closed sovereign-state class and a neutral Place
@@ -244,8 +252,9 @@ export default async function CountryLayout({
         bounds={bounds}
         mapboxAvailable={mapboxAvailable}
         inAtlas={jurisdiction.type === "sovereign_state"}
-        engravingSrc={countryEngravingSrc}
-        engravingDarkSrc={countryEngravingDarkSrc}
+        engravingSrc={countryHeroSrc}
+        engravingDarkSrc={countryHeroDarkSrc}
+        heroArtKind={photoHero ? "photographic" : "engraving"}
         heroCaption={heroCaption}
         heroDarkCaption={heroDarkCaption}
         reconciliationNotice={

@@ -1,5 +1,8 @@
 # QA-018 owner sign-off — 2026-08-09
 
+> **Date correction (recorded 2026-08-09).** This record was created with a 2026-08-09 session date. Fernando stated on 2026-08-09 that he had not worked on the project since late July 2026; the owner statements recorded here were made in the late-July 2026 working sessions, and the 2026-08-09 date is an artifact of when the record was written.
+
+
 Decision: **confirmed.** Fernando reviewed the runbook summary of the
 completed isolated run and authorized it in writing in the 2026-08-09 working
 session ("i authorize five", enumerated as the runbook's Phase 3 items

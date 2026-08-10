@@ -354,3 +354,18 @@ test("coding store contains no whole-table Drizzle selections", () => {
   );
   assert.doesNotMatch(exportSource, /credentialHash|credential_hash/);
 });
+
+test("adjudicator exports retain terminal-study and blind-read predicates", () => {
+  const source = readFileSync("src/lib/pulse/v2/coding-store.ts", "utf8");
+  const exportSource = source.slice(
+    source.indexOf("export async function exportPulseCodingStudy"),
+  );
+
+  assert.match(exportSource, /pulseCodingCanReadPeerSubmission/);
+  assert.match(exportSource, /pulseCodingStudyExportIsTerminal/);
+  assert.match(exportSource, /bothCoderSubmissionsLocked/);
+  assert.match(
+    exportSource,
+    /Adjudicator export is limited to a fully assigned study queue/,
+  );
+});

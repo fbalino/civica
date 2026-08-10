@@ -25,6 +25,7 @@
 /test-results/
 /.firecrawl/
 /data/research-input-cache/
+/local/type-lab-fonts/
 
 # misc
 .DS_Store
@@ -57,3 +58,4 @@ next-env.d.ts
 **/.venv/
 **/__pycache__/
 **/*.pyc
+/.playwright-cli/

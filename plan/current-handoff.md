@@ -1,66 +1,61 @@
 # Current handoff — Civica
 
-**Updated:** 2026-08-10
-**Current objective:** the owner-authorized Wikidata refresh wave
-(ATL-010 / DAT-036 / EXP-029) is complete on branch
-`claude/serene-wilbur-375a03`; the remaining authorized waves execute one at
-a time under their own packets.
+**Updated:** 2026-08-10 (Wikidata refresh wave merged into the main lineage)
+**Current objective:** main is the single working lineage; complete the
+remaining owner-gated and dependency-blocked tasks from the master checklist.
 
 ## Verified state
 
-- Active branch for this work: `claude/serene-wilbur-375a03` (the production
-  lineage; `codex/civica-academic-readiness` is 35 commits behind it and its
-  checkout carries separate in-flight uncommitted work — do not discard or
-  absorb either side). Plan is 259/310 complete.
-- The 2026-08-09 owner authorization
-  (`plan/evidence/QA-018/OWNER-SIGNOFF-2026-08-09.md`) covered four operator
-  waves. Already executed earlier on this branch (2026-07-29): the Conditions
-  production batch (ATL-026/ATL-027) and migrations 0046/0047 with the
-  ATL-024 production preparation; production has been at migration head
-  `0051_eminent_jocasta` since then, so migration 0048 was already live.
-- This wave (2026-08-09/10) executed the named-release Wikidata refresh
-  `atlas-wikidata-refresh-20260809-v1`:
-  - **ATL-010 complete** — roster refreshed (197 states, 0 discrepancies,
-    Samoa HoG a disclosed upstream-ambiguous exclusion), release
-    `leaders-2026-08-10` ready, `/leaders` live in footer + sitemap, browser
-    QA passed. Two defects fixed en route: Neon-HTTP parameter typing in the
-    entity history writer, and a dissolved-state identity clobber (Russian
-    Empire → Russia) with a dissolved-state SPARQL filter, a fail-closed
-    identity guard, and a verified Q159 repair.
-  - **DAT-036 complete** — 1,269/1,270 rows repaired append-only under the
-    named release with public correction record
-    `4ffdc3a2-012a-4256-ba0c-c4395aab7a4b` (resolved_corrected); one
-    disclosed residual (Botswana GDP per capita, key no longer synced); the
-    strict live release-quality gate passes all nine families.
-  - **EXP-029 complete** — registered `atlas.entity-name-forms` pipeline
-    wrote 1,184 source-backed forms; masthead and leaders-directory surfaces
-    render labeled source forms; parties remain an explicit zero scope (no
-    publisher identity exists).
-- The G2 release was not rewritten; no new frozen vintage was cut.
-- The Explore megamenu keeps its owner-approved eight art-backed items; a
-  ninth ("World Leaders") needs owner-approved artwork if ever desired.
+- Active branch: `main`. The former `codex/civica-academic-readiness` working
+  tree was fully merged on 2026-08-09 at Fernando's written instruction
+  ("i want everything committed and on the main branch and live"); this
+  update merges the completed Wikidata refresh wave from
+  `claude/serene-wilbur-375a03` on top. Plan is 261/310 complete.
+- Production Neon is at authoritative migration head `0051_eminent_jocasta`.
+  The named Conditions release `conditions-production-20260729-v1` is live
+  (ATL-026/ATL-027 complete); QA-018 and QA-019 are complete per the 2026-08-09
+  accounting (owner-session records carry date-correction notes — the
+  sessions occurred in late July 2026).
+- The Wikidata refresh wave (2026-08-09/10, named release
+  `atlas-wikidata-refresh-20260809-v1`) completed **ATL-010** (roster
+  refreshed, release `leaders-2026-08-10` ready, `/leaders` live in footer +
+  sitemap, Samoa HoG a disclosed upstream-ambiguous exclusion, Russia's
+  jurisdiction QID repaired to Q159 with new dissolved-state and identity
+  guards), **DAT-036** (1,269/1,270 facts repaired append-only under public
+  correction record `4ffdc3a2-012a-4256-ba0c-c4395aab7a4b`; one disclosed
+  residual; strict live release-quality gate green), and **EXP-029**
+  (registered `atlas.entity-name-forms` pipeline wrote 1,184 source-backed
+  forms; masthead and directory render labeled source forms; parties remain
+  an explicit zero scope). The G2 release was untouched; no new frozen
+  vintage was cut.
+- EXP-015: the owner-directed Explore-panel revisions are merged; owner
+  re-review of the rendered panel is still open. EXP-038: A4 and T3 are
+  applied; T4 (correction route) is the only held copy decision.
 
 ## Next actions
 
-1. Rehearse QA-019 rollback/forward-fix in staging only (authorized,
-   unexecuted).
-2. Production deployment of this wave's code (release regeneration, /leaders
-   activation, reader surfaces) follows the deployment runbook as a separate
-   action; the database changes are already live.
-3. When Fernando supplies a Pulse cost cap (or declines), record it and act
-   accordingly; the Pulse wave (PUL-043/024/027 → PUL-040) remains
-   unauthorized and untouched.
-4. Denmark's jurisdiction QID (`Q756617`, Kingdom of Denmark) was reviewed
-   and deliberately retained during the QID audit; flag to Fernando only if a
+1. Deploy the merged tree to production (the wave's database changes are
+   already live; `/leaders`, the masthead name forms, and release artifacts
+   go live with the deployment).
+2. ATL-020/ATL-024: complete the stored history journey, opaque correction
+   receipt, authenticated triage, correction linkage, and delivery evidence
+   against the live schema (migrations 0046/0047 are active).
+3. QA-019 residuals: the owner-created external status record and Fernando's
+   dated disposition of the retained rehearsal run (itemized in
+   `plan/evidence/QA-019/SIGNOFF-NOTE-2026-08-09.md`).
+4. Obtain Fernando's re-review of the revised EXP-015 Explore panel and his
+   T4 copy decision (EXP-038).
+5. Pulse wave (PUL-043/024/027 → PUL-040 start): still requires the owner's
+   written provider/model, volume, and hard-USD-cap authority. Raw-event
+   ingestion showed no rows after 2026-07-29 — diagnose cron health as part
+   of any Pulse setup.
+6. Denmark's jurisdiction QID (`Q756617`, Kingdom of Denmark) was reviewed
+   during the wave's QID audit and deliberately retained; revisit only if a
    Denmark-scoped data question arises.
 
 ## Boundaries
 
-- One wave at a time; approvals do not combine; staging is not production
-  authority except where the 2026-08-09 record explicitly grants production.
-- Do not start the Pulse wave or any paid classifier run without written
-  provider/model, volume, and hard-USD-cap authority.
+- One wave at a time; do not combine approvals. Written owner authority is
+  required for paid classifier runs and any new production data batch.
 - Do not expose credentials or private evidence in context files. Do not
   initialize BridgeMemory. Rewrite this handoff at the next milestone.
-- The main checkout still holds an older untracked `plan/current-handoff.md`
-  from 2026-08-09; this committed version supersedes it.
