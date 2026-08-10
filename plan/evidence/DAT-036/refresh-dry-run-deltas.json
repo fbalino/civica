@@ -1,0 +1,1761 @@
+{
+  "schemaVersion": "civica-dat036-refresh-dry-run-deltas/v1",
+  "taskId": "DAT-036",
+  "dryRunLogLines": 1320,
+  "proposedAdmissions": 1264,
+  "storedCurrentWikidataRows": 1270,
+  "valueUnchanged": 1050,
+  "valueChangedCount": 214,
+  "newPairCount": 0,
+  "droppedPairCount": 6,
+  "sparqlErrors": [
+    "! suriname unemployment_rate_pct: SPARQL failure — SPARQL query failed after retries: SPARQL 502 Bad Gateway: <html>",
+    "! panama birth_rate: SPARQL failure — SPARQL query failed after retries: SPARQL 502 Bad Gateway: <html>",
+    "! panama fertility_rate: SPARQL failure — SPARQL query failed after retries: SPARQL 502 Bad Gateway: <html>",
+    "! montenegro unemployment_rate_pct: SPARQL failure — SPARQL query failed after retries: SPARQL 502 Bad Gateway: <html>",
+    "! bosnia-and-herzegovina population_total: SPARQL failure — SPARQL query failed after retries: SPARQL 502 Bad Gateway: <html>"
+  ],
+  "note": "Publisher value revisions listed here ride along with the precision correction as ordinary routine_refresh source updates; the precision repair itself changes only value_json.publisherDate/as_of/fact_year representation. Dropped pairs are stored rows whose current ranked Wikidata selection no longer admits a claim; they retain their stored values and remain publisher-refresh-bound for precision.",
+  "valueChanged": [
+    {
+      "slug": "saint-vincent-and-the-grenadines",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.9485585,
+      "proposedValue": 0.9485585030000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "maldives",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 6.1898656,
+      "proposedValue": 6.189865408,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "liberia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 4.001047,
+      "proposedValue": 4.001047150000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "niger",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 13.969605,
+      "proposedValue": 13.969605583000002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "the-gambia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2.396111,
+      "proposedValue": 2.39611102,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "lesotho",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2.5534596,
+      "proposedValue": 2.553459763,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "moldova",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 14.420948,
+      "proposedValue": 14.420947884,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "south-africa",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 405.86972,
+      "proposedValue": 405.86971846200004,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "sao-tome-and-principe",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.54668033,
+      "proposedValue": 0.546680342,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "thailand",
+      "factKey": "population_total",
+      "storedValue": 67010504,
+      "proposedValue": 67010502,
+      "storedAsOf": "2013-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "thailand",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 495.3406,
+      "proposedValue": 495.340592811,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "senegal",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 27.684431,
+      "proposedValue": 27.684430244,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "sierra-leone",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 3.9703438,
+      "proposedValue": 3.970343852,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "andorra",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 3.3520327,
+      "proposedValue": 3.352032737,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "mozambique",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 17.851492,
+      "proposedValue": 17.851491428000003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "belize",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2.824082,
+      "proposedValue": 2.824081836,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "tanzania",
+      "factKey": "population_total",
+      "storedValue": 57310020,
+      "proposedValue": 57310019,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "tanzania",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 75.70929,
+      "proposedValue": 75.709289056,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "mauritania",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 10.375461,
+      "proposedValue": 10.37546068,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "ghana",
+      "factKey": "population_total",
+      "storedValue": 32833032,
+      "proposedValue": 32833031,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "ghana",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 72.8388,
+      "proposedValue": 72.838798788,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "chad",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 12.70415,
+      "proposedValue": 12.704149842000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "angola",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 84.82465,
+      "proposedValue": 84.82465448100001,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "zimbabwe",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 20.678055,
+      "proposedValue": 20.678055598,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "guinea-bissau",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1.6335591,
+      "proposedValue": 1.633559092,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "ethiopia",
+      "factKey": "population_total",
+      "storedValue": 120283024,
+      "proposedValue": 120283026,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "ethiopia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 126.78347,
+      "proposedValue": 126.783472501,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "suriname",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 3.620655,
+      "proposedValue": 3.620655116,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "panama",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 76.522514,
+      "proposedValue": 76.522511781,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "zambia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 29.784454,
+      "proposedValue": 29.784454056,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "georgia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 24.605375,
+      "proposedValue": 24.60537542,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "united-states",
+      "factKey": "population_total",
+      "storedValue": 340110980,
+      "proposedValue": 340110988,
+      "storedAsOf": "2024-07-01",
+      "proposedAsOf": "2024-07-01"
+    },
+    {
+      "slug": "united-states",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 28750.957,
+      "proposedValue": 28750.956130000002,
+      "storedAsOf": "2024-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "seychelles",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1.5884064,
+      "proposedValue": 1.588406479,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "syria",
+      "factKey": "population_total",
+      "storedValue": 23865424,
+      "proposedValue": 23865423,
+      "storedAsOf": "2024-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "mauritius",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 12.898307,
+      "proposedValue": 12.898307089000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "cambodia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 29.95677,
+      "proposedValue": 29.956769529000002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "kiribati",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.22335294,
+      "proposedValue": 0.22335294300000003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "dominica",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.61204815,
+      "proposedValue": 0.6120481480000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "morocco",
+      "factKey": "population_total",
+      "storedValue": 36828328,
+      "proposedValue": 36828330,
+      "storedAsOf": "2024-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "morocco",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 134.1816,
+      "proposedValue": 134.18158777000002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "norway",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 579.2674,
+      "proposedValue": 579.2673658660001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "micronesia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.42709413,
+      "proposedValue": 0.42709411900000005,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "bolivia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 43.068886,
+      "proposedValue": 43.068885673000004,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "grenada",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1.2564132,
+      "proposedValue": 1.256413185,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "guatemala",
+      "factKey": "population_total",
+      "storedValue": 17263240,
+      "proposedValue": 17263239,
+      "storedAsOf": "2018-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "guatemala",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 95.003334,
+      "proposedValue": 95.003333381,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "guinea",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 21.227749,
+      "proposedValue": 21.227749389000003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "laos",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 15.724383,
+      "proposedValue": 15.724383783,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "guyana",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 15.357537,
+      "proposedValue": 15.357537068000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "saint-lucia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2.0650275,
+      "proposedValue": 2.065027556,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "saint-kitts-and-nevis",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.9615632,
+      "proposedValue": 0.9615632590000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "kyrgyzstan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 10.930645,
+      "proposedValue": 10.930644915,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "estonia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 38.100815,
+      "proposedValue": 38.100812959,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "libya",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 45.752335,
+      "proposedValue": 45.752336036,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "ireland",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 529.2449,
+      "proposedValue": 529.244870223,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "vietnam",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 408.80237,
+      "proposedValue": 408.80237906800005,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "afghanistan",
+      "factKey": "population_total",
+      "storedValue": 37466416,
+      "proposedValue": 37466414,
+      "storedAsOf": "2021-07-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "afghanistan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 17.233051,
+      "proposedValue": 17.77850888,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "afghanistan",
+      "factKey": "unemployment_rate_pct",
+      "storedValue": 8.5,
+      "proposedValue": 13.4,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "afghanistan",
+      "factKey": "fertility_rate",
+      "storedValue": 4.843,
+      "proposedValue": 4.84,
+      "storedAsOf": "2014-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "canada",
+      "factKey": "population_total",
+      "storedValue": 36991980,
+      "proposedValue": 36991981,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "kenya",
+      "factKey": "population_total",
+      "storedValue": 48468136,
+      "proposedValue": 48468138,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "kenya",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 113.420006,
+      "proposedValue": 113.420008179,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "iceland",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 27.841648,
+      "proposedValue": 27.841648044000003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "switzerland",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 807.70605,
+      "proposedValue": 807.7060353520001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "kosovo",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 9.429156,
+      "proposedValue": 9.429156202,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "ukraine",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 160.50275,
+      "proposedValue": 160.502739236,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "timor-leste",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 3.1633246,
+      "proposedValue": 3.163324631,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "ecuador",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 115.04948,
+      "proposedValue": 115.04947600000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "romania",
+      "factKey": "population_total",
+      "storedValue": 19586540,
+      "proposedValue": 19586539,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "romania",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 301.2616,
+      "proposedValue": 301.26158292400004,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "romania",
+      "factKey": "fertility_rate",
+      "storedValue": 1.41,
+      "proposedValue": 1.71,
+      "storedAsOf": "2014-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "china",
+      "factKey": "population_total",
+      "storedValue": 1332810900,
+      "proposedValue": 1332810869,
+      "storedAsOf": "2010-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "china",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 17963.17,
+      "proposedValue": 17963.170521080003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "poland",
+      "factKey": "population_total",
+      "storedValue": 37563072,
+      "proposedValue": 37563071,
+      "storedAsOf": "2024-06-30",
+      "proposedAsOf": "2024-06-30"
+    },
+    {
+      "slug": "poland",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 688.17664,
+      "proposedValue": 688.176605955,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "lithuania",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 70.3343,
+      "proposedValue": 70.334299008,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "tunisia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 46.664948,
+      "proposedValue": 46.664948952,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "congo-brazzaville",
+      "factKey": "population_total",
+      "storedValue": 5260750,
+      "proposedValue": 6278845,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "congo-brazzaville",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 14.615532,
+      "proposedValue": 14.615532210000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "liechtenstein",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 7.1864285,
+      "proposedValue": 7.186428783,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "spain",
+      "factKey": "population_total",
+      "storedValue": 48592908,
+      "proposedValue": 48592909,
+      "storedAsOf": "2024-01-01",
+      "proposedAsOf": "2024-01-01"
+    },
+    {
+      "slug": "spain",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1397.5093,
+      "proposedValue": 1397.5092720540001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "luxembourg",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 82.27481,
+      "proposedValue": 82.274812251,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "portugal",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 251.94537,
+      "proposedValue": 251.945377529,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "somalia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 8.126105,
+      "proposedValue": 8.1261056,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "united-kingdom",
+      "factKey": "population_total",
+      "storedValue": 67326570,
+      "proposedValue": 67326569,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "united-kingdom",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 3070.6677,
+      "proposedValue": 3070.667732359,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "montenegro",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 6.0959787,
+      "proposedValue": 6.095978868,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "namibia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 12.607437,
+      "proposedValue": 12.607436976,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "mali",
+      "factKey": "population_total",
+      "storedValue": 20250832,
+      "proposedValue": 20250833,
+      "storedAsOf": "2020-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "mali",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 18.827177,
+      "proposedValue": 18.827176532000003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "burundi",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2.6421616,
+      "proposedValue": 2.642161668,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "comoros",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1.2425194,
+      "proposedValue": 1.242519407,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "malawi",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 13.164668,
+      "proposedValue": 13.164667627,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "costa-rica",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 68.38084,
+      "proposedValue": 68.38083831600001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "jordan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 47.4515,
+      "proposedValue": 47.451499859,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "turkey",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 905.98785,
+      "proposedValue": 905.987824096,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "nicaragua",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 15.671584,
+      "proposedValue": 15.671583878000002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "sudan",
+      "factKey": "population_total",
+      "storedValue": 40533328,
+      "proposedValue": 40533330,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "sudan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 51.662243,
+      "proposedValue": 51.662241775000005,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "serbia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 63.501747,
+      "proposedValue": 63.501748652,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "new-zealand",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 247.23405,
+      "proposedValue": 247.23405373900002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "the-dominican",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 113.64186,
+      "proposedValue": 113.641857434,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "bangladesh",
+      "factKey": "population_total",
+      "storedValue": 169356260,
+      "proposedValue": 169356251,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "bangladesh",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 437.41534,
+      "proposedValue": 437.41533104,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "bhutan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2.5395513,
+      "proposedValue": 2.5395513270000003,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "benin",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 19.676048,
+      "proposedValue": 19.676049075,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "malaysia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 406.30594,
+      "proposedValue": 406.305924656,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "brunei",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 16.681532,
+      "proposedValue": 16.681531646,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "trinidad-and-tobago",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 27.899082,
+      "proposedValue": 27.899082337000003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "chile",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 301.02524,
+      "proposedValue": 301.025249438,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "australia",
+      "factKey": "population_total",
+      "storedValue": 27614412,
+      "proposedValue": 27614411,
+      "storedAsOf": "2025-06-30",
+      "proposedAsOf": "2025-06-30"
+    },
+    {
+      "slug": "australia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1757.0225,
+      "proposedValue": 1757.0224516530002,
+      "storedAsOf": "2024-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "uruguay",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 71.17715,
+      "proposedValue": 71.177146197,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "sri-lanka",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 74.40358,
+      "proposedValue": 74.40357836300001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "india",
+      "factKey": "population_total",
+      "storedValue": 1326093200,
+      "proposedValue": 1326093247,
+      "storedAsOf": "2020-07-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "india",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 3385.0898,
+      "proposedValue": 3385.089881935,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "djibouti",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 3.515109,
+      "proposedValue": 3.5151090750000002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "germany",
+      "factKey": "population_total",
+      "storedValue": 83577136,
+      "proposedValue": 83577140,
+      "storedAsOf": "2024-12-31",
+      "proposedAsOf": "2024-12-31"
+    },
+    {
+      "slug": "kazakhstan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 220.623,
+      "proposedValue": 220.62300196700002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "nepal",
+      "factKey": "population_total",
+      "storedValue": 30327876,
+      "proposedValue": 30327877,
+      "storedAsOf": "2020-07-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "nepal",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 40.828247,
+      "proposedValue": 40.828247302,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "united-arab-emirates",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 514.13043,
+      "proposedValue": 514.1304326530001,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "central-african-republic",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2.3826187,
+      "proposedValue": 2.382618615,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "austria",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 511.6852,
+      "proposedValue": 511.68520384500005,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "philippines",
+      "factKey": "population_total",
+      "storedValue": 112729490,
+      "proposedValue": 112729484,
+      "storedAsOf": "2024-07-01",
+      "proposedAsOf": "2024-07-01"
+    },
+    {
+      "slug": "philippines",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 404.28433,
+      "proposedValue": 404.284327312,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "solomon-islands",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1.5957108,
+      "proposedValue": 1.595710784,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "croatia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 70.96461,
+      "proposedValue": 70.964606465,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "belarus",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 72.79346,
+      "proposedValue": 72.79345758800001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "russia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2240.4224,
+      "proposedValue": 2240.4224383630003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "gabon",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.14146897,
+      "proposedValue": 0.141468977,
+      "storedAsOf": "1960-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "barbados",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 5.6379147,
+      "proposedValue": 5.637914515,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "hungary",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 181.84802,
+      "proposedValue": 181.84802223,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "hungary",
+      "factKey": "life_expectancy_years",
+      "storedValue": 76,
+      "proposedValue": 77,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "mongolia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 16.810883,
+      "proposedValue": 16.810883361000002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "nigeria",
+      "factKey": "population_total",
+      "storedValue": 190886300,
+      "proposedValue": 190886311,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "nigeria",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 477.3861,
+      "proposedValue": 477.38612063600004,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "cabo-verde",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2.3148167,
+      "proposedValue": 2.3148167920000002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "uganda",
+      "factKey": "population_total",
+      "storedValue": 42862960,
+      "proposedValue": 42862958,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "uganda",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 45.5592,
+      "proposedValue": 45.559202049,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "saudi-arabia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1108.1489,
+      "proposedValue": 1108.1489782180001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "botswana",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 20.352322,
+      "proposedValue": 20.352322157,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "papua-new-guinea",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 30.633444,
+      "proposedValue": 30.633444295,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "kuwait",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 184.55827,
+      "proposedValue": 184.55827428900002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "madagascar",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 14.9549675,
+      "proposedValue": 14.954967604,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "antigua-and-barbuda",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1.7576036,
+      "proposedValue": 1.757603704,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "south-korea",
+      "factKey": "population_total",
+      "storedValue": 51466200,
+      "proposedValue": 51466201,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "south-korea",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1665.2455,
+      "proposedValue": 1665.2455385950002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "iran",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 388.54446,
+      "proposedValue": 388.54446814000005,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "vanuatu",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.98358285,
+      "proposedValue": 0.983582865,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "burkina-faso",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 20.324617,
+      "proposedValue": 20.324617844000002,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "drc",
+      "factKey": "population_total",
+      "storedValue": 86790570,
+      "proposedValue": 86790567,
+      "storedAsOf": "2019-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "drc",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 58.065952,
+      "proposedValue": 58.065953573,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "indonesia",
+      "factKey": "population_total",
+      "storedValue": 270625570,
+      "proposedValue": 270625568,
+      "storedAsOf": "2019-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "indonesia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1319.1002,
+      "proposedValue": 1319.100220389,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "jamaica",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 17.097761,
+      "proposedValue": 17.097760745000002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "honduras",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 31.717701,
+      "proposedValue": 31.717700115000003,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "tajikistan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 10.492124,
+      "proposedValue": 10.492123388000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "fiji",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 4.9432483,
+      "proposedValue": 4.9432482,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "egypt",
+      "factKey": "population_total",
+      "storedValue": 82056376,
+      "proposedValue": 82056378,
+      "storedAsOf": "2013-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "egypt",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 476.7477,
+      "proposedValue": 476.747720365,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "cameroon",
+      "factKey": "population_total",
+      "storedValue": 24053728,
+      "proposedValue": 24053727,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "cameroon",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 44.34165,
+      "proposedValue": 44.341646509,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "tonga",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.46922812,
+      "proposedValue": 0.469228124,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "samoa",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 0.83242154,
+      "proposedValue": 0.8324215650000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "qatar",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 237.29558,
+      "proposedValue": 237.29557517100002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "finland",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 280.82596,
+      "proposedValue": 280.825957768,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "mexico",
+      "factKey": "population_total",
+      "storedValue": 122332400,
+      "proposedValue": 122332399,
+      "storedAsOf": "2013-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "mexico",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1414.1871,
+      "proposedValue": 1414.1871939920002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "san-marino",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1.8553828,
+      "proposedValue": 1.8553828330000002,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "monaco",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 8.596156,
+      "proposedValue": 8.596156574,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "north-macedonia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 13.563132,
+      "proposedValue": 13.563132057,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "bosnia-and-herzegovina",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 27.514782,
+      "proposedValue": 27.514782476,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "bulgaria",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 89.0404,
+      "proposedValue": 89.04039840600001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "brazil",
+      "factKey": "population_total",
+      "storedValue": 203062510,
+      "proposedValue": 203062512,
+      "storedAsOf": "2022-08-01",
+      "proposedAsOf": "2022-08-01"
+    },
+    {
+      "slug": "brazil",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 1920.0956,
+      "proposedValue": 1920.0955609950001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "greece",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 219.06587,
+      "proposedValue": 219.065872466,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "latvia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 41.15391,
+      "proposedValue": 41.153912663,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "slovakia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 115.4688,
+      "proposedValue": 115.468803972,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "belgium",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 644.7828,
+      "proposedValue": 644.782756682,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "japan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 4231.141,
+      "proposedValue": 4231.141201863,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "burma",
+      "factKey": "population_total",
+      "storedValue": 53370608,
+      "proposedValue": 53370609,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "burma",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 59.36436,
+      "proposedValue": 59.364362541000006,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "oman",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 114.66736,
+      "proposedValue": 114.667360208,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "bahrain",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 44.39082,
+      "proposedValue": 44.390820479000006,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "argentina",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 646.07526,
+      "proposedValue": 646.075277525,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "sweden",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 585.93915,
+      "proposedValue": 585.939170124,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "haiti",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 20.253551,
+      "proposedValue": 20.253551885,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "iraq",
+      "factKey": "population_total",
+      "storedValue": 38274616,
+      "proposedValue": 38274618,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "iraq",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 264.18216,
+      "proposedValue": 264.182173793,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "lebanon",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 23.13194,
+      "proposedValue": 23.131941557,
+      "storedAsOf": "2021-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "pakistan",
+      "factKey": "population_total",
+      "storedValue": 216565310,
+      "proposedValue": 216565318,
+      "storedAsOf": "2019-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "pakistan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 376.53275,
+      "proposedValue": 376.532751807,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "eswatini",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 4.8541675,
+      "proposedValue": 4.854167638000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "north-korea",
+      "factKey": "population_total",
+      "storedValue": 25490964,
+      "proposedValue": 25490965,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "paraguay",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 41.722294,
+      "proposedValue": 41.722295362000004,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "france",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 2782.9053,
+      "proposedValue": 2782.9053256250004,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "algeria",
+      "factKey": "population_total",
+      "storedValue": 41318144,
+      "proposedValue": 41318142,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "algeria",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 191.91289,
+      "proposedValue": 191.91288942100002,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "peru",
+      "factKey": "population_total",
+      "storedValue": 29381884,
+      "proposedValue": 34157732,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "peru",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 242.63155,
+      "proposedValue": 242.631549613,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "albania",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 23.54718,
+      "proposedValue": 23.54717983,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "armenia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 24.085749,
+      "proposedValue": 24.085749592000003,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "italy",
+      "factKey": "population_total",
+      "storedValue": 58850716,
+      "proposedValue": 58850717,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "slovenia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 62.117767,
+      "proposedValue": 62.117768015,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "colombia",
+      "factKey": "population_total",
+      "storedValue": 49065616,
+      "proposedValue": 49065615,
+      "storedAsOf": "2017-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "colombia",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 343.93945,
+      "proposedValue": 343.939445259,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "azerbaijan",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 72.35618,
+      "proposedValue": 72.35617647000001,
+      "storedAsOf": "2023-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "equatorial-guinea",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 11.813909,
+      "proposedValue": 11.813908448000001,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "rwanda",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 14.251642,
+      "proposedValue": 14.251642230000002,
+      "storedAsOf": "2024-01-01",
+      "proposedAsOf": null
+    },
+    {
+      "slug": "cyprus",
+      "factKey": "gdp_nominal_usd_billions",
+      "storedValue": 28.439053,
+      "proposedValue": 28.439052741,
+      "storedAsOf": "2022-01-01",
+      "proposedAsOf": null
+    }
+  ],
+  "newPairs": [],
+  "droppedPairs": [
+    {
+      "slug": "montenegro",
+      "factKey": "unemployment_rate_pct"
+    },
+    {
+      "slug": "botswana",
+      "factKey": "gdp_per_capita_usd"
+    },
+    {
+      "slug": "bosnia-and-herzegovina",
+      "factKey": "population_total"
+    },
+    {
+      "slug": "panama",
+      "factKey": "birth_rate"
+    },
+    {
+      "slug": "panama",
+      "factKey": "fertility_rate"
+    },
+    {
+      "slug": "suriname",
+      "factKey": "unemployment_rate_pct"
+    }
+  ],
+  "semanticSha256": "0bf001a8df1a1135855ff9727f44efff714c3ef952e2492b6e039020af7b6e58"
+}

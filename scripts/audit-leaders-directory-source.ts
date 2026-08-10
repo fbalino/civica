@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 
 import { sparqlQuery } from "@/lib/data/wikidata";
@@ -121,6 +121,13 @@ async function main() {
       role,
     })),
   );
+  // An upstream-ambiguous role (multiple un-ended normal-rank claims) is a
+  // disclosed exclusion, not a publication block — provided nothing is
+  // published for it. A retained current row under an ambiguous role would be
+  // an unverifiable claim and keeps the release blocked.
+  const ambiguousRolesWithRetainedRows = ambiguousRoles.filter((row) =>
+    current.has(key(row.stateQid, row.role)),
+  );
   const sourceSelectedRecordCount = [...expected.values()].reduce(
     (sum, row) => sum + row.personQids.length,
     0,
@@ -135,23 +142,29 @@ async function main() {
       "https://www.wikidata.org/wiki/Help:Ranking",
     queryContract:
       "Wikidata truthy-rank P35/P6 statements with no P582 end qualifier; multiple preferred statements retained, multiple un-ended normal statements fail closed",
-    retainedReleaseId: "leaders-2026-07-23",
+    retainedReleaseId: (
+      JSON.parse(
+        readFileSync("data/leaders-directory-release.v1.json", "utf8"),
+      ) as { releaseId: string }
+    ).releaseId,
     sourceBindings: bindings.length,
     sourceStates: states.length,
     sourceSelectedRecordCount,
     retainedRecordCount: currentRows.length,
     discrepancyCount: discrepancies.length,
     ambiguousRoleCount: ambiguousRoles.length,
+    ambiguousRolesWithRetainedRowsCount: ambiguousRolesWithRetainedRows.length,
     currentRowsWithoutSourceIdentityCount:
       currentRowsWithoutSourceIdentity.length,
     releaseReady:
       discrepancies.length === 0 &&
-      ambiguousRoles.length === 0 &&
+      ambiguousRolesWithRetainedRows.length === 0 &&
       currentRowsWithoutSourceIdentity.length === 0,
     requiredAction:
       "Owner-authorized production run of sync:wikidata with a named Atlas release, followed by recapture, live directory validation, browser QA, and publication-status activation.",
     discrepancies,
     ambiguousRoles,
+    ambiguousRolesWithRetainedRows,
     currentRowsWithoutSourceIdentity,
   };
   const artifact = {

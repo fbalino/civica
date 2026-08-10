@@ -1,9 +1,9 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "58ee73db8fb83d94cfc8ca7459c4a5abbc04e9660b7b12ebc2408b1768d84296",
+  "semanticHash": "b7a0e9bed794eea16c4ba4603eddde1ccc8c9ddf2f44d35daf02c7c6d998a66e",
   "summary": {
     "route": 184,
-    "pipeline": 50,
+    "pipeline": 51,
     "calculation": 8,
     "data_domain": 14,
     "failure_state": 16
@@ -1867,6 +1867,53 @@
       "owner": "Data ingestion and release operations",
       "fixture": "Registered atlas.elections manual adapter and canonical command",
       "command": "npm run sync:elections-ipu",
+      "coverage": {
+        "unit": {
+          "status": "covered",
+          "evidence": [
+            "src/lib/platform/pipeline-observability.test.ts"
+          ],
+          "gapTask": null
+        },
+        "integration": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:pipeline-observability",
+            "npm run validate:production-adapters",
+            "npm run validate:ingestion-contract-fixtures"
+          ],
+          "gapTask": null
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        },
+        "manual": {
+          "status": "covered",
+          "evidence": [
+            "npm run test:qa-011"
+          ],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "pipeline:atlas.entity-name-forms",
+      "kind": "pipeline",
+      "title": "atlas.entity-name-forms manual production pipeline",
+      "source": "scripts/sync-entity-name-forms.ts, src/lib/i18n/name-form-sync.ts, src/lib/i18n/name-form-store.ts",
+      "critical": true,
+      "owner": "Data ingestion and release operations",
+      "fixture": "Registered atlas.entity-name-forms manual adapter and canonical command",
+      "command": "npm run sync:entity-name-forms",
       "coverage": {
         "unit": {
           "status": "covered",

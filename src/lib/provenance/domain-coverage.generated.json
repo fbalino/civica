@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas-domain-coverage/v1",
-  "generatedAt": "2026-07-29T13:20:17.575Z",
+  "generatedAt": "2026-08-10T02:57:44.972Z",
   "scope": {
     "jurisdictionTaxonomy": "jurisdiction-status/v1",
     "eligibleClass": "sovereign_state",
@@ -92,9 +92,9 @@
         {
           "field": "as_of",
           "label": "Observation/reference date",
-          "complete": 16592,
+          "complete": 15349,
           "total": 23987,
-          "percent": 69.2
+          "percent": 64
         }
       ],
       "sources": [
@@ -204,7 +204,7 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         },
         {
           "id": "world_bank",
@@ -219,7 +219,7 @@
           "lastSuccessfulRun": "2026-05-05T01:13:11.931Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-29T13:05:02.240Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "Record presence is not equivalent to canonical selection or independent corroboration; the separate fact-provenance report measures resolver support, source depth, disputes, and staleness by fact key."
       ],
@@ -234,7 +234,7 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Canonical facts: Observation/reference date is 69.2% complete; alert threshold is 80%."
+          "message": "Canonical facts: Observation/reference date is 64% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -288,7 +288,7 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         },
         {
           "id": "ipu_parline",
@@ -297,7 +297,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-29T01:01:52.668Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "Coverage counts any stored body and does not establish that every constitutional branch, subnational body, or reporting relationship is complete."
       ],
@@ -337,9 +337,9 @@
         {
           "field": "wikidata_qid",
           "label": "Wikidata identifier",
-          "complete": 9,
+          "complete": 346,
           "total": 5184,
-          "percent": 0.2
+          "percent": 6.7
         }
       ],
       "sources": [
@@ -353,7 +353,7 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         },
         {
           "id": "ipu_parline",
@@ -362,7 +362,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-29T01:01:52.668Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "Cabinet depth varies by publisher and office identifiers remain incomplete; coverage counts any jurisdiction with at least one office."
       ],
@@ -377,7 +377,7 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Offices: Wikidata identifier is 0.2% complete; alert threshold is 80%."
+          "message": "Offices: Wikidata identifier is 6.7% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -388,22 +388,22 @@
       "id": "people",
       "label": "People",
       "recordLabel": "person records",
-      "recordCount": 4878,
+      "recordCount": 4894,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "wikidata_qid",
           "label": "Wikidata identifier",
-          "complete": 2389,
-          "total": 4878,
-          "percent": 49
+          "complete": 2405,
+          "total": 4894,
+          "percent": 49.1
         },
         {
           "field": "date_of_birth",
           "label": "Date of birth",
-          "complete": 1812,
-          "total": 4878,
-          "percent": 37.1
+          "complete": 1833,
+          "total": 4894,
+          "percent": 37.5
         }
       ],
       "sources": [
@@ -417,7 +417,7 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         },
         {
           "id": "ipu_parline",
@@ -426,7 +426,7 @@
           "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-29T01:01:52.668Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "The denominator is people linked to an office term, not every politically relevant person; birth dates and stable identifiers are publisher-dependent."
       ],
@@ -441,12 +441,12 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "People: Wikidata identifier is 49% complete; alert threshold is 80%."
+          "message": "People: Wikidata identifier is 49.1% complete; alert threshold is 80%."
         },
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "People: Date of birth is 37.1% complete; alert threshold is 80%."
+          "message": "People: Date of birth is 37.5% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -500,10 +500,10 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "A stored legislative body does not guarantee current party composition, electoral-system detail, upper-chamber coverage, or an independently verified total-seat count."
       ],
@@ -558,7 +558,7 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         },
         {
           "id": "vparty",
@@ -567,7 +567,7 @@
           "lastSuccessfulRun": "2026-07-06T20:12:27.185Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "Party rows are legislature snapshots rather than a global party registry; V-Party positions cover only confidently matched parties in its frozen vintage."
       ],
@@ -648,7 +648,7 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         },
         {
           "id": "international_idea",
@@ -657,7 +657,7 @@
           "lastSuccessfulRun": "2026-07-05T15:22:35.000Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "The checked 915-row baseline contains 88 quarantined rows and 215 separately labelled term-length projection groups; neither is counted as a qualified event.",
         "21 rows lack retained publisher jurisdiction identity and remain quarantined; no checked publisher jurisdiction mismatch is public.",
@@ -985,7 +985,7 @@
       "id": "images",
       "label": "Images",
       "recordLabel": "country photos and person portraits",
-      "recordCount": 3100,
+      "recordCount": 3140,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
@@ -998,8 +998,8 @@
         {
           "field": "portrait_attribution",
           "label": "Portrait license and credit",
-          "complete": 1556,
-          "total": 1556,
+          "complete": 1596,
+          "total": 1596,
           "percent": 100
         }
       ],
@@ -1014,10 +1014,10 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-08T02:02:32.520Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "Country coverage counts jurisdictions with at least one gallery photo; person portraits are reported as a separate completeness metric and do not expand the country-photo denominator."
       ],
@@ -1037,42 +1037,42 @@
       "id": "citations",
       "label": "Statement citations",
       "recordLabel": "statement-level provenance records",
-      "recordCount": 6946,
+      "recordCount": 7038,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "source_id",
           "label": "Source identifier",
-          "complete": 6946,
-          "total": 6946,
+          "complete": 7038,
+          "total": 7038,
           "percent": 100
         },
         {
           "field": "source_url",
           "label": "Source URL",
-          "complete": 6755,
-          "total": 6946,
+          "complete": 6847,
+          "total": 7038,
           "percent": 97.3
         },
         {
           "field": "source_license",
           "label": "Captured source license",
-          "complete": 6946,
-          "total": 6946,
+          "complete": 7038,
+          "total": 7038,
           "percent": 100
         },
         {
           "field": "retrieved_at",
           "label": "Retrieval time",
-          "complete": 6946,
-          "total": 6946,
+          "complete": 7038,
+          "total": 7038,
           "percent": 100
         },
         {
           "field": "source_hash",
           "label": "Source hash",
           "complete": 0,
-          "total": 6946,
+          "total": 7038,
           "percent": 0
         }
       ],
@@ -1111,10 +1111,10 @@
           "id": "wikidata",
           "label": "Wikidata",
           "family": "wikidata",
-          "lastSuccessfulRun": "2026-07-08T02:02:32.520Z"
+          "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-29T01:01:52.668Z",
+      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
       "knownGaps": [
         "Statement rows currently cover the closed polymorphic subject set only; canonical country facts use their own row-level provenance and are measured separately rather than being double-counted here."
       ],

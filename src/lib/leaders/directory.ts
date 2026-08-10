@@ -12,6 +12,16 @@ export type LeadershipCapacity =
   | "caretaker"
   | "source_not_specified";
 
+/** A stored, source-backed name form surfaced on the directory (EXP-029). */
+export interface LeaderNameForm {
+  value: string;
+  languageTag: string;
+  /** English language display name, computed once at the server boundary so
+   *  the rendered label never depends on the viewer's ICU data. */
+  languageLabel: string;
+  nameRole: string;
+}
+
 export interface LeaderDirectoryInput {
   termId: string;
   personId: string;
@@ -32,6 +42,12 @@ export interface LeaderDirectoryInput {
   sourceLicense: string;
   sourceRetrievedAt: string;
   sourceLastSyncAt: string | null;
+  /** Stored current person forms (e.g. Wikidata P1559 name in native
+   * language). Absent forms stay absent; nothing is inferred from the
+   * English display name. */
+  personNameForms?: LeaderNameForm[];
+  /** Stored current office forms for offices with a publisher identity. */
+  officeNameForms?: LeaderNameForm[];
 }
 
 export interface LeaderDirectoryRow extends LeaderDirectoryInput {

@@ -1,7 +1,7 @@
 {
   "contract": "exp-029-browser-verification/v1",
-  "checkedAt": "2026-07-23T09:32:54.899Z",
-  "baseUrl": "http://localhost:3000",
+  "checkedAt": "2026-08-10T01:37:58.096Z",
+  "baseUrl": "http://localhost:54683",
   "results": [
     {
       "viewport": "desktop",
@@ -14,7 +14,7 @@
         "ja": "ltr",
         "es-UY": "ltr"
       },
-      "screenshot": "output/playwright/EXP-029/design-system-desktop-light.png"
+      "screenshot": "/Users/fernandobalino/Projects/civica/.claude/worktrees/serene-wilbur-375a03/output/playwright/EXP-029/design-system-desktop-light.png"
     },
     {
       "viewport": "desktop",
@@ -27,7 +27,7 @@
         "ja": "ltr",
         "es-UY": "ltr"
       },
-      "screenshot": "output/playwright/EXP-029/design-system-desktop-dark.png"
+      "screenshot": "/Users/fernandobalino/Projects/civica/.claude/worktrees/serene-wilbur-375a03/output/playwright/EXP-029/design-system-desktop-dark.png"
     },
     {
       "viewport": "mobile",
@@ -40,7 +40,7 @@
         "ja": "ltr",
         "es-UY": "ltr"
       },
-      "screenshot": "output/playwright/EXP-029/design-system-mobile-light.png"
+      "screenshot": "/Users/fernandobalino/Projects/civica/.claude/worktrees/serene-wilbur-375a03/output/playwright/EXP-029/design-system-mobile-light.png"
     },
     {
       "viewport": "mobile",
@@ -53,12 +53,7 @@
         "ja": "ltr",
         "es-UY": "ltr"
       },
-      "screenshot": "output/playwright/EXP-029/design-system-mobile-dark.png"
+      "screenshot": "/Users/fernandobalino/Projects/civica/.claude/worktrees/serene-wilbur-375a03/output/playwright/EXP-029/design-system-mobile-dark.png"
     }
-  ],
-  "languageDisclosure": {
-    "route": "/about#language",
-    "visible": true,
-    "translatedInterfaceClaim": false
-  }
+  ]
 }

@@ -8,7 +8,7 @@ Contracts:
 - `civica-entity-name-form/v1`
 - `exp-029-browser-verification/v1`
 
-Status: agent preparation complete; production activation pending
+Status: complete — production activation ran 2026-08-09/10 under the authorized named-release refresh; see `production-activation-2026-08-09.md`
 
 ## What is complete
 
@@ -59,12 +59,14 @@ statements and no destructive statement, and has SHA-256
 The zero-write live plan confirms that `entity_name_forms` is not present and
 that no write occurred.
 
-EXP-029 remains open until an owner-authorized production migration and
-publisher refresh populate reviewed source-form rows, the relevant adapters
-use the checked writer, and stored jurisdiction/person/office/party forms are
-verified on representative public reader surfaces. Existing English display
-names remain authoritative until that activation; no source language,
-translation, or transliteration is fabricated.
+Production activation is complete: migration 0048 is live, the registered
+`atlas.entity-name-forms` adapter populated 1,184 reviewed source-form rows
+through the checked writer, and stored jurisdiction/person/office forms are
+verified on the country masthead and world-leaders directory
+(`production-activation-2026-08-09.md`). Political parties retain no
+publisher identity, so party forms remain an explicit zero scope. English
+display names remain authoritative; no source language, translation, or
+transliteration is fabricated.
 
 ## Verification
 

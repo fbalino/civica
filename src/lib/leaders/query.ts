@@ -10,11 +10,14 @@ import {
   statements,
   terms,
 } from "@/lib/db/schema";
+import { getCurrentEntityNameFormsForEntities } from "@/lib/i18n/name-form-store";
+import { publicLanguageName } from "@/lib/i18n/presentation";
 import {
   annotateLeaderDirectory,
   PRINCIPAL_LEADER_OFFICE_TYPES,
   type LeaderDirectoryInput,
   type LeaderDirectoryRow,
+  type LeaderNameForm,
   type PrincipalLeaderOfficeType,
 } from "./directory";
 
@@ -76,6 +79,36 @@ export async function getWorldLeadersDirectory(): Promise<
       ),
     );
 
+  // EXP-029: attach stored, source-backed name forms. Missing forms remain
+  // missing; the English display name is never used to fabricate one.
+  const [personForms, officeForms] = await Promise.all([
+    getCurrentEntityNameFormsForEntities(
+      db,
+      "person",
+      rows.map((row) => row.personId),
+    ),
+    getCurrentEntityNameFormsForEntities(
+      db,
+      "office",
+      rows.map((row) => row.officeId),
+    ),
+  ]);
+  const compactForms = (
+    stored:
+      | Awaited<ReturnType<typeof getCurrentEntityNameFormsForEntities>>
+      | undefined,
+    id: string,
+  ): LeaderNameForm[] | undefined => {
+    const forms = stored?.get(id);
+    if (!forms || forms.length === 0) return undefined;
+    return forms.map((form) => ({
+      value: form.value,
+      languageTag: form.languageTag,
+      languageLabel: publicLanguageName(form.languageTag),
+      nameRole: form.nameRole,
+    }));
+  };
+
   const verified = rows.flatMap((row): LeaderDirectoryInput[] => {
     if (
       !PRINCIPAL_LEADER_OFFICE_TYPES.includes(
@@ -97,6 +130,8 @@ export async function getWorldLeadersDirectory(): Promise<
         startDate: iso(row.startDate),
         sourceRetrievedAt: iso(row.sourceRetrievedAt)!,
         sourceLastSyncAt: iso(row.sourceLastSyncAt),
+        personNameForms: compactForms(personForms, row.personId),
+        officeNameForms: compactForms(officeForms, row.officeId),
       },
     ];
   });

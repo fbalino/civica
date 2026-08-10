@@ -258,6 +258,11 @@ async function main() {
   const unresolved = assessments.filter(
     (row) => row.requiresPublisherRefresh,
   );
+  // Post-repair rows whose retained snapshot precision already matches the
+  // stored representation: healthy, neither repairable nor refresh-bound.
+  const alreadyCorrect = assessments.filter(
+    (row) => !row.needsRepair && !row.requiresPublisherRefresh,
+  );
   if (apply) {
     for (const repair of repairs) await applyRepair(repair);
   }
@@ -270,6 +275,7 @@ async function main() {
     examinedRows: liveRows.length,
     repairCount: repairs.length,
     requiresPublisherRefreshCount: unresolved.length,
+    alreadyCorrectCount: alreadyCorrect.length,
     limitation:
       "Legacy SPARQL snapshots did not retain Wikibase time precision; valid-looking January 1 dates cannot be classified without a fresh publisher query. The corrected sync captures precision before any authorized write.",
     rows: repairs.map(({ row, precision, expected, stored }) => ({

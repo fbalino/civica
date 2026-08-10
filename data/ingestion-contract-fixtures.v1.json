@@ -1,9 +1,9 @@
 {
   "schemaVersion": "civica-ingestion-contract-fixtures/v1",
   "generatedFrom": "production-adapter-registry/source-input-manifest/rights-manifest",
-  "fixtureCount": 62,
+  "fixtureCount": 63,
   "sourceCount": 44,
-  "externalPipelineCount": 39,
+  "externalPipelineCount": 40,
   "fixtures": [
     {
       "fixtureId": "atlas.cia-factbook:cia_factbook",
@@ -657,6 +657,98 @@
       "publicExport": "allowed",
       "witnessTests": [
         "src/lib/elections/__tests__/writer-repeatability.test.ts"
+      ],
+      "outcomes": [
+        {
+          "scenario": "normal",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "empty",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "malformed",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "upstream_schema_change",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "partial",
+          "disposition": "rejected",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "retry",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "dry_run",
+          "disposition": "planned",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "duplicate",
+          "disposition": "duplicate_noop",
+          "rowDelta": 0,
+          "freshnessAdvanced": false,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        },
+        {
+          "scenario": "rights_blocked_publication",
+          "disposition": "applied",
+          "rowDelta": 1,
+          "freshnessAdvanced": true,
+          "preservesSourceVersion": true,
+          "publicDistribution": "allowed"
+        }
+      ]
+    },
+    {
+      "fixtureId": "atlas.entity-name-forms:wikidata",
+      "pipelineId": "atlas.entity-name-forms",
+      "sourceId": "wikidata",
+      "source": {
+        "canonicalUrl": "https://query.wikidata.org/sparql",
+        "format": "rdf-json",
+        "upstreamVersion": "Wikidata revision state at retrieval",
+        "upstreamVintage": "statement/reference dates plus retrieval date",
+        "expectedCoverage": "entities matched by the configured SPARQL query",
+        "redistributionPosture": "public-domain"
+      },
+      "publicExport": "allowed",
+      "witnessTests": [
+        "src/lib/i18n/name-form-sync.test.ts",
+        "src/lib/i18n/name-form-store.test.ts"
       ],
       "outcomes": [
         {

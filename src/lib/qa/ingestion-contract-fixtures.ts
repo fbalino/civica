@@ -68,6 +68,10 @@ export const EXTERNAL_PIPELINE_FIXTURE_WITNESSES: Readonly<
   "atlas.constitutions": [
     "src/lib/constitute/__tests__/writer-repeatability.test.ts",
   ],
+  "atlas.entity-name-forms": [
+    "src/lib/i18n/name-form-sync.test.ts",
+    "src/lib/i18n/name-form-store.test.ts",
+  ],
   "atlas.elections": [
     "src/lib/elections/__tests__/writer-repeatability.test.ts",
   ],

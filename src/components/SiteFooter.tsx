@@ -55,6 +55,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Evidence Dashboard", href: "/governance-evidence" },
       { label: "Governance Change", href: "/governance-change" },
       { label: "Countries", href: "/country" },
+      { label: "World Leaders", href: "/leaders" },
       { label: "Parties", href: "/parties" },
       { label: "World Atlas", href: "/atlas" },
       { label: "Compare", href: "/compare" },

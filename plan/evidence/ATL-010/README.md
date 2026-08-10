@@ -1,8 +1,14 @@
-# ATL-010 — world leaders directory preparation
+# ATL-010 — world leaders directory
 
-Prepared 2026-07-23. **ATL-010 remains open.** The complete directory
-implementation exists, but publication is blocked until an owner-authorized
-production source refresh resolves the checked roster discrepancies.
+Prepared 2026-07-23; completed 2026-08-09/10 under the owner-authorized
+named-release refresh (`atlas-wikidata-refresh-20260809-v1`, authority
+`plan/evidence/QA-018/OWNER-SIGNOFF-2026-08-09.md`). The refresh run record is
+`production-refresh-2026-08-09.md`; the recaptured zero-write audit reports
+0 roster discrepancies and `releaseReady: true`; the checked release is
+`leaders-2026-08-10` (389 records, 327 people, 197 jurisdictions, status
+`ready`); `/leaders` is live in the footer and sitemap. Samoa's head of
+government remains a disclosed upstream-ambiguous exclusion published as
+explicit noncoverage. The sections below retain the preparation history.
 
 ## What shipped
 

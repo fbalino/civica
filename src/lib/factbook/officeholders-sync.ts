@@ -120,6 +120,11 @@ SELECT ?state ?stateLabel ?iso2 ?iso3 ?shortName
        ?headOfGov ?headOfGovLabel ?hogStart ?hogRank
 WHERE {
   ?state wdt:P31 wd:Q3624078 .
+  # Historical states (e.g. the Russian Empire, Q34266) also carry the
+  # sovereign-state class but have a dissolution date. Without this filter a
+  # dissolved state whose short name matches a current jurisdiction can
+  # clobber its identity and roster.
+  FILTER NOT EXISTS { ?state wdt:P576 ?dissolved . }
   OPTIONAL { ?state wdt:P297 ?iso2 . }
   OPTIONAL { ?state wdt:P298 ?iso3 . }
   OPTIONAL { ?state wdt:P1813 ?shortName . FILTER(LANG(?shortName) = "en") }
@@ -1394,6 +1399,25 @@ export async function syncFactbookOfficeholders(
       log(
         `! ${stateName}: multiple un-ended normal-rank ${role} statements; failing closed instead of selecting by endpoint order`,
       );
+    }
+
+    // A source state may never silently rewrite a different retained
+    // jurisdiction identity: a name-fallback match against the wrong entity
+    // would otherwise clobber the QID and retire the legitimate roster.
+    // Identity corrections are deliberate, evidenced repairs, not sync side
+    // effects.
+    const retainedIdentity = await db
+      .select({ wikidataQid: jurisdictions.wikidataQid })
+      .from(jurisdictions)
+      .where(eq(jurisdictions.id, jurisdictionId))
+      .limit(1);
+    const retainedQid = retainedIdentity[0]?.wikidataQid ?? null;
+    if (retainedQid && retainedQid !== stateQid) {
+      skipped++;
+      log(
+        `! Skipped ${stateName} (${stateQid}) — retained jurisdiction QID ${retainedQid} differs; failing closed instead of rewriting identity`,
+      );
+      continue;
     }
 
     if (options.dryRun) {

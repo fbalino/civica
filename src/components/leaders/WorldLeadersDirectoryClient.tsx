@@ -11,11 +11,50 @@ import {
 } from "@/components/editorial/SortableDataTable";
 import { SearchField } from "@/components/editorial/SearchField";
 import { SourceDot } from "@/components/SourceDot";
-import type { LeaderDirectoryRow } from "@/lib/leaders/directory";
+import { SourceText } from "@/components/editorial/SourceText";
+import type {
+  LeaderDirectoryRow,
+  LeaderNameForm,
+} from "@/lib/leaders/directory";
 import {
   comparePublicLabels,
   formatPublicDate,
 } from "@/lib/i18n/presentation";
+
+function nameFormLabel(form: LeaderNameForm): string {
+  const role =
+    form.nameRole === "native"
+      ? "Name in native language"
+      : form.nameRole === "official"
+        ? "Official source form"
+        : "Source form";
+  return `${role} · ${form.languageLabel} · not translated`;
+}
+
+function NameFormLines({
+  forms,
+  omitValue,
+}: {
+  forms?: LeaderNameForm[];
+  /** Skip forms byte-identical to the already-displayed English name. */
+  omitValue?: string;
+}) {
+  const distinct = (forms ?? []).filter((form) => form.value !== omitValue);
+  if (distinct.length === 0) return null;
+  return (
+    <div className="editorial-meta">
+      {distinct.map((form) => (
+        <SourceText
+          key={`${form.nameRole}-${form.languageTag}-${form.value}`}
+          languageTag={form.languageTag}
+          label={nameFormLabel(form)}
+        >
+          {form.value}
+        </SourceText>
+      ))}
+    </div>
+  );
+}
 
 function roleLabel(role: LeaderDirectoryRow["officeType"]) {
   return role === "head_of_state" ? "Head of state" : "Head of government";
@@ -56,6 +95,7 @@ export function WorldLeadersDirectoryClient({
         row.personName,
         row.jurisdictionName,
         row.officeName,
+        ...(row.personNameForms ?? []).map((form) => form.value),
       ].some((value) => value.toLocaleLowerCase("en").includes(needle));
     });
   }, [continent, query, role, rows]);
@@ -70,6 +110,7 @@ export function WorldLeadersDirectoryClient({
           <Link href={`/country/${row.jurisdictionSlug}/civica-data#leaders`}>
             {row.personName}
           </Link>
+          <NameFormLines forms={row.personNameForms} omitValue={row.personName} />
           <div className="editorial-card-pills">
             {row.leadershipCapacity !== "source_not_specified" ? (
               <Chip variant="sand">{row.leadershipCapacity}</Chip>
@@ -99,6 +140,7 @@ export function WorldLeadersDirectoryClient({
           <span>{row.officeName}</span>
           <br />
           <span className="editorial-meta">{roleLabel(row.officeType)}</span>
+          <NameFormLines forms={row.officeNameForms} omitValue={row.officeName} />
         </>
       ),
     },
