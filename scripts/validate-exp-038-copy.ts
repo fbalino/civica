@@ -78,9 +78,8 @@ const expectations: Expectation[] = [
     present: [
       'title="Contact the editors"',
       "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Baliño reviews submissions manually.",
-      "Messages are reviewed manually and a reply is not guaranteed.",
+      "Messages are reviewed manually. We&rsquo;ll get back to you as soon as",
       "urgent data corrections, open an issue on GitHub.",
-      "Messages are reviewed manually. A reply is",
     ],
   },
   {

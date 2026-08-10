@@ -74,8 +74,8 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
       </div>
       <h2 className="contact-success-title">Thanks &mdash; we&rsquo;ve got it.</h2>
       <p className="contact-success-body">
-        Messages are reviewed manually and a reply is not guaranteed. For
-        urgent data corrections, open an issue on GitHub.
+        Messages are reviewed manually. We&rsquo;ll get back to you as soon as
+        possible. For urgent data corrections, open an issue on GitHub.
       </p>
       <Button variant="secondary" size="sm" onClick={onReset}>
         Send another
@@ -360,8 +360,8 @@ export default function ContactClient() {
             label="Response"
             body={
               <>
-                Messages are reviewed manually. A reply is{" "}
-                <strong>not guaranteed</strong>.
+                Messages are reviewed manually. We&rsquo;ll get back to you as
+                soon as possible.
               </>
             }
           />

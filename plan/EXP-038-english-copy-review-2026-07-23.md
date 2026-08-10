@@ -39,12 +39,12 @@ vendor-relationship, and editorial-control facts that support it.
   pending an owner choice of interim copy or activation of the dedicated
   production correction flow.
 
-**T3 resolved on 2026-08-09:** Fernando chose the no-guarantee wording
-("contact: no guarantee wording."). The success panel now reads "Messages are
-reviewed manually and a reply is not guaranteed." and the Response tile reads
-"Messages are reviewed manually. A reply is not guaranteed."; the former
-"SLA · Response" tile label is now "Response" because no service level is
-promised.
+**T3 resolved on 2026-08-09:** Fernando first chose no-guarantee wording, then
+revised it the same day to his own phrasing ("just say messages are reviewed
+manually, we'll get back to you as soon as possible"). The success panel and
+the Response tile now read "Messages are reviewed manually. We'll get back to
+you as soon as possible."; the former "SLA · Response" tile label is now
+"Response" because no timed service level is promised.
 
 These holds are recorded rather than inferred. No external review, endorsement,
 service-level observation, or production correction-flow activation is
