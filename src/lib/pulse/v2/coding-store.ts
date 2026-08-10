@@ -13,6 +13,8 @@ import {
 import {
   PULSE_CODING_WORKSPACE_VERSION,
   comparePulseCodingSubmissions,
+  pulseCodingCanReadPeerSubmission,
+  pulseCodingStudyExportIsTerminal,
   pulseCodingAccessCodeHash,
   pulseCodingAdjudicationErrors,
   pulseCodingHash,
@@ -1047,25 +1049,18 @@ export async function exportPulseCodingStudy(
   const assignmentRows = assignments;
   const comparisonRows = comparisons;
   const adjudicationRows = adjudications;
-  if (session.kind === "admin") {
-    const adjudicatedComparisonIds = new Set(
-      adjudicationRows
-        .filter(
-          ({ status }) => status === "resolved" || status === "unresolved",
-        )
-        .map(({ comparisonId }) => comparisonId),
+  const terminal = pulseCodingStudyExportIsTerminal({
+    studyStatus: study.status,
+    packetIds: packets.map(({ id }) => id),
+    comparisons: comparisonRows,
+    adjudications: adjudicationRows,
+  });
+  if (!terminal)
+    throw new Error(
+      "Study admins receive status only until the study is closed and every disagreement is terminal",
     );
-    const terminal =
-      study.status === "closed" &&
-      comparisonRows.length === packets.length &&
-      comparisonRows
-        .filter(({ disagreementAxes }) => disagreementAxes.length > 0)
-        .every(({ id }) => adjudicatedComparisonIds.has(id));
-    if (!terminal)
-      throw new Error(
-        "Study admins receive status only until the study is closed and every disagreement is terminal",
-      );
-  } else {
+
+  if (session.kind !== "admin") {
     const assignedPacketIds = new Set(
       assignmentRows
         .filter(
@@ -1074,9 +1069,35 @@ export async function exportPulseCodingStudy(
         )
         .map(({ packetId }) => packetId),
     );
+    const allPacketsReadyForAdjudicator = packets.every(({ id: packetId }) => {
+      const coderAssignments = assignmentRows.filter(
+        ({ packetId: assignmentPacketId, slot }) =>
+          assignmentPacketId === packetId &&
+          (slot === "coder_a" || slot === "coder_b"),
+      );
+      if (coderAssignments.length !== 2) return false;
+      const bothCoderSubmissionsLocked = coderAssignments.every(
+        ({ status, submission }) => status === "locked" && submission != null,
+      );
+      return pulseCodingCanReadPeerSubmission({
+        participantId: session.participantId,
+        role: session.role,
+        assignedCoderIds: [
+          coderAssignments[0].participantId,
+          coderAssignments[1].participantId,
+        ],
+        assignedAdjudicatorId: assignedPacketIds.has(packetId)
+          ? session.participantId
+          : null,
+        ownSubmissionLocked: false,
+        bothSubmissionsLocked: bothCoderSubmissionsLocked,
+        adjudicationTerminal: false,
+      });
+    });
     if (
       assignedPacketIds.size !== packets.length ||
-      comparisonRows.some(({ packetId }) => !assignedPacketIds.has(packetId))
+      comparisonRows.some(({ packetId }) => !assignedPacketIds.has(packetId)) ||
+      !allPacketsReadyForAdjudicator
     )
       throw new Error(
         "Adjudicator export is limited to a fully assigned study queue",

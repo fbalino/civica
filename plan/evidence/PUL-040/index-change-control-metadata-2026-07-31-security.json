@@ -1,0 +1,40 @@
+{
+  "id": "pul-040-retained-evidence-security-boundary-2026-07-31",
+  "toVersion": "civica-index-pulse-retained-evidence-v55",
+  "categories": ["weight_or_model", "presentation"],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/PUL-040/pulse-retained-evidence-security-boundary-2026-07-31.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json"
+    ],
+    "release_note": [
+      "plan/evidence/PUL-040/pulse-retained-evidence-release-note-2026-07-31.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-040/pulse-retained-evidence-migration-plan-2026-07-31.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/retained-source-evidence.test.ts",
+      "src/lib/pulse/v2/country-attribution.test.ts",
+      "src/lib/pulse/v2/classify-fixture.test.ts",
+      "src/lib/pulse/v2/runtime-method.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-index-pulse-retained-evidence.ts",
+      "scripts/validate-pulse-runtime-method.ts",
+      "src/lib/pulse/v2/publication-gate.test.ts"
+    ]
+  },
+  "validations": [
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-pulse-retained-evidence",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:pulse-jurisdiction-attribution",
+    "validate:pulse-runtime"
+  ]
+}

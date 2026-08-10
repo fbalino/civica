@@ -74,8 +74,8 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
       </div>
       <h2 className="contact-success-title">Thanks &mdash; we&rsquo;ve got it.</h2>
       <p className="contact-success-body">
-        The editors usually reply within <strong>3 business days</strong>. For
-        urgent data corrections, open an issue on GitHub.
+        Messages are reviewed manually. We&rsquo;ll get back to you as soon as
+        possible. For urgent data corrections, open an issue on GitHub.
       </p>
       <Button variant="secondary" size="sm" onClick={onReset}>
         Send another
@@ -357,10 +357,11 @@ export default function ContactClient() {
       <section className="editorial-section">
         <div className="contact-tiles">
           <InfoTile
-            label="SLA · Response"
+            label="Response"
             body={
               <>
-                We usually reply within <strong>3 business days</strong>.
+                Messages are reviewed manually. We&rsquo;ll get back to you as
+                soon as possible.
               </>
             }
           />

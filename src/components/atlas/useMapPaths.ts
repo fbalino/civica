@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { feature } from "topojson-client";
+import worldAtlas from "world-atlas/countries-110m.json";
 import { type Country, WORLD_PATHS } from "./data";
 import {
   type MapPath,
@@ -9,11 +11,50 @@ import {
   geomToPath,
 } from "./map-geom";
 
+export function buildBundledMapPaths(
+  countries: Country[],
+  neIdToOurs: Record<string, string>,
+): MapPath[] {
+  const topology = worldAtlas as unknown as Parameters<typeof feature>[0];
+  const geo = feature(topology, topology.objects.countries);
+  if (geo.type !== "FeatureCollection") {
+    throw new Error("Expected countries to convert to a feature collection");
+  }
+
+  return geo.features.map((f) => {
+    const geometry = f.geometry as Parameters<typeof geomToPath>[0];
+    const neId = String(f.id).padStart(3, "0");
+    const ourId = neIdToOurs[neId] || null;
+    const country = ourId
+      ? countries.find((candidate) => candidate.id === ourId) || null
+      : null;
+    return {
+      d: geomToPath(geometry),
+      id: ourId,
+      country,
+      neId,
+      centroid: geomCentroid(geometry, ourId),
+      area: geomBBoxArea(geometry),
+    };
+  });
+}
+
+export function buildFallbackMapPaths(countries: Country[]): MapPath[] {
+  return Object.entries(WORLD_PATHS).map(([id, data]) => ({
+    d: data.d,
+    id,
+    country: countries.find((candidate) => candidate.id === id) || null,
+    neId: "",
+    centroid: data.label,
+    area: 1000,
+  }));
+}
+
 /**
- * Loads the world-atlas TopoJSON via unpkg, projects each feature to an
- * SVG path using our Equirectangular helpers in map-geom.ts, and links
- * each path to a Country by NE_ID lookup. Falls back to the curated
- * WORLD_PATHS set in ./data if the CDN fetch fails offline.
+ * Converts the bundled world-atlas TopoJSON to SVG paths using our
+ * Equirectangular helpers in map-geom.ts, then links each path to a Country by
+ * NE_ID lookup. Falls back to the curated WORLD_PATHS set in ./data if the
+ * bundled conversion fails.
  *
  * Used by both AtlasApp (legacy /) and the standalone (reader)/atlas pages.
  */
@@ -26,56 +67,14 @@ export function useMapPaths(
 
   useEffect(() => {
     let cancelled = false;
-    async function load() {
+    function load() {
       try {
-        const script = document.createElement("script");
-        script.src =
-          "https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js";
-        await new Promise<void>((resolve, reject) => {
-          script.onload = () => resolve();
-          script.onerror = () => reject();
-          document.head.appendChild(script);
-        });
-        const resp = await fetch(
-          "https://unpkg.com/world-atlas@2.0.2/countries-110m.json",
-        );
-        const topo = await resp.json();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const geo = (window as any).topojson.feature(
-          topo,
-          topo.objects.countries,
-        );
+        const paths = buildBundledMapPaths(countries, neIdToOurs);
         if (cancelled) return;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const paths: MapPath[] = geo.features.map((f: any) => {
-          const neId = String(f.id).padStart(3, "0");
-          const ourId = neIdToOurs[neId] || null;
-          const c = ourId
-            ? countries.find((cc) => cc.id === ourId) || null
-            : null;
-          return {
-            d: geomToPath(f.geometry),
-            id: ourId,
-            country: c,
-            neId,
-            centroid: geomCentroid(f.geometry, ourId),
-            area: geomBBoxArea(f.geometry),
-          };
-        });
         setMapPaths(paths);
         setMapLoaded(true);
       } catch {
-        const paths = Object.entries(WORLD_PATHS).map(([id, data]) => {
-          const c = countries.find((cc) => cc.id === id) || null;
-          return {
-            d: data.d,
-            id,
-            country: c,
-            neId: "",
-            centroid: data.label as [number, number],
-            area: 1000,
-          };
-        });
+        const paths = buildFallbackMapPaths(countries);
         if (!cancelled) {
           setMapPaths(paths);
           setMapLoaded(true);

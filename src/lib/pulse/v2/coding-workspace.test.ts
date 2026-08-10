@@ -5,6 +5,7 @@ import {
   pulseCodingAdjudicationErrors,
   pulseCodingCanAdjudicate,
   pulseCodingCanReadPeerSubmission,
+  pulseCodingStudyExportIsTerminal,
   pulseCodingPacketErrors,
   pulseCodingPacketHash,
   pulseCodingSubmissionErrors,
@@ -197,6 +198,42 @@ test("adjudicator must be separate and both submissions must be locked", () => {
         bothSubmissionsLocked: true,
       }),
     ),
+    false,
+  );
+});
+
+test("whole-study exports wait for a closed and terminal evidence set", () => {
+  const base = {
+    studyStatus: "closed",
+    packetIds: ["packet-a", "packet-b"],
+    comparisons: [
+      {
+        id: "comparison-a",
+        packetId: "packet-a",
+        disagreementAxes: [],
+      },
+      {
+        id: "comparison-b",
+        packetId: "packet-b",
+        disagreementAxes: ["packet_outcome"],
+      },
+    ],
+    adjudications: [
+      { comparisonId: "comparison-b", status: "resolved" },
+    ],
+  };
+
+  assert.equal(pulseCodingStudyExportIsTerminal(base), true);
+  assert.equal(
+    pulseCodingStudyExportIsTerminal({ ...base, studyStatus: "active" }),
+    false,
+  );
+  assert.equal(
+    pulseCodingStudyExportIsTerminal({ ...base, comparisons: [] }),
+    false,
+  );
+  assert.equal(
+    pulseCodingStudyExportIsTerminal({ ...base, adjudications: [] }),
     false,
   );
 });

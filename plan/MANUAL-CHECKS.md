@@ -93,15 +93,14 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
 - **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.
-- **GOV-012 · Owner:** choose and sign the compensation posture in `plan/research/reviewer-honorarium-decision-brief-v1.md`. The recommendation is fixed honoraria of $1,000 for each 8–12-hour Atlas/Index review and $1,500 for each 12–16-hour Pulse review, with a $12,075 first-wave ceiling for nine primaries including a 15% logistics reserve. Also identify the paying person/entity and jurisdiction so accounting can confirm forms, withholding, currency, fees, and institutional-payment handling. This approval does not authorize contact; GOV-016 and G4 still apply, and Pulse also waits for GOV-015.
+- **GOV-012 · Owner — DECIDED 2026-08-09 (Option A, revisitable):** Fernando selected the no-honorarium posture on budget grounds ("no honoraria (for now)"); the completed approval record is in `plan/research/reviewer-honorarium-decision-brief-v1.md`. No paying entity or accounting/tax workflow is required while the posture is unpaid; if funds become available before outreach, the recommended Option B bands remain documented for a revisited decision. Contact still waits for GOV-016 and G4.
 - **EXP-038 · Owner:** the approved subset in
-  `plan/EXP-038-english-copy-review-2026-07-23.md` is already applied. Record
-  only the four remaining dispositions: retain or replace A4 after deciding
-  how prominently to name Fernando; approve H5 only after GOV-003 closes;
-  choose the no-guarantee T3 response copy or adopt a genuinely monitored
-  response target; and choose the interim T4 correction instruction or wait
-  for ATL-024 activation. These decisions authorize only the named English
-  copy; they do not authorize translation, deployment, a legal conclusion, or
+  `plan/EXP-038-english-copy-review-2026-07-23.md` is already applied. A4
+  (About naming) and H5 (independence label after GOV-003) are resolved, and
+  T3 was decided on 2026-08-09 (no-guarantee response copy, applied). One
+  disposition remains: choose the interim T4 correction instruction or wait
+  for ATL-024 activation. That decision authorizes only the named English
+  copy; it does not authorize translation, deployment, a legal conclusion, or
   an external message.
 - Approve the final public disposition of each experimental measurement after its resolution and external review are complete.
 - **EXP-030 / EXP-031 · Owner decision — embed disposition (found 2026-07-12):** the Civica Index score embed (`/embed/[slug]`) is retired (HTTP 410 stub) under the atlas-first decision, so there are no live size presets to repair, and the old preset builder (`src/components/widget/WidgetBuilder.tsx` + `WidgetCopyButton.tsx`) is **orphaned dead code — mounted in no route** and still points its generated iframes at the 410 endpoint. Hardening the retired stub's HTML (add `<h1>`, `robots noindex`) is blocked because the route is an Index-change-control **protected presentation file**, so any edit requires the full methodology-change ceremony (version advance + all six evidence roles) — disproportionate for a cosmetic fix to a retired page. Decide the structural path: (a) formally **de-protect** the retired embed route from `INDEX_PROTECTED_FILES` via a proper change-control record, then harden its document, or (b) fold EXP-030 into **EXP-031** (source-native embed redesign), which will rebuild or remove the route and the orphaned builder through the same ceremony. Until then EXP-030 stays open.
@@ -115,10 +114,12 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 - **PLT-010 · Owner/platform — pending:** after deployment applies `0034_superb_the_fallen` and `0035_equal_marvex`, run one safe non-model cron dry run with a unique stable `Idempotency-Key`, record the redacted HTTP status, repeat the identical request, and confirm `200 duplicate_suppressed`, one terminal execution, one completed attempt, and no `sources.last_sync_at` change. Confirm only hashed request/key identities appear in the ledger. After the next ordinary scheduled Pulse classify run, verify read-only that any classify delivery binding points to the expected persisted classify run; do not start a paid manual classifier run solely for this check. Store bounded/redacted output under `plan/evidence/PLT-010/`.
 - **PLT-011 · Owner/platform — pending:** after the branch exists remotely, configure the independent `RATE_LIMIT_KEY_SECRET` for Preview without printing or retaining it, then deploy an isolated Preview against a test database. Confirm spoofed and chained forwarding headers cannot mint fresh identities; concurrent requests through at least two function instances allow exactly the configured budget and then return `429`; a deliberately unavailable counter/key returns fail-closed `503` without protected work; recovery succeeds after restoring configuration; Pulse sign-out still clears its browser cookie during a counter outage; and the checked Vercel all-path 600/60-second/IP Challenge rule remains active with no draft. Production already has the encrypted key, but no PLT-011 application deployment or destructive production exhaustion test is claimed. Store only redacted counts, deployment IDs, and timestamps under `plan/evidence/PLT-011/`.
 - **PLT-018 · Owner/platform — pending:** before setting `VERCEL_PROTECTED_SOURCEMAPS=true`, enable **Protected Source Maps** in Vercel Project Settings → Deployment Protection. Apply `0039_living_clea` only through PLT-019's staged procedure, deploy an isolated protected Preview/staging build, and verify while authenticated to Vercel that its browser map is protected. Trigger one safe seeded monitoring event, confirm the durable record has only the closed release/route-or-job/source-map fields, confirm the owned Runtime Logs alert, link an opaque correction or status record ID, and resolve it. Record only deployment IDs, timestamps, bounded fields, and redacted result counts under `plan/evidence/PLT-018/`; do not retain a map, stack, digest, exception message, request content, or credential.
-- **QA-018 · Owner — disposition pending:** review the retained exact-candidate
-  `0051` packet under `plan/evidence/QA-018/` and record Fernando's dated
-  approval or rejection. The technical run is complete; it does not itself
-  claim owner sign-off or production promotion.
+- **QA-018 · Owner — RESOLVED (late July 2026):** Fernando confirmed the isolated
+  attempt-06 run in writing; the record is
+  `plan/evidence/QA-018/OWNER-SIGNOFF-2026-08-09.md` (misdated at creation; it
+  carries a date-correction note). The exact-candidate attempt-07 packet through
+  `0051` passed the same protocol technically, and on 2026-08-09 Fernando
+  directed integration and deployment of the merged candidate.
 - **QA-019 · Owner/provider — external record and disposition pending:** use
   `plan/evidence/QA-019/` to create one real non-notifying external status
   record, retain only its opaque ID, then have Fernando approve or reject the

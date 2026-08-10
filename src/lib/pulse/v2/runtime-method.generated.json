@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "890693b9702d1710ff1bb9dc7e0fab205de3c46f5ebb1f4fa0519db820a5cf61",
+  "contractHash": "49a1403ffb99d8cb9fbc37c2e67b8692f1b9e160fddcdf269d52b4a40ae2cb39",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -424,6 +424,7 @@
     "classify": {
       "agreementEvidence": "stored_provider_distinct_prompt_versioned_classify_runs",
       "attemptSchemaVersion": "pulse-classification-attempt/v1",
+      "automaticEvidenceBinding": "exact_retained_quote_per_supporting_classifier",
       "categoryConsensus": "strict_majority_of_successful_voters",
       "claimLeaseMinutes": 30,
       "configSchemaVersion": "pulse-classification-config/v1",
@@ -450,6 +451,7 @@
       "mode": "cross_vendor_ensemble",
       "noneDisposition": "terminal_none_not_failure",
       "providerFailuresPersisted": false,
+      "publisherInputBoundary": "explicit_untrusted_json_evidence_never_instructions",
       "queueOrder": "new_then_due_retry_oldest_first",
       "retryExhaustionDisposition": "terminal_failure",
       "retryPolicy": {
@@ -497,9 +499,9 @@
       "failurePolicy": "unresolved_no_automatic_publication",
       "inputContext": "human_readable_versioned_entity_candidates",
       "legacyRule": "Retained single-jurisdiction rows remain explicit legacy projections without invented historical alias/entity inputs.",
-      "output": "one_primary_zero_or_more_affected_with_rationales_and_evidence_refs",
+      "output": "one_primary_zero_or_more_affected_with_rationales_evidence_refs_and_exact_quotes",
       "projectionRule": "primary_only_affected_are_descriptive_not_scored",
-      "responseValidation": "strict_scope_roles_iso3_rationale_and_evidence_shape",
+      "responseValidation": "strict_scope_roles_iso3_rationale_exact_retained_quote_and_entity_match",
       "role": "attribute_primary_and_affected_jurisdictions",
       "runsAfterClassification": true
     },
@@ -522,8 +524,9 @@
     }
   },
   "publicationPolicy": {
-    "automaticEligibility": "stored_ensemble_and_gate_and_resolved_subject",
-    "majorityNone": "drop_not_governance_event",
+    "automaticEligibility": "stored_ensemble_gate_resolved_subject_and_deterministic_retained_evidence",
+    "indirectInstructionSignal": "non_none_queue_none_retry_then_terminal_failure",
+    "majorityNone": "drop_only_without_indirect_instruction_signal",
     "numericSeverityAggregation": "median_of_winning_category_voters_then_tier_clamp",
     "reviewGates": {
       "absoluteSeverityTiers": [

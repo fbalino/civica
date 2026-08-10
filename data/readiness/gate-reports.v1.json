@@ -1,9 +1,9 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "360496c3657b4b6bd76ca88df350bb8204fe93694115e9a6d4982fb7ef72f04a",
-    "plan/PROGRESS.md": "f26d51567660b86a8d3ac742e48c77c909c8841772538d20fb51b2de8b31d4cc",
-    "plan/MANUAL-CHECKS.md": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
+    "plan/MASTER-CHECKLIST.md": "27e769e6cab7a1fbd86fbcec4eabd6e87c6259c75bb16103e9ce46f24a7e03af",
+    "plan/PROGRESS.md": "730ddaf359e46a0af5398981211b99920016e6729c733c27ef4a40da3f21e1f8",
+    "plan/MANUAL-CHECKS.md": "7a472f25da54414060b311b89b9131d4b0f0443cbe247bef7668b4f5ab501b5f",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "d8e19b6dadb22036d58240748581a45711840bfdb48fc9fd3bc29df1cb10d293",
@@ -12,7 +12,7 @@
     "plan/06-atlas-content-and-research-features.md": "ab3a23e85d0737cc18d2e72fb6baaf0164d4c799c80c2cb5288fd03fa7a36f8e",
     "plan/07-design-system-assets-and-reader-experience.md": "1c35dba50ace06d4de0fc57968ca6a0486f2abe3bdfe2f6f44cdaf423ee7aa93",
     "plan/08-platform-security-performance-and-operations.md": "f7fa9d0651a83c408b8211397e244d8fb71b88a1aee9939cb987f53e5df4738b",
-    "plan/09-testing-qa-and-release.md": "cca051890a0c5c06b444e2474dc0c3824025a5c213c67fbfda16f83491cfd69d",
+    "plan/09-testing-qa-and-release.md": "2a2a7d2d6bd8fae6efab1d02b17cbc00ddb67e6374f81fe7d5dfb3d26f872014",
     "plan/10-academic-governance-review-and-outreach.md": "d92e4b4bc3392dccd81ad135c257304ed60edaece5d2cd7f28a6123a5e02baa6",
     "plan/11-brand-legal-and-licensing.md": "7c3989aa13da0480d17780fef6701811dd717f37dd5f216dca45f8f5a286d52b"
   },
@@ -23,16 +23,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 256,
-        "remaining": 54,
+        "completed": 258,
+        "remaining": 52,
         "byPriority": {
           "P0": {
             "total": 192,
-            "completed": 169
+            "completed": 170
           },
           "P1": {
             "total": 113,
-            "completed": 86
+            "completed": 87
           },
           "P2": {
             "total": 5,
@@ -78,7 +78,7 @@
           },
           "09-testing-qa-and-release.md": {
             "total": 22,
-            "completed": 18
+            "completed": 20
           }
         }
       },
@@ -104,8 +104,7 @@
         "PUL-022",
         "PUL-026",
         "PUL-029",
-        "PUL-030",
-        "QA-018"
+        "PUL-030"
       ],
       "openP0P1": [
         "ATL-020",
@@ -155,15 +154,13 @@
         "PUL-030",
         "PUL-040",
         "QA-012",
-        "QA-013",
-        "QA-018",
-        "QA-019"
+        "QA-013"
       ],
       "evidenceGaps": [],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
+        "sha256": "7a472f25da54414060b311b89b9131d4b0f0443cbe247bef7668b4f5ab501b5f",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -189,7 +186,6 @@
           "GOV-003",
           "GOV-010",
           "GOV-012",
-          "GOV-015",
           "GOV-016",
           "PLT-001",
           "PLT-007",
@@ -248,7 +244,7 @@
         }
       ],
       "blockers": [
-        "23 unchecked P0 tasks prevent a green report"
+        "22 unchecked P0 tasks prevent a green report"
       ]
     },
     {
@@ -257,16 +253,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 256,
-        "remaining": 54,
+        "completed": 258,
+        "remaining": 52,
         "byPriority": {
           "P0": {
             "total": 192,
-            "completed": 169
+            "completed": 170
           },
           "P1": {
             "total": 113,
-            "completed": 86
+            "completed": 87
           },
           "P2": {
             "total": 5,
@@ -312,7 +308,7 @@
           },
           "09-testing-qa-and-release.md": {
             "total": 22,
-            "completed": 18
+            "completed": 20
           }
         }
       },
@@ -338,8 +334,7 @@
         "PUL-022",
         "PUL-026",
         "PUL-029",
-        "PUL-030",
-        "QA-018"
+        "PUL-030"
       ],
       "openP0P1": [
         "ATL-020",
@@ -389,15 +384,13 @@
         "PUL-030",
         "PUL-040",
         "QA-012",
-        "QA-013",
-        "QA-018",
-        "QA-019"
+        "QA-013"
       ],
       "evidenceGaps": [],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
+        "sha256": "7a472f25da54414060b311b89b9131d4b0f0443cbe247bef7668b4f5ab501b5f",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -423,7 +416,6 @@
           "GOV-003",
           "GOV-010",
           "GOV-012",
-          "GOV-015",
           "GOV-016",
           "PLT-001",
           "PLT-007",
@@ -489,8 +481,8 @@
         }
       ],
       "blockers": [
-        "23 unchecked P0 tasks prevent a green report",
-        "50 unchecked P0/P1 tasks prevent G4"
+        "22 unchecked P0 tasks prevent a green report",
+        "48 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -499,16 +491,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 256,
-        "remaining": 54,
+        "completed": 258,
+        "remaining": 52,
         "byPriority": {
           "P0": {
             "total": 192,
-            "completed": 169
+            "completed": 170
           },
           "P1": {
             "total": 113,
-            "completed": 86
+            "completed": 87
           },
           "P2": {
             "total": 5,
@@ -554,7 +546,7 @@
           },
           "09-testing-qa-and-release.md": {
             "total": 22,
-            "completed": 18
+            "completed": 20
           }
         }
       },
@@ -580,8 +572,7 @@
         "PUL-022",
         "PUL-026",
         "PUL-029",
-        "PUL-030",
-        "QA-018"
+        "PUL-030"
       ],
       "openP0P1": [
         "ATL-020",
@@ -631,15 +622,13 @@
         "PUL-030",
         "PUL-040",
         "QA-012",
-        "QA-013",
-        "QA-018",
-        "QA-019"
+        "QA-013"
       ],
       "evidenceGaps": [],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
+        "sha256": "7a472f25da54414060b311b89b9131d4b0f0443cbe247bef7668b4f5ab501b5f",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -665,7 +654,6 @@
           "GOV-003",
           "GOV-010",
           "GOV-012",
-          "GOV-015",
           "GOV-016",
           "PLT-001",
           "PLT-007",
@@ -717,7 +705,7 @@
         }
       ],
       "blockers": [
-        "23 unchecked P0 tasks prevent a green report",
+        "22 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
     },
@@ -727,16 +715,16 @@
       "checkedAt": null,
       "taskSummary": {
         "total": 310,
-        "completed": 256,
-        "remaining": 54,
+        "completed": 258,
+        "remaining": 52,
         "byPriority": {
           "P0": {
             "total": 192,
-            "completed": 169
+            "completed": 170
           },
           "P1": {
             "total": 113,
-            "completed": 86
+            "completed": 87
           },
           "P2": {
             "total": 5,
@@ -782,7 +770,7 @@
           },
           "09-testing-qa-and-release.md": {
             "total": 22,
-            "completed": 18
+            "completed": 20
           }
         }
       },
@@ -808,8 +796,7 @@
         "PUL-022",
         "PUL-026",
         "PUL-029",
-        "PUL-030",
-        "QA-018"
+        "PUL-030"
       ],
       "openP0P1": [
         "ATL-020",
@@ -859,15 +846,13 @@
         "PUL-030",
         "PUL-040",
         "QA-012",
-        "QA-013",
-        "QA-018",
-        "QA-019"
+        "QA-013"
       ],
       "evidenceGaps": [],
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "8f63d82c3cf6f88f6174265717f055c24e3fdff2a0d0a79d8a720472dbd00e6b",
+        "sha256": "7a472f25da54414060b311b89b9131d4b0f0443cbe247bef7668b4f5ab501b5f",
         "linkedTaskIds": [
           "ATL-010",
           "ATL-024",
@@ -893,7 +878,6 @@
           "GOV-003",
           "GOV-010",
           "GOV-012",
-          "GOV-015",
           "GOV-016",
           "PLT-001",
           "PLT-007",
@@ -945,7 +929,7 @@
         }
       ],
       "blockers": [
-        "23 unchecked P0 tasks prevent a green report",
+        "22 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
     }
