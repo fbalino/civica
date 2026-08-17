@@ -3,8 +3,6 @@ import ContactClient from "./ContactClient";
 import { withOg } from "@/lib/og";
 import "./contact.css";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Contact the editors",
   description:

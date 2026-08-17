@@ -13,8 +13,6 @@ import type { FactCoverageReport } from "@/lib/provenance/fact-coverage";
 import rawReconciliationAudit from "@/lib/factbook/reconcile/reconciliation-audit.generated.json";
 import type { ReconciliationAuditReport } from "@/lib/factbook/reconcile/reconciliation-audit";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Fact Provenance Coverage — Methodology",
   description:

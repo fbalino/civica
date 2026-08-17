@@ -12,7 +12,6 @@ import {
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CountryFlag } from "@/components/CountryFlag";
-import type { JurisdictionStatusPresentation } from "@/lib/jurisdictions/status-presentation";
 
 export interface CountrySearchOption {
   slug: string;
@@ -20,7 +19,10 @@ export interface CountrySearchOption {
   iso2: string | null;
   iso3?: string | null;
   capital?: string | null;
-  status?: JurisdictionStatusPresentation;
+  /** Only the display label is required here — callers with a full
+   * `JurisdictionStatusPresentation` can pass it as-is, but root-layout
+   * surfaces ship just `{ label }` from the checked directory artifact. */
+  status?: { label: string } | null;
 }
 
 interface CountrySearchComboboxProps {

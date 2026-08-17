@@ -18,8 +18,6 @@ import {
 } from "@/lib/privacy/data-handling";
 import { ADVISORY_APPLICATION_POLICY } from "@/lib/research/advisory-application";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:

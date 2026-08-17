@@ -11,8 +11,6 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { ATLAS_CASE_STUDY_REPORT as report } from "@/lib/atlas/case-studies-runtime";
 import { withOg } from "@/lib/og";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Reproducible Atlas Case Studies",
   description:

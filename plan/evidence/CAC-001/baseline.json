@@ -1,0 +1,42 @@
+{
+  "task": "CAC-001",
+  "capturedAt": "2026-08-17T14:26:00Z",
+  "capturedBy": "Claude (Fable 5), Option A execution session",
+  "productionHost": "civicaatlas.org",
+  "note-www": "www.civicaatlas.org 308-redirects to the apex; all captures below are against the apex.",
+  "curlGroundTruth": {
+    "file": "curl-headers.txt",
+    "summary": {
+      "htmlDocumentRoutes": {
+        "routesProbed": [
+          "/",
+          "/country/japan",
+          "/governance-evidence",
+          "/licensing",
+          "/compare",
+          "/constitution",
+          "/civica-index/pulse-changelog",
+          "/country",
+          "/elections",
+          "/methodology",
+          "/terms"
+        ],
+        "result": "Every HTML document route returned x-vercel-cache: MISS on both a first and an immediate second request, with cache-control: private, no-cache, no-store, max-age=0, must-revalidate and age: 0. No HTML route is CDN-cached today.",
+        "slugCorrection": "The plan's example URL /country/jpn returns 404 because country slugs are full names (e.g. /country/japan, HTTP 200). This was a wrong example slug in the plan, not an R1 incident. Later verification steps must use /country/japan."
+      },
+      "staticAssets": {
+        "probe": "/_next/static/chunks/07h-mc7zemhco.css",
+        "result": "x-vercel-cache: HIT with age 528913 (~6.1 days) and cache-control: public,max-age=31536000,immutable on both requests. Static assets cache unconditionally, unaffected by revalidate settings."
+      }
+    }
+  },
+  "sevenDayCacheStatusByRoute": {
+    "status": "BLOCKED - dashboard access unavailable this session",
+    "detail": "Vercel Observability (Edge Requests grouped by Cache Status, filtered by Path) is the only source for the trailing-7-day request-count split. The connected Chrome profile is logged into Vercel as fernando@theharmonycgroup.com, which has no access to the civica project (404); the authorized account is fbalino (Vercel CLI login). Credential entry/sign-in flows are out of scope for the agent. The Web Analytics API is not enabled for this project (error web_analytics_not_enabled), and Vercel exposes no public API for edge-request cache-status metrics.",
+    "howToBackfill": "Log the browser into the fbalino Vercel account (or open the dashboard manually): Project civica -> Observability -> Edge Requests -> group by Cache Status, filter by Path, trailing 7 days. Record HIT/MISS/STALE/BYPASS counts for /, /country/[slug], /governance-evidence, /licensing, /compare, /constitution, /civica-index/pulse-changelog, /_next/static/* (separately), and all-other as one bucket. CAC-006 requires the same access for its comparison, so this must be resolved before the CAC-006 soak ends."
+  },
+  "mechanismConclusions": {
+    "currentHtmlHitRate": "0% by construction: every one of the 75 page surfaces declares revalidate = 0 (or is otherwise dynamic), which emits no-store and prevents any CDN entry.",
+    "q1Implication": "Any historical nonzero platform-wide hit rate (the remembered 78%) can only have been composed of static assets, images, fonts, and redirects - HTML documents cannot have contributed since 2026-07-27. The exact historical composition still requires the dashboard query above."
+  }
+}

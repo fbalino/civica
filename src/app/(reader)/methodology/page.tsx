@@ -12,8 +12,6 @@ import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Methodology — How Civica Builds Its Data",
   description:

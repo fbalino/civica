@@ -10,8 +10,6 @@ import { Reveal } from "@/components/motion/Reveal";
 import { civicaIndex } from "@/lib/content/site-state";
 import pcaAnalysis from "@/lib/ci/pca-analysis.generated.json";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Historical PCA Weight Record — Civica Index",
   description: `The limited ${civicaIndex.pca.panelSize}-country 2023 cross-section that informed the archived Civica Index Beta weights, with later temporal evidence and the unrun fifth-dimension test stated explicitly.`,

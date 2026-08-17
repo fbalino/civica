@@ -21,8 +21,6 @@ import { SourceText } from "@/components/editorial/SourceText";
 
 import "./design-system.css";
 
-export const revalidate = 0;
-
 type DesignTokenGroup = {
   id: string;
   title: string;

@@ -21,8 +21,6 @@ import { withOg } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildArticle } from "@/lib/seo/jsonld";
 
-export const revalidate = 0;
-
 const SITE_URL = "https://civicaatlas.org";
 
 export function generateStaticParams() {

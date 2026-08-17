@@ -12,8 +12,6 @@ import { Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { PageHero } from "@/components/PageHero";
 import "../glossary.css";
 
-export const revalidate = 0;
-
 const TITLE = "Glossary of Governance Terms";
 const DESCRIPTION =
   "The vocabulary of governance, plainly defined — every term Civica uses across the Index, the Pulse, and the Factbook, with concise definitions and links to the methodology behind each.";

@@ -1,0 +1,165 @@
+=== GET / (request 1) 2026-08-17T14:25:53Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::thf55-1786976753963-831196cfbd22
+=== GET / (request 2) 2026-08-17T14:25:54Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::cfm5d-1786976754612-d6c9e28c57e9
+=== GET /country/jpn (request 1) 2026-08-17T14:25:54Z ===
+HTTP/2 404 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /country/[slug]
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::8l7ph-1786976755212-a1b1a2effe83
+=== GET /country/jpn (request 2) 2026-08-17T14:25:55Z ===
+HTTP/2 404 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /country/[slug]
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::gs2db-1786976755660-e1ffeec984cb
+=== GET /governance-evidence (request 1) 2026-08-17T14:25:55Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /governance-evidence
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::gjffn-1786976756119-fbd039bee726
+=== GET /governance-evidence (request 2) 2026-08-17T14:25:56Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /governance-evidence
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::dzkc6-1786976756743-26af2a7f284d
+=== GET /licensing (request 1) 2026-08-17T14:25:56Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /licensing
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::jt6tg-1786976757475-4ee8c1d532b4
+=== GET /licensing (request 2) 2026-08-17T14:25:57Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /licensing
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::thf55-1786976757926-13d9b0495e81
+=== GET /compare (request 1) 2026-08-17T14:25:57Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /compare
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::znkkn-1786976758334-469d8c62ca52
+=== GET /compare (request 2) 2026-08-17T14:25:58Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /compare
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::cfm5d-1786976759901-47b71e693314
+=== GET /constitution (request 1) 2026-08-17T14:25:59Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /constitution
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::pg9wq-1786976760346-a0435c9c718d
+=== GET /constitution (request 2) 2026-08-17T14:26:00Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /constitution
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::ksl82-1786976760792-488e1007728e
+=== GET /civica-index/pulse-changelog (request 1) 2026-08-17T14:26:00Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /civica-index/pulse-changelog
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::qz2wf-1786976761224-6b38d21b92db
+=== GET /civica-index/pulse-changelog (request 2) 2026-08-17T14:26:01Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /civica-index/pulse-changelog
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::z6w4c-1786976761810-43b495c07308
+=== GET /country (request 1) 2026-08-17T14:26:01Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /country
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::p5z8f-1786976762284-dae5e09fe84d
+=== GET /country (request 2) 2026-08-17T14:26:02Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /country
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::8t6tk-1786976762874-6cd945233997
+=== GET /elections (request 1) 2026-08-17T14:26:02Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /elections
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::l52qh-1786976763364-0159b6ef09ac
+=== GET /elections (request 2) 2026-08-17T14:26:04Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /elections
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::7fdtk-1786976764603-fc2959a39d8a
+=== GET /methodology (request 1) 2026-08-17T14:26:05Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /methodology
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::6kzfg-1786976766075-2087eedd5217
+=== GET /methodology (request 2) 2026-08-17T14:26:06Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /methodology
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::cpvcx-1786976766568-650174ae332c
+=== GET /terms (request 1) 2026-08-17T14:26:06Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /terms
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::f56dn-1786976767013-99f2d1d830d8
+=== GET /terms (request 2) 2026-08-17T14:26:07Z ===
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+x-matched-path: /terms
+x-vercel-cache: MISS
+x-vercel-id: gru1::iad1::2nrkq-1786976767532-c454a40f5e7d
+=== static asset /_next/static/chunks/07h-mc7zemhco.css ===
+--- request 1 ---
+HTTP/2 200 
+age: 528913
+cache-control: public,max-age=31536000,immutable
+x-vercel-cache: HIT
+--- request 2 ---
+HTTP/2 200 
+age: 528913
+cache-control: public,max-age=31536000,immutable
+x-vercel-cache: HIT

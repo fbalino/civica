@@ -12,9 +12,11 @@ import { createHash } from "node:crypto";
 export const CANONICAL_CI_WORKFLOW = ".github/workflows/ci.yml";
 export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
-/** SHA-256 of the complete credential-free production build command. */
+/** SHA-256 of the complete credential-free production build command.
+ * 2026-08-17 (CAC-003): build:core adds validate:jurisdiction-directory
+ * beside validate:jurisdiction-status. */
 export const BUILD_CORE_SHA256 =
-  "05cdc1b790f30984587d7e23b06b1a10cc82709b889876341ae385628a1a069d";
+  "34e5ec7919f56e00c955636d60591df5c4cacd67483d0127d1b743ce35ef3fc0";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",
