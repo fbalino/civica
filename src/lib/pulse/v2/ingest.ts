@@ -318,41 +318,57 @@ export async function ingestPulseV2(
     .filter(({ error }) => error !== undefined)
     .map(({ source, error }) => ({ component: source, message: error! }));
 
-  if (failures.length > 0) {
-    // The successful connector subset is intentionally not published. Its
-    // rows will be fetched again on retry, so no earlier freshness claim can
-    // be stranded as a duplicate-only source on the successful attempt.
-    if (persistRun && !options.cronExecutionKey) {
+  // Partial-availability policy (2026-08-17 ingest restoration): a failed
+  // connector never blocks the successful subset. Nine heterogeneous external
+  // feeds mean at least one is broken on most real days, so all-or-nothing
+  // publication starved ingestion entirely. Failed connectors still fail
+  // closed individually — they contribute no rows, and the atomic writer
+  // stamps freshness only for sources that actually gained a row — while the
+  // run finalizes as 'partial' with every failure recorded. Finalization no
+  // longer skips cron-keyed runs: a terminal 'partial' beats a run row stuck
+  // at 'running' forever, and the cron boundary's fenced idempotency ledger
+  // already absorbs duplicate scheduled deliveries.
+  if (failures.length > 0 && options.failOnConnectorError) {
+    if (persistRun) {
       await finishPulsePipelineRun(db, run.id, {
         status: "partial",
         counts: runCounts,
         failures,
       });
     }
-    if (options.failOnConnectorError) {
-      const first = failures[0];
-      throw new Error(
-        `Pulse connector ${first.component} failed: ${first.message}`,
-      );
-    }
-    reports.sort((left, right) => left.source.localeCompare(right.source));
-    return {
-      runId: run.id,
-      versionKey: run.versionKey,
-      reports,
-      totalFetched: initialTotals.fetched,
-      totalInserted: 0,
-      totalSkipped: 0,
-      totalUnmatched: initialTotals.unmatched,
-      totalWouldWrite: initialTotals.wouldWrite,
-      sourcesStamped: [],
-      dryRun: options.dryRun ?? false,
-      reused: false,
-    };
+    const first = failures[0];
+    throw new Error(
+      `Pulse connector ${first.component} failed: ${first.message}`,
+    );
   }
 
   if ((options.requireNonEmpty ?? true) && initialTotals.wouldWrite === 0) {
-    if (persistRun && !options.cronExecutionKey) {
+    if (failures.length > 0) {
+      // Nothing usable arrived and at least one connector failed: record the
+      // partial run and report honestly instead of publishing.
+      if (persistRun) {
+        await finishPulsePipelineRun(db, run.id, {
+          status: "partial",
+          counts: runCounts,
+          failures,
+        });
+      }
+      reports.sort((left, right) => left.source.localeCompare(right.source));
+      return {
+        runId: run.id,
+        versionKey: run.versionKey,
+        reports,
+        totalFetched: initialTotals.fetched,
+        totalInserted: 0,
+        totalSkipped: 0,
+        totalUnmatched: initialTotals.unmatched,
+        totalWouldWrite: 0,
+        sourcesStamped: [],
+        dryRun: options.dryRun ?? false,
+        reused: false,
+      };
+    }
+    if (persistRun) {
       await finishPulsePipelineRun(db, run.id, {
         status: "failed",
         counts: runCounts,
@@ -392,7 +408,13 @@ export async function ingestPulseV2(
   // production pipeline-run completion.
   const upsert: UpsertResult = await writeRows(db, allRows, run.id, {
     connectorIds,
-    finalizeRun: persistRun ? { counts: runCounts } : undefined,
+    finalizeRun: persistRun
+      ? {
+          counts: runCounts,
+          status: failures.length > 0 ? "partial" : "completed",
+          failures,
+        }
+      : undefined,
   });
 
   let outcomeOffset = 0;

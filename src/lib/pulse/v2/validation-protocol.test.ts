@@ -65,9 +65,28 @@ test("prospective shadow evaluation freezes the full current pipeline before lab
 
 test("checked protocol is the exact deterministic artifact", () => {
   const checked = readFileSync(
-    "data/research/pulse-validation-protocol-v1.json",
+    "data/research/pulse-validation-protocol-v2.json",
     "utf8",
   );
   assert.equal(checked, renderPulseValidationProtocol());
   assert.match(pulseValidationProtocolHash(), /^[a-f0-9]{64}$/);
+});
+
+test("the superseded v1 preregistration is preserved unchanged", () => {
+  const v1 = JSON.parse(
+    readFileSync("data/research/pulse-validation-protocol-v1.json", "utf8"),
+  ) as { schemaVersion: string; lockedAt: string; semanticSha256: string };
+  assert.equal(v1.schemaVersion, "pulse-validation-protocol/v1");
+  assert.equal(v1.lockedAt, "2026-07-12T12:00:00.000Z");
+  // Frozen semantic hash recorded at supersession time (2026-08-17); any
+  // rewrite of the preserved v1 artifact fails here.
+  assert.equal(
+    v1.semanticSha256,
+    "89bea0ceb83090725e9a65a39e7e96a0f8e5badcae988493cd06873267a329e3",
+  );
+  assert.equal(
+    PULSE_VALIDATION_PROTOCOL.supersedes.version,
+    "pulse-validation-protocol/v1",
+  );
+  assert.equal(PULSE_VALIDATION_PROTOCOL.supersedes.windowStartedUnderPrior, false);
 });

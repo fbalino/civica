@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.15-beta");
+  assert.equal(method.version, "pulse-v2.16-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -184,18 +184,23 @@ test("the runtime snapshot distinguishes observed evidence from operating state"
 
 test("provider roles distinguish current ensemble, subject pass, review aid, and old backtest", () => {
   const providers = CURRENT_PULSE_RUNTIME_METHOD.providers;
+  // pulse-v2.16-beta: owner-approved subscription-CLI panel
+  // (plan/pulse-subscription-runtime-resolution-v1.md, 2026-08-17).
   assert.deepEqual(providers.classify.engines, [
-    { provider: "deepseek", model: "deepseek-v4-flash" },
-    { provider: "glm", model: "glm-4.7" },
-    { provider: "anthropic", model: "claude-haiku-4-5" },
+    { provider: "openai", model: "gpt-5.6-terra", transport: "subscription-cli" },
+    { provider: "anthropic", model: "claude-sonnet-5", transport: "subscription-cli" },
+    { provider: "moonshot", model: "kimi-k3", transport: "subscription-cli" },
+    { provider: "xai", model: "grok-4.5", transport: "subscription-cli" },
   ]);
   assert.deepEqual(providers.verify.engine, {
     provider: "anthropic",
-    model: "claude-haiku-4-5",
+    model: "claude-sonnet-5",
+    transport: "subscription-cli",
   });
   assert.deepEqual(providers.subject.engine, {
     provider: "anthropic",
-    model: "claude-sonnet-4-6",
+    model: "claude-sonnet-5",
+    transport: "subscription-cli",
   });
   assert.equal(
     providers.subject.responseValidation,

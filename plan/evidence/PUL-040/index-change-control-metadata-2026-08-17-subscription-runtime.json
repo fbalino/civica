@@ -1,0 +1,49 @@
+{
+  "id": "pul-040-subscription-runtime-2026-08-17",
+  "toVersion": "civica-index-pulse-subscription-runtime-v60",
+  "evidence": {
+    "documentation": [
+      "plan/evidence/PUL-040/subscription-runtime-implementation-2026-08-17.md",
+      "plan/pulse-subscription-runtime-resolution-v1.md"
+    ],
+    "registry": [
+      "src/lib/pulse/v2/runtime-method.generated.json"
+    ],
+    "release_note": [
+      "plan/evidence/PUL-040/ingest-restoration-2026-08-17.md",
+      "plan/evidence/PUL-040/subscription-runtime-implementation-2026-08-17.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PUL-040/subscription-runtime-implementation-2026-08-17.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts",
+      "src/lib/pulse/v2/subscription-cli.test.ts",
+      "src/lib/pulse/v2/classify-fixture.test.ts",
+      "src/lib/pulse/v2/validation-protocol.test.ts"
+    ],
+    "contract_test": [
+      "scripts/validate-pulse-runtime-method.ts",
+      "scripts/validate-pulse-validation-protocol.ts",
+      "src/lib/pulse/v2/publication-consistency.test.ts"
+    ]
+  },
+  "validations": [
+    "validate:ci-current-release",
+    "validate:ci-missingness",
+    "validate:ci-ranking",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:ci-uncertainty",
+    "validate:claims-docs",
+    "validate:cron-safety",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-pulse-subscription-runtime",
+    "validate:index-quarantine",
+    "validate:index-research-archive",
+    "validate:pulse-runtime",
+    "validate:pulse-source-coverage"
+  ]
+}

@@ -193,7 +193,7 @@ test("aggregate ingest fetches every connector before one successful publish", a
   assert.deepEqual(harness.stampedBatches, [["gdelt", "rsf"]]);
 });
 
-test("a connector failure writes nothing and the full successful retry stamps every inserted source", async () => {
+test("a connector failure publishes the successful subset and the retry adds only the recovered source", async () => {
   const harness = aggregatePublishHarness();
   let rsfFails = true;
   const connectorJobs = (): PulseConnectorJob[] => [
@@ -205,8 +205,8 @@ test("a connector failure writes nothing and the full successful retry stamps ev
       source: "rsf",
       fetcher: async () => {
         if (rsfFails) {
-          // Even an empty message is an aggregate failure; truthiness must not
-          // control whether the successful connector subset is published.
+          // Even an empty message is a connector failure; truthiness must not
+          // control whether the failure is recorded on the partial run.
           throw new Error("");
         }
         return {
@@ -225,6 +225,8 @@ test("a connector failure writes nothing and the full successful retry stamps ev
     },
   ];
 
+  // Partial-availability policy: the failed connector contributes no rows and
+  // no freshness, but it cannot starve the successful subset.
   const partial = await ingestPulseV2(harness.db, {
     jobs: connectorJobs(),
     jurisdictionMap: new Map<string, string>(),
@@ -232,14 +234,14 @@ test("a connector failure writes nothing and the full successful retry stamps ev
     runRef,
   });
 
-  assert.equal(partial.totalInserted, 0);
+  assert.equal(partial.totalInserted, 1);
   assert.equal(
     partial.reports.find(({ source }) => source === "rsf")?.error,
     "",
   );
-  assert.deepEqual(partial.sourcesStamped, []);
-  assert.equal(harness.publishCalls(), 0);
-  assert.equal(harness.state.size, 0);
+  assert.deepEqual(partial.sourcesStamped, ["gdelt"]);
+  assert.equal(harness.publishCalls(), 1);
+  assert.equal(harness.state.size, 1);
 
   rsfFails = false;
   const retried = await ingestPulseV2(harness.db, {
@@ -249,11 +251,14 @@ test("a connector failure writes nothing and the full successful retry stamps ev
     runRef,
   });
 
-  assert.equal(retried.totalInserted, 2);
-  assert.equal(harness.publishCalls(), 1);
+  // The recovered source inserts and stamps; the already-published gdelt row
+  // deduplicates and must NOT restamp freshness on duplicate-only work.
+  assert.equal(retried.totalInserted, 1);
+  assert.equal(retried.totalSkipped, 1);
+  assert.equal(harness.publishCalls(), 2);
   assert.equal(harness.state.size, 2);
-  assert.deepEqual(retried.sourcesStamped.toSorted(), ["gdelt", "rsf"]);
-  assert.deepEqual(harness.stampedBatches, [["gdelt", "rsf"]]);
+  assert.deepEqual(retried.sourcesStamped, ["rsf"]);
+  assert.deepEqual(harness.stampedBatches, [["gdelt"], ["rsf"]]);
 });
 
 test("strict connector failures still await every fetch and publish nothing", async () => {

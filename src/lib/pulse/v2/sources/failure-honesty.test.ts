@@ -195,7 +195,7 @@ test("the IPU default endpoint surfaces HTTP and parse failures", async () => {
       fetchImpl: (async () =>
         Response.json({ unexpected: [] })) as typeof fetch,
     }),
-    /IPU actions response parse failed.*expected a results array/,
+    /IPU actions response parse failed.*expected a JSON:API data array/,
   );
 });
 
@@ -215,7 +215,7 @@ test("configured connectors accept successful quiet periods with zero rows", asy
   });
   assert.deepEqual(
     await fetchIpuActions(map, {
-      fetchImpl: (async () => Response.json({ results: [] })) as typeof fetch,
+      fetchImpl: (async () => Response.json({ data: [] })) as typeof fetch,
     }),
     { rows: [], unmatchedCountry: 0, fetched: 0 },
   );
@@ -284,9 +284,11 @@ test("a configured connector failure cannot be masked by a successful sibling", 
     }),
   });
 
-  assert.equal(publishCalls, 0);
-  assert.equal(summary.totalInserted, 0);
-  assert.deepEqual(summary.sourcesStamped, []);
+  // The successful sibling publishes, but the failure stays visible: the run
+  // is partial, the connector error is recorded, and monitoring sees 502.
+  assert.equal(publishCalls, 1);
+  assert.equal(summary.totalInserted, 1);
+  assert.deepEqual(summary.sourcesStamped, ["working_feed"]);
   assert.match(
     summary.reports.find(({ source }) => source === "reuters_ap")?.error ?? "",
     /configured feed unavailable/,
@@ -339,7 +341,9 @@ test("partial ACLED configuration cannot be masked by a successful sibling", asy
     }),
   });
 
-  assert.equal(publishCalls, 0);
+  // The successful sibling publishes; the misconfiguration stays a visible
+  // partial-run failure.
+  assert.equal(publishCalls, 1);
   assert.match(
     summary.reports.find(({ source }) => source === "acled")?.error ?? "",
     /ACLED configuration incomplete/,
@@ -384,9 +388,10 @@ test("nonempty but structurally unusable connector output cannot be masked by a 
     }),
   });
 
-  assert.equal(publishCalls, 0);
+  // The drifted connector is a recorded failure; the sibling still publishes.
+  assert.equal(publishCalls, 1);
   assert.equal(summary.totalFetched, 4);
-  assert.equal(summary.totalInserted, 0);
+  assert.equal(summary.totalInserted, 1);
   const failure = summary.reports.find(
     ({ source }) => source === "schema_drifted",
   );

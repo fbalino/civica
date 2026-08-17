@@ -17,8 +17,8 @@
 import { createHash } from "node:crypto";
 
 import {
-  DEFAULT_ENSEMBLE,
-  DEFAULT_ENSEMBLE_VERIFY,
+  SUBSCRIPTION_ENSEMBLE_CONFIGS,
+  SUBSCRIPTION_VERIFY_PROVIDER_CONFIG,
   PROVIDER_DEFAULT_MODEL,
   type ClassifierProvider,
   type ResolvedProviderConfig,
@@ -40,8 +40,8 @@ import {
   type SeverityTier,
 } from "./types";
 import {
-  SUBJECT_ATTRIBUTION_MODEL,
   SUBJECT_ATTRIBUTION_PROVIDER,
+  SUBSCRIPTION_SUBJECT_ATTRIBUTION_MODEL,
 } from "./country-attribution";
 import {
   PULSE_JURISDICTION_ATTRIBUTION_VERSION,
@@ -103,8 +103,14 @@ import {
   PULSE_REVIEW_SLA_VERSION,
 } from "./review-sla";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.14.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.15-beta" as const;
+// 1.15.0 / pulse-v2.16-beta (2026-08-17): the classify, verify, and
+// subject-attribution passes move to the owner-approved subscription-CLI
+// transport (plan/pulse-subscription-runtime-resolution-v1.md). Provider
+// refs gain a transport field; decoding is provider-default on that
+// transport; subscription-run classifications always queue for human review
+// (PUL-036) and the paid HTTP classifier path carries a $0 authority.
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.15.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.16-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-29" as const;
 
@@ -120,6 +126,9 @@ export type PulseConnectorStatus =
 export interface PulseProviderRef {
   provider: ClassifierProvider;
   model: string;
+  /** "subscription-cli" = owner-Mac subscription runtime ($0 marginal,
+   * provider-default decoding, always human review); absent = HTTP API. */
+  transport?: "subscription-cli";
 }
 
 export interface PulseConnectorFact {
@@ -535,7 +544,13 @@ export interface PulseRuntimeMethodSnapshot extends PulseRuntimeMethodContract {
 }
 
 function providerRef(config: ResolvedProviderConfig): PulseProviderRef {
-  return { provider: config.provider, model: config.model };
+  return config.transport === "subscription-cli"
+    ? {
+        provider: config.provider,
+        model: config.model,
+        transport: "subscription-cli",
+      }
+    : { provider: config.provider, model: config.model };
 }
 
 function uniqueSorted(values: readonly string[]): string[] {
@@ -1135,11 +1150,12 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
       operations: ["corroborate", "score"],
     },
   ],
-  classifyEngines: DEFAULT_ENSEMBLE,
-  verifyEngine: DEFAULT_ENSEMBLE_VERIFY,
+  classifyEngines: SUBSCRIPTION_ENSEMBLE_CONFIGS,
+  verifyEngine: SUBSCRIPTION_VERIFY_PROVIDER_CONFIG,
   subjectEngine: {
     provider: SUBJECT_ATTRIBUTION_PROVIDER,
-    model: SUBJECT_ATTRIBUTION_MODEL,
+    model: SUBSCRIPTION_SUBJECT_ATTRIBUTION_MODEL,
+    transport: "subscription-cli",
   },
   reviewSummaryEngine: {
     provider: PULSE_REVIEW_SUMMARY_PROVIDER,

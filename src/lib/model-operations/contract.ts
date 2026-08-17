@@ -19,7 +19,13 @@ export type ModelOperationId =
   | "bills-summarize"
   | "stats-sa-reconciliation";
 
-export type ModelProvider = "anthropic" | "deepseek" | "glm" | "openai";
+export type ModelProvider =
+  | "anthropic"
+  | "deepseek"
+  | "glm"
+  | "openai"
+  | "xai"
+  | "moonshot";
 
 export interface ModelOperationControl {
   credentialEnv: string;
@@ -144,10 +150,21 @@ export const MODEL_OPERATION_CONTROLS: Record<
 };
 
 export const APPROVED_PULSE_PROVIDER_MODELS = {
-  anthropic: ["claude-sonnet-4-6", "claude-haiku-4-5"] as const,
+  // The subscription-CLI voter panel entries (claude-sonnet-5, gpt-5.6-terra,
+  // grok-4.5, kimi-k3) are the owner's written 2026-08-17 model authority
+  // (`plan/pulse-subscription-runtime-resolution-v1.md`, approval record).
+  // They run only through the subscription-cli transport at $0 marginal
+  // cost; xai and moonshot have no HTTP/API path in this codebase.
+  anthropic: [
+    "claude-sonnet-4-6",
+    "claude-haiku-4-5",
+    "claude-sonnet-5",
+  ] as const,
   deepseek: ["deepseek-v4-flash", "deepseek-v4-pro"] as const,
   glm: ["glm-4.7", "glm-4.7-flashx", "glm-4.7-flash", "glm-5.2"] as const,
-  openai: ["gpt-4.1-mini"] as const,
+  openai: ["gpt-4.1-mini", "gpt-5.6-terra"] as const,
+  xai: ["grok-4.5"] as const,
+  moonshot: ["kimi-k3"] as const,
 } satisfies Record<ModelProvider, readonly string[]>;
 
 export function modelOperationControl(

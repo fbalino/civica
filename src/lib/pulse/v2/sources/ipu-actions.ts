@@ -9,11 +9,15 @@
  * confidence votes, dissolutions, etc.) of the kind the Pulse
  * needs.
  *
- * The connector returns recent elections as Pulse events when the
- * IPU /elections endpoint exposes new rows since the last sync. This
- * gives us *some* signal — peaceful transfers + flawed elections
- * are real Pulse events — but the full vision (live legislative
- * actions) requires a different data path we haven't identified.
+ * The connector returns recent elections as Pulse events. The v1 API
+ * serves a JSON:API envelope ({ meta, links, data: [{ type, id,
+ * attributes }] }) whose per-field values are wrapped as
+ * { value, annotation, missing_reason }, and it does not honor a
+ * date_from filter — so we request newest-first (sort=-election_date)
+ * and window client-side. This gives us *some* signal — peaceful
+ * transfers + flawed elections are real Pulse events — but the full
+ * vision (live legislative actions) requires a different data path we
+ * haven't identified.
  */
 
 import { type JurisdictionMap, resolveCountry } from "../country-resolver";
@@ -22,12 +26,20 @@ import type { RawEventInput } from "../types";
 const IPU_BASE = process.env.IPU_BASE_URL ?? "https://api.data.ipu.org/v1";
 const SOURCE_ID = "ipu_parline";
 
-interface IpuElection {
-  id: number;
-  country?: { code?: string; name?: string };
-  type?: string;
-  date?: string;
-  result?: string;
+/** A JSON:API attribute cell: { value, annotation, missing_reason }. */
+function cell(attributes: Record<string, unknown>, key: string): unknown {
+  const wrapped = attributes[key];
+  if (typeof wrapped !== "object" || wrapped === null) return null;
+  return (wrapped as { value?: unknown }).value ?? null;
+}
+
+function localizedEn(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && value !== null && "en" in value) {
+    const en = (value as { en?: unknown }).en;
+    return typeof en === "string" && en.trim() ? en : null;
+  }
+  return null;
 }
 
 export interface IpuFetchResult {
@@ -52,7 +64,7 @@ export async function fetchIpuActions(
     .slice(0, 10);
 
   const baseUrl = opts.baseUrl ?? IPU_BASE;
-  const url = `${baseUrl}/elections?date_from=${since}&page_size=200`;
+  const url = `${baseUrl}/elections?sort=-election_date&page_size=200`;
 
   let resp: Response;
   try {
@@ -85,40 +97,71 @@ export async function fetchIpuActions(
   if (
     typeof json !== "object" ||
     json === null ||
-    !("results" in json) ||
-    !Array.isArray(json.results)
+    !("data" in json) ||
+    !Array.isArray((json as { data: unknown }).data)
   ) {
     throw new Error(
-      `IPU actions response parse failed (${url}): expected a results array`,
+      `IPU actions response parse failed (${url}): expected a JSON:API data array`,
     );
   }
-  const elections = json.results as IpuElection[];
+  const records = (json as { data: unknown[] }).data;
 
   const rows: RawEventInput[] = [];
   let unmatchedCountry = 0;
+  let inWindow = 0;
 
-  for (const e of elections) {
-    if (!e.id || !e.country?.code) continue;
-    const jurisdictionId =
-      resolveCountry(e.country.code, map) ??
-      resolveCountry(e.country.name ?? null, map);
+  for (const record of records) {
+    if (typeof record !== "object" || record === null) continue;
+    const id = (record as { id?: unknown }).id;
+    const attributes = (record as { attributes?: unknown }).attributes;
+    if (typeof id !== "string" || !id.trim()) continue;
+    if (typeof attributes !== "object" || attributes === null) continue;
+    const attrs = attributes as Record<string, unknown>;
+
+    const dateValue = cell(attrs, "election_date");
+    const from =
+      typeof dateValue === "object" && dateValue !== null
+        ? (dateValue as { from?: unknown }).from
+        : dateValue;
+    const eventDate =
+      typeof from === "string" && from.length >= 10 ? from.slice(0, 10) : null;
+    // Newest-first sort + client-side window: past the window we are done.
+    if (!eventDate) continue;
+    if (eventDate < since) break;
+    inWindow++;
+
+    // Election codes prefix the ISO2 country code (e.g. ZM-LC01-E20260813).
+    const iso2 = id.slice(0, 2);
+    const jurisdictionId = resolveCountry(iso2, map);
     if (!jurisdictionId) {
       unmatchedCountry++;
     }
-    const title = `${e.country.name ?? e.country.code}: ${e.type ?? "Election"} on ${e.date ?? "unknown date"}`;
+    const title =
+      localizedEn(cell(attrs, "election_title")) ?? `IPU election ${id}`;
+    const seats = cell(attrs, "number_of_seats_at_stake");
+    const scope = cell(attrs, "scope_of_elections");
+    const scopeTerm =
+      typeof scope === "object" && scope !== null
+        ? (scope as { term?: unknown }).term
+        : null;
+    const bodyParts: string[] = [];
+    if (typeof seats === "number") bodyParts.push(`${seats} seats at stake`);
+    if (typeof scopeTerm === "string") {
+      bodyParts.push(`scope: ${scopeTerm.replaceAll("_", " ")}`);
+    }
     rows.push({
       sourceId: SOURCE_ID,
-      externalId: `election-${e.id}`,
-      sourceUrl: `${baseUrl}/elections/${e.id}`,
+      externalId: `election-${id}`,
+      sourceUrl: `${baseUrl}/elections/${encodeURIComponent(id)}`,
       sourceType: "specialist",
       jurisdictionId,
-      rawCountryName: e.country.name ?? null,
-      eventDate: e.date ?? null,
+      rawCountryName: iso2,
+      eventDate,
       title,
-      body: e.result ?? null,
-      raw: e as unknown as Record<string, unknown>,
+      body: bodyParts.length ? bodyParts.join("; ") : null,
+      raw: record as Record<string, unknown>,
     });
   }
 
-  return { rows, unmatchedCountry, fetched: elections.length };
+  return { rows, unmatchedCountry, fetched: inWindow };
 }

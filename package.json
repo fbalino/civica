@@ -504,7 +504,8 @@
     "validate:deps": "npm audit --audit-level=critical --omit=dev",
     "validate:env": "tsx scripts/validate-env.ts",
     "predev": "npm run validate:env -- --context=dev",
-    "validate:monetization-gate": "tsx scripts/validate-monetization-gate.ts"
+    "validate:monetization-gate": "tsx scripts/validate-monetization-gate.ts",
+    "validate:index-pulse-subscription-runtime": "tsx scripts/validate-index-pulse-subscription-runtime.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

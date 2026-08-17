@@ -81,6 +81,9 @@ export interface ClassifierRun {
   /** Vendor engine that produced this run (ensemble rows). Optional so
    *  legacy rows without it still satisfy the type. */
   provider?: ClassifierProvider;
+  /** "subscription-cli" for owner-Mac subscription runs (always human
+   *  review, never auto-publish — PUL-036); absent/"http" for API runs. */
+  transport?: "http" | "subscription-cli";
   /** Explicit pass role. Missing on retained legacy rows. */
   role?: "classify" | "verify";
   /** Exact classifier prompt bundle used for this pass. */
@@ -109,7 +112,13 @@ export interface ClassifierRun {
  *  `ClassifierProvider` in `provider.ts`; duplicated here (a string-literal
  *  union, no runtime cost) to keep `types.ts` free of a provider-module
  *  import cycle. */
-export type ClassifierProvider = "anthropic" | "deepseek" | "glm" | "openai";
+export type ClassifierProvider =
+  | "anthropic"
+  | "deepseek"
+  | "glm"
+  | "openai"
+  | "xai"
+  | "moonshot";
 
 /** Persisted voter-agreement signal on `pulse_events_v2.classifier_agreement`.
  *  Current rows derive it only from provider-distinct, prompt-versioned
