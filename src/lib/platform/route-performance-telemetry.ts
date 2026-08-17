@@ -18,6 +18,21 @@ export const ROUTE_PERFORMANCE_TELEMETRY_VERSION =
 export const ROUTE_PERFORMANCE_RETENTION_DAYS = 30;
 export const ROUTE_PERFORMANCE_WINDOW_HOURS = 24;
 
+/**
+ * Request telemetry is uniformly sampled so a per-request database write does
+ * not scale with traffic. Only the `request` surface is sampled: job and
+ * server-error observations are always recorded, so the sampled request count
+ * is the single quantity downstream consumers must rate-correct.
+ *
+ * The sample is deliberately uniform. Exempting slow requests would keep the
+ * tail while discarding the body of the distribution, which would turn the
+ * stored `p95` into something that is no longer a percentile of real traffic.
+ * The proxy also cannot know the response status, so an error-based exemption
+ * is not available there; `onRequestError` records errors on its own unsampled
+ * path.
+ */
+export const ROUTE_PERFORMANCE_REQUEST_SAMPLE_RATE: number = 0.05;
+
 export type RoutePerformanceSurface = "request" | "job" | "error";
 export type RoutePerformanceMetric =
   "request_duration_ms" | "job_duration_ms" | "server_error";
@@ -234,6 +249,32 @@ export function requestPerformanceObservation(
   };
 }
 
+/**
+ * Decide whether one request contributes a stored observation. The random
+ * source is injected so the decision is exercisable without stubbing globals,
+ * and an unusable draw fails closed rather than becoming a write.
+ */
+export function shouldRecordRequestPerformanceSample(
+  random: () => number = Math.random,
+): boolean {
+  const rate = ROUTE_PERFORMANCE_REQUEST_SAMPLE_RATE;
+  if (!Number.isFinite(rate) || rate <= 0) return false;
+  if (rate >= 1) return true;
+  const draw = random();
+  if (!Number.isFinite(draw) || draw < 0 || draw >= 1) return false;
+  return draw < rate;
+}
+
+/**
+ * Scale a sampled request count back to the request volume it represents.
+ * Server errors are never sampled, so any comparison between an error count
+ * and a request count has to pass through this correction.
+ */
+export function estimatedRequestPopulation(sampledCount: number): number {
+  if (!Number.isFinite(sampledCount) || sampledCount <= 0) return 0;
+  return Math.round(sampledCount / ROUTE_PERFORMANCE_REQUEST_SAMPLE_RATE);
+}
+
 export function jobPerformanceObservation(
   jobId: string,
   method: string,
@@ -448,6 +489,9 @@ export function routePerformanceAlerts(
     const key = alertKey(summary);
     if (summary.metric === "request_duration_ms") {
       requests.set(key, (requests.get(key) ?? 0) + summary.sampleCount);
+      // This gate gauges how reliable the stored percentile is, so it counts
+      // stored observations rather than estimated traffic. Under sampling a
+      // route needs roughly 20/rate real requests in the window to qualify.
       if (summary.sampleCount >= 20 && (summary.p95Ms ?? 0) > 1_500) {
         alerts.push({
           id: "request_p95",
@@ -485,14 +529,17 @@ export function routePerformanceAlerts(
     }
   }
   for (const [key, errorSummary] of errors) {
-    const requestCount = requests.get(key) ?? 0;
+    // Stored request rows are a uniform sample and stored error rows are not,
+    // so the denominator is restored to its estimated population before the
+    // rate is compared. Without this the ratio would be inflated by 1/rate.
+    const requestCount = estimatedRequestPopulation(requests.get(key) ?? 0);
     if (requestCount >= 100 && errorSummary.sampleCount / requestCount > 0.02) {
       alerts.push({
         id: "server_error_rate",
         routeId: errorSummary.routeId,
         releaseId: errorSummary.releaseId,
         cacheProfile: errorSummary.cacheProfile,
-        detail: `${errorSummary.sampleCount}/${requestCount} server errors exceed the 2% threshold`,
+        detail: `${errorSummary.sampleCount}/${requestCount} server errors exceed the 2% threshold (requests estimated from a ${ROUTE_PERFORMANCE_REQUEST_SAMPLE_RATE} sample)`,
       });
     }
   }

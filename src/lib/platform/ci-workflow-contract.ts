@@ -254,7 +254,7 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     "validate:query-budgets":
       "node --import tsx --test src/lib/platform/query-budget.test.ts scripts/validate-query-budgets.test.ts && tsx scripts/validate-query-budgets.ts",
     "validate:route-performance-telemetry":
-      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring && npm run validate:health-status && npm run validate:ask-civica && npm run validate:model-operations && npm run validate:serverless-db",
+      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts src/proxy.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring && npm run validate:health-status && npm run validate:ask-civica && npm run validate:model-operations && npm run validate:serverless-db",
     "validate:privacy-data-handling":
       "node --import tsx --test src/lib/privacy/data-handling.test.ts src/lib/api/request-body-schemas.test.ts && node --import tsx scripts/validate-privacy-data-handling.ts",
     "validate:error-monitoring":
