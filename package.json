@@ -545,7 +545,7 @@
     "@types/sanitize-html": "^2.16.1",
     "@types/topojson-client": "^3.1.5",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^9",
+    "eslint": "^10",
     "eslint-config-next": "16.2.7",
     "fflate": "^0.8.3",
     "tailwindcss": "^4",
