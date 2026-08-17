@@ -61,7 +61,7 @@ stage_route() {
   out="$(curl -sS -m 900 -w '\n%{http_code}' \
     -H "Authorization: Bearer $SECRET" \
     -H "Idempotency-Key: mac-runner-$name-$DAY" \
-    "$BASE$route?source=mac-runner" 2>>"$LOG")"
+    "$BASE$route" 2>>"$LOG")"
   code="${out##*$'\n'}"
   log "stage=$name http=$code body=$(echo "$out" | head -c 300 | tr '\n' ' ')"
   # 200 = completed; 502/503 = honest partial/skip recorded by the route.
@@ -74,12 +74,24 @@ stage_route() {
 log "=== Pulse daily cycle start day=$DAY ==="
 
 stage_route ingest "/api/cron/pulse/v2/ingest"
-stage_route cluster "/api/cron/pulse/v2/cluster"
 
-# Classification: locally, on the owner's subscription CLIs only.
+# Clustering runs LOCALLY: incident identity requires the semantic embedding
+# model, which loads on this Mac but not in serverless. The scheduled route
+# stays as an honest partial (publishes nothing under lexical fallback).
+if "$RUNNER_NODE" "$REPO/node_modules/.bin/tsx" \
+   scripts/sync-pulse-v2-cluster.ts >> "$LOG" 2>&1; then
+  log "stage=cluster local embedding run completed"
+else
+  log "stage=cluster FAILED (see log above)"
+  FAILED="$FAILED cluster"
+fi
+
+# Classification: locally, on the owner's subscription CLIs only. The daily
+# cap bounds CLI churn (~40s/cluster observed); the queue's terminal states
+# make the backlog drain across days with zero repeat calls.
 if PULSE_CLASSIFY_TRANSPORT=subscription-cli \
    "$RUNNER_NODE" "$REPO/node_modules/.bin/tsx" \
-   scripts/sync-pulse-v2-classify.ts >> "$LOG" 2>&1; then
+   scripts/sync-pulse-v2-classify.ts --limit 120 >> "$LOG" 2>&1; then
   log "stage=classify local subscription run completed"
 else
   log "stage=classify FAILED (see log above)"

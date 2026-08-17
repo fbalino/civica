@@ -213,7 +213,7 @@ export function callSubscriptionCli(
       if (code !== 0) {
         reject(
           new Error(
-            `Subscription voter ${config.provider}/${config.model} exited ${code}: ${stderr.slice(0, 400)}`,
+            `Subscription voter ${config.provider}/${config.model} exited ${code}: stderr=${stderr.slice(0, 300)} stdout=${stdout.slice(-300)}`,
           ),
         );
         return;
