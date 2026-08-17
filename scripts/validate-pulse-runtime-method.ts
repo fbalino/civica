@@ -29,8 +29,8 @@ import {
   type PulseRuntimeMethodSnapshot,
 } from "../src/lib/pulse/v2/runtime-contract";
 import {
-  DEFAULT_ENSEMBLE,
-  DEFAULT_ENSEMBLE_VERIFY,
+  SUBSCRIPTION_ENSEMBLE_CONFIGS,
+  SUBSCRIPTION_VERIFY_PROVIDER_CONFIG,
   PROVIDER_DEFAULT_MODEL,
 } from "../src/lib/pulse/v2/provider";
 import {
@@ -239,17 +239,27 @@ function validateExportedRuntimeConstants(
   state: ValidationState,
   snapshot: PulseRuntimeMethodSnapshot,
 ): void {
+  // pulse-v2.16-beta: the canonical panel is the owner-approved subscription
+  // configuration (plan/pulse-subscription-runtime-resolution-v1.md).
   checkEqual(
     state,
     snapshot.providers.classify.engines,
-    DEFAULT_ENSEMBLE,
-    "Classify engines must match DEFAULT_ENSEMBLE",
+    SUBSCRIPTION_ENSEMBLE_CONFIGS.map(({ provider, model }) => ({
+      provider,
+      model,
+      transport: "subscription-cli",
+    })),
+    "Classify engines must match the subscription panel",
   );
   checkEqual(
     state,
     snapshot.providers.verify.engine,
-    DEFAULT_ENSEMBLE_VERIFY,
-    "Verify engine must match DEFAULT_ENSEMBLE_VERIFY",
+    {
+      provider: SUBSCRIPTION_VERIFY_PROVIDER_CONFIG.provider,
+      model: SUBSCRIPTION_VERIFY_PROVIDER_CONFIG.model,
+      transport: "subscription-cli",
+    },
+    "Verify engine must match the subscription verify config",
   );
   checkEqual(
     state,
@@ -492,7 +502,7 @@ function validateProviderRoles(
   check(
     state,
     subject.includes(
-      `export const SUBJECT_ATTRIBUTION_MODEL = "${snapshot.providers.subject.engine.model}"`,
+      `export const SUBSCRIPTION_SUBJECT_ATTRIBUTION_MODEL = "${snapshot.providers.subject.engine.model}"`,
     ) ||
       subject.includes(
         `const MODEL = "${snapshot.providers.subject.engine.model}"`,

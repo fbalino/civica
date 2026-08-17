@@ -8,7 +8,7 @@ import {
 } from "../src/lib/pulse/v2/validation-protocol";
 
 const checked = readFileSync(
-  "data/research/pulse-validation-protocol-v1.json",
+  "data/research/pulse-validation-protocol-v2.json",
   "utf8",
 );
 assert.equal(checked, renderPulseValidationProtocol());

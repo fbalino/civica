@@ -64,8 +64,18 @@ import {
   modelOperationControl,
   type ModelOperationId,
 } from "@/lib/model-operations/contract";
+import {
+  SUBSCRIPTION_CLASSIFY_ENSEMBLE,
+  SUBSCRIPTION_VERIFY_CONFIG,
+} from "./subscription-cli";
 
-export type ClassifierProvider = "anthropic" | "deepseek" | "glm" | "openai";
+export type ClassifierProvider =
+  | "anthropic"
+  | "deepseek"
+  | "glm"
+  | "openai"
+  | "xai"
+  | "moonshot";
 
 /** Legacy/single-engine configuration is retained only for verification. */
 export type ClassifierPass = "verify";
@@ -113,6 +123,10 @@ export const PROVIDER_DEFAULT_MODEL: Record<ClassifierProvider, string> = {
   deepseek: "deepseek-v4-flash",
   glm: "glm-4.7",
   openai: "gpt-4.1-mini",
+  // xai and moonshot exist ONLY on the subscription-cli transport; they have
+  // no HTTP path and no API key in this codebase.
+  xai: "grok-4.5",
+  moonshot: "kimi-k3",
 };
 
 /** OpenAI-compatible endpoints. All accept `/chat/completions`. */
@@ -128,6 +142,10 @@ const PROVIDER_KEY_ENV: Record<ClassifierProvider, string> = {
   deepseek: "DEEPSEEK_API_KEY",
   glm: "GLM_API_KEY",
   openai: "OPENAI_API_KEY",
+  // Deliberately never configured: the subscription-cli transport does not
+  // read keys, and the HTTP path rejects these providers outright.
+  xai: "XAI_API_KEY",
+  moonshot: "MOONSHOT_API_KEY",
 };
 
 /**
@@ -157,7 +175,44 @@ export const PROVIDER_MODEL_PRICES: Record<
 export interface ResolvedProviderConfig {
   provider: ClassifierProvider;
   model: string;
+  /** "http" (default) or "subscription-cli" — the owner-approved
+   * zero-marginal-cost transport (`pulse-subscription-runtime-resolution-v1`).
+   */
+  transport?: "http" | "subscription-cli";
+  /** CLI binary for the subscription-cli transport. */
+  bin?: string;
+  /** CLI-specific model alias when it differs from the recorded model. */
+  cliModelArg?: string;
 }
+
+/**
+ * True when the classify path runs on the owner's subscription CLIs instead
+ * of paid HTTP APIs. Selected explicitly by the Mac runner; never default.
+ */
+export function subscriptionTransportActive(): boolean {
+  return (
+    (process.env.PULSE_CLASSIFY_TRANSPORT ?? "").trim() === "subscription-cli"
+  );
+}
+
+/** The pulse-v2.16-beta canonical classify panel: the owner-approved
+ * subscription voters as provider configs (closed set, not env-driven). */
+export const SUBSCRIPTION_ENSEMBLE_CONFIGS: ResolvedProviderConfig[] =
+  SUBSCRIPTION_CLASSIFY_ENSEMBLE.map((voter) => ({
+    provider: voter.provider,
+    model: voter.model,
+    transport: "subscription-cli" as const,
+    bin: voter.bin,
+    cliModelArg: voter.cliModelArg,
+  }));
+
+export const SUBSCRIPTION_VERIFY_PROVIDER_CONFIG: ResolvedProviderConfig = {
+  provider: SUBSCRIPTION_VERIFY_CONFIG.provider,
+  model: SUBSCRIPTION_VERIFY_CONFIG.model,
+  transport: "subscription-cli",
+  bin: SUBSCRIPTION_VERIFY_CONFIG.bin,
+  cliModelArg: SUBSCRIPTION_VERIFY_CONFIG.cliModelArg,
+};
 
 export function parseProvider(
   value: string | undefined,
@@ -257,6 +312,12 @@ export function parseProviderModelPair(
  * silently spending against a different configuration.
  */
 export function resolveClassifyEnsemble(): ResolvedProviderConfig[] {
+  if (subscriptionTransportActive()) {
+    // The subscription panel is a closed set fixed by the owner's approval
+    // record; PULSE_CLASSIFY_ENSEMBLE cannot vary it. This keeps the frozen
+    // validation configuration immune to env drift.
+    return SUBSCRIPTION_ENSEMBLE_CONFIGS.map((config) => ({ ...config }));
+  }
   const raw = (process.env.PULSE_CLASSIFY_ENSEMBLE ?? "").trim();
   if (!raw) return DEFAULT_ENSEMBLE;
   const parsed = raw
@@ -274,6 +335,9 @@ export function resolveClassifyEnsemble(): ResolvedProviderConfig[] {
  * (a single `provider:model` pair). Unset → Anthropic Haiku 4.5.
  */
 export function resolveEnsembleVerifyConfig(): ResolvedProviderConfig {
+  if (subscriptionTransportActive()) {
+    return { ...SUBSCRIPTION_VERIFY_PROVIDER_CONFIG };
+  }
   const raw = (process.env.PULSE_ENSEMBLE_VERIFY ?? "").trim();
   if (!raw) return DEFAULT_ENSEMBLE_VERIFY;
   const parsed = parseProviderModelPair(raw);
@@ -507,6 +571,42 @@ export async function callClassifier(
 ): Promise<ProviderResponse> {
   if (!isApprovedPulseProviderModel(config.provider, config.model)) {
     throw new Error("Classifier provider/model is not approved");
+  }
+  if (config.transport === "subscription-cli") {
+    // Owner-approved zero-marginal-cost path: a headless subscription CLI on
+    // the owner's Mac. No API key is read; token usage is not metered by a
+    // billing meter, so it is reported as zero. The response's `model`
+    // carries the CLI-reported identifier when available (run-level model
+    // logging per the resolution).
+    assertModelOperationRequest(
+      operation,
+      req.system.length + req.user.length,
+      req.maxTokens,
+    );
+    if (!config.bin) {
+      throw new Error("subscription-cli transport requires a CLI binary");
+    }
+    const { callSubscriptionCli } = await import("./subscription-cli");
+    const result = await callSubscriptionCli(
+      {
+        provider: config.provider as never,
+        model: config.model,
+        bin: config.bin,
+        cliModelArg: config.cliModelArg,
+      },
+      { system: req.system, user: req.user },
+    );
+    return {
+      text: result.text,
+      usage: { inputTokens: 0, outputTokens: 0 },
+      provider: config.provider,
+      model: result.reportedModel ?? config.model,
+    };
+  }
+  if (config.provider === "xai" || config.provider === "moonshot") {
+    throw new Error(
+      `Provider ${config.provider} has no HTTP path; it runs only on the subscription-cli transport`,
+    );
   }
   if (config.provider === "anthropic") {
     assertModelOperationRequest(operation, req.system.length + req.user.length, req.maxTokens);

@@ -43,6 +43,11 @@ export interface UpsertRawEventsOptions {
    */
   finalizeRun?: {
     counts: Record<string, number>;
+    /** 'partial' when some connectors failed but the successful subset is
+     * still published; defaults to 'completed'. */
+    status?: "completed" | "partial";
+    /** Connector failures recorded on the finalized run row. */
+    failures?: ReadonlyArray<{ component: string; message: string }>;
   };
   /** Deterministic fixture seam and shared commit/freshness timestamp. */
   committedAt?: Date;
@@ -325,6 +330,11 @@ export async function upsertRawEvents(
   const freshnessCte = markSourcesSyncedFromInsertedRowsCte(committedAt);
   const requiresFinalization = options.finalizeRun !== undefined;
   const baseCounts = JSON.stringify(options.finalizeRun?.counts ?? {});
+  const finalStatus = options.finalizeRun?.status ?? "completed";
+  if (finalStatus !== "completed" && finalStatus !== "partial") {
+    throw new Error(`Invalid finalize status: ${String(finalStatus)}`);
+  }
+  const finalFailures = JSON.stringify(options.finalizeRun?.failures ?? []);
 
   const result = await db.execute(sql`
     WITH input_rows AS (
@@ -507,7 +517,7 @@ export async function upsertRawEvents(
     ), finalized_run AS (
       UPDATE pulse_pipeline_runs run
       SET
-        status = 'completed',
+        status = ${finalStatus},
         counts = ${baseCounts}::jsonb
           || jsonb_build_object(
             'inserted', (
@@ -522,7 +532,7 @@ export async function upsertRawEvents(
             )
           )
           || (SELECT values FROM connector_metrics),
-        failures = '[]'::jsonb,
+        failures = ${finalFailures}::jsonb,
         completed_at = ${committedAt}
       WHERE run.id = ${ingestRunId}
         AND run.status = 'running'

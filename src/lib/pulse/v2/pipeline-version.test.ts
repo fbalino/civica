@@ -53,7 +53,8 @@ test("scheduled classifications name production v2, not adopted research v3", ()
     classify.ontology.state === "versioned" ? classify.ontology.id : null,
     ADOPTED_PULSE_RESEARCH_ONTOLOGY_VERSION,
   );
-  assert.equal(classify.models.filter(({ role }) => role === "classify").length, 3);
+  // pulse-v2.16-beta: four subscription voters (owner panel, 2026-08-17).
+  assert.equal(classify.models.filter(({ role }) => role === "classify").length, 4);
   assert.equal(classify.models.filter(({ role }) => role === "verify").length, 1);
   assert.equal(
     classify.models.filter(({ role }) => role === "subject_attribution").length,

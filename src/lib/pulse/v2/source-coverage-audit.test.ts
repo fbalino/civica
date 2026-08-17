@@ -9,7 +9,7 @@ import {
 } from "./source-coverage-audit";
 
 const CHECKED_PATH =
-  "plan/evidence/PUL-008/source-coverage-audit-2026-07-14.json";
+  "plan/evidence/PUL-040/source-coverage-audit-2026-08-17.json";
 const checked = JSON.parse(
   readFileSync(CHECKED_PATH, "utf8"),
 ) as PulseSourceCoverageAudit;
@@ -93,21 +93,21 @@ test("runtime connector and exact rights posture drift fail closed", () => {
 
 test("state, telemetry, evidence, summary, and time contradictions fail", () => {
   const state = clone();
-  const amnesty = state.report.feeds.find((feed) => feed.feedId === "amnesty")!;
-  amnesty.state = "degraded";
-  amnesty.stateReason =
+  const hrw = state.report.feeds.find((feed) => feed.feedId === "hrw")!;
+  hrw.state = "degraded";
+  hrw.stateReason =
     "No connector-level retrieval telemetry has been retained yet.";
   rejected(reseal(state), "state must derive as operating");
 
   const retrieval = clone();
   retrieval.report.feeds.find(
-    (feed) => feed.feedId === "amnesty",
+    (feed) => feed.feedId === "hrw",
   )!.retrieval.latestFetched = null;
   rejected(reseal(retrieval), "observed-run telemetry is incomplete");
 
   const evidence = clone();
   evidence.report.feeds.find(
-    (feed) => feed.feedId === "amnesty",
+    (feed) => feed.feedId === "hrw",
   )!.evidence.retainedRows = 0;
   rejected(reseal(evidence), "retained rows and last-data time disagree");
 

@@ -27,6 +27,11 @@ export const PULSE_SCORE_PUBLICATION_SCHEMA =
 /** The retained 2026-07-12 r2.15 publication used the exact v2.4 decay
  * serialization. It remains readable as historical evidence, but no new
  * stable-key release may use it after PUL-027 advanced the lifecycle. */
+/** Method versions of retained published score runs (verifiable as named
+ * history; never valid for new runs). pulse-v2.15-beta rows predate the
+ * 2026-08-17 subscription-runtime method (pulse-v2.16-beta). */
+const RETAINED_PULSE_METHOD_VERSIONS = new Set<string>(["pulse-v2.15-beta"]);
+
 const LEGACY_PULSE_SCORE_ALGORITHM_VERSION =
   "pulse-delta/decay-window-v2.4+incident-resolution-v1+output-history-v1+absorption-evidence-v1";
 
@@ -185,8 +190,20 @@ export function assertPulseScorePublication(
     errors.push("pointer and score-run version keys differ");
   }
   errors.push(...pulseStageVersionErrors(row.runVersions));
+  // Retained score runs published under a prior method version remain
+  // verifiable under that named version; new runs must carry the current one.
+  const methodologyRef = row.runVersions.methodology;
+  const retainedMethodology =
+    methodologyRef.state === "versioned" &&
+    RETAINED_PULSE_METHOD_VERSIONS.has(methodologyRef.id);
+  if (
+    methodologyRef.state !== "versioned" ||
+    (methodologyRef.id !== PULSE_RUNTIME_METHOD_VERSION &&
+      !retainedMethodology)
+  ) {
+    errors.push(`score-run methodology must be ${PULSE_RUNTIME_METHOD_VERSION}`);
+  }
   for (const [axis, expected] of [
-    ["methodology", PULSE_RUNTIME_METHOD_VERSION],
     ["ontology", PULSE_TAXONOMY_VERSION],
     ["pipeline", PULSE_PIPELINE_VERSION],
   ] as const) {

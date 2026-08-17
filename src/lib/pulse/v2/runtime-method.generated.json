@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "49a1403ffb99d8cb9fbc37c2e67b8692f1b9e160fddcdf269d52b4a40ae2cb39",
+  "contractHash": "1c89a6bc5778583901cbe023755dcb0df0ea640ba08b1227c585f6866a7ee8e8",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -433,16 +433,24 @@
       "degradedRunsRecorded": false,
       "engines": [
         {
-          "model": "deepseek-v4-flash",
-          "provider": "deepseek"
+          "model": "gpt-5.6-terra",
+          "provider": "openai",
+          "transport": "subscription-cli"
         },
         {
-          "model": "glm-4.7",
-          "provider": "glm"
+          "model": "claude-sonnet-5",
+          "provider": "anthropic",
+          "transport": "subscription-cli"
         },
         {
-          "model": "claude-haiku-4-5",
-          "provider": "anthropic"
+          "model": "kimi-k3",
+          "provider": "moonshot",
+          "transport": "subscription-cli"
+        },
+        {
+          "model": "grok-4.5",
+          "provider": "xai",
+          "transport": "subscription-cli"
         }
       ],
       "invalidSelfConfidencePolicy": "reject_response_as_unusable",
@@ -492,8 +500,9 @@
       "aliasVersion": "pulse-jurisdiction-aliases/v1",
       "attributionVersion": "pulse-jurisdiction-attribution/v2",
       "engine": {
-        "model": "claude-sonnet-4-6",
-        "provider": "anthropic"
+        "model": "claude-sonnet-5",
+        "provider": "anthropic",
+        "transport": "subscription-cli"
       },
       "entityCatalogVersion": "pulse-jurisdiction-entities/v1",
       "failurePolicy": "unresolved_no_automatic_publication",
@@ -507,8 +516,9 @@
     },
     "verify": {
       "engine": {
-        "model": "claude-haiku-4-5",
-        "provider": "anthropic"
+        "model": "claude-sonnet-5",
+        "provider": "anthropic",
+        "transport": "subscription-cli"
       },
       "invalidConfidencePolicy": "coerce_to_low_confidence_objection",
       "malformedVerdictOrAxesPolicy": "reject_as_failed_objection",
@@ -651,7 +661,7 @@
     },
     "version": "pulse-review-sla/v1"
   },
-  "schemaVersion": "1.14.0",
+  "schemaVersion": "1.15.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -664,5 +674,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.15-beta"
+  "version": "pulse-v2.16-beta"
 }

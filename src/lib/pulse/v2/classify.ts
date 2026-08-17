@@ -78,7 +78,7 @@ import {
   resolveSubjectJurisdiction,
   subjectAttributionSupportsAutomaticPublication,
   subjectAttributionDecisionPayload,
-  SUBJECT_ATTRIBUTION_MODEL,
+  activeSubjectAttributionModel,
   SUBJECT_ATTRIBUTION_PROMPT_VERSION,
   SUBJECT_ATTRIBUTION_PROVIDER,
 } from "./country-attribution";
@@ -92,6 +92,7 @@ import {
   resolveClassifyEnsemble,
   resolveEnsembleVerifyConfig,
   resolveProviderConfig,
+  subscriptionTransportActive,
   type ResolvedProviderConfig,
 } from "./provider";
 import { clampSeverityToTier } from "./ensemble";
@@ -203,11 +204,16 @@ export function currentClassificationConfig(): ClassificationConfigInput {
     verifyEngine: VERIFY_CONFIG,
     subjectAttribution: {
       provider: SUBJECT_ATTRIBUTION_PROVIDER,
-      model: SUBJECT_ATTRIBUTION_MODEL,
+      model: activeSubjectAttributionModel(),
       attributionVersion: PULSE_JURISDICTION_ATTRIBUTION_VERSION,
       promptVersion: SUBJECT_ATTRIBUTION_PROMPT_VERSION,
     },
-    decodeMode: "temperature-0-json",
+    // Subscription CLIs do not expose decoding parameters; the configuration
+    // honestly records provider-default decoding (disclosed limitation in
+    // pulse-subscription-runtime-resolution-v1 §4).
+    decodeMode: subscriptionTransportActive()
+      ? "provider-default-json"
+      : "temperature-0-json",
     thinkingMode: "disabled",
     retryPolicy: PULSE_CLASSIFICATION_RETRY_POLICY,
   };
@@ -802,7 +808,7 @@ export async function classifyClusters(
         {
           role: "subject_attribution" as const,
           provider: SUBJECT_ATTRIBUTION_PROVIDER,
-          model: SUBJECT_ATTRIBUTION_MODEL,
+          model: activeSubjectAttributionModel(),
         },
       ],
       inputIds: classificationInputIds(clusters),
@@ -1187,6 +1193,7 @@ async function classifyOneSingle(
     temp: 0,
     provider: CLASSIFY_CONFIG.provider,
     model: CLASSIFY_CONFIG.model,
+    transport: CLASSIFY_CONFIG.transport,
     ...runEvidence("classify"),
     category: first.category,
     dimension: cat.dimension,
@@ -1201,6 +1208,7 @@ async function classifyOneSingle(
     temp: 0,
     provider: VERIFY_CONFIG.provider,
     model: VERIFY_CONFIG.model,
+    transport: VERIFY_CONFIG.transport,
     ...runEvidence("verify"),
     category: first.category,
     dimension: cat.dimension,
@@ -1240,7 +1248,9 @@ async function classifyOneSingle(
 
   return {
     classified,
-    autoPublished: !requiresReview,
+    // PUL-036: subscription-agent classifications always queue for human
+    // review — the subscription-cli transport can never auto-publish.
+    autoPublished: !requiresReview && !subscriptionTransportActive(),
     verification: verify,
   };
 }
@@ -1296,6 +1306,7 @@ async function classifyOneEnsemble(
       temp: 0,
       provider: cfg.provider,
       model: cfg.model,
+      transport: cfg.transport,
       ...runEvidence("classify"),
       category: result.category,
       dimension: cat?.dimension ?? "stability",
@@ -1428,6 +1439,7 @@ function buildEnsembleResult(
       temp: 0,
       provider: VERIFY_CONFIG.provider,
       model: VERIFY_CONFIG.model,
+      transport: VERIFY_CONFIG.transport,
       ...runEvidence("verify"),
       category: consensus.category,
       dimension,
@@ -1478,7 +1490,9 @@ function buildEnsembleResult(
 
   return {
     classified,
-    autoPublished: !requiresReview,
+    // PUL-036: subscription-agent classifications always queue for human
+    // review — the subscription-cli transport can never auto-publish.
+    autoPublished: !requiresReview && !subscriptionTransportActive(),
     verification: verify,
   };
 }
@@ -1955,7 +1969,7 @@ export function classificationDecisionInputs(input: {
       actor: {
         type: "subject_attributor",
         provider: SUBJECT_ATTRIBUTION_PROVIDER,
-        model: SUBJECT_ATTRIBUTION_MODEL,
+        model: activeSubjectAttributionModel(),
         reviewerId: null,
       },
       stageRunId: runId,

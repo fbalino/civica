@@ -13,7 +13,7 @@ if (unknown.length > 0) throw new Error(`Unknown arguments: ${unknown.join(", ")
 
 async function main() {
 const protocolBytes = readFileSync(
-  "data/research/pulse-validation-protocol-v1.json",
+  "data/research/pulse-validation-protocol-v2.json",
   "utf8",
 );
 const protocol = JSON.parse(protocolBytes) as {

@@ -1,9 +1,19 @@
 import { createHash } from "node:crypto";
 
 import { PULSE_RUNTIME_METHOD_VERSION } from "./runtime-contract";
+import {
+  SUBSCRIPTION_ENSEMBLE_CONFIGS,
+  SUBSCRIPTION_VERIFY_PROVIDER_CONFIG,
+} from "./provider";
+import { SUBSCRIPTION_SUBJECT_ATTRIBUTION_MODEL } from "./country-attribution";
+
+/** v1 remains the preserved, superseded preregistration; its checked artifact
+ * (`data/research/pulse-validation-protocol-v1.json`) is never rewritten. */
+export const SUPERSEDED_PULSE_VALIDATION_PROTOCOL_VERSION =
+  "pulse-validation-protocol/v1" as const;
 
 export const PULSE_VALIDATION_PROTOCOL_VERSION =
-  "pulse-validation-protocol/v1" as const;
+  "pulse-validation-protocol/v2" as const;
 
 export const PULSE_REGRESSION_CASE_IDS = [
   "afghanistan-2021",
@@ -22,9 +32,41 @@ export const PULSE_PROSPECTIVE_WINDOW_DAYS = 90;
 
 export const PULSE_VALIDATION_PROTOCOL = Object.freeze({
   schemaVersion: PULSE_VALIDATION_PROTOCOL_VERSION,
-  lockedAt: "2026-07-12T12:00:00.000Z",
+  lockedAt: "2026-08-17T20:30:00.000Z",
   status: "preregistered_not_started" as const,
   currentRuntimeMethod: PULSE_RUNTIME_METHOD_VERSION,
+  // Pre-start supersession (IDX-038 precedent): v1 froze the paid HTTP
+  // ensemble; no window ever started under it. v2 freezes the owner-approved
+  // subscription-CLI configuration before any window start
+  // (plan/pulse-subscription-runtime-resolution-v1.md, 2026-08-17). All v1
+  // artifacts are preserved unchanged.
+  supersedes: {
+    version: SUPERSEDED_PULSE_VALIDATION_PROTOCOL_VERSION,
+    checkedArtifact: "data/research/pulse-validation-protocol-v1.json",
+    windowStartedUnderPrior: false,
+    reason:
+      "The classification configuration moved to the owner-Mac subscription-CLI transport under the owner's $0 authority before any prospective window started.",
+  },
+  classifierConfiguration: {
+    transport: "subscription-cli" as const,
+    classifyPanel: SUBSCRIPTION_ENSEMBLE_CONFIGS.map(
+      ({ provider, model }) => ({ provider, model }),
+    ),
+    verifyEngine: {
+      provider: SUBSCRIPTION_VERIFY_PROVIDER_CONFIG.provider,
+      model: SUBSCRIPTION_VERIFY_PROVIDER_CONFIG.model,
+    },
+    subjectAttribution: {
+      provider: "anthropic" as const,
+      model: SUBSCRIPTION_SUBJECT_ATTRIBUTION_MODEL,
+    },
+    decodingDisclosure:
+      "Subscription CLIs expose model selection but not temperature/seed; runs execute under provider-default decoding, recorded per run.",
+    publicationRule:
+      "Subscription-transport classifications always queue for human review and never publish automatically (PUL-036).",
+    paidTransportAuthority:
+      "The paid HTTP classifier path is disabled with a $0 cap; the scheduled classify route refuses non-subscription transports.",
+  },
   labelPolicy: {
     ownerAndModelOutputsAreGold: false,
     independentHumanGoldRequired: true,
@@ -121,6 +163,8 @@ export const PULSE_VALIDATION_PROTOCOL = Object.freeze({
         "Stage runs and all evidence-bearing inputs, attempts, decisions, projections, history, exclusions, and failures are retained before labels exist.",
       methodChangeRule:
         "Any semantic pipeline, prompt, model panel, ontology, source-basket, threshold, or publication-rule change ends the current window and requires a new protocol version/window.",
+      providerModelChangePolicy:
+        "Predeclared: subscription models are pinned by name and every run records the CLI-reported model identifier. A provider-side change in what a pinned name serves is not a Civica method change; it is detected from the run-level model logs and reported as a within-window configuration segment with segment-split sensitivity analyses. A Civica-side configuration change still ends the window under methodChangeRule.",
       reportingRule:
         "Publish the frozen results and limitations regardless of whether thresholds pass.",
     },

@@ -15,6 +15,7 @@ import {
   modelOperationVersion,
 } from "@/lib/model-operations/contract";
 import { contentVersion } from "@/lib/research/derivation-version";
+import { subscriptionTransportActive } from "./provider";
 import type { PulseDecisionPayloads } from "./decision-ledger";
 import {
   PULSE_JURISDICTION_ATTRIBUTION_VERSION,
@@ -41,6 +42,26 @@ export const SUBJECT_ATTRIBUTION_MODEL_VERSION = modelOperationVersion(
   SUBJECT_ATTRIBUTION_PROVIDER,
   SUBJECT_ATTRIBUTION_MODEL,
 );
+
+/** Subscription-cli transport runs attribution on the owner's Claude plan
+ * (`pulse-subscription-runtime-resolution-v1`, 2026-08-17). */
+export const SUBSCRIPTION_SUBJECT_ATTRIBUTION_MODEL = "claude-sonnet-5" as const;
+
+/** The model identity actually in force for the current transport. Decision
+ * payloads must record this, not the static HTTP constant. */
+export function activeSubjectAttributionModel(): string {
+  return subscriptionTransportActive()
+    ? SUBSCRIPTION_SUBJECT_ATTRIBUTION_MODEL
+    : SUBJECT_ATTRIBUTION_MODEL;
+}
+
+export function activeSubjectAttributionModelVersion(): string {
+  return modelOperationVersion(
+    "pulse-subject-attribution",
+    SUBJECT_ATTRIBUTION_PROVIDER,
+    activeSubjectAttributionModel(),
+  );
+}
 
 export const SUBJECT_ATTRIBUTION_SYSTEM_PROMPT = `You classify jurisdiction roles for a governance-event ledger.
 Use the retained headline, description, and the human-readable Civica entity context. Never infer the subject from the outlet, language, or an internal id.
@@ -216,6 +237,16 @@ export async function classifySubjectCountry(
       SUBJECT_ATTRIBUTION_SYSTEM_PROMPT.length + userContent.length,
       700,
     );
+    if (subscriptionTransportActive()) {
+      const { callSubscriptionCli, SUBSCRIPTION_VERIFY_CONFIG } = await import(
+        "./subscription-cli"
+      );
+      const result = await callSubscriptionCli(SUBSCRIPTION_VERIFY_CONFIG, {
+        system: SUBJECT_ATTRIBUTION_SYSTEM_PROMPT,
+        user: userContent,
+      });
+      return parseSubjectVerdict(result.text);
+    }
     const response = await getAnthropic().messages.create({
       model: SUBJECT_ATTRIBUTION_MODEL,
       max_tokens: 700,

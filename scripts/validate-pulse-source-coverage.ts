@@ -7,7 +7,7 @@ import {
 } from "../src/lib/pulse/v2/source-coverage-audit";
 
 const CHECKED_PATH =
-  "plan/evidence/PUL-008/source-coverage-audit-2026-07-14.json";
+  "plan/evidence/PUL-040/source-coverage-audit-2026-08-17.json";
 const LIVE = process.argv.includes("--live");
 const unknownArgs = process.argv.slice(2).filter((arg) => arg !== "--live");
 

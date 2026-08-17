@@ -3,8 +3,8 @@
 > **Date correction (recorded 2026-08-09).** This record was created with a 2026-08-09 session date. Fernando stated on 2026-08-09 that he had not worked on the project since late July 2026; the owner statements recorded here were made in the late-July 2026 working sessions, and the 2026-08-09 date is an artifact of when the record was written.
 
 
-Status: **proposal pending owner sign-off**. Written 2026-08-09 at the
-owner's direction after he rejected any recurring API spend for Pulse.
+Status: **adopted 2026-08-17** (owner go-ahead recorded below). Written at
+the owner's direction after he rejected any recurring API spend for Pulse.
 Companion to `pulse-classifier-cost-resolution-v1.md` (July 2026) and the
 preregistered `pulse-validation-protocol/v1`
 (`plan/evidence/PUL-040/start-readiness.json`, status
@@ -114,6 +114,15 @@ resolution and remains a separate future decision.
 
 ## Approval record
 
-Owner decision: **pending**
+Owner decision: **approved** — "you have my go ahead," given in writing in
+the working session against this document's stated design and commitments
+(Mac on daily; daily review queue). The voter panel is the owner's explicit
+model selection: GPT 5.6 Terra (CLI model id gpt-5.6-terra) (Codex), Claude Sonnet 5 (Claude Code),
+Kimi K3 (Kimi CLI), Grok 4.5 (Grok CLI).
 
-Date: **pending**
+Paid-API authority: **none granted.** The paid classifier path remains
+disabled; its hard USD cap is $0. This resolution is the written
+provider/model and volume authority the Pulse wave required, in
+subscription-only form.
+
+Date: **2026-08-17**
