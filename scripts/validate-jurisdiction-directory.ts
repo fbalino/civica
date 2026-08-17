@@ -57,9 +57,11 @@ for (const row of artifact.rows) {
 }
 
 // ── Live diff against the jurisdictions table ───────────────────────────────
+// Runs only where DATABASE_URL is available (local work, Vercel builds). The
+// credential-free CI build still enforces every integrity check above and
+// reports an explicit skip so the live diff is never silently absent.
 async function liveRows(): Promise<JurisdictionDirectorySourceRow[]> {
-  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
-  const sql = neon(process.env.DATABASE_URL);
+  const sql = neon(process.env.DATABASE_URL!);
   const rows = await sql`
     SELECT slug, name, iso2, iso3, type,
            status_source_ids AS "statusSourceIds",
@@ -75,6 +77,20 @@ async function liveRows(): Promise<JurisdictionDirectorySourceRow[]> {
 }
 
 async function main() {
+  if (!process.env.DATABASE_URL) {
+    if (errors.length > 0) {
+      console.error(
+        `✗ jurisdiction-directory integrity failed (${errors.length} error(s)):`,
+      );
+      for (const error of errors) console.error(`  - ${error}`);
+      process.exit(1);
+    }
+    console.log(
+      `✓ ${JURISDICTION_DIRECTORY_VERSION}: ${artifact.rowCount} rows pass integrity checks. SKIP: live jurisdictions diff (no DATABASE_URL in this environment).`,
+    );
+    return;
+  }
+
   const rebuilt = buildJurisdictionDirectoryRows(await liveRows());
   if (sha256(rebuilt) !== artifact.rowsSha256) {
     const checkedBySlug = new Map(artifact.rows.map((row) => [row.slug, row]));

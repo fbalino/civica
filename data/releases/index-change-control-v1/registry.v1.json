@@ -39856,7 +39856,7 @@
         "contract_test": [
           {
             "path": "scripts/validate-jurisdiction-directory.ts",
-            "sha256": "c8cb39b24e1f86fa7f3302c21b289c17bfe6414697b5d11173d166bf85df1ab0"
+            "sha256": "4db4838480919b1f50f01d094ca3f81f96ca88d4d1617af3c481493e91c0a9c4"
           }
         ]
       },
