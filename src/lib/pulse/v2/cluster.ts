@@ -859,7 +859,13 @@ export async function runClustering(
     });
   }
 
-  if (persistRun && !atomicPublish && useEmbeddings) {
+  if (persistRun && !atomicPublish) {
+    // The no-embedding path deliberately publishes nothing (lexical
+    // similarity is not a safe incident identity), but the run row must
+    // still finalize honestly — a run stuck at 'running' forever is how the
+    // July/August scheduler outage hid for weeks. The environment without
+    // the local embedding model (serverless) records a partial run; the
+    // owner-Mac runner executes this stage with embeddings available.
     await finishPulsePipelineRun(db, run.id, {
       status: useEmbeddings ? "completed" : "partial",
       counts: completionCounts,
@@ -868,7 +874,8 @@ export async function runClustering(
         : [
             {
               component: "embedding",
-              message: "Embedding runtime unavailable; lexical fallback used.",
+              message:
+                "Embedding runtime unavailable; clustering publishes nothing under lexical fallback.",
             },
           ],
     });

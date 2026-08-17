@@ -1528,8 +1528,12 @@ async function runClassify(
       {},
       "pulse-classify",
     );
-  } catch {
-    console.warn("[pulse-classify] provider_call_failed");
+  } catch (err) {
+    console.warn(
+      `[pulse-classify] provider_call_failed ${config.provider}/${config.model}: ${
+        err instanceof Error ? err.message.slice(0, 200) : String(err)
+      }`,
+    );
     return null;
   }
   const parsed = parseClassify(response.text);
@@ -1572,8 +1576,12 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
       {},
       "pulse-verify",
     );
-  } catch {
-    console.warn("[pulse-verify] provider_call_failed");
+  } catch (err) {
+    console.warn(
+      `[pulse-verify] provider_call_failed ${config.provider}/${config.model}: ${
+        err instanceof Error ? err.message.slice(0, 200) : String(err)
+      }`,
+    );
     return null;
   }
   const parsed = parseVerify(response.text);

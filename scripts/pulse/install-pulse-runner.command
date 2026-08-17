@@ -51,6 +51,9 @@ cat > "$PLIST" << PLISTEOF
     <key>RUNNER_NODE</key><string>$NODE_REAL</string>
     <key>CIVICA_REPO</key><string>$REPO</string>
     <key>HOME</key><string>$HOME</string>
+    <key>USER</key><string>$(id -un)</string>
+    <key>LOGNAME</key><string>$(id -un)</string>
+    <key>TMPDIR</key><string>/tmp/</string>
   </dict>
   <key>StartCalendarInterval</key>
   <dict>
