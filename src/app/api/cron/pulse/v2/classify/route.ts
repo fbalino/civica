@@ -34,6 +34,35 @@ async function handler(request: Request) {
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
   const cronExecutionKey = cronExecutionKeyFromRequest(request);
 
+  // HARD $0 LOCK (owner authority 2026-08-17,
+  // plan/pulse-subscription-runtime-resolution-v1.md): classification runs
+  // ONLY on the owner-Mac subscription-cli transport. This scheduled route
+  // refuses to classify on any paid HTTP transport even when provider API
+  // keys exist in the environment — key deletion is a second, independent
+  // lock, not the only one. PULSE_CLASSIFY_TRANSPORT is never set on Vercel,
+  // so this branch always takes effect there; the owner's local runner sets
+  // it and runs the classify stage directly, not through this route.
+  if ((process.env.PULSE_CLASSIFY_TRANSPORT ?? "").trim() !== "subscription-cli") {
+    console.warn(
+      "[cron pulse.v2.classify] locked: paid classifier transport is " +
+        "disabled under the owner's $0 authority; classification runs on " +
+        "the owner's subscription runtime instead.",
+    );
+    return NextResponse.json(
+      {
+        ok: false,
+        outcome: "skipped",
+        reason: "paid_transport_locked",
+        step: "pulse.v2.classify",
+        dryRun,
+        skipped: true,
+        started,
+        finished: new Date().toISOString(),
+      },
+      { status: 503 },
+    );
+  }
+
   // Guard the configuration that classify.ts actually runs. Subject-country
   // attribution is a separate Anthropic pass and must be keyed even when the
   // voter/verifier configuration does not otherwise include Anthropic.
