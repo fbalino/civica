@@ -12,8 +12,6 @@ import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import rawReport from "@/lib/provenance/domain-coverage.generated.json";
 import type { DomainCoverageReport } from "@/lib/provenance/domain-coverage";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Source Coverage by Domain — Methodology",
   description:

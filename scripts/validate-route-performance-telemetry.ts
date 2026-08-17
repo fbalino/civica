@@ -8,6 +8,7 @@ const files = {
   cron: "src/lib/api/cron-job.ts",
   dictionary: "src/lib/data-dictionary/registry.ts",
   policy: "data/ROUTE-PERFORMANCE-TELEMETRY.md",
+  report: "scripts/report-route-performance.ts",
   migration: "drizzle/authoritative/0037_minor_sharon_carter.sql",
   plan: "plan/PLT-016-route-performance-telemetry-2026-07-15.md",
 } as const;
@@ -46,6 +47,9 @@ if (errors.length === 0) {
     "routePerformanceAlerts",
     "ROUTE_PERFORMANCE_RETENTION_DAYS = 30",
     "telemetry_write_failed",
+    "ROUTE_PERFORMANCE_REQUEST_SAMPLE_RATE",
+    "export function shouldRecordRequestPerformanceSample(",
+    "export function estimatedRequestPopulation(",
   ]) {
     if (!telemetry.includes(token))
       errors.push(`telemetry contract omits ${token}`);
@@ -56,6 +60,57 @@ if (errors.length === 0) {
     errors.push("proxy must defer request telemetry until after the response");
   if (proxy.includes("request.nextUrl.search"))
     errors.push("proxy must not pass query data into telemetry");
+
+  // The sampling decision is a named, injectable seam. Inlining a raw draw in
+  // the proxy would make the rate untestable and undocumentable.
+  if (!proxy.includes("shouldRecordRequestPerformanceSample()"))
+    errors.push("proxy must gate request telemetry on the named sampler");
+  if (/Math\s*\.\s*random/.test(proxy))
+    errors.push("proxy must not inline a sampling draw");
+
+  // The proxy must not run on the build asset tree or on static image/font
+  // requests, which carry no route-performance signal.
+  // Anchored on the end of the config object: the matcher itself contains
+  // `]` characters inside its character classes.
+  const matcherMatch = proxy.match(/matcher:\s*\[([\s\S]*?)\]\s*,?\s*\}\s*;/);
+  if (!matcherMatch) {
+    errors.push("proxy must declare a static matcher array");
+  } else {
+    const matcher = matcherMatch[1]!;
+    if (!matcher.includes("_next/"))
+      errors.push("proxy matcher must exclude the whole _next/ tree");
+    for (const extension of [
+      "webp",
+      "avif",
+      "png",
+      "jpg",
+      "jpeg",
+      "gif",
+      "svg",
+      "ico",
+      "woff2",
+      "woff",
+      "ttf",
+      "otf",
+      "eot",
+    ])
+      if (!new RegExp(`\\b${extension}\\b`).test(matcher))
+        errors.push(`proxy matcher must exclude .${extension} assets`);
+    if (!matcher.includes("$)"))
+      errors.push(
+        "proxy matcher must anchor the asset exclusion to a trailing extension",
+      );
+  }
+
+  // Errors and jobs are unsampled, so any comparison against the sampled
+  // request count has to be rate-corrected rather than raw.
+  if (!telemetry.includes("estimatedRequestPopulation(requests.get(key)"))
+    errors.push(
+      "server-error rate must use the estimated request population, not the sampled count",
+    );
+  const report = readFileSync(files.report, "utf8");
+  if (!report.includes("ROUTE_PERFORMANCE_REQUEST_SAMPLE_RATE"))
+    errors.push("route-performance report omits the request sample rate");
   for (const token of [
     "onRequestError",
     "serverErrorObservation",
@@ -84,6 +139,12 @@ if (errors.length === 0) {
   ] as const)
     if (!pattern.test(policy))
       errors.push(`privacy policy must explicitly exclude ${label}`);
+  for (const [label, pattern] of [
+    ["the matcher scope", /## Collection scope/],
+    ["the request sample rate", /1 in 20|5%/],
+    ["that jobs and errors are unsampled", /unsampled|not sampled/],
+  ] as const)
+    if (!pattern.test(policy)) errors.push(`policy must document ${label}`);
   for (const token of [
     'CREATE TABLE "route_performance_observations"',
     "duration_ms",

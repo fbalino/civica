@@ -1,18 +1,10 @@
-import { cache } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CivicaLogo } from "@/components/CivicaLogo";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { tier1Publishers } from "@/lib/content/site-state";
 import { RIGHTS_REGISTRY_PATH } from "@/lib/claims/reuse-rights";
-import { getAllJurisdictions } from "@/lib/db/queries";
-import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
-
-// Per-request memoized so the footer's country list is fetched at most once
-// per render pass. (The header search fetches the same rows; deduping those
-// two callsites needs a `cache()` wrapper at the `getAllJurisdictions` query
-// layer, which lives outside this component.)
-const getFooterCountries = cache(getAllJurisdictions);
+import directory from "@/lib/jurisdictions/directory.generated.json";
 
 // Sources NOT covered by `tier1Publishers` — supporting feeds,
 // governance specialists, and indices. Update by hand when a major
@@ -145,7 +137,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
   );
 }
 
-export async function SiteFooter() {
+export function SiteFooter() {
   const tier1ShippedShortNames = tier1Publishers
     .filter((p) => p.shipped)
     .map((p) => p.shortName);
@@ -154,24 +146,17 @@ export async function SiteFooter() {
     ...tier1ShippedShortNames,
   ].join(", ");
 
-  // Real, working country search — fed by the same jurisdictions query the
-  // header search uses. Soft-fails to an empty list so the footer still
-  // renders when the DB is unreachable.
-  let countries: {
-    slug: string;
-    name: string;
-    iso2: string | null;
-    capital: string | null;
-  }[] = [];
-  try {
-    const all = await getFooterCountries();
-    countries = all.map((c) => ({
-      slug: c.slug,
-      name: c.name,
-      iso2: c.iso2,
-      capital: readCachedFieldFromRow(c, "capital"),
+  // Real, working country search — fed by the checked jurisdiction directory
+  // artifact (CAC-003), the same deploy-frozen list the header search uses.
+  // Sovereign states only, matching the legacy footer query's universe.
+  const countries = directory.rows
+    .filter((row) => row.statusType === "sovereign_state")
+    .map((row) => ({
+      slug: row.slug,
+      name: row.name,
+      iso2: row.iso2,
+      capital: row.capital,
     }));
-  } catch {}
 
   return (
     <footer className="site-footer">

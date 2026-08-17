@@ -34,8 +34,6 @@ import { getCountryGallery, wikimediaUrl } from "@/lib/data/country-photos";
 import { getCountryBounds } from "@/lib/data/country-bounds";
 import { countryHeroPhoto } from "@/lib/data/country-hero-photos";
 
-export const revalidate = 3600;
-
 function galleryCaption(p: { caption: string; license?: string }): string {
   const license =
     p.license && p.license !== "Wikimedia Commons" ? ` · ${p.license}` : "";

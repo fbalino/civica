@@ -6,8 +6,6 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Power and Transfer Ledger Rulebook — Research Prototype",
   description: "The versioned rules, evidence requirements, nonclaims, and validation gates for Civica's experimental Power and Transfer Ledger.",

@@ -1,0 +1,2032 @@
+{
+  "schemaVersion": "jurisdiction-directory/v1",
+  "generatedAt": "2026-08-17T14:35:03.240Z",
+  "rowCount": 253,
+  "rowsSha256": "c12edf5eee090812088cffba4faf3c593bcb644fc249ca290a5fbfda6f32432f",
+  "rows": [
+    {
+      "slug": "afghanistan",
+      "name": "Afghanistan",
+      "iso2": "AF",
+      "capital": "Kabul",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "akrotiri",
+      "name": "Akrotiri",
+      "iso2": null,
+      "capital": "Episkopi Cantonment (base administrative center for Akrotiri and Dhekelia)",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "albania",
+      "name": "Albania",
+      "iso2": "AL",
+      "capital": "Tirana (Tirane)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "algeria",
+      "name": "Algeria",
+      "iso2": "DZ",
+      "capital": "Algiers",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "american-samoa",
+      "name": "American Samoa",
+      "iso2": "AS",
+      "capital": "Pago Pago",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "andorra",
+      "name": "Andorra",
+      "iso2": "AD",
+      "capital": "Andorra la Vella",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "angola",
+      "name": "Angola",
+      "iso2": "AO",
+      "capital": "Luanda",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "anguilla",
+      "name": "Anguilla",
+      "iso2": "AI",
+      "capital": "The Valley",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "antarctica",
+      "name": "Antarctica",
+      "iso2": "AQ",
+      "capital": null,
+      "statusType": "aggregate_or_special_area",
+      "statusLabel": "Special treaty area"
+    },
+    {
+      "slug": "antigua-and-barbuda",
+      "name": "Antigua and Barbuda",
+      "iso2": "AG",
+      "capital": "Saint John's",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "argentina",
+      "name": "Argentina",
+      "iso2": "AR",
+      "capital": "Buenos Aires",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "armenia",
+      "name": "Armenia",
+      "iso2": "AM",
+      "capital": "Yerevan",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "aruba",
+      "name": "Aruba",
+      "iso2": "AW",
+      "capital": "Oranjestad",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "ashmore-and-cartier-islands",
+      "name": "Ashmore and Cartier Islands",
+      "iso2": null,
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "australia",
+      "name": "Australia",
+      "iso2": "AU",
+      "capital": "Canberra",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "austria",
+      "name": "Austria",
+      "iso2": "AT",
+      "capital": "Vienna",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "azerbaijan",
+      "name": "Azerbaijan",
+      "iso2": "AZ",
+      "capital": "Baku (Baki, Baky)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "bahrain",
+      "name": "Bahrain",
+      "iso2": "BH",
+      "capital": "Manama",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "baker-island-howland-island-jarvis-island-johnston-atoll-kingman-reef-midway-islands-palmyra-atoll",
+      "name": "Baker Island, Howland Island, Jarvis Island, Johnston Atoll, Kingman Reef, Midway Islands, Palmyra Atoll",
+      "iso2": null,
+      "capital": null,
+      "statusType": "aggregate_or_special_area",
+      "statusLabel": "Grouped territorial entry"
+    },
+    {
+      "slug": "bangladesh",
+      "name": "Bangladesh",
+      "iso2": "BD",
+      "capital": "Dhaka",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "barbados",
+      "name": "Barbados",
+      "iso2": "BB",
+      "capital": "Bridgetown",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "belarus",
+      "name": "Belarus",
+      "iso2": "BY",
+      "capital": "Minsk",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "belgium",
+      "name": "Belgium",
+      "iso2": "BE",
+      "capital": "Brussels",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "belize",
+      "name": "Belize",
+      "iso2": "BZ",
+      "capital": "Belmopan",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "benin",
+      "name": "Benin",
+      "iso2": "BJ",
+      "capital": "Porto-Novo (constitutional capital); Cotonou (seat of government)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "bermuda",
+      "name": "Bermuda",
+      "iso2": "BM",
+      "capital": "Hamilton",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "bhutan",
+      "name": "Bhutan",
+      "iso2": "BT",
+      "capital": "Thimphu",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "bolivia",
+      "name": "Bolivia",
+      "iso2": "BO",
+      "capital": "La Paz (administrative capital); Sucre (constitutional [legislative and judicial] capital)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "bosnia-and-herzegovina",
+      "name": "Bosnia and Herzegovina",
+      "iso2": "BA",
+      "capital": "Sarajevo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "botswana",
+      "name": "Botswana",
+      "iso2": "BW",
+      "capital": "Gaborone",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "bouvet-island",
+      "name": "Bouvet Island",
+      "iso2": "BV",
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "brazil",
+      "name": "Brazil",
+      "iso2": "BR",
+      "capital": "Brasília",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "british-virgin-islands",
+      "name": "British Virgin Islands",
+      "iso2": "VG",
+      "capital": "Road Town",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "brunei",
+      "name": "Brunei",
+      "iso2": "BN",
+      "capital": "Bandar Seri Begawan",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "bulgaria",
+      "name": "Bulgaria",
+      "iso2": "BG",
+      "capital": "Sofia",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "burkina-faso",
+      "name": "Burkina Faso",
+      "iso2": "BF",
+      "capital": "Ouagadougou",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "burma",
+      "name": "Burma",
+      "iso2": "MM",
+      "capital": "Rangoon (aka Yangon, continues to be recognized as the primary Burmese capital by the US Government); Nay Pyi Taw is the administrative capital",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "burundi",
+      "name": "Burundi",
+      "iso2": "BI",
+      "capital": "Gitega (political capital), Bujumbura (commercial capital)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "cabo-verde",
+      "name": "Cabo Verde",
+      "iso2": "CV",
+      "capital": "Praia",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "cambodia",
+      "name": "Cambodia",
+      "iso2": "KH",
+      "capital": "Phnom Penh",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "cameroon",
+      "name": "Cameroon",
+      "iso2": "CM",
+      "capital": "Yaounde",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "canada",
+      "name": "Canada",
+      "iso2": "CA",
+      "capital": "Ottawa",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "cayman-islands",
+      "name": "Cayman Islands",
+      "iso2": "KY",
+      "capital": "George Town (on Grand Cayman)",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "central-african-republic",
+      "name": "Central African Republic",
+      "iso2": "CF",
+      "capital": null,
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "chad",
+      "name": "Chad",
+      "iso2": "TD",
+      "capital": "N'Djamena",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "chile",
+      "name": "Chile",
+      "iso2": "CL",
+      "capital": "Santiago; note - Valparaiso is the seat of the national legislature",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "china",
+      "name": "China",
+      "iso2": "CN",
+      "capital": "Beijing",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "christmas-island",
+      "name": "Christmas Island",
+      "iso2": "CX",
+      "capital": "The Settlement (Flying Fish Cove)",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "clipperton-island",
+      "name": "Clipperton Island",
+      "iso2": null,
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "cocos-keeling-islands",
+      "name": "Cocos (Keeling) Islands",
+      "iso2": "CC",
+      "capital": "West Island",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "colombia",
+      "name": "Colombia",
+      "iso2": "CO",
+      "capital": "Bogotá",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "comoros",
+      "name": "Comoros",
+      "iso2": "KM",
+      "capital": "Moroni",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "congo-brazzaville",
+      "name": "Congo (Brazzaville)",
+      "iso2": "CG",
+      "capital": "Brazzaville",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "cook-islands",
+      "name": "Cook Islands",
+      "iso2": "CK",
+      "capital": "Avarua",
+      "statusType": "associated_state",
+      "statusLabel": "Self-governing state in free association"
+    },
+    {
+      "slug": "coral-sea-islands",
+      "name": "Coral Sea Islands",
+      "iso2": null,
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "costa-rica",
+      "name": "Costa Rica",
+      "iso2": "CR",
+      "capital": "San José",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "croatia",
+      "name": "Croatia",
+      "iso2": "HR",
+      "capital": "Zagreb",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "cuba",
+      "name": "Cuba",
+      "iso2": "CU",
+      "capital": "Havana",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "curacao",
+      "name": "Curacao",
+      "iso2": "CW",
+      "capital": "Willemstad",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "cyprus",
+      "name": "Cyprus",
+      "iso2": "CY",
+      "capital": "Nicosia (Lefkosia/Lefkosa)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "czechia",
+      "name": "Czechia",
+      "iso2": "CZ",
+      "capital": "Prague",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "c-te-d-ivoire",
+      "name": "Côte d'Ivoire",
+      "iso2": "CI",
+      "capital": "Yamoussoukro (legislative capital), Abidjan (administrative and economic capital); note - the US Embassy is in Abidjan",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "drc",
+      "name": "DRC",
+      "iso2": "CD",
+      "capital": "Kinshasa",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "denmark",
+      "name": "Denmark",
+      "iso2": "DK",
+      "capital": "Copenhagen",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "dhekelia",
+      "name": "Dhekelia",
+      "iso2": null,
+      "capital": "Episkopi Cantonment (base administrative center for Akrotiri and Dhekelia); located in Akrotiri",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "djibouti",
+      "name": "Djibouti",
+      "iso2": "DJ",
+      "capital": "Djibouti",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "dominica",
+      "name": "Dominica",
+      "iso2": "DM",
+      "capital": "Roseau",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "ecuador",
+      "name": "Ecuador",
+      "iso2": "EC",
+      "capital": "Quito",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "egypt",
+      "name": "Egypt",
+      "iso2": "EG",
+      "capital": "Cairo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "el-salvador",
+      "name": "El Salvador",
+      "iso2": "SV",
+      "capital": "San Salvador",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "equatorial-guinea",
+      "name": "Equatorial Guinea",
+      "iso2": "GQ",
+      "capital": "Malabo; note - Malabo is on the island of Bioko; some months of the year, the government operates out of Bata on the mainland region.",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "eritrea",
+      "name": "Eritrea",
+      "iso2": "ER",
+      "capital": "Asmara",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "estonia",
+      "name": "Estonia",
+      "iso2": "EE",
+      "capital": "Tallinn",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "eswatini",
+      "name": "Eswatini",
+      "iso2": "SZ",
+      "capital": "Mbabane (administrative capital); Lobamba (royal and legislative capital)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "ethiopia",
+      "name": "Ethiopia",
+      "iso2": "ET",
+      "capital": "Addis Ababa",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "falkland-islands-islas-malvinas",
+      "name": "Falkland Islands (Islas Malvinas)",
+      "iso2": "FK",
+      "capital": "Stanley",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "faroe-islands",
+      "name": "Faroe Islands",
+      "iso2": "FO",
+      "capital": "Torshavn",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "fiji",
+      "name": "Fiji",
+      "iso2": "FJ",
+      "capital": "Suva (on Viti Levu)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "finland",
+      "name": "Finland",
+      "iso2": "FI",
+      "capital": "Helsinki",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "france",
+      "name": "France",
+      "iso2": "FR",
+      "capital": "Paris",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "french-polynesia",
+      "name": "French Polynesia",
+      "iso2": "PF",
+      "capital": "Papeete (located on Tahiti)",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "french-southern-and-antarctic-lands",
+      "name": "French Southern and Antarctic Lands",
+      "iso2": "TF",
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "gabon",
+      "name": "Gabon",
+      "iso2": "GA",
+      "capital": "Libreville",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "gaza-gaza-strip",
+      "name": "Gaza, Gaza Strip",
+      "iso2": null,
+      "capital": null,
+      "statusType": "disputed_or_limited_recognition",
+      "statusLabel": "Disputed or separately profiled area"
+    },
+    {
+      "slug": "georgia",
+      "name": "Georgia",
+      "iso2": "GE",
+      "capital": "Tbilisi",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "germany",
+      "name": "Germany",
+      "iso2": "DE",
+      "capital": "Berlin",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "ghana",
+      "name": "Ghana",
+      "iso2": "GH",
+      "capital": "Accra",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "gibraltar",
+      "name": "Gibraltar",
+      "iso2": "GI",
+      "capital": "Gibraltar",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "greece",
+      "name": "Greece",
+      "iso2": "GR",
+      "capital": "Athens",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "greenland",
+      "name": "Greenland",
+      "iso2": "GL",
+      "capital": "Nuuk",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "grenada",
+      "name": "Grenada",
+      "iso2": "GD",
+      "capital": "Saint George's",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "guam",
+      "name": "Guam",
+      "iso2": "GU",
+      "capital": "Hagatna (Agana)",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "guatemala",
+      "name": "Guatemala",
+      "iso2": "GT",
+      "capital": "Guatemala City",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "guernsey",
+      "name": "Guernsey",
+      "iso2": "GG",
+      "capital": "Saint Peter Port",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "guinea",
+      "name": "Guinea",
+      "iso2": "GN",
+      "capital": "Conakry",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "guinea-bissau",
+      "name": "Guinea-Bissau",
+      "iso2": "GW",
+      "capital": "Bissau",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "guyana",
+      "name": "Guyana",
+      "iso2": "GY",
+      "capital": "Georgetown",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "haiti",
+      "name": "Haiti",
+      "iso2": "HT",
+      "capital": "Port-au-Prince",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "heard-island-and-mcdonald-islands",
+      "name": "Heard Island and McDonald Islands",
+      "iso2": "HM",
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "holy-see-vatican-city",
+      "name": "Holy See (Vatican City)",
+      "iso2": "VA",
+      "capital": "Vatican City",
+      "statusType": "sovereign_state",
+      "statusLabel": "Sovereign observer state"
+    },
+    {
+      "slug": "honduras",
+      "name": "Honduras",
+      "iso2": "HN",
+      "capital": "Tegucigalpa",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "hong-kong",
+      "name": "Hong Kong",
+      "iso2": "HK",
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "hungary",
+      "name": "Hungary",
+      "iso2": "HU",
+      "capital": "Budapest",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "iceland",
+      "name": "Iceland",
+      "iso2": "IS",
+      "capital": "Reykjavik",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "india",
+      "name": "India",
+      "iso2": "IN",
+      "capital": "New Delhi",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "indonesia",
+      "name": "Indonesia",
+      "iso2": "ID",
+      "capital": "Jakarta",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "iran",
+      "name": "Iran",
+      "iso2": "IR",
+      "capital": "Tehran",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "iraq",
+      "name": "Iraq",
+      "iso2": "IQ",
+      "capital": "Baghdad",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "ireland",
+      "name": "Ireland",
+      "iso2": "IE",
+      "capital": "Dublin",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "isle-of-man",
+      "name": "Isle of Man",
+      "iso2": "IM",
+      "capital": "Douglas",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "israel",
+      "name": "Israel",
+      "iso2": "IL",
+      "capital": "Jerusalem",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "italy",
+      "name": "Italy",
+      "iso2": "IT",
+      "capital": "Rome",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "jamaica",
+      "name": "Jamaica",
+      "iso2": "JM",
+      "capital": "Kingston",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "jan-mayen",
+      "name": "Jan Mayen",
+      "iso2": null,
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "japan",
+      "name": "Japan",
+      "iso2": "JP",
+      "capital": "Tokyo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "jersey",
+      "name": "Jersey",
+      "iso2": "JE",
+      "capital": "Saint Helier",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "jordan",
+      "name": "Jordan",
+      "iso2": "JO",
+      "capital": "Amman",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "kazakhstan",
+      "name": "Kazakhstan",
+      "iso2": "KZ",
+      "capital": "Astana",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "kenya",
+      "name": "Kenya",
+      "iso2": "KE",
+      "capital": "Nairobi",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "kiribati",
+      "name": "Kiribati",
+      "iso2": "KI",
+      "capital": "Tarawa",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "kosovo",
+      "name": "Kosovo",
+      "iso2": "XK",
+      "capital": "Pristina (Prishtine, Prishtina)",
+      "statusType": "disputed_or_limited_recognition",
+      "statusLabel": "Limited-recognition entity"
+    },
+    {
+      "slug": "kuwait",
+      "name": "Kuwait",
+      "iso2": "KW",
+      "capital": "Kuwait City",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "kyrgyzstan",
+      "name": "Kyrgyzstan",
+      "iso2": "KG",
+      "capital": "Bishkek",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "laos",
+      "name": "Laos",
+      "iso2": "LA",
+      "capital": "Vientiane (Viangchan)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "latvia",
+      "name": "Latvia",
+      "iso2": "LV",
+      "capital": "Riga",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "lebanon",
+      "name": "Lebanon",
+      "iso2": "LB",
+      "capital": "Beirut",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "lesotho",
+      "name": "Lesotho",
+      "iso2": "LS",
+      "capital": "Maseru",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "liberia",
+      "name": "Liberia",
+      "iso2": "LR",
+      "capital": "Monrovia",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "libya",
+      "name": "Libya",
+      "iso2": "LY",
+      "capital": "Tripoli (Tarabulus)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "liechtenstein",
+      "name": "Liechtenstein",
+      "iso2": "LI",
+      "capital": "Vaduz",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "lithuania",
+      "name": "Lithuania",
+      "iso2": "LT",
+      "capital": "Vilnius",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "luxembourg",
+      "name": "Luxembourg",
+      "iso2": "LU",
+      "capital": "Luxembourg",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "macau",
+      "name": "Macau",
+      "iso2": "MO",
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "madagascar",
+      "name": "Madagascar",
+      "iso2": "MG",
+      "capital": "Antananarivo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "malawi",
+      "name": "Malawi",
+      "iso2": "MW",
+      "capital": "Lilongwe",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "malaysia",
+      "name": "Malaysia",
+      "iso2": "MY",
+      "capital": "Kuala Lumpur",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "maldives",
+      "name": "Maldives",
+      "iso2": "MV",
+      "capital": "Malé",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "mali",
+      "name": "Mali",
+      "iso2": "ML",
+      "capital": "Bamako",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "malta",
+      "name": "Malta",
+      "iso2": "MT",
+      "capital": "Valletta",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "marshall-islands",
+      "name": "Marshall Islands",
+      "iso2": "MH",
+      "capital": "Majuro",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "mauritania",
+      "name": "Mauritania",
+      "iso2": "MR",
+      "capital": "Nouakchott",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "mauritius",
+      "name": "Mauritius",
+      "iso2": "MU",
+      "capital": "Port Louis",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "mexico",
+      "name": "Mexico",
+      "iso2": "MX",
+      "capital": "Mexico City (Ciudad de Mexico)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "micronesia",
+      "name": "Micronesia",
+      "iso2": "FM",
+      "capital": null,
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "moldova",
+      "name": "Moldova",
+      "iso2": "MD",
+      "capital": "Chisinau in Romanian (Kishinev in Russian)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "monaco",
+      "name": "Monaco",
+      "iso2": "MC",
+      "capital": "Monaco",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "mongolia",
+      "name": "Mongolia",
+      "iso2": "MN",
+      "capital": "Ulaanbaatar",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "montenegro",
+      "name": "Montenegro",
+      "iso2": "ME",
+      "capital": "Podgorica",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "montserrat",
+      "name": "Montserrat",
+      "iso2": "MS",
+      "capital": "Plymouth",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "morocco",
+      "name": "Morocco",
+      "iso2": "MA",
+      "capital": "Rabat",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "mozambique",
+      "name": "Mozambique",
+      "iso2": "MZ",
+      "capital": "Maputo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "namibia",
+      "name": "Namibia",
+      "iso2": "NA",
+      "capital": "Windhoek",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "nauru",
+      "name": "Nauru",
+      "iso2": "NR",
+      "capital": "no official capital; government offices in the Yaren District",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "navassa-island",
+      "name": "Navassa Island",
+      "iso2": null,
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "nepal",
+      "name": "Nepal",
+      "iso2": "NP",
+      "capital": "Kathmandu",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "netherlands",
+      "name": "Netherlands",
+      "iso2": "NL",
+      "capital": "Amsterdam",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "new-caledonia",
+      "name": "New Caledonia",
+      "iso2": "NC",
+      "capital": "Noumea",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "new-zealand",
+      "name": "New Zealand",
+      "iso2": "NZ",
+      "capital": "Wellington",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "nicaragua",
+      "name": "Nicaragua",
+      "iso2": "NI",
+      "capital": "Managua",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "niger",
+      "name": "Niger",
+      "iso2": "NE",
+      "capital": "Niamey",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "nigeria",
+      "name": "Nigeria",
+      "iso2": "NG",
+      "capital": "Abuja",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "niue",
+      "name": "Niue",
+      "iso2": "NU",
+      "capital": "Alofi",
+      "statusType": "associated_state",
+      "statusLabel": "Self-governing state in free association"
+    },
+    {
+      "slug": "norfolk-island",
+      "name": "Norfolk Island",
+      "iso2": "NF",
+      "capital": "Kingston",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "north-korea",
+      "name": "North Korea",
+      "iso2": "KP",
+      "capital": "Pyongyang",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "north-macedonia",
+      "name": "North Macedonia",
+      "iso2": "MK",
+      "capital": "Skopje",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "northern-mariana-islands",
+      "name": "Northern Mariana Islands",
+      "iso2": "MP",
+      "capital": "Saipan",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "norway",
+      "name": "Norway",
+      "iso2": "NO",
+      "capital": "Oslo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "oman",
+      "name": "Oman",
+      "iso2": "OM",
+      "capital": "Muscat",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "pakistan",
+      "name": "Pakistan",
+      "iso2": "PK",
+      "capital": "Islamabad",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "palau",
+      "name": "Palau",
+      "iso2": "PW",
+      "capital": "Ngerulmud",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "palestine",
+      "name": "Palestine",
+      "iso2": "PS",
+      "capital": null,
+      "statusType": "disputed_or_limited_recognition",
+      "statusLabel": "UN observer state"
+    },
+    {
+      "slug": "panama",
+      "name": "Panama",
+      "iso2": "PA",
+      "capital": "Panama City",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "papua-new-guinea",
+      "name": "Papua New Guinea",
+      "iso2": "PG",
+      "capital": "Port Moresby",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "paracel-islands",
+      "name": "Paracel Islands",
+      "iso2": null,
+      "capital": null,
+      "statusType": "disputed_or_limited_recognition",
+      "statusLabel": "Disputed or separately profiled area"
+    },
+    {
+      "slug": "paraguay",
+      "name": "Paraguay",
+      "iso2": "PY",
+      "capital": "Asunción",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "peru",
+      "name": "Peru",
+      "iso2": "PE",
+      "capital": "Lima",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "philippines",
+      "name": "Philippines",
+      "iso2": "PH",
+      "capital": "Manila",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "pitcairn-islands",
+      "name": "Pitcairn Islands",
+      "iso2": "PN",
+      "capital": "Adamstown",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "poland",
+      "name": "Poland",
+      "iso2": "PL",
+      "capital": "Warsaw",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "portugal",
+      "name": "Portugal",
+      "iso2": "PT",
+      "capital": "Lisbon",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "puerto-rico",
+      "name": "Puerto Rico",
+      "iso2": "PR",
+      "capital": "San Juan",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "qatar",
+      "name": "Qatar",
+      "iso2": "QA",
+      "capital": "Doha",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "romania",
+      "name": "Romania",
+      "iso2": "RO",
+      "capital": "Bucharest",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "russia",
+      "name": "Russia",
+      "iso2": "RU",
+      "capital": "Moscow",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "rwanda",
+      "name": "Rwanda",
+      "iso2": "RW",
+      "capital": "Kigali",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "saint-barthelemy",
+      "name": "Saint Barthelemy",
+      "iso2": "BL",
+      "capital": "Gustavia",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "saint-kitts-and-nevis",
+      "name": "Saint Kitts and Nevis",
+      "iso2": "KN",
+      "capital": "Basseterre",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "saint-lucia",
+      "name": "Saint Lucia",
+      "iso2": "LC",
+      "capital": "Castries",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "saint-martin",
+      "name": "Saint Martin",
+      "iso2": "MF",
+      "capital": "Marigot",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "saint-pierre-and-miquelon",
+      "name": "Saint Pierre and Miquelon",
+      "iso2": "PM",
+      "capital": "Saint-Pierre",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "saint-vincent-and-the-grenadines",
+      "name": "Saint Vincent and the Grenadines",
+      "iso2": "VC",
+      "capital": "Kingstown",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "samoa",
+      "name": "Samoa",
+      "iso2": "WS",
+      "capital": "Apia",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "san-marino",
+      "name": "San Marino",
+      "iso2": "SM",
+      "capital": "San Marino (city)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "sao-tome-and-principe",
+      "name": "Sao Tome and Principe",
+      "iso2": "ST",
+      "capital": "Sao Tome",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "saudi-arabia",
+      "name": "Saudi Arabia",
+      "iso2": "SA",
+      "capital": "Riyadh",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "senegal",
+      "name": "Senegal",
+      "iso2": "SN",
+      "capital": "Dakar",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "serbia",
+      "name": "Serbia",
+      "iso2": "RS",
+      "capital": "Belgrade (Beograd)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "seychelles",
+      "name": "Seychelles",
+      "iso2": "SC",
+      "capital": "Victoria",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "sierra-leone",
+      "name": "Sierra Leone",
+      "iso2": "SL",
+      "capital": "Freetown",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "singapore",
+      "name": "Singapore",
+      "iso2": "SG",
+      "capital": "Singapore",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "sint-maarten",
+      "name": "Sint Maarten",
+      "iso2": "SX",
+      "capital": "Philipsburg",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "slovakia",
+      "name": "Slovakia",
+      "iso2": "SK",
+      "capital": "Bratislava",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "slovenia",
+      "name": "Slovenia",
+      "iso2": "SI",
+      "capital": "Ljubljana",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "solomon-islands",
+      "name": "Solomon Islands",
+      "iso2": "SB",
+      "capital": "Honiara",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "somalia",
+      "name": "Somalia",
+      "iso2": "SO",
+      "capital": "Mogadishu",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "south-africa",
+      "name": "South Africa",
+      "iso2": "ZA",
+      "capital": "Pretoria (administrative capital); Cape Town (legislative capital); Bloemfontein (judicial capital)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "south-georgia-and-south-sandwich-islands",
+      "name": "South Georgia and South Sandwich Islands",
+      "iso2": "GS",
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "south-korea",
+      "name": "South Korea",
+      "iso2": "KR",
+      "capital": "Seoul",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "south-sudan",
+      "name": "South Sudan",
+      "iso2": "SS",
+      "capital": "Juba",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "spain",
+      "name": "Spain",
+      "iso2": "ES",
+      "capital": "Madrid",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "spratly-islands",
+      "name": "Spratly Islands",
+      "iso2": null,
+      "capital": null,
+      "statusType": "disputed_or_limited_recognition",
+      "statusLabel": "Disputed or separately profiled area"
+    },
+    {
+      "slug": "sri-lanka",
+      "name": "Sri Lanka",
+      "iso2": "LK",
+      "capital": "Colombo (commercial capital); Sri Jayewardenepura Kotte (legislative capital)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "sudan",
+      "name": "Sudan",
+      "iso2": "SD",
+      "capital": "Khartoum",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "suriname",
+      "name": "Suriname",
+      "iso2": "SR",
+      "capital": "Paramaribo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "svalbard-sometimes-referred-to-as-spitsbergen-the-largest-island-in-the-archipelago",
+      "name": "Svalbard (sometimes referred to as Spitsbergen, the largest island in the archipelago)",
+      "iso2": null,
+      "capital": "Longyearbyen",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "sweden",
+      "name": "Sweden",
+      "iso2": "SE",
+      "capital": "Stockholm",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "switzerland",
+      "name": "Switzerland",
+      "iso2": "CH",
+      "capital": "Bern",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "syria",
+      "name": "Syria",
+      "iso2": "SY",
+      "capital": "Damascus",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "taiwan",
+      "name": "Taiwan",
+      "iso2": "TW",
+      "capital": "Taipei",
+      "statusType": "disputed_or_limited_recognition",
+      "statusLabel": "Limited-recognition entity"
+    },
+    {
+      "slug": "tajikistan",
+      "name": "Tajikistan",
+      "iso2": "TJ",
+      "capital": "Dushanbe",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "tanzania",
+      "name": "Tanzania",
+      "iso2": "TZ",
+      "capital": "Dodoma",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "thailand",
+      "name": "Thailand",
+      "iso2": "TH",
+      "capital": "Bangkok",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "the-bahamas",
+      "name": "The Bahamas",
+      "iso2": "BS",
+      "capital": "Nassau",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "the-dominican",
+      "name": "The Dominican",
+      "iso2": "DO",
+      "capital": "Santo Domingo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "the-gambia",
+      "name": "The Gambia",
+      "iso2": "GM",
+      "capital": "Banjul",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "timor-leste",
+      "name": "Timor-Leste",
+      "iso2": "TL",
+      "capital": "Dili",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "togo",
+      "name": "Togo",
+      "iso2": "TG",
+      "capital": "Lome",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "tokelau",
+      "name": "Tokelau",
+      "iso2": "TK",
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "tonga",
+      "name": "Tonga",
+      "iso2": "TO",
+      "capital": "Nuku'alofa",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "trinidad-and-tobago",
+      "name": "Trinidad and Tobago",
+      "iso2": "TT",
+      "capital": "Port of Spain",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "tunisia",
+      "name": "Tunisia",
+      "iso2": "TN",
+      "capital": "Tunis",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "turkey",
+      "name": "Turkey",
+      "iso2": "TR",
+      "capital": "Ankara",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "turkmenistan",
+      "name": "Turkmenistan",
+      "iso2": "TM",
+      "capital": "Ashgabat (Ashkhabad)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "turks-and-caicos-islands",
+      "name": "Turks and Caicos Islands",
+      "iso2": "TC",
+      "capital": "Grand Turk (Cockburn Town)",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "tuvalu",
+      "name": "Tuvalu",
+      "iso2": "TV",
+      "capital": "Funafuti",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "uganda",
+      "name": "Uganda",
+      "iso2": "UG",
+      "capital": "Kampala",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "ukraine",
+      "name": "Ukraine",
+      "iso2": "UA",
+      "capital": "Kyiv (Kiev is the transliteration from Russian)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "united-arab-emirates",
+      "name": "United Arab Emirates",
+      "iso2": "AE",
+      "capital": null,
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "united-kingdom",
+      "name": "United Kingdom",
+      "iso2": "GB",
+      "capital": "London",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "united-states",
+      "name": "United States",
+      "iso2": "US",
+      "capital": "Washington, D.C.",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "uruguay",
+      "name": "Uruguay",
+      "iso2": "UY",
+      "capital": "Montevideo",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "uzbekistan",
+      "name": "Uzbekistan",
+      "iso2": "UZ",
+      "capital": "Tashkent (Toshkent)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "vanuatu",
+      "name": "Vanuatu",
+      "iso2": "VU",
+      "capital": "Port-Vila (on Efate)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "venezuela",
+      "name": "Venezuela",
+      "iso2": "VE",
+      "capital": "Caracas",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "vietnam",
+      "name": "Vietnam",
+      "iso2": "VN",
+      "capital": "Hanoi (Ha Noi)",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "virgin-islands",
+      "name": "Virgin Islands",
+      "iso2": "VI",
+      "capital": "Charlotte Amalie",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "wake-island",
+      "name": "Wake Island",
+      "iso2": null,
+      "capital": null,
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "wallis-and-futuna",
+      "name": "Wallis and Futuna",
+      "iso2": "WF",
+      "capital": "Mata-Utu (on Ile Uvea)",
+      "statusType": "dependency_or_territory",
+      "statusLabel": "Dependency or territory"
+    },
+    {
+      "slug": "west-bank",
+      "name": "West Bank",
+      "iso2": null,
+      "capital": null,
+      "statusType": "disputed_or_limited_recognition",
+      "statusLabel": "Disputed or separately profiled area"
+    },
+    {
+      "slug": "western-sahara",
+      "name": "Western Sahara",
+      "iso2": "EH",
+      "capital": null,
+      "statusType": "disputed_or_limited_recognition",
+      "statusLabel": "Disputed or separately profiled area"
+    },
+    {
+      "slug": "yemen",
+      "name": "Yemen",
+      "iso2": "YE",
+      "capital": "Sanaa",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "zambia",
+      "name": "Zambia",
+      "iso2": "ZM",
+      "capital": "Lusaka",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    },
+    {
+      "slug": "zimbabwe",
+      "name": "Zimbabwe",
+      "iso2": "ZW",
+      "capital": "Harare",
+      "statusType": "sovereign_state",
+      "statusLabel": "UN member state"
+    }
+  ]
+}

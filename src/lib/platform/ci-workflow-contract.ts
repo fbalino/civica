@@ -12,9 +12,11 @@ import { createHash } from "node:crypto";
 export const CANONICAL_CI_WORKFLOW = ".github/workflows/ci.yml";
 export const RETIRED_CLAIMS_WORKFLOW = ".github/workflows/claims-docs.yml";
 
-/** SHA-256 of the complete credential-free production build command. */
+/** SHA-256 of the complete credential-free production build command.
+ * 2026-08-17 (CAC-003): build:core adds validate:jurisdiction-directory
+ * beside validate:jurisdiction-status. */
 export const BUILD_CORE_SHA256 =
-  "05cdc1b790f30984587d7e23b06b1a10cc82709b889876341ae385628a1a069d";
+  "34e5ec7919f56e00c955636d60591df5c4cacd67483d0127d1b743ce35ef3fc0";
 
 export const REQUIRED_CI_COMMANDS = [
   "npm ci",
@@ -254,7 +256,7 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     "validate:query-budgets":
       "node --import tsx --test src/lib/platform/query-budget.test.ts scripts/validate-query-budgets.test.ts && tsx scripts/validate-query-budgets.ts",
     "validate:route-performance-telemetry":
-      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring && npm run validate:health-status && npm run validate:ask-civica && npm run validate:model-operations && npm run validate:serverless-db",
+      "node --import tsx --test src/lib/platform/route-performance-telemetry.test.ts src/proxy.test.ts && tsx scripts/validate-route-performance-telemetry.ts && npm run validate:pipeline-observability && npm run validate:error-monitoring && npm run validate:health-status && npm run validate:ask-civica && npm run validate:model-operations && npm run validate:serverless-db",
     "validate:privacy-data-handling":
       "node --import tsx --test src/lib/privacy/data-handling.test.ts src/lib/api/request-body-schemas.test.ts && node --import tsx scripts/validate-privacy-data-handling.ts",
     "validate:error-monitoring":

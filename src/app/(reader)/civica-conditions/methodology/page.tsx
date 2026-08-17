@@ -7,8 +7,6 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Civica Conditions Codebook and Replication",
   description:

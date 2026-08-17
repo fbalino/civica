@@ -10,8 +10,6 @@ import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { withOg } from "@/lib/og";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Terms of Use",
   description:

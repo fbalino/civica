@@ -56,7 +56,9 @@ const FORMAT_LABEL: Record<Format, string> = {
  * JSON" link to the v1 API (the page's full underlying dataset, not the
  * citation) is shown only when a `downloadSlug` is supplied (i.e. on
  * per-country pages where `/api/v1/countries/<slug>` actually serves that
- * page's data).
+ * page's data). That endpoint requires an explicit temporal selection
+ * (DAT-031), so the link always carries `as_of` — dropping it makes the
+ * download return 400.
  *
  * Two dates, kept distinct: the citation's publication date is the
  * data's real `dataVintage` (or "n.d." when unknown — never today),
@@ -231,7 +233,7 @@ export function CiteAccordion({
           {downloadSlug ? (
             <a
               className="cite-action"
-              href={`/api/v1/countries/${downloadSlug}`}
+              href={`/api/v1/countries/${downloadSlug}?as_of=live`}
               download={`civica-${downloadSlug}.json`}
             >
               <Download size={13} aria-hidden="true" /> Download as JSON

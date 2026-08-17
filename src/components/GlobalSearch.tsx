@@ -7,7 +7,7 @@ interface Country {
   name: string;
   iso2: string | null;
   capital: string | null;
-  status: import("@/lib/jurisdictions/status-presentation").JurisdictionStatusPresentation;
+  status: { label: string };
 }
 
 export function GlobalSearch({ countries }: { countries: Country[] }) {

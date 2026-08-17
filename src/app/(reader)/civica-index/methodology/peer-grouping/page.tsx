@@ -8,8 +8,6 @@ import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
 import { peerGrouping, civicaIndex } from "@/lib/content/site-state";
 
-export const revalidate = 0;
-
 const REVIEW_STATUS_LABEL: Record<"pending" | "in-review" | "complete", string> = {
   pending: "Pending external review",
   "in-review": "External review in progress",

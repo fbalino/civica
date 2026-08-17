@@ -5,8 +5,6 @@ import { BlogCover } from "@/components/blog/BlogCover";
 import { withOg } from "@/lib/og";
 import { Reveal } from "@/components/motion/Reveal";
 
-export const revalidate = 0;
-
 const SITE_URL = "https://civicaatlas.org";
 
 export const metadata: Metadata = {

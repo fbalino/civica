@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "Accessibility & Security",
   description:
