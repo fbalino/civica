@@ -1,19 +1,15 @@
-/** EXP-017 — navigation and hero asset transfer budget. */
+/**
+ * EXP-017 — navigation and hero asset transfer budget.
+ *
+ * The Explore menu is a plain text dropdown (owner decision 2026-08-17): no
+ * navigation artwork may be requested on any surface, open or closed. The
+ * hero check still proves the homepage resolves only the active theme's art.
+ */
 import type { Response } from "@playwright/test";
 
-import { EXPLORE_NAV_GROUPS } from "../src/components/exploreNavItems";
 import { expect, test } from "./harness/fixtures";
 
 const NAVIGATION_ART_PREFIX = "/engravings/navigation/explore-";
-const MAX_OPEN_MENU_ART_BYTES = 96_000;
-
-const NAVIGATION_ART_NAMES = Array.from(
-  new Set(
-    EXPLORE_NAV_GROUPS.flatMap((group) =>
-      group.items.map((item) => item.art),
-    ),
-  ),
-).sort();
 
 function localPath(url: string): string {
   return new URL(url).pathname;
@@ -26,13 +22,6 @@ function navigationArtPaths(responses: readonly Response[]): string[] {
     .filter((path) => path.startsWith(NAVIGATION_ART_PREFIX));
 }
 
-function expectedNavigationArtPaths(theme: "light" | "dark"): string[] {
-  return NAVIGATION_ART_NAMES.map(
-    (art) =>
-      `${NAVIGATION_ART_PREFIX}${art}${theme === "dark" ? "-dark" : ""}.webp`,
-  );
-}
-
 async function openExploreMenu(page: import("@playwright/test").Page) {
   const trigger = page.getByRole("button", { name: "Explore", exact: true });
   await trigger.click();
@@ -40,7 +29,7 @@ async function openExploreMenu(page: import("@playwright/test").Page) {
 }
 
 test.describe("EXP-017 — navigation and hero asset budget", () => {
-  test("closed desktop Explore menu defers its art, then loads only the light destination batch", async ({
+  test("the desktop Explore dropdown loads no navigation artwork, closed or open", async ({
     page,
   }) => {
     const responses: Response[] = [];
@@ -53,51 +42,25 @@ test.describe("EXP-017 — navigation and hero asset budget", () => {
     expect(navigationArtPaths(responses)).toEqual([]);
 
     await openExploreMenu(page);
-    await expect
-      .poll(() => navigationArtPaths(responses).length)
-      .toBe(NAVIGATION_ART_NAMES.length);
-
-    const artResponses = responses.filter((response) =>
-      localPath(response.url()).startsWith(NAVIGATION_ART_PREFIX),
-    );
-    expect(navigationArtPaths(responses).sort()).toEqual(
-      expectedNavigationArtPaths("light"),
-    );
-    expect(
-      navigationArtPaths(responses).some((path) => path.includes("-dark.webp")),
-    ).toBe(false);
-
-    const totalBytes = (
-      await Promise.all(artResponses.map((response) => response.body()))
-    ).reduce((sum, body) => sum + body.byteLength, 0);
-    expect(totalBytes).toBeLessThanOrEqual(MAX_OPEN_MENU_ART_BYTES);
+    await page.waitForTimeout(250);
+    expect(navigationArtPaths(responses)).toEqual([]);
   });
 
-  test("dark mode resolves dark menu and homepage art without light counterparts", async ({
+  test("dark mode resolves dark homepage hero art without light counterparts", async ({
     page,
   }) => {
-    const menuResponses: Response[] = [];
-    page.on("response", (response) => menuResponses.push(response));
-
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.emulateMedia({ colorScheme: "dark" });
     await page.addInitScript(() => {
       window.localStorage.setItem("theme", "dark");
     });
-    await page.goto("/about", { waitUntil: "networkidle" });
-    await openExploreMenu(page);
-    await expect
-      .poll(() => navigationArtPaths(menuResponses).length)
-      .toBe(NAVIGATION_ART_NAMES.length);
-
-    expect(navigationArtPaths(menuResponses).sort()).toEqual(
-      expectedNavigationArtPaths("dark"),
-    );
 
     const homeResponses: Response[] = [];
     page.on("response", (response) => homeResponses.push(response));
     await page.goto("/", { waitUntil: "networkidle" });
-    await expect(page.locator(".home-hero-art-img.civica-themed-image")).toBeVisible();
+    await expect(
+      page.locator(".home-hero-art-img.civica-themed-image"),
+    ).toBeVisible();
 
     const heroPaths = homeResponses
       .filter((response) => response.request().resourceType() === "image")
@@ -107,7 +70,7 @@ test.describe("EXP-017 — navigation and hero asset budget", () => {
     expect(heroPaths).not.toContain("/engravings/hero.webp");
   });
 
-  test("closed mobile menu defers its destination artwork", async ({ page }) => {
+  test("the open mobile menu loads no navigation artwork", async ({ page }) => {
     const responses: Response[] = [];
     page.on("response", (response) => responses.push(response));
 
@@ -117,19 +80,7 @@ test.describe("EXP-017 — navigation and hero asset budget", () => {
 
     await page.getByRole("button", { name: "Open menu" }).click();
     await expect(page.locator(".mobile-menu")).toBeVisible();
-    await expect
-      .poll(() => navigationArtPaths(responses).length)
-      .toBe(NAVIGATION_ART_NAMES.length);
-
-    const artResponses = responses.filter((response) =>
-      localPath(response.url()).startsWith(NAVIGATION_ART_PREFIX),
-    );
-    expect(navigationArtPaths(responses).sort()).toEqual(
-      expectedNavigationArtPaths("light"),
-    );
-    const totalBytes = (
-      await Promise.all(artResponses.map((response) => response.body()))
-    ).reduce((sum, body) => sum + body.byteLength, 0);
-    expect(totalBytes).toBeLessThanOrEqual(MAX_OPEN_MENU_ART_BYTES);
+    await page.waitForTimeout(250);
+    expect(navigationArtPaths(responses)).toEqual([]);
   });
 });

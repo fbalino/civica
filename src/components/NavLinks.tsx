@@ -15,7 +15,7 @@ import {
   isMethodologyGroupActive,
 } from "@/components/navActiveState";
 
-/** All hrefs that live under the "Explore" megamenu — used to light the
+/** All hrefs that live under the "Explore" dropdown — used to light the
  * trigger active when the reader is on any of the eight browse surfaces. */
 const EXPLORE_HREFS = EXPLORE_NAV_GROUPS.flatMap((g) =>
   g.items.map((i) => i.href),
@@ -69,7 +69,7 @@ export function NavLinks() {
   return (
     <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>
       <div
-        className="nav-dropdown nav-dropdown--explore"
+        className="nav-dropdown"
         onMouseEnter={openExplore}
         onMouseLeave={closeExploreSoon}
         onFocus={(event) => {
@@ -125,7 +125,6 @@ export function NavLinks() {
             aria-label="Explore Civica Atlas"
           >
             <ExploreMenuPanel
-              shouldLoadArt
               groups={EXPLORE_NAV_GROUPS}
               isActiveHref={isActiveHref}
               onNavigate={() => setExploreOpen(false)}

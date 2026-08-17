@@ -18,7 +18,6 @@ import {
   EXPLORE_NAV_GROUPS,
   type ExploreNavItem,
 } from "@/components/exploreNavItems";
-import { ExploreNavArtwork } from "@/components/ExploreMenuPanel";
 import { EDITORIAL_NAV_ITEMS } from "@/components/editorialNavItems";
 import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 import {
@@ -291,7 +290,6 @@ function ExploreLink({
       href={item.href}
       className={`mobile-menu__explore-link${active ? " is-active" : ""}`}
     >
-      <ExploreNavArtwork item={item} className="mobile-menu__spot" />
       <span className="mobile-menu__explore-copy">
         <strong>{item.label}</strong>
         <small>{item.description}</small>

@@ -175,29 +175,11 @@ const DESIGN_TOKEN_GROUPS: DesignTokenGroup[] = [
     "navigation-composition",
     "Navigation composition",
     [
-      "--width-navigation-summary",
-      "--measure-navigation-heading",
-      "--measure-navigation-summary",
-      "--aspect-square",
-      "--aspect-navigation-plate",
-      "--navigation-art-rest-scale",
-      "--navigation-art-surface-mix",
-      "--navigation-selection-border-mix",
-      "--navigation-selection-surface-mix",
       "--navigation-mobile-divider-mix",
       "--navigation-mobile-selection-mix",
       "--stroke-icon-light",
     ],
     {
-      "--width-navigation-summary": "Explore orientation column",
-      "--measure-navigation-heading": "Short navigation heading measure",
-      "--measure-navigation-summary": "Compact navigation summary measure",
-      "--aspect-square": "Compact destination plate",
-      "--aspect-navigation-plate": "Destination image plate",
-      "--navigation-art-rest-scale": "Resting plate-art inset",
-      "--navigation-art-surface-mix": "Plate surface accent",
-      "--navigation-selection-border-mix": "Selected plate border",
-      "--navigation-selection-surface-mix": "Selected plate surface",
       "--navigation-mobile-divider-mix": "Mobile register divider",
       "--navigation-mobile-selection-mix": "Mobile selected row",
       "--stroke-icon-light": "Quiet directional and close icons",
@@ -1032,12 +1014,12 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="ds-comp ds-comp--wide">
-              <h4 id="explore-concepts">Explore megamenu</h4>
+              <h4 id="explore-concepts">Explore dropdown</h4>
               <p className="ds-component-note">
-                The header&rsquo;s near-page-width Explore panel, shown open.
-                A short orientation introduces two 2 × 2 registers whose eight
-                destination-specific plates sharpen on hover and keyboard
-                focus. Artwork transfers only for the active theme.
+                The header&rsquo;s Explore menu, shown open: a standard
+                dropdown matching the Governance Evidence and Methodology
+                menus, with two labeled groups — Start with a place and
+                Research tools — as plain text links.
               </p>
               <ExploreMenuDemo />
             </div>

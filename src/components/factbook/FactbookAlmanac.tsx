@@ -37,26 +37,21 @@ export interface FactbookAlmanacCountry {
 /* ── Region model ──────────────────────────────────────────────────────
    The DB stores 7 continents; the picker collapses them into the five
    reader-facing regions from mockup C (N+S America → "Americas"; the
-   handful of Antarctic territories fold into Oceania). Each region owns a
-   colored dot token used both on the quick-filter chips and per-row. */
+   handful of Antarctic territories fold into Oceania). */
 type RegionKey = "all" | "africa" | "americas" | "asia" | "europe" | "oceania";
 
 interface RegionDef {
   key: RegionKey;
   label: string;
-  /** CSS var driving the chip + row dot color. */
-  dotVar: string;
-  /** editorial-chip tonal modifier for the active state wash. */
-  chipTone: string;
 }
 
 const REGIONS: RegionDef[] = [
-  { key: "all", label: "All regions", dotVar: "", chipTone: "" },
-  { key: "africa", label: "Africa", dotVar: "var(--color-status-warning)", chipTone: "editorial-chip--sand" },
-  { key: "americas", label: "Americas", dotVar: "var(--color-accent)", chipTone: "editorial-chip--accent" },
-  { key: "asia", label: "Asia", dotVar: "var(--color-status-info)", chipTone: "editorial-chip--blue" },
-  { key: "europe", label: "Europe", dotVar: "var(--color-status-success)", chipTone: "editorial-chip--sage" },
-  { key: "oceania", label: "Oceania", dotVar: "var(--gov-semi)", chipTone: "" },
+  { key: "all", label: "All regions" },
+  { key: "africa", label: "Africa" },
+  { key: "americas", label: "Americas" },
+  { key: "asia", label: "Asia" },
+  { key: "europe", label: "Europe" },
+  { key: "oceania", label: "Oceania" },
 ];
 
 /** Map a raw DB continent to one of the five picker regions. */
@@ -318,13 +313,6 @@ export function FactbookAlmanac({
                     })
                   }
                 >
-                  {r.dotVar ? (
-                    <span
-                      className="factbook-region-chip__dot"
-                      style={{ background: r.dotVar }}
-                      aria-hidden="true"
-                    />
-                  ) : null}
                   {r.label}
                 </button>
               );

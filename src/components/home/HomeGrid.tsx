@@ -158,22 +158,9 @@ export async function HomeGrid() {
                 <span className="home-stat-value">{catalogCount ?? "—"}</span>
                 <span className="home-stat-label">Countries &amp; territories</span>
               </div>
-              <div className="home-stat">
-                <span className="home-stat-mark" aria-hidden="true">◆</span>
-                <span className="home-stat-label">Source-native evidence</span>
-              </div>
-              <div className="home-stat home-stat--mark">
-                <span className="home-stat-mark" aria-hidden="true">
-                  ◆
-                </span>
-                <span className="home-stat-label">Source links &amp; provenance</span>
-              </div>
-              <div className="home-stat home-stat--mark">
-                <span className="home-stat-mark" aria-hidden="true">
-                  ◆
-                </span>
-                <span className="home-stat-label">Independent &amp; nonpartisan</span>
-              </div>
+              <p className="home-stats-note">
+                Independent and nonpartisan, built on source-native evidence.
+              </p>
             </HeroRevealItem>
           </HeroReveal>
         </div>

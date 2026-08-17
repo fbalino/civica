@@ -20,28 +20,18 @@ interface CountryDirectoryProps {
   animated?: boolean;
 }
 
+/**
+ * The unmarked default of the directory. UN member states are the baseline
+ * case, so repeating their label 193 times is noise; every OTHER status
+ * (observer state, dependency, associated state, disputed, special area)
+ * stays visibly labeled per jurisdiction-status/v1, and the full sourced
+ * status disclosure lives on each profile.
+ */
+const DEFAULT_STATUS_LABEL = "UN member state";
+
 function indexLetter(name: string): string {
   const first = name.trim().charAt(0).toUpperCase();
   return first >= "A" && first <= "Z" ? first : "#";
-}
-
-function regionDot(continent: string | null | undefined): string {
-  switch (continent) {
-    case "Africa":
-      return "var(--color-status-warning)";
-    case "North America":
-    case "South America":
-      return "var(--color-accent)";
-    case "Asia":
-      return "var(--color-status-info)";
-    case "Europe":
-      return "var(--color-status-success)";
-    case "Oceania":
-    case "Antarctica":
-      return "var(--gov-semi)";
-    default:
-      return "var(--color-text-30)";
-  }
 }
 
 function destination(
@@ -58,7 +48,9 @@ function destination(
 /**
  * Canonical A–Z country directory used by country and evidence browse pages.
  * Callers own filtering and destination semantics; this component owns the
- * shared alphabet grouping, flags, region signals, and responsive layout.
+ * shared alphabet grouping, flags, status labels, and responsive layout.
+ * Rows are single-line: flag slot, name, and a muted status suffix only for
+ * non-default entries.
  */
 export function CountryDirectory({
   countries,
@@ -93,36 +85,37 @@ export function CountryDirectory({
         </span>
       </div>
       <div className="country-directory__entries">
-        {entries.map((country) => (
-          <Link
-            key={country.id ?? country.slug}
-            href={destination(hrefPrefix, queryParam, country.slug)}
-            className="country-directory__item"
-          >
-            <span className="country-directory__flag" aria-hidden="true">
-              <CountryFlag iso2={country.iso2} size={21} decorative />
-            </span>
-            <span className="country-directory__name">
-              <span className="country-directory__label">{country.name}</span>
-              {country.status ? (
-                <span className="country-directory__status">
-                  <span
-                    className="country-directory__status-separator"
-                    aria-hidden="true"
-                  >
-                    ·
+        {entries.map((country) => {
+          const statusLabel =
+            country.status && country.status.label !== DEFAULT_STATUS_LABEL
+              ? country.status.label
+              : null;
+          return (
+            <Link
+              key={country.id ?? country.slug}
+              href={destination(hrefPrefix, queryParam, country.slug)}
+              className="country-directory__item"
+            >
+              <span className="country-directory__flag" aria-hidden="true">
+                <CountryFlag iso2={country.iso2} size={21} decorative />
+              </span>
+              <span className="country-directory__name">
+                <span className="country-directory__label">{country.name}</span>
+                {statusLabel ? (
+                  <span className="country-directory__status">
+                    <span
+                      className="country-directory__status-separator"
+                      aria-hidden="true"
+                    >
+                      ·
+                    </span>
+                    {statusLabel}
                   </span>
-                  {country.status.label}
-                </span>
-              ) : null}
-            </span>
-            <span
-              className="country-directory__dot"
-              style={{ background: regionDot(country.continent) }}
-              aria-hidden="true"
-            />
-          </Link>
-        ))}
+                ) : null}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </section>
   ));

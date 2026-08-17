@@ -36,11 +36,11 @@ import { EDITORIAL_NAV_ITEMS } from "../editorialNavItems";
  *     required `target`/`rel` security attributes, and that none of the
  *     four shared destination lists silently contain an unhandled
  *     absolute-URL entry.
- *  5. Locks the shared desktop panel and its themed artwork renderer to the
- *     canonical Explore data instead of a copied card list or filename map.
- *  6. Checks the Explore item's accessible name — built from `item.label`
- *     then `item.description`, in that order, with no overriding
- *     `aria-label` — is constructed identically on both surfaces.
+ *  5. Locks the shared desktop dropdown panel to the canonical Explore data
+ *     instead of a copied link list.
+ *  6. Checks the Explore item's accessible name comes from its text content
+ *     (desktop: `item.label`; mobile: `item.label` then `item.description`)
+ *     with no overriding `aria-label`.
  *
  * Source-backed and pure: no rendering, no DOM, no jsdom dependency.
  */
@@ -156,13 +156,9 @@ test("desktop Explore renders the shared panel with the canonical groups unmodif
     /<ExploreMenuPanel[\s\S]*?\bgroups=\{\s*EXPLORE_NAV_GROUPS\s*\}[\s\S]*?\/>/,
     "NavLinks.tsx must pass the canonical Explore groups directly to the shared panel",
   );
-  assert.ok(
-    !/<ExploreNavArtwork\b/.test(navLinksSrc),
-    "NavLinks.tsx must not recreate Explore cards or artwork outside the shared panel",
-  );
 });
 
-test("shared Explore panel maps canonical groups/items directly and derives both themed asset paths from item.art", () => {
+test("shared Explore panel maps canonical groups/items directly and carries no imagery", () => {
   assert.ok(
     importsNamedFrom(
       explorePanelSrc,
@@ -186,21 +182,21 @@ test("shared Explore panel maps canonical groups/items directly and derives both
     /\bgroup\.items\.map\(/,
     "ExploreMenuPanel must map each canonical item list directly",
   );
-  assert.match(
-    explorePanelSrc,
-    /src=\{`\/engravings\/navigation\/explore-\$\{item\.art\}\.webp`\}/,
-    "light artwork paths must derive from the canonical item.art basename",
-  );
-  assert.match(
-    explorePanelSrc,
-    /darkSrc=\{`\/engravings\/navigation\/explore-\$\{item\.art\}-dark\.webp`\}/,
-    "dark artwork paths must derive from the same canonical item.art basename",
-  );
-  assert.match(
-    explorePanelSrc,
-    /<span className=\{className\} aria-hidden="true">/,
-    "Explore artwork must remain decorative and outside the accessible name",
-  );
+  // The Explore menu is a plain text dropdown (owner decision 2026-08-17):
+  // no engravings, images, or decorative artwork may return to the panel.
+  for (const [surface, src] of [
+    ["ExploreMenuPanel.tsx", explorePanelSrc],
+    ["MobileNav.tsx (explore register)", mobileNavSrc],
+  ] as const) {
+    assert.ok(
+      !/engravings\/navigation/.test(src),
+      `${surface} must not reference navigation artwork assets`,
+    );
+    assert.ok(
+      !/ExploreNavArtwork/.test(src),
+      `${surface} must not reintroduce the retired ExploreNavArtwork renderer`,
+    );
+  }
 });
 
 function consumesUnmodified(src: string, ident: string): boolean {
@@ -302,30 +298,43 @@ function extractEnclosingTag(src: string, uniqueMarker: string, tag: string): st
   return src.slice(openIndex, closeIndex + tag.length + 3);
 }
 
-test("Explore item accessible name (label then description) is built identically on both surfaces, with no aria-label override", () => {
+test("Explore item accessible name comes from text content on both surfaces, with no aria-label override", () => {
   const desktopBlock = extractEnclosingTag(
     explorePanelSrc,
-    "<ExploreNavArtwork",
+    "{item.label}",
     "Link",
   );
-  const mobileBlock = extractEnclosingTag(mobileNavSrc, "mobile-menu__spot", "Link");
+  const mobileBlock = extractEnclosingTag(
+    mobileNavSrc,
+    "mobile-menu__explore-copy",
+    "Link",
+  );
 
-  for (const [name, block] of [
-    ["desktop", desktopBlock],
-    ["mobile", mobileBlock],
-  ] as const) {
-    assert.ok(block.includes("{item.label}"), `${name} Explore item must render {item.label}`);
-    assert.ok(
-      block.includes("{item.description}"),
-      `${name} Explore item must render {item.description}`,
-    );
-    assert.ok(
-      block.indexOf("{item.label}") < block.indexOf("{item.description}"),
-      `${name} Explore item must announce label before description`,
-    );
-    assert.ok(
-      !block.includes("aria-label"),
-      `${name} Explore item link must not override its text-content accessible name with aria-label`,
-    );
-  }
+  // Desktop dropdown items are plain label links, like the sibling menus.
+  assert.ok(
+    desktopBlock.includes("{item.label}"),
+    "desktop Explore item must render {item.label}",
+  );
+  assert.ok(
+    !desktopBlock.includes("aria-label"),
+    "desktop Explore item link must not override its text-content accessible name with aria-label",
+  );
+
+  // Mobile keeps the one-line description after the label.
+  assert.ok(
+    mobileBlock.includes("{item.label}"),
+    "mobile Explore item must render {item.label}",
+  );
+  assert.ok(
+    mobileBlock.includes("{item.description}"),
+    "mobile Explore item must render {item.description}",
+  );
+  assert.ok(
+    mobileBlock.indexOf("{item.label}") < mobileBlock.indexOf("{item.description}"),
+    "mobile Explore item must announce label before description",
+  );
+  assert.ok(
+    !mobileBlock.includes("aria-label"),
+    "mobile Explore item link must not override its text-content accessible name with aria-label",
+  );
 });

@@ -1328,13 +1328,6 @@
   transform: translateY(-1px);
   border-color: var(--color-text-30);
 }
-.factbook-region-chip__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-full);
-  flex-shrink: 0;
-}
-
 /* ── Almanac index ── */
 .factbook-almanac {
   max-width: var(--width-page-standard);
