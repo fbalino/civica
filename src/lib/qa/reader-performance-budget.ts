@@ -66,9 +66,25 @@ export interface ReaderPerformanceFixture {
   budget: ReaderPerformanceBudget;
 }
 
+/**
+ * 2026-08-17 revision (documented in
+ * `plan/evidence/QA-014/2026-08-17-budget-revision.md`):
+ *
+ * - `rscBytes` covers full link prefetch. The CAC-005 caching wave made 24
+ *   prose routes static, and Next.js fully prefetches static routes linked
+ *   from the header/footer/Explore menu, so a complete prefetch pass inside
+ *   the measurement window is ~800 kB of RSC on a fast machine. The prior
+ *   500 kB cap only passed when a slow runner finished fewer prefetches
+ *   before the observation window closed.
+ * - `fontBytes` moved to per-fixture caps. The owner-approved 2026-07-26
+ *   Newsreader/Archivo self-hosted faces have a hard floor of 222,104 bytes
+ *   (both upright Latin subsets) that the original 200 kB cap predated.
+ *   Each fixture cap sits less than one smallest-subset-file (~27 kB) above
+ *   its exact measured payload, so loading any additional font file still
+ *   fails the budget.
+ */
 const SHARED_BUDGET = {
-  rscBytes: 500_000,
-  fontBytes: 200_000,
+  rscBytes: 900_000,
   cls: 0.05,
   inpMs: 300,
 } as const;
@@ -94,8 +110,11 @@ export const READER_PERFORMANCE_FIXTURES: readonly ReaderPerformanceFixture[] = 
       htmlBytes: 1_100_000,
       javascriptBytes: 1_200_000,
       cssBytes: 500_000,
-      imageBytes: 1_500_000,
-      requestCount: 110,
+      // Measured 1,521,309 B with the database-backed featured grid
+      // (2026-08-17); the prior 1.5 MB cap predated home imagery growth.
+      imageBytes: 1_600_000,
+      fontBytes: 240_000,
+      requestCount: 120,
       serverResponseMs: 4_000,
       lcpMs: 4_000,
       longestLongTaskMs: 150,
@@ -116,6 +135,7 @@ export const READER_PERFORMANCE_FIXTURES: readonly ReaderPerformanceFixture[] = 
       javascriptBytes: 1_300_000,
       cssBytes: 500_000,
       imageBytes: 2_500_000,
+      fontBytes: 240_000,
       requestCount: 105,
       serverResponseMs: 10_000,
       lcpMs: 10_000,
@@ -138,6 +158,8 @@ export const READER_PERFORMANCE_FIXTURES: readonly ReaderPerformanceFixture[] = 
       javascriptBytes: 3_000_000,
       cssBytes: 650_000,
       imageBytes: 3_800_000,
+      // Upright Latin floor plus Archivo italic (constitution body prose).
+      fontBytes: 340_000,
       requestCount: 125,
       serverResponseMs: 7_000,
       lcpMs: 7_000,
@@ -159,7 +181,9 @@ export const READER_PERFORMANCE_FIXTURES: readonly ReaderPerformanceFixture[] = 
       javascriptBytes: 1_200_000,
       cssBytes: 500_000,
       imageBytes: 3_000_000,
-      requestCount: 105,
+      // Upright Latin floor plus both italic faces (long-form article prose).
+      fontBytes: 490_000,
+      requestCount: 120,
       serverResponseMs: 4_000,
       lcpMs: 4_000,
       longestLongTaskMs: 150,
