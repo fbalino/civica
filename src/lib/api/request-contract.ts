@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { apiProblem } from "@/lib/api/problem";
+import { GOOGLE_ISSUERS } from "@/lib/admin/google-oauth";
 import { CI_RELEASE_QUERY_IDENTITIES } from "@/lib/ci/release-query-identities";
 import { JURISDICTION_STATUS_TYPES } from "@/lib/jurisdictions/status-taxonomy";
 import { DATA_VALUE_STATUSES } from "@/lib/data/value-state";
@@ -176,6 +177,10 @@ const oauthCallbackSchema = z
     authuser: canonicalInteger(0, 100).optional(),
     prompt: optionalText(100),
     hd: optionalText(253),
+    // RFC 9207 issuer identification. Google sends this on every callback, so
+    // omitting it rejected every real sign-in. The route verifies the value
+    // against the expected authorization server (see google-oauth.ts).
+    iss: z.enum(GOOGLE_ISSUERS).optional(),
   })
   .strict();
 

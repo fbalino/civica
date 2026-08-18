@@ -176,9 +176,12 @@ test("unknown keys, malformed encodings, invalid types, and ranges fail closed",
 });
 
 test("OAuth and constitution-search contracts accept their bounded real shapes", () => {
+  // Mirrors an actual Google callback, `iss` included — Google sends the
+  // RFC 9207 issuer on every response, so a shape without it is not the real
+  // one and hid a total sign-in failure.
   const oauth = parseQueryContract(
     request(
-      "?code=opaque-code&state=0123456789abcdef0123456789abcdef0123456789abcdef&scope=openid+email&authuser=0&prompt=consent",
+      "?code=opaque-code&state=0123456789abcdef0123456789abcdef0123456789abcdef&scope=openid+email&authuser=0&prompt=consent&iss=https%3A%2F%2Faccounts.google.com",
     ),
     "oauth-callback-query/v1",
   );
@@ -190,6 +193,7 @@ test("OAuth and constitution-search contracts accept their bounded real shapes",
       scope: "openid email",
       authuser: 0,
       prompt: "consent",
+      iss: "https://accounts.google.com",
     },
   });
 
@@ -209,6 +213,23 @@ test("OAuth and constitution-search contracts accept their bounded real shapes",
       limit: 10,
     },
   });
+});
+
+test("the OAuth callback contract accepts only the expected issuer", () => {
+  const withIssuer = (iss: string) =>
+    parseQueryContract(
+      request(
+        `?code=opaque-code&state=0123456789abcdef0123456789abcdef0123456789abcdef&iss=${encodeURIComponent(iss)}`,
+      ),
+      "oauth-callback-query/v1",
+    ).ok;
+
+  assert.equal(withIssuer("https://accounts.google.com"), true);
+  assert.equal(withIssuer("accounts.google.com"), true);
+  // A response naming a different authorization server must fail closed,
+  // including a lookalike host that merely starts with the real issuer.
+  assert.equal(withIssuer("https://evil.example.com"), false);
+  assert.equal(withIssuer("https://accounts.google.com.evil.example"), false);
 });
 
 test("all declared GET query schemas accept their canonical minimum shape", () => {

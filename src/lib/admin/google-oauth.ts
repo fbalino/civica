@@ -21,6 +21,28 @@ const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 export const GOOGLE_STATE_COOKIE = "civica_admin_google_state";
 export const GOOGLE_REDIRECT_COOKIE = "civica_admin_google_redirect";
 
+/**
+ * The issuer identifiers Google may return in the callback's `iss` parameter
+ * (RFC 9207, OAuth 2.0 Authorization Server Issuer Identification). Google
+ * sends the `https://` form; the bare host is the long-standing OpenID
+ * Connect alias and is accepted for the same issuer.
+ *
+ * `iss` is absent from some providers and flows, so it cannot be required.
+ * When it IS present it must name Google, which is what makes it useful:
+ * a mismatch means the response came from a different authorization server.
+ */
+export const GOOGLE_ISSUERS = [
+  "https://accounts.google.com",
+  "accounts.google.com",
+] as const;
+
+/** False only when a present `iss` names an authorization server that is not
+ *  Google. An absent `iss` is allowed — see GOOGLE_ISSUERS. */
+export function isExpectedGoogleIssuer(iss: string | undefined): boolean {
+  if (iss === undefined) return true;
+  return (GOOGLE_ISSUERS as readonly string[]).includes(iss);
+}
+
 /** True only when all three Google-sign-in env vars are set. Fail closed
  *  otherwise — mirrors isAdminConfigured() for the password flow. */
 export function isGoogleSignInConfigured(): boolean {

@@ -22,6 +22,7 @@ import {
   exchangeGoogleCode,
   fetchGoogleUserInfo,
   isAllowedAdminGoogleAccount,
+  isExpectedGoogleIssuer,
   isGoogleSignInConfigured,
   GOOGLE_STATE_COOKIE,
   GOOGLE_REDIRECT_COOKIE,
@@ -73,9 +74,17 @@ export async function GET(request: NextRequest) {
     const rawRedirect = cookieJar.get(GOOGLE_REDIRECT_COOKIE)?.value;
     const redirectPath = safeInternalPathOr(rawRedirect, "/admin/pulse-review");
 
-    const { code, state } = query.data;
+    const { code, state, iss } = query.data;
 
-    if (!code || !state || !expectedState || state !== expectedState) {
+    // Reject a response that names an authorization server other than Google
+    // before the code is ever exchanged (RFC 9207 mix-up defence).
+    if (
+      !isExpectedGoogleIssuer(iss) ||
+      !code ||
+      !state ||
+      !expectedState ||
+      state !== expectedState
+    ) {
       const res = NextResponse.redirect(failUrl, 303);
       res.headers.set("Cache-Control", "no-store");
       for (const [name, value] of clearOAuthCookieHeaders()) {
