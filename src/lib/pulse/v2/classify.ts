@@ -87,6 +87,7 @@ import {
 // unchanged; only which model(s) run the classify pass moves here.
 // See plan/pulse-classifier-cost-resolution-v1.md (cost resolution) and
 // plan/pulse-ensemble-classifier-implementation-2026-07-05.md (ensemble).
+import { voterFailureKind, type VoterFailureKind } from "./subscription-cli";
 import {
   callClassifier,
   resolveClassifyEnsemble,
@@ -277,6 +278,13 @@ export interface ClassifySummary {
   retryableFailures: number;
   terminalFailures: number;
   claimsSkipped: number;
+  /**
+   * Voter dropouts for this run, keyed `<provider>.<kind>` plus
+   * `<provider>.<kind>.severity.<outcome>`. `content_filter` entries are
+   * provider-side content-policy refusals, kept separate from ordinary
+   * failures so content-correlated dropout is measurable.
+   */
+  voterFailures: Record<string, number>;
   configHash: string;
   queueBefore: ClassificationQueueMetricsRow | null;
   queueAfter: ClassificationQueueMetricsRow | null;
@@ -564,6 +572,11 @@ function reusedClassificationSummary(
     retryableFailures: counts.retryableFailures ?? 0,
     terminalFailures: counts.terminalFailures ?? 0,
     claimsSkipped: counts.claimsSkipped ?? 0,
+    voterFailures: Object.fromEntries(
+      Object.entries(counts)
+        .filter(([key]) => key.startsWith("voter."))
+        .map(([key, value]) => [key.slice("voter.".length), value]),
+    ),
     configHash,
     queueBefore: null,
     queueAfter: null,
@@ -678,6 +691,8 @@ export async function classifyClusters(
   // provider contract are the local cost ceiling; provider workspaces carry
   // the monthly cap and alert threshold.
   const limit = Math.min(opts.limit ?? 50, 50);
+  // A classify stage run owns its own voter-dropout tally.
+  resetVoterFailures();
   const operationNow = opts.now ?? new Date();
   const persistRun = !opts.dryRun && !opts.clusters && !opts.runRef;
   const persistState = !opts.dryRun && !opts.clusters;
@@ -841,6 +856,7 @@ export async function classifyClusters(
     retryableFailures: 0,
     terminalFailures: 0,
     claimsSkipped: 0,
+    voterFailures: {},
     configHash: CURRENT_CLASSIFICATION_CONFIG_HASH,
     queueBefore,
     queueAfter: null,
@@ -1073,6 +1089,9 @@ export async function classifyClusters(
     }
     throw err;
   }
+  // Snapshot the run's voter dropouts before any finalization path persists
+  // counts, so both the cron and direct paths carry the same tally.
+  summary.voterFailures = voterFailureCounts();
   if (persistRun && cronRunId) {
     const runSnapshot = frozenClassificationClusters(
       run.versions.inputIds,
@@ -1104,6 +1123,12 @@ export async function classifyClusters(
         retryableFailures: summary.retryableFailures,
         terminalFailures: summary.terminalFailures,
         claimsSkipped: summary.claimsSkipped,
+        ...Object.fromEntries(
+          Object.entries(summary.voterFailures).map(([key, value]) => [
+            `voter.${key}`,
+            value,
+          ]),
+        ),
       },
       failures:
         summary.failed > 0
@@ -1272,6 +1297,42 @@ async function classifyOneSingle(
  * Every engine's classify run + the verify run are recorded in
  * classifierRuns for audit.
  */
+/**
+ * Per-run tally of voter dropouts, keyed `<provider>.<kind>` and — once the
+ * surviving voters agree an outcome — `<provider>.<kind>.severity.<tier>`.
+ * The severity pairing is the point: it answers "does this voter fail more
+ * often on the worst events?", which a bare failure count cannot.
+ *
+ * Module-scoped because a classify stage run is one process; `resetVoterFailures`
+ * is called at the top of every `classifyClusters` so a second in-process run
+ * (fixtures, tests) never inherits the previous tally.
+ */
+const voterFailureTally = new Map<string, number>();
+
+export function resetVoterFailures(): void {
+  voterFailureTally.clear();
+}
+
+export function recordVoterFailure(provider: string, kind: VoterFailureKind): void {
+  const key = `${provider}.${kind}`;
+  voterFailureTally.set(key, (voterFailureTally.get(key) ?? 0) + 1);
+}
+
+/** Pair this cluster's dropouts with the outcome the survivors agreed on. */
+export function recordVoterFailureOutcome(
+  dropouts: ReadonlyArray<{ provider: string; kind: VoterFailureKind }>,
+  outcome: string,
+): void {
+  for (const { provider, kind } of dropouts) {
+    const key = `${provider}.${kind}.severity.${outcome}`;
+    voterFailureTally.set(key, (voterFailureTally.get(key) ?? 0) + 1);
+  }
+}
+
+export function voterFailureCounts(): Record<string, number> {
+  return Object.fromEntries([...voterFailureTally.entries()].sort());
+}
+
 async function classifyOneEnsemble(
   cluster: ClusterToClassify,
 ): Promise<ClassifyOneResult | { category: "none" } | null> {
@@ -1282,8 +1343,15 @@ async function classifyOneEnsemble(
   });
 
   // --- Fan out one classify call per engine, in parallel ---
+  // Dropouts are captured per cluster so they can be paired with the outcome
+  // the surviving voters agree on (see recordVoterFailureOutcome).
+  const dropouts: Array<{ provider: string; kind: VoterFailureKind }> = [];
   const settled = await Promise.allSettled(
-    CLASSIFY_ENSEMBLE.map((cfg) => runClassify(cfg, userContent)),
+    CLASSIFY_ENSEMBLE.map((cfg) =>
+      runClassify(cfg, userContent, (kind) =>
+        dropouts.push({ provider: cfg.provider, kind }),
+      ),
+    ),
   );
 
   const runs: EnsembleRun[] = [];
@@ -1292,8 +1360,15 @@ async function classifyOneEnsemble(
     const cfg = CLASSIFY_ENSEMBLE[i];
     const result = outcome.status === "fulfilled" ? outcome.value : null;
     if (outcome.status === "rejected") {
+      const message =
+        outcome.reason instanceof Error
+          ? outcome.reason.message
+          : String(outcome.reason);
+      const kind = voterFailureKind(message);
+      recordVoterFailure(cfg.provider, kind);
+      dropouts.push({ provider: cfg.provider, kind });
       console.error(
-        `[classify] ensemble engine ${cfg.provider}/${cfg.model} rejected:`,
+        `[classify] ensemble engine ${cfg.provider}/${cfg.model} rejected (${kind}):`,
         outcome.reason,
       );
     }
@@ -1319,7 +1394,10 @@ async function classifyOneEnsemble(
   });
 
   // No engine returned anything usable — treat as a hard failure.
-  if (runs.length === 0) return null;
+  if (runs.length === 0) {
+    recordVoterFailureOutcome(dropouts, "panel_failed");
+    return null;
+  }
 
   const storedDerivation = deriveStoredEnsemble(classifyRuns);
   if (!storedDerivation.valid) {
@@ -1335,11 +1413,13 @@ async function classifyOneEnsemble(
   // agreement "none"; those must NOT be silently dropped — they route to
   // review below.)
   if (consensus.category === "none" && consensus.agreement !== "none") {
+    recordVoterFailureOutcome(dropouts, "none");
     return sourceHasIndirectInstruction ? null : { category: "none" };
   }
 
   // Deadlock / no quorum → straight to review, verify skipped.
   if (consensus.agreement === "none") {
+    recordVoterFailureOutcome(dropouts, "deadlock");
     return buildEnsembleResult(cluster, consensus, classifyRuns, {
       verify: null,
       verifySkipped: true,
@@ -1353,6 +1433,7 @@ async function classifyOneEnsemble(
     console.warn(
       `[classify] cluster ${cluster.clusterId}: consensus category "${consensus.category}" not in taxonomy → review`,
     );
+    recordVoterFailureOutcome(dropouts, "invalid_category");
     return buildEnsembleResult(
       cluster,
       normalizeInvalidConsensusForReview(consensus),
@@ -1371,6 +1452,9 @@ async function classifyOneEnsemble(
   )
     ? consensus.severityTier
     : cat.allowedTiers[0];
+  // The measurement that matters: pair this cluster's dropouts with the
+  // severity the surviving voters agreed on.
+  recordVoterFailureOutcome(dropouts, severityTier);
   const severityValue = clampSeverityToTier(
     consensus.severityValue,
     severityTier,
@@ -1514,6 +1598,7 @@ type EnsembleConsensusLike = {
 async function runClassify(
   config: ResolvedProviderConfig,
   userContent: string,
+  onFailure?: (kind: VoterFailureKind) => void,
 ): Promise<ClassifyResultLite | null> {
   let response;
   try {
@@ -1529,16 +1614,22 @@ async function runClassify(
       "pulse-classify",
     );
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const kind = voterFailureKind(message);
+    recordVoterFailure(config.provider, kind);
+    onFailure?.(kind);
     console.warn(
-      `[pulse-classify] provider_call_failed ${config.provider}/${config.model}: ${
-        err instanceof Error ? err.message.slice(0, 200) : String(err)
-      }`,
+      `[pulse-classify] provider_call_failed ${config.provider}/${config.model} (${kind}): ${message.slice(0, 200)}`,
     );
     return null;
   }
   const parsed = parseClassify(response.text);
   if (!parsed) {
-    console.warn("[pulse-classify] provider_parse_failed");
+    recordVoterFailure(config.provider, "parse");
+    onFailure?.("parse");
+    console.warn(
+      `[pulse-classify] provider_parse_failed ${config.provider}/${config.model}`,
+    );
     return null;
   }
   return parsed;

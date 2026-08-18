@@ -9,6 +9,7 @@ import {
   SUBSCRIPTION_VERIFY_CONFIG,
   cliInvocation,
   summarizeCliStderr,
+  voterFailureKind,
 } from "./subscription-cli";
 import {
   resolveClassifyEnsemble,
@@ -175,5 +176,47 @@ test("xai and moonshot have no HTTP path", async () => {
       { system: "s", user: "u", maxTokens: 10, expectJson: true },
     ),
     /no HTTP path/,
+  );
+});
+
+test("content-policy refusals are separated from ordinary voter failures", () => {
+  // The exact Moonshot/Kimi refusal that killed the fourth voter.
+  assert.equal(
+    voterFailureKind(
+      "Subscription voter moonshot/kimi-k3 exited 1: stderr=error: failed to run prompt: provider.api_error: 400 The request was rejected because it was considered high risk",
+    ),
+    "content_filter",
+  );
+  // Vendor-neutral phrasings a future provider might use.
+  for (const message of [
+    "error: blocked due to content policy",
+    "rejected: content_filter triggered",
+    "error: request refused by safety policy",
+  ]) {
+    assert.equal(voterFailureKind(message), "content_filter", message);
+  }
+
+  // Ordinary failures must NOT be miscounted as refusals — that would
+  // manufacture evidence of content-correlated dropout that does not exist.
+  assert.equal(
+    voterFailureKind("Subscription voter x/y timed out after 300000ms"),
+    "timeout",
+  );
+  assert.equal(
+    voterFailureKind("Subscription voter x/y failed to start: ENOENT"),
+    "startup",
+  );
+  assert.equal(
+    voterFailureKind("Subscription voter x/y produced empty output"),
+    "empty_output",
+  );
+  assert.equal(
+    voterFailureKind("Subscription voter x/y exited 1: stderr=segfault"),
+    "exit",
+  );
+  // A model reasoning ABOUT a risky event is not a refusal.
+  assert.equal(
+    voterFailureKind("the protest carried a high risk of escalation"),
+    "unknown",
   );
 });

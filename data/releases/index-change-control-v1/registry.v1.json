@@ -41218,7 +41218,670 @@
         "validate:pulse-runtime",
         "validate:claims-docs"
       ]
+    },
+    {
+      "id": "pul-040-voter-dropout-counter-2026-08-18",
+      "fromVersion": "civica-index-pulse-subscription-runtime-v61",
+      "toVersion": "civica-index-pulse-voter-dropout-counter-v63",
+      "parentSnapshotSha256": "4f6289cc3e73e75e21a06e49c2c17e23d638e6d29fd9e5e61e7eb3ba99bd2213",
+      "snapshotSha256": "c593c874fcc463199a10bfe0518d9664349a7603a1c529652de1402db2b27512",
+      "categories": [
+        "weight_or_model"
+      ],
+      "changedPaths": [
+        "src/lib/pulse/v2/classify.ts"
+      ],
+      "protectedFiles": [
+        {
+          "path": "src/lib/ci/atomic-ingestion.ts",
+          "category": "input",
+          "sha256": "1c65f6e071d720993bdae70388adae30b2316622ccb68cbd9ad9c73d8e7478b9"
+        },
+        {
+          "path": "src/lib/ci/current-release.ts",
+          "category": "input",
+          "sha256": "31b002ad7416fde22cfd2c7a8b3f60bbce2f938f1585acce953790c793a8dd8a"
+        },
+        {
+          "path": "src/lib/ci/production-source-adapters.ts",
+          "category": "input",
+          "sha256": "6630049f39b2eeb2886879210026ae802f31ad70abed7eb60dbb3d5411be1b82"
+        },
+        {
+          "path": "src/lib/ci/research-panel.ts",
+          "category": "input",
+          "sha256": "db61bc83d1c2b48c1952e3078e926529ccd7c738a3f20fab4223e1336cdfdc57"
+        },
+        {
+          "path": "src/lib/ci/release-selection.ts",
+          "category": "input",
+          "sha256": "5f07685f8ff35a3ab131c1df0804d9db9804b8152bd39af41ba1da046a9792ff"
+        },
+        {
+          "path": "src/lib/ci/release-publication.ts",
+          "category": "input",
+          "sha256": "c8bd2523bcabbca804c55804a5ef930a56f075dc8dcccce4e010945d1977ba0f"
+        },
+        {
+          "path": "src/lib/ci/release-store.ts",
+          "category": "input",
+          "sha256": "ca7f0e7683967549a8ef6c10e0b6b7c22f83677fe8a9b9451fbf05e516157b96"
+        },
+        {
+          "path": "src/lib/ci/series-provenance.ts",
+          "category": "input",
+          "sha256": "3b120071672ac3e54c3ac8cc480585ffbe27c9a69cb5866cd6b09cb3ac9e8287"
+        },
+        {
+          "path": "src/lib/ci/k1-uncertainty-inputs.ts",
+          "category": "input",
+          "sha256": "d7efe443224ec254a093c36c514058bda57ebde7202b642eae7527214b4cc864"
+        },
+        {
+          "path": "src/lib/ci/k4-practice-inputs.ts",
+          "category": "input",
+          "sha256": "ac3fc1df3fc22a3569cadde3fb1938d64f44ab77f7f3f1f8d4b2d27d07329405"
+        },
+        {
+          "path": "src/lib/ci/history-adapters.ts",
+          "category": "input",
+          "sha256": "75a4a013abffa1e89a33f7e009c6655e98b9546bdf0f5b38178182b5114df02a"
+        },
+        {
+          "path": "src/lib/ci/ingest.ts",
+          "category": "input",
+          "sha256": "9a00bc16059ea2b62e11e6c135acd548e77dd138fa808f2b4979135e79dfa428"
+        },
+        {
+          "path": "src/lib/ci/longitudinal-validation-inputs.ts",
+          "category": "input",
+          "sha256": "5e8a986acd2cf1a334e8e32ded0ece7157042c322582b1ea4f0e161459348939"
+        },
+        {
+          "path": "src/lib/ci/index-analysis-inputs.ts",
+          "category": "input",
+          "sha256": "0333bb2e018e26163a0cb3452f20465d841ccd17bfb6eba6e1a457abab764627"
+        },
+        {
+          "path": "src/lib/ci/subgroup-fairness-inputs.ts",
+          "category": "input",
+          "sha256": "db2651bd0db4c5bb50b20ca346067bc7750719a6fe21d7bf8a49b78a3ed3f5cd"
+        },
+        {
+          "path": "src/lib/ci/source-utils.ts",
+          "category": "input",
+          "sha256": "4aa706cf288dd4897ee42caa1fa0c08443221079e45f1796e8885319c8280c75"
+        },
+        {
+          "path": "src/lib/db/queries.ts",
+          "category": "input",
+          "sha256": "120084f3575649f713274ecab0e7dbd676c8926b563e8958b3384179f4d42463"
+        },
+        {
+          "path": "src/lib/db/queries-peer-grouping.ts",
+          "category": "input",
+          "sha256": "1f0b5b8c0895565e50c1336bcbbced84cd80cda0942c1b2390c581a8b559f58e"
+        },
+        {
+          "path": "src/lib/db/queries-scores.ts",
+          "category": "input",
+          "sha256": "2cb653d2d8294aa13ea05f03f1fcd2d01b0d933ef29cd749069feefc16909b7f"
+        },
+        {
+          "path": "src/lib/db/queries-governance-evidence.ts",
+          "category": "input",
+          "sha256": "cda486edf6e955a4d223a04bb16fc623c82f4ef450607f43d893bb047ced1778"
+        },
+        {
+          "path": "src/lib/pulse/v2/country-resolver.ts",
+          "category": "input",
+          "sha256": "acc50b33ab9bb28d31af27d2b80963dcee1f99e1ff75b6005ce92d5f06f88e9c"
+        },
+        {
+          "path": "src/lib/pulse/v2/jurisdiction-entities.ts",
+          "category": "input",
+          "sha256": "b73e772da45e0ce0f0a3b97c035528f3ad6a4be160138123f431e8824fd3b006"
+        },
+        {
+          "path": "src/lib/data/production-adapter-registry.ts",
+          "category": "input",
+          "sha256": "ada8079334010621a2ff827d4409b2643ede7c9338310e9bdfe50e9c6ff1acb4"
+        },
+        {
+          "path": "src/lib/data/source-input-manifest.ts",
+          "category": "input",
+          "sha256": "e90cacd564d389fa38b3f2abc4c20db0acae42a4a5e94835fa8062b34b8d02f4"
+        },
+        {
+          "path": "scripts/apply-pulse-information-environment.ts",
+          "category": "input",
+          "sha256": "38964f37e05930004b353c54d08c8b64792c70df747431b09f5ac04d44df91f6"
+        },
+        {
+          "path": "src/lib/ci/normalize.ts",
+          "category": "transform",
+          "sha256": "28d4970f0097b25a2347d28d4b043e11640d825d3a6f500aa292500c9abae512"
+        },
+        {
+          "path": "src/lib/ci/normalize-v2.ts",
+          "category": "transform",
+          "sha256": "185a04bd4ac235f31202b5c38aa50c671483485e74a10d310963a633ac39b40c"
+        },
+        {
+          "path": "src/lib/ci/calculate.ts",
+          "category": "transform",
+          "sha256": "afff61db299f1f10b4958adaafef093bb1ffc52dbb82b30ceee60c2e50fe371c"
+        },
+        {
+          "path": "src/lib/ci/calculate-v2.ts",
+          "category": "transform",
+          "sha256": "7a76cd922a7dde117b1bbf09d8ffc4d4210393f3b6aa63db46317f4d5e1afceb"
+        },
+        {
+          "path": "src/lib/ci/normalization-table.ts",
+          "category": "transform",
+          "sha256": "9d27f4ef51911a08898943e1fb31d110fc8878909ba9542913b3fe73b6871f6c"
+        },
+        {
+          "path": "src/lib/ci/reproduce-current-release.ts",
+          "category": "transform",
+          "sha256": "6cfdf010f4de81861a18a4ac2a79aa340509dca2ed82ee4425b8fab48d3726fb"
+        },
+        {
+          "path": "src/lib/ci/versioning.ts",
+          "category": "transform",
+          "sha256": "9ef6876543377898e0f502352b02fdce5b51b73e2867861e2b934aafa0e15ad1"
+        },
+        {
+          "path": "scripts/calculate-ci-v2.ts",
+          "category": "transform",
+          "sha256": "e02df9f5a6c3ee6c91e727f0496c720621cf1b0509f20bca427f33d848b4ba39"
+        },
+        {
+          "path": "src/lib/ci/dimensions-v2.ts",
+          "category": "weight_or_model",
+          "sha256": "7a9b6ff64c873c68d9a2a46c3b4027034ba9a6963860bf78e47e126caff3ceb3"
+        },
+        {
+          "path": "src/lib/ci/pca-analysis.generated.json",
+          "category": "weight_or_model",
+          "sha256": "32e97870857661a676d95e5a82b7811f8ad4103f14013a0f5a56c9ca45d841e5"
+        },
+        {
+          "path": "analysis/phase-5-3/results.json",
+          "category": "weight_or_model",
+          "sha256": "621337ff2ba3b45531101626705ca8abd1eead2176da400fa775c1698c3e02d2"
+        },
+        {
+          "path": "analysis/phase-5-3/run_pca.py",
+          "category": "weight_or_model",
+          "sha256": "5e609bb856d8cd514ce22b09c13fc4fa7126921730fc55ae7a7dfccd0d04e0b2"
+        },
+        {
+          "path": "src/lib/ci/candidate-specifications.ts",
+          "category": "weight_or_model",
+          "sha256": "9d99fdeaaf8d689285991cfafbdce6eb4490b723afa256ebc94ef222a0fcc234"
+        },
+        {
+          "path": "src/lib/ci/dimensionality-analysis.ts",
+          "category": "weight_or_model",
+          "sha256": "3760a51940e1725927e33be42764ebc9bceb22cd6872ccfdd6d90c9c9ae615e1"
+        },
+        {
+          "path": "src/lib/ci/incremental-information-analysis.ts",
+          "category": "weight_or_model",
+          "sha256": "42dafc16a8b8e99ebac38f04b8d2c587312eb88a3cdfb1c14c62b633038e4036"
+        },
+        {
+          "path": "src/lib/ci/incremental-information-preregistration.ts",
+          "category": "weight_or_model",
+          "sha256": "cde8795fadb3e5f61ed82b294883f0cbe72cb200216228441a156f2a30058c71"
+        },
+        {
+          "path": "src/lib/ci/longitudinal-analysis.ts",
+          "category": "weight_or_model",
+          "sha256": "32a2b0f64f7c364c051b0c592199a8d0432c50f83b69513675040a6bf77d483a"
+        },
+        {
+          "path": "src/lib/ci/longitudinal-preregistration.ts",
+          "category": "weight_or_model",
+          "sha256": "3325b99738f757a794fda1428a6cbe04f0203b3e7031c9c7ab3c828404aacea0"
+        },
+        {
+          "path": "src/lib/ci/pca-analysis.ts",
+          "category": "weight_or_model",
+          "sha256": "efab3a4c64b117eed8367f329f1a9d115026a70911ba296df8fe4522d602237c"
+        },
+        {
+          "path": "src/lib/ci/reader-task-protocol.ts",
+          "category": "weight_or_model",
+          "sha256": "72020711b924f3300de430f731146169a884943bcb891fc9cf3988a77a06fb08"
+        },
+        {
+          "path": "src/lib/ci/research-charter.ts",
+          "category": "weight_or_model",
+          "sha256": "7185961930cd345ae3fcc211824db5b85ee342733c0da9ced8fbadbdfe181619"
+        },
+        {
+          "path": "src/lib/ci/source-ecosystem-dependence.ts",
+          "category": "weight_or_model",
+          "sha256": "3ee13c6441f204ef90935903cbb7a0348d9f7444f3a6bd335e85ccf0273aec1a"
+        },
+        {
+          "path": "src/lib/ci/subgroup-fairness.ts",
+          "category": "weight_or_model",
+          "sha256": "2327dfd3de8a77681b83f2f09c4d779bca1f3797e400f316e08f3edf8f9e0f81"
+        },
+        {
+          "path": "src/lib/ci/tournament-baselines.ts",
+          "category": "weight_or_model",
+          "sha256": "7a4254489d9ea78e00658785c461466faeae931a7bf90371f35127ef17b3a1f8"
+        },
+        {
+          "path": "src/lib/ci/tournament-candidate-k1.ts",
+          "category": "weight_or_model",
+          "sha256": "e72caf0ff53c97c98b483d0cb5392d26b20b58a6556a471f252c7f13bfbe3c00"
+        },
+        {
+          "path": "src/lib/ci/tournament-candidate-k2.ts",
+          "category": "weight_or_model",
+          "sha256": "5fa234498ce7d0c4a578f705316d44f7b72a0978d86eee70ed94600f8198042f"
+        },
+        {
+          "path": "src/lib/ci/tournament-candidate-k3.ts",
+          "category": "weight_or_model",
+          "sha256": "2711a26cdfff490b04bb977e1cfc34631aba55c8ab808b46745518b4255f91e6"
+        },
+        {
+          "path": "src/lib/ci/tournament-candidate-k4.ts",
+          "category": "weight_or_model",
+          "sha256": "8b63eae64ca335ed868b188f40d760113c0003c164b47358fecfcb8a778f8ac9"
+        },
+        {
+          "path": "src/lib/ci/tournament-candidate-k5.ts",
+          "category": "weight_or_model",
+          "sha256": "9c2cb14429668f433f90c0a798a44279ead6d62cc0c158e9cb1ae561945497a3"
+        },
+        {
+          "path": "src/lib/ci/tournament-evaluation-interface.ts",
+          "category": "weight_or_model",
+          "sha256": "6460ac00b54ef65003e9d168c0a8b994225afc92eb4eee028e094f7fcdc1dcba"
+        },
+        {
+          "path": "src/lib/ci/tournament-decision.ts",
+          "category": "weight_or_model",
+          "sha256": "a400c8fe89233ca3c7c7ad54c9b2af061d1ea68d6cbb79ddf2d380269cc9a746"
+        },
+        {
+          "path": "src/lib/ci/tournament-preregistration.ts",
+          "category": "weight_or_model",
+          "sha256": "356a0e6fba6a31af73d26303d40acf6bef74cedd7bfb4282b67671a6f5891295"
+        },
+        {
+          "path": "src/lib/ci/tournament-results-package.ts",
+          "category": "weight_or_model",
+          "sha256": "9eb8107cc2a086ec63cbce9398ca7540a14c4ef2a9a1430cae2ce22e4e534389"
+        },
+        {
+          "path": "src/lib/ci/types.ts",
+          "category": "weight_or_model",
+          "sha256": "7ad4bb4a71900ba071eb07a3d18fafc4d92c5e29bf379f1a0a1f948fc2493fc8"
+        },
+        {
+          "path": "src/lib/ci/validity-analysis.ts",
+          "category": "weight_or_model",
+          "sha256": "9b634ff923d79527c4a47b71ee0ea4bf99a7708203f0fa3c8c5d5f58ef607b72"
+        },
+        {
+          "path": "src/lib/ci/validity-preregistration.ts",
+          "category": "weight_or_model",
+          "sha256": "d94eb6cdb6fb944dffd620861d189b5effa7ec8aa62bbcfe7777ed50621bc22f"
+        },
+        {
+          "path": "src/lib/pulse/v2/country-attribution.ts",
+          "category": "weight_or_model",
+          "sha256": "e10a8e8a44370ddab8f540c6a95a7d56cd769895a3218e00d8b48bd9f7567d90"
+        },
+        {
+          "path": "src/lib/pulse/v2/classify.ts",
+          "category": "weight_or_model",
+          "sha256": "063440c915a7a830a16ceab31576e52586613b670b2177904f64e76d21390de5"
+        },
+        {
+          "path": "src/lib/pulse/v2/decision-ledger.ts",
+          "category": "weight_or_model",
+          "sha256": "9a6fce03a79b318fa34ec4c331c317eaaf75eff579a29d0d773542b4d786cba5"
+        },
+        {
+          "path": "src/lib/pulse/v2/absorption.ts",
+          "category": "weight_or_model",
+          "sha256": "654e7f2008c2c3e424110c777c87ad31316c9c71bdf87cd131f8d9d5db4db9e1"
+        },
+        {
+          "path": "src/lib/pulse/v2/decouple.ts",
+          "category": "weight_or_model",
+          "sha256": "8ba490e2060a309ad0711b6862252211b70fada971a752c824433ed24886cc0f"
+        },
+        {
+          "path": "src/lib/pulse/v2/score.ts",
+          "category": "weight_or_model",
+          "sha256": "dd4c8920dd81f21275b8df65c1e52f7cb23d679ec3fe5f5b683820b1e5fdd8be"
+        },
+        {
+          "path": "src/lib/pulse/v2/press-freedom.ts",
+          "category": "weight_or_model",
+          "sha256": "7fccf796a2c70b41d8fdb9a7b4644a8fe49ccf40b280fa1f40783a7099ec2af4"
+        },
+        {
+          "path": "src/lib/pulse/v2/corroborate.ts",
+          "category": "weight_or_model",
+          "sha256": "3de77eae681ed9c3105cb093a6f9317114b24e5c112c95dfc54777568efced6a"
+        },
+        {
+          "path": "src/lib/pulse/v2/validation-protocol.ts",
+          "category": "weight_or_model",
+          "sha256": "435d6f4ed46bad211527866d0e6181df7c3e0347c22ea6d20f6751f3a72a5e37"
+        },
+        {
+          "path": "src/lib/ci/missingness-policy.ts",
+          "category": "missingness",
+          "sha256": "7d9e2697abb5cf5375b5d0149956feba31e35a17829f808417f737dcc6965594"
+        },
+        {
+          "path": "src/lib/pulse/v2/information-environment-evidence.ts",
+          "category": "missingness",
+          "sha256": "72c340388bd3c07253ed2b1027cc5f7d48b89803aa5386fc699d576f373d9897"
+        },
+        {
+          "path": "src/lib/ci/uncertainty-policy.ts",
+          "category": "uncertainty",
+          "sha256": "cf3d7064b6b9b70d2bf7d372a42f6b8b356bb0db353cbfe22fddf1e1419e3a3d"
+        },
+        {
+          "path": "src/lib/ci/monte-carlo.ts",
+          "category": "uncertainty",
+          "sha256": "2621526cfc04b95f2d1cabdcea35c5cb7fefb9065b0ac1789885a79bc6382000"
+        },
+        {
+          "path": "src/lib/ci/sensitivity-analysis.ts",
+          "category": "uncertainty",
+          "sha256": "e1cefef801855a0951f27caa2483f67fa6c8f8b10b76a043fd3a4ad64ba91f27"
+        },
+        {
+          "path": "src/lib/ci/bands.ts",
+          "category": "band_or_rank",
+          "sha256": "7f0d893da21789b6c9c00beb43542619e2a1e1e3a8441bd4cde73d4c11d2d69c"
+        },
+        {
+          "path": "src/lib/ci/tiers.ts",
+          "category": "band_or_rank",
+          "sha256": "02bf8cee3b51155410eb70fd3d3a5c27dfecc36532b0b37333fe333ca15b85cc"
+        },
+        {
+          "path": "src/lib/ci/rank-policy.ts",
+          "category": "band_or_rank",
+          "sha256": "d06873999c72e69d3720953380fef110290b41ca61278c6c5af2e39680011d2c"
+        },
+        {
+          "path": "src/lib/ci/governance-evidence.ts",
+          "category": "presentation",
+          "sha256": "51ebcfb59fd26fca2b3f5835354d0c2eee9e6c8afc1fc3b04ea0feedd65e193c"
+        },
+        {
+          "path": "src/lib/ci/dimension-colors.ts",
+          "category": "presentation",
+          "sha256": "e8d753397ae82990646ccdf6db2ea704b34d20e77bf54922fed20ba44891712c"
+        },
+        {
+          "path": "src/lib/ci/index-disposition.ts",
+          "category": "presentation",
+          "sha256": "e18f3228bbc085a571e1cdf698fa23c13de30481d22241fd0800eda00ef70312"
+        },
+        {
+          "path": "src/lib/ci/misuse-audit.ts",
+          "category": "presentation",
+          "sha256": "14062f75f625a40bdfe971ba114e225bb2302df609e81f87ae06d09bf6f5b515"
+        },
+        {
+          "path": "src/lib/ci/publication-components.ts",
+          "category": "presentation",
+          "sha256": "4dee681e16204f7fc43a2703433ad21e7083a4013daf39d1edde0b5f5d61c66b"
+        },
+        {
+          "path": "src/components/scores/freshness-label.ts",
+          "category": "presentation",
+          "sha256": "6673b1d18807e572156090780d30d4417fda33f80c9daf649f22a90129e9bfed"
+        },
+        {
+          "path": "src/components/scores/ScoresAndRankings.tsx",
+          "category": "presentation",
+          "sha256": "9e119cf820f792fff12aefb1fd6ff44fb3ac984c02eefd58b649d84363d7b962"
+        },
+        {
+          "path": "src/components/governance-evidence/GovernanceEvidenceTable.tsx",
+          "category": "presentation",
+          "sha256": "7f11dcbd969d8804244c7c75ad9c5b085d452e5b6d01afc6d09d32bc754cbe1e"
+        },
+        {
+          "path": "src/components/factbook/FactbookHeaderStrip.tsx",
+          "category": "presentation",
+          "sha256": "6d238125b502a8fb6185743b9c3bbfaaf59b66a4853370de468b2ec5c6072bc9"
+        },
+        {
+          "path": "src/app/governance-evidence/page.tsx",
+          "category": "presentation",
+          "sha256": "159364d7b0587607b2d9d6d143a0caf1dacabe29da4c2ff33414e50b8249dedc"
+        },
+        {
+          "path": "src/app/api/governance-evidence/[slug]/route.ts",
+          "category": "presentation",
+          "sha256": "049d499d97a432dfaf1012891b962920ad6bb9712e93f74aa4a1d467182dd87e"
+        },
+        {
+          "path": "src/app/(reader)/civica-index/page.tsx",
+          "category": "presentation",
+          "sha256": "3e0d3354c4fdc26872cb34b5116cce7a29dc2eb24d0da080b7b284682d2c30e6"
+        },
+        {
+          "path": "src/app/(reader)/civica-index/methodology/page.tsx",
+          "category": "presentation",
+          "sha256": "9b36415c76d3bf40d95b5960c677113286bb2c7d0dbfb88faf9f7c5c8eb9fc93"
+        },
+        {
+          "path": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
+          "category": "presentation",
+          "sha256": "6fd631a30dd9d1bbb4411b221923558a34d1e1edc4064aaf0a3b2c0374eefce1"
+        },
+        {
+          "path": "src/app/(reader)/country/[slug]/civica-data/page.tsx",
+          "category": "presentation",
+          "sha256": "59853dc333b9d2444f32edea3b1c22fd1188b6cb47a98f8745242788d5924719"
+        },
+        {
+          "path": "src/app/compare/page.tsx",
+          "category": "presentation",
+          "sha256": "a52eeb65c4607de5838d273b9d8a729c00a393561cdc4f4637195c96aefca4ec"
+        },
+        {
+          "path": "src/app/rankings/RankingsMatrix.tsx",
+          "category": "presentation",
+          "sha256": "388c20beeb86b64d2950d4412b2b957bef31b1f9a9bd8e71617433d7756d5aad"
+        },
+        {
+          "path": "src/lib/atlas/map-layers.ts",
+          "category": "presentation",
+          "sha256": "768e556a1343dd26e6d8adacb149432084380078b84c0230188d7a1ee6aae7b5"
+        },
+        {
+          "path": "src/app/embed/[slug]/route.ts",
+          "category": "presentation",
+          "sha256": "653020261928ff90ebb29458c4600f00b15992eaa5003a3eee7f179bc3119769"
+        },
+        {
+          "path": "src/lib/ci/quarantine-contract.ts",
+          "category": "presentation",
+          "sha256": "cd3df3442dc9ecf087e32d11058119b9f226df0d8ce3e93d052dd59174bb1f97"
+        },
+        {
+          "path": "src/lib/api/contract/registry.ts",
+          "category": "presentation",
+          "sha256": "0adfb2f31c4878f0437b55c13b7e0564677fa9d9ce507b8200dbc9d214712fa5"
+        },
+        {
+          "path": "src/lib/api/contract/schemas.ts",
+          "category": "presentation",
+          "sha256": "a0b898afeedbef66b6ae30a76ae219a5b0d3c83769fa54f484348c6957e61023"
+        },
+        {
+          "path": "src/lib/api/contract/shapes.ts",
+          "category": "presentation",
+          "sha256": "9c7bdd1cbe1e0a36686fc71e555cdf47215d36dfd30717ff95a49723cd1ff00e"
+        },
+        {
+          "path": "src/lib/api/contract/examples.ts",
+          "category": "presentation",
+          "sha256": "9ad7f4f67e58c2597315fbc8080a500c4f294c37446a2e95cd4484b7789dcf55"
+        },
+        {
+          "path": "src/lib/db/queries-pulse-v2.ts",
+          "category": "presentation",
+          "sha256": "a590297d92984006d6831074f7dac3ccb600b749ab6b7a9ad59754142f6d6183"
+        },
+        {
+          "path": "src/lib/pulse/v2/publication-consistency.ts",
+          "category": "presentation",
+          "sha256": "a8e1d19c43a46c90b51e28fd5499040530fc4e7edb15492c2088a529e8b17f27"
+        },
+        {
+          "path": "src/app/api/v1/index/[country_slug]/route.ts",
+          "category": "presentation",
+          "sha256": "b4c0f672960548f57335d706242055dbd4bdef492800d3dcab44c9940d8f539d"
+        },
+        {
+          "path": "src/app/api/countries/[slug]/scores/route.ts",
+          "category": "presentation",
+          "sha256": "a016f7fc0d46b16908378cfe3137697fac1848b8a08dde7aefeddaaf377cb8df"
+        },
+        {
+          "path": "src/app/api/v1/index/[country_slug]/history/route.ts",
+          "category": "presentation",
+          "sha256": "a7e6520091cc0f4b4876e9919f16080bbab827e9bb0b659b34e692ea8189911d"
+        },
+        {
+          "path": "src/app/api/v1/index/by-government-type/route.ts",
+          "category": "presentation",
+          "sha256": "914e5c76a2cb8c369207af4305f65945bc5b6f98ad6407830cd8cc4844878f8f"
+        },
+        {
+          "path": "src/app/api/v1/index/compare/route.ts",
+          "category": "presentation",
+          "sha256": "e5f5cf49fd8fd6e50be53c3bf716d39418bd8ac0eb983fb441549fd9810cbdd0"
+        },
+        {
+          "path": "src/app/api/v1/index/methodology/route.ts",
+          "category": "presentation",
+          "sha256": "4467c83d9b91f80dfc6af60d32353df4e1dc44ea8b33373d2a76cd9860c151e3"
+        },
+        {
+          "path": "src/app/api/v1/index/rankings/route.ts",
+          "category": "presentation",
+          "sha256": "2c6f08ad059a5426a62e144ad2b4ad32532f0420cf900c47b718a315ac519a2b"
+        },
+        {
+          "path": "src/lib/pulse/v2/runtime-contract.ts",
+          "category": "presentation",
+          "sha256": "ac80962f9b728a47930431177e8c0e20e27720c8be71cd34aa473fb3d0f5f31d"
+        },
+        {
+          "path": "src/lib/pulse/v2/observability-live.ts",
+          "category": "presentation",
+          "sha256": "f6f0ddb3f79537b21635a2a86da29d7c0a513147ad8cac178f04786a3cbf3853"
+        },
+        {
+          "path": "content/methodology-civica-index.md",
+          "category": "presentation",
+          "sha256": "f32d52af9f3967e11c3e00ff528607413a5e67b1d800dec0098a9847ae798eb8"
+        },
+        {
+          "path": "content/methodology-pulse.md",
+          "category": "presentation",
+          "sha256": "5e00ea75a26065299e508b4c94006ad95d28628c99b68a8f72958b08289caabc"
+        },
+        {
+          "path": "content/methodology-pca-appendix.md",
+          "category": "presentation",
+          "sha256": "b8e097d7c17752acb95ddae5b171a2a7cb4b76ffa041dc649f9014742ff85c40"
+        },
+        {
+          "path": "content/data-approach.md",
+          "category": "presentation",
+          "sha256": "38632f29dd804496dcb92b90012dd246258e674d08b997d7b26890162267c83c"
+        }
+      ],
+      "evidence": {
+        "documentation": [
+          {
+            "path": "plan/evidence/PUL-040/kimi-content-filter-2026-08-17.md",
+            "sha256": "01a59580c55251d266c00eccd984f88ff16371ab722d8a7aa49f93595d0bef94"
+          }
+        ],
+        "registry": [
+          {
+            "path": "src/lib/pulse/v2/subscription-cli.ts",
+            "sha256": "76a11cd47294d15d5b62ea9952828127ac61e9f5d4dc27dc267c5f68e1c4ccda"
+          }
+        ],
+        "release_note": [
+          {
+            "path": "plan/evidence/PUL-040/voter-dropout-counter-2026-08-18.md",
+            "sha256": "c6217e542d2ca151fdca28cc1640aca69551b39d94ac46f7a2bc107c3046c57d"
+          }
+        ],
+        "migration_plan": [
+          {
+            "path": "plan/evidence/PUL-040/voter-dropout-counter-2026-08-18.md",
+            "sha256": "c6217e542d2ca151fdca28cc1640aca69551b39d94ac46f7a2bc107c3046c57d"
+          }
+        ],
+        "golden_test": [
+          {
+            "path": "src/lib/pulse/v2/voter-failure-tally.test.ts",
+            "sha256": "ca24773d5164ce95ac201794564f9ef67ef00ee33cd9458111a6adcc3bb4c558"
+          },
+          {
+            "path": "src/lib/pulse/v2/subscription-cli.test.ts",
+            "sha256": "c990a451ddaf78842f5456a5b92461e451e0f77e0a6a0a5584649930bc71321c"
+          }
+        ],
+        "contract_test": [
+          {
+            "path": "scripts/validate-index-pulse-subscription-runtime.ts",
+            "sha256": "4b7208099f809449b13263edac32a16e24a8b2d1de68ef237388cc6c26757d68"
+          },
+          {
+            "path": "scripts/validate-pulse-runtime-method.ts",
+            "sha256": "9aee1ec37d3bc4529758fe81bcf647c3792fc159a2a5feae14ed5c0df36d0ae9"
+          }
+        ]
+      },
+      "validations": [
+        "validate:ci-current-release",
+        "validate:ci-missingness",
+        "validate:ci-ranking",
+        "validate:ci-release-selection",
+        "validate:ci-research-panel",
+        "validate:ci-series-provenance",
+        "validate:ci-uncertainty",
+        "validate:claims-docs",
+        "validate:cron-safety",
+        "validate:governance-evidence-review-packet",
+        "validate:index-disposition",
+        "validate:index-pulse-subscription-runtime",
+        "validate:index-quarantine",
+        "validate:index-research-archive",
+        "validate:pulse-runtime"
+      ]
     }
   ],
-  "currentSnapshotSha256": "4f6289cc3e73e75e21a06e49c2c17e23d638e6d29fd9e5e61e7eb3ba99bd2213"
+  "currentSnapshotSha256": "c593c874fcc463199a10bfe0518d9664349a7603a1c529652de1402db2b27512"
 }

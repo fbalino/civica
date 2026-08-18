@@ -43,6 +43,21 @@ async function main() {
   console.log(`    terminal:          ${summary.terminalFailures}`);
   console.log(`  model calls:         ${summary.modelCalls}`);
   console.log(`  claim collisions:    ${summary.claimsSkipped}`);
+  const voterFailures = Object.entries(summary.voterFailures).filter(
+    ([key]) => !key.includes(".severity."),
+  );
+  if (voterFailures.length > 0) {
+    console.log("  voter dropouts:");
+    for (const [key, count] of voterFailures) {
+      const severities = Object.entries(summary.voterFailures)
+        .filter(([other]) => other.startsWith(`${key}.severity.`))
+        .map(([other, n]) => `${other.split(".severity.")[1]}=${n}`)
+        .join(" ");
+      console.log(
+        `    ${key.padEnd(28)} ${count}${severities ? `  [${severities}]` : ""}`,
+      );
+    }
+  }
   console.log(`  config:              ${summary.configHash}`);
   if (summary.queueAfter) {
     console.log(`  queue eligible:      ${summary.queueAfter.eligibleDepth}`);

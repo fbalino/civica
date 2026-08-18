@@ -211,6 +211,56 @@ export function summarizeCliStderr(stderr: string, limit = 400): string {
   return (errors.length > 0 ? errors : lines).join(" | ").slice(0, limit);
 }
 
+/**
+ * Why a voter call failed. `content_filter` is separated from ordinary
+ * failures deliberately: a provider that refuses governance evidence on
+ * content-policy grounds does not fail at random — it fails hardest on the
+ * most severe events, so a panel that silently loses that voter gets weaker
+ * exactly where the news is worst. Counting those refusals separately (and
+ * against the severity the surviving voters agreed on) turns that risk into
+ * a measured number instead of a guess. See
+ * `plan/evidence/PUL-040/kimi-content-filter-2026-08-17.md`.
+ */
+export type VoterFailureKind =
+  | "content_filter"
+  | "timeout"
+  | "startup"
+  | "empty_output"
+  | "exit"
+  | "parse"
+  | "unknown";
+
+/**
+ * Signatures of a provider-side content-policy refusal. Vendor-neutral: any
+ * of these voters could add a filter. Extend this list rather than widening
+ * a pattern, so an ordinary failure is never miscounted as a refusal.
+ */
+const CONTENT_FILTER_SIGNATURES: readonly RegExp[] = [
+  // Moonshot/Kimi, observed exactly: "provider.api_error: 400 The request
+  // was rejected because it was considered high risk".
+  /rejected .{0,40}high[-\s]?risk/i,
+  /high[-\s]?risk .{0,40}(request|content|prompt)/i,
+  /content[_\s-]?(policy|filter|moderation)/i,
+  /safety[_\s-]?(policy|filter|system).{0,40}(block|refus|reject)/i,
+  /(blocked|refused|rejected) .{0,30}(by|due to) .{0,40}(policy|safety|moderation)/i,
+];
+
+/**
+ * Classify a voter failure message. Only ever applied to a FAILED call's
+ * summarized stderr, never to model output, so a model reasoning about a
+ * risky event cannot be mistaken for a refusal.
+ */
+export function voterFailureKind(message: string): VoterFailureKind {
+  if (CONTENT_FILTER_SIGNATURES.some((pattern) => pattern.test(message))) {
+    return "content_filter";
+  }
+  if (/timed out after \d+ms/i.test(message)) return "timeout";
+  if (/failed to start/i.test(message)) return "startup";
+  if (/produced empty output/i.test(message)) return "empty_output";
+  if (/exited \d+/i.test(message)) return "exit";
+  return "unknown";
+}
+
 export interface SubscriptionCallOptions {
   /** Hard wall-clock limit per voter call. */
   timeoutMs?: number;
