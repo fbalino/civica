@@ -92,7 +92,8 @@
 .home-stats {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-6) var(--space-7);
+  align-items: flex-end;
+  gap: var(--space-4) var(--space-7);
   margin-top: var(--space-7);
   padding-top: var(--space-6);
   border-top: 1px solid var(--color-border-default);
@@ -105,19 +106,6 @@
   color: var(--color-text-primary);
   line-height: 1;
 }
-/* Mark stats (◆ Source-linked, ◆ Independent) render diamond + label on ONE line.
-   Use flex-row so the diamond and text stay together without breaking. */
-.home-stat--mark {
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-2);
-}
-.home-stat-mark {
-  color: var(--color-accent);
-  font-size: var(--text-18);
-  line-height: 1;
-  flex-shrink: 0;
-}
 .home-stat-label {
   font-family: var(--font-body);
   font-size: var(--text-12);
@@ -125,6 +113,15 @@
   text-transform: uppercase;
   color: var(--color-text-muted);
   white-space: nowrap;
+}
+/* One quiet posture line beside the count — plain sentence case, no badges. */
+.home-stats-note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+  max-width: 30ch;
 }
 /* The hero engraving is now the section background (.home-hero background-image). */
 

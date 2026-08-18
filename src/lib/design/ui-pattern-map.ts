@@ -323,11 +323,11 @@ export const UI_PATTERN_MAP: UiPatternFamily[] = [
     family: "navigation",
     patterns: [
       {
-        pattern: "Explore megamenu",
+        pattern: "Explore dropdown",
         kind: "composition",
         primitives: ["src/components/ExploreMenuPanel.tsx"],
         classes: ["explore-menu"],
-        note: "Single Explore disclosure opens the near-page-width two-register image-card panel; the eight hrefs and art identities live in exploreNavItems.ts and are consumed by desktop and mobile.",
+        note: "Single Explore disclosure opens a standard grouped dropdown (Start with a place / Research tools) of plain text links; the eight hrefs live in exploreNavItems.ts and are consumed by desktop and mobile.",
       },
       {
         pattern: "Full-screen atlas / mobile menu",

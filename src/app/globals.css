@@ -448,12 +448,6 @@
   --stroke-icon-light: 1.5;
 
   /* --- Media geometry --- */
-  --aspect-square: 1;
-  --aspect-navigation-plate: 4 / 3;
-  --navigation-art-rest-scale: 0.94;
-  --navigation-art-surface-mix: 4%;
-  --navigation-selection-border-mix: 40%;
-  --navigation-selection-surface-mix: 5%;
   --navigation-mobile-divider-mix: 64%;
   --navigation-mobile-selection-mix: 7%;
   --position-home-hero-art: center center;
@@ -539,13 +533,6 @@ html:root {
   --width-constitution-context: 360px;
   --width-record-rail: var(--width-rail-compact);
   --width-record-body: 680px;
-
-  /* Explore navigation composition. These keep the archival panel's reading
-     measure and destination-plate geometry canonical across live and demo
-     renderers rather than embedding page-local literals. */
-  --width-navigation-summary: 16rem;
-  --measure-navigation-heading: 18ch;
-  --measure-navigation-summary: 44ch;
 }
 
 /* Dark mode override. Light mode remains the default token set above. */
@@ -1294,253 +1281,40 @@ a {
 }
 
 /* ============================================================
-   Explore megamenu — EXP-015 image-led atlas candidate
-   Near-page-width disclosure with two explicit 2 × 2 registers.
-   Every destination carries its own editorial motif;
-   text remains the accessible identity. Token-only.
+   Explore dropdown — a standard grouped header dropdown, matching
+   the Governance Evidence and Methodology menus. Two labeled
+   groups (Start with a place / Research tools), plain text links,
+   no imagery. Token-only.
    ============================================================ */
 
-/* Let the large panel resolve against the sticky header instead of the
-   narrow trigger box while it remains a descendant for hover/focus. */
-.nav-dropdown--explore {
-  position: static;
-}
-
-.explore-menu {
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-5);
-  width: min(
-    var(--width-page-standard),
-    calc(100vw - var(--space-7) - var(--space-7))
-  );
-  max-height: calc(100svh - var(--header-height) - var(--space-5));
-  padding: var(--space-6);
-  overflow-y: auto;
-  border-top: calc(var(--border-hairline) + var(--border-hairline)) solid
-    var(--color-accent);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-hard-lg);
-}
-
-.explore-menu__header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-7);
-  align-items: baseline;
-  justify-content: space-between;
-  padding-bottom: var(--space-4);
-  border-bottom: var(--border-hairline) solid var(--color-border-default);
-}
-
 /* The panel mounts already open (conditional render), so entry motion comes
-   from @starting-style: a short settle down from the header with a fade.
-   Exit is an instant unmount, which is correct for a hover-dismissed menu. */
+   from @starting-style: a short fade in. Exit is an instant unmount, which
+   is correct for a hover-dismissed menu. */
 .nav-dropdown-menu.explore-menu--open {
-  transform-origin: top center;
-  transition:
-    opacity var(--motion-fast) var(--motion-ease-out),
-    transform var(--motion-base) var(--motion-ease-out);
+  transition: opacity var(--motion-fast) var(--motion-ease-out);
 }
 
 @starting-style {
   .nav-dropdown-menu.explore-menu--open {
     opacity: 0;
-    transform: translateX(-50%) translateY(calc(var(--space-2) * -1))
-      scale(0.98);
   }
 }
 
-.explore-menu__eyebrow,
-.explore-register__label {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-}
-
-.explore-menu__eyebrow {
-  margin: 0;
-  color: var(--color-accent);
-}
-
-.explore-menu__dek {
-  max-width: var(--measure-navigation-summary);
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: var(--text-14);
-  line-height: var(--leading-normal);
-  color: var(--color-text-secondary);
-}
-
-.explore-menu__registers {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  /* Match the card gutter so the two registers read as one even
-     four-column rhythm; the register labels carry the grouping. */
-  gap: var(--space-3);
-}
-
-.explore-register {
-  min-width: 0;
-}
-
-.explore-register__label {
-  margin: 0 0 var(--space-3);
-  color: var(--color-text-secondary);
-}
-
-.explore-register__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-}
-
-.explore-item {
-  position: relative;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  min-width: 0;
-  overflow: hidden;
-  border: var(--border-hairline) solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-card-bg);
-  color: var(--color-text-primary);
-  text-decoration: none;
-  box-shadow: var(--shadow-hard-sm);
-  transition:
-    background var(--motion-fast) var(--motion-ease-out),
-    border-color var(--motion-fast) var(--motion-ease-out);
-}
-
-.explore-item__art {
-  display: block;
-  /* The navigation engravings are square masters; a square tile lets them
-     fill edge to edge instead of letterboxing inside a wider frame. */
-  aspect-ratio: 1;
-  overflow: hidden;
-  border-bottom: var(--border-hairline) solid var(--color-card-border);
-  background: color-mix(
-    in oklab,
-    var(--color-accent) var(--navigation-art-surface-mix),
-    var(--color-surface-secondary)
-  );
-}
-
-.explore-item__art-image {
-  width: 100%;
-  height: 100%;
-}
-
-.explore-item__body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-3);
-  align-items: start;
-  padding: var(--space-4);
-}
-
-.explore-item__copy {
-  display: grid;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.explore-item__name {
-  font-family: var(--font-heading);
-  font-size: var(--text-20);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-snug);
-  color: var(--color-text-primary);
-}
-
-.explore-item__desc {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  line-height: var(--leading-normal);
-  color: var(--color-text-secondary);
-}
-
-.explore-item__arrow {
-  width: var(--space-5);
-  height: var(--space-5);
-  color: var(--color-text-muted);
-  stroke-width: var(--stroke-icon-light);
-  transition:
-    color var(--motion-base) var(--motion-ease-out),
-    transform var(--motion-base) var(--motion-ease-out);
-}
-
-/* One quiet hover response: the card warms toward the accent and the arrow
-   confirms the target. No lift, zoom, or underline choreography — this is a
-   navigation surface readers hit constantly. */
-.explore-item:hover,
-.explore-item:focus-visible,
 .explore-item--active {
-  border-color: color-mix(
-    in oklab,
-    var(--color-accent) var(--navigation-selection-border-mix),
-    var(--color-card-border)
-  );
-  background: color-mix(in oklab, var(--color-accent) 5%, var(--color-card-bg));
-  outline: none;
-}
-
-.explore-item:hover .explore-item__arrow,
-.explore-item:focus-visible .explore-item__arrow,
-.explore-item--active .explore-item__arrow,
-.explore-item--active .explore-item__name {
-  color: var(--color-accent);
-}
-
-@media (max-width: 960px) {
-  .explore-menu {
-    width: calc(100vw - var(--space-5) - var(--space-5));
-    padding: var(--space-5);
-  }
-
-  .explore-menu__registers {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-5);
-  }
-
-  .explore-item {
-    grid-template-columns: calc(var(--space-9) + var(--space-8)) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
-  }
-
-  .explore-item__art {
-    aspect-ratio: var(--aspect-square);
-    border-right: var(--border-hairline) solid var(--color-card-border);
-    border-bottom: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* Keep the entry fade for comprehension; drop the positional settle. */
-  .nav-dropdown-menu.explore-menu--open {
-    transition: opacity var(--motion-fast) var(--motion-ease-out);
-  }
-
-  @starting-style {
-    .nav-dropdown-menu.explore-menu--open {
-      transform: translateX(-50%);
-    }
-  }
+  color: var(--color-text-primary);
+  background: var(--color-card-bg);
+  border-color: var(--color-card-border);
 }
 
 /* Static, always-open rendering for the /design-system showcase. */
 .explore-menu--static {
   position: static;
-  width: 100%;
-  max-width: 100%;
   max-height: none;
   overflow: visible;
   opacity: 1;
   pointer-events: auto;
   transform: none;
+  width: max-content;
 }
 
 /* ============================================================
@@ -4493,9 +4267,7 @@ a {
 }
 .mobile-menu__explore-link {
   display: grid;
-  grid-template-columns:
-    calc(var(--space-9) + var(--space-5))
-    minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-4);
   min-height: var(--space-9);
@@ -4523,31 +4295,6 @@ a {
   );
   color: var(--color-accent);
   transform: translateX(var(--space-2));
-}
-.mobile-menu__spot {
-  position: relative;
-  width: calc(var(--space-9) + var(--space-5));
-  height: calc(var(--space-9) + var(--space-5));
-  overflow: hidden;
-  border: var(--border-hairline) solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  background: color-mix(
-    in oklab,
-    var(--color-accent) var(--navigation-art-surface-mix),
-    var(--color-surface-secondary)
-  );
-}
-.mobile-menu__spot :is(img, .civica-themed-image) {
-  width: 100%;
-  height: 100%;
-  background-size: contain;
-  transform: scale(var(--navigation-art-rest-scale));
-  transition: transform var(--motion-slow) var(--motion-ease-out);
-}
-.mobile-menu__explore-link:hover
-  .mobile-menu__spot
-  :is(img, .civica-themed-image) {
-  transform: scale(1);
 }
 .mobile-menu__explore-copy {
   min-width: 0;
@@ -4779,11 +4526,6 @@ a {
   .mobile-menu__editorial-links {
     grid-template-columns: 1fr;
   }
-  .mobile-menu__explore-link {
-    grid-template-columns:
-      calc(var(--space-9) + var(--space-5))
-      minmax(0, 1fr) auto;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .mobile-menu,
@@ -4792,7 +4534,6 @@ a {
     animation: none;
   }
   .mobile-menu__explore-link,
-  .mobile-menu__spot :is(img, .civica-themed-image),
   .mobile-menu__close,
   .mobile-menu-trigger__lines span {
     transition: none;

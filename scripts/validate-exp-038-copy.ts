@@ -18,7 +18,10 @@ const expectations: Expectation[] = [
       "Open the profile for source details and known gaps; the summary cards do not show provenance for every value.",
       "Compare political systems and institutions on one map.",
       "Browse legislatures, chambers, government systems, and other institutions across countries.",
-      "Independent &amp; nonpartisan",
+      // 2026-08-17 hero cleanup: the retained independence label and the
+      // source-native posture now read as one plain sentence beside the
+      // coverage count, not a row of uppercase badges.
+      "Independent and nonpartisan, built on source-native evidence.",
     ],
   },
   {

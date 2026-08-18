@@ -5214,9 +5214,11 @@ a.constitution-xref-card-country:hover {
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-border-default);
 }
+/* Three columns at full width: wide enough that "name · status" rows for
+   territories usually fit without truncating. */
 .country-directory__entries {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   column-gap: var(--space-6);
   row-gap: var(--space-1);
 }
@@ -5246,42 +5248,51 @@ a.constitution-xref-card-country:hover {
 .country-directory__item:focus-visible {
   background: var(--color-select-bg);
 }
+/* Fixed-width flag slot so names align even when an entry has no flag. */
 .country-directory__flag {
   display: inline-flex;
+  justify-content: center;
+  width: var(--space-6);
   flex-shrink: 0;
 }
+/* Single-line rows: the name keeps one baseline and long entries ellipsize
+   rather than wrapping into a ragged two-line grid. */
 .country-directory__name {
   display: flex;
   align-items: baseline;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   flex: 1;
   min-width: 0;
   column-gap: var(--space-2);
-  row-gap: var(--space-1);
+  overflow: hidden;
 }
 .country-directory__label {
+  flex: 0 1 auto;
   color: var(--color-text-primary);
   font-family: var(--font-heading);
   font-size: var(--text-15);
   line-height: var(--leading-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+/* The status suffix yields its space before the name does (the huge shrink
+   factor absorbs any deficit first), and truncates with a real ellipsis. */
 .country-directory__status {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-1);
+  flex: 0 9999 auto;
+  min-width: 0;
+  display: block;
   color: var(--color-text-muted);
   font-family: var(--font-body);
   font-size: var(--text-11);
+  line-height: var(--leading-normal);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .country-directory__status-separator {
   color: var(--color-border-strong);
-}
-.country-directory__dot {
-  width: var(--space-3);
-  height: var(--space-3);
-  border-radius: var(--radius-full);
-  flex-shrink: 0;
+  margin-right: var(--space-1);
 }
 
 /* Shared, sourced entity-status disclosure. Used wherever a route or card
@@ -5349,7 +5360,7 @@ a.constitution-xref-card-country:hover {
 }
 @media (max-width: 1080px) {
   .country-directory__entries {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 768px) {
