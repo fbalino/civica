@@ -174,7 +174,7 @@ export const ENV_DEGRADES: Array<{
   {
     name: "FIRECRAWL_API_KEY",
     secret: true,
-    note: "Retrieval fallback for publishers that block direct ingestion (Amnesty 403s its whole domain); unset = blocked feeds fail honestly.",
+    note: "Retrieval fallback for blocked publishers, usable only where publisher-fallback-permission/v1 records a grant (no publisher grants it today, Amnesty included); unset = blocked feeds fail honestly.",
   },
   {
     name: "DEEPSEEK_API_KEY",

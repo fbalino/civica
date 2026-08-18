@@ -10,6 +10,7 @@ import {
   firecrawlRawFetch,
   isPublisherBlock,
 } from "./firecrawl-fetch";
+import { publisherFallbackDecision } from "./publisher-fallback-permission";
 
 export interface RssItem {
   title: string;
@@ -40,11 +41,17 @@ function getParser(): Parser {
  * Fetch + parse an RSS/Atom feed. Returns normalised items.
  *
  * Direct retrieval first. If the publisher BLOCKS us (403/401/429 — Amnesty
- * International refuses its whole domain to any user agent), retry the same
- * public URL through Firecrawl and parse the identical bytes. Everything
- * downstream — parser, provenance, rights record — is unchanged; only the
- * transport differs. Ordinary failures (timeout, 5xx) are not retried, so a
- * publisher having a bad day costs nothing.
+ * International refuses its whole domain to any user agent), the same public
+ * URL is retried through Firecrawl ONLY when that publisher's recorded
+ * permission state is `granted` (`publisher-fallback-permission/v1`).
+ * Everything else — an unregistered host, a request still pending, a refusal,
+ * or a missing key — leaves the publisher's own error standing, with the
+ * reason logged so the cause of a failing feed is visible in the run log.
+ *
+ * When the fallback does run, the parser, provenance record, and rights
+ * handling are unchanged; only the transport differs. Ordinary failures
+ * (timeout, 5xx) are never retried, so a publisher having a bad day costs
+ * nothing.
  */
 export async function fetchRss(url: string): Promise<RssItem[]> {
   const parser = getParser();
@@ -52,9 +59,23 @@ export async function fetchRss(url: string): Promise<RssItem[]> {
   try {
     feed = await parser.parseURL(url);
   } catch (error) {
-    if (!isPublisherBlock(error) || !firecrawlConfigured()) throw error;
+    if (!isPublisherBlock(error)) throw error;
+
+    const decision = publisherFallbackDecision(url);
+    if (!decision.allowed) {
+      console.warn(
+        `[rss] ${url} blocked by publisher; fallback NOT used: ${decision.reason}`,
+      );
+      throw error;
+    }
+    if (!firecrawlConfigured()) {
+      console.warn(
+        `[rss] ${url} blocked by publisher; fallback permitted but FIRECRAWL_API_KEY is not configured`,
+      );
+      throw error;
+    }
     console.warn(
-      `[rss] ${url} blocked by publisher; retrieving via Firecrawl fallback`,
+      `[rss] ${url} blocked by publisher; retrieving via Firecrawl fallback (${decision.reason})`,
     );
     feed = await parser.parseString(await firecrawlRawFetch(url));
   }

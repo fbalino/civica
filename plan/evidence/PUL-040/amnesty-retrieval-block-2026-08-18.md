@@ -34,24 +34,57 @@ fallback, and a real `pulse:v2:ingest` inserted 12 Amnesty rows
 failure distinction, the no-key inert path, and the empty/HTTP-error
 fail-closed paths.
 
-## Open question for the owner — deliberately not decided here
+## Owner decision (2026-08-18): ask, do not route around
 
-Amnesty publishes this RSS feed for syndication, the content is free to read,
-and the block is near-certainly generic bot protection rather than a decision
-about Civica. Even so, routing around a publisher's edge control is a
-different act from fetching an open feed, and this project holds itself to a
-stricter rights standard than "it was technically reachable".
+Fernando: "I would prefer to ask Amnesty to allowlist Civica. Civica cannot be
+breaking any rules."
 
-Two things are worth doing before this is treated as settled:
+Research into Amnesty's own published rules then found the question is wider
+than the Firecrawl fallback:
 
-1. **Ask Amnesty for allowlisting.** A short note to their press/web team
-   identifying Civica, its non-commercial research purpose, and its request
-   rate (one feed fetch per day) is the clean long-term fix and removes the
-   question entirely.
-2. **Decide whether to keep the fallback in the meantime.** Keeping it is
-   defensible; so is disabling Amnesty until an allowlist exists. Unsetting
-   `FIRECRAWL_API_KEY` reverts to the honest-failure behaviour with no code
-   change.
+- **robots.txt permits it.** `/en/feed/` is not disallowed; the only `*`
+  rules cover `/search/` and `/wp-admin/`. No crawl-delay applies to `*`.
+- **The Terms of Use do not.** §3 (page `dateModified` **2026-08-13**, five
+  days before the block was observed) forbids "using automated tools,
+  scraping, data-mining or similar technologies to access, copy, monitor or
+  extract content or data from the site unless we have allowed this", and
+  separately forbids "trying to bypass security controls, access controls,
+  rate limits or other protective measures... You must not try to evade those
+  controls." §7 repeats the scraping prohibition.
+- Content is otherwise CC BY-NC-ND 4.0 per their permissions page, but that
+  licence governs *reuse*, not *automated access*.
 
-Nothing about Amnesty's licence terms or attribution changes either way; that
-record is unaffected by how the bytes were retrieved.
+The terms are the stricter instrument, so Civica follows them. Two
+consequences, both implemented:
+
+1. **The Firecrawl fallback is off for amnesty.org** — enforced by the
+   `publisher-fallback-permission/v1` registry, not by whether an API key is
+   set. A host absent from the registry is refused; `granted` cannot be
+   written without evidence.
+2. **The connector no longer requests Amnesty at all.** Under §3 even an
+   ordinary daily feed fetch needs their permission, and a request we believe
+   is disallowed should not be sent even once. `fetchAmnesty` reports a
+   legitimate skip (`ran: false`, no error) via `PUBLISHER_DIRECT_RETRIEVAL`.
+
+Amnesty publishes no API, data portal, developer programme or syndication
+scheme, so there is no cleaner official route to use instead.
+
+The outreach draft, with the contact routes verified from Amnesty's own
+pages, is `amnesty-permission-request-draft-2026-08-18.md`. It is unsent.
+
+### Retained rows from the 2026-08-18 fallback test
+
+Before this decision, testing the fallback retrieved and stored 12 Amnesty
+items (raw_events, 2026-08-18T11:51Z). They never clustered, never became
+events, and were never published. They are NOT deleted: `raw_events` is
+append-only under the DAT-016 research-evidence-retention triggers, and
+deleting them to tidy up would break one rule to satisfy another. They are
+recorded here instead. If Amnesty refuses permission, ask them whether they
+would like those 12 rows removed and, if so, seek the retention-contract
+exception explicitly rather than quietly.
+
+### Side effect worth naming
+
+Amnesty becoming a recorded non-retrieval means ingest can once again record a
+clean `completed` run, which is one of PUL-040's start prerequisites. That is
+a consequence of the rights decision, not a reason for it.
