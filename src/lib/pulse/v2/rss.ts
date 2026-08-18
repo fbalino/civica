@@ -5,6 +5,11 @@
  */
 
 import Parser from "rss-parser";
+import {
+  firecrawlConfigured,
+  firecrawlRawFetch,
+  isPublisherBlock,
+} from "./firecrawl-fetch";
 
 export interface RssItem {
   title: string;
@@ -31,10 +36,28 @@ function getParser(): Parser {
   return parserCache;
 }
 
-/** Fetch + parse an RSS/Atom feed. Returns normalised items. */
+/**
+ * Fetch + parse an RSS/Atom feed. Returns normalised items.
+ *
+ * Direct retrieval first. If the publisher BLOCKS us (403/401/429 — Amnesty
+ * International refuses its whole domain to any user agent), retry the same
+ * public URL through Firecrawl and parse the identical bytes. Everything
+ * downstream — parser, provenance, rights record — is unchanged; only the
+ * transport differs. Ordinary failures (timeout, 5xx) are not retried, so a
+ * publisher having a bad day costs nothing.
+ */
 export async function fetchRss(url: string): Promise<RssItem[]> {
   const parser = getParser();
-  const feed = await parser.parseURL(url);
+  let feed;
+  try {
+    feed = await parser.parseURL(url);
+  } catch (error) {
+    if (!isPublisherBlock(error) || !firecrawlConfigured()) throw error;
+    console.warn(
+      `[rss] ${url} blocked by publisher; retrieving via Firecrawl fallback`,
+    );
+    feed = await parser.parseString(await firecrawlRawFetch(url));
+  }
   return (feed.items ?? []).map((item) => ({
     title: (item.title ?? "").trim(),
     link: (item.link ?? "").trim(),

@@ -172,6 +172,11 @@ export const ENV_DEGRADES: Array<{
     note: "Stats SA reconciliation extraction.",
   },
   {
+    name: "FIRECRAWL_API_KEY",
+    secret: true,
+    note: "Retrieval fallback for publishers that block direct ingestion (Amnesty 403s its whole domain); unset = blocked feeds fail honestly.",
+  },
+  {
     name: "DEEPSEEK_API_KEY",
     secret: true,
     note: "Default Pulse voter; classify cron no-ops without it.",
