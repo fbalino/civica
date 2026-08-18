@@ -14,6 +14,7 @@ import type { SemanticClusterPublisher } from "./cluster-publish";
 type Db = NeonHttpDatabase<typeof schema>;
 
 const EXECUTION_KEY = "c".repeat(64);
+const RETRY_EXECUTION_KEY = "d".repeat(64);
 const RAW_ID = "11111111-1111-4111-8111-111111111111";
 const INGEST_RUN_ID = "22222222-2222-4222-8222-222222222222";
 const INCIDENT_ID = "33333333-3333-4333-8333-333333333333";
@@ -174,7 +175,7 @@ test("completed cluster delivery retry is a no-op before rereading the queue", a
   }
 });
 
-test("publish failure and lexical fallback leave one deterministic run retryable", async () => {
+test("publish failure and lexical fallback leave deterministic runs retryable", async () => {
   const state = await harness();
   let attempts = 0;
   const publisher: SemanticClusterPublisher = async (db, plan) => {
@@ -187,24 +188,47 @@ test("publish failure and lexical fallback leave one deterministic run retryable
     persistedIncidents: [],
     clusterIdFactory: () => INCIDENT_ID,
     now: NOW,
-    cronExecutionKey: EXECUTION_KEY,
     persistRun: true,
     publishPlan: publisher,
   };
   try {
+    // The no-embedding path publishes nothing and finalizes its run row
+    // honestly as terminal 'partial' — a row stuck at 'running' is how the
+    // scheduler outage hid.
     const lexical = await runClustering(state.db, {
       ...options,
+      cronExecutionKey: EXECUTION_KEY,
       embeddingResult: null,
     });
     assert.equal(lexical.status, "partial");
     assert.equal(lexical.clustered, 0);
+    assert.equal(attempts, 0);
 
+    // The partial run is terminal: the same delivery identity cannot be
+    // resumed with embeddings later. Real clustering arrives under a fresh
+    // delivery identity (the owner-Mac runner's own scheduled execution).
     await assert.rejects(
-      runClustering(state.db, { ...options, embeddingResult: [[1, 0]] }),
+      runClustering(state.db, {
+        ...options,
+        cronExecutionKey: EXECUTION_KEY,
+        embeddingResult: [[1, 0]],
+      }),
+      /Terminal Pulse pipeline run cannot be resumed/,
+    );
+
+    // Under the fresh identity, an injected publish failure leaves one
+    // deterministic run retryable, and the retry completes it.
+    await assert.rejects(
+      runClustering(state.db, {
+        ...options,
+        cronExecutionKey: RETRY_EXECUTION_KEY,
+        embeddingResult: [[1, 0]],
+      }),
       /injected publish failure/,
     );
     const retry = await runClustering(state.db, {
       ...options,
+      cronExecutionKey: RETRY_EXECUTION_KEY,
       embeddingResult: [[1, 0]],
     });
     assert.equal(retry.status, "completed");
@@ -212,13 +236,18 @@ test("publish failure and lexical fallback leave one deterministic run retryable
     assert.equal(attempts, 2);
 
     const rows = await state.database.query<{
-      count: number;
       status: string;
+      count: number;
     }>(`
-      SELECT count(*)::integer AS count, min(status) AS status
+      SELECT status, count(*)::integer AS count
       FROM pulse_pipeline_runs
+      GROUP BY status
+      ORDER BY status
     `);
-    assert.deepEqual(rows.rows[0], { count: 1, status: "completed" });
+    assert.deepEqual(rows.rows, [
+      { status: "completed", count: 1 },
+      { status: "partial", count: 1 },
+    ]);
   } finally {
     await state.database.close();
   }
