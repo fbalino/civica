@@ -1,21 +1,21 @@
 {
   "schemaVersion": "pulse-prospective-start-readiness/v1",
   "taskId": "PUL-040",
-  "checkedAt": "2026-07-26T16:00:20.208Z",
+  "checkedAt": "2026-08-17T21:16:35.020Z",
   "status": "blocked",
   "protocol": {
-    "schemaVersion": "pulse-validation-protocol/v1",
-    "semanticSha256": "89bea0ceb83090725e9a65a39e7e96a0f8e5badcae988493cd06873267a329e3",
+    "schemaVersion": "pulse-validation-protocol/v2",
+    "semanticSha256": "75ef6ed1b93068649ee7cc4541abcb1ce1cbbace550fc489d775760ae72fd470",
     "status": "preregistered_not_started",
-    "currentRuntimeMethod": "pulse-v2.15-beta",
+    "currentRuntimeMethod": "pulse-v2.16-beta",
     "durationDays": 90
   },
   "runtime": {
-    "codeMethodVersion": "pulse-v2.15-beta",
-    "checkedContractVersion": "pulse-v2.15-beta",
-    "checkedContractHash": "992f3ee25ca794835d318dfeec554856dd39c2b6a2631a11c79eab9d10bcce20",
-    "checkedObservedEvidenceThrough": "2026-07-26",
-    "liveObservedEvidenceThrough": "2026-07-26"
+    "codeMethodVersion": "pulse-v2.16-beta",
+    "checkedContractVersion": "pulse-v2.16-beta",
+    "checkedContractHash": "1c89a6bc5778583901cbe023755dcb0df0ea640ba08b1227c585f6866a7ee8e8",
+    "checkedObservedEvidenceThrough": "2026-07-29",
+    "liveObservedEvidenceThrough": "2026-08-17"
   },
   "scheduledRoutes": [
     {
@@ -52,35 +52,35 @@
     },
     {
       "stage": "cluster",
-      "completedCount": 0,
-      "latestCompletedAt": null
+      "completedCount": 3,
+      "latestCompletedAt": "2026-08-17 21:13:18.464203"
     },
     {
       "stage": "classify",
-      "completedCount": 0,
-      "latestCompletedAt": null
+      "completedCount": 1,
+      "latestCompletedAt": "2026-08-17 21:15:42.507981"
     },
     {
       "stage": "corroborate",
       "completedCount": 1,
-      "latestCompletedAt": "2026-07-12 11:26:09.685"
+      "latestCompletedAt": "2026-08-17 21:16:02.885263"
     },
     {
       "stage": "score",
       "completedCount": 1,
-      "latestCompletedAt": "2026-07-12 11:26:10.262"
+      "latestCompletedAt": "2026-08-17 21:16:04.665217"
     }
   ],
   "prerequisites": [
     {
       "id": "protocol_artifact_and_hash_checked_in",
       "status": "pass",
-      "evidence": "protocol pulse-validation-protocol/v1 semantic SHA-256 89bea0ceb83090725e9a65a39e7e96a0f8e5badcae988493cd06873267a329e3"
+      "evidence": "protocol pulse-validation-protocol/v2 semantic SHA-256 75ef6ed1b93068649ee7cc4541abcb1ce1cbbace550fc489d775760ae72fd470"
     },
     {
       "id": "runtime_method_and_every_stage_version_frozen",
       "status": "pass",
-      "evidence": "runtime pulse-v2.15-beta contract 992f3ee25ca794835d318dfeec554856dd39c2b6a2631a11c79eab9d10bcce20"
+      "evidence": "runtime pulse-v2.16-beta contract 1c89a6bc5778583901cbe023755dcb0df0ea640ba08b1227c585f6866a7ee8e8"
     },
     {
       "id": "scheduled_ingest_cluster_classify_score_and_review_sla_routes_enabled",
@@ -116,5 +116,5 @@
   "earliestCompliantStart": null,
   "plannedEnd": null,
   "startCalculation": "After every prerequisite passes, record the boundary before the next eligible retrieval. The start is that first retained eligible retrieval timestamp; plannedEnd is exactly 90 consecutive UTC days later. Never backdate.",
-  "semanticSha256": "ac3d5f7b79bc53fea4cecb090535c2b38cc313bc4237492996c308ff664665ac"
+  "semanticSha256": "e83ea64840500dd94137eeb53d96ae58abdf53b8cccc0cbd919ca38ec06deb46"
 }

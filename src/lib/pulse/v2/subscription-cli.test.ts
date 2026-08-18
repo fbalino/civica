@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 
 import {
   SUBSCRIPTION_CLASSIFY_ENSEMBLE,
   SUBSCRIPTION_VERIFY_CONFIG,
+  cliInvocation,
+  summarizeCliStderr,
 } from "./subscription-cli";
 import {
   resolveClassifyEnsemble,
@@ -78,6 +83,81 @@ test("without the transport flag the HTTP ensemble path is unchanged", () => {
       }
     });
   });
+});
+
+test("the Kimi voter carries the frozen system prompt in the system channel", () => {
+  // Regression: flattening the classify rubric into Kimi's user turn is
+  // refused by the managed endpoint's content-risk filter with a
+  // deterministic HTTP 400, killing the fourth voter on every cluster.
+  const scratch = mkdtempSync(join(tmpdir(), "civica-voter-test-"));
+  const request = { system: "FROZEN RUBRIC", user: "EVENT EVIDENCE" };
+  const kimi = SUBSCRIPTION_CLASSIFY_ENSEMBLE.find(
+    (voter) => voter.provider === "moonshot",
+  );
+  assert.ok(kimi);
+  const argv = cliInvocation(kimi, request, scratch);
+
+  const agentFileIndex = argv.indexOf("--agent-file");
+  assert.notEqual(agentFileIndex, -1, "the system prompt uses --agent-file");
+  const agentFile = argv[agentFileIndex + 1];
+  assert.equal(
+    agentFile.startsWith(scratch),
+    true,
+    "the agent file stays in the empty scratch directory",
+  );
+  assert.match(readFileSync(agentFile, "utf8"), /FROZEN RUBRIC/);
+
+  const promptIndex = argv.indexOf("-p");
+  assert.notEqual(promptIndex, -1);
+  assert.equal(
+    argv[promptIndex + 1],
+    "EVENT EVIDENCE",
+    "the user turn carries the event evidence alone",
+  );
+  assert.equal(
+    argv.some((arg) => arg.includes("FROZEN RUBRIC")),
+    false,
+    "the rubric never enters the user turn",
+  );
+  assert.deepEqual(argv.slice(-4), [
+    "--model",
+    "kimi-code/k3",
+    "--output-format",
+    "text",
+  ]);
+});
+
+test("the other three voters keep one self-contained prompt", () => {
+  const scratch = mkdtempSync(join(tmpdir(), "civica-voter-test-"));
+  const request = { system: "FROZEN RUBRIC", user: "EVENT EVIDENCE" };
+  for (const voter of SUBSCRIPTION_CLASSIFY_ENSEMBLE.filter(
+    (candidate) => candidate.provider !== "moonshot",
+  )) {
+    const argv = cliInvocation(voter, request, scratch);
+    assert.equal(
+      argv.includes("FROZEN RUBRIC\n\nEVENT EVIDENCE"),
+      true,
+      `${voter.provider} keeps the combined prompt`,
+    );
+    assert.equal(argv.includes("--agent-file"), false);
+  }
+});
+
+test("a CLI failure reports the provider error, not the version banner", () => {
+  // The first diagnosis of the Kimi outage was misdirected because the raw
+  // head-slice of stderr showed only `kimi version 0.36.1`.
+  const stderr = [
+    "kimi version 0.36.1",
+    "• thinking about the taxonomy",
+    "error: failed to run prompt: provider.api_error: 400 The request was rejected because it was considered high risk",
+    "See log: /Users/fernandobalino/.kimi-code/logs/kimi-code.log",
+  ].join("\n");
+  const summary = summarizeCliStderr(stderr);
+  assert.match(summary, /provider\.api_error: 400/);
+  assert.equal(summary.includes("kimi version"), false);
+  assert.equal(summary.includes("thinking about"), false);
+  // With no error-shaped line it still reports something useful.
+  assert.equal(summarizeCliStderr("kimi version 0.36.1\nsome context"), "some context");
 });
 
 test("xai and moonshot have no HTTP path", async () => {

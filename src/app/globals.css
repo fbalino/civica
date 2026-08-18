@@ -1231,7 +1231,7 @@ a {
 
 .nav-dropdown:hover .nav-dropdown-menu,
 .nav-dropdown:focus-within .nav-dropdown-menu,
-/* JS-driven open state for the Explore megamenu (keeps aria-expanded truthful);
+/* JS-driven open state for the Explore dropdown (keeps aria-expanded truthful);
    the :hover/:focus-within rules above remain the no-JS fallback. */
 .nav-dropdown-menu.explore-menu--open {
   opacity: 1;

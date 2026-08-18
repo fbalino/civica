@@ -7,10 +7,13 @@
  * no paid API key is read or used anywhere on this path ($0 hard cap).
  *
  * Contract notes:
- * - Voters receive one self-contained prompt (frozen system + user text)
- *   and must answer with JSON only; the CLIs are invoked in their most
- *   direct non-interactive mode from an empty scratch directory so no
- *   repository context can leak into a classification.
+ * - Voters receive the frozen system + user text and must answer with JSON
+ *   only; the CLIs are invoked in their most direct non-interactive mode
+ *   from an empty scratch directory so no repository context can leak into
+ *   a classification. Three CLIs take the two parts as one self-contained
+ *   prompt; Kimi takes the system part through its agent (system) channel —
+ *   see `cliInvocation` for why, and note that the prompt text itself is
+ *   identical for every voter either way.
  * - Every run records the configured model AND the model identifier the
  *   CLI reports for that call (where its output envelope carries one), per
  *   the resolution's run-level model-logging requirement.
@@ -23,7 +26,7 @@
  */
 
 import { spawn } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -75,6 +78,51 @@ export interface SubscriptionCallResult {
   /** Model identifier the CLI reported for this call, when its output
    * envelope carries one; null when the CLI reports none. */
   reportedModel: string | null;
+}
+
+/**
+ * Kimi's managed endpoint applies a server-side content-risk filter to the
+ * user turn. Civica's frozen classify rubric is a dense catalogue of
+ * repression categories (martial law, journalist arrest, mass detention,
+ * internet shutdown, foreign occupation, …); flattened into a single user
+ * message it is refused with `provider.api_error: 400 The request was
+ * rejected because it was considered high risk` — deterministically, and
+ * independently of the calling environment. The same frozen text delivered
+ * through the CLI's own agent (system) channel, where an operator rubric
+ * belongs, is accepted and answers correctly.
+ *
+ * So the moonshot voter keeps the system prompt in the system channel
+ * instead of collapsing it into the user turn. The prompt TEXT is byte-for-
+ * byte the frozen prompt; only the channel the CLI uses to carry it changes,
+ * which §4 of the runtime resolution already discloses as per-CLI wrapper
+ * scaffolding. Returns the argv for the call, writing any file the CLI needs
+ * into the caller's scratch directory.
+ */
+export function cliInvocation(
+  config: SubscriptionVoterConfig,
+  request: { system: string; user: string },
+  scratch: string,
+): string[] {
+  const model = config.cliModelArg ?? config.model;
+  if (config.provider === "moonshot") {
+    const agentFile = join(scratch, "civica-pulse-classifier.md");
+    writeFileSync(
+      agentFile,
+      `---\nname: civica-pulse-classifier\ndescription: Civica Pulse governance-event classifier\n---\n\n${request.system}\n`,
+      "utf8",
+    );
+    return [
+      "--agent-file",
+      agentFile,
+      "-p",
+      request.user,
+      "--model",
+      model,
+      "--output-format",
+      "text",
+    ];
+  }
+  return cliArgs(config, `${request.system}\n\n${request.user}`);
 }
 
 function cliArgs(config: SubscriptionVoterConfig, prompt: string): string[] {
@@ -144,6 +192,25 @@ function extractResult(
   return { text: trimmed, reportedModel: null };
 }
 
+/**
+ * Reduce a CLI's stderr to the lines that explain a failure. These CLIs put
+ * a version banner and (for Kimi) the model's whole reasoning trace on
+ * stderr, so a naive head-slice reports `kimi version 0.36.1` and truncates
+ * the actual provider error away — which is exactly how a deterministic
+ * content-policy refusal was first misread as an environment fault.
+ */
+export function summarizeCliStderr(stderr: string, limit = 400): string {
+  const lines = stderr
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => !/^\S+ version \d/.test(line));
+  const errors = lines.filter((line) =>
+    /^(error|fatal)\b|error:|failed|refus|reject/i.test(line),
+  );
+  return (errors.length > 0 ? errors : lines).join(" | ").slice(0, limit);
+}
+
 export interface SubscriptionCallOptions {
   /** Hard wall-clock limit per voter call. */
   timeoutMs?: number;
@@ -162,12 +229,12 @@ export function callSubscriptionCli(
   options: SubscriptionCallOptions = {},
 ): Promise<SubscriptionCallResult> {
   const timeoutMs = options.timeoutMs ?? 300_000;
-  const prompt = `${request.system}\n\n${request.user}`;
   const scratch = mkdtempSync(join(tmpdir(), "civica-pulse-voter-"));
+  const argv = cliInvocation(config, request, scratch);
   const spawnImpl = options.spawnImpl ?? spawn;
 
   return new Promise<SubscriptionCallResult>((resolve, reject) => {
-    const child = spawnImpl(config.bin, cliArgs(config, prompt), {
+    const child = spawnImpl(config.bin, argv, {
       cwd: scratch,
       env: process.env,
       // stdin is a pipe we close immediately: "ignore" leaves some CLIs
@@ -213,7 +280,7 @@ export function callSubscriptionCli(
       if (code !== 0) {
         reject(
           new Error(
-            `Subscription voter ${config.provider}/${config.model} exited ${code}: stderr=${stderr.slice(0, 300)} stdout=${stdout.slice(-300)}`,
+            `Subscription voter ${config.provider}/${config.model} exited ${code}: stderr=${summarizeCliStderr(stderr)} stdout=${stdout.slice(-300)}`,
           ),
         );
         return;

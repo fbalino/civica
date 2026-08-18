@@ -1,5 +1,12 @@
 # EXP-018 — Desktop/mobile primary nav synchronization
 
+> **SUPERSEDED 2026-08-17.** Fernando rejected the image-led Explore
+> megamenu direction and replaced it with a standard grouped header dropdown
+> (commit `a8f58bcc`, PR #24). This document is retained unchanged as the
+> historical record of the superseded direction; it does not describe what
+> Civica ships. The current contract is the "Explore dropdown" entry in
+> `DESIGN.md`.
+
 ## Audit findings
 
 The desktop "Explore" megamenu (`src/components/NavLinks.tsx`) and the

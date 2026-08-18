@@ -1,9 +1,13 @@
 /**
- * EXP-015 — real-browser review of the current large Explore candidate.
+ * EXP-015 — real-browser coverage of the shipped Explore dropdown.
  *
- * This is review coverage for the candidate's behavior and capture surface.
- * It intentionally does not record owner approval of the rendered result;
- * optional screenshots are review artifacts only.
+ * The image-led megamenu candidate this file originally reviewed was
+ * rejected by the owner on 2026-08-17 and replaced with a standard grouped
+ * header dropdown (see DESIGN.md, "Explore dropdown"). The behavioural
+ * contract asserted here — the eight destinations in their canonical order,
+ * ordered Tab traversal, visible Escape dismissal, and an accessible open
+ * state — survived that change unaltered, so the coverage is kept and
+ * retargeted rather than deleted.
  */
 import { join } from "node:path";
 import type { Locator, Page } from "@playwright/test";
@@ -67,7 +71,7 @@ async function expectFocusInside(page: Page, container: Locator) {
   ).toBe(true);
 }
 
-test.describe("EXP-015 — large Explore candidate", () => {
+test.describe("EXP-015 — Explore dropdown", () => {
   for (const theme of THEMES) {
     test(`desktop disclosure supports ordered Tab traversal, visible Escape dismissal, and open-state accessibility in ${theme}`, async ({
       page,
@@ -150,6 +154,19 @@ test.describe("EXP-015 — large Explore candidate", () => {
       const links = dialog.locator("a.mobile-menu__explore-link");
       await expectDestinationOrder(links);
       await captureCandidate(dialog, "small-mobile", theme);
+
+      // The dialog enters with `civ-menu-enter` (opacity 0 -> 1). axe
+      // composites ancestor opacity into its contrast maths, so auditing
+      // mid-fade measures partially transparent text and reports contrast
+      // failures that do not exist once the animation settles. Wait for the
+      // entrance to finish before auditing.
+      await dialog.evaluate((node) =>
+        Promise.all(
+          node.getAnimations({ subtree: true }).map((animation) =>
+            animation.finished.catch(() => undefined),
+          ),
+        ),
+      );
 
       const audit = await auditAccessibility(page, "#civica-full-menu");
       await testInfo.attach(`axe-exp-015-mobile-open-${theme}.json`, {

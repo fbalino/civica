@@ -85,11 +85,27 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
   pair with reviewer, date, exact hashes, and reason. Approval authorizes only
   a later checked asset replacement; it is not itself a production change or
   a source-evidence claim.
-- **EXP-015 · Owner:** review the exact large Explore candidate on the local
-  home header and `/design-system#explore-concepts` in desktop/mobile and
-  light/dark states. The corrected light-master batch is already approved;
-  record approve/revise/reject for the rendered result. Approval is not
-  deployment authority.
+- **PUL-040 · Owner — small methodology call, before the window starts:** the
+  Kimi voter carries the frozen classify rubric through its CLI's system
+  channel because Moonshot's endpoint refuses that rubric in a user turn
+  (`plan/evidence/PUL-040/kimi-content-filter-2026-08-17.md`); the other three
+  voters receive it concatenated. The prompt text is byte-identical for all
+  four, and resolution §4's existing "CLI wrappers add their own scaffolding
+  around the prompt / most direct non-interactive mode each CLI offers"
+  clause already covers it in substance. Decide whether that is sufficient,
+  or whether the delivery channel belongs in the runtime-method identity
+  (APR-D147) as its own version note. The resolution text was deliberately
+  NOT amended here: it is hash-pinned as evidence by change-control record
+  `pul-040-runner-follow-ups-2026-08-17`, so spelling the difference out in
+  §4 must ride along with whatever record this decision produces. Nothing is
+  blocked either way; no window has started.
+- **EXP-015 · Owner — DECIDED 2026-08-17:** Fernando rejected the image-led
+  megamenu direction outright and replaced it with a standard grouped header
+  dropdown (commit `a8f58bcc`, merged in PR #24), matching the Governance
+  Evidence and Methodology menus. No further review of the large candidate is
+  required; `DESIGN.md`'s "Explore dropdown" entry is the current contract.
+  The EXP-015/EXP-017/EXP-018 evidence folders remain historical records of
+  the superseded direction.
 - Approve any shortlist of replacement names before legal clearance or migration work.
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
 - **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.
@@ -144,8 +160,8 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
   explicit noncoverage. Release `leaders-2026-08-10` (389 records) is marked
   ready, `validate:leaders-directory:live` passes, populated
   desktop/mobile/light/dark browser QA passed, and `/leaders` is live in the
-  footer and sitemap (the Explore megamenu stays at its owner-approved eight
-  art-backed destinations). Run record:
+  footer and sitemap (the Explore dropdown stays at its owner-approved eight
+  destinations). Run record:
   `plan/evidence/ATL-010/production-refresh-2026-08-09.md`.
 - Confirm DOI registration and metadata display in the chosen repository.
 - Confirm advisory-board and contact submissions arrive, retain required audit data, and produce the promised acknowledgement using real external delivery.

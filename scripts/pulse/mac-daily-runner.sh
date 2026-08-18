@@ -3,17 +3,22 @@
 #
 # Drives the daily Pulse cycle under the adopted subscription runtime
 # (plan/pulse-subscription-runtime-resolution-v1.md):
-#   1. ingest  — production cron route (model-free; idempotent per day)
-#   2. cluster — production cron route (model-free; idempotent per day)
+#   1. ingest  — production cron route (model-free; content-idempotent)
+#   2. cluster — production cron route (model-free; content-idempotent)
 #   3. classify — LOCALLY on this Mac through the four subscription CLIs
 #                 (PULSE_CLASSIFY_TRANSPORT=subscription-cli; $0 marginal)
-#   4. score   — production cron route (model-free; idempotent per day)
+#   4. score   — production cron route (model-free; content-idempotent)
 #
-# Catch-up semantics: every stage is idempotent per UTC day (durable
-# Idempotency-Keys + the pipeline's own convergence guarantees), so launchd
-# firing late after wake, or a manual re-run, is always safe. A fully missed
-# day is recorded honestly by the pipeline's own run ledger as an outage
-# (PUL-022); this script never backfills or backdates anything.
+# Catch-up semantics: launchd firing late after wake, or a deliberate manual
+# re-run, is always safe. Every invocation is its own delivery — the stage
+# Idempotency-Keys carry this cycle's start stamp, because the cron boundary
+# derives a deterministic pipeline-run id from that key, and a repeated key
+# resolves to an earlier cycle's already-terminal run row (a terminal run is
+# never resumable, so the route answers 500 handler_exception). Re-runs stay
+# safe through content idempotency instead: duplicate raw events are skipped
+# and source freshness is stamped only for sources that actually gained a row.
+# A fully missed day is recorded honestly by the pipeline's own run ledger as
+# an outage (PUL-022); this script never backfills or backdates anything.
 #
 # No paid API is touched anywhere in this script. The scheduled Vercel
 # classify route is hard-locked separately; classification happens only here.
@@ -22,6 +27,8 @@ set -u
 REPO="${CIVICA_REPO:-/Users/fernandobalino/Projects/civica}"
 LOG="$HOME/Library/Logs/civica-pulse-runner.log"
 DAY="$(date -u +%Y-%m-%d)"
+# One identity per invocation, not per day: see the catch-up note above.
+CYCLE="$(date -u +%Y%m%dT%H%M%SZ)-$$"
 BASE="https://civicaatlas.org"
 
 log() { echo "$(date -u +%FT%TZ) $*" >> "$LOG"; }
@@ -57,18 +64,37 @@ FAILED=""
 
 stage_route() {
   local name="$1" route="$2"
-  local out code
+  local key="mac-runner-$name-$CYCLE"
+  local out code body outcome
   out="$(curl -sS -m 900 -w '\n%{http_code}' \
     -H "Authorization: Bearer $SECRET" \
-    -H "Idempotency-Key: mac-runner-$name-$DAY" \
+    -H "Idempotency-Key: $key" \
     "$BASE$route" 2>>"$LOG")"
   code="${out##*$'\n'}"
-  log "stage=$name http=$code body=$(echo "$out" | head -c 300 | tr '\n' ' ')"
-  # 200 = completed; 502/503 = honest partial/skip recorded by the route.
+  body="${out%$'\n'*}"
+  outcome="$(printf '%s' "$body" |
+    grep -o '"outcome"[[:space:]]*:[[:space:]]*"[a-z_]*"' | head -1 |
+    sed 's/.*:[[:space:]]*"//; s/"$//')"
+  log "stage=$name http=$code outcome=${outcome:-none} key=$key body=$(printf '%s' "$body" | head -c 300 | tr '\n' ' ')"
+  # Honest, non-failure results:
+  #   200                          the stage completed (or was suppressed as a duplicate)
+  #   202 job_in_progress          another delivery of this job holds the lease
+  #   503 job_busy                 same, from the job-wide lock
+  #   502/503 partial | blocked    the route recorded a real partial result
+  # Everything else is a genuine failure and must reach the owner: 500
+  # handler_exception, any 4xx, and the 503 infrastructure outcomes
+  # (delivery_control_unavailable, pipeline_observability_unavailable,
+  # retry_limit_exhausted) all mean the stage did not honestly run.
   case "$code" in
-    200|502|503) return 0 ;;
-    *) FAILED="$FAILED $name"; return 1 ;;
+    200) return 0 ;;
+    202|502|503)
+      case "$outcome" in
+        job_in_progress|job_busy|partial|blocked) return 0 ;;
+      esac
+      ;;
   esac
+  FAILED="$FAILED $name"
+  return 1
 }
 
 log "=== Pulse daily cycle start day=$DAY ==="

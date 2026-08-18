@@ -1,5 +1,12 @@
 # EXP-015 owner review — 2026-08-09
 
+> **SUPERSEDED 2026-08-17.** Fernando rejected the image-led Explore
+> megamenu direction and replaced it with a standard grouped header dropdown
+> (commit `a8f58bcc`, PR #24). This document is retained unchanged as the
+> historical record of the superseded direction; it does not describe what
+> Civica ships. The current contract is the "Explore dropdown" entry in
+> `DESIGN.md`.
+
 > **Date correction (recorded 2026-08-09).** This record was created with a 2026-08-09 session date. Fernando stated on 2026-08-09 that he had not worked on the project since late July 2026; the owner statements recorded here were made in the late-July 2026 working sessions, and the 2026-08-09 date is an artifact of when the record was written.
 
 
