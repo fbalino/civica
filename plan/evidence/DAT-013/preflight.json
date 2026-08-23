@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-26T19:17:27.027Z",
+  "generatedAt": "2026-08-23T22:04:52.600Z",
   "appliedAuthoritativeMigrationIds": [
     "0000_authoritative_baseline",
     "0001_aspiring_bloodaxe",
@@ -33,7 +33,25 @@
     "0029_whole_dazzler",
     "0030_cute_namora",
     "0031_hot_saracen",
-    "0032_sparkling_genesis"
+    "0032_sparkling_genesis",
+    "0033_flat_hardball",
+    "0034_superb_the_fallen",
+    "0035_equal_marvex",
+    "0036_moaning_toad_men",
+    "0037_minor_sharon_carter",
+    "0038_heavy_slyde",
+    "0039_living_clea",
+    "0040_closed_young_avengers",
+    "0042_grey_sally_floyd",
+    "0043_pulse_decay_lifecycle",
+    "0044_pulse_drift_monitoring",
+    "0045_pulse_evaluation_workspace_reconciliation",
+    "0046_little_mulholland_black",
+    "0047_atlas_data_error_reports",
+    "0048_entity_name_forms",
+    "0049_curvy_shen",
+    "0050_index_release_header_contract",
+    "0051_eminent_jocasta"
   ],
   "plans": [
     {
@@ -70,10 +88,10 @@
         "jurisdictions": 253,
         "legislature_parties": 1548,
         "offices": 5326,
-        "persons": 4985,
+        "persons": 5002,
         "sources": 57,
-        "statements": 7154,
-        "terms": 5590
+        "statements": 7251,
+        "terms": 5611
       },
       "writesPerformed": 0
     },
@@ -137,7 +155,7 @@
       "invariantPlan": "npm run db:plan -- --id=0002_purple_rachel_grey --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bill_summary_cache": 7193,
+        "bill_summary_cache": 8213,
         "contact_submissions": 1,
         "country_metrics": 7449,
         "election_results": 1351,
@@ -203,7 +221,7 @@
       "invariantPlan": "npm run db:plan -- --id=0004_gray_mojo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bills": 7885
+        "bills": 8447
       },
       "writesPerformed": 0
     },
@@ -224,7 +242,7 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "advisory_board_members": 0,
-        "correction_log": 1
+        "correction_log": 3
       },
       "writesPerformed": 0
     },
@@ -262,7 +280,7 @@
       "invariantPlan": "npm run db:plan -- --id=0007_stiff_hobgoblin --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "civica_conditions_scores": 331
+        "civica_conditions_scores": 432
       },
       "writesPerformed": 0
     },
@@ -286,10 +304,10 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_corrections": 0,
-        "pulse_dimensional_deltas": 325,
-        "pulse_events_v2": 384,
-        "pulse_sources": 529,
-        "raw_events": 1595
+        "pulse_dimensional_deltas": 335,
+        "pulse_events_v2": 581,
+        "pulse_sources": 753,
+        "raw_events": 2098
       },
       "writesPerformed": 0
     },
@@ -350,7 +368,7 @@
       "invariantPlan": "npm run db:plan -- --id=0011_tidy_mordo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_events_v2": 384
+        "pulse_events_v2": 581
       },
       "writesPerformed": 0
     },
@@ -557,8 +575,8 @@
         "ci_dimension_scores": 4867,
         "country_fact_vintages": 35021,
         "government_taxonomies": 249,
-        "pulse_dimensional_deltas": 325,
-        "pulse_events_v2": 384
+        "pulse_dimensional_deltas": 335,
+        "pulse_events_v2": 581
       },
       "writesPerformed": 0
     },
@@ -578,8 +596,8 @@
       "invariantPlan": "npm run db:plan -- --id=0022_pulse_event_idempotency --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_events_v2": 384,
-        "pulse_sources": 529
+        "pulse_events_v2": 581,
+        "pulse_sources": 753
       },
       "writesPerformed": 0
     },
@@ -655,10 +673,10 @@
         "backtest_runs": 52,
         "ci_composite_scores": 1236,
         "ci_dimension_scores": 4867,
-        "civica_conditions_scores": 331,
+        "civica_conditions_scores": 432,
         "constitution_topic_excerpts": 30537,
         "constitutions": 186,
-        "correction_log": 1,
+        "correction_log": 3,
         "country_facts": 25829,
         "country_metrics": 7449,
         "data_disputes": 33,
@@ -671,15 +689,15 @@
         "legislature_parties": 1548,
         "offices": 5326,
         "organization_memberships": 1880,
-        "persons": 4985,
-        "pulse_dimensional_deltas": 325,
-        "pulse_events_v2": 384,
+        "persons": 5002,
+        "pulse_dimensional_deltas": 335,
+        "pulse_events_v2": 581,
         "pulse_review_audit_log": 13,
-        "pulse_sources": 529,
-        "raw_events": 1595,
-        "research_evidence_history": 85723,
-        "statements": 7154,
-        "terms": 5590
+        "pulse_sources": 753,
+        "raw_events": 2098,
+        "research_evidence_history": 110327,
+        "statements": 7251,
+        "terms": 5611
       },
       "writesPerformed": 0
     },
@@ -751,14 +769,14 @@
       "invariantPlan": "npm run db:plan -- --id=0023_wide_gorilla_man --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_events_v2": 384,
-        "pulse_incident_assignments": 1507,
-        "pulse_incident_resolutions": 479,
-        "pulse_incidents": 1224,
-        "pulse_pipeline_runs": 99,
-        "pulse_sources": 529,
-        "raw_events": 1595,
-        "research_evidence_history": 85723
+        "pulse_events_v2": 581,
+        "pulse_incident_assignments": 2010,
+        "pulse_incident_resolutions": 1011,
+        "pulse_incidents": 1702,
+        "pulse_pipeline_runs": 207,
+        "pulse_sources": 753,
+        "raw_events": 2098,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -783,13 +801,13 @@
       "invariantPlan": "npm run db:plan -- --id=0024_dark_maginty --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_classification_attempts": 385,
-        "pulse_cluster_classification_states": 385,
-        "pulse_event_decisions": 10163,
-        "pulse_events_v2": 384,
-        "pulse_pipeline_runs": 99,
-        "raw_events": 1595,
-        "research_evidence_history": 85723
+        "pulse_classification_attempts": 1514,
+        "pulse_cluster_classification_states": 952,
+        "pulse_event_decisions": 21066,
+        "pulse_events_v2": 581,
+        "pulse_pipeline_runs": 207,
+        "raw_events": 2098,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -812,11 +830,11 @@
       "invariantPlan": "npm run db:plan -- --id=0025_careful_the_professor --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_events_v2": 384,
-        "pulse_incidents": 1224,
-        "pulse_review_obligations": 175,
-        "pulse_review_sla_events": 175,
-        "research_evidence_history": 85723
+        "pulse_events_v2": 581,
+        "pulse_incidents": 1702,
+        "pulse_review_obligations": 344,
+        "pulse_review_sla_events": 445,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -858,9 +876,9 @@
       "invariantPlan": "npm run db:plan -- --id=0027_smart_tempest --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_dimensional_delta_history": 1625,
-        "pulse_dimensional_deltas": 325,
-        "research_evidence_history": 85723
+        "pulse_dimensional_delta_history": 7640,
+        "pulse_dimensional_deltas": 335,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -884,8 +902,8 @@
       "liveRowCounts": {
         "ci_dimension_scores": 4867,
         "pulse_event_absorptions": 0,
-        "pulse_events_v2": 384,
-        "research_evidence_history": 85723
+        "pulse_events_v2": 581,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -911,12 +929,12 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "jurisdictions": 253,
-        "pulse_event_information_environment_pins": 384,
-        "pulse_events_v2": 384,
+        "pulse_event_information_environment_pins": 581,
+        "pulse_events_v2": 581,
         "pulse_information_environment_releases": 1,
         "pulse_information_environment_values": 251,
-        "pulse_pipeline_runs": 99,
-        "research_evidence_history": 85723
+        "pulse_pipeline_runs": 207,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -968,9 +986,9 @@
         "party_composition_runs": 194,
         "party_identity_events": 1548,
         "political_parties": 1548,
-        "research_evidence_history": 85723,
+        "research_evidence_history": 110327,
         "sources": 57,
-        "statements": 7154
+        "statements": 7251
       },
       "writesPerformed": 0
     },
@@ -996,7 +1014,7 @@
         "jurisdictions": 253,
         "organization_memberships": 1880,
         "organizations": 24,
-        "research_evidence_history": 85723,
+        "research_evidence_history": 110327,
         "sources": 57
       },
       "writesPerformed": 0
@@ -1017,8 +1035,8 @@
       "invariantPlan": "npm run db:plan -- --id=0033_flat_hardball --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "admin_mutation_audit_log": "missing",
-        "admin_session_revocations": "missing"
+        "admin_mutation_audit_log": 4,
+        "admin_session_revocations": 0
       },
       "writesPerformed": 0
     },
@@ -1039,9 +1057,9 @@
       "invariantPlan": "npm run db:plan -- --id=0034_superb_the_fallen --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "cron_job_attempts": "missing",
-        "cron_job_executions": "missing",
-        "cron_job_leases": "missing"
+        "cron_job_attempts": 753,
+        "cron_job_executions": 745,
+        "cron_job_leases": 18
       },
       "writesPerformed": 0
     },
@@ -1060,7 +1078,7 @@
       "invariantPlan": "npm run db:plan -- --id=0035_equal_marvex --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_classification_delivery_bindings": "missing"
+        "pulse_classification_delivery_bindings": 1
       },
       "writesPerformed": 0
     },
@@ -1091,15 +1109,15 @@
       "liveRowCounts": {
         "ci_composite_scores": 1236,
         "ci_dimension_scores": 4867,
-        "ci_index_release_pointers": "missing",
-        "ci_index_releases": "missing",
+        "ci_index_release_pointers": 1,
+        "ci_index_releases": 3,
         "ci_methodology_versions": 7,
         "country_fact_vintage_candidates": 25827,
         "country_fact_vintage_releases": 2,
         "country_fact_vintages": 35021,
-        "pulse_dimensional_delta_history": 1625,
-        "pulse_pipeline_runs": 99,
-        "pulse_score_publication_pointers": "missing"
+        "pulse_dimensional_delta_history": 7640,
+        "pulse_pipeline_runs": 207,
+        "pulse_score_publication_pointers": 1
       },
       "writesPerformed": 0
     },
@@ -1118,7 +1136,7 @@
       "invariantPlan": "npm run db:plan -- --id=0037_minor_sharon_carter --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "route_performance_observations": "missing"
+        "route_performance_observations": 245448
       },
       "writesPerformed": 0
     },
@@ -1137,7 +1155,7 @@
       "invariantPlan": "npm run db:plan -- --id=0038_heavy_slyde --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "production_pipeline_runs": "missing"
+        "production_pipeline_runs": 747
       },
       "writesPerformed": 0
     },
@@ -1157,8 +1175,8 @@
       "invariantPlan": "npm run db:plan -- --id=0039_living_clea --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "error_monitoring_events": "missing",
-        "error_monitoring_issue_links": "missing"
+        "error_monitoring_events": 71,
+        "error_monitoring_issue_links": 0
       },
       "writesPerformed": 0
     },
@@ -1180,10 +1198,10 @@
       "invariantPlan": "npm run db:plan -- --id=0040_closed_young_avengers --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "civica_conditions_calculations": "missing",
-        "civica_conditions_components": "missing",
-        "civica_conditions_scores": 331,
-        "research_evidence_history": 85723
+        "civica_conditions_calculations": 340,
+        "civica_conditions_components": 818,
+        "civica_conditions_scores": 432,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -1207,12 +1225,12 @@
       "invariantPlan": "npm run db:plan -- --id=0042_grey_sally_floyd --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "civica_conditions_calculations": "missing",
-        "civica_conditions_normalization_parameters": "missing",
-        "civica_conditions_reference_sets": "missing",
-        "civica_conditions_releases": "missing",
-        "civica_conditions_scores": 331,
-        "research_evidence_history": 85723
+        "civica_conditions_calculations": 340,
+        "civica_conditions_normalization_parameters": 5,
+        "civica_conditions_reference_sets": 3,
+        "civica_conditions_releases": 1,
+        "civica_conditions_scores": 432,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -1232,8 +1250,8 @@
       "invariantPlan": "npm run db:plan -- --id=0043_pulse_decay_lifecycle --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_dimensional_delta_history": 1625,
-        "pulse_dimensional_deltas": 325
+        "pulse_dimensional_delta_history": 7640,
+        "pulse_dimensional_deltas": 335
       },
       "writesPerformed": 0
     },
@@ -1254,9 +1272,9 @@
       "invariantPlan": "npm run db:plan -- --id=0044_pulse_drift_monitoring --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_drift_alerts": "missing",
-        "pulse_drift_baselines": "missing",
-        "pulse_drift_observations": "missing"
+        "pulse_drift_alerts": 0,
+        "pulse_drift_baselines": 0,
+        "pulse_drift_observations": 14
       },
       "writesPerformed": 0
     },
@@ -1275,7 +1293,7 @@
       "invariantPlan": "npm run db:plan -- --id=0045_pulse_evaluation_workspace_reconciliation --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_coding_studies": 4
+        "pulse_coding_studies": 6
       },
       "writesPerformed": 0
     },
@@ -1295,8 +1313,8 @@
       "invariantPlan": "npm run db:plan -- --id=0046_little_mulholland_black --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "atlas_entity_change_history": "missing",
-        "correction_log": 1
+        "atlas_entity_change_history": 2738,
+        "correction_log": 3
       },
       "writesPerformed": 0
     },
@@ -1317,9 +1335,9 @@
       "invariantPlan": "npm run db:plan -- --id=0047_atlas_data_error_reports --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "atlas_entity_change_history": "missing",
-        "correction_log": 1,
-        "research_evidence_history": 85723
+        "atlas_entity_change_history": 2738,
+        "correction_log": 3,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },
@@ -1338,7 +1356,7 @@
       "invariantPlan": "npm run db:plan -- --id=0048_entity_name_forms --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "entity_name_forms": "missing"
+        "entity_name_forms": 1184
       },
       "writesPerformed": 0
     },
@@ -1359,9 +1377,9 @@
       "invariantPlan": "npm run db:plan -- --id=0049_curvy_shen --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "civica_conditions_components": "missing",
-        "civica_conditions_normalization_parameters": "missing",
-        "civica_conditions_scores": 331
+        "civica_conditions_components": 818,
+        "civica_conditions_normalization_parameters": 5,
+        "civica_conditions_scores": 432
       },
       "writesPerformed": 0
     },
@@ -1381,8 +1399,8 @@
       "invariantPlan": "npm run db:plan -- --id=0050_index_release_header_contract --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "ci_index_release_pointers": "missing",
-        "ci_index_releases": "missing"
+        "ci_index_release_pointers": 1,
+        "ci_index_releases": 3
       },
       "writesPerformed": 0
     },
@@ -1401,7 +1419,7 @@
       "invariantPlan": "npm run db:plan -- --id=0051_eminent_jocasta --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "civica_conditions_normalization_parameters": "missing"
+        "civica_conditions_normalization_parameters": 5
       },
       "writesPerformed": 0
     },
@@ -1443,6 +1461,25 @@
       "liveRowCounts": {
         "election_results": 1351,
         "elections": 915,
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-jurisdiction-capitals",
+      "artifact": "scripts/backfill-jurisdiction-capitals.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "0bbc50497a43255a3c0cfd204a6131194fc636ed2abce4ae2f8542d9f40d5529",
+      "affectedRelations": [
+        "jurisdictions"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-jurisdiction-capitals-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-jurisdiction-capitals --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
         "jurisdictions": 253
       },
       "writesPerformed": 0
@@ -1564,8 +1601,8 @@
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "offices": 5326,
-        "persons": 4985,
-        "terms": 5590
+        "persons": 5002,
+        "terms": 5611
       },
       "writesPerformed": 0
     },
@@ -1584,7 +1621,7 @@
       "invariantPlan": "npm run db:plan -- --id=data-create-rate-limits-table --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "rate_limits": 1
+        "rate_limits": 2
       },
       "writesPerformed": 0
     },
@@ -1604,8 +1641,8 @@
       "invariantPlan": "npm run db:plan -- --id=data-repair-pulse-agreement --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "pulse_events_v2": 384,
-        "research_evidence_history": 85723
+        "pulse_events_v2": 581,
+        "research_evidence_history": 110327
       },
       "writesPerformed": 0
     },

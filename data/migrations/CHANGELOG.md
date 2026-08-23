@@ -341,7 +341,8 @@ data-backfill-cia-vintage · data-backfill-election-results ·
 data-backfill-growth-methodology · data-backfill-methodology-version ·
 data-backfill-territory-iso2 · data-backfill-upstream-vintage-labels ·
 data-bridge-cia-legacy-to-canonical · data-cleanup-bad-offices ·
-data-create-rate-limits-table · data-repair-pulse-agreement · data-reseed-bug3-corrupted ·
+data-backfill-jurisdiction-capitals · data-create-rate-limits-table ·
+data-repair-pulse-agreement · data-reseed-bug3-corrupted ·
 data-restore-overdemoted-disputes
 
 `data-repair-pulse-agreement` recomputes the current agreement projection from
@@ -349,3 +350,13 @@ stored provider-distinct, prompt-versioned classify runs. Unsupported labels
 become `none`; automatic rows without that evidence enter legacy quarantine.
 Human-reviewed publication remains intact, and the retention trigger records
 every prior projection.
+
+`data-backfill-jurisdiction-capitals` populates the never-filled
+`jurisdictions.capital` column from the CIA `government` section payload
+already retained in `country_factbook_sections`. It is a correction, not a
+sync: it writes one column, stamps no `last_sync_at`, and skips rows whose
+stored payload carries no capital. The column had been NULL for all 253 rows
+while `jurisdictions` had not been written since 2026-05-05, so the checked
+`jurisdiction-directory` artifact failed its live diff on every deployment.
+Extraction mirrors the seed's `decodeHtmlEntities` + `extractText` discipline,
+and reruns are no-ops once the column matches the stored evidence.

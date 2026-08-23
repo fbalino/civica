@@ -8,7 +8,7 @@ const sqlFiles = readdirSync(resolve(root, "drizzle/migrations")).filter((name) 
 const registeredAuthoritativeSql = MIGRATION_ARTIFACTS
   .map(({ path }) => path)
   .filter((path) => path.startsWith("drizzle/authoritative/") && path.endsWith(".sql"));
-const dataNames = ["backfill-cia-vintage", "backfill-election-results", "backfill-growth-methodology", "backfill-methodology-version", "backfill-territory-iso2", "backfill-upstream-vintage-labels", "bridge-cia-legacy-to-canonical", "cleanup-bad-offices", "create-rate-limits-table", "repair-pulse-agreement", "reseed-bug3-corrupted", "restore-overdemoted-disputes"];
+const dataNames = ["backfill-cia-vintage", "backfill-election-results", "backfill-jurisdiction-capitals", "backfill-growth-methodology", "backfill-methodology-version", "backfill-territory-iso2", "backfill-upstream-vintage-labels", "bridge-cia-legacy-to-canonical", "cleanup-bad-offices", "create-rate-limits-table", "repair-pulse-agreement", "reseed-bug3-corrupted", "restore-overdemoted-disputes"];
 const dataScripts = dataNames.map((name) => `scripts/${name}.ts`);
 const journal = JSON.parse(readFileSync(resolve(root, "drizzle/migrations/meta/_journal.json"), "utf8")) as { entries: Array<{ tag: string }> };
 const authoritativeJournal = JSON.parse(readFileSync(resolve(root, "drizzle/authoritative/meta/_journal.json"), "utf8")) as { entries: Array<{ tag: string }> };
