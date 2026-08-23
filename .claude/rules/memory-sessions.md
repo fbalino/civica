@@ -192,6 +192,26 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Lazy-init the Anthropic client (a module-level `new Anthropic()` evaluates before dotenv
   populates env vars).
 
+- **A checked artifact that live-diffs against the DB can be committed from a
+  divergent local state and then block EVERY deploy silently.**
+  `src/lib/jurisdictions/directory.generated.json` was generated 2026-08-17
+  carrying capitals; production's `jurisdictions.capital` was NULL for all 253
+  rows (table untouched since 2026-05-05), so `validate:jurisdiction-directory`
+  failed its live diff on every Vercel build for six days. Nothing in the repo
+  surfaced this — local `npm test` and the DB-free CI gate both pass, because
+  the live diff only runs where `DATABASE_URL` exists. When regenerating any
+  `*.generated.json` that a validator diffs against Neon, confirm the DB you are
+  pointed at IS production, and check recent prod deploy status after landing it.
+  Diagnosis order that worked: field-by-field NULL counts (isolates the column) →
+  `max(updated_at)` (rules out a recent wipe) → history ledger (rules out a
+  tracked edit) → look for the value elsewhere. The capitals were never lost —
+  the raw CIA payload in `country_factbook_sections.section_data`
+  (`Capital.name.text`) reproduced all 253 checked rows exactly, so
+  `scripts/backfill-jurisdiction-capitals.ts` restored the column from evidence
+  already in the DB instead of re-running the full Factbook seed (which would
+  also rewrite population/area/GDP/languages). Note `jurisdictions` carries NO
+  history trigger, so the ledger can't prove absence of an untracked edit.
+
 ## Deferred / calendar-gated (do NOT "fix" unasked)
 
 - **`--shadow-hard*` token naming** — owner-gated (see memory-decisions 2026-06-20). The palette
