@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AnalyticsConsentProvider } from "@/components/analytics/AnalyticsConsent";
+import { CookieConsentBanner } from "@/components/analytics/CookieConsentBanner";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo, CivicaLogoSprite } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -114,15 +116,21 @@ export default function RootLayout({
             metadata tags into <head> itself. */}
         <JsonLd data={[buildOrganization(), buildWebSite()]} />
         <ThemeProvider>
-          <SiteHeader
-            searchSlot={<GlobalSearchWrapper />}
-            logoSlot={<CivicaLogo size={40} />}
-            logoSlotSmall={<CivicaLogo size={26} />}
-          />
+          {/* Analytics is consent-gated: this provider loads no analytics
+              code until a reader explicitly allows it in the banner below.
+              See src/lib/analytics/consent.ts. */}
+          <AnalyticsConsentProvider>
+            <SiteHeader
+              searchSlot={<GlobalSearchWrapper />}
+              logoSlot={<CivicaLogo size={40} />}
+              logoSlotSmall={<CivicaLogo size={26} />}
+            />
 
-          <main style={{ flex: 1 }}>{children}</main>
+            <main style={{ flex: 1 }}>{children}</main>
 
-          <SiteFooter />
+            <SiteFooter />
+            <CookieConsentBanner />
+          </AnalyticsConsentProvider>
         </ThemeProvider>
       </body>
     </html>

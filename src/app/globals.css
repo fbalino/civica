@@ -5402,6 +5402,120 @@ a {
   height: var(--space-4);
 }
 
+/* ── Analytics consent ─────────────────────────────────────────── */
+
+/* Bottom-anchored consent bar for optional product analytics. Fixed so the
+   reader can keep reading while deciding, and never a blocking modal — the
+   undecided state already loads no analytics, so there is nothing to trap
+   them into answering. */
+.cookie-consent {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: var(--z-toast);
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4);
+  /* The bar overlays page content; only the panel itself is interactive. */
+  pointer-events: none;
+}
+
+.cookie-consent__panel {
+  pointer-events: auto;
+  width: 100%;
+  max-width: var(--width-page-standard);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard-lg);
+}
+
+.cookie-consent__copy {
+  flex: 1 1 22rem;
+  min-width: 0;
+}
+
+.cookie-consent__title {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-snug);
+  color: var(--color-text-primary);
+}
+
+.cookie-consent__body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-snug);
+  color: var(--color-text-secondary);
+}
+
+.cookie-consent__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+@media (max-width: 640px) {
+  .cookie-consent__panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  /* The 22rem basis above is a COLUMN width for the side-by-side layout. Once
+     the panel stacks, flex-basis resolves against the block axis instead and
+     would pad the copy out to 352px tall, leaving a dead gap above the
+     buttons. Size to content here. */
+  .cookie-consent__copy {
+    flex: 0 0 auto;
+  }
+  .cookie-consent__actions .btn {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}
+
+/* Standing control on /privacy so a decision made in the bar above is
+   reversible from a stable URL. */
+.analytics-preference {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+
+.analytics-preference__state {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.analytics-preference__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.analytics-preference__note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-muted);
+}
+
 /* ── Reduced motion ────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {

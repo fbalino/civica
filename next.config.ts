@@ -22,20 +22,27 @@ const protectedSourceMapsEnabled =
 // applied separately to all routes EXCEPT /embed/* so the embed widget stays
 // embeddable in third-party iframes.
 // Minimal resource allowlist. Externally LOADED origins (not link targets) are
-// only map resources: OpenFreeMap (2D fallback style/tiles), the self-hosted
-// Protomaps PMTiles archive on Vercel Blob, and Mapbox (opt-in 3D). Fonts are
-// self-hosted by next/font; there are no external scripts or image CDNs.
+// map resources — OpenFreeMap (2D fallback style/tiles), the self-hosted
+// Protomaps PMTiles archive on Vercel Blob, and Mapbox (opt-in 3D) — plus
+// PostHog, the consent-gated analytics bundle. Fonts are self-hosted by
+// next/font; there are no image CDNs.
+//
+// The PostHog origins are allowlisted here so the report-only policy stays
+// quiet and a future enforcing flip does not break analytics. Allowlisting is
+// not activation: the bundle is requested only after a reader grants consent
+// (src/lib/analytics/consent.ts), so an undecided or declining reader still
+// contacts none of these hosts.
 // Shipped as Content-Security-Policy-Report-Only: enforcing script/style-src
 // under Next's App Router requires per-request nonces (streaming injects inline
 // scripts), so we observe violations first and flip to enforcing once a nonce
 // pass lands. See plan/evidence/PLT-013/. (PLT-013)
 const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://us-assets.i.posthog.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://tiles.openfreemap.org https://api.mapbox.com https://flagcdn.com https://commons.wikimedia.org https://upload.wikimedia.org",
   "font-src 'self'",
-  "connect-src 'self' https://tiles.openfreemap.org https://*.blob.vercel-storage.com https://api.mapbox.com https://events.mapbox.com",
+  "connect-src 'self' https://tiles.openfreemap.org https://*.blob.vercel-storage.com https://api.mapbox.com https://events.mapbox.com https://us.i.posthog.com https://us-assets.i.posthog.com",
   "worker-src 'self' blob:",
   "frame-ancestors 'self'",
   "base-uri 'self'",

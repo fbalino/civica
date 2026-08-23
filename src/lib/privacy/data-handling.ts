@@ -9,10 +9,11 @@
 
 export const PRIVACY_DATA_HANDLING_VERSION =
   "civica-privacy-data-handling/v1" as const;
-export const PRIVACY_DATA_HANDLING_EFFECTIVE_ON = "2026-07-23";
+export const PRIVACY_DATA_HANDLING_EFFECTIVE_ON = "2026-08-23";
 
 export const PRIVACY_FLOW_IDS = [
   "browser-preferences",
+  "product-analytics",
   "contact-messages",
   "data-error-reports",
   "advisory-applications",
@@ -70,6 +71,33 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     sourcePaths: [
       "src/components/ThemeProvider.tsx",
       "src/components/factbook/CivicaAIDrawer.tsx",
+    ],
+    publicSummary: true,
+  },
+  {
+    id: "product-analytics",
+    label: "Consent-gated product analytics",
+    audiences: ["ordinary-reader"],
+    trigger:
+      "A reader explicitly allows analytics in the consent banner or on the privacy page. Nothing is loaded before that choice.",
+    data:
+      "Page address and referrer, plus the standard connection metadata any web request exposes (IP address, browser/user-agent, approximate coarse location derived from IP by the provider) and a random device identifier stored in the reader's browser. No name, email, account, or Civica-held identity is attached, and no reader is ever identified to the provider.",
+    purpose:
+      "Count which pages are read so editorial and engineering effort can be directed at the parts of the atlas people actually use.",
+    destinations: "PostHog (PostHog US cloud, or the configured region host).",
+    retention:
+      "Controlled by the configured PostHog plan and project retention settings; Civica's repository does not enforce or claim an exact provider period.",
+    access: "Fernando Baliño through the authenticated PostHog project.",
+    deletion:
+      "Turn analytics off on the privacy page to stop capture and discard the device identifier, or clear browser site data. Provider-side deletion requests are routed through Civica to PostHog.",
+    safeguards:
+      "No analytics script, request, or identifier exists until consent is granted; the decision is stored in the reader's own local storage rather than a cookie. Autocapture, session recording, heatmaps, surveys, and feature-flag requests are all disabled, no person profile is created, the cookie is not shared across subdomains, and a browser Do Not Track signal suppresses capture even after consent.",
+    providers: ["PostHog"],
+    sourcePaths: [
+      "src/lib/analytics/consent.ts",
+      "src/lib/analytics/posthog.ts",
+      "src/components/analytics/AnalyticsConsent.tsx",
+      "src/components/analytics/CookieConsentBanner.tsx",
     ],
     publicSummary: true,
   },
@@ -221,7 +249,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     deletion:
       "Provider-managed; privacy requests can be routed through Civica for account-specific follow-up.",
     safeguards:
-      "No third-party behavioral analytics or advertising tracker is installed; application telemetry below is separately content-free.",
+      "No advertising tracker is installed, and the only third-party analytics is the consent-gated product-analytics flow above, which loads nothing unless a reader allows it; application telemetry below is separately content-free.",
     providers: ["Vercel"],
     sourcePaths: [
       "src/proxy.ts",

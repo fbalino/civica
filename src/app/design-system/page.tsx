@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FactbookLegislatureChart } from "@/components/factbook/FactbookLegislatureChart";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { Banner } from "@/components/editorial/Banner";
+import { Button } from "@/components/editorial/Button";
 import { Pill } from "@/components/editorial/Pill";
 import { StatusDot } from "@/components/editorial/StatusDot";
 import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
@@ -958,6 +959,38 @@ export default function DesignSystemPage() {
                 <Banner variant="danger">
                   This figure failed reconciliation.
                 </Banner>
+              </div>
+            </div>
+
+            <div className="ds-comp ds-comp--wide" id="analytics-consent">
+              <h4>Analytics consent bar</h4>
+              <p className="ds-component-note">
+                The consent bar shown once to a reader who has not yet chosen
+                whether to allow product analytics. It is bottom-fixed in
+                production (<code>--z-toast</code>); the static example below
+                shows the panel itself. Accept and decline carry equal weight,
+                and nothing loads while it is open. Live component:{" "}
+                <code>CookieConsentBanner</code>; reader control:{" "}
+                <code>AnalyticsPreference</code> on <code>/privacy#analytics</code>.
+              </p>
+              <div className="cookie-consent__panel">
+                <div className="cookie-consent__copy">
+                  <p className="cookie-consent__title">
+                    Help us see which parts of the atlas get used
+                  </p>
+                  <p className="cookie-consent__body">
+                    With your permission, Civica measures which pages readers
+                    open, so we know where to put the next round of work.
+                  </p>
+                </div>
+                <div className="cookie-consent__actions">
+                  <Button variant="primary" size="sm">
+                    Allow
+                  </Button>
+                  <Button variant="secondary" size="sm">
+                    Decline
+                  </Button>
+                </div>
               </div>
             </div>
 

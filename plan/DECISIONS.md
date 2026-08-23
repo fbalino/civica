@@ -1255,3 +1255,38 @@ provenance debt without inventing historical facts. Professional review still
 decides the legal sufficiency of the historical corpus, provider terms,
 screening rules, and public rights language; the repository can enforce the
 questions and evidence but cannot supply that legal judgment.
+
+### APR-D172 — Analytics is consent-gated, and consent is not itself a tracker
+
+**Decision:** Adopt `civica-analytics-consent/v1` as the single decision
+contract for reader analytics, and register `product-analytics` as a public
+flow in `civica-privacy-data-handling/v1`. PostHog is the only third-party
+analytics on the site and is loaded by exactly one component, only on an
+explicit `granted` decision. An undecided or declining reader downloads no
+analytics bundle, opens no connection to the provider, and receives no
+identifier, so declining is that reader's existing state rather than a
+suppression of collection that already happened. The decision is stored in the
+reader's own `localStorage`, never a cookie. Anything unreadable, unversioned,
+or written under a superseded contract version resolves to `pending` and
+re-asks. Autocapture, session recording, heatmaps, surveys, and feature-flag
+requests are disabled, no person profile is created, and a browser Do Not Track
+signal suppresses capture even after consent. Withdrawal at
+`/privacy#analytics` opts out, discards the identifier, and purges provider
+storage. Absent `NEXT_PUBLIC_POSTHOG_KEY`, neither analytics nor its banner
+exists for that deployment. The provider bundle is loaded from PostHog's
+published browser build rather than an npm dependency.
+
+**Why:** A consent banner that fires the tracker before the reader answers, or
+that records the refusal in a cookie, contradicts the thing it claims to
+protect; gating the load itself is the only version of the promise that is
+checkable. Ordering is load-bearing and was wrong in the first implementation:
+`reset()` clears PostHog's persisted opt-out flag, so calling it after
+`opt_out_capturing()` silently re-enabled capture — the fixed order is verified
+in-browser and asserted in the validator. The public claim that Civica runs no
+analytics was true and is now retired rather than quietly left standing; the
+privacy page, terms, inventory, and validator move together so the disclosure
+cannot drift from the configuration. The bundle is not an npm dependency
+because several frozen release artifacts pin `package-lock.json`, and adding a
+runtime dependency would change the hash of published, immutable research
+packages — analytics must not perturb a provenance artifact. The cost is that
+the bundle version is provider-controlled rather than lockfile-pinned.

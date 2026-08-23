@@ -211,6 +211,14 @@ export const ENV_DEGRADES: Array<{
     name: "NEXT_PUBLIC_BASEMAP_PMTILES_URL",
     note: "Self-hosted basemap; falls back to OpenFreeMap.",
   },
+  {
+    name: "NEXT_PUBLIC_POSTHOG_KEY",
+    note: "Consent-gated analytics; absent disables analytics and its banner.",
+  },
+  {
+    name: "NEXT_PUBLIC_POSTHOG_HOST",
+    note: "Analytics ingestion host; defaults to PostHog US cloud.",
+  },
 ];
 
 export type EnvCheckResult = {

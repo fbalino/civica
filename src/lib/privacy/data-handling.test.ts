@@ -31,7 +31,15 @@ test("every required BRD-012 domain has a distinct flow", () => {
 
 test("public summaries name every reader-visible external service boundary", () => {
   const providers = new Set(PUBLIC_PRIVACY_DATA_FLOWS.flatMap((flow) => flow.providers));
-  for (const provider of ["Vercel", "Neon", "Anthropic", "FlagCDN", "OpenFreeMap", "Mapbox"]) {
+  for (const provider of [
+    "Vercel",
+    "Neon",
+    "Anthropic",
+    "FlagCDN",
+    "OpenFreeMap",
+    "Mapbox",
+    "PostHog",
+  ]) {
     assert.ok(providers.has(provider), provider);
   }
 });
@@ -59,5 +67,38 @@ test("operational telemetry declares bounded retention or an honest absence", ()
     const flow = PRIVACY_DATA_FLOWS.find((candidate) => candidate.id === id);
     assert.ok(flow);
     assert.match(flow.retention, pattern);
+  }
+});
+
+test("the analytics flow discloses consent gating, not merely analytics", () => {
+  const flow = PRIVACY_DATA_FLOWS.find((c) => c.id === "product-analytics");
+  assert.ok(flow);
+  assert.ok(flow.publicSummary, "analytics must be reader-visible");
+  assert.deepEqual([...flow.providers], ["PostHog"]);
+  // The trigger is a reader's explicit act, never a page load.
+  assert.match(flow.trigger, /explicitly allows/i);
+  // Each switched-off capture mode is a promise on /privacy#analytics.
+  for (const pattern of [
+    /session recording/i,
+    /autocapture/i,
+    /heatmap/i,
+    /survey/i,
+    /feature-flag/i,
+    /Do Not Track/i,
+    /local storage rather than a cookie/i,
+  ]) {
+    assert.match(flow.safeguards, pattern);
+  }
+  // Reversible, and reversible in the reader's own hands.
+  assert.match(flow.deletion, /privacy page/i);
+});
+
+test("no flow still claims Civica installs no analytics at all", () => {
+  for (const flow of PRIVACY_DATA_FLOWS) {
+    assert.doesNotMatch(
+      flow.safeguards,
+      /No third-party behavioral analytics/i,
+      `${flow.id} carries a stale no-analytics claim`,
+    );
   }
 });

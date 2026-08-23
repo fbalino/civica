@@ -25,6 +25,7 @@ export const metadata: Metadata = {
 
 const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "use", label: "Using the site" },
+  { id: "cookies", label: "Cookies & analytics" },
   { id: "data-reuse", label: "Reusing the data" },
   { id: "downloads", label: "Downloads & bulk exports" },
   { id: "embedding", label: "Embedding" },
@@ -42,7 +43,7 @@ export default function TermsPage() {
       <article className="methodology-content">
         <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Terms of Use</h1>
-        <p className="editorial-page-meta">Last updated: July 14, 2026</p>
+        <p className="editorial-page-meta">Last updated: August 23, 2026</p>
         <p className="editorial-page-subtitle">
           Civica Atlas is a free-to-access comparative reference for how every
           country on Earth is governed. These terms describe, in plain language,
@@ -82,6 +83,32 @@ export default function TermsPage() {
               limits and reuse terms.
             </li>
           </ul>
+        </section>
+
+        <section id="cookies" className="editorial-section">
+          <SectionHeader
+            eyebrow="Cookies and analytics"
+            title="What we ask permission for"
+            dek="No account, no advertising, and no analytics unless you allow it."
+          />
+
+          <p>
+            Civica Atlas sets no advertising cookies and runs no advertising
+            networks. The site asks once whether you are willing to let it
+            count page views through PostHog, its analytics provider. If you
+            decline or never answer, no analytics code loads and no cookie or
+            identifier is created for it. If you allow it, PostHog stores a
+            random identifier in your browser so repeat views in one visit are
+            not counted as separate readers.
+          </p>
+
+          <p>
+            You can change that choice at any time, and see exactly what is and
+            is not collected, on the{" "}
+            <Link href="/privacy#analytics">privacy page</Link>. Separately,
+            signing in to the owner-only administrative area sets a strictly
+            necessary session cookie; that area is not part of the public site.
+          </p>
         </section>
 
         <section id="data-reuse" className="editorial-section">

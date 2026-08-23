@@ -20,7 +20,12 @@ for (const fragment of [
   "PUBLIC_PRIVACY_DATA_FLOWS",
   "PRIVACY_DATA_FLOWS",
   "PRIVACY_DATA_HANDLING_VERSION",
-  "no advertising or analytics trackers",
+  "no advertising trackers",
+  // Analytics is disclosed, consent-gated, and reversible from a stable URL.
+  'id="analytics"',
+  "AnalyticsPreference",
+  "civica.analytics-consent",
+  "no session recording",
   "New messages do not retain your raw IP address",
   "Civica does not claim that",
   "zero-data retention is enabled",
@@ -37,6 +42,46 @@ if (contactRoute.includes("getRequestIp"))
   errors.push("contact route still reads a raw request IP");
 if (!contactRoute.includes("ipAddress: null"))
   errors.push("contact route does not explicitly prevent raw-IP retention");
+
+// The product-analytics flow is only honestly disclosed if the code really is
+// consent-gated: the loader must never be reached from module scope, and the
+// provider must load it solely on an explicit `granted` decision.
+const consentModule = read("src/lib/analytics/consent.ts");
+if (!consentModule.includes("ANALYTICS_CONSENT_STORAGE_KEY"))
+  errors.push("analytics consent: missing versioned storage contract");
+if (!/return "pending";/.test(consentModule))
+  errors.push("analytics consent: unreadable state must fail closed to pending");
+
+const analyticsProvider = read("src/components/analytics/AnalyticsConsent.tsx");
+for (const fragment of [
+  'state === "granted"',
+  "if (granted) loadAnalytics();",
+]) {
+  if (!analyticsProvider.includes(fragment))
+    errors.push(`analytics provider: missing consent gate ${fragment}`);
+}
+
+const analyticsLoader = read("src/lib/analytics/posthog.ts");
+for (const fragment of [
+  "autocapture: false",
+  "disable_session_recording: true",
+  "disable_surveys: true",
+  "capture_heatmaps: false",
+  "advanced_disable_feature_flags: true",
+  "respect_dnt: true",
+]) {
+  if (!analyticsLoader.includes(fragment))
+    errors.push(`analytics loader: capture policy drifted, missing ${fragment}`);
+}
+// A top-level call would run the loader before any consent check.
+if (/^loadAnalytics\(\);/m.test(analyticsLoader))
+  errors.push("analytics loader: must not self-invoke at module scope");
+
+const termsPage = read("src/app/terms/page.tsx");
+for (const fragment of ['id="cookies"', "/privacy#analytics"]) {
+  if (!termsPage.includes(fragment))
+    errors.push(`terms page: missing ${fragment}`);
+}
 
 const adminMessageRoute = read("src/app/api/admin/messages/[id]/route.ts");
 for (const fragment of [

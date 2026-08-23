@@ -1033,6 +1033,34 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Public status disclosures include the neutral note, review, countability,
   administering relationship, and sources. Durable record: APR-D160.
 
+## 2026-08-23 — Analytics loads only after consent, and never via npm
+
+PostHog is the only third-party analytics on the site. `src/lib/analytics/
+consent.ts` owns the versioned decision; `AnalyticsConsent.tsx` is the only
+component allowed to load the bundle, and only on an explicit `granted`.
+Undecided/declining readers get no script, no connection, no identifier. The
+decision lives in `localStorage`, never a cookie. Autocapture, session
+recording, heatmaps, surveys, and flags are off; DNT is respected.
+
+Two traps, both verified in a real browser:
+
+- **`reset()` clears PostHog's persisted opt-out flag.** Calling it after
+  `opt_out_capturing()` silently re-enables capture. Order must be
+  `reset(true)` → `opt_out_capturing()` → confirm `has_opted_out_capturing()`.
+- **`flex-basis` flips axis when a flex row stacks to a column.** The banner's
+  `flex: 1 1 22rem` copy column became 352px *tall* under the mobile query,
+  leaving a dead gap; the media query resets it to `flex: 0 0 auto`.
+
+The bundle is loaded from PostHog's published browser build, NOT `posthog-js`,
+because frozen release artifacts pin `package-lock.json` — a dependency would
+change published immutable research-package hashes. Tradeoff: bundle version is
+provider-controlled, not lockfile-pinned.
+
+The old public claim that Civica runs no analytics is retired; `/privacy`,
+`/terms`, the data-handling inventory, and
+`scripts/validate-privacy-data-handling.ts` all moved together. Durable record:
+APR-D172 in `plan/DECISIONS.md`.
+
 ## 2026-07-12 — Election rows require a qualification layer
 
 - Keep raw election storage separate from public qualification; weak rows stay

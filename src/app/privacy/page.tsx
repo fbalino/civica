@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AnalyticsPreference } from "@/components/analytics/AnalyticsPreference";
 import { Banner } from "@/components/editorial/Banner";
 import { DataTable } from "@/components/editorial/DataTable";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
@@ -21,19 +22,20 @@ import { ADVISORY_APPLICATION_POLICY } from "@/lib/research/advisory-application
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How Civica Atlas handles your information — written in plain language for a public reference site with no user accounts and no analytics tracking.",
+    "How Civica Atlas handles your information — written in plain language for a public reference site with no user accounts, no advertising, and analytics only if you allow it.",
   alternates: { canonical: "https://civicaatlas.org/privacy" },
   openGraph: withOg({
     title: "Privacy Policy · Civica Atlas",
     description:
-      "How Civica Atlas handles your information — plain language, no user accounts, no analytics tracking.",
+      "How Civica Atlas handles your information — plain language, no user accounts, no advertising, analytics only if you allow it.",
     url: "https://civicaatlas.org/privacy",
   }),
 };
 
 const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
-  { id: "no-accounts", label: "No accounts, no tracking" },
+  { id: "no-accounts", label: "No accounts, no ads" },
   { id: "storage", label: "In your browser" },
+  { id: "analytics", label: "Analytics & your choice" },
   { id: "messages", label: "What you send us" },
   { id: "ask-civica", label: "Ask Civica" },
   { id: "applications", label: "Board applications" },
@@ -52,10 +54,11 @@ export default function PrivacyPage() {
       <article className="methodology-content">
         <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Privacy Policy</h1>
-        <p className="editorial-page-meta">Last updated: July 23, 2026</p>
+        <p className="editorial-page-meta">Last updated: August 23, 2026</p>
         <p className="editorial-page-subtitle">
           Civica Atlas is a public reference site. There are no visitor
-          accounts, no sign-up, and no advertising or analytics trackers. This
+          accounts, no sign-up, and no advertising trackers. The one analytics
+          tool the site uses does nothing at all unless you allow it. This
           page explains, in plain language, the small amount of information
           the site touches and why.
         </p>
@@ -71,7 +74,7 @@ export default function PrivacyPage() {
         <section id="no-accounts" className="editorial-section">
           <SectionHeader
             eyebrow="The short version"
-            title="No accounts, no tracking"
+            title="No accounts, no ads"
             dek="Reading Civica Atlas does not require you to identify yourself."
           />
 
@@ -81,9 +84,16 @@ export default function PrivacyPage() {
               create one, and we never ask you to.
             </li>
             <li>
-              The site runs no advertising networks, no third-party analytics
-              (such as Google Analytics or Plausible), and no behavioral
-              tracking pixels.
+              The site runs no advertising networks and no advertising or
+              behavioral tracking pixels, and nothing about your reading is
+              sold or shared with advertisers.
+            </li>
+            <li>
+              There is one analytics tool, PostHog, and it is off until you
+              say otherwise. If you decline, or simply never answer, no
+              analytics code is loaded and no request to PostHog is ever made.
+              The section below explains exactly what it does when you allow
+              it, and how to change your mind.
             </li>
             <li>
               We do not sell or rent personal information. Information sent
@@ -121,6 +131,73 @@ export default function PrivacyPage() {
             site data for civicaatlas.org. The site keeps working without
             them; it just forgets your theme choice and prior chat.
           </p>
+        </section>
+
+        <section id="analytics" className="editorial-section">
+          <SectionHeader
+            eyebrow="Analytics"
+            title="Page counts, only if you allow them"
+            dek="Off by default. Declining means the code is never loaded, not merely ignored."
+          />
+
+          <p>
+            Knowing which countries, methodology pages, and datasets people
+            actually open is what tells us where the next round of work
+            belongs. To measure that, Civica uses{" "}
+            <a href="https://posthog.com" target="_blank" rel="noreferrer">
+              PostHog
+            </a>
+            , a product-analytics service. The first time you visit, a small
+            bar asks whether that is alright. Until you answer &ldquo;Allow,&rdquo;
+            no analytics script is downloaded, no connection to PostHog is
+            opened, and no identifier is created. Declining leaves you in
+            exactly that state permanently.
+          </p>
+
+          <p>
+            Your answer is remembered in your own browser&rsquo;s local storage
+            under the key <code>civica.analytics-consent</code>&mdash;not a
+            cookie&mdash;so recording your refusal does not itself require the
+            thing you refused.
+          </p>
+
+          <p>When you do allow it, PostHog receives:</p>
+          <ul>
+            <li>
+              the address of the page you opened and the page that referred
+              you;
+            </li>
+            <li>
+              the ordinary connection details every web request exposes: your
+              IP address, your browser and operating system, and the rough
+              region PostHog derives from that IP;
+            </li>
+            <li>
+              a random identifier, stored in your browser, that lets two page
+              views in the same visit be counted as one visit rather than two
+              strangers.
+            </li>
+          </ul>
+
+          <p>
+            It does not receive your name, your email, or anything you type,
+            because Civica never sends it any of those and has no account to
+            attach them to. We deliberately switched off the parts of PostHog
+            that would collect more: there is <strong>no session recording</strong>{" "}
+            (your screen and keystrokes are never captured), no automatic
+            capture of clicks or on-page text, no heatmaps, no surveys, and no
+            advertising or cross-site profile. If your browser sends a &ldquo;Do
+            Not Track&rdquo; signal, capture stays off even if you allowed it.
+          </p>
+
+          <h3>Change your mind</h3>
+          <p>
+            This control takes effect immediately and applies to this browser.
+            Turning analytics off also discards the random identifier described
+            above.
+          </p>
+
+          <AnalyticsPreference />
         </section>
 
         <section id="messages" className="editorial-section">

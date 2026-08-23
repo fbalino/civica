@@ -2,7 +2,7 @@
 
 Contract: `civica-privacy-data-handling/v1`
 
-Effective: 2026-07-23
+Effective: 2026-08-23
 
 ## Canonical inventory
 
@@ -16,6 +16,31 @@ manual queue drift.
 The inventory records current behavior, including honest limitations. A
 provider-controlled retention period is not converted into a Civica promise,
 and the absence of an automatic deletion job is stated rather than hidden.
+
+## Consent-gated analytics
+
+Product analytics (PostHog) is the only third-party analytics on the site, and
+it is opt-in. `src/lib/analytics/consent.ts` owns the versioned decision
+contract and `src/components/analytics/AnalyticsConsent.tsx` is the only place
+permitted to load the provider bundle.
+
+- Nothing loads before consent. An undecided or declining reader downloads no
+  analytics script, opens no connection to PostHog, and is issued no
+  identifier. Declining is therefore the reader's existing state, not a
+  post-hoc suppression of collection that already happened.
+- The decision is stored in the reader's `localStorage`, not a cookie, so
+  recording a refusal does not require the mechanism being refused.
+- Anything unreadable, unversioned, or written under a superseded contract
+  version resolves to `pending`, which re-asks rather than assuming consent.
+- Autocapture, session recording, heatmaps, surveys, and feature-flag requests
+  are disabled; no person profile is created; the cookie is not shared across
+  subdomains; and a browser Do Not Track signal suppresses capture even after
+  consent. `ANALYTICS_CAPTURE_POLICY` states this posture once, and both the
+  validator and `src/lib/analytics/consent.test.ts` fail on drift.
+- Withdrawal is reversible from `/privacy#analytics`, which stops capture and
+  discards the device identifier immediately.
+- Absent `NEXT_PUBLIC_POSTHOG_KEY`, analytics and its banner do not exist for
+  that deployment.
 
 ## Minimization and deletion
 
@@ -57,6 +82,10 @@ applicable rights.
 - Neon documents its platform security controls, but application-row retention
   remains Civica's responsibility:
   <https://neon.com/docs/security/security-overview>
+- PostHog documents project-level data retention and deletion controls.
+  Civica's configured project retention still requires account-level
+  verification and is not asserted as a Civica promise:
+  <https://posthog.com/docs/privacy>
 - Mapbox publishes a product privacy policy and a current privacy/security FAQ;
   the optional 3D view remains an explicit remote-provider boundary:
   <https://www.mapbox.com/legal/privacy>
