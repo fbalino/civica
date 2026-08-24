@@ -1276,6 +1276,21 @@ storage. Absent `NEXT_PUBLIC_POSTHOG_KEY`, neither analytics nor its banner
 exists for that deployment. The provider bundle is loaded from PostHog's
 published browser build rather than an npm dependency.
 
+**Amendment (2026-08-23) — internal-traffic exclusion.** `?internal` on any
+Civica URL marks that browser permanently: analytics never loads, the banner
+never appears, and anything already running stops and discards its identifier.
+`?internal=off` reverses it, the parameter is stripped from the address bar so a
+shared link cannot re-apply it, and the current state plus a one-click undo live
+at `/privacy#analytics`. The mark is suppression-only by construction — it can
+stop analytics but never start it — so it is not a second consent path, and an
+existing consent decision is preserved rather than destroyed. Because
+`localStorage` is per-origin, non-production origins (localhost and
+`*.vercel.app` deployment URLs) are excluded by default; an explicit
+`?internal=off` overrides that per origin so the banner and full consent flow
+stay testable in development. An unrecognized parameter value changes nothing
+rather than being guessed at. The privacy validator fails closed if either the
+loader gate or the banner gate is removed.
+
 **Why:** A consent banner that fires the tracker before the reader answers, or
 that records the refusal in a cookie, contradicts the thing it claims to
 protect; gating the load itself is the only version of the promise that is

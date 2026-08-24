@@ -1056,6 +1056,16 @@ because frozen release artifacts pin `package-lock.json` — a dependency would
 change published immutable research-package hashes. Tradeoff: bundle version is
 provider-controlled, not lockfile-pinned.
 
+**Internal traffic:** `?internal` on any URL marks that browser excluded
+forever (`?internal=off` reverses; state + undo at `/privacy#analytics`). It is
+suppression-only — it can never enable analytics — and preserves any existing
+consent decision. `localStorage` is per-origin, so localhost and `*.vercel.app`
+are excluded BY DEFAULT; `?internal=off` overrides per origin so the banner
+stays testable in dev. Do not use `URLSearchParams.delete` in new code under
+`scripts/` or `src/lib/`: the DAT-016 retention scanner flags every `.delete(`
+call as a possible evidence deletion, and the fix is to filter entries, not to
+loosen the guard.
+
 The old public claim that Civica runs no analytics is retired; `/privacy`,
 `/terms`, the data-handling inventory, and
 `scripts/validate-privacy-data-handling.ts` all moved together. Durable record:
