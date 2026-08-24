@@ -17,9 +17,11 @@ import { useAnalyticsConsent } from "@/components/analytics/AnalyticsConsent";
  * and the shared `<Button>` primitive; this component sets no local styles.
  */
 export function CookieConsentBanner() {
-  const { state, configured, decide } = useAnalyticsConsent();
+  const { state, configured, internal, decide } = useAnalyticsConsent();
 
-  if (!configured || state !== "pending") return null;
+  // Internal traffic is never asked: there is nothing to consent to,
+  // because analytics cannot load on this browser at all.
+  if (!configured || internal || state !== "pending") return null;
 
   return (
     <div

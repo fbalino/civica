@@ -61,6 +61,22 @@ for (const fragment of [
     errors.push(`analytics provider: missing consent gate ${fragment}`);
 }
 
+// Internal-traffic exclusion must be suppression-only: it may stop analytics,
+// never start it, and it must gate the loader and the banner alike.
+const internalTraffic = read("src/lib/analytics/internal-traffic.ts");
+for (const fragment of [
+  "INTERNAL_TRAFFIC_STORAGE_KEY",
+  "export function resolveInternalTraffic",
+]) {
+  if (!internalTraffic.includes(fragment))
+    errors.push(`internal-traffic: missing ${fragment}`);
+}
+if (!analyticsProvider.includes("!internal && state === \"granted\""))
+  errors.push("analytics provider: internal traffic does not gate the loader");
+const consentBanner = read("src/components/analytics/CookieConsentBanner.tsx");
+if (!consentBanner.includes("internal || state !== \"pending\""))
+  errors.push("consent banner: internal traffic does not suppress the prompt");
+
 const analyticsLoader = read("src/lib/analytics/posthog.ts");
 for (const fragment of [
   "autocapture: false",

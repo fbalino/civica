@@ -41,6 +41,17 @@ permitted to load the provider bundle.
   discards the device identifier immediately.
 - Absent `NEXT_PUBLIC_POSTHOG_KEY`, analytics and its banner do not exist for
   that deployment.
+- Operator traffic is excluded with `?internal` on any Civica URL (for example
+  `https://civicaatlas.org/?internal`), which marks that browser permanently:
+  analytics never loads, the banner never appears, and anything already running
+  is stopped and its identifier discarded. `?internal=off` reverses it, and the
+  current state is shown with an undo control at `/privacy#analytics`. The mark
+  is stored per origin in `localStorage`, so non-production origins — localhost
+  and `*.vercel.app` deployment URLs — are excluded by default; an explicit
+  `?internal=off` there restores the full consent flow for testing. The
+  mechanism can only suppress analytics, never enable it, so it is not a second
+  consent path; `src/lib/analytics/internal-traffic.test.ts` locks that
+  direction and the validator fails closed if either gate is removed.
 
 ## Minimization and deletion
 

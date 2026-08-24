@@ -25,6 +25,13 @@ import {
   disableAnalytics,
   loadAnalytics,
 } from "@/lib/analytics/posthog";
+import {
+  applyInternalTrafficParam,
+  readInternalTraffic,
+  readStoredInternalMark,
+  subscribeInternalTraffic,
+  writeInternalTraffic,
+} from "@/lib/analytics/internal-traffic";
 
 /**
  * Reader-facing analytics consent state.
@@ -39,16 +46,28 @@ interface AnalyticsConsentValue {
   state: AnalyticsConsentState;
   /** False when the deployment has no analytics configured at all. */
   configured: boolean;
+  /**
+   * True when this browser is excluded as internal traffic (`?internal`, or a
+   * non-production origin). Suppresses the loader and the banner outright.
+   */
+  internal: boolean;
+  /** True when the exclusion came from an explicit `?internal` mark. */
+  internalMarked: boolean;
   decide: (decision: AnalyticsConsentDecision) => void;
   /** Clear the stored decision so the reader is asked again. */
   reset: () => void;
+  /** Set or clear the internal-traffic exclusion for this browser. */
+  setInternal: (internal: boolean) => void;
 }
 
 const AnalyticsConsentContext = createContext<AnalyticsConsentValue>({
   state: "unknown",
   configured: false,
+  internal: false,
+  internalMarked: false,
   decide: () => {},
   reset: () => {},
+  setInternal: () => {},
 });
 
 export function useAnalyticsConsent(): AnalyticsConsentValue {
@@ -57,6 +76,13 @@ export function useAnalyticsConsent(): AnalyticsConsentValue {
 
 function getServerConsent(): AnalyticsConsentState {
   return "unknown";
+}
+
+// The server cannot see the reader's storage or hostname, so it must not
+// assume an exclusion in either direction; the client re-renders with the real
+// value immediately after hydration.
+function getServerInternal(): boolean {
+  return false;
 }
 
 /**
@@ -97,12 +123,35 @@ export function AnalyticsConsentProvider({ children }: { children: ReactNode }) 
     readConsent,
     getServerConsent,
   );
+  const internal = useSyncExternalStore(
+    subscribeInternalTraffic,
+    readInternalTraffic,
+    getServerInternal,
+  );
+  const internalMarked = useSyncExternalStore(
+    subscribeInternalTraffic,
+    () => readStoredInternalMark() === "on",
+    getServerInternal,
+  );
   const configured = analyticsConfigured();
-  const granted = configured && state === "granted";
+
+  // `?internal` is applied before the load effect below runs, so a first visit
+  // carrying the parameter never loads analytics even once.
+  useEffect(() => {
+    if (applyInternalTrafficParam() === "on") disableAnalytics();
+  }, []);
+
+  const granted = configured && !internal && state === "granted";
 
   useEffect(() => {
     if (granted) loadAnalytics();
   }, [granted]);
+
+  // Marking a browser internal mid-session stops anything already running and
+  // discards its identifier, rather than waiting for the next page load.
+  useEffect(() => {
+    if (internal) disableAnalytics();
+  }, [internal]);
 
   const decide = useCallback((decision: AnalyticsConsentDecision) => {
     writeConsent(decision);
@@ -114,9 +163,14 @@ export function AnalyticsConsentProvider({ children }: { children: ReactNode }) 
     disableAnalytics();
   }, []);
 
+  const setInternal = useCallback((next: boolean) => {
+    writeInternalTraffic(next ? "on" : "off");
+    if (next) disableAnalytics();
+  }, []);
+
   return (
     <AnalyticsConsentContext.Provider
-      value={{ state, configured, decide, reset }}
+      value={{ state, configured, internal, internalMarked, decide, reset, setInternal }}
     >
       {children}
       {granted ? <PageviewReporter /> : null}

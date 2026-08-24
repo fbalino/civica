@@ -91,11 +91,12 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     deletion:
       "Turn analytics off on the privacy page to stop capture and discard the device identifier, or clear browser site data. Provider-side deletion requests are routed through Civica to PostHog.",
     safeguards:
-      "No analytics script, request, or identifier exists until consent is granted; the decision is stored in the reader's own local storage rather than a cookie. Autocapture, session recording, heatmaps, surveys, and feature-flag requests are all disabled, no person profile is created, the cookie is not shared across subdomains, and a browser Do Not Track signal suppresses capture even after consent.",
+      "No analytics script, request, or identifier exists until consent is granted; the decision is stored in the reader's own local storage rather than a cookie. Autocapture, session recording, heatmaps, surveys, and feature-flag requests are all disabled, no person profile is created, the cookie is not shared across subdomains, and a browser Do Not Track signal suppresses capture even after consent. Operator and non-production traffic is excluded outright through the `?internal` mark, which can only suppress analytics and never enable it.",
     providers: ["PostHog"],
     sourcePaths: [
       "src/lib/analytics/consent.ts",
       "src/lib/analytics/posthog.ts",
+      "src/lib/analytics/internal-traffic.ts",
       "src/components/analytics/AnalyticsConsent.tsx",
       "src/components/analytics/CookieConsentBanner.tsx",
     ],

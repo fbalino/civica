@@ -12,9 +12,34 @@ import { useAnalyticsConsent } from "@/components/analytics/AnalyticsConsent";
  * there would be nothing to consent to.
  */
 export function AnalyticsPreference() {
-  const { state, configured, decide } = useAnalyticsConsent();
+  const { state, configured, internal, internalMarked, decide, setInternal } =
+    useAnalyticsConsent();
 
   if (!configured) return null;
+
+  // Internal traffic (an explicit `?internal` mark, or a development origin)
+  // outranks the consent decision: nothing can load, so showing Allow/Decline
+  // here would be a control that does nothing.
+  if (internal) {
+    return (
+      <div className="analytics-preference">
+        <p className="analytics-preference__state">
+          This browser is excluded from analytics as internal traffic. No
+          analytics code loads, and the consent banner does not appear.
+        </p>
+        <div className="analytics-preference__actions">
+          <Button variant="primary" size="sm" onClick={() => setInternal(false)}>
+            Stop excluding this browser
+          </Button>
+        </div>
+        <p className="analytics-preference__note">
+          {internalMarked
+            ? "This browser was marked with the ?internal link. The mark is stored per site address, so it applies here only."
+            : "This address is a development or preview origin, which is excluded automatically."}
+        </p>
+      </div>
+    );
+  }
 
   // `unknown` is the pre-hydration server state; render the neutral pending
   // copy rather than asserting a decision the server cannot know.
