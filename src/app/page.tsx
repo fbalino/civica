@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "Civica Atlas is a provenance-first comparative reference to how every country is governed, with country profiles covering institutions, constitutions, elections, and source-linked facts.",
   alternates: { canonical: "https://civicaatlas.org" },
   openGraph: withOg({
-    title: "Civica Atlas — How Every Country Is Governed",
+    title: "Civica Atlas — A world atlas of government.",
     description:
       "A provenance-first comparative reference to how every country is governed, with country profiles covering institutions, constitutions, elections, and source-linked facts.",
     url: "https://civicaatlas.org",
