@@ -11,6 +11,7 @@ import { civicaIndex, pulse } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
 import {
   PROJECT_DISCLOSURE,
+  PROJECT_DISCLOSURE_ARTIFACT_PATH,
   PROJECT_DISCLOSURE_PUBLIC_SECTIONS,
 } from "@/lib/research/project-disclosure";
 
@@ -557,11 +558,14 @@ export default async function AboutPage() {
           Effective {PROJECT_DISCLOSURE.effectiveOn}. The next scheduled review
           is {PROJECT_DISCLOSURE.nextScheduledReviewOn}; the record is also
           reviewed after any material change. The{" "}
-          <Link href="https://github.com/fbalino/civica/blob/main/data/research/project-disclosure-v1.json">
+          <Link
+            href={`https://github.com/fbalino/civica/blob/main/${PROJECT_DISCLOSURE_ARTIFACT_PATH}`}
+          >
             machine-readable disclosure
           </Link>{" "}
-          is reused unchanged in Atlas and Index reviewer packets and is
-          mandatory when the Pulse reviewer packet is assembled. Please{" "}
+          is versioned and preserved in its linked reviewer packets. The
+          current record is bound to the Index packet and is mandatory when the
+          Pulse reviewer packet is assembled. Please{" "}
           <Link href={PROJECT_DISCLOSURE.correctionUrl}>report a correction</Link>{" "}
           if this disclosure is incomplete or outdated.
         </p>

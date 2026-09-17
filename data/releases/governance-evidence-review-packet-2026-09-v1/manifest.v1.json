@@ -427,9 +427,9 @@
     {
       "artifactId": "project-disclosure",
       "role": "governance",
-      "bytes": 4549,
-      "sha256": "408f653b60310c7ee4b05ff14c471313da4fe2d5c6f78068cf9ed99f48f40640",
-      "path": "data/research/project-disclosure-v1.json"
+      "bytes": 4805,
+      "sha256": "4dd78c5e392aa78d450cb58374c22f40ccda9a2be195cd05e5b9affbc4f1ccc3",
+      "path": "data/research/project-disclosure-v2.json"
     },
     {
       "artifactId": "package-lock",
@@ -511,8 +511,8 @@
     {
       "artifactId": "review-packet-builder",
       "role": "selected-product-code",
-      "bytes": 10820,
-      "sha256": "07f1c3cc3d616da8d140d7c4fbddbae71b9a5f3dd316fccd4f602a5b93baa167",
+      "bytes": 10893,
+      "sha256": "c1c18bacd0efea6ee175cfb7ae6899a2a0ef072797130b7dda6f1945c07f58c6",
       "path": "src/lib/ci/governance-evidence-review-package.ts"
     },
     {
@@ -551,5 +551,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "48de2a96fd563ab4d433e4a81341fcf1d13f6c3b5407015e4dca3726b523790a"
+  "bundleSemanticSha256": "d3d719d065227cfb83014a7ece740b4e2d3fbe51405d510b6a67e5d7741feb16"
 }

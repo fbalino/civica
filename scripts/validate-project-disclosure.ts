@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import {
   PROJECT_DISCLOSURE,
   PROJECT_DISCLOSURE_ARTIFACT_PATH,
+  PROJECT_DISCLOSURE_V1_ARTIFACT_PATH,
   PROJECT_DISCLOSURE_PUBLIC_SECTIONS,
   projectDisclosureErrors,
 } from "../src/lib/research/project-disclosure";
@@ -30,9 +31,10 @@ const atlas = buildAtlasReviewPacket();
 assert.ok(
   atlas.artifacts.some(
     ({ id, path }) =>
-      id === "project_disclosure" && path === PROJECT_DISCLOSURE_ARTIFACT_PATH,
+      id === "project_disclosure" &&
+      path === PROJECT_DISCLOSURE_V1_ARTIFACT_PATH,
   ),
-  "Atlas reviewer packet does not bind the canonical disclosure",
+  "frozen Atlas reviewer packet does not preserve disclosure v1",
 );
 
 const index = buildGovernanceEvidenceReviewBundle();
@@ -54,5 +56,5 @@ assert.equal(
 );
 
 console.log(
-  "PASS — About, Atlas, Index, and the future Pulse packet contract reuse the owner-approved project disclosure unchanged.",
+  "PASS — About uses the current owner-approved disclosure, the frozen Atlas packet preserves v1, and the active Index and future Pulse contracts bind v2.",
 );

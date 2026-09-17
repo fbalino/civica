@@ -82,7 +82,7 @@ const expectations: Expectation[] = [
       'title="Contact the editors"',
       "Send a data correction, research question, press inquiry, or collaboration proposal. Fernando Baliño reviews submissions manually.",
       "Messages are reviewed manually. We&rsquo;ll get back to you as soon as",
-      "urgent data corrections, open an issue on GitHub.",
+      'urgent data corrections, use the dedicated{" "} <Link href="/report-data-issue">report form</Link>.',
     ],
   },
   {
@@ -99,6 +99,7 @@ const expectations: Expectation[] = [
       "No outside funder or sponsor exists.",
       "It has received no donated or discounted services",
       "Fernando has confirmed no relevant outside affiliations or interests.",
+      'correctionUrl: "/report-data-issue"',
     ],
   },
 ];
@@ -130,5 +131,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  "EXP-038 copy contract passed: approved edits are present, the confirmed disclosure supports the retained independence label, and held copy remains unapplied.",
+  "EXP-038 copy contract passed: approved edits are present, the confirmed disclosure supports the retained independence label, and corrections route to the dedicated Atlas report form.",
 );
