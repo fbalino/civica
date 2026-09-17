@@ -70,6 +70,14 @@ and P1 operational finding below is closed.
 
 ## Jobs, freshness, and error monitoring
 
+- PLT-031's operational repair is deployed at `e99cecd0`. Cabinet and three
+  legislative dry runs passed with unchanged domain fingerprints/freshness and
+  no paid summary generation; replay suppression and the deployed recovery
+  control path passed. Reconciliation's advisory warning remains visible
+  separately from successful execution. First ordinary post-repair scheduled
+  applications are still pending, assigned to the hourly local Codex monitor.
+  Exact evidence and exclusions are in `plan/evidence/PLT-031/`.
+
 - `civica-pipeline-observability/v1` closes 39 scheduled and 12 canonical
   manual production pipelines with bounded run identity, outcome, counts,
   source versions, cost, freshness, and alert states.

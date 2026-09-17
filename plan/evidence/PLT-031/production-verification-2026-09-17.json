@@ -1,0 +1,365 @@
+{
+  "schemaVersion": "civica-routine-recovery-verification/v1",
+  "checkedAt": "2026-09-17T21:56:28.243138+00:00",
+  "pullRequests": [
+    35,
+    36
+  ],
+  "deployment": {
+    "id": "dpl_H56r26mdRqRU1L8MbzhKP1RN4ooX",
+    "state": "READY",
+    "commit": "e99cecd0f66550634d3281f2ac8b7dd9b52a3856",
+    "url": "civica-mdtffposv-fbalinos-projects.vercel.app",
+    "canonicalOrigin": "https://civicaatlas.org",
+    "aliases": [
+      "civicaatlas.org",
+      "civica-kappa.vercel.app",
+      "www.civicaatlas.org",
+      "civica-fbalinos-projects.vercel.app",
+      "civica-git-main-fbalinos-projects.vercel.app"
+    ],
+    "observedAt": "2026-09-17T21:53:36.086Z"
+  },
+  "supersededFailedDeployment": {
+    "id": "dpl_8oBF5HoPogqoRZvUPWqHFwUon2S5",
+    "commit": "be62cfd7dc2cc28b04c8fffd89e3016fbded63fa",
+    "cause": "Two missing-configuration tests inherited the newly configured valid Atlas release identity. PR #36 isolates those negative fixtures; runtime configuration and required gates were retained."
+  },
+  "dryRuns": [
+    {
+      "job": "ca",
+      "startedAt": "2026-09-17T21:54:30.451Z",
+      "finishedAt": "2026-09-17T21:54:34.337Z",
+      "httpStatus": 200,
+      "summary": {
+        "dryRun": true,
+        "fetched": 100,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 0,
+        "wouldWrite": 100,
+        "summarised": 0,
+        "sourcesStamped": []
+      }
+    },
+    {
+      "job": "de",
+      "startedAt": "2026-09-17T21:54:27.428Z",
+      "finishedAt": "2026-09-17T21:54:29.938Z",
+      "httpStatus": 200,
+      "summary": {
+        "dryRun": true,
+        "fetched": 77,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 0,
+        "wouldWrite": 77,
+        "summarised": 0,
+        "sourcesStamped": []
+      }
+    },
+    {
+      "job": "fr",
+      "startedAt": "2026-09-17T21:54:28.045Z",
+      "finishedAt": "2026-09-17T21:54:34.346Z",
+      "httpStatus": 200,
+      "summary": {
+        "dryRun": true,
+        "fetched": 100,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 0,
+        "wouldWrite": 100,
+        "summarised": 0,
+        "sourcesStamped": []
+      }
+    },
+    {
+      "job": "cabinet",
+      "startedAt": "2026-09-17T21:54:27.798Z",
+      "finishedAt": "2026-09-17T21:55:51.623Z",
+      "httpStatus": 200,
+      "summary": {
+        "dryRun": true,
+        "shardIndex": 16,
+        "countriesInShard": 9,
+        "countriesCrawled": 9,
+        "countriesApplied": 7,
+        "countriesFetchFailed": 2,
+        "countriesUnmatched": 0,
+        "freshnessStamped": false,
+        "projectedRows": 696,
+        "observedDomainWrites": 0
+      }
+    }
+  ],
+  "duplicateDelivery": {
+    "job": "bills.ca",
+    "httpStatus": 200,
+    "outcome": "duplicate_suppressed",
+    "sameIdempotencyKey": true
+  },
+  "dryRunInvariants": {
+    "beforeAt": "2026-09-17T21:53:24.256Z",
+    "afterAt": "2026-09-17T21:56:07.880Z",
+    "sourceFreshnessUnchanged": true,
+    "billRowsUnchanged": true,
+    "cabinetDomainRowsUnchanged": true,
+    "billFingerprints": [
+      {
+        "source_id": "bundestag_dip",
+        "count": 152,
+        "fingerprint": "e95d5e4c4c702715223d1de4938a5eb3"
+      },
+      {
+        "source_id": "data_assemblee_fr",
+        "count": 260,
+        "fingerprint": "61e9c1a49835e657acc4ea348602e6c7"
+      },
+      {
+        "source_id": "legisinfo_ca",
+        "count": 137,
+        "fingerprint": "418995aa3a27235a958ac68b357e8e72"
+      },
+      {
+        "source_id": "senat_fr",
+        "count": 134,
+        "fingerprint": "7d52603ae3b80c1129405f5845513d1c"
+      }
+    ],
+    "cabinetFingerprints": [
+      {
+        "table": "government_bodies",
+        "count": 483,
+        "fingerprint": "c5e3d15d42c40bb2ab9189800022fb4b"
+      },
+      {
+        "table": "offices",
+        "count": 5326,
+        "fingerprint": "f006d09685131e81c99440fe0b5d5037"
+      },
+      {
+        "table": "persons",
+        "count": 5002,
+        "fingerprint": "eb6ea6ec1306d6d28d64c786287ba2ad"
+      },
+      {
+        "table": "terms",
+        "count": 5611,
+        "fingerprint": "26b27313dab291e4d797c70a7c15bc1c"
+      },
+      {
+        "table": "statements",
+        "count": 7251,
+        "fingerprint": "b1ee4de2b13b76fb9fdba56306462ef2"
+      },
+      {
+        "table": "atlas_entity_change_history",
+        "count": 2967,
+        "fingerprint": "096a9ce93ec7c2ac31ba7a632c51d3c9"
+      }
+    ],
+    "sourceTimestamps": [
+      {
+        "id": "bundestag_dip",
+        "last_sync_at": "2026-05-30T09:00:29.087Z"
+      },
+      {
+        "id": "cia_world_leaders",
+        "last_sync_at": "2026-07-29T05:01:52.668Z"
+      },
+      {
+        "id": "data_assemblee_fr",
+        "last_sync_at": "2026-07-11T09:30:36.495Z"
+      },
+      {
+        "id": "legisinfo_ca",
+        "last_sync_at": "2026-07-12T08:01:47.013Z"
+      },
+      {
+        "id": "senat_fr",
+        "last_sync_at": "2026-07-11T09:30:36.495Z"
+      }
+    ],
+    "boundary": "Domain fingerprints and source timestamps are unchanged. Operational cron execution records are expected to be written."
+  },
+  "executionRecordsAfterDryRuns": [
+    {
+      "job_id": "bills.ca",
+      "trigger_kind": "manual",
+      "request_mode": "dry_run",
+      "status": "succeeded",
+      "attempt_count": 1,
+      "schedule_slot": null,
+      "last_started_at": "2026-09-17T21:54:30.598Z",
+      "completed_at": "2026-09-17T21:54:34.301Z",
+      "response_status": 200,
+      "result_code": "handler_succeeded"
+    },
+    {
+      "job_id": "bills.ca",
+      "trigger_kind": "scheduled",
+      "request_mode": "apply",
+      "status": "failed",
+      "attempt_count": 1,
+      "schedule_slot": "2026-09-17T04:00:00.000Z",
+      "last_started_at": "2026-09-17T04:00:36.568Z",
+      "completed_at": "2026-09-17T04:00:37.715Z",
+      "response_status": 500,
+      "result_code": "handler_failed"
+    },
+    {
+      "job_id": "bills.de",
+      "trigger_kind": "manual",
+      "request_mode": "dry_run",
+      "status": "succeeded",
+      "attempt_count": 1,
+      "schedule_slot": null,
+      "last_started_at": "2026-09-17T21:54:27.973Z",
+      "completed_at": "2026-09-17T21:54:29.912Z",
+      "response_status": 200,
+      "result_code": "handler_succeeded"
+    },
+    {
+      "job_id": "bills.de",
+      "trigger_kind": "scheduled",
+      "request_mode": "apply",
+      "status": "failed",
+      "attempt_count": 1,
+      "schedule_slot": "2026-09-17T05:00:00.000Z",
+      "last_started_at": "2026-09-17T05:00:10.544Z",
+      "completed_at": "2026-09-17T05:00:10.907Z",
+      "response_status": 500,
+      "result_code": "handler_failed"
+    },
+    {
+      "job_id": "bills.fr",
+      "trigger_kind": "manual",
+      "request_mode": "dry_run",
+      "status": "succeeded",
+      "attempt_count": 1,
+      "schedule_slot": null,
+      "last_started_at": "2026-09-17T21:54:28.271Z",
+      "completed_at": "2026-09-17T21:54:34.310Z",
+      "response_status": 200,
+      "result_code": "handler_succeeded"
+    },
+    {
+      "job_id": "bills.fr",
+      "trigger_kind": "scheduled",
+      "request_mode": "apply",
+      "status": "failed",
+      "attempt_count": 1,
+      "schedule_slot": "2026-09-17T05:30:00.000Z",
+      "last_started_at": "2026-09-17T05:30:05.307Z",
+      "completed_at": "2026-09-17T05:30:11.616Z",
+      "response_status": 500,
+      "result_code": "handler_failed"
+    },
+    {
+      "job_id": "factbook.cia-cabinets",
+      "trigger_kind": "manual",
+      "request_mode": "dry_run",
+      "status": "succeeded",
+      "attempt_count": 1,
+      "schedule_slot": null,
+      "last_started_at": "2026-09-17T21:54:28.227Z",
+      "completed_at": "2026-09-17T21:55:51.583Z",
+      "response_status": 200,
+      "result_code": "completed"
+    },
+    {
+      "job_id": "factbook.cia-cabinets",
+      "trigger_kind": "scheduled",
+      "request_mode": "apply",
+      "status": "failed",
+      "attempt_count": 1,
+      "schedule_slot": "2026-09-17T01:00:00.000Z",
+      "last_started_at": "2026-09-17T01:00:21.442Z",
+      "completed_at": "2026-09-17T01:01:44.651Z",
+      "response_status": 500,
+      "result_code": "handler_failed"
+    },
+    {
+      "job_id": "factbook.verify-reconciliation",
+      "trigger_kind": "scheduled",
+      "request_mode": "apply",
+      "status": "failed",
+      "attempt_count": 1,
+      "schedule_slot": "2026-09-17T03:45:00.000Z",
+      "last_started_at": "2026-09-17T03:45:51.025Z",
+      "completed_at": "2026-09-17T03:45:51.527Z",
+      "response_status": 503,
+      "result_code": "handler_failed"
+    },
+    {
+      "job_id": "operations.health-alerts",
+      "trigger_kind": "scheduled",
+      "request_mode": "apply",
+      "status": "succeeded",
+      "attempt_count": 1,
+      "schedule_slot": "2026-09-17T21:45:00.000Z",
+      "last_started_at": "2026-09-17T21:45:09.367Z",
+      "completed_at": "2026-09-17T21:45:09.533Z",
+      "response_status": 200,
+      "result_code": "handler_succeeded"
+    },
+    {
+      "job_id": "operations.pipeline-alerts",
+      "trigger_kind": "scheduled",
+      "request_mode": "apply",
+      "status": "failed",
+      "attempt_count": 1,
+      "schedule_slot": "2026-09-16T23:55:00.000Z",
+      "last_started_at": "2026-09-16T23:55:09.217Z",
+      "completed_at": "2026-09-16T23:55:09.285Z",
+      "response_status": 503,
+      "result_code": "handler_failed"
+    }
+  ],
+  "healthMonitor": {
+    "checkedAt": "2026-09-17T21:56:22.166Z",
+    "httpStatus": 200,
+    "ok": true,
+    "overall": "degraded",
+    "outcome": "health_alert_observed_33c205ed197e8c41",
+    "scheduledRecovery": {
+      "checked": 0,
+      "dispatched": 0,
+      "completed": 0,
+      "retrySucceeded": 0,
+      "retryFailed": 0,
+      "transportFailed": 0
+    }
+  },
+  "reconciliationMonitor": {
+    "checkedAt": "2026-09-17T21:56:22.605Z",
+    "httpStatus": 200,
+    "ok": true,
+    "healthOk": false,
+    "outcome": "completed_with_findings",
+    "dryRun": true,
+    "summary": {
+      "overallStatus": "warn",
+      "passCount": 13,
+      "warnCount": 1,
+      "failCount": 0
+    }
+  },
+  "ordinaryScheduledApply": {
+    "status": "pending_first_post_repair_observation",
+    "owner": "Hourly Codex reliability monitor while local host is available",
+    "nextSlotsUtc": {
+      "factbook.cia-cabinets": "2026-09-18T01:00:00Z",
+      "bills.ca": "2026-09-18T04:00:00Z",
+      "bills.de": "2026-09-18T05:00:00Z",
+      "bills.fr": "2026-09-18T05:30:00Z"
+    }
+  },
+  "limits": [
+    "Dry runs establish deployed source fetch, mapping, planning, and no-write behavior; they do not establish an ordinary scheduled data application.",
+    "No production fault was injected to manufacture retry evidence.",
+    "The pipeline monitor retains the original HTTP 503 open-findings contract, excludes itself from alert inputs, and records pipeline_alert transitions; this is not a new failed ingestion.",
+    "Optional paid classification, unsupported Vercel clustering, GDELT degradation, missing historical slots, and excluded long-running jobs remain separately disclosed."
+  ]
+}
