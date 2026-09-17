@@ -63,10 +63,28 @@ test("CIA lifecycle writes may explicitly update review status", () => {
   assert.match(query.sql, /status_reason = EXCLUDED.status_reason/i);
 });
 
-test("Atlas release identity fails closed", () => {
-  assert.throws(() => resolveAtlasReleaseId(""), /named Atlas release/);
-  assert.throws(() => resolveAtlasReleaseId("release with spaces"), /named Atlas release/);
-  assert.equal(resolveAtlasReleaseId("atlas-2026-07"), "atlas-2026-07");
+test("Atlas release identity is validated independently of the host environment", () => {
+  const noReleaseEnvironment = {};
+  const configuredEnvironment = {
+    CIVICA_ATLAS_RELEASE_ID: "atlas-routine-refresh-test",
+  };
+
+  assert.throws(
+    () => resolveAtlasReleaseId("", noReleaseEnvironment),
+    /named Atlas release/,
+  );
+  assert.throws(
+    () => resolveAtlasReleaseId("release with spaces", configuredEnvironment),
+    /named Atlas release/,
+  );
+  assert.equal(
+    resolveAtlasReleaseId(undefined, configuredEnvironment),
+    "atlas-routine-refresh-test",
+  );
+  assert.equal(
+    resolveAtlasReleaseId("atlas-2026-07", configuredEnvironment),
+    "atlas-2026-07",
+  );
 });
 
 test("reviewer demotion updates the fact and appends its event in one statement", () => {
