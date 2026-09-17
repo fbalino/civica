@@ -14,9 +14,10 @@ The map is deferred at Fernando's direction. The master checklist is 265/312 com
 
 ## Active reliability work
 
-- PLT-031 records repeated cabinet/legislative failures, absent scheduled retries, and the alert monitor self-loop. Repairs are being prepared and tested locally before push; no recovery is claimed until deployed behavior is checked.
-- Routine Dependabot version-update PRs are capped and cooled down; security updates retain their separate handling. Vercel pull-request comments were disabled at the project level, while commit-status checks, deployment events, and failure notifications remain enabled.
+- PLT-031 records repeated cabinet/legislative failures, absent scheduled retries, and the alert monitor self-loop. The cabinet, three legislative adapters, bounded scheduled recovery, and durable monitor transitions are integrated and undergoing the full build before push; no production recovery is claimed until deployed behavior is checked.
+- Routine Dependabot version-update PRs are capped and cooled down; security updates retain their separate handling. Vercel pull-request comments were disabled at the project level, while commit-status checks and deployment events remain enabled. Vercel Deployment Failures emails were subsequently disabled at the personal team setting; web alerts remain on, and billing/domain/security-related settings are unchanged.
 - Read-only mailbox review distinguished cleanup-related messages from unresolved import failures. Private mailbox evidence stays outside Git.
+- The owner chose Codex to investigate sync problems. An hourly local heartbeat now monitors this task and handles authorized routine repairs, with no email or public status-page messages. It requires the local host to be available; unchanged healthy or already-recovering states stay quiet.
 
 ## Reconciled decisions
 
