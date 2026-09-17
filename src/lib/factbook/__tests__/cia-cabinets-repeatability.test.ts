@@ -130,6 +130,33 @@ test("CIA cabinet dry-run is stable and performs zero writes", async () => {
   assert.equal(state.writes(), 0);
 });
 
+test("CIA cabinet dry-run rejects an invalid release before reads or fetches", async () => {
+  let databaseReads = 0;
+  let fetches = 0;
+  const db = {
+    select: () => {
+      databaseReads++;
+      throw new Error("database must not be read");
+    },
+  };
+
+  await assert.rejects(
+    syncCiaCabinets({
+      atlasReleaseId: "release with spaces",
+      db: db as never,
+      slugs: ["canada"],
+      dryRun: true,
+      fetchCountryPage: async () => {
+        fetches++;
+        return { ok: true, status: 200, html: "" };
+      },
+    }),
+    /named Atlas release/,
+  );
+  assert.equal(databaseReads, 0);
+  assert.equal(fetches, 0);
+});
+
 test("CIA cabinet apply fails closed before entity writes without a named release", async () => {
   const state = harness();
   await assert.rejects(

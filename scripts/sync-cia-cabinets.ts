@@ -9,6 +9,7 @@ import {
   buildCiaSlugList,
 } from "../src/lib/factbook/cia-cabinets-sync";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { resolveAtlasReleaseId } from "../src/lib/factbook/country-fact-history-writer";
 
 // Thin CLI wrapper around the shared CIA-cabinets-sync core in
 // `src/lib/factbook/cia-cabinets-sync.ts` (the single implementation the cron
@@ -103,6 +104,9 @@ function onlySlugsFromArgs(): string[] | undefined {
 }
 
 async function runDryRun() {
+  // A preview is an operational readiness check, so validate the same history
+  // identity an apply would use before making any source or database request.
+  resolveAtlasReleaseId(ATLAS_RELEASE_ID);
   console.log("=== CIA World Leaders Cabinet Import (DRY RUN) ===");
   console.log(`Sample: ${SAMPLE_SLUGS.length} countries`);
   console.log(
@@ -128,6 +132,7 @@ async function runDryRun() {
 }
 
 async function runApply() {
+  const atlasReleaseId = resolveAtlasReleaseId(ATLAS_RELEASE_ID);
   const base = SAMPLE ? SAMPLE_SLUGS : await buildCiaSlugList();
   const only = SAMPLE ? undefined : onlySlugsFromArgs();
   const scoped = only ? base.filter((s) => only.includes(s.toLowerCase())) : base;
@@ -147,7 +152,7 @@ async function runApply() {
   );
 
   const summary = await syncCiaCabinets({
-    atlasReleaseId: ATLAS_RELEASE_ID,
+    atlasReleaseId,
     slugs,
     crawlDelayMs: crawlDelayFromArgs(),
     onProgress: (line) => {
@@ -161,6 +166,7 @@ async function runApply() {
 }
 
 async function runBackfill() {
+  const atlasReleaseId = resolveAtlasReleaseId(ATLAS_RELEASE_ID);
   const limit = limitFromArgs();
   console.log(
     `=== CIA Cabinet QID Backfill${DRY_RUN ? " (DRY RUN)" : ""} — deferred, decoupled ===`,
@@ -171,7 +177,7 @@ async function runBackfill() {
   console.log("Resumable — re-run to continue where this batch left off.\n");
 
   const summary = await backfillCabinetQids({
-    atlasReleaseId: ATLAS_RELEASE_ID,
+    atlasReleaseId,
     limit,
     dryRun: DRY_RUN,
     onProgress: (line) => {

@@ -98,6 +98,17 @@ Dry runs never advance freshness. A monitoring or verification job may expose
 `healthOk: false` separately from its execution outcome so operators can tell
 "the check ran" from "the checked system is healthy."
 
+### Atlas history identity
+
+Scheduled Atlas writers that append public change history require a deliberate
+`CIVICA_ATLAS_RELEASE_ID`. The CIA cabinet route validates it before selecting
+a shard, reading the domain database, or crawling CIA pages; its dry run uses
+the same check. The current live routine-refresh revision is
+`atlas-routine-refresh-2026-09-17`. It names mutable routine updates under the
+existing public method and is not the frozen `atlas-2026-07-11` publication, a
+deployment identifier, or the one-off capital repair. A later revision must be
+named deliberately and documented before the environment value is changed.
+
 ## Durable records
 
 Authoritative migration `0034_superb_the_fallen` creates three internal
