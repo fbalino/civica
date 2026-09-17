@@ -180,7 +180,7 @@ export async function runBillsSync(
     .filter((i) => i >= 0);
 
   let summarisedCount = 0;
-  if (missingIdx.length > 0) {
+  if (!opts.dryRun && missingIdx.length > 0) {
     const generated = await (opts.generateSummaries ?? generateSummariesBatch)(
       missingIdx.map((i) => ({
         promptTitle: drafts[i].longTitle ?? drafts[i].title,
@@ -191,12 +191,11 @@ export async function runBillsSync(
         const summary = generated[genIdx];
         if (summary) {
           cached[origIdx] = summary;
-          if (!opts.dryRun)
-            await (opts.cacheSummary ?? writeCachedSummary)(
-              db,
-              cacheKeys[origIdx],
-              summary,
-            );
+          await (opts.cacheSummary ?? writeCachedSummary)(
+            db,
+            cacheKeys[origIdx],
+            summary,
+          );
           summarisedCount++;
         }
       }),

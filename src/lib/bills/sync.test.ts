@@ -31,6 +31,7 @@ const draft: BillIngestDraft = {
 
 test("the shared six-country bills runner keeps dry-run cache and table writes at zero", async () => {
   let cacheWrites = 0;
+  let summaryGenerations = 0;
   let tableDryRun = false;
   const options = {
     jurisdictionSlug: "united-states",
@@ -39,7 +40,10 @@ test("the shared six-country bills runner keeps dry-run cache and table writes a
     dryRun: true,
     fetchDrafts: async () => [draft],
     readSummaries: async () => [null],
-    generateSummaries: async () => ["Generated fixture summary."],
+    generateSummaries: async () => {
+      summaryGenerations++;
+      return ["Generated fixture summary."];
+    },
     cacheSummary: async () => { cacheWrites++; },
     writeRows: async (_db: Db, rows: unknown[], writeOptions?: { dryRun?: boolean }) => {
       tableDryRun = writeOptions?.dryRun === true;
@@ -50,9 +54,47 @@ test("the shared six-country bills runner keeps dry-run cache and table writes a
   const second = await runBillsSync({} as Db, options);
   assert.deepEqual(first, second);
   assert.equal(first.wouldWrite, 1);
-  assert.equal(first.summarised, 1);
+  assert.equal(first.summarised, 0);
   assert.equal(tableDryRun, true);
+  assert.equal(summaryGenerations, 0);
   assert.equal(cacheWrites, 0);
+});
+
+test("the shared bills runner generates and caches missing summaries on apply", async () => {
+  let summaryGenerations = 0;
+  let cacheWrites = 0;
+  let writtenSummary: string | null | undefined;
+  const result = await runBillsSync({} as Db, {
+    jurisdictionSlug: "united-states",
+    jurisdictionId: draft.jurisdictionId,
+    iso2: "US",
+    fetchDrafts: async () => [draft],
+    readSummaries: async () => [null],
+    generateSummaries: async () => {
+      summaryGenerations++;
+      return ["Generated fixture summary."];
+    },
+    cacheSummary: async () => {
+      cacheWrites++;
+    },
+    writeRows: async (_db: Db, rows: Array<{ summary?: string | null }>) => {
+      writtenSummary = rows[0]?.summary;
+      return {
+        inserted: 1,
+        updated: 0,
+        unchanged: 0,
+        wouldWrite: 1,
+        dryRun: false,
+        sourcesStamped: [draft.sourceId],
+      };
+    },
+  });
+
+  assert.equal(summaryGenerations, 1);
+  assert.equal(cacheWrites, 1);
+  assert.equal(writtenSummary, "Generated fixture summary.");
+  assert.equal(result.summarised, 1);
+  assert.deepEqual(result.sourcesStamped, [draft.sourceId]);
 });
 
 test("the shared bills runner fails loudly on an empty upstream before writes", async () => {
