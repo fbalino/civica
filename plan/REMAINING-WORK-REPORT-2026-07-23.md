@@ -2,7 +2,7 @@
 
 **Reviewed:** 2026-09-17
 
-**Checklist state:** 264 of 311 complete; 47 remain; 84.9%.
+**Checklist state:** 265 of 311 complete; 46 remain; 85.2%.
 
 ## Bottom line
 
@@ -13,12 +13,14 @@ participant work. Two require production, provider, or other external-system
 authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
 is currently running. Thirty are downstream tasks that cannot honestly start
-until an earlier gate produces real evidence. One active release-stabilization
-task must be evidenced before beta or release claims.
+until an earlier gate produces real evidence. The September release-stabilization
+task is complete, with dated production evidence; broader gates remain open.
 
 All currently safe, dependency-valid agent preparation is complete. There is
-no checklist item that an agent can finish now without one of those new inputs
-or authorities. This does not mean the agents are finished permanently:
+no checklist item that an agent can finish now within the cleanup-only scope
+without renewed roadmap direction or the named new inputs. EXP-038 T4 is
+engineering reconciliation and is parked for the owner's requested review,
+not misrepresented as another legal approval. This does not mean the agents are finished permanently:
 decisions, production journeys, source refreshes, human studies, and the
 prospective window will each re-enable implementation, analysis, remediation,
 publication, or reporting work.
@@ -146,19 +148,20 @@ Starting these early would either use the wrong design, analyze nonexistent
 data, contact reviewers before authorization, draft against an unfrozen
 release, or imply approvals that do not exist.
 
-### 6. Current release stabilization — 1
+### 6. Current release stabilization — 0
 
-ID: PLT-030.
+IDs: none.
 
-The runtime owners must first record dated reproduction, remediation or
-containment, rollback posture, and replacement build, health, and reader-surface
-evidence for the country-directory/data drift and critical dependency-audit
-finding. This is current stabilization work, not a declaration that either
-finding has a known cause or is fixed.
+PLT-030 is complete. The September 17 named production release supersedes
+August 24 and includes the bounded dependency, canonical-capital, and sharing
+card repairs. The exact backup, repair, replacement build, health, reader, and
+sharing delivery proof is retained under `plan/evidence/PLT-030/`. Existing
+health warnings and broader G4 blockers remain explicit.
 
 ## Recommended order
 
-1. Stabilize the current release under PLT-030 before beta or release claims.
+1. Fernando reviews the cleaned-up current release before broader work resumes.
+   The map stays deferred; PLT-030 no longer needs action.
 2. Resolve the owner-review bundle: GOV-012, EXP-009, the remaining EXP-038
    reconciliation, EXP-025/QA-013, and PLT-029 facts.
 3. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
@@ -174,7 +177,7 @@ finding has a known cause or is fixed.
 
 ## Gate status
 
-G4 remains blocked with 22 unchecked P0 tasks and 44 unchecked P0/P1 tasks.
+G4 remains blocked with 21 unchecked P0 tasks and 43 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,

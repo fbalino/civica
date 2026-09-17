@@ -96,7 +96,7 @@ fresh runtime reset, but failed before tab creation with
 `Cannot redefine property: process`. The repository's real Playwright harness
 was therefore the documented fallback for this run.
 
-## External operation queued, not claimed
+## Historical external-operation boundary — July 14
 
 The live GitHub check found `main` unprotected, with no ruleset requiring
 `verify`, and no hosted run of this new job yet. That repository-setting change
@@ -105,3 +105,13 @@ owner/platform to push the branch, observe the first hosted pull-request and
 `main` runs, and require `verify` through branch protection or a ruleset.
 
 No hosted run or branch-protection change is claimed here.
+
+## Hosted refresh — September 17, 2026
+
+The canonical job passed on PRs [29](https://github.com/fbalino/civica/actions/runs/35265105969),
+[30](https://github.com/fbalino/civica/actions/runs/35266056646), and
+[27](https://github.com/fbalino/civica/actions/runs/35266075382), and on
+[main at 6964c1f0](https://github.com/fbalino/civica/actions/runs/35266026305).
+All configured checks were green before the corresponding merges. The GitHub API read still returned `Branch not protected`
+for main and an empty repository ruleset list. Enforcement remains a separate
+manual follow-up; the completed implementation is not reopened.

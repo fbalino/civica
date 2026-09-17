@@ -5,7 +5,24 @@ open because G4 is blocked.
 
 The canonical report is `data/OPERATIONS-READINESS.md`.
 
-## Current refresh — 2026-07-29
+## Current refresh — 2026-09-17
+
+PLT-030 closed after the named September production release, canonical-domain
+assignment, application/database/asset health, reader browser checks, and
+Twitterbot metadata/image verification. Evidence is retained under
+`plan/evidence/PLT-030/production-release-check-2026-09-17.json`; the canonical
+capital backup/restore and repeat-safe repair have a separate record there.
+Passing hosted PR and main CI evidence is under `plan/evidence/PLT-001/`.
+
+The checklist is 265/311 complete with 46 remaining, 21 open P0, and 43 open
+P0/P1 tasks; G4 and PLT-025 remain blocked, with zero evidence gaps, mirror
+errors, or waivers. QA-018 and EXP-015 are resolved; QA-019's residual external
+record/disposition remains separate from its completed technical rehearsal.
+Repository enforcement is still pending: main has no protection or ruleset.
+Existing freshness and optional-classification warnings, provider controls,
+and qualified reviews remain explicit. The map is deferred.
+
+## Historical refresh — 2026-07-29
 
 The dedicated release worktree at `b8351519` reran the fixed G4 matrix. All six
 commands passed: master-plan integrity, verification-matrix validation, the
@@ -21,7 +38,7 @@ historical Neon owner credential is rotated and freshly rejected on production
 main and the retained recovery branch; its invalid bytes remain registered by
 hash pending an owner decision on shared-history rewriting.
 
-The generated readiness state is correctly blocked at 256/310 tasks, with 54
+At that historical checkpoint, readiness was blocked at 256/310 tasks, with 54
 remaining, 23 open P0, 50 open P0/P1, zero evidence gaps, zero master-mirror
 errors, and zero waivers.
 
@@ -29,7 +46,8 @@ The current QA-018 technical run completed against a disposable Neon child
 and exact Vercel Preview candidate, with production explicitly excluded and
 untouched. The retained migration, release, cache, protected-route,
 idempotent dry-run, freshness, API, and responsive-browser checks passed.
-QA-018 remains unchecked only for Fernando's dated approval or rejection.
+That was the July 29 boundary. QA-018 is now complete; the owner confirmation
+and date correction are retained in its evidence directory.
 
 Production subsequently advanced through authoritative head `0051` with a
 retained recovery branch. ATL-026 and ATL-027 now have named production release,
@@ -53,5 +71,5 @@ At the initial report checkpoint, the following validators passed:
 - the nine-migration local deployment/recovery rehearsal contract.
 
 At that historical checkpoint, the generated report was blocked at 246/308
-tasks with 27 open P0 and 58 open P0/P1. The current figures above supersede
+tasks with 27 open P0 and 58 open P0/P1. The dated refreshes supersede
 those counts without rewriting the original evidence boundary.

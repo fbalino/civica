@@ -1,51 +1,24 @@
 # Current handoff — Civica
 
 **Updated:** 2026-09-17
-**Current objective:** stabilize the current release before beta, release, or
-readiness claims. The active checklist task is PLT-030.
+**Current objective:** repository cleanup and release stabilization are complete. Await Fernando's review before resuming broader work; the map is deferred.
 
-## Current priority
+## Current release work
 
-Two release-stability findings are open: a country-directory/data discrepancy
-reported against the current release, and a critical dependency-audit finding.
-Their root causes, remediations, and current deployment/CI status are not yet
-recorded in this repository. The runtime owners must attach dated evidence to
-`plan/evidence/PLT-030/`; do not treat historical production or local checks as
-proof that either finding is fixed.
+- Twenty-three obsolete remote branches were removed and eleven obsolete or deferred pull requests were closed. Deferred major toolchain upgrades were not merged; their links and exact heads remain in `plan/evidence/PLT-030/branch-cleanup-record-2026-09-17.json`.
+- The critical dependency repair is merged in PR #29. All configured checks and its Vercel preview passed; the replacement September production release is live. The July research bundles remain unchanged, with their historical reproduction environment preserved separately.
+- The canonical-capital repair was explicitly authorized and applied: 229 source-backed facts, 229 atomic history events, and 229 capital-cache values. A repeat proposes zero writes; all 253 directory rows match. Non-target data and source freshness are unchanged. A fresh isolated restore also survived the normal full cache refresh. Runtime/seed repair PR #30 is merged and deployed. See `plan/evidence/PLT-030/canonical-capital-repair-2026-09-17.json`.
+- The selected engraved-globe sharing card and approved tagline from PR #27 are live. Main `5203cb7b` reached Ready with both canonical domains; HTTP, health, reader, Twitterbot metadata, and image-byte checks passed. Exact proof is in `plan/evidence/PLT-030/production-release-check-2026-09-17.json`. PR #28 records this reconciliation; its own documentation-only merge follows the normal checks.
 
-Do not resume product-roadmap work while PLT-030 is open. The user's current
-map work is deferred, not cancelled; no new product task is created here.
+The map is deferred at Fernando's direction. The master checklist is 265/311 complete with 46 remaining; G4 is blocked by 21 P0 and 43 P0/P1 tasks. Existing freshness and optional-classification health warnings remain disclosed. Do not interpret this task as a beta, academic-release, or external-review approval.
 
-The owner-authorized branch cleanup is complete: 21 obsolete remote branches
-were deleted and obsolete pull requests 2, 3, and 4 were closed. The retained
-inventory is evidence of cleanup, not a claim that the remaining branches all
-need merging.
+## Reconciled decisions
 
-Dependabot pull requests 6, 7, 9, 10, 11, and 12 are deferred maintenance,
-not release blockers; they are now closed with links retained and their remote
-branches auto-deleted. Critical dependency pull requests 13 and 20 remain until
-their validated replacement is ready. The canonical-capital repair has separate
-owner authority for the canonical source and 229-row backfill, but no live write
-or recovery claim is recorded here.
+- EXP-015 is complete: the 2026-08-17 owner decision rejected the image-led megamenu; the grouped Explore dropdown is canonical in `DESIGN.md`.
+- EXP-038 T4 is engineering reconciliation against the already-shipped ATL-024 correction flow, not another owner decision.
+- Amnesty permission was already chosen on 2026-08-18. PUL-040 stays open for a genuinely qualifying, newly evidenced observation start; never backdate the 90-day clock. No outreach or paid classifier transport is authorized here.
+- G4 and PLT-025 remain blocked by the remaining checklist. Successful release checks do not close unrelated manual, provider, research, or external-review work.
 
-## Reconciled historical records
+## Sources of truth
 
-- **Explore:** Fernando rejected the image-led megamenu on 2026-08-17. The
-  grouped dropdown in `DESIGN.md` is canonical, and EXP-015 is complete.
-- **Atlas correction route:** ATL-024 has retained production evidence for its
-  active report and triage flow. EXP-038's old conditional T4 hold is now an
-  engineering evidence/copy reconciliation, not a fresh owner decision.
-- **Pulse:** the runtime method is historically recorded as `pulse-v2.16-beta`.
-  Fernando's 2026-08-18 Amnesty decision was to request permission rather than
-  retrieve or bypass restrictions; the connector skips the source. PUL-040 is
-  still open because the 90-day protocol start must be freshly evidenced and
-  never backdated. The old v2.15/v2.8 handoff language is historical only.
-
-## Boundaries
-
-- Do not claim a beta, production recovery, formal gate, external review, or
-  academic-release result until its named current evidence exists.
-- No paid classifier transport or Amnesty outreach is authorized by this
-  handoff.
-- Preserve frozen protocol and retained evidence artifacts; use a new
-  evidence record for any current verification.
+`plan/MASTER-CHECKLIST.md` and its area mirrors own current task status. `plan/MANUAL-CHECKS.md` identifies remaining manual work. `plan/PROGRESS.md`, Git, and task evidence retain historical shipped state; old handoff prose is not current production proof. Preserve the original checkout's untracked `plan/concept-mockups/` and unrelated local worktrees.

@@ -3,9 +3,9 @@
   "reviewedAt": "2026-09-17",
   "checklist": {
     "total": 311,
-    "completed": 264,
-    "remaining": 47,
-    "progressPercent": 84.9
+    "completed": 265,
+    "remaining": 46,
+    "progressPercent": 85.2
   },
   "agentExecutableNow": [],
   "categories": [
@@ -97,11 +97,9 @@
     {
       "id": "current-release-stabilization",
       "label": "Current release stabilization",
-      "count": 1,
-      "taskIds": [
-        "PLT-030"
-      ],
-      "nextStep": "Runtime owners must record dated reproduction, remediation or containment, rollback posture, and replacement build, health, and reader-surface evidence before any beta or release claim."
+      "count": 0,
+      "taskIds": [],
+      "nextStep": "The September 17 release stabilization is complete; retain its named production evidence and wait for owner review before broader roadmap work."
     }
   ]
 }

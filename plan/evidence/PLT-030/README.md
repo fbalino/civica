@@ -1,41 +1,55 @@
 # PLT-030 — current release stabilization
 
 **Opened:** 2026-09-17
+**Status:** complete — 2026-09-17; bounded release stabilization only.
 
-## Status
+The August 24 deployment stayed live because replacement builds were blocked by missing capital-cache values and the current dependency audit had critical findings.
 
-Open. This record separates current release stabilization from the historical
-G4 and production evidence retained elsewhere. No root cause, remediation,
-passing build, deployment recovery, or live verification is claimed here.
+## Capital data repair
 
-## Recorded findings
+The CIA seed retained government payloads and populated the capital cache, but omitted canonical capital facts. The nightly resolver correctly cleared caches with no canonical evidence, undoing the earlier cache-only repair. The authorized repair restores the retained evidence through the fact/history writer and refreshes only capital; the seed now emits canonical capital facts.
 
-1. The country-directory/data surface has a reported live discrepancy involving
-   missing capital values.
-2. The current CI/dependency audit has a reported critical finding.
+`canonical-capital-repair-2026-09-17.json` records the private backup identity, isolated restore, exact dry-run, timestamp-safe replay, normal-cache-refresh rehearsal, production apply, 229 history events, zero-write repeat, 253-row directory match, and unchanged non-target/source/schema fingerprints. Runtime PR: https://github.com/fbalino/civica/pull/30.
 
-## Completed repository hygiene
+## Dependency repair
 
-The owner-authorized 2026-09-17 cleanup deleted 21 obsolete remote branches
-and closed obsolete pull requests 2, 3, and 4. The exact scope, heads, and
-reasons are retained in `branch-cleanup-record-2026-09-17.json`. The record
-lists four remaining live branches as an inventory only; it does not assert that
-they are all active, mergeable, or required.
+PR #29 resolves the two critical findings with the supported framework and map-library fixes, preserves the frozen July research bundles, and retains their exact historical lockfile separately. The complete GitHub CI run and Vercel preview passed before merge. Eighteen lower-severity audit findings remain outside this bounded repair. This is not a clean bill of health for the entire dependency tree.
 
-Dependabot pull requests 6, 7, 9, 10, 11, and 12 are deferred maintenance,
-not release blockers; they are now closed with links retained and their remote
-branches auto-deleted. Critical dependency pull requests 13 and 20 are superseded
-only when their validated replacement is ready.
+## Repository hygiene
 
-The canonical-source capital repair and its 229-row backfill have separate
-owner authority, but no live write is claimed in this record. PLT-030 remains
-open pending implementation and deployment evidence.
+The owner-authorized cleanup removed 23 obsolete remote branches and closed PRs 2, 3, 4, 6, 7, 9, 10, 11, 12, 13, and 20. Exact heads, reasons, and retained links are in `branch-cleanup-record-2026-09-17.json`. Optional major upgrades were deferred; PRs 13 and 20 were superseded by #29. The inventory, dependency, capital, and sharing-card branches were removed after their merges. The only remaining release branch at this evidence capture is the checklist PR #28 itself; remove it on merge.
 
-The implementation owners must add a dated, bounded record for each finding:
-the named deployment or CI run, reproduction, affected scope, root cause,
-remediation or containment, rollback posture, and replacement build/health and
-affected reader-surface checks. Do not add secrets, raw production data, or
-unredacted provider output.
+## Release evidence and recovery
 
-PLT-030 stays open until the checklist `Done when` is met. Refresh PLT-025 only
-after this evidence distinguishes current outcomes from historical checks.
+- The blocked September replacement at `dpl_4mw14pc4sTMcbjbPauP8MmKDB3ec`
+  (main `583e4edf`) retained the country-directory mismatch; the dependency
+  gate also failed in [CI run 35256874358](https://github.com/fbalino/civica/actions/runs/35256874358).
+  No gate was weakened to release the replacement.
+- PRs #26, #29, #30, and #27 are merged. Their scoped repairs reached production
+  as `dpl_77DvkLZewq1hzgf2kH45e1jUPnL7`, main
+  `5203cb7ba6d7da723a7f38b47cefeeb8c86568b4`. Both canonical domains are
+  attached. `production-release-check-2026-09-17.json` retains the exact check
+  time, deployment identity, HTTP/health results, metadata, image hash, and
+  browser observations. This September release supersedes August 24.
+- The home, Uruguay, and About reader routes returned 200. Application,
+  database, and critical assets were operational. Health remains degraded
+  for existing scheduled-data freshness and optional classification limits;
+  these are disclosed, not silently closed. The bounded browser check found
+  no console errors and opened a working source disclosure.
+- Twitterbot requests received the approved card metadata and exact 1200×630
+  PNG with the selected tagline. An actual X composer preview was not observed;
+  this proves the site's delivery, not X's cache state.
+- The capital repair retained a private fresh backup and an isolated restore.
+  Recovery is restore or a separately reviewed forward compensation; no
+  ad-hoc reverse mutation. The exact repair is repeat-safe and the canonical
+  facts survive the ordinary nightly refresh in the isolated rehearsal.
+  Application containment can retain the last known Ready deployment while
+  a tested forward fix builds; do not roll back dependency fixes casually.
+
+## Completion boundary
+
+PLT-030 is complete. PLT-025 is refreshed with this dated proof and G4 remains
+blocked. The map remains deferred. No source-refresh completion, research
+validation, external review, beta approval, or broader roadmap approval is
+implied. The remaining lower-severity dependency findings and provider/manual
+follow-ups stay visible in `data/OPERATIONS-READINESS.md`.
