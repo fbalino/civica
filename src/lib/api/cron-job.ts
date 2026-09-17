@@ -12,6 +12,11 @@ import {
   type CronExecutionStore,
   postgresCronExecutionStore,
 } from "./cron-execution-store";
+import {
+  CRON_RECOVERY_EXECUTION_HEADER,
+  type CronRecoveryStore,
+  postgresCronRecoveryStore,
+} from "./cron-recovery";
 import { CRON_JOB_LEASE_MS, getCronJobDefinition } from "./cron-job-registry";
 import { latestCronScheduleSlot } from "./cron-schedule";
 import {
@@ -34,6 +39,7 @@ import {
 
 const IDEMPOTENCY_HEADER = "idempotency-key";
 const INTERNAL_EXECUTION_KEY_HEADER = "x-civica-cron-execution-key";
+const INTERNAL_SCHEDULE_SLOT_HEADER = "x-civica-cron-schedule-slot";
 
 export type CronRouteHandler = (
   request: Request,
@@ -42,6 +48,7 @@ export type CronRouteHandler = (
 interface CronJobDependencies {
   now?: () => Date;
   store?: CronExecutionStore;
+  recoveryStore?: CronRecoveryStore;
   pipelineStore?: PipelineRunStore;
   errorMonitoringStore?: ErrorMonitoringStore;
 }
@@ -226,12 +233,32 @@ export function cronExecutionKeyFromRequest(request: Request): string {
   return executionKey;
 }
 
-function withInternalExecutionKey(
+/**
+ * Read the immutable scheduled input time chosen by the authenticated cron
+ * boundary. Recovered attempts receive the retained original slot, so handlers
+ * with calendar-derived inputs do not silently change work across midnight.
+ */
+export function cronScheduleSlotFromRequest(request: Request): Date {
+  const value = request.headers.get(INTERNAL_SCHEDULE_SLOT_HEADER) ?? "";
+  const scheduleSlot = new Date(value);
+  if (!value || !Number.isFinite(scheduleSlot.getTime())) {
+    throw new Error("Cron handler is missing its scheduled input time");
+  }
+  return scheduleSlot;
+}
+
+function withInternalCronContext(
   request: Request,
   executionKey: string,
+  scheduleSlot: Date | null,
 ): Request {
   const headers = new Headers(request.headers);
   headers.set(INTERNAL_EXECUTION_KEY_HEADER, executionKey);
+  if (scheduleSlot) {
+    headers.set(INTERNAL_SCHEDULE_SLOT_HEADER, scheduleSlot.toISOString());
+  } else {
+    headers.delete(INTERNAL_SCHEDULE_SLOT_HEADER);
+  }
   return new Request(request, { headers });
 }
 
@@ -240,6 +267,7 @@ function readIdempotencyScope(request: Request):
       ok: true;
       triggerKind: "scheduled" | "manual";
       scopeKey: string | null;
+      recoveryExecutionKey: string | null;
     }
   | { ok: false; response: NextResponse } {
   const method = request.method.toUpperCase();
@@ -255,6 +283,30 @@ function readIdempotencyScope(request: Request):
   }
 
   const header = request.headers.get(IDEMPOTENCY_HEADER);
+  const recoveryExecutionKey = request.headers.get(
+    CRON_RECOVERY_EXECUTION_HEADER,
+  );
+  if (
+    recoveryExecutionKey &&
+    !/^[a-f0-9]{64}$/.test(recoveryExecutionKey)
+  ) {
+    return {
+      ok: false,
+      response: safeJsonResponse(
+        { ok: false, outcome: "invalid_recovery_execution" },
+        400,
+      ),
+    };
+  }
+  if (recoveryExecutionKey && header) {
+    return {
+      ok: false,
+      response: safeJsonResponse(
+        { ok: false, outcome: "conflicting_delivery_identity" },
+        400,
+      ),
+    };
+  }
   const hasQuery = new URL(request.url).searchParams.size > 0;
   const requiresKey = method === "POST" || hasQuery;
 
@@ -284,7 +336,23 @@ function readIdempotencyScope(request: Request):
     ok: true,
     triggerKind: header ? "manual" : "scheduled",
     scopeKey: header ? sha256(["civica-cron-scope/v1", header]) : null,
+    recoveryExecutionKey,
   };
+}
+
+function boundedCronResultCode(payload: unknown, fallback: string): string {
+  const outcome =
+    payload && typeof payload === "object" && !Array.isArray(payload)
+      ? String((payload as Record<string, unknown>).outcome ?? fallback)
+      : fallback;
+  const normalized = outcome
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 80);
+  return /^[a-z][a-z0-9_.-]{0,79}$/.test(normalized)
+    ? normalized
+    : "handler_failed";
 }
 
 /**
@@ -363,14 +431,41 @@ export function withCronJob(
         if (!scope.ok) return scope.response;
 
         const now = dependencies.now?.() ?? new Date();
+        let recoveryTarget = null;
+        if (scope.recoveryExecutionKey) {
+          try {
+            recoveryTarget = await (
+              dependencies.recoveryStore ?? postgresCronRecoveryStore
+            ).resolveDue(scope.recoveryExecutionKey, definition.id, now);
+          } catch {
+            await recordCronFailure(
+              jobId,
+              definition.route,
+              "cron.recovery_control_unavailable",
+              dependencies.errorMonitoringStore,
+            );
+            return safeJsonResponse(
+              { ok: false, jobId, outcome: "recovery_control_unavailable" },
+              503,
+            );
+          }
+          if (!recoveryTarget || recoveryTarget.route !== definition.route) {
+            return safeJsonResponse(
+              { ok: false, jobId, outcome: "recovery_not_due" },
+              409,
+            );
+          }
+        }
         const scheduleSlot =
           scope.triggerKind === "scheduled"
-            ? latestCronScheduleSlot(definition.schedule!, now)
+            ? recoveryTarget?.scheduleSlot ??
+              latestCronScheduleSlot(definition.schedule!, now)
             : null;
         const mode = requestMode(request);
         const requestSha256 = canonicalRequestSha256(request);
-        const executionKey =
-          scope.triggerKind === "scheduled"
+        const executionKey = recoveryTarget
+          ? recoveryTarget.executionKey
+          : scope.triggerKind === "scheduled"
             ? sha256([
                 "civica-cron-execution/v1",
                 "scheduled",
@@ -548,10 +643,14 @@ export function withCronJob(
             jobId,
             definition.route,
             activeHandler,
-            withInternalExecutionKey(request, executionKey),
+            withInternalCronContext(request, executionKey, scheduleSlot),
             dependencies.errorMonitoringStore,
           ),
         );
+        const operationalPayload = await operationalResponsePayload(
+          normalized.response,
+        );
+        let deliveryPayload = operationalPayload;
         let responseForDelivery = normalized.response;
         let terminalStatus: "succeeded" | "failed" = normalized.succeeded
           ? "succeeded"
@@ -571,7 +670,7 @@ export function withCronJob(
                 ...pipelineRun,
                 responseStatus: normalized.response.status,
                 succeeded: normalized.succeeded,
-                payload: await operationalResponsePayload(normalized.response),
+                payload: operationalPayload,
               },
               dependencies.pipelineStore,
             );
@@ -587,6 +686,9 @@ export function withCronJob(
               { ok: false, jobId, outcome: "pipeline_observability_unavailable" },
               503,
             );
+            deliveryPayload = await operationalResponsePayload(
+              responseForDelivery,
+            );
             terminalStatus = "failed";
           }
         }
@@ -600,9 +702,12 @@ export function withCronJob(
             leaseFence: claim.leaseFence,
             status: terminalStatus,
             responseStatus: responseForDelivery.status,
-            resultCode: terminalStatus === "succeeded"
-              ? "handler_succeeded"
-              : "handler_failed",
+            resultCode: boundedCronResultCode(
+              deliveryPayload,
+              terminalStatus === "succeeded"
+                ? "handler_succeeded"
+                : "handler_failed",
+            ),
           });
           if (!finished) {
             throw new Error(

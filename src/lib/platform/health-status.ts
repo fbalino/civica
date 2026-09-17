@@ -89,7 +89,10 @@ function isConfigured(value: string | undefined): boolean {
 function expectedPipelineSlots(now: Date): ReadonlyMap<string, Date> {
   return new Map(
     CRON_JOB_DEFINITIONS.filter(
-      (definition) => !definition.retired && definition.schedule,
+      (definition) =>
+        !definition.retired &&
+        definition.schedule &&
+        !definition.id.startsWith("operations."),
     ).map((definition) => [
       definition.id,
       latestCronScheduleSlot(definition.schedule!, now),
@@ -262,7 +265,16 @@ export async function checkHealthStatus(
     loadRows(now).then(
       (rows): HealthComponent =>
         freshnessComponent(
-          pipelineAlerts({ now, expectedSlots: slotsFor(now), rows }),
+          pipelineAlerts({
+            now,
+            expectedSlots: slotsFor(now),
+            rows,
+            ignoredPipelineIds: new Set(
+              CRON_JOB_DEFINITIONS.filter(({ id }) =>
+                id.startsWith("operations."),
+              ).map(({ id }) => id),
+            ),
+          }),
         ),
       (): HealthComponent => ({
         id: "scheduled_data_freshness",

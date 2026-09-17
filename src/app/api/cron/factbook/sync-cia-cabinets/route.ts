@@ -18,7 +18,10 @@
  * shards 0–2. Freshness re-stamps on any day a shard writes rows.
  */
 import { NextResponse } from "next/server";
-import { withCronJob } from "@/lib/api/cron-job";
+import {
+  cronScheduleSlotFromRequest,
+  withCronJob,
+} from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import {
   buildCiaSlugList,
@@ -100,7 +103,11 @@ export function createCiaCabinetHandler(
     // history identity is missing or malformed.
     const atlasReleaseId = resolveAtlasReleaseId(undefined, environment);
 
-    const shard = resolveCiaCabinetShard(request);
+    const hasExplicitShard = new URL(request.url).searchParams.has("shard");
+    const shard = resolveCiaCabinetShard(
+      request,
+      hasExplicitShard ? undefined : cronScheduleSlotFromRequest(request),
+    );
     if (!shard.ok) {
       return NextResponse.json(
         { ok: false, step: "factbook.cia-cabinets.sync", error: shard.error },

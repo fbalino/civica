@@ -167,3 +167,33 @@ test("a newer successful row clears a prior failed alert for the same pipeline",
     [],
   );
 });
+
+test("the pipeline monitor cannot create a recursive alert about itself", () => {
+  const monitorId = "operations.pipeline-alerts";
+  const alerts = pipelineAlerts({
+    now: new Date("2026-07-16T12:00:00.000Z"),
+    expectedSlots: new Map([
+      [monitorId, new Date("2026-07-16T08:00:00.000Z")],
+      ["factbook.wdi", new Date("2026-07-16T08:00:00.000Z")],
+    ]),
+    rows: [
+      {
+        pipelineId: monitorId,
+        triggerKind: "scheduled",
+        scheduleSlot: new Date("2026-07-16T08:00:00.000Z"),
+        status: "failed",
+        startedAt: new Date("2026-07-16T08:00:00.000Z"),
+        completedAt: new Date("2026-07-16T08:01:00.000Z"),
+        rowsRead: null,
+        rowsWritten: null,
+        rowsRejected: null,
+      },
+    ],
+    ignoredPipelineIds: new Set([monitorId]),
+  });
+
+  assert.deepEqual(
+    alerts.map(({ id, pipelineId }) => `${id}:${pipelineId}`),
+    ["missed:factbook.wdi"],
+  );
+});

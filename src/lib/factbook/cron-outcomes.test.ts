@@ -124,7 +124,7 @@ test("officeholder sync accepts only a complete run that produced rows", () => {
   );
 });
 
-test("reconciliation findings are unhealthy non-success outcomes", () => {
+test("reconciliation warnings complete with findings while true failures fail", () => {
   assert.deepEqual(
     reconciliationVerificationCronOutcome({ overallStatus: "pass" }),
     {
@@ -134,13 +134,24 @@ test("reconciliation findings are unhealthy non-success outcomes", () => {
       httpStatus: 200,
     },
   );
-  for (const overallStatus of ["warn", "fail"] as const) {
-    assert.deepEqual(reconciliationVerificationCronOutcome({ overallStatus }), {
+  assert.deepEqual(
+    reconciliationVerificationCronOutcome({ overallStatus: "warn" }),
+    {
+      ok: true,
+      outcome: "completed_with_findings",
+      healthOk: false,
+      httpStatus: 200,
+      reason: "verification_findings",
+    },
+  );
+  assert.deepEqual(
+    reconciliationVerificationCronOutcome({ overallStatus: "fail" }),
+    {
       ok: false,
       outcome: "completed_with_findings",
       healthOk: false,
       httpStatus: 503,
       reason: "verification_findings",
-    });
-  }
+    },
+  );
 });

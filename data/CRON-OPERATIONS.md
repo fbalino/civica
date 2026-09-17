@@ -152,6 +152,52 @@ and truncate operations are rejected.
 | `503 delivery_control_unavailable` | The ledger/lease could not be acquired. | Treat the job as not started; check database availability. |
 | `503 delivery_finalization_failed` | The handler returned, but durable completion was not confirmed. | Inspect the ledger before retrying; reuse the same key/slot. |
 
+## Automatic scheduled recovery
+
+The existing `operations.health-alerts` run also checks for bounded recovery
+work every 15 minutes. It re-delivers only an existing scheduled execution that
+is still within 48 hours, has attempts remaining, and is either an expired
+running attempt or a failed attempt with a closed transient outcome
+(`upstream_timeout`, `upstream_rate_limited`, `upstream_unavailable`,
+`upstream_network_error`, or `pipeline_observability_unavailable`). The first
+retry waits 15 minutes and the second waits 60 minutes; the shared three-attempt
+cap remains authoritative. Each health run dispatches at most four executions.
+
+Before acquiring a target, the destination route reads the retained row again
+and rejects a missing, repaired, capped, non-transient, or currently leased
+execution. It then uses the original execution key, schedule slot, job-wide
+lease, and fencing path. The boundary passes that retained slot to handlers as
+trusted internal context so calendar-derived work cannot change across
+midnight. Dispatch is limited to registered routes on the canonical Civica
+origin, uses the cron bearer only in an authorization header, and never follows
+redirects.
+
+Generic handler exceptions, invalid configuration, authentication or endpoint
+errors, schema/mapping failures, empty/anomalous results, monitoring jobs, and
+`pulse.v2.classify` are not retried automatically. `pulse.v2.cluster` is also
+excluded because its intentionally degraded Vercel path lacks the local ONNX
+runtime. The 800-second Wikidata and officeholder routes remain operator-run so
+they cannot consume the health monitor's own finalization window; all dispatched
+recoveries have a 650-second transport deadline. A missed slot has no execution
+row and remains a distinct alert requiring investigation; recovery never
+invents or backfills a missed run. Automatic retry also never advances source
+freshness unless the retried handler commits eligible rows through the normal
+freshness API.
+
+The pre-launch reconciliation verifier treats `warn` as an advisory completed
+check: it returns `200 completed_with_findings` with `healthOk: false`. A true
+`fail` remains a failing `503` execution. This does not change the strict live
+release-quality validator or any publication gate.
+
+The health and pipeline monitors also use existing cron execution outcomes as
+a content-free transition ledger. Health incidents open after two consecutive
+non-core observations (core application/database outages open immediately),
+repeat at most once per 24 hours while unchanged, and emit one recovery line.
+Pipeline alert sets open immediately, repeat after 72 hours while unchanged,
+and emit one recovery line. These transitions suppress duplicate Runtime Log
+lines without hiding current health payloads or changing pipeline-alert HTTP
+failure status.
+
 ## Investigation queries
 
 Use read-only queries and bound the job ID/time window. Do not edit these
@@ -211,6 +257,9 @@ Before adding or changing a cron job:
 - aggregate freshness until every required stage succeeds;
 - return non-`2xx` with `ok: false` for execution failures or partial work;
 - add source-shaped repeatability and outcome fixtures; and
+- classify transient failures with a closed safe outcome so recovery cannot
+  mistake a configuration, endpoint, schema, or data-quality defect for an
+  outage;
 - run `npm run validate:cron-safety`, `npm run validate:sync-freshness`, and
   `npm run validate:production-adapters`.
 

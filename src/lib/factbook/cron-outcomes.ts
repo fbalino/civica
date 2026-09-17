@@ -90,18 +90,31 @@ export function officeholderSyncCronOutcome(
 export function reconciliationVerificationCronOutcome(
   report: Pick<VerificationReport, "overallStatus">,
 ): FactbookCronOutcome {
-  return report.overallStatus === "pass"
-    ? {
-        ok: true,
-        outcome: "completed",
-        healthOk: true,
-        httpStatus: 200,
-      }
-    : {
-        ok: false,
-        outcome: "completed_with_findings",
-        healthOk: false,
-        httpStatus: 503,
-        reason: "verification_findings",
-      };
+  if (report.overallStatus === "pass") {
+    return {
+      ok: true,
+      outcome: "completed",
+      healthOk: true,
+      httpStatus: 200,
+    };
+  }
+  if (report.overallStatus === "warn") {
+    // The pre-launch verifier defines warnings as advisory findings. Preserve
+    // that unhealthy signal without turning a completed check into a failed
+    // execution; strict release-quality validation remains a separate gate.
+    return {
+      ok: true,
+      outcome: "completed_with_findings",
+      healthOk: false,
+      httpStatus: 200,
+      reason: "verification_findings",
+    };
+  }
+  return {
+    ok: false,
+    outcome: "completed_with_findings",
+    healthOk: false,
+    httpStatus: 503,
+    reason: "verification_findings",
+  };
 }
