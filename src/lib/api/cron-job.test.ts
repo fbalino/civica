@@ -9,7 +9,17 @@ import type {
   CronExecutionFinishInput,
   CronExecutionStore,
 } from "./cron-execution-store";
-import { cronExecutionKeyFromRequest, withCronJob } from "./cron-job";
+import {
+  cronExecutionKeyFromRequest,
+  cronScheduleSlotFromRequest,
+  withCronJob,
+} from "./cron-job";
+import { cronAlertTransition } from "./cron-alert-transition";
+import {
+  CRON_RECOVERY_EXECUTION_HEADER,
+  type CronRecoveryCandidate,
+  type CronRecoveryStore,
+} from "./cron-recovery";
 import { cacheControlFor } from "@/lib/platform/cache-consistency";
 import type { PipelineRunStore } from "@/lib/platform/pipeline-observability";
 
@@ -37,6 +47,7 @@ class MemoryCronExecutionStore implements CronExecutionStore {
   readonly leases = new Map<string, StoredLease>();
   acquireCalls = 0;
   finishCalls = 0;
+  lastFinish: CronExecutionFinishInput | null = null;
   failFinish = false;
 
   constructor(private readonly now: () => Date = () => new Date()) {}
@@ -135,6 +146,7 @@ class MemoryCronExecutionStore implements CronExecutionStore {
 
   async finish(input: CronExecutionFinishInput): Promise<boolean> {
     this.finishCalls++;
+    this.lastFinish = input;
     if (this.failFinish) throw new Error("seeded finish outage");
     const lease = this.leases.get(input.jobId);
     const active = lease?.active;
@@ -158,6 +170,23 @@ class MemoryCronExecutionStore implements CronExecutionStore {
     });
     this.leases.set(input.jobId, { fence: lease.fence, active: null });
     return true;
+  }
+}
+
+class MemoryCronRecoveryStore implements CronRecoveryStore {
+  resolveCalls = 0;
+
+  constructor(public target: CronRecoveryCandidate | null) {}
+
+  async listDue() {
+    return this.target ? [this.target] : [];
+  }
+
+  async resolveDue(executionKey: string, jobId: string) {
+    this.resolveCalls++;
+    return this.target?.executionKey === executionKey && this.target.jobId === jobId
+      ? this.target
+      : null;
   }
 }
 
@@ -549,6 +578,166 @@ test("a failed delivery retries with the same key up to success", async () => {
   );
   assert.equal(handlerCalls, 2);
   assert.equal([...store.executions.values()][0].attemptCount, 2);
+});
+
+test("scheduled recovery revalidates and resumes the exact failed execution", async () => {
+  const store = new MemoryCronExecutionStore(() => FIXED_NOW);
+  const recoveryStore = new MemoryCronRecoveryStore(null);
+  let handlerCalls = 0;
+  const guarded = withCronJob(
+    "pulse.v2.ingest",
+    () => {
+      handlerCalls++;
+      return handlerCalls === 1
+        ? Response.json(
+            { ok: false, outcome: "upstream_unavailable" },
+            { status: 503 },
+          )
+        : Response.json({ ok: true });
+    },
+    { store, recoveryStore, now: () => FIXED_NOW },
+  );
+
+  const first = await guarded(
+    request(undefined, { secret: "correct-cron-secret" }),
+  );
+  assert.equal(first.status, 503);
+  assert.equal(store.lastFinish?.resultCode, "upstream_unavailable");
+  const executionKey = [...store.executions.keys()][0];
+  recoveryStore.target = {
+    executionKey,
+    jobId: "pulse.v2.ingest",
+    route: "/api/cron/pulse/v2/ingest",
+    scheduleSlot: new Date("2026-07-14T08:00:00.000Z"),
+    attemptCount: 1,
+    dueAt: FIXED_NOW,
+    reason: "transient_failure",
+  };
+
+  const recovered = await guarded(
+    request(undefined, {
+      secret: "correct-cron-secret",
+      headers: { [CRON_RECOVERY_EXECUTION_HEADER]: executionKey },
+    }),
+  );
+  assert.equal(recovered.status, 200);
+  assert.equal(handlerCalls, 2);
+  assert.equal([...store.executions.values()][0].attemptCount, 2);
+  assert.equal(recoveryStore.resolveCalls, 1);
+});
+
+test("scheduled recovery retains calendar-derived inputs across midnight", async () => {
+  let now = new Date("2026-07-15T03:05:00.000Z");
+  const store = new MemoryCronExecutionStore(() => now);
+  const recoveryStore = new MemoryCronRecoveryStore(null);
+  const seenSlots: string[] = [];
+  const guarded = withCronJob(
+    "factbook.cia-cabinets",
+    (handlerRequest) => {
+      seenSlots.push(cronScheduleSlotFromRequest(handlerRequest).toISOString());
+      return seenSlots.length === 1
+        ? Response.json(
+            { ok: false, outcome: "upstream_unavailable" },
+            { status: 503 },
+          )
+        : Response.json({ ok: true });
+    },
+    { store, recoveryStore, now: () => now },
+  );
+
+  const first = await guarded(
+    request("/api/cron/factbook/sync-cia-cabinets", {
+      secret: "correct-cron-secret",
+    }),
+  );
+  assert.equal(first.status, 503);
+  const executionKey = [...store.executions.keys()][0];
+  recoveryStore.target = {
+    executionKey,
+    jobId: "factbook.cia-cabinets",
+    route: "/api/cron/factbook/sync-cia-cabinets",
+    scheduleSlot: new Date("2026-07-15T01:00:00.000Z"),
+    attemptCount: 1,
+    dueAt: new Date("2026-07-16T00:05:00.000Z"),
+    reason: "transient_failure",
+  };
+  now = new Date("2026-07-16T00:05:00.000Z");
+
+  const recovered = await guarded(
+    request("/api/cron/factbook/sync-cia-cabinets", {
+      secret: "correct-cron-secret",
+      headers: {
+        [CRON_RECOVERY_EXECUTION_HEADER]: executionKey,
+        "x-civica-cron-schedule-slot": "2099-01-01T00:00:00.000Z",
+      },
+    }),
+  );
+  assert.equal(recovered.status, 200);
+  assert.deepEqual(seenSlots, [
+    "2026-07-15T01:00:00.000Z",
+    "2026-07-15T01:00:00.000Z",
+  ]);
+});
+
+test("successful monitor outcomes persist for the next alert transition", async () => {
+  const store = new MemoryCronExecutionStore(() => FIXED_NOW);
+  const signature = "0123456789abcdef";
+  const guarded = withCronJob(
+    "operations.health-alerts",
+    () =>
+      Response.json({
+        ok: true,
+        outcome: `health_alert_observed_${signature}`,
+      }),
+    { store, now: () => FIXED_NOW },
+  );
+
+  const response = await guarded(
+    request("/api/cron/operations/health-alerts", {
+      secret: "correct-cron-secret",
+    }),
+  );
+  assert.equal(response.status, 200);
+  assert.equal(
+    store.lastFinish?.resultCode,
+    `health_alert_observed_${signature}`,
+  );
+  const next = cronAlertTransition({
+    namespace: "health",
+    now: new Date(FIXED_NOW.getTime() + 15 * 60_000),
+    currentSignature: signature,
+    requiredConsecutive: 2,
+    reminderCooldownMs: 24 * 60 * 60_000,
+    history: [
+      {
+        resultCode: store.lastFinish!.resultCode,
+        completedAt: FIXED_NOW,
+      },
+    ],
+  });
+  assert.equal(next.emission, "open");
+  assert.equal(next.consecutiveAdverseObservations, 2);
+});
+
+test("an arbitrary or no-longer-due recovery key is rejected before acquire", async () => {
+  const store = new MemoryCronExecutionStore(() => FIXED_NOW);
+  const recoveryStore = new MemoryCronRecoveryStore(null);
+  const guarded = withCronJob(
+    "pulse.v2.ingest",
+    () => Response.json({ ok: true }),
+    { store, recoveryStore, now: () => FIXED_NOW },
+  );
+
+  const response = await guarded(
+    request(undefined, {
+      secret: "correct-cron-secret",
+      headers: { [CRON_RECOVERY_EXECUTION_HEADER]: "f".repeat(64) },
+    }),
+  );
+  assert.equal(response.status, 409);
+  assert.equal((await response.json()).outcome, "recovery_not_due");
+  assert.equal(store.acquireCalls, 0);
+  assert.equal(recoveryStore.resolveCalls, 1);
 });
 
 test("the cron boundary retains a safe failed pipeline run before retrying", async () => {

@@ -22,8 +22,12 @@ at the end.
   the rest of the atlas.
 - **Owner:** Fernando (may reassign a specific adapter).
 - **Rollback/correction:** re-run the adapter once upstream recovers
-  (idempotent; reruns converge). If upstream changed schema, patch the adapter,
-  add a fixture, and rerun.
+  (idempotent; reruns converge). Closed transient failures and expired attempts
+  are automatically retried on the original execution after bounded backoff;
+  deterministic endpoint, configuration, authentication, schema, mapping,
+  empty, and anomalous outcomes remain manual repairs. A missed slot remains an
+  alert because no execution exists to retry. If upstream changed schema, patch
+  the adapter, add a fixture, and rerun.
 - **User communication:** if a source is stale beyond its cadence, the reader
   provenance dot already shows it; post to the status page only if a whole
   domain is affected.

@@ -201,7 +201,7 @@ export const ENV_DEGRADES: Array<{
   {
     name: "BUNDESTAG_API_KEY",
     secret: true,
-    note: "German legislative sync; falls back to anonymous.",
+    note: "Required by the German legislative sync; no embedded fallback.",
   },
   {
     name: "NEXT_PUBLIC_MAPBOX_TOKEN",

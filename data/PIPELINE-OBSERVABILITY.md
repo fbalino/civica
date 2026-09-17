@@ -19,7 +19,10 @@ to fail rather than claim an unobserved successful source run.
 The daily `operations.pipeline-alerts` Vercel Cron evaluates the most recent
 expected UTC slot after a two-hour grace period for a missed run, plus the most
 recent failed, empty, or rejection-rate-anomalous runs. Open alerts produce a content-free
-structured Vercel Cron log and a non-success job response. The accountable
+structured Vercel Cron log and a non-success job response. The cron ledger
+retains a content-free signature, emits immediately when the alert set opens or
+changes, suppresses unchanged log lines, reminds after 72 hours, and emits once
+on recovery. The accountable
 owner is Fernando Baliño. Within one business day, follow the **Upstream
 data-source breakage** runbook in `data/OPERATIONAL-RUNBOOKS.md`: contain the
 affected source, preserve the safe run record and unchanged freshness state,
@@ -31,6 +34,18 @@ delivery is best effort, failed deliveries are not retried by Vercel, and
 overlap/duplicate delivery is possible; that is why a retained run record and
 expected-slot alert are both required. The platform's cron log is the owned
 alert channel until PLT-018 adds broader exception-routing infrastructure.
+
+The existing 15-minute health operation also provides bounded application
+recovery for retained transient failures and expired attempts. It retries the
+same logical execution after backoff under the existing lease, fence, and
+three-attempt cap. It does not turn a missed slot into a run, retry deterministic
+failures, enable paid Pulse classification, or make a stale source look fresh.
+The pipeline-alert monitor excludes its own pipeline ID so an alert response
+cannot recursively become another pipeline-health alert.
+
+Vercel Runtime Logs remain the only configured owner alert channel. The
+repository does not claim a provider-side email/log-drain subscription exists;
+that delivery setting must be verified independently.
 
 ## Operator readout
 

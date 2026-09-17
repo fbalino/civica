@@ -32,9 +32,15 @@ import { governmentBodies } from "@/lib/db/schema";
 import type {
   BillFetchBatch,
   BillIngestDraft,
+  BillSourceFailureCode,
   BillSourceFetchOutcome,
 } from "../types";
-import { finalizeBillSourceMapping } from "../source-outcome";
+import {
+  failedBillSourceHttpOutcome,
+  failedBillSourceOutcome,
+  failedBillSourceRequestOutcome,
+  finalizeBillSourceMapping,
+} from "../source-outcome";
 import { statusToStage } from "../stage";
 
 const AN_SOURCE_ID = "data_assemblee_fr";
@@ -66,18 +72,13 @@ type ChamberFetchResult<T> = {
 
 function failedFetch<T>(
   sourceId: string,
-  error: unknown,
+  code: BillSourceFailureCode,
+  error: string,
   fetched = 0,
 ): ChamberFetchResult<T> {
   return {
     rows: [],
-    outcome: {
-      sourceId,
-      status: "failed",
-      fetched,
-      mapped: 0,
-      error: error instanceof Error ? error.message : String(error),
-    },
+    outcome: failedBillSourceOutcome(sourceId, code, error, fetched),
   };
 }
 
@@ -133,21 +134,44 @@ async function fetchAN(limit: number): Promise<ChamberFetchResult<AnDossier>> {
   let AdmZip: typeof import("adm-zip");
   try {
     AdmZip = (await import("adm-zip")).default;
-  } catch (err) {
-    return failedFetch(AN_SOURCE_ID, err);
+  } catch {
+    return failedFetch(
+      AN_SOURCE_ID,
+      "source_configuration_missing",
+      "ZIP parser is unavailable",
+    );
   }
+  let res: Response;
   try {
-    const res = await fetch(AN_BULK_URL, {
+    res = await fetch(AN_BULK_URL, {
       cache: "no-store",
       headers: {
         "User-Agent": "civica-bills-sync/1.0 (https://civicaatlas.org)",
       },
       signal: AbortSignal.timeout(120_000),
     });
-    if (!res.ok) {
-      return failedFetch(AN_SOURCE_ID, `HTTP ${res.status}`);
-    }
-    const buf = Buffer.from(await res.arrayBuffer());
+  } catch (error) {
+    return {
+      rows: [],
+      outcome: failedBillSourceRequestOutcome(AN_SOURCE_ID, error),
+    };
+  }
+  if (!res.ok) {
+    return {
+      rows: [],
+      outcome: failedBillSourceHttpOutcome(AN_SOURCE_ID, res.status),
+    };
+  }
+  let buf: Buffer;
+  try {
+    buf = Buffer.from(await res.arrayBuffer());
+  } catch (error) {
+    return {
+      rows: [],
+      outcome: failedBillSourceRequestOutcome(AN_SOURCE_ID, error),
+    };
+  }
+  try {
     const zip = new AdmZip(buf);
     const entries = zip
       .getEntries()
@@ -155,6 +179,7 @@ async function fetchAN(limit: number): Promise<ChamberFetchResult<AnDossier>> {
     if (entries.length === 0) {
       return failedFetch(
         AN_SOURCE_ID,
+        "source_schema_invalid",
         "bulk archive contained no JSON entries",
       );
     }
@@ -178,6 +203,9 @@ async function fetchAN(limit: number): Promise<ChamberFetchResult<AnDossier>> {
       return failedFetch(
         AN_SOURCE_ID,
         malformedEntries > 0
+          ? "source_payload_invalid"
+          : "source_schema_invalid",
+        malformedEntries > 0
           ? `all ${malformedEntries} JSON entries were malformed`
           : `${entries.length} JSON entries contained no recognized legislative dossiers`,
         entries.length,
@@ -190,8 +218,12 @@ async function fetchAN(limit: number): Promise<ChamberFetchResult<AnDossier>> {
       AN_SOURCE_ID,
       out.slice(0, limit).map((s) => s.dossier),
     );
-  } catch (err) {
-    return failedFetch(AN_SOURCE_ID, err);
+  } catch {
+    return failedFetch(
+      AN_SOURCE_ID,
+      "source_payload_invalid",
+      "publisher archive could not be parsed",
+    );
   }
 }
 
@@ -301,22 +333,37 @@ async function fetchSenat(
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) {
-      return failedFetch(SENAT_SOURCE_ID, `HTTP ${res.status}`);
+      return {
+        rows: [],
+        outcome: failedBillSourceHttpOutcome(SENAT_SOURCE_ID, res.status),
+      };
     }
     // Sénat CSV is served as latin-1; decode explicitly.
     const buf = Buffer.from(await res.arrayBuffer());
     const text = new TextDecoder("iso-8859-1").decode(buf);
     const lines = text.split(/\r?\n/);
     if (!lines[0]?.toLowerCase().includes("titre")) {
-      return failedFetch(SENAT_SOURCE_ID, "CSV header was not recognized");
+      return failedFetch(
+        SENAT_SOURCE_ID,
+        "source_schema_invalid",
+        "CSV header was not recognized",
+      );
     }
     const rows = parseSenatCsv(text);
     const structuredDataLines = lines.slice(1).filter((line) => line.trim());
     if (structuredDataLines.length > 0 && rows.length === 0) {
       return failedFetch(
         SENAT_SOURCE_ID,
+        "source_payload_invalid",
         `${structuredDataLines.length} non-empty CSV row(s) produced zero recognized records`,
         structuredDataLines.length,
+      );
+    }
+    if (rows.length === 0) {
+      return failedFetch(
+        SENAT_SOURCE_ID,
+        "source_empty_unexpected",
+        "Sénat dossier export returned no records",
       );
     }
     rows.sort((a, b) => {
@@ -325,8 +372,11 @@ async function fetchSenat(
       return db.localeCompare(da);
     });
     return successfulFetch(SENAT_SOURCE_ID, rows.slice(0, limit));
-  } catch (err) {
-    return failedFetch(SENAT_SOURCE_ID, err);
+  } catch (error) {
+    return {
+      rows: [],
+      outcome: failedBillSourceRequestOutcome(SENAT_SOURCE_ID, error),
+    };
   }
 }
 
@@ -339,6 +389,8 @@ function senatDraft(
   // across re-syncs — e.g. "ppl25-563.html" → "ppl25-563".
   const slug = r.url.match(/\/dossier-legislatif\/([^.]+)\./)?.[1];
   if (!slug || !r.titre) return null;
+  const url = senatPublicUrl(r.url);
+  if (!url) return null;
   const introduced = ddmmyyyyToIso(r.dateInitiale);
   const lastAction =
     ddmmyyyyToIso(r.datePromulgation) ??
@@ -361,13 +413,25 @@ function senatDraft(
     lastActionText: status,
     sponsorName: null,
     sponsorParty: null,
-    url: r.url,
+    url,
     textUrl: null,
     voteYes: null,
     voteNo: null,
     voteAbstain: null,
     raw: r,
   };
+}
+
+function senatPublicUrl(value: string): string | null {
+  try {
+    const url = new URL(value);
+    if (!["senat.fr", "www.senat.fr"].includes(url.hostname)) return null;
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    url.protocol = "https:";
+    return url.toString();
+  } catch {
+    return null;
+  }
 }
 
 /* ---------- public entrypoint ---------- */
@@ -415,6 +479,7 @@ export async function fetchFRBillsForSync(opts: {
     an.outcome,
     out.filter((draft) => draft.sourceId === AN_SOURCE_ID).length,
     {
+      requireCompleteMapping: true,
       zeroMappedError: `${an.rows.length} Assemblée dossier(s) produced zero mappable bill drafts`,
     },
   );
@@ -422,6 +487,7 @@ export async function fetchFRBillsForSync(opts: {
     senat.outcome,
     out.filter((draft) => draft.sourceId === SENAT_SOURCE_ID).length,
     {
+      requireCompleteMapping: true,
       zeroMappedError: `${senat.rows.length} Sénat record(s) produced zero mappable bill drafts`,
     },
   );

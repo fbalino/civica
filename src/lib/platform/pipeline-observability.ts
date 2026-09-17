@@ -422,17 +422,20 @@ export function pipelineAlerts(input: {
   expectedSlots: ReadonlyMap<string, Date>;
   rows: readonly PipelineAlertRow[];
   missedRunGraceMs?: number;
+  ignoredPipelineIds?: ReadonlySet<string>;
 }): PipelineAlert[] {
   const alerts: PipelineAlert[] = [];
   const grace = input.missedRunGraceMs ?? PIPELINE_MISSED_RUN_GRACE_MS;
   const latestRows = new Map<string, PipelineAlertRow>();
   for (const row of input.rows) {
+    if (input.ignoredPipelineIds?.has(row.pipelineId)) continue;
     const existing = latestRows.get(row.pipelineId);
     if (!existing || row.startedAt.getTime() > existing.startedAt.getTime()) {
       latestRows.set(row.pipelineId, row);
     }
   }
   for (const [pipelineId, expectedSlot] of input.expectedSlots) {
+    if (input.ignoredPipelineIds?.has(pipelineId)) continue;
     if (input.now.getTime() <= expectedSlot.getTime() + grace) continue;
     const observed = input.rows.some(
       (row) =>

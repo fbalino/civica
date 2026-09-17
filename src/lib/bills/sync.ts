@@ -23,8 +23,10 @@ import { upsertBills } from "./upsert";
 import type {
   BillFetchResult,
   BillIngest,
+  BillSourceFailureCode,
   BillSourceFetchOutcome,
 } from "./types";
+import { TRANSIENT_BILL_SOURCE_FAILURE_CODES } from "./source-outcome";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -34,9 +36,7 @@ export interface RunBillsSyncOptions {
   /** ISO2 code, e.g. "US" — used as the cache-key prefix. */
   iso2: string;
   /** Source adapter call — receives the resolved jurisdictionId. */
-  fetchDrafts: (opts: {
-    jurisdictionId: string;
-  }) => Promise<BillFetchResult>;
+  fetchDrafts: (opts: { jurisdictionId: string }) => Promise<BillFetchResult>;
   dryRun?: boolean;
   /** Deterministic fixture seams; production callers omit these. */
   jurisdictionId?: string;
@@ -63,13 +63,16 @@ export interface RunBillsSyncSummary {
 
 export class BillSourceAggregateError extends Error {
   readonly outcomes: BillSourceFetchOutcome[];
+  readonly outcome:
+    Extract<BillSourceFailureCode, `upstream_${string}`> | "source_sync_failed";
+  readonly status: 429 | 502 | 503 | 504;
 
   constructor(jurisdictionSlug: string, outcomes: BillSourceFetchOutcome[]) {
     const failures = outcomes.filter(
-      (outcome): outcome is Extract<
-        BillSourceFetchOutcome,
-        { status: "failed" }
-      > => outcome.status === "failed",
+      (
+        outcome,
+      ): outcome is Extract<BillSourceFetchOutcome, { status: "failed" }> =>
+        outcome.status === "failed",
     );
     super(
       `Bills upstream failed for ${jurisdictionSlug}: ${failures
@@ -78,6 +81,26 @@ export class BillSourceAggregateError extends Error {
     );
     this.name = "BillSourceAggregateError";
     this.outcomes = outcomes;
+    const codes = failures.map((failure) => failure.code);
+    const allTransient = codes.every((code) =>
+      TRANSIENT_BILL_SOURCE_FAILURE_CODES.has(code),
+    );
+    if (allTransient) {
+      this.outcome =
+        new Set(codes).size === 1
+          ? (codes[0] as Extract<BillSourceFailureCode, `upstream_${string}`>)
+          : "upstream_unavailable";
+    } else {
+      this.outcome = "source_sync_failed";
+    }
+    this.status =
+      this.outcome === "upstream_rate_limited"
+        ? 429
+        : this.outcome === "upstream_timeout"
+          ? 504
+          : this.outcome === "upstream_unavailable"
+            ? 503
+            : 502;
   }
 }
 
@@ -86,11 +109,13 @@ export async function runBillsSync(
   opts: RunBillsSyncOptions,
 ): Promise<RunBillsSyncSummary> {
   // Resolve jurisdiction UUID by slug.
-  const j = opts.jurisdictionId ? [{ id: opts.jurisdictionId }] : await db
-    .select({ id: jurisdictions.id })
-    .from(jurisdictions)
-    .where(eq(jurisdictions.slug, opts.jurisdictionSlug))
-    .limit(1);
+  const j = opts.jurisdictionId
+    ? [{ id: opts.jurisdictionId }]
+    : await db
+        .select({ id: jurisdictions.id })
+        .from(jurisdictions)
+        .where(eq(jurisdictions.slug, opts.jurisdictionSlug))
+        .limit(1);
   const jurisdictionId = j[0]?.id;
   if (!jurisdictionId) {
     throw new Error(
@@ -140,20 +165,22 @@ export async function runBillsSync(
     );
   }
 
-
   // Batch-summarise. Cache key uses iso2 + (longTitle || title) — same
   // shape the legacy live-fetch route uses, so cached entries carry
   // over.
   const cacheKeys = drafts.map((d) =>
     makeCacheKey(opts.iso2, d.longTitle ?? d.title),
   );
-  const cached = await (opts.readSummaries ?? readCachedSummaries)(db, cacheKeys);
+  const cached = await (opts.readSummaries ?? readCachedSummaries)(
+    db,
+    cacheKeys,
+  );
   const missingIdx = cached
     .map((s, i) => (s === null ? i : -1))
     .filter((i) => i >= 0);
 
   let summarisedCount = 0;
-  if (missingIdx.length > 0) {
+  if (!opts.dryRun && missingIdx.length > 0) {
     const generated = await (opts.generateSummaries ?? generateSummariesBatch)(
       missingIdx.map((i) => ({
         promptTitle: drafts[i].longTitle ?? drafts[i].title,
@@ -164,7 +191,11 @@ export async function runBillsSync(
         const summary = generated[genIdx];
         if (summary) {
           cached[origIdx] = summary;
-          if (!opts.dryRun) await (opts.cacheSummary ?? writeCachedSummary)(db, cacheKeys[origIdx], summary);
+          await (opts.cacheSummary ?? writeCachedSummary)(
+            db,
+            cacheKeys[origIdx],
+            summary,
+          );
           summarisedCount++;
         }
       }),
@@ -195,7 +226,9 @@ export async function runBillsSync(
     raw: d.raw,
   }));
 
-  const result = await (opts.writeRows ?? upsertBills)(db, rows, { dryRun: opts.dryRun });
+  const result = await (opts.writeRows ?? upsertBills)(db, rows, {
+    dryRun: opts.dryRun,
+  });
 
   return {
     jurisdictionId,

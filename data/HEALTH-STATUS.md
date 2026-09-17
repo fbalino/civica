@@ -37,9 +37,13 @@ and every value from the environment.
 ## Incident threshold and ownership
 
 Fernando Baliño is the accountable owner. The `operations.health-alerts` Cron
-writes one safe `[health-alert]` JSON line to Vercel Runtime Logs whenever a
-component is not operational. It intentionally succeeds after reporting an
-open condition, so the monitor does not create a second failed-pipeline alert.
+writes a safe `[health-alert]` JSON line to Vercel Runtime Logs when an incident
+opens, once per 24-hour reminder window while it remains unchanged, and once
+when it recovers. The cron execution ledger retains the content-free alert
+signature and transition, so the monitor itself evaluates consecutive
+observations and suppresses duplicate log lines. It intentionally succeeds
+after reporting an open condition, so the monitor does not create a second
+failed-pipeline alert.
 
 Use these fixed thresholds:
 
@@ -48,7 +52,8 @@ Use these fixed thresholds:
    data` affected.
 2. **Persistence-gated publication:** the same map asset, scheduled-data
    freshness, or Ask Civica condition appears in **two consecutive 15-minute
-   health-monitor observations**. Publish as **Investigating** and mark,
+   health-monitor observations**, evaluated automatically from retained cron
+   outcomes. Publish as **Investigating** and mark,
    respectively, `Atlas map`, `Atlas data`, or `Ask Civica` affected.
 3. **Observe only:** a single non-core observation or limited back-office
    automated classification. Investigate and retain the safe log, but do not
@@ -62,6 +67,10 @@ Resolved**. The current provider procedure was checked on 2026-07-16 against
 [Incident.io’s publishing guide](https://docs.incident.io/status-pages/publishing-incidents).
 That guide confirms the dashboard flow and the four incident states; it does
 not make an internal health log a public incident by itself.
+
+Vercel Runtime Logs are the only configured owner alert channel. This contract
+does not claim that a Vercel email/log-drain subscription or an Incident.io
+automation exists; provider-side delivery must be verified separately.
 
 On the next provider-admin review, Fernando must ensure the status page’s
 component labels are exactly `Website`, `Atlas data`, `Atlas map`, and `Ask

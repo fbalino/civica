@@ -36,9 +36,12 @@ export type CountryFactHistoryWriter = (
   input: CountryFactHistoryWrite,
 ) => Promise<void>;
 
-export function resolveAtlasReleaseId(explicit?: string | null): string {
+export function resolveAtlasReleaseId(
+  explicit?: string | null,
+  environment: Record<string, string | undefined> = process.env,
+): string {
   const releaseId =
-    explicit?.trim() || process.env.CIVICA_ATLAS_RELEASE_ID?.trim() || "";
+    explicit?.trim() || environment.CIVICA_ATLAS_RELEASE_ID?.trim() || "";
   if (!/^[A-Za-z0-9._-]{1,96}$/.test(releaseId)) {
     throw new Error(
       "A named Atlas release is required: pass atlasReleaseId or set CIVICA_ATLAS_RELEASE_ID.",

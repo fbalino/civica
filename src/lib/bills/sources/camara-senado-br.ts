@@ -27,9 +27,15 @@ import { governmentBodies } from "@/lib/db/schema";
 import type {
   BillFetchBatch,
   BillIngestDraft,
+  BillSourceFailureCode,
   BillSourceFetchOutcome,
 } from "../types";
-import { finalizeBillSourceMapping } from "../source-outcome";
+import {
+  failedBillSourceHttpOutcome,
+  failedBillSourceOutcome,
+  failedBillSourceRequestOutcome,
+  finalizeBillSourceMapping,
+} from "../source-outcome";
 import { statusToStage } from "../stage";
 
 const CAMARA_SOURCE_ID = "camara_br";
@@ -42,18 +48,13 @@ type ChamberFetchResult<T> = {
 
 function failedFetch<T>(
   sourceId: string,
-  error: unknown,
+  code: BillSourceFailureCode,
+  error: string,
   fetched = 0,
 ): ChamberFetchResult<T> {
   return {
     rows: [],
-    outcome: {
-      sourceId,
-      status: "failed",
-      fetched,
-      mapped: 0,
-      error: error instanceof Error ? error.message : String(error),
-    },
+    outcome: failedBillSourceOutcome(sourceId, code, error, fetched),
   };
 }
 
@@ -103,15 +104,25 @@ async function fetchCamara(
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) {
-      return failedFetch(CAMARA_SOURCE_ID, `HTTP ${res.status}`);
+      return {
+        rows: [],
+        outcome: failedBillSourceHttpOutcome(CAMARA_SOURCE_ID, res.status),
+      };
     }
     const json = (await res.json()) as CamaraResponse;
     if (!Array.isArray(json.dados)) {
-      return failedFetch(CAMARA_SOURCE_ID, "response omitted the dados array");
+      return failedFetch(
+        CAMARA_SOURCE_ID,
+        "source_schema_invalid",
+        "response omitted the dados array",
+      );
     }
     return successfulFetch(CAMARA_SOURCE_ID, json.dados);
-  } catch (err) {
-    return failedFetch(CAMARA_SOURCE_ID, err);
+  } catch (error) {
+    return {
+      rows: [],
+      outcome: failedBillSourceRequestOutcome(CAMARA_SOURCE_ID, error),
+    };
   }
 }
 
@@ -174,20 +185,27 @@ async function fetchSenado(): Promise<ChamberFetchResult<SenadoMateria>> {
       signal: AbortSignal.timeout(60_000),
     });
     if (!res.ok) {
-      return failedFetch(SENADO_SOURCE_ID, `HTTP ${res.status}`);
+      return {
+        rows: [],
+        outcome: failedBillSourceHttpOutcome(SENADO_SOURCE_ID, res.status),
+      };
     }
     const json = (await res.json()) as SenadoResponse;
     if (!json.ListaMateriasAtualizadas) {
       return failedFetch(
         SENADO_SOURCE_ID,
+        "source_schema_invalid",
         "response omitted ListaMateriasAtualizadas",
       );
     }
     const m = json.ListaMateriasAtualizadas.Materias?.Materia;
     const rows = !m ? [] : Array.isArray(m) ? m : [m];
     return successfulFetch(SENADO_SOURCE_ID, rows);
-  } catch (err) {
-    return failedFetch(SENADO_SOURCE_ID, err);
+  } catch (error) {
+    return {
+      rows: [],
+      outcome: failedBillSourceRequestOutcome(SENADO_SOURCE_ID, error),
+    };
   }
 }
 
@@ -266,7 +284,8 @@ function senadoDraft(
     longTitle: formal !== identifier ? formal : null,
     stage: statusToStage(null),
     rawStatus: null,
-    introducedDate: m.DadosBasicosMateria?.DataApresentacao?.slice(0, 10) ?? null,
+    introducedDate:
+      m.DadosBasicosMateria?.DataApresentacao?.slice(0, 10) ?? null,
     lastActionDate: lastAction,
     lastActionText: null,
     sponsorName: null,

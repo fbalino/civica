@@ -1519,6 +1519,11 @@ export interface CiaCabinetSyncSummary {
 export async function syncCiaCabinets(
   options: CabinetSyncOptions = {},
 ): Promise<CiaCabinetSyncSummary> {
+  // Validate the history identity before selecting slugs, crawling CIA, or
+  // reading/writing the database. Dry runs exercise this same configuration
+  // boundary so they cannot report a healthy preview for an apply that would
+  // fail only after the crawl completes.
+  const atlasReleaseId = resolveAtlasReleaseId(options.atlasReleaseId);
   const db = options.db ?? sharedDb;
   const log = options.onProgress ?? (() => {});
   const writers = options.entityWriters ?? governmentEntityHistoryWriters;
@@ -1589,7 +1594,6 @@ export async function syncCiaCabinets(
     summary.durationMs = finishedAtMs - startedAtMs;
     return summary;
   }
-  const atlasReleaseId = resolveAtlasReleaseId(options.atlasReleaseId);
   const history: GovernmentEntityHistoryContext = {
     changeKind: "routine_refresh",
     reason: "CIA World Leaders government roster refresh",

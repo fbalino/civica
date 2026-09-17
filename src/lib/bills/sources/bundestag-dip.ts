@@ -5,11 +5,9 @@
  *
  * License: Bundestag Open Data (CC-BY-equivalent terms).
  *
- * Auth: requires an `apikey` query param. The public/anonymous key
- * documented at https://dip.bundestag.api.bund.dev/ and in the
- * bundesAPI/dip-bundestag-api repo is rate-limited but sufficient for
- * a 100-row daily sync. Production deploys can override by setting
- * `BUNDESTAG_API_KEY`.
+ * Auth: requires `BUNDESTAG_API_KEY`. The Bundestag publishes a rotating
+ * public key and also offers dedicated keys; neither belongs in source code.
+ * The key is sent in the Authorization header so it cannot enter request URLs.
  *
  * Original German titles are stored in `bills.title`; the shared
  * summariser produces an English plain-language summary at sync time.
@@ -23,14 +21,18 @@ import { eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "@/lib/db/schema";
 import { governmentBodies } from "@/lib/db/schema";
-import type { BillIngestDraft } from "../types";
+import type { BillFetchBatch, BillIngestDraft } from "../types";
+import {
+  failedBillSourceHttpOutcome,
+  failedBillSourceOutcome,
+  failedBillSourceRequestOutcome,
+  finalizeBillSourceMapping,
+} from "../source-outcome";
 import { statusToStage } from "../stage";
 
 const SOURCE_ID = "bundestag_dip";
-
-/** Public-anonymous key documented in the bundesAPI README. Override
- * via `BUNDESTAG_API_KEY` env var for higher rate limits. */
-const PUBLIC_DIP_KEY = "OSOegLs.PR2lwJ1dwCeje9vTj7FPOt3hvpYKtwKkhw";
+const DIP_VORGANG_URL = "https://search.dip.bundestag.de/api/v1/vorgang";
+const MAX_PAGES = 10;
 
 interface DipDoc {
   id?: string;
@@ -45,42 +47,125 @@ interface DipDoc {
 }
 interface DipResponse {
   numFound?: number;
+  cursor?: string;
   documents?: DipDoc[];
 }
 
-async function fetchRaw(limit: number): Promise<DipDoc[]> {
-  const apiKey = process.env.BUNDESTAG_API_KEY || PUBLIC_DIP_KEY;
+async function fetchRaw(limit: number): Promise<{
+  rows: DipDoc[];
+  outcome: BillFetchBatch["sourceOutcomes"][number];
+}> {
+  const apiKey = process.env.BUNDESTAG_API_KEY?.trim();
   if (!apiKey) {
-    console.warn(
-      "[bills.de] No BUNDESTAG_API_KEY and no fallback key; skipping",
-    );
-    return [];
+    return {
+      rows: [],
+      outcome: failedBillSourceOutcome(
+        SOURCE_ID,
+        "source_configuration_missing",
+        "BUNDESTAG_API_KEY is not configured",
+      ),
+    };
   }
-  // The API doesn't expose a sort param; the default order is by
-  // recency (most recently `aktualisiert` first), which is what we
-  // want. Page size caps at 100 per request.
-  const url = `https://search.dip.bundestag.de/api/v1/vorgang?f.vorgangstyp=Gesetzgebung&format=json&apikey=${encodeURIComponent(apiKey)}`;
-  try {
-    const res = await fetch(url, {
-      cache: "no-store",
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "civica-bills-sync/1.0 (https://civicaatlas.org)",
-      },
-      signal: AbortSignal.timeout(60_000),
-    });
-    if (!res.ok) {
-      console.warn(`[bills.de] DIP fetch ${res.status}; skipping`);
-      return [];
+
+  const legislation: DipDoc[] = [];
+  let cursor: string | null = null;
+  for (let page = 0; page < MAX_PAGES && legislation.length < limit; page++) {
+    const url = new URL(DIP_VORGANG_URL);
+    url.searchParams.set("format", "json");
+    if (cursor) url.searchParams.set("cursor", cursor);
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+          Authorization: `ApiKey ${apiKey}`,
+          "User-Agent": "civica-bills-sync/1.0 (https://civicaatlas.org)",
+        },
+        signal: AbortSignal.timeout(60_000),
+      });
+    } catch (error) {
+      return {
+        rows: [],
+        outcome: failedBillSourceRequestOutcome(SOURCE_ID, error),
+      };
     }
-    const json = (await res.json()) as DipResponse;
-    return (json.documents ?? []).slice(0, limit);
-  } catch (err) {
-    console.warn(
-      `[bills.de] DIP fetch failed: ${err instanceof Error ? err.message : err}; skipping`,
+    if (!res.ok) {
+      return {
+        rows: [],
+        outcome: failedBillSourceHttpOutcome(SOURCE_ID, res.status),
+      };
+    }
+
+    let json: unknown;
+    try {
+      json = await res.json();
+    } catch {
+      return {
+        rows: [],
+        outcome: failedBillSourceOutcome(
+          SOURCE_ID,
+          "source_payload_invalid",
+          "publisher response was not valid JSON",
+        ),
+      };
+    }
+    if (!isDipResponse(json)) {
+      return {
+        rows: [],
+        outcome: failedBillSourceOutcome(
+          SOURCE_ID,
+          "source_schema_invalid",
+          "publisher response did not match the DIP list schema",
+        ),
+      };
+    }
+    legislation.push(
+      ...json.documents.filter(
+        (document) => document.vorgangstyp === "Gesetzgebung",
+      ),
     );
-    return [];
+
+    const nextCursor = json.cursor?.trim() || null;
+    if (json.documents.length === 0 || !nextCursor || nextCursor === cursor)
+      break;
+    cursor = nextCursor;
   }
+
+  const rows = legislation.slice(0, limit);
+  if (rows.length === 0) {
+    return {
+      rows: [],
+      outcome: failedBillSourceOutcome(
+        SOURCE_ID,
+        "source_empty_unexpected",
+        "DIP returned no legislative proceedings in the inspected pages",
+      ),
+    };
+  }
+  return {
+    rows,
+    outcome: {
+      sourceId: SOURCE_ID,
+      status: "success",
+      fetched: rows.length,
+      mapped: 0,
+    },
+  };
+}
+
+function isDipResponse(
+  value: unknown,
+): value is DipResponse & { documents: DipDoc[] } {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const response = value as DipResponse;
+  return (
+    Array.isArray(response.documents) &&
+    response.documents.every(
+      (document) =>
+        document && typeof document === "object" && !Array.isArray(document),
+    )
+  );
 }
 
 /** Build a stable, human-readable identifier from the gesta number
@@ -101,8 +186,11 @@ export async function fetchDEBillsForSync(opts: {
   db: NeonHttpDatabase<typeof schema>;
   /** Default 100 (DIP page size). */
   limit?: number;
-}): Promise<BillIngestDraft[]> {
-  const raw = await fetchRaw(opts.limit ?? 100);
+}): Promise<BillFetchBatch> {
+  const fetched = await fetchRaw(opts.limit ?? 100);
+  if (fetched.outcome.status === "failed") {
+    return { drafts: [], sourceOutcomes: [fetched.outcome] };
+  }
 
   // Resolve the Bundestag body id (chamber_type = "lower").
   const bodies = await opts.db
@@ -114,7 +202,7 @@ export async function fetchDEBillsForSync(opts: {
     .where(eq(governmentBodies.jurisdictionId, opts.jurisdictionId));
   const bodyId = bodies.find((b) => b.chamberType === "lower")?.id ?? null;
 
-  return raw
+  const drafts = fetched.rows
     .filter((d) => d.id && d.titel)
     .map((d) => {
       const identifier = pickIdentifier(d);
@@ -144,4 +232,13 @@ export async function fetchDEBillsForSync(opts: {
         raw: d,
       } satisfies BillIngestDraft;
     });
+  return {
+    drafts,
+    sourceOutcomes: [
+      finalizeBillSourceMapping(fetched.outcome, drafts.length, {
+        requireCompleteMapping: true,
+        zeroMappedError: `${fetched.rows.length - drafts.length} DIP proceeding(s) lacked a stable id or title`,
+      }),
+    ],
+  };
 }

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { withCronJob } from "@/lib/api/cron-job";
+import {
+  cronScheduleSlotFromRequest,
+  withCronJob,
+} from "@/lib/api/cron-job";
 import {
   loadPulseReviewSlaReport,
   recordDuePulseReviewEscalations,
@@ -11,7 +14,9 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 async function handler(request: Request) {
-  const now = new Date();
+  const now = request.headers.has("idempotency-key")
+    ? new Date()
+    : cronScheduleSlotFromRequest(request);
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
   const alertsRecorded = dryRun
     ? 0

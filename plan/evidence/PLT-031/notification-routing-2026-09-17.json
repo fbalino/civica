@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-09-17T21:07:58.020194+00:00",
+  "purpose": "Owner requested operational failures reach Codex instead of repeated email",
+  "githubActions": {
+    "scope": "personal account",
+    "email": false,
+    "web": true,
+    "failedWorkflowsOnly": true,
+    "workflowExecutionChanged": false
+  },
+  "vercelDeploymentFailures": {
+    "scope": "personal preference for existing team",
+    "email": false,
+    "web": true
+  },
+  "codexMonitoring": {
+    "kind": "heartbeat",
+    "intervalHours": 1,
+    "state": "active",
+    "requiresLocalHost": true,
+    "routineRepairScope": "PLT-031",
+    "emailOrPublicIncidentDelivery": false
+  },
+  "dependabotVulnerabilityNotificationsChanged": false,
+  "billingDomainSecurityNotificationsChanged": false,
+  "mailboxMessagesModified": false,
+  "newSpendingAuthorized": false
+}

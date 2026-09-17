@@ -1,8 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { resolveCiaCabinetShard } from "@/app/api/cron/factbook/sync-cia-cabinets/route";
+import {
+  createCiaCabinetHandler,
+  resolveCiaCabinetShard,
+} from "@/app/api/cron/factbook/sync-cia-cabinets/route";
 import { resolveSnapshotVintageIdentity } from "@/app/api/cron/factbook/snapshot-vintage/route";
+import type {
+  CabinetSyncOptions,
+  CiaCabinetSyncSummary,
+} from "@/lib/factbook/cia-cabinets-sync";
 
 function request(path: string, manual = true): Request {
   return new Request(`https://civicaatlas.org${path}`, {
@@ -29,6 +36,124 @@ test("manual CIA retries require and retain one explicit shard across midnight",
     ).ok,
     false,
   );
+});
+
+function cabinetSummary(dryRun: boolean): CiaCabinetSyncSummary {
+  return {
+    startedAt: "2026-09-17T00:00:00.000Z",
+    finishedAt: "2026-09-17T00:00:01.000Z",
+    durationMs: 1_000,
+    countriesCrawled: 1,
+    countriesApplied: 1,
+    countriesFetchFailed: 0,
+    countriesSkipped: 0,
+    skipped: [],
+    countriesUnmatched: 0,
+    officesWritten: 1,
+    personsExisting: 1,
+    personsQidCreated: 0,
+    personsIdlessCreated: 0,
+    termsWritten: 1,
+    vacantOffices: 0,
+    diplomaticSkipped: 0,
+    statementsWritten: 1,
+    totalRowsWritten: 3,
+    freshnessStamped: !dryRun,
+    dryRun,
+  };
+}
+
+for (const [label, environment] of [
+  ["missing", {}],
+  ["invalid", { CIVICA_ATLAS_RELEASE_ID: "release with spaces" }],
+] as const) {
+  test(`CIA ${label} release configuration fails before domain I/O`, async () => {
+    let databaseReads = 0;
+    let syncCalls = 0;
+    const handler = createCiaCabinetHandler({
+      database: {} as never,
+      environment,
+      buildSlugList: async () => {
+        databaseReads++;
+        return ["canada"];
+      },
+      sync: async () => {
+        syncCalls++;
+        return cabinetSummary(true);
+      },
+    });
+
+    await assert.rejects(
+      handler(
+        request(
+          "/api/cron/factbook/sync-cia-cabinets?shard=0&dryRun=1",
+          false,
+        ),
+      ),
+      /named Atlas release/,
+    );
+    assert.equal(databaseReads, 0);
+    assert.equal(syncCalls, 0);
+  });
+}
+
+test("CIA route validates and propagates its named routine-refresh release", async () => {
+  const received: CabinetSyncOptions[] = [];
+  const handler = createCiaCabinetHandler({
+    database: {} as never,
+    environment: {
+      CIVICA_ATLAS_RELEASE_ID: "atlas-routine-refresh-2026-09-17",
+    },
+    buildSlugList: async () => ["canada"],
+    sync: async (options) => {
+      received.push(options);
+      return cabinetSummary(true);
+    },
+  });
+
+  const response = await handler(
+    request(
+      "/api/cron/factbook/sync-cia-cabinets?shard=0&dryRun=1",
+      false,
+    ),
+  );
+  assert.equal(response.status, 200);
+  assert.equal(
+    received[0]?.atlasReleaseId,
+    "atlas-routine-refresh-2026-09-17",
+  );
+  assert.equal(received[0]?.dryRun, true);
+});
+
+test("manual CIA delivery without a shard fails before schedule or domain I/O", async () => {
+  let databaseReads = 0;
+  let syncCalls = 0;
+  const handler = createCiaCabinetHandler({
+    database: {} as never,
+    environment: {
+      CIVICA_ATLAS_RELEASE_ID: "atlas-routine-refresh-2026-09-17",
+    },
+    buildSlugList: async () => {
+      databaseReads++;
+      return ["canada"];
+    },
+    sync: async () => {
+      syncCalls++;
+      return cabinetSummary(true);
+    },
+  });
+
+  const response = await handler(
+    request("/api/cron/factbook/sync-cia-cabinets?dryRun=1"),
+  );
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), {
+    ok: false,
+    step: "factbook.cia-cabinets.sync",
+    error: "Manual cabinet deliveries require an explicit shard (0-27)",
+  });
+  assert.equal(databaseReads, 0);
+  assert.equal(syncCalls, 0);
 });
 
 test("manual vintage retries require and retain an explicit label and cut across quarters", () => {

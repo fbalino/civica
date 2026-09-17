@@ -37,7 +37,10 @@
  * Methodology: ~/civica/plan/vintage-cadence-resolution-v1.md
  */
 import { NextResponse } from "next/server";
-import { withCronJob } from "@/lib/api/cron-job";
+import {
+  cronScheduleSlotFromRequest,
+  withCronJob,
+} from "@/lib/api/cron-job";
 import { deriveVintageLabel } from "@/lib/factbook/reconcile/snapshot-vintage";
 import { snapshotCompleteCandidateRelease } from "@/lib/factbook/reconcile/snapshot-candidate-release";
 
@@ -87,7 +90,12 @@ async function handler(request: Request) {
   const url = new URL(request.url);
   const dryRun = url.searchParams.get("dryRun") === "1";
 
-  const identity = resolveSnapshotVintageIdentity(request);
+  const identity = resolveSnapshotVintageIdentity(
+    request,
+    url.searchParams.has("cutAt")
+      ? undefined
+      : cronScheduleSlotFromRequest(request),
+  );
   if (!identity.ok) {
     return NextResponse.json(
       { ok: false, step: "factbook.snapshot-vintage", error: identity.error },

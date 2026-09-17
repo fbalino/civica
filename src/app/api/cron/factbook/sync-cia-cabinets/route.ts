@@ -18,13 +18,20 @@
  * shards 0–2. Freshness re-stamps on any day a shard writes rows.
  */
 import { NextResponse } from "next/server";
-import { withCronJob } from "@/lib/api/cron-job";
+import {
+  cronScheduleSlotFromRequest,
+  withCronJob,
+} from "@/lib/api/cron-job";
 import { db } from "@/lib/db";
 import {
   buildCiaSlugList,
   syncCiaCabinets,
+  type CabinetSyncDb,
+  type CabinetSyncOptions,
+  type CiaCabinetSyncSummary,
 } from "@/lib/factbook/cia-cabinets-sync";
 import { ciaCabinetSyncCronOutcome } from "@/lib/factbook/cron-outcomes";
+import { resolveAtlasReleaseId } from "@/lib/factbook/country-fact-history-writer";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -67,95 +74,130 @@ export function resolveCiaCabinetShard(
   };
 }
 
-async function handler(request: Request) {
-  const startedAt = new Date().toISOString();
-  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
-
-  const shard = resolveCiaCabinetShard(request);
-  if (!shard.ok) {
-    return NextResponse.json(
-      { ok: false, step: "factbook.cia-cabinets.sync", error: shard.error },
-      { status: 400 },
-    );
-  }
-  // Deterministic, sorted full list → stable per-day shard membership.
-  const allSlugs = await buildCiaSlugList(db);
-  const shardIndex = shard.shardIndex;
-  const perShard = Math.ceil(allSlugs.length / SHARD_COUNT);
-  const slugs = allSlugs.slice(
-    shardIndex * perShard,
-    shardIndex * perShard + perShard,
-  );
-
-  if (slugs.length === 0) {
-    return NextResponse.json({
-      ok: true,
-      step: "factbook.cia-cabinets.sync",
-      started: startedAt,
-      shardIndex,
-      shardCount: SHARD_COUNT,
-      countriesInShard: 0,
-      note: "Empty shard for this day-of-month — nothing to crawl.",
-    });
-  }
-
-  const summary = await syncCiaCabinets({
-    db,
-    slugs,
-    // Drop progress lines in cron mode — too verbose for the log buffer.
-    // Warnings (`!`) still surface.
-    onProgress: (line) => {
-      if (line.startsWith("!")) console.error(line);
-    },
-    dryRun,
-  });
-  const outcome = ciaCabinetSyncCronOutcome(summary);
-
-  if (!outcome.ok) {
-    return NextResponse.json(
-      {
-        ok: outcome.ok,
-        outcome: outcome.outcome,
-        healthOk: outcome.healthOk,
-        reason: outcome.reason,
-        step: "factbook.cia-cabinets.sync",
-        dryRun,
-        errorCount: Math.max(1, summary.skipped.length),
-      },
-      { status: outcome.httpStatus },
-    );
-  }
-
-  return NextResponse.json({
-    ok: outcome.ok,
-    outcome: outcome.outcome,
-    healthOk: outcome.healthOk,
-    reason: outcome.reason,
-    step: "factbook.cia-cabinets.sync",
-    started: startedAt,
-    finished: summary.finishedAt,
-    durationSec: Math.round(summary.durationMs / 1000),
-    shardIndex,
-    shardCount: SHARD_COUNT,
-    countriesInShard: slugs.length,
-    countriesCrawled: summary.countriesCrawled,
-    countriesApplied: summary.countriesApplied,
-    countriesFetchFailed: summary.countriesFetchFailed,
-    countriesUnmatched: summary.countriesUnmatched,
-    officesWritten: summary.officesWritten,
-    termsWritten: summary.termsWritten,
-    personsExisting: summary.personsExisting,
-    personsQidCreated: summary.personsQidCreated,
-    personsIdlessCreated: summary.personsIdlessCreated,
-    vacantOffices: summary.vacantOffices,
-    diplomaticSkipped: summary.diplomaticSkipped,
-    statementsWritten: summary.statementsWritten,
-    totalRowsWritten: summary.totalRowsWritten,
-    freshnessStamped: summary.freshnessStamped,
-    dryRun,
-  });
+interface CiaCabinetHandlerDependencies {
+  database?: CabinetSyncDb;
+  environment?: Record<string, string | undefined>;
+  buildSlugList?: (database: CabinetSyncDb) => Promise<string[]>;
+  sync?: (options: CabinetSyncOptions) => Promise<CiaCabinetSyncSummary>;
 }
 
+/**
+ * Route-level fixture seam. Configuration is resolved before any domain
+ * database read or CIA request, while the shared cron boundary continues to
+ * own authentication, delivery history, and retry fencing.
+ */
+export function createCiaCabinetHandler(
+  dependencies: CiaCabinetHandlerDependencies = {},
+) {
+  const database = dependencies.database ?? db;
+  const environment = dependencies.environment ?? process.env;
+  const buildSlugList = dependencies.buildSlugList ?? buildCiaSlugList;
+  const sync = dependencies.sync ?? syncCiaCabinets;
+
+  return async function handler(request: Request) {
+    const startedAt = new Date().toISOString();
+    const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
+
+    // This is intentionally route-scoped rather than a global cron startup
+    // requirement: unrelated scheduled jobs remain available if this writer's
+    // history identity is missing or malformed.
+    const atlasReleaseId = resolveAtlasReleaseId(undefined, environment);
+
+    const hasExplicitShard = new URL(request.url).searchParams.has("shard");
+    const manual = request.headers.has("idempotency-key");
+    const shard = resolveCiaCabinetShard(
+      request,
+      hasExplicitShard || manual
+        ? undefined
+        : cronScheduleSlotFromRequest(request),
+    );
+    if (!shard.ok) {
+      return NextResponse.json(
+        { ok: false, step: "factbook.cia-cabinets.sync", error: shard.error },
+        { status: 400 },
+      );
+    }
+    // Deterministic, sorted full list → stable per-day shard membership.
+    const allSlugs = await buildSlugList(database);
+    const shardIndex = shard.shardIndex;
+    const perShard = Math.ceil(allSlugs.length / SHARD_COUNT);
+    const slugs = allSlugs.slice(
+      shardIndex * perShard,
+      shardIndex * perShard + perShard,
+    );
+
+    if (slugs.length === 0) {
+      return NextResponse.json({
+        ok: true,
+        step: "factbook.cia-cabinets.sync",
+        started: startedAt,
+        shardIndex,
+        shardCount: SHARD_COUNT,
+        countriesInShard: 0,
+        note: "Empty shard for this day-of-month — nothing to crawl.",
+      });
+    }
+
+    const summary = await sync({
+      db: database,
+      slugs,
+      atlasReleaseId,
+      // Drop progress lines in cron mode — too verbose for the log buffer.
+      // Warnings (`!`) still surface.
+      onProgress: (line) => {
+        if (line.startsWith("!")) console.error(line);
+      },
+      dryRun,
+    });
+    const outcome = ciaCabinetSyncCronOutcome(summary);
+
+    if (!outcome.ok) {
+      return NextResponse.json(
+        {
+          ok: outcome.ok,
+          outcome: outcome.outcome,
+          healthOk: outcome.healthOk,
+          reason: outcome.reason,
+          step: "factbook.cia-cabinets.sync",
+          dryRun,
+          errorCount: Math.max(1, summary.skipped.length),
+        },
+        { status: outcome.httpStatus },
+      );
+    }
+
+    return NextResponse.json({
+      ok: outcome.ok,
+      outcome: outcome.outcome,
+      healthOk: outcome.healthOk,
+      reason: outcome.reason,
+      step: "factbook.cia-cabinets.sync",
+      started: startedAt,
+      finished: summary.finishedAt,
+      durationSec: Math.round(summary.durationMs / 1000),
+      shardIndex,
+      shardCount: SHARD_COUNT,
+      countriesInShard: slugs.length,
+      countriesCrawled: summary.countriesCrawled,
+      countriesApplied: summary.countriesApplied,
+      countriesFetchFailed: summary.countriesFetchFailed,
+      countriesUnmatched: summary.countriesUnmatched,
+      officesWritten: summary.officesWritten,
+      termsWritten: summary.termsWritten,
+      personsExisting: summary.personsExisting,
+      personsQidCreated: summary.personsQidCreated,
+      personsIdlessCreated: summary.personsIdlessCreated,
+      vacantOffices: summary.vacantOffices,
+      diplomaticSkipped: summary.diplomaticSkipped,
+      statementsWritten: summary.statementsWritten,
+      totalRowsWritten: summary.totalRowsWritten,
+      freshnessStamped: summary.freshnessStamped,
+      dryRun,
+    });
+  };
+}
+
+const handler = createCiaCabinetHandler();
 const cronHandler = withCronJob("factbook.cia-cabinets", handler);
 
 export { cronHandler as GET, cronHandler as POST };
