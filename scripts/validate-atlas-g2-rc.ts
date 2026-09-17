@@ -9,6 +9,7 @@ import { buildRightsManifest } from "../src/lib/rights/manifest";
 
 const dir = resolve("data/releases/atlas-2026-07-11/g2-rc1");
 const archive = resolve("data/releases/atlas-2026-07-11-g2-rc1.zip");
+const reproductionPackageLock = resolve("data/releases/atlas-2026-07-11/g2-rc1-reproduction-environment/package-lock.json");
 const archiveManifest = JSON.parse(readFileSync(resolve("data/releases/atlas-2026-07-11-g2-rc1.archive.json"), "utf8"));
 const expectedFiles = [
   "atlas-export.v1.json.gz", "bundle-manifest.v1.json", "CHANGELOG.md",
@@ -59,7 +60,7 @@ for (const source of bom.sourceInputs) {
 const coverage = JSON.parse(readFileSync(join(dir, "coverage-report.v1.json"), "utf8"));
 if (coverage.rows !== bom.rowCounts.facts || coverage.sourceLinkedRows !== coverage.rows || coverage.jurisdictions !== bom.rowCounts.jurisdictions) fail("frozen coverage report drift");
 const environment = JSON.parse(readFileSync(join(dir, "environment.v1.json"), "utf8"));
-if (environment.packageLockSha256 !== sha(readFileSync("package-lock.json")) || environment.requiredConfiguration.length !== 0) fail("reproduction environment drift");
+if (environment.packageLockSha256 !== sha(readFileSync(reproductionPackageLock)) || environment.requiredConfiguration.length !== 0) fail("reproduction environment drift");
 const citation = YAML.parse(readFileSync(join(dir, "CITATION.cff"), "utf8"));
 if (citation.version !== "atlas-2026-07-11-g2-rc1" || citation["date-released"] !== "2026-07-11" || !String(citation.url).includes("civica-atlas-2026-07-11.json.gz")) fail("citation draft drift");
 const cleanRoom = JSON.parse(readFileSync(join(dir, "clean-room-evidence.v1.json"), "utf8"));
