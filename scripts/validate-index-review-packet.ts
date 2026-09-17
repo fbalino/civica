@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import { GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR } from "../src/lib/ci/governance-evidence-review-package";
+import { GOVERNANCE_EVIDENCE_REVIEW_PACKET } from "../src/lib/ci/governance-evidence-review-packet";
 
-const manifestPath = "data/releases/governance-evidence-review-packet-2026-07-v4/manifest.v1.json";
+const manifestPath = `${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/manifest.v1.json`;
 const packet = JSON.parse(readFileSync(manifestPath, "utf8"));
 
-assert.equal(packet.releaseId, "governance-evidence-review-packet-2026-07-v4");
+assert.equal(packet.releaseId, GOVERNANCE_EVIDENCE_REVIEW_PACKET.releaseId);
 assert.equal(packet.status, "ready_for_external_review_not_endorsed");
 assert.equal(packet.tournamentWinnerSelected, false);
 assert.ok(packet.frozenInputs?.releaseId && packet.frozenInputs?.grid?.cells === 970);
@@ -21,7 +23,7 @@ for (const key of ["package", "preregistration", "decisionTable", "disposition",
 for (const path of [packet.sensitivity.relatedCompositeAnalysis, packet.subgroupResults.coverageOwner])
   assert.ok(existsSync(path), `${path} is missing`);
 
-const inventory = readFileSync("data/releases/governance-evidence-review-packet-2026-07-v4/artifact-inventory.v1.csv", "utf8").trim().split("\n");
+const inventory = readFileSync(`${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/artifact-inventory.v1.csv`, "utf8").trim().split("\n");
 assert.equal(inventory.length - 1, packet.inventory.length);
 assert.ok(
   packet.inventory.some(
