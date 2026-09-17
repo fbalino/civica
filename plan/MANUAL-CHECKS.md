@@ -99,7 +99,7 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
   `pul-040-runner-follow-ups-2026-08-17`, so spelling the difference out in
   §4 must ride along with whatever record this decision produces. Nothing is
   blocked either way; no window has started.
-- **EXP-015 · Owner — DECIDED 2026-08-17:** Fernando rejected the image-led
+- **EXP-015 · Owner — RESOLVED 2026-08-17:** Fernando rejected the image-led
   megamenu direction outright and replaced it with a standard grouped header
   dropdown (commit `a8f58bcc`, merged in PR #24), matching the Governance
   Evidence and Methodology menus. No further review of the large candidate is
@@ -110,18 +110,20 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 - Approve reviewer identities, conflict disclosures, honoraria, contact copy, and outreach sequencing before contact.
 - **GOV-010 · Owner:** review `plan/research/reviewer-ranking-v1.md`, approve or revise the proposed ordering with a recorded rubric-based reason, and confirm which alternates remain contact-ready. This is not authorization to contact; GOV-016 must still pass first.
 - **GOV-012 · Owner — DECIDED 2026-08-09 (Option A, revisitable):** Fernando selected the no-honorarium posture on budget grounds ("no honoraria (for now)"); the completed approval record is in `plan/research/reviewer-honorarium-decision-brief-v1.md`. No paying entity or accounting/tax workflow is required while the posture is unpaid; if funds become available before outreach, the recommended Option B bands remain documented for a revisited decision. Contact still waits for GOV-016 and G4.
-- **EXP-038 · Owner:** the approved subset in
+- **EXP-038 · Engineering reconciliation:** the approved subset in
   `plan/EXP-038-english-copy-review-2026-07-23.md` is already applied. A4
   (About naming) and H5 (independence label after GOV-003) are resolved, and
   T3 was decided on 2026-08-09 (no-guarantee response copy, applied). One
-  disposition remains: choose the interim T4 correction instruction or wait
-  for ATL-024 activation. That decision authorizes only the named English
-  copy; it does not authorize translation, deployment, a legal conclusion, or
-  an external message.
+  conditional T4 hold referred to ATL-024 activation. ATL-024 now has
+  production evidence for the active data-error route. Reconcile the existing
+  correction instruction against that active route, refresh its claims/browser
+  evidence, and close EXP-038 only if its full `Done when` remains satisfied.
+  This is not a new owner decision and does not authorize translation, a legal
+  conclusion, or an external message.
 - Approve the final public disposition of each experimental measurement after its resolution and external review are complete.
 - **EXP-030 / EXP-031 · Owner decision — embed disposition (found 2026-07-12):** the Civica Index score embed (`/embed/[slug]`) is retired (HTTP 410 stub) under the atlas-first decision, so there are no live size presets to repair, and the old preset builder (`src/components/widget/WidgetBuilder.tsx` + `WidgetCopyButton.tsx`) is **orphaned dead code — mounted in no route** and still points its generated iframes at the 410 endpoint. Hardening the retired stub's HTML (add `<h1>`, `robots noindex`) is blocked because the route is an Index-change-control **protected presentation file**, so any edit requires the full methodology-change ceremony (version advance + all six evidence roles) — disproportionate for a cosmetic fix to a retired page. Decide the structural path: (a) formally **de-protect** the retired embed route from `INDEX_PROTECTED_FILES` via a proper change-control record, then harden its document, or (b) fold EXP-030 into **EXP-031** (source-native embed redesign), which will rebuild or remove the route and the orphaned builder through the same ceremony. Until then EXP-030 stays open.
 - **PUL-039 · Owner:** approve the independent-coder recruitment plan — candidate pool, compensation posture and budget ceiling, blinding/independence terms, and start timing — before any candidate is contacted. Allow six to eight weeks after contact authorization to recruit, screen, contract, train, and qualify the panel. PUL-041's packet prerequisite is complete; external contact remains blocked until G4 and this approval.
-- **PUL-040 · Owner/platform:** deploy the locked `pulse-v2.15-beta` branch before the prospective clock can start, then allow one complete scheduled ingest → cluster → classify → corroborate/score cycle to finish under that exact method. Production currently serves `pulse-v2.8-beta`; the live ledger has no successful v2.15 ingest, cluster, or classify run and the classification queue contains 746 eligible clusters. Do not backdate the window. A manual paid classifier run requires separate approval naming providers/models, a maximum cluster/call count, and a hard USD cap; otherwise wait for the first post-deployment cron cycle.
+- **PUL-040 · method and rights decision recorded; current start evidence still required:** the August 2026 records freeze `pulse-v2.16-beta` before the window, and Fernando decided that Civica must not retrieve Amnesty without permission. The connector skips Amnesty; the unsent permission draft remains only a prepared outreach artifact. Do not backdate the window. Before any start claim, capture fresh read-only evidence that every protocol prerequisite has passed under the frozen current method, including the required completed automatic-stage and review-SLA runs, retention/observability boundary, and recorded start instant. The historical v2.15/v2.8 deployment wording is superseded and is not a live claim. No paid manual classifier run is authorized by this queue item.
 
 ## External systems
 

@@ -1,79 +1,49 @@
 # Current handoff — Civica
 
-**Updated:** 2026-08-18 (subscription-runtime wave closed; two items parked on
-data and one owner decision)
-**Current objective:** none in flight. The Pulse daily machine runs itself.
-Two checklist items wait on accumulation and one small owner call.
+**Updated:** 2026-09-17
+**Current objective:** stabilize the current release before beta, release, or
+readiness claims. The active checklist task is PLT-030.
 
-## Verified state
+## Current priority
 
-- Branch `main`, pushed and clean (`52679084`). The home-nav/Explore
-  simplification (`a8f58bcc`, PR #24) and its doc fallout are merged and
-  reconciled; PR #25 and this commit closed the follow-ups.
-- **$0 enforcement is live and verified twice in production:** the owner
-  removed the three classifier API keys, and the scheduled classify route
-  refuses any paid transport (`paid_transport_locked`). The Vercel cron
-  feature toggle is ON; every scheduled stage is model-free.
-- **The four-voter subscription panel works on live data.** Proven
-  2026-08-18: a real cluster classified with openai/anthropic/moonshot/xai
-  runs stored, `classifier_agreement = all`, `published = false`,
-  `review_status = pending`. $0 marginal cost.
-- Runtime method `pulse-v2.16-beta`; `pulse-validation-protocol/v2`
-  supersedes v1 pre-start with v1 preserved and hash-pinned. The daily
-  launchd job (`org.civicaatlas.pulse-daily`, 09:30 local, catch-up on wake)
-  is installed and has completed real cycles.
-- Gates green on this commit: 9/9 explore e2e, exp-017/exp-024/qa-016,
-  typecheck, design tokens, index change control, the v60 subscription-runtime
-  contract validator, and the full `validate:claims-docs` aggregate.
+Two release-stability findings are open: a country-directory/data discrepancy
+reported against the current release, and a critical dependency-audit finding.
+Their root causes, remediations, and current deployment/CI status are not yet
+recorded in this repository. The runtime owners must attach dated evidence to
+`plan/evidence/PLT-030/`; do not treat historical production or local checks as
+proof that either finding is fixed.
 
-## The two open items — neither is blocked on engineering
+Do not resume product-roadmap work while PLT-030 is open. The user's current
+map work is deferred, not cancelled; no new product task is created here.
 
-1. **PUL-024 (drift baseline) — waiting on data.** The baseline needs 100
-   retained model-version rows; the database had ~12 at the cut. The daily
-   runner accumulates them. When
-   `npm run capture:pulse-drift-baseline` stops saying NOT ELIGIBLE, run it
-   with `--write`, let one scheduled monitoring outcome record, then check
-   PUL-024.
-2. **PUL-040 (90-day clock) — waiting on one owner decision.** The
-   preregistered prerequisite wants a `completed` run for each automatic
-   stage. Ingest cannot reach `completed` because Amnesty's feed WAF-blocks
-   every request (verified 403 across three user agents), so ingest honestly
-   records `partial` every day. Two legitimate paths, owner's choice:
-   retire Amnesty to `inactive` alongside ACLED/RSF/Reuters (it genuinely is
-   unavailable), or rule that an honest `partial` with per-connector failure
-   recording satisfies "a successful run of the stage". **Do not loosen the
-   preregistered rule unilaterally to make the gate turn green.** A
-   review-SLA run under v2.16 is also still needed; its manual POST is
-   rejected, so the 6-hourly schedule supplies it.
+The owner-authorized branch cleanup is complete: 15 obsolete remote branches
+were deleted and obsolete pull requests 2, 3, and 4 were closed. The retained
+inventory is evidence of cleanup, not a claim that the remaining branches all
+need merging.
 
-Also queued for the owner in `plan/MANUAL-CHECKS.md`: whether the Kimi
-voter's system-channel prompt delivery needs its own runtime-method note
-(APR-D147). Substance is already covered by resolution §4; the resolution
-text itself is hash-pinned, so any amendment must ride with that decision's
-change-control record.
+Dependabot pull requests 6, 7, 9, 10, 11, and 12 are deferred maintenance,
+not release blockers. Critical dependency pull requests 13 and 20 remain until
+their validated replacement is ready. The canonical-capital repair has separate
+owner authority, but no live write or recovery claim is recorded here.
 
-## Known, recorded, not blocking
+## Reconciled historical records
 
-- The 2026-08-17 cycles classified 26 clusters on a degraded 3-voter panel
-  (Kimi failing). Honest historical evidence, settled in the PUL-032 state
-  machine, entirely pre-window. Re-running is a separate decision.
-- Headless Kimi calls load the owner's MCP servers (~30 s/call overhead);
-  `~/.kimi-code/mcp.json`, outside this repo.
-- Dead code left deliberately: ~160 lines of `.explore-concept*` CSS in
-  `design-system.css`, `continent?` in `CountryDirectoryEntry`, and 16
-  orphaned `explore-*.webp` navigation engravings. Deleting the engravings is
-  a manifest cascade — see the inventory in this session's review before
-  touching them.
-- `e2e/visual-baselines/candidate-manifest.json` hashes are stale for home,
-  home-explore-menu, and design-system. No gate reads it.
-- **Operational gotcha, cost hours tonight:** a stale `.next` made the e2e
-  suite test a build with no Explore section at all, producing four
-  convincing false failures. If e2e results contradict the source, kill the
-  dev servers, `rm -rf .next`, restart, and re-run before believing them.
+- **Explore:** Fernando rejected the image-led megamenu on 2026-08-17. The
+  grouped dropdown in `DESIGN.md` is canonical, and EXP-015 is complete.
+- **Atlas correction route:** ATL-024 has retained production evidence for its
+  active report and triage flow. EXP-038's old conditional T4 hold is now an
+  engineering evidence/copy reconciliation, not a fresh owner decision.
+- **Pulse:** the runtime method is historically recorded as `pulse-v2.16-beta`.
+  Fernando's 2026-08-18 Amnesty decision was to request permission rather than
+  retrieve or bypass restrictions; the connector skips the source. PUL-040 is
+  still open because the 90-day protocol start must be freshly evidenced and
+  never backdated. The old v2.15/v2.8 handoff language is historical only.
 
 ## Boundaries
 
-- No paid classifier transport, ever, without new written owner authority.
-  Do not weaken the route lock or PUL-036's always-queue rule.
-- Never rewrite `data/research/pulse-validation-protocol-v1.json` or retained
-  v2.15 artifacts. Rewrite this handoff at the next milestone.
+- Do not claim a beta, production recovery, formal gate, external review, or
+  academic-release result until its named current evidence exists.
+- No paid classifier transport or Amnesty outreach is authorized by this
+  handoff.
+- Preserve frozen protocol and retained evidence artifacts; use a new
+  evidence record for any current verification.

@@ -1,25 +1,24 @@
 {
   "schemaVersion": "civica-remaining-work/v1",
-  "reviewedAt": "2026-08-10",
+  "reviewedAt": "2026-09-17",
   "checklist": {
-    "total": 310,
-    "completed": 263,
+    "total": 311,
+    "completed": 264,
     "remaining": 47,
-    "progressPercent": 84.8
+    "progressPercent": 84.9
   },
   "agentExecutableNow": [],
   "categories": [
     {
       "id": "direct-human-owner-professional",
       "label": "Direct human, owner, or professional review",
-      "count": 14,
+      "count": 13,
       "taskIds": [
         "BRD-003",
         "BRD-010",
         "BRD-012",
         "EXP-001",
         "EXP-009",
-        "EXP-015",
         "EXP-025",
         "EXP-038",
         "GOV-012",
@@ -29,7 +28,7 @@
         "QA-012",
         "QA-013"
       ],
-      "nextStep": "Obtain the exact rendered Explore disposition; the three residual EXP-038 dispositions; owner spend and honorarium facts; and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
+      "nextStep": "Obtain the remaining EXP-038 engineering reconciliation, owner spend and honorarium facts, and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
     },
     {
       "id": "production-staging-external-authority",
@@ -94,6 +93,15 @@
         "PUL-030"
       ],
       "nextStep": "Do not execute out of dependency order. Resume each task only after its named design, staging, gold-data, prospective-evaluation, G4, G5, DOI, counsel, or disposition prerequisite is real."
+    },
+    {
+      "id": "current-release-stabilization",
+      "label": "Current release stabilization",
+      "count": 1,
+      "taskIds": [
+        "PLT-030"
+      ],
+      "nextStep": "Runtime owners must record dated reproduction, remediation or containment, rollback posture, and replacement build, health, and reader-surface evidence before any beta or release claim."
     }
   ]
 }

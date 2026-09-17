@@ -1,0 +1,45 @@
+{
+  "recorded_at": "2026-09-17",
+  "base_main": "583e4edfc67f4cf235ce8b70a44f603f67db42a9",
+  "scope": "Remote branch and obsolete-PR cleanup authorized by repository owner",
+  "pr_closures": [
+    { "number": 2, "branch": "fix/civ-63-data-coverage-top20", "head": "283630625a01969ccdfb8cb2ff1fdf6f359bc8b1", "reason": "Superseded retired routes/components and old direct data-repair script", "status": "closed" },
+    { "number": 3, "branch": "fix/civ-159-compare-reconcile", "head": "eb86b3caf6109ced29239d04e679ad99c95a8d4c", "reason": "Superseded retired src/app/index/compare architecture", "status": "closed" },
+    { "number": 4, "branch": "codex/full-ci-country-coverage", "head": "1c48f32b5f02a6d6ce78b1d3bdabac969eaa26a6", "reason": "Superseded pre-contract CI ingestion implementation", "status": "closed" }
+  ],
+  "deleted_remote_branches": [
+    { "branch": "claude/serene-wilbur-375a03", "head": "d7ae5d820c36402aa0de1e88c54f51f42d8ed4a4", "pr": null, "reason": "Exact ancestor of main" },
+    { "branch": "codex/civica-academic-readiness", "head": "c1f28bccf1d097dbd9ba7908d94a1b85e48a7d9c", "pr": null, "reason": "Exact ancestor of main" },
+    { "branch": "codex/index-nav-dropdown", "head": "5e15de7464ccee44c15f81683b4fb5a6805689ac", "pr": null, "reason": "Exact ancestor of main" },
+    { "branch": "feat/cac-option-a", "head": "7d41d87130288583ffd6656517d7f4e5b888f996", "pr": 18, "reason": "Exact ancestor of main after merged PR" },
+    { "branch": "feat/home-nav-directory-cleanup", "head": "aff687a8a22e86b07c4de1846bef24274b0c0008", "pr": 24, "reason": "Exact ancestor of main after merged PR" },
+    { "branch": "feat/pulse-subscription-runtime", "head": "c76e78b1c5ff3c59cdc426037041486ab627b0b4", "pr": 22, "reason": "Exact ancestor of main after merged PR" },
+    { "branch": "fix/invocation-spike-telemetry-and-download", "head": "949617f173796944e4ae118a6b61c2cdab42d94a", "pr": 17, "reason": "Exact ancestor of main after merged PR" },
+    { "branch": "fix/pul-040-change-record-and-cluster-test", "head": "36b4f164fb61f0cb71f1671162452e2fc5fef5b8", "pr": 25, "reason": "Exact ancestor of main after merged PR" },
+    { "branch": "fix/pulse-runner-follow-ups", "head": "669c75188e19a3926c592c87539f9576a7f9e4f1", "pr": 23, "reason": "Exact ancestor of main after merged PR" },
+    { "branch": "fix/qa-014-budget-revision", "head": "2f05aca67234389df51e0a8f4a4eae2adf527007", "pr": 19, "reason": "Exact ancestor of main after merged PR" },
+    { "branch": "hotfix/pulse-classify-zero-lock", "head": "a7caaf779bdf25e2a495a80be333b042c0c82706", "pr": 21, "reason": "Exact ancestor of main after merged PR" },
+    { "branch": "fix/civ-63-data-coverage-top20", "head": "283630625a01969ccdfb8cb2ff1fdf6f359bc8b1", "pr": 2, "reason": "Owner-authorized obsolete PR cleanup" },
+    { "branch": "fix/civ-159-compare-reconcile", "head": "eb86b3caf6109ced29239d04e679ad99c95a8d4c", "pr": 3, "reason": "Owner-authorized obsolete PR cleanup" },
+    { "branch": "codex/full-ci-country-coverage", "head": "1c48f32b5f02a6d6ce78b1d3bdabac969eaa26a6", "pr": 4, "reason": "Owner-authorized obsolete PR cleanup" },
+    { "branch": "codex/design-system-hydration", "head": "c332c3c3572713aa62d08ce8d3da5e7df277c1ab", "pr": null, "reason": "Superseded: current canonical DESIGN.md conflicts with its obsolete guidance, FactbookLegislatureChart replaced the old standalone hemicycle, and main later restored the theme-provider external-store implementation" }
+  ],
+  "result": {
+    "remaining_live_branch_count": 10,
+    "remaining_live_branches": [
+      "main", "codex/fix/social-sharing-card",
+      "dependabot/github_actions/actions/checkout-7", "dependabot/github_actions/actions/setup-node-7",
+      "dependabot/npm_and_yarn/eslint-10.8.0", "dependabot/npm_and_yarn/maplibre-gl-6.0.0",
+      "dependabot/npm_and_yarn/minor-and-patch-32a9cbbf5c", "dependabot/npm_and_yarn/node-html-parser-9.0.0",
+      "dependabot/npm_and_yarn/types/node-26.1.1", "dependabot/npm_and_yarn/typescript-7.0.2"
+    ],
+    "main_head_confirmed": "583e4edfc67f4cf235ce8b70a44f603f67db42a9"
+  },
+  "deferred_maintenance": {
+    "status": "not release blockers",
+    "dependabot_pull_requests": [6, 7, 9, 10, 11, 12],
+    "planned_disposition": "Close and delete remote branches with their links recorded; do not treat them as required merges.",
+    "critical_dependency_pull_requests": [13, 20],
+    "critical_dependency_disposition": "Superseded only when the validated replacement is ready."
+  }
+}
