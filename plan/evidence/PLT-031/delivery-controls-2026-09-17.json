@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-09-17",
+  "repository": "fbalino/civica",
+  "rulesetId": 23623964,
+  "requiredChecks": [
+    "verify",
+    "Vercel"
+  ],
+  "requiredApprovals": 0,
+  "bypassActors": [],
+  "upToDateRequired": true,
+  "forcePushBlocked": true,
+  "branchDeletionBlocked": true,
+  "vercel": {
+    "pullRequestComments": false,
+    "commitComments": false,
+    "commitStatus": true,
+    "deploymentStatusEvents": true,
+    "repositoryDispatchEvents": true
+  },
+  "mailboxChanges": false,
+  "accountWideNotificationChanges": false,
+  "dependabot": {
+    "npmVersionUpdateLimit": 2,
+    "githubActionsVersionUpdateLimit": 1,
+    "cooldownDays": 7,
+    "securityUpdatesDelayed": false
+  },
+  "validation": [
+    "master-plan validator passed",
+    "Dependabot YAML parse and intended field values passed",
+    "canonical CI workflow contract passed",
+    "git diff --check passed"
+  ]
+}
