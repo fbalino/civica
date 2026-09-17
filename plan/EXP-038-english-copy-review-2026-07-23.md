@@ -50,9 +50,9 @@ the Response tile now read "Messages are reviewed manually. We'll get back to
 you as soon as possible."; the former "SLA · Response" tile label is now
 "Response" because no timed service level is promised.
 
-These holds are recorded rather than inferred. No external review, endorsement,
-service-level observation, or production correction-flow activation is
-claimed.
+These dispositions retain the recorded owner decisions. No external review,
+endorsement, or service-level observation is claimed. ATL-024 supplies the
+existing production correction-flow evidence; this change reconciles its links.
 
 ## Verification
 

@@ -115,3 +115,13 @@ The canonical job passed on PRs [29](https://github.com/fbalino/civica/actions/r
 All configured checks were green before the corresponding merges. The GitHub API read still returned `Branch not protected`
 for main and an empty repository ruleset list. Enforcement remains a separate
 manual follow-up; the completed implementation is not reopened.
+
+## Repository enforcement — September 17, 2026
+
+A later authorized operations pass applied active default-branch ruleset
+`23623964`: pull request required, `verify` (GitHub Actions app) and Vercel
+required, current-base checks, resolved conversations, squash merge, zero
+required human approvals, no bypass actors, and force-push/deletion protection.
+PR #35 then merged through the normal protected path after both checks passed.
+The earlier same-day unprotected read above is historical. Settings evidence
+is retained in `plan/evidence/PLT-031/delivery-controls-2026-09-17.json`.
