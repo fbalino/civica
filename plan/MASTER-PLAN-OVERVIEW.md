@@ -4,10 +4,13 @@
 
 Repository cleanup and release stabilization are complete. Production now
 serves the September release with the selected sharing card. The master
-checklist has 265 of 311 tasks complete and 46 remaining; G4 is still blocked.
-The map is deferred. Fernando will review the cleaned-up project before more
-roadmap work starts. Current evidence is in `plan/evidence/PLT-030/`, and the
-remaining work is separated in `plan/REMAINING-WORK-REPORT-2026-07-23.md`.
+checklist has 266 of 312 tasks complete and 46 remaining; G4 is still blocked.
+The map is deferred. Recurring data-update repairs are merged under PLT-031;
+deployed dry-run verification passed, and the first ordinary scheduled
+applications remain the operational follow-up. Codex checks hourly while the local host is
+available, and routine failure email has been replaced by web visibility.
+Current evidence is in `plan/evidence/PLT-030/` and `plan/evidence/PLT-031/`.
+The older remaining-work report is historical; the master checklist is current.
 
 The phases below describe the overall program, not a list of currently open
 tasks. The master checklist owns completion state. The Explore-menu decision

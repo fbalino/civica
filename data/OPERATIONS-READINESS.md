@@ -59,14 +59,24 @@ and P1 operational finding below is closed.
   [main](https://github.com/fbalino/civica/actions/runs/35266026305),
   [PR #30](https://github.com/fbalino/civica/actions/runs/35266056646), and
   [PR #27](https://github.com/fbalino/civica/actions/runs/35266075382).
-  PLT-001 remains complete. The separate repository-setting follow-up remains
-  open: the September 17 read found main unprotected and no rulesets. No
-  protection change or bypass was made.
-- The current G4 readiness record reports 265 of 311 tasks complete, 21 open P0 tasks,
+  PLT-001 remains complete. A later authorized September 17 change added the
+  active default-branch ruleset requiring PRs, `verify`, Vercel, current-base
+  checks, resolved conversations, and squash merge, with no bypass actors.
+  PR #35 passed both required checks and merged through that protected path.
+  Settings evidence is retained under `plan/evidence/PLT-031/`.
+- The current G4 readiness record reports 266 of 312 tasks complete, 22 open P0 tasks,
   43 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 
 ## Jobs, freshness, and error monitoring
+
+- PLT-031's operational repair is deployed at `e99cecd0`. Cabinet and three
+  legislative dry runs passed with unchanged domain fingerprints/freshness and
+  no paid summary generation; replay suppression and the deployed recovery
+  control path passed. Reconciliation's advisory warning remains visible
+  separately from successful execution. First ordinary post-repair scheduled
+  applications are still pending, assigned to the hourly local Codex monitor.
+  Exact evidence and exclusions are in `plan/evidence/PLT-031/`.
 
 - `civica-pipeline-observability/v1` closes 39 scheduled and 12 canonical
   manual production pipelines with bounded run identity, outcome, counts,
@@ -93,7 +103,7 @@ and P1 operational finding below is closed.
 
 ## Deployment, rollback, caches, and releases
 
-- **Current September 17 release:** PLT-030 is complete. Main `5203cb7b`
+- **September 17 cleanup-release checkpoint:** PLT-030 is complete. Main `5203cb7b`
   reached Ready at `dpl_77DvkLZewq1hzgf2kH45e1jUPnL7` with both canonical
   domains attached. The inventory prerequisite, critical dependency repair,
   durable 229-capital source repair, and selected sharing card are deployed.

@@ -77,11 +77,11 @@ for (const viewport of [
         disclosure.getByRole("link", { name: "machine-readable disclosure" }),
       ).toHaveAttribute(
         "href",
-        "https://github.com/fbalino/civica/blob/main/data/research/project-disclosure-v1.json",
+        "https://github.com/fbalino/civica/blob/main/data/research/project-disclosure-v2.json",
       );
       await expect(
         disclosure.getByRole("link", { name: "report a correction" }),
-      ).toHaveAttribute("href", "/contact");
+      ).toHaveAttribute("href", "/report-data-issue");
       expect((await measureHorizontalOverflow(page)).overflow).toBeLessThanOrEqual(
         1,
       );
@@ -169,3 +169,68 @@ for (const viewport of [
     expect(errors.hardFailures(), errors.hardFailures().join("\n")).toEqual([]);
   });
 }
+
+test("correction routes use the dedicated intake while contact and GitHub remain available", async ({
+  page,
+  errors,
+}) => {
+  await page.route("**/api/contact", async (route) => {
+    if (route.request().method() === "POST") {
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify({ ok: true }),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.goto("/about#project-disclosure", {
+    waitUntil: "domcontentloaded",
+  });
+  await expect(
+    page.getByRole("link", { name: "machine-readable disclosure" }),
+  ).toHaveAttribute(
+    "href",
+    "https://github.com/fbalino/civica/blob/main/data/research/project-disclosure-v2.json",
+  );
+  await expect(
+    page.getByRole("link", { name: "report a correction" }),
+  ).toHaveAttribute("href", "/report-data-issue");
+
+  await page.goto("/report-data-issue", { waitUntil: "domcontentloaded" });
+  await expect(
+    page.getByRole("heading", { name: "Report a data issue", level: 1 }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Point to the exact record" }),
+  ).toBeVisible();
+
+  await page.goto("/contact", { waitUntil: "domcontentloaded" });
+  await expect(
+    page.getByRole("heading", { name: "Contact the editors" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Open a ticket on GitHub" }),
+  ).toHaveAttribute("href", "https://github.com/fbalino/civica/issues");
+  const otherCategory = page.getByRole("button", { name: "Other" });
+  await otherCategory.click();
+  await expect(otherCategory).toHaveAttribute("aria-pressed", "true");
+
+  const nameInput = page.getByLabel(/^Name/);
+  const emailInput = page.getByLabel(/^Email/);
+  const messageInput = page.getByLabel(/^Message/);
+  await nameInput.fill("Browser check");
+  await emailInput.fill("browser-check@example.com");
+  await messageInput.fill("Reader correction-routing check.");
+  await expect(nameInput).toHaveValue("Browser check");
+  await expect(emailInput).toHaveValue("browser-check@example.com");
+  await expect(messageInput).toHaveValue("Reader correction-routing check.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(
+    page.getByRole("link", { name: "report form" }),
+  ).toHaveAttribute("href", "/report-data-issue");
+
+  expect(errors.hardFailures(), errors.hardFailures().join("\n")).toEqual([]);
+});

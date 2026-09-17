@@ -1,7 +1,7 @@
 # EXP-038 — English-first editorial copy review
 
-Status: approved bundle applied and browser-checked; one explicitly gated
-copy decision remains (T4)
+Status: approved bundle applied and browser-checked; T4 correction routing is
+reconciled with the shipped ATL-024 intake flow
 
 Owner decision: Fernando Baliño approved the prepared English copy bundle on
 2026-07-25. In a later late-July 2026 session he additionally approved naming
@@ -33,11 +33,15 @@ The existing Home label “Independent & nonpartisan” is retained because
 GOV-003 now publishes the owner-confirmed funding, support, affiliation,
 vendor-relationship, and editorial-control facts that support it.
 
-## Explicit holds
+## Post-release reconciliation
 
-- **T4 — correction route.** The existing GitHub instruction remains unchanged
-  pending an owner choice of interim copy or activation of the dedicated
-  production correction flow.
+- **T4 — correction route resolved on 2026-09-17.** ATL-024 activated and
+  verified the dedicated production flow at `/report-data-issue`. The Contact
+  success panel now directs urgent data corrections there, and the project
+  disclosure uses the same correction route. The ordinary Contact form and
+  GitHub bug-ticket path remain available for their existing purposes. This is
+  engineering reconciliation against the shipped flow, not a new owner choice
+  or an external-review claim.
 
 **T3 resolved on 2026-08-09:** Fernando first chose no-guarantee wording, then
 revised it the same day to his own phrasing ("just say messages are reviewed
@@ -46,14 +50,15 @@ the Response tile now read "Messages are reviewed manually. We'll get back to
 you as soon as possible."; the former "SLA · Response" tile label is now
 "Response" because no timed service level is promised.
 
-These holds are recorded rather than inferred. No external review, endorsement,
-service-level observation, or production correction-flow activation is
-claimed.
+These dispositions retain the recorded owner decisions. No external review,
+endorsement, or service-level observation is claimed. ATL-024 supplies the
+existing production correction-flow evidence; this change reconciles its links.
 
 ## Verification
 
 The permanent copy contract is
 `scripts/validate-exp-038-copy.ts`. The current browser contract is
 `e2e/exp-038-copy-and-disclosure.spec.ts`; its desktop/mobile and light/dark
-checks passed on the local Main-aligned candidate on 2026-07-26. Detailed
-evidence is in `plan/evidence/EXP-038/`.
+checks passed on the local Main-aligned candidate on 2026-07-26. The focused
+correction-routing checks passed without a live submission on 2026-09-17.
+Detailed evidence is in `plan/evidence/EXP-038/`.

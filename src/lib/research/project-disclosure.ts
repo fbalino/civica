@@ -1,16 +1,18 @@
 import { createHash } from "node:crypto";
 
 export const PROJECT_DISCLOSURE_VERSION =
-  "civica-project-disclosure/v1" as const;
-export const PROJECT_DISCLOSURE_ARTIFACT_PATH =
+  "civica-project-disclosure/v2" as const;
+export const PROJECT_DISCLOSURE_V1_ARTIFACT_PATH =
   "data/research/project-disclosure-v1.json" as const;
+export const PROJECT_DISCLOSURE_ARTIFACT_PATH =
+  "data/research/project-disclosure-v2.json" as const;
 
 export const PROJECT_DISCLOSURE = Object.freeze({
   schemaVersion: PROJECT_DISCLOSURE_VERSION,
   effectiveOn: "2026-07-25",
   nextScheduledReviewOn: "2027-01-25",
   approvedBy: "Fernando Baliño",
-  correctionUrl: "/contact",
+  correctionUrl: "/report-data-issue",
   updateCadence: Object.freeze({
     scheduled: "Every six months.",
     eventDriven:
@@ -54,8 +56,8 @@ export const PROJECT_DISCLOSURE = Object.freeze({
       Object.freeze({
         product: "Atlas",
         checklistTask: "GOV-013",
-        status: "active",
-        artifactPath: PROJECT_DISCLOSURE_ARTIFACT_PATH,
+        status: "frozen_historical",
+        artifactPath: PROJECT_DISCLOSURE_V1_ARTIFACT_PATH,
       }),
       Object.freeze({
         product: "Index",
@@ -77,6 +79,12 @@ export const PROJECT_DISCLOSURE = Object.freeze({
       approvedBy: "Fernando Baliño",
       change:
         "Initial publication after owner confirmation of funding, support, affiliations, source and vendor relationships, editorial control, publication authorization, and review cadence.",
+    }),
+    Object.freeze({
+      effectiveOn: "2026-09-17",
+      approvedBy: "Fernando Baliño",
+      change:
+        "Moved correction routing from /contact to /report-data-issue after ATL-024 activation; no research or governance claims changed.",
     }),
   ]),
 });
@@ -153,12 +161,16 @@ export function projectDisclosureErrors(
   for (const product of ["Atlas", "Index", "Pulse"] as const)
     if (!packetProducts.has(product))
       errors.push(`${product} reviewer-packet binding is missing`);
-  if (
-    record.publicationAuthorization.reviewerPackets.some(
-      ({ artifactPath }) => artifactPath !== PROJECT_DISCLOSURE_ARTIFACT_PATH,
-    )
-  )
-    errors.push("a reviewer packet rewrites or forks the canonical disclosure");
+  const expectedPacketArtifacts = new Map([
+    ["Atlas", PROJECT_DISCLOSURE_V1_ARTIFACT_PATH],
+    ["Index", PROJECT_DISCLOSURE_ARTIFACT_PATH],
+    ["Pulse", PROJECT_DISCLOSURE_ARTIFACT_PATH],
+  ]);
+  for (const { product, artifactPath } of record.publicationAuthorization
+    .reviewerPackets) {
+    if (artifactPath !== expectedPacketArtifacts.get(product))
+      errors.push(`${product} reviewer-packet disclosure binding drifted`);
+  }
   if (
     record.nextScheduledReviewOn !== "2027-01-25" ||
     !record.updateCadence.eventDriven.includes("material change")

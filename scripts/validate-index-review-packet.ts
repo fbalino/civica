@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR } from "../src/lib/ci/governance-evidence-review-package";
 import { GOVERNANCE_EVIDENCE_REVIEW_PACKET } from "../src/lib/ci/governance-evidence-review-packet";
+import { PROJECT_DISCLOSURE_ARTIFACT_PATH } from "../src/lib/research/project-disclosure";
 
 const manifestPath = `${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/manifest.v1.json`;
 const packet = JSON.parse(readFileSync(manifestPath, "utf8"));
@@ -29,7 +30,7 @@ assert.ok(
   packet.inventory.some(
     ({ artifactId, path }: { artifactId: string; path: string }) =>
       artifactId === "project-disclosure" &&
-      path === "data/research/project-disclosure-v1.json",
+      path === PROJECT_DISCLOSURE_ARTIFACT_PATH,
   ),
   "canonical project disclosure is not bound",
 );

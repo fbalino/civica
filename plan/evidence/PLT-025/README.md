@@ -14,11 +14,13 @@ Twitterbot metadata/image verification. Evidence is retained under
 capital backup/restore and repeat-safe repair have a separate record there.
 Passing hosted PR and main CI evidence is under `plan/evidence/PLT-001/`.
 
-The checklist is 265/311 complete with 46 remaining, 21 open P0, and 43 open
+The checklist is 266/312 complete with 46 remaining, 22 open P0, and 43 open
 P0/P1 tasks; G4 and PLT-025 remain blocked, with zero evidence gaps, mirror
 errors, or waivers. QA-018 and EXP-015 are resolved; QA-019's residual external
 record/disposition remains separate from its completed technical rehearsal.
-Repository enforcement is still pending: main has no protection or ruleset.
+Repository enforcement is now active under ruleset `23623964`; PR #35 passed
+its required checks and merged through the normal protected path. EXP-038 is
+reconciled; PLT-031 remains open for ordinary scheduled production recovery.
 Existing freshness and optional-classification warnings, provider controls,
 and qualified reviews remain explicit. The map is deferred.
 

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { PROJECT_DISCLOSURE_ARTIFACT_PATH } from "../research/project-disclosure";
 import { GOVERNANCE_EVIDENCE_REVIEW_PACKET } from "./governance-evidence-review-packet";
 
 export const GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR =
@@ -40,7 +41,7 @@ const CORE_EXTERNAL_ARTIFACTS: ReadonlyArray<{
   { artifactId: "confirmatory-decision", role: "disposition", path: "data/releases/index-tournament-confirmatory-decision-v1/decision.v1.json" },
   { artifactId: "adopted-disposition", role: "disposition", path: "data/releases/index-disposition-2026-07-v1/resolution.v1.json" },
   { artifactId: "public-surface-migration", role: "disposition", path: "plan/evidence/IDX-027/README.md" },
-  { artifactId: "project-disclosure", role: "governance", path: "data/research/project-disclosure-v1.json" },
+  { artifactId: "project-disclosure", role: "governance", path: PROJECT_DISCLOSURE_ARTIFACT_PATH },
   { artifactId: "rights-manifest-code", role: "rights", path: "src/lib/rights/manifest.ts" },
   { artifactId: "package-lock", role: "environment", path: "package-lock.json" },
   { artifactId: "review-packet-contract", role: "selected-product-code", path: "src/lib/ci/governance-evidence-review-packet.ts" },

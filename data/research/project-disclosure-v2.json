@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "civica-project-disclosure/v2",
+  "effectiveOn": "2026-07-25",
+  "nextScheduledReviewOn": "2027-01-25",
+  "approvedBy": "Fernando Baliño",
+  "correctionUrl": "/report-data-issue",
+  "updateCadence": {
+    "scheduled": "Every six months.",
+    "eventDriven": "Review and update after any material change to funding, support, affiliations, source or vendor relationships, control rights, or conflict posture."
+  },
+  "funding": {
+    "personallyFundedBy": "Fernando Baliño",
+    "outsideFundersOrSponsors": [],
+    "publicText": "Civica Atlas is personally funded by Fernando Baliño. As of 2026-07-25, it has received no grants, sponsorships, donations, employer support, or outcome-contingent funding. No outside funder or sponsor exists."
+  },
+  "servicesAndInKindSupport": {
+    "donatedOrDiscountedMaterialSupport": false,
+    "publicText": "The project uses commercial and free-tier software, hosting, database, model, research, and developer services. Fernando pays the project's costs. It has received no donated or discounted services, credits, waived fees, free professional work, equipment, datasets beyond ordinary published access, or other material in-kind support. Routine public free tiers and generally available open-source packages are disclosed by category rather than assigned a monetary value."
+  },
+  "politicalIndependenceAndAffiliations": {
+    "outsideAffiliationsOrRelevantInterests": [],
+    "publicText": "Civica Atlas is not affiliated with or directed by any political party, campaign, government, lobbying organization, advocacy organization, university, research institute, NGO, or commercial governance-data provider. Fernando has confirmed no relevant outside affiliations or interests. The project takes no institutional position on parties, governments, or regime outcomes."
+  },
+  "editorialControl": {
+    "finalAuthority": "Fernando Baliño",
+    "exceptionalThirdPartyControlRights": [],
+    "publicText": "Fernando Baliño has final authority over data inclusion, methodology, copy, corrections, releases, security, source rights, reviewer process, conflicts, and emergency action under civica-research-publication-governance/v1. No third party has exceptional approval, veto, advance-access, publication-timing, messaging, hiring, reviewer-selection, or data-removal rights. Contractors, agents, model providers, source publishers, prospective reviewers, and advisory-board applicants have no publication veto or automatic approval role. Any future delegation, funder condition, sponsor right, or exceptional third-party control right will be named and dated."
+  },
+  "sourceAndVendorRelationships": {
+    "formalOrPrivilegedBeyondOrdinaryTerms": [],
+    "publicText": "Civica has no formal or privileged source or vendor relationships beyond ordinary paid-customer or public-access terms. It obtains data under the source-by-source access and rights conditions in its manifests. Citation, payment, public access, or technical integration does not imply endorsement by either party."
+  },
+  "conflictHandling": {
+    "publicText": "Relevant project, author, contributor, reviewer, source-provider, funder, vendor, political, personal, and competitive interests are disclosed before the affected decision. They are managed, recused, or excluded under the governance charter. An unmanageable conflict held by the sole owner blocks the affected claim until a qualified independent decision-maker is appointed."
+  },
+  "publicationAuthorization": {
+    "about": true,
+    "unchangedReviewerPacketReuse": true,
+    "reviewerPackets": [
+      {
+        "product": "Atlas",
+        "checklistTask": "GOV-013",
+        "status": "frozen_historical",
+        "artifactPath": "data/research/project-disclosure-v1.json"
+      },
+      {
+        "product": "Index",
+        "checklistTask": "GOV-014",
+        "status": "active",
+        "artifactPath": "data/research/project-disclosure-v2.json"
+      },
+      {
+        "product": "Pulse",
+        "checklistTask": "GOV-015",
+        "status": "required_when_packet_is_assembled",
+        "artifactPath": "data/research/project-disclosure-v2.json"
+      }
+    ]
+  },
+  "changeHistory": [
+    {
+      "effectiveOn": "2026-07-25",
+      "approvedBy": "Fernando Baliño",
+      "change": "Initial publication after owner confirmation of funding, support, affiliations, source and vendor relationships, editorial control, publication authorization, and review cadence."
+    },
+    {
+      "effectiveOn": "2026-09-17",
+      "approvedBy": "Fernando Baliño",
+      "change": "Moved correction routing from /contact to /report-data-issue after ATL-024 activation; no research or governance claims changed."
+    }
+  ],
+  "semanticSha256": "71465ba5dd3a747908d73cd50c0ff3b98bb64f1e88eda9637635c268219fcb85"
+}

@@ -75,7 +75,8 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
       <h2 className="contact-success-title">Thanks &mdash; we&rsquo;ve got it.</h2>
       <p className="contact-success-body">
         Messages are reviewed manually. We&rsquo;ll get back to you as soon as
-        possible. For urgent data corrections, open an issue on GitHub.
+        possible. For urgent data corrections, use the dedicated{" "}
+        <Link href="/report-data-issue">report form</Link>.
       </p>
       <Button variant="secondary" size="sm" onClick={onReset}>
         Send another

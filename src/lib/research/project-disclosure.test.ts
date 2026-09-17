@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   PROJECT_DISCLOSURE,
   PROJECT_DISCLOSURE_ARTIFACT_PATH,
+  PROJECT_DISCLOSURE_V1_ARTIFACT_PATH,
   PROJECT_DISCLOSURE_PUBLIC_SECTIONS,
   projectDisclosureErrors,
 } from "./project-disclosure";
@@ -10,6 +11,7 @@ import {
 test("project disclosure records every confirmed owner field", () => {
   assert.deepEqual(projectDisclosureErrors(), []);
   assert.equal(PROJECT_DISCLOSURE.approvedBy, "Fernando Baliño");
+  assert.equal(PROJECT_DISCLOSURE.correctionUrl, "/report-data-issue");
   assert.equal(PROJECT_DISCLOSURE.funding.outsideFundersOrSponsors.length, 0);
   assert.equal(
     PROJECT_DISCLOSURE.sourceAndVendorRelationships
@@ -23,7 +25,7 @@ test("project disclosure records every confirmed owner field", () => {
   assert.equal(PROJECT_DISCLOSURE_PUBLIC_SECTIONS.length, 6);
 });
 
-test("Atlas, Index, and future Pulse packets reuse one canonical artifact", () => {
+test("review packets preserve the disclosure version they bind", () => {
   assert.equal(
     PROJECT_DISCLOSURE.publicationAuthorization.unchangedReviewerPacketReuse,
     true,
@@ -33,7 +35,7 @@ test("Atlas, Index, and future Pulse packets reuse one canonical artifact", () =
       ({ product, artifactPath }) => [product, artifactPath],
     ),
     [
-      ["Atlas", PROJECT_DISCLOSURE_ARTIFACT_PATH],
+      ["Atlas", PROJECT_DISCLOSURE_V1_ARTIFACT_PATH],
       ["Index", PROJECT_DISCLOSURE_ARTIFACT_PATH],
       ["Pulse", PROJECT_DISCLOSURE_ARTIFACT_PATH],
     ],

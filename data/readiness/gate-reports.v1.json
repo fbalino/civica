@@ -1,17 +1,17 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "ec6919d1921277d9b95af5225ca4366d27779e4b3a12999c7797f9855fa138a5",
-    "plan/PROGRESS.md": "58476d047ef062cd7813bae345d884ea65599048cf6f6d34b152545736e41e51",
-    "plan/MANUAL-CHECKS.md": "a6b278632a64c4084b4e4cf9facbedb7c0e04c99ad879e9703b248a301b9e8bf",
+    "plan/MASTER-CHECKLIST.md": "c7de6bc7e71499302d8e6c9a43b8233c1acb55e8fcddba705cabe8d60e1ab1a4",
+    "plan/PROGRESS.md": "1bb708c0231f9462ac71ce06bd8f0ec1606c692f241bcd2687b15e27dc0589d4",
+    "plan/MANUAL-CHECKS.md": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
     "plan/03-data-provenance-and-reproducibility.md": "8ce0389812f14fe7a12afd6ca3b0752b53578db2134a99045cd66d42d21bedf6",
     "plan/04-civica-index-research-program.md": "6d879a9fecefeda072af4a41ccde7d8be1b77a555f42f9ebece4c38e01343b4b",
     "plan/05-pulse-event-ledger-and-validation.md": "469c04ca66b439905a60c39c69e1a8e20b55e4d0ec9e6c9482b8987da64d64d7",
     "plan/06-atlas-content-and-research-features.md": "73c404cb712e67de4230b17b5b8790051eae8f3f909e3d92e4ecdb789c886fd4",
-    "plan/07-design-system-assets-and-reader-experience.md": "13c6ee82ad120615263532e68691824af5f8b50abbd9d02a0af5dbbf62105977",
-    "plan/08-platform-security-performance-and-operations.md": "d8c393c9dafc9ead9e558cf3a30c1117eb1ce896bf5bcdfcb8224a857f641482",
+    "plan/07-design-system-assets-and-reader-experience.md": "10dd3f0d32840eec2423362440d2a95e26c11c26b001d30c1b67380b79a768bf",
+    "plan/08-platform-security-performance-and-operations.md": "58f7cc964c2ed942250b3f332cd5a623ff3490841551c735ab1f6da6e42320e8",
     "plan/09-testing-qa-and-release.md": "2a2a7d2d6bd8fae6efab1d02b17cbc00ddb67e6374f81fe7d5dfb3d26f872014",
     "plan/10-academic-governance-review-and-outreach.md": "d92e4b4bc3392dccd81ad135c257304ed60edaece5d2cd7f28a6123a5e02baa6",
     "plan/11-brand-legal-and-licensing.md": "7c3989aa13da0480d17780fef6701811dd717f37dd5f216dca45f8f5a286d52b"
@@ -22,17 +22,17 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 311,
-        "completed": 265,
+        "total": 312,
+        "completed": 266,
         "remaining": 46,
         "byPriority": {
           "P0": {
-            "total": 193,
+            "total": 194,
             "completed": 172
           },
           "P1": {
             "total": 113,
-            "completed": 91
+            "completed": 92
           },
           "P2": {
             "total": 5,
@@ -58,7 +58,7 @@
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 44,
-            "completed": 38
+            "completed": 39
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -69,7 +69,7 @@
             "completed": 39
           },
           "08-platform-security-performance-and-operations.md": {
-            "total": 30,
+            "total": 31,
             "completed": 28
           },
           "05-pulse-event-ledger-and-validation.md": {
@@ -97,6 +97,7 @@
         "GOV-020",
         "GOV-021",
         "PLT-025",
+        "PLT-031",
         "PUL-018",
         "PUL-019",
         "PUL-020",
@@ -116,7 +117,6 @@
         "EXP-016",
         "EXP-025",
         "EXP-028",
-        "EXP-038",
         "GOV-012",
         "GOV-015",
         "GOV-016",
@@ -135,6 +135,7 @@
         "IDX-022",
         "PLT-025",
         "PLT-029",
+        "PLT-031",
         "PUL-018",
         "PUL-019",
         "PUL-020",
@@ -154,10 +155,9 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "a6b278632a64c4084b4e4cf9facbedb7c0e04c99ad879e9703b248a301b9e8bf",
+        "sha256": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
         "linkedTaskIds": [
           "ATL-010",
-          "ATL-024",
           "ATL-026",
           "ATL-027",
           "BRD-002",
@@ -179,7 +179,6 @@
           "EXP-030",
           "EXP-031",
           "EXP-038",
-          "GOV-003",
           "GOV-010",
           "GOV-012",
           "GOV-016",
@@ -193,6 +192,7 @@
           "PLT-020",
           "PLT-021",
           "PLT-022",
+          "PLT-031",
           "PUL-039",
           "PUL-040",
           "PUL-041",
@@ -240,7 +240,7 @@
         }
       ],
       "blockers": [
-        "21 unchecked P0 tasks prevent a green report"
+        "22 unchecked P0 tasks prevent a green report"
       ]
     },
     {
@@ -248,17 +248,17 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 311,
-        "completed": 265,
+        "total": 312,
+        "completed": 266,
         "remaining": 46,
         "byPriority": {
           "P0": {
-            "total": 193,
+            "total": 194,
             "completed": 172
           },
           "P1": {
             "total": 113,
-            "completed": 91
+            "completed": 92
           },
           "P2": {
             "total": 5,
@@ -284,7 +284,7 @@
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 44,
-            "completed": 38
+            "completed": 39
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -295,7 +295,7 @@
             "completed": 39
           },
           "08-platform-security-performance-and-operations.md": {
-            "total": 30,
+            "total": 31,
             "completed": 28
           },
           "05-pulse-event-ledger-and-validation.md": {
@@ -323,6 +323,7 @@
         "GOV-020",
         "GOV-021",
         "PLT-025",
+        "PLT-031",
         "PUL-018",
         "PUL-019",
         "PUL-020",
@@ -342,7 +343,6 @@
         "EXP-016",
         "EXP-025",
         "EXP-028",
-        "EXP-038",
         "GOV-012",
         "GOV-015",
         "GOV-016",
@@ -361,6 +361,7 @@
         "IDX-022",
         "PLT-025",
         "PLT-029",
+        "PLT-031",
         "PUL-018",
         "PUL-019",
         "PUL-020",
@@ -380,10 +381,9 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "a6b278632a64c4084b4e4cf9facbedb7c0e04c99ad879e9703b248a301b9e8bf",
+        "sha256": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
         "linkedTaskIds": [
           "ATL-010",
-          "ATL-024",
           "ATL-026",
           "ATL-027",
           "BRD-002",
@@ -405,7 +405,6 @@
           "EXP-030",
           "EXP-031",
           "EXP-038",
-          "GOV-003",
           "GOV-010",
           "GOV-012",
           "GOV-016",
@@ -419,6 +418,7 @@
           "PLT-020",
           "PLT-021",
           "PLT-022",
+          "PLT-031",
           "PUL-039",
           "PUL-040",
           "PUL-041",
@@ -473,7 +473,7 @@
         }
       ],
       "blockers": [
-        "21 unchecked P0 tasks prevent a green report",
+        "22 unchecked P0 tasks prevent a green report",
         "43 unchecked P0/P1 tasks prevent G4"
       ]
     },
@@ -482,17 +482,17 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 311,
-        "completed": 265,
+        "total": 312,
+        "completed": 266,
         "remaining": 46,
         "byPriority": {
           "P0": {
-            "total": 193,
+            "total": 194,
             "completed": 172
           },
           "P1": {
             "total": 113,
-            "completed": 91
+            "completed": 92
           },
           "P2": {
             "total": 5,
@@ -518,7 +518,7 @@
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 44,
-            "completed": 38
+            "completed": 39
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -529,7 +529,7 @@
             "completed": 39
           },
           "08-platform-security-performance-and-operations.md": {
-            "total": 30,
+            "total": 31,
             "completed": 28
           },
           "05-pulse-event-ledger-and-validation.md": {
@@ -557,6 +557,7 @@
         "GOV-020",
         "GOV-021",
         "PLT-025",
+        "PLT-031",
         "PUL-018",
         "PUL-019",
         "PUL-020",
@@ -576,7 +577,6 @@
         "EXP-016",
         "EXP-025",
         "EXP-028",
-        "EXP-038",
         "GOV-012",
         "GOV-015",
         "GOV-016",
@@ -595,6 +595,7 @@
         "IDX-022",
         "PLT-025",
         "PLT-029",
+        "PLT-031",
         "PUL-018",
         "PUL-019",
         "PUL-020",
@@ -614,10 +615,9 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "a6b278632a64c4084b4e4cf9facbedb7c0e04c99ad879e9703b248a301b9e8bf",
+        "sha256": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
         "linkedTaskIds": [
           "ATL-010",
-          "ATL-024",
           "ATL-026",
           "ATL-027",
           "BRD-002",
@@ -639,7 +639,6 @@
           "EXP-030",
           "EXP-031",
           "EXP-038",
-          "GOV-003",
           "GOV-010",
           "GOV-012",
           "GOV-016",
@@ -653,6 +652,7 @@
           "PLT-020",
           "PLT-021",
           "PLT-022",
+          "PLT-031",
           "PUL-039",
           "PUL-040",
           "PUL-041",
@@ -693,7 +693,7 @@
         }
       ],
       "blockers": [
-        "21 unchecked P0 tasks prevent a green report",
+        "22 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
     },
@@ -702,17 +702,17 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 311,
-        "completed": 265,
+        "total": 312,
+        "completed": 266,
         "remaining": 46,
         "byPriority": {
           "P0": {
-            "total": 193,
+            "total": 194,
             "completed": 172
           },
           "P1": {
             "total": 113,
-            "completed": 91
+            "completed": 92
           },
           "P2": {
             "total": 5,
@@ -738,7 +738,7 @@
           },
           "07-design-system-assets-and-reader-experience.md": {
             "total": 44,
-            "completed": 38
+            "completed": 39
           },
           "10-academic-governance-review-and-outreach.md": {
             "total": 28,
@@ -749,7 +749,7 @@
             "completed": 39
           },
           "08-platform-security-performance-and-operations.md": {
-            "total": 30,
+            "total": 31,
             "completed": 28
           },
           "05-pulse-event-ledger-and-validation.md": {
@@ -777,6 +777,7 @@
         "GOV-020",
         "GOV-021",
         "PLT-025",
+        "PLT-031",
         "PUL-018",
         "PUL-019",
         "PUL-020",
@@ -796,7 +797,6 @@
         "EXP-016",
         "EXP-025",
         "EXP-028",
-        "EXP-038",
         "GOV-012",
         "GOV-015",
         "GOV-016",
@@ -815,6 +815,7 @@
         "IDX-022",
         "PLT-025",
         "PLT-029",
+        "PLT-031",
         "PUL-018",
         "PUL-019",
         "PUL-020",
@@ -834,10 +835,9 @@
       "masterMirrorErrors": [],
       "manualChecks": {
         "path": "plan/MANUAL-CHECKS.md",
-        "sha256": "a6b278632a64c4084b4e4cf9facbedb7c0e04c99ad879e9703b248a301b9e8bf",
+        "sha256": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
         "linkedTaskIds": [
           "ATL-010",
-          "ATL-024",
           "ATL-026",
           "ATL-027",
           "BRD-002",
@@ -859,7 +859,6 @@
           "EXP-030",
           "EXP-031",
           "EXP-038",
-          "GOV-003",
           "GOV-010",
           "GOV-012",
           "GOV-016",
@@ -873,6 +872,7 @@
           "PLT-020",
           "PLT-021",
           "PLT-022",
+          "PLT-031",
           "PUL-039",
           "PUL-040",
           "PUL-041",
@@ -913,7 +913,7 @@
         }
       ],
       "blockers": [
-        "21 unchecked P0 tasks prevent a green report",
+        "22 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
     }
