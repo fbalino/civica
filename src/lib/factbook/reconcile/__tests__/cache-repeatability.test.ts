@@ -29,7 +29,7 @@ function harness(initialState: Record<string, unknown> = {}) {
           returning: async () => {
             if (writeError) throw writeError;
             if (affectedRows === 1) {
-              state = structuredClone(value);
+              state = { ...state, ...structuredClone(value) };
               writes++;
               return [{ id: jurisdiction.id }];
             }
@@ -103,6 +103,48 @@ test("withdrawn canonicals clear stale fields in the same timestamped update", a
   assert.equal(result.fieldsWritten, 5);
   assert.equal(result.fieldsCleared, 2);
   assert.equal(result.jurisdictionsRefreshed, 1);
+});
+
+test("capital-only repair preserves unrelated cache values and row freshness", async () => {
+  const previousRefresh = new Date("2026-09-16T06:30:00.000Z");
+  const state = harness({
+    capital: null,
+    population: 41_000_000,
+    factCacheRefreshedAt: previousRefresh,
+  });
+
+  const result = await refreshJurisdictionCache(state.db, {
+    jurisdictions: [jurisdiction],
+    fields: ["capital"],
+    resolveFacts: async () => ({ capital: resolved.capital }) as never,
+  });
+
+  assert.equal(state.state().capital, "Ottawa");
+  assert.equal(state.state().population, 41_000_000);
+  assert.deepEqual(state.state().factCacheRefreshedAt, previousRefresh);
+  assert.equal(result.fieldsWritten, 1);
+  assert.equal(result.fieldsCleared, 0);
+});
+
+test("capital-only repair still clears a withdrawn canonical", async () => {
+  const previousRefresh = new Date("2026-09-16T06:30:00.000Z");
+  const state = harness({
+    capital: "Stale City",
+    population: 41_000_000,
+    factCacheRefreshedAt: previousRefresh,
+  });
+
+  const result = await refreshJurisdictionCache(state.db, {
+    jurisdictions: [jurisdiction],
+    fields: ["capital"],
+    resolveFacts: async () => ({ capital: { canonical: null } }) as never,
+  });
+
+  assert.equal(state.state().capital, null);
+  assert.equal(state.state().population, 41_000_000);
+  assert.deepEqual(state.state().factCacheRefreshedAt, previousRefresh);
+  assert.equal(result.fieldsWritten, 0);
+  assert.equal(result.fieldsCleared, 1);
 });
 
 test("a zero-row update cannot advance freshness or committed counts", async () => {

@@ -1,0 +1,140 @@
+{
+  "contract": "civica-social-card-generation-records/v1",
+  "policy": "civica-editorial-illustration-rights/v1",
+  "records": [
+    {
+      "id": "og-atlas-2026-09-v1",
+      "assetKey": "og-atlas-2026-09",
+      "route": "Default social image for public routes without their own card",
+      "subject": "Decorative engraved globe, books and generic coastline beside the Civica Atlas identity and reference-work description.",
+      "caption": "A world atlas of government. Institutions, constitutions, elections—and their sources.",
+      "assets": [
+        {
+          "theme": "light",
+          "path": "public/og-atlas-2026-09.png",
+          "sha256": "ec62a5aea5a8d62cb79d6df448a2869fc67cda6a5bace020d0ebed05ee21d6a2",
+          "width": 1200,
+          "height": 630,
+          "format": "png",
+          "bytes": 1405450,
+          "sourceOutputSha256": "85293154dad95424feb46367783caa71abd6ad2a7bb26cf98d5a8bd5c72a401f"
+        }
+      ],
+      "generation": {
+        "provider": "OpenAI",
+        "tool": "Codex native image_gen.imagegen",
+        "model": "not-exposed-by-native-runtime",
+        "version": "not-exposed-by-native-runtime",
+        "modelDisclosure": "The native runtime did not expose an exact image model or version, so none is inferred.",
+        "accountContext": "Authenticated ChatGPT/Codex native session; no API key or separate API transport was used.",
+        "accountTerms": {
+          "name": "OpenAI Terms of Use",
+          "url": "https://openai.com/policies/terms-of-use/",
+          "effectiveOn": "2026-01-01",
+          "checkedOn": "2026-09-17",
+          "applicabilityBasis": "The image was generated through the native tool in the authenticated ChatGPT/Codex consumer session.",
+          "outputRightsSummary": "As between the user and OpenAI, and to the extent permitted by applicable law, the user owns the output and OpenAI assigns any output interest it may have.",
+          "nonUniquenessSummary": "The terms state that outputs may not be unique and other users may receive similar output."
+        },
+        "seed": null,
+        "seedDisclosure": "The native runtime did not expose a seed.",
+        "parameters": {
+          "requestedAspectRatio": "1200:630 landscape",
+          "returnedWidth": 1732,
+          "returnedHeight": 908,
+          "quality": "not-exposed-by-native-runtime",
+          "styleControl": "prompt-only"
+        }
+      },
+      "prompts": {
+        "initial": "Use case: ads-marketing. Create ONE finished Open Graph sharing image for Civica Atlas, landscape 1200 × 630 pixels, roughly 1.91:1 aspect ratio, full canvas artwork, no mockup frame. This is option 1, 'The engraved atlas', but DO NOT print the option name.\nBrand source: Civica's CURRENT fine-press almanac design system: warm ivory #FAF7F2 paper, ink-navy #0B1B2D typography, a restrained terracotta #B7512B accent, hairline rules, exquisitely detailed antique engraved illustration. Newsreader Light serif for display, Archivo sans serif for small text. This is an elegant contemporary scholarly reference, never a tech dashboard or vintage distressed poster.\nComposition: asymmetrical editorial cover, left 57% a calm ivory text field, right 43% an extraordinary navy copperplate engraving of an old terrestrial globe on a simple stand, graceful meridians and recognisable continents, fading naturally into the paper toward the text, very fine controlled hatching. No country borders or labels. The globe is decorative.\nSet 'Civica Atlas' near upper left in a beautiful generously sized Newsreader-style serif wordmark. Below, the principal headline occupies three large airy lines: 'How every' / 'country is' / 'governed.' Set with light, crisp high-contrast serif, plenty of optical whitespace; readable in a small X card. Tiny terracotta hairline and subtle small Archivo line at lower left: 'Country profiles. Sources. Context.' Along the bottom a fine rule and 'civicaatlas.org' in clean sans serif. The brand and headline must be dominant, engraving supports them.\nOnly exact text allowed: 'Civica Atlas', 'How every country is governed.', 'Country profiles. Sources. Context.', 'civicaatlas.org'. No invented icon or logo, no pseudo seals, no other words, no counts, no claims of comprehensiveness, no map data, no charts, no Index or Pulse. No monospace, gradients, bevels, offset shadows, rounded container, banners or busy UI. Min 55px safe margin at 1200px width. Visually impeccable professional typography and refined hierarchy.",
+        "approvedTextEdit": "Edit the attached approved Civica Atlas social sharing image. Preserve the ivory paper background, navy engraved globe with its stand/books/coastline on the right, brand wordmark, terracotta rules, overall composition, typography style and color. Change ONLY the headline and supporting line as follows. Replace 'How every country is governed.' with the exact headline 'A world atlas of government.' arranged in three elegant large serif lines: 'A world' / 'atlas of' / 'government.' Keep it within the left text field and do not overlap the globe. Replace 'Country profiles. Sources. Context.' with the exact supporting line 'Institutions, constitutions, elections—and their sources.' in clean Archivo-style sans serif. It may wrap naturally over TWO lines so it is easily readable in the left field; adjust the small terracotta line and bottom domain line slightly if needed to retain balanced breathing room and safe margins. Preserve 'Civica Atlas' and 'civicaatlas.org' exactly. No additional text. Keep the full canvas fully opaque warm ivory #FAF7F2; absolutely no transparency. Keep the selected antique engraving, layout and style. Finished flat sharing image, no mockup. Target 1200 by 630 aspect ratio (1.905:1). This is the approved production wording, so spelling and punctuation must be exact.",
+        "negativePrompt": "No separate negative-prompt parameter; exclusions are retained in the full prompts."
+      },
+      "references": [
+        {
+          "id": "owner-selected-internal-draft",
+          "sha256": "15bad29bbc0e45c2845252ae75809a1e894b010beadbaacd7150d03f218ea3a3",
+          "source": "Original native imagegen output from the initial prompt retained in this record.",
+          "author": "AI-assisted output directed by the Civica owner and Codex implementation agent.",
+          "permission": "Same native generation workflow and provider terms recorded above; not an external reference.",
+          "retrievedOn": "2026-09-17",
+          "intendedUse": "Preserve the owner-selected illustration and layout while replacing the headline and supporting copy."
+        }
+      ],
+      "referenceDisclosure": "No external photograph or visual reference was supplied to the initial generation. The final edit used only the internally generated, owner-selected draft identified by hash.",
+      "humanDirection": {
+        "owner": "Fernando Baliño",
+        "requestedOn": "2026-09-17",
+        "request": "Create three current-design-system social-card options; the owner selected the first engraved atlas direction and approved the replacement headline and supporting line.",
+        "specificOutputApproval": "Owner selected option 1 and authorized its stated text edit, isolated pull request, and merge.",
+        "specificOutputApprovalDisclosure": "The final edited pixels were generated under the approved direction; no separate approval of those final pixels is implied."
+      },
+      "selection": {
+        "selectedBy": "Fernando Baliño",
+        "selectedOn": "2026-09-17",
+        "basis": "Owner-selected light engraved atlas composition with the approved government-atlas wording.",
+        "rejectedAlternatives": [
+          "Dark globe direction",
+          "Typography-led reference cover direction"
+        ]
+      },
+      "transformations": [
+        {
+          "date": "2026-09-17",
+          "tool": "sharp (repository dependency)",
+          "operation": "Resize the returned 1732x908 PNG to the established 1200x630 social-card dimensions with fit fill, strip metadata by default, and encode PNG at compression level 9.",
+          "colorOrContentEdits": "Only the separately recorded native text edit; no additional content, recoloring, or compositing."
+        }
+      ],
+      "screenings": [
+        {
+          "id": "reference-copyright",
+          "disposition": "cleared",
+          "reason": "No external image was supplied to the initial generation; the edit reference is the internally generated draft retained by hash and prompt."
+        },
+        {
+          "id": "architecture-panorama",
+          "disposition": "cleared",
+          "reason": "Generic globe, books and coastline; no identifiable modern architecture, public art or interior."
+        },
+        {
+          "id": "trademark-insignia",
+          "disposition": "cleared",
+          "reason": "Only owner-authorized Civica Atlas text branding and domain; no third-party logo, flag, official seal or endorsement."
+        },
+        {
+          "id": "personality-likeness",
+          "disposition": "cleared",
+          "reason": "No person or public-figure likeness is depicted."
+        },
+        {
+          "id": "cultural-documentary-risk",
+          "disposition": "cleared",
+          "reason": "An unlabeled engraved globe is a decorative editorial motif, not a geographic, border, territorial-status or institutional evidence source."
+        }
+      ],
+      "review": {
+        "reviewer": "Codex implementation review",
+        "reviewerType": "agent technical and editorial screening",
+        "reviewedOn": "2026-09-17",
+        "outcome": "cleared",
+        "scope": "Approved wording, composition, small-card legibility, opaque background, file dimensions and hash, and the five screening domains.",
+        "independentProfessionalReview": false
+      },
+      "release": {
+        "releaseIdentity": "social-card-2026-09-v1",
+        "status": "owner-authorized-for-commit-and-merge",
+        "publicDisclosure": "/licensing#imagery",
+        "sourceEvidence": false
+      },
+      "correctionHistory": [
+        {
+          "date": "2026-09-17",
+          "replaces": "public/og-default.png",
+          "reason": "Replace obsolete branding and country-count copy with the owner-selected illustration and approved reference-work wording. The previous asset remains available for cached links."
+        }
+      ]
+    }
+  ]
+}

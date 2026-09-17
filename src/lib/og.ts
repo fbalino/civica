@@ -16,13 +16,13 @@ import { absoluteUrl } from "@/lib/site";
 /**
  * Default social-share image (1200x630). A root-relative path; Next resolves
  * it to an absolute URL against the root layout's `metadataBase`
- * (https://civicaatlas.org). Used as a bare string for `twitter.images`.
+ * (https://civicaatlas.org). Shared by Open Graph and Twitter image descriptors.
  */
-export const OG_DEFAULT_IMAGE = "/og-default.png";
+export const OG_DEFAULT_IMAGE = "/og-atlas-2026-09.png";
 
 // PUBLIC_CLAIM: metadata.social-card-positioning
 export const OG_DEFAULT_IMAGE_ALT =
-  "Civica Atlas — a provenance-first comparative reference to how every country is governed.";
+  "Civica Atlas — A world atlas of government. Institutions, constitutions, elections—and their sources.";
 
 /**
  * Default Open Graph `images` array (descriptor form, with dimensions + alt).

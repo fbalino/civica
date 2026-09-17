@@ -911,11 +911,12 @@ export const PUBLIC_CLAIMS = [
     surface: "metadata",
     routeOrArtifact: "Default Open Graph and social card alt text",
     exactClaim:
-      "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
+      "Civica Atlas — A world atlas of government. Institutions, constitutions, elections—and their sources.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/lib/og.ts",
-      "public/og-default.png",
+      "public/og-atlas-2026-09.png",
+      "data/social-card-generation-records.v1.json",
       "plan/DECISIONS.md",
     ],
     implementationOwner: "SEO and atlas editorial",
@@ -924,7 +925,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/lib/og.ts",
       fragment:
-        "Civica Atlas — a provenance-first comparative reference to how every country is governed.",
+        "Civica Atlas — A world atlas of government. Institutions, constitutions, elections—and their sources.",
     },
   },
   {

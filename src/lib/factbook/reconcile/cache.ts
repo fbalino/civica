@@ -52,7 +52,18 @@ const COLUMN_TO_FACT_KEY: Record<CachedField, string> = {
   democracyIndex: "vdem_row",
 };
 
-const ALL_FACT_KEYS = Object.values(COLUMN_TO_FACT_KEY);
+const ALL_CACHE_FIELDS = Object.keys(COLUMN_TO_FACT_KEY) as CachedField[];
+
+type CacheUpdate = Partial<{
+  capital: string | null;
+  population: number | null;
+  gdpBillions: number | null;
+  areaSqKm: number | null;
+  languages: string | null;
+  currency: string | null;
+  democracyIndex: number | null;
+  factCacheRefreshedAt: Date;
+}>;
 
 export interface CacheRefreshSummary {
   startedAt: string;
@@ -93,11 +104,21 @@ export async function refreshJurisdictionCache(
     dryRun?: boolean;
     jurisdictions?: CacheJurisdiction[];
     resolveFacts?: typeof getCanonicalFactsForJurisdiction;
+    /** Restrict a repair to specific cache columns. Partial refreshes do not
+     * advance the row-wide freshness timestamp because untouched fields were
+     * not revalidated. The scheduled full refresh keeps the default. */
+    fields?: CachedField[];
   } = {}
 ): Promise<CacheRefreshSummary> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
+  const cacheFields = options.fields ?? ALL_CACHE_FIELDS;
+  if (cacheFields.length === 0 || new Set(cacheFields).size !== cacheFields.length) {
+    throw new Error("Cache refresh fields must be non-empty and unique");
+  }
+  const factKeys = cacheFields.map((field) => COLUMN_TO_FACT_KEY[field]);
+  const isFullRefresh = cacheFields.length === ALL_CACHE_FIELDS.length;
 
   const jurisdictionRows = options.jurisdictions ?? (options.jurisdictionId
     ? await db
@@ -109,7 +130,7 @@ export async function refreshJurisdictionCache(
         .from(jurisdictions));
 
   log(
-    `${jurisdictionRows.length} jurisdiction(s) to refresh; ${ALL_FACT_KEYS.length} cached fact-keys.`
+    `${jurisdictionRows.length} jurisdiction(s) to refresh; ${factKeys.length} cached fact-key(s).`
   );
 
   let jurisdictionsRefreshed = 0;
@@ -121,61 +142,45 @@ export async function refreshJurisdictionCache(
     try {
       const resolved = await (options.resolveFacts ?? getCanonicalFactsForJurisdiction)(
         j.id,
-        ALL_FACT_KEYS
+        factKeys
       );
 
       // Every cache column participates in the same atomic update. A missing
       // canonical clears its former value; retaining it while advancing the
       // refresh timestamp would falsely relabel stale data as current.
-      const update: {
-        capital: string | null;
-        population: number | null;
-        gdpBillions: number | null;
-        areaSqKm: number | null;
-        languages: string | null;
-        currency: string | null;
-        democracyIndex: number | null;
-        factCacheRefreshedAt: Date;
-      } = {
-        capital: null,
-        population: null,
-        gdpBillions: null,
-        areaSqKm: null,
-        languages: null,
-        currency: null,
-        democracyIndex: null,
-        factCacheRefreshedAt: new Date(),
-      };
+      const update: CacheUpdate = {};
+      for (const field of cacheFields) update[field] = null;
+      if (isFullRefresh) update.factCacheRefreshedAt = new Date();
 
       const popResult = resolved["population_total"];
-      if (popResult?.canonical) {
+      if (cacheFields.includes("population") && popResult?.canonical) {
         const v = popResult.canonical.factValueNumeric;
         update.population = v === null ? null : Math.round(v);
       }
 
       const gdpResult = resolved["gdp_ppp_usd_billions"];
-      if (gdpResult?.canonical) {
+      if (cacheFields.includes("gdpBillions") && gdpResult?.canonical) {
         update.gdpBillions = gdpResult.canonical.factValueNumeric;
       }
 
       const areaResult = resolved["area_total_km2"];
-      if (areaResult?.canonical) {
+      if (cacheFields.includes("areaSqKm") && areaResult?.canonical) {
         const v = areaResult.canonical.factValueNumeric;
         update.areaSqKm = v === null ? null : Math.round(v);
       }
 
       const capitalResult = resolved["capital"];
-      if (capitalResult?.canonical?.factValue) {
+      if (cacheFields.includes("capital") && capitalResult?.canonical?.factValue) {
         update.capital = capitalResult.canonical.factValue;
       }
 
       const langsResult = resolved["official_languages"];
-      if (langsResult?.canonical?.factValue) {
+      if (cacheFields.includes("languages") && langsResult?.canonical?.factValue) {
         update.languages = langsResult.canonical.factValue;
       }
 
       const currencyResult = resolved["currency_code"];
-      if (currencyResult?.canonical?.factValue) {
+      if (cacheFields.includes("currency") && currencyResult?.canonical?.factValue) {
         update.currency = currencyResult.canonical.factValue;
       }
 
@@ -187,21 +192,13 @@ export async function refreshJurisdictionCache(
       // reads with resolver calls, at which point this mapping can
       // be retired.
       const vdemResult = resolved["vdem_row"];
-      if (vdemResult?.canonical?.factValue) {
+      if (cacheFields.includes("democracyIndex") && vdemResult?.canonical?.factValue) {
         update.democracyIndex = mapVdemRowToOrdinal(
           vdemResult.canonical.factValue
         );
       }
 
-      const cacheValues = [
-        update.capital,
-        update.population,
-        update.gdpBillions,
-        update.areaSqKm,
-        update.languages,
-        update.currency,
-        update.democracyIndex,
-      ];
+      const cacheValues = cacheFields.map((field) => update[field]);
       const jurisdictionFieldsWritten = cacheValues.filter(
         (value) => value !== null
       ).length;

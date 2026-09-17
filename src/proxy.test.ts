@@ -62,6 +62,7 @@ const MUST_NOT_MATCH = [
   "/engravings/countries/japan.webp",
   "/blog/the-record-launch/cover.webp",
   "/og-default.png",
+  "/og-atlas-2026-09.png",
   "/civica-logo.svg",
   "/fonts/archivo/archivo-normal-latin.woff2",
   "/fonts/newsreader/newsreader-italic-latin.woff",
