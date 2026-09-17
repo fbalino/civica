@@ -16,15 +16,17 @@ proof that either finding is fixed.
 Do not resume product-roadmap work while PLT-030 is open. The user's current
 map work is deferred, not cancelled; no new product task is created here.
 
-The owner-authorized branch cleanup is complete: 15 obsolete remote branches
+The owner-authorized branch cleanup is complete: 21 obsolete remote branches
 were deleted and obsolete pull requests 2, 3, and 4 were closed. The retained
 inventory is evidence of cleanup, not a claim that the remaining branches all
 need merging.
 
 Dependabot pull requests 6, 7, 9, 10, 11, and 12 are deferred maintenance,
-not release blockers. Critical dependency pull requests 13 and 20 remain until
+not release blockers; they are now closed with links retained and their remote
+branches auto-deleted. Critical dependency pull requests 13 and 20 remain until
 their validated replacement is ready. The canonical-capital repair has separate
-owner authority, but no live write or recovery claim is recorded here.
+owner authority for the canonical source and 229-row backfill, but no live write
+or recovery claim is recorded here.
 
 ## Reconciled historical records
 

@@ -16,20 +16,20 @@ passing build, deployment recovery, or live verification is claimed here.
 
 ## Completed repository hygiene
 
-The owner-authorized 2026-09-17 cleanup deleted 15 obsolete remote branches
+The owner-authorized 2026-09-17 cleanup deleted 21 obsolete remote branches
 and closed obsolete pull requests 2, 3, and 4. The exact scope, heads, and
 reasons are retained in `branch-cleanup-record-2026-09-17.json`. The record
-lists 10 remaining live branches as an inventory only; it does not assert that
+lists four remaining live branches as an inventory only; it does not assert that
 they are all active, mergeable, or required.
 
 Dependabot pull requests 6, 7, 9, 10, 11, and 12 are deferred maintenance,
-not release blockers. Their eventual close/delete disposition must retain the
-pull-request links. Critical dependency pull requests 13 and 20 are superseded
+not release blockers; they are now closed with links retained and their remote
+branches auto-deleted. Critical dependency pull requests 13 and 20 are superseded
 only when their validated replacement is ready.
 
-The canonical-capital repair has separate owner authority, but no live write is
-claimed in this record. PLT-030 remains open pending its implementation and
-deployment evidence.
+The canonical-source capital repair and its 229-row backfill have separate
+owner authority, but no live write is claimed in this record. PLT-030 remains
+open pending implementation and deployment evidence.
 
 The implementation owners must add a dated, bounded record for each finding:
 the named deployment or CI run, reproduction, affected scope, root cause,
