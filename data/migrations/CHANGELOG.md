@@ -337,13 +337,22 @@ forward correction or isolated pre-change backup.
 
 ## Operational data changes
 
-data-backfill-cia-vintage · data-backfill-election-results ·
+data-backfill-canonical-capitals · data-backfill-cia-vintage ·
+data-backfill-election-results ·
 data-backfill-growth-methodology · data-backfill-methodology-version ·
 data-backfill-territory-iso2 · data-backfill-upstream-vintage-labels ·
 data-bridge-cia-legacy-to-canonical · data-cleanup-bad-offices ·
 data-backfill-jurisdiction-capitals · data-create-rate-limits-table ·
 data-repair-pulse-agreement · data-reseed-bug3-corrupted ·
 data-restore-overdemoted-disputes
+
+`data-backfill-canonical-capitals` creates the omitted Group A CIA capital
+facts from retained `government` sections through the atomic fact/history
+writer, then reconciles only `jurisdictions.capital`. It leaves absent source
+values absent, preserves reviewer lifecycle state, does not advance source or
+row-wide cache freshness, and is dry-run by default. Its source metadata comes
+from the existing frozen CIA source contract and retained import provenance;
+no retrieval time is inferred from the repair run.
 
 `data-repair-pulse-agreement` recomputes the current agreement projection from
 stored provider-distinct, prompt-versioned classify runs. Unsupported labels

@@ -376,6 +376,7 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "journaled",
   ),
   ...[
+    "backfill-canonical-capitals",
     "backfill-cia-vintage",
     "backfill-election-results",
     "backfill-jurisdiction-capitals",

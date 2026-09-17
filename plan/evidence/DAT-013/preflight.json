@@ -1691,6 +1691,37 @@
         "sources": 57
       },
       "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-canonical-capitals",
+      "artifact": "scripts/backfill-canonical-capitals.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "1e863c14f08faab8ab514f4c6746d583f9570e8e5b49f4d1d58f82edd741991b",
+      "affectedRelations": [
+        "atlas_entity_change_history",
+        "country_factbook_sections",
+        "country_facts",
+        "jurisdictions",
+        "research_evidence_history",
+        "sources",
+        "statements"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-canonical-capitals-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-canonical-capitals --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "atlas_entity_change_history": 2738,
+        "country_factbook_sections": 2889,
+        "country_facts": 25829,
+        "jurisdictions": 253,
+        "research_evidence_history": 159089,
+        "sources": 57,
+        "statements": 7251
+      },
+      "writesPerformed": 0
     }
   ]
 }

@@ -14,6 +14,7 @@ import { classifyJurisdictionStatus } from "../src/lib/jurisdictions/status-taxo
 import countryGalleries from "../src/lib/data/country-galleries.generated.json";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
 import { writeAtlasCountry, type AtlasSectionInput } from "../src/lib/factbook/atlas-seed-writer";
+import { buildCiaCapitalFact } from "../src/lib/factbook/cia-capital";
 import { parseFactbookNumeric } from "../src/lib/factbook/numeric-validation";
 
 const sql = neon(process.env.DATABASE_URL!);
@@ -158,15 +159,23 @@ interface FactExtraction {
   factKey: string;
   factValue: string;
   factValueNumeric: number | null;
-  factUnit: string;
+  factUnit: string | null;
   factYear: number | null;
-  sourceNote: string;
+  sourceNote: string | null;
   /** Real underlying measurement year when it differs from CIA's prose
    *  stamp (`factYear`). Non-null only for the five demographic keys
    *  whose CIA "(YYYY est.)" stamp is a projection one year ahead of the
    *  measurement vintage. See `CIA_VINTAGE_OFFSET_KEYS` and
    *  `~/civica/plan/cia-stale-vintage-resolution-v1.md` (Option A). */
   dataVintageYear: number | null;
+  factGroup?: "A" | "B" | "C";
+  sourceUrl?: string;
+  valueStatus?: "observed";
+  valueStatusReason?: null;
+  upstreamVintageLabel?: string;
+  methodologyVersion?: string;
+  valueType?: "measured";
+  growthMethodology?: null;
 }
 
 /**
@@ -237,6 +246,9 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
       dataVintageYear,
     });
   }
+
+  const capital = buildCiaCapitalFact(data["Government"]);
+  if (capital) facts.push({ ...capital, sourceNote: null });
 
   // Economy
   const economy = data["Economy"] as Record<string, unknown> | undefined;

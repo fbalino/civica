@@ -1,0 +1,350 @@
+{
+  "schemaVersion": "civica-release-capital-repair/v1",
+  "executedAt": "2026-09-17T19:32:14.960Z",
+  "authorization": "Owner explicitly approved fixing the capital source records and the 229-record backfill after backup and local rehearsal.",
+  "rootCause": "The seed populated jurisdiction capital caches and retained government payloads but omitted canonical capital country_facts. The nightly resolver cache correctly cleared unsupported capital caches, undoing the earlier cache-only backfill.",
+  "repairArtifact": "scripts/backfill-canonical-capitals.ts",
+  "repairSha256": "1e863c14f08faab8ab514f4c6746d583f9570e8e5b49f4d1d58f82edd741991b",
+  "releaseId": "capital-canonical-repair-2026-09-17",
+  "sourceInputs": "Existing retained CIA government sections and the earliest retained factbook_import retrieval timestamp; no upstream fetch or invented source freshness.",
+  "snapshot": {
+    "at": "2026-09-17T19:16:35.295Z",
+    "bytes": 194809429,
+    "sha256": "4e4691313e817ba1d9f22bb3e79c099d9962d6dd545b615c81157b58bbe1b718",
+    "readOnly": true,
+    "directEndpoint": true
+  },
+  "restore": {
+    "allTableFingerprintsMatched": true,
+    "schemaMatchesExceptPhysicalColumnPositions": true,
+    "schemaDifference": "pg_dump restores dense physical column positions where production previously dropped columns in pulse_coding_adjudications; definitions otherwise match",
+    "normalizedSchemaSha256": "f38cd0663044c7012180400ae23f469ffa9044b335037dd8026ff6c14aae9cc8",
+    "comparedTables": [
+      "jurisdictions",
+      "sources",
+      "country_facts",
+      "statements",
+      "country_factbook_sections"
+    ]
+  },
+  "isolatedRehearsal": {
+    "transport": "Original Neon SQL and transaction payloads executed through a loopback-only PostgreSQL adapter; production connections forbidden.",
+    "apply": {
+      "schemaVersion": "civica-canonical-capital-backfill-plan/v1",
+      "mode": "authorized_apply",
+      "releaseId": "capital-canonical-repair-2026-09-17",
+      "jurisdictions": 253,
+      "governmentSections": 249,
+      "retainedCapitalValues": 229,
+      "missingPublisherValues": 20,
+      "missingGovernmentSections": 4,
+      "missingRetainedProvenance": 0,
+      "canonicalCapitalFactsBefore": 0,
+      "canonicalFactInserts": 229,
+      "canonicalFactUpdates": 0,
+      "canonicalFactsUnchanged": 0,
+      "canonicalFactsToWrite": 229,
+      "projectedCapitalCacheWrites": 229,
+      "sourceLastSyncAtBefore": "2026-07-15T07:00:32.564Z",
+      "writesPerformed": 229,
+      "sample": [
+        {
+          "slug": "afghanistan",
+          "before": null,
+          "after": "Kabul"
+        },
+        {
+          "slug": "akrotiri",
+          "before": null,
+          "after": "Episkopi Cantonment (base administrative center for Akrotiri and Dhekelia)"
+        },
+        {
+          "slug": "albania",
+          "before": null,
+          "after": "Tirana (Tirane)"
+        },
+        {
+          "slug": "algeria",
+          "before": null,
+          "after": "Algiers"
+        },
+        {
+          "slug": "american-samoa",
+          "before": null,
+          "after": "Pago Pago"
+        },
+        {
+          "slug": "andorra",
+          "before": null,
+          "after": "Andorra la Vella"
+        },
+        {
+          "slug": "angola",
+          "before": null,
+          "after": "Luanda"
+        },
+        {
+          "slug": "anguilla",
+          "before": null,
+          "after": "The Valley"
+        },
+        {
+          "slug": "antigua-and-barbuda",
+          "before": null,
+          "after": "Saint John's"
+        },
+        {
+          "slug": "argentina",
+          "before": null,
+          "after": "Buenos Aires"
+        }
+      ],
+      "capitalCacheWrites": 229,
+      "capitalCacheFieldsWritten": 229,
+      "capitalCacheFieldsCleared": 0,
+      "sourceLastSyncAtAfter": "2026-07-15T07:00:32.564Z"
+    },
+    "repeatPlan": {
+      "schemaVersion": "civica-canonical-capital-backfill-plan/v1",
+      "mode": "zero_write",
+      "releaseId": null,
+      "jurisdictions": 253,
+      "governmentSections": 249,
+      "retainedCapitalValues": 229,
+      "missingPublisherValues": 20,
+      "missingGovernmentSections": 4,
+      "missingRetainedProvenance": 0,
+      "canonicalCapitalFactsBefore": 229,
+      "canonicalFactInserts": 0,
+      "canonicalFactUpdates": 0,
+      "canonicalFactsUnchanged": 229,
+      "canonicalFactsToWrite": 0,
+      "projectedCapitalCacheWrites": 0,
+      "sourceLastSyncAtBefore": "2026-07-15T07:00:32.564Z",
+      "writesPerformed": 0,
+      "sample": []
+    },
+    "unchanged": {
+      "sources": true,
+      "statements": true,
+      "country_factbook_sections": true,
+      "jurisdictions_non_target": true,
+      "facts_non_target": true,
+      "source_freshness": true,
+      "schema": true
+    },
+    "normalNightlyRefresh": {
+      "jurisdictions": 253,
+      "errors": 0,
+      "directoryRowsMatchingAfterRefresh": 253
+    }
+  },
+  "production": {
+    "preflight": {
+      "schemaVersion": "civica-canonical-capital-backfill-plan/v1",
+      "mode": "zero_write",
+      "releaseId": null,
+      "jurisdictions": 253,
+      "governmentSections": 249,
+      "retainedCapitalValues": 229,
+      "missingPublisherValues": 20,
+      "missingGovernmentSections": 4,
+      "missingRetainedProvenance": 0,
+      "canonicalCapitalFactsBefore": 0,
+      "canonicalFactInserts": 229,
+      "canonicalFactUpdates": 0,
+      "canonicalFactsUnchanged": 0,
+      "canonicalFactsToWrite": 229,
+      "projectedCapitalCacheWrites": 229,
+      "sourceLastSyncAtBefore": "2026-07-15T07:00:32.564Z",
+      "writesPerformed": 0,
+      "sample": [
+        {
+          "slug": "afghanistan",
+          "before": null,
+          "after": "Kabul"
+        },
+        {
+          "slug": "akrotiri",
+          "before": null,
+          "after": "Episkopi Cantonment (base administrative center for Akrotiri and Dhekelia)"
+        },
+        {
+          "slug": "albania",
+          "before": null,
+          "after": "Tirana (Tirane)"
+        },
+        {
+          "slug": "algeria",
+          "before": null,
+          "after": "Algiers"
+        },
+        {
+          "slug": "american-samoa",
+          "before": null,
+          "after": "Pago Pago"
+        },
+        {
+          "slug": "andorra",
+          "before": null,
+          "after": "Andorra la Vella"
+        },
+        {
+          "slug": "angola",
+          "before": null,
+          "after": "Luanda"
+        },
+        {
+          "slug": "anguilla",
+          "before": null,
+          "after": "The Valley"
+        },
+        {
+          "slug": "antigua-and-barbuda",
+          "before": null,
+          "after": "Saint John's"
+        },
+        {
+          "slug": "argentina",
+          "before": null,
+          "after": "Buenos Aires"
+        }
+      ]
+    },
+    "apply": {
+      "schemaVersion": "civica-canonical-capital-backfill-plan/v1",
+      "mode": "authorized_apply",
+      "releaseId": "capital-canonical-repair-2026-09-17",
+      "jurisdictions": 253,
+      "governmentSections": 249,
+      "retainedCapitalValues": 229,
+      "missingPublisherValues": 20,
+      "missingGovernmentSections": 4,
+      "missingRetainedProvenance": 0,
+      "canonicalCapitalFactsBefore": 0,
+      "canonicalFactInserts": 229,
+      "canonicalFactUpdates": 0,
+      "canonicalFactsUnchanged": 0,
+      "canonicalFactsToWrite": 229,
+      "projectedCapitalCacheWrites": 229,
+      "sourceLastSyncAtBefore": "2026-07-15T07:00:32.564Z",
+      "writesPerformed": 229,
+      "sample": [
+        {
+          "slug": "afghanistan",
+          "before": null,
+          "after": "Kabul"
+        },
+        {
+          "slug": "akrotiri",
+          "before": null,
+          "after": "Episkopi Cantonment (base administrative center for Akrotiri and Dhekelia)"
+        },
+        {
+          "slug": "albania",
+          "before": null,
+          "after": "Tirana (Tirane)"
+        },
+        {
+          "slug": "algeria",
+          "before": null,
+          "after": "Algiers"
+        },
+        {
+          "slug": "american-samoa",
+          "before": null,
+          "after": "Pago Pago"
+        },
+        {
+          "slug": "andorra",
+          "before": null,
+          "after": "Andorra la Vella"
+        },
+        {
+          "slug": "angola",
+          "before": null,
+          "after": "Luanda"
+        },
+        {
+          "slug": "anguilla",
+          "before": null,
+          "after": "The Valley"
+        },
+        {
+          "slug": "antigua-and-barbuda",
+          "before": null,
+          "after": "Saint John's"
+        },
+        {
+          "slug": "argentina",
+          "before": null,
+          "after": "Buenos Aires"
+        }
+      ],
+      "capitalCacheWrites": 229,
+      "capitalCacheFieldsWritten": 229,
+      "capitalCacheFieldsCleared": 0,
+      "sourceLastSyncAtAfter": "2026-07-15T07:00:32.564Z"
+    },
+    "repeatPlan": {
+      "schemaVersion": "civica-canonical-capital-backfill-plan/v1",
+      "mode": "zero_write",
+      "releaseId": null,
+      "jurisdictions": 253,
+      "governmentSections": 249,
+      "retainedCapitalValues": 229,
+      "missingPublisherValues": 20,
+      "missingGovernmentSections": 4,
+      "missingRetainedProvenance": 0,
+      "canonicalCapitalFactsBefore": 229,
+      "canonicalFactInserts": 0,
+      "canonicalFactUpdates": 0,
+      "canonicalFactsUnchanged": 229,
+      "canonicalFactsToWrite": 0,
+      "projectedCapitalCacheWrites": 0,
+      "sourceLastSyncAtBefore": "2026-07-15T07:00:32.564Z",
+      "writesPerformed": 0,
+      "sample": []
+    },
+    "postflight": {
+      "at": "2026-09-17T19:32:14.960Z",
+      "canonical_facts": 229,
+      "history_events": 229,
+      "provenance_timestamp_mismatches": 0
+    },
+    "fingerprints": {
+      "unchanged": {
+        "sources": true,
+        "statements": true,
+        "country_factbook_sections": true,
+        "jurisdictions_non_target": true,
+        "facts_non_target": true,
+        "source_freshness": true,
+        "schema": true
+      },
+      "before": {
+        "facts": 0,
+        "filledCache": 0,
+        "history": 159089
+      },
+      "after": {
+        "facts": 229,
+        "filledCache": 229,
+        "history": 159089
+      }
+    },
+    "directoryRowsMatching": 253
+  },
+  "transactionBoundary": "All canonical fact/history changes were one transaction. The subsequent capital-only cache pass was independently idempotent and left all other columns and the row-wide cache freshness timestamp unchanged.",
+  "checks": [
+    "migration registry and zero-write live preflight",
+    "13 focused capital/cache tests including UTC replay and ISO-bound timestamps",
+    "TypeScript and targeted lint",
+    "Atlas change-history writer and source-freshness validation",
+    "fact coverage and data value-state validation",
+    "full cache refresh only in isolated restore; production directory validator passed"
+  ],
+  "recovery": "Verified private logical snapshot and isolated restore retained outside Git. Use reviewed forward compensation or isolated restore; never implicit production reverse writes.",
+  "deploymentStatus": "Data blocker cleared; runtime patch and release deployment still require PR integration and deployment verification.",
+  "result": "pass"
+}
