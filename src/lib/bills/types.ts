@@ -51,6 +51,20 @@ export type BillIngestDraft = Omit<BillIngest, "summary"> & {
 export type BillSourceEmptyReason =
   "upstream_returned_no_rows" | "no_bill_records_in_period";
 
+export type BillSourceFailureCode =
+  | "upstream_timeout"
+  | "upstream_rate_limited"
+  | "upstream_unavailable"
+  | "upstream_network_error"
+  | "source_configuration_missing"
+  | "source_authentication_failed"
+  | "source_endpoint_not_found"
+  | "source_http_error"
+  | "source_payload_invalid"
+  | "source_schema_invalid"
+  | "source_empty_unexpected"
+  | "source_mapping_failed";
+
 /**
  * Per-upstream evidence returned by adapters that aggregate more than one
  * publisher feed. An empty successful feed is different from a failed feed:
@@ -73,6 +87,7 @@ export type BillSourceFetchOutcome =
       status: "failed";
       fetched: number;
       mapped: 0;
+      code: BillSourceFailureCode;
       error: string;
     };
 

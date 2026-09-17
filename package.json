@@ -363,6 +363,7 @@
     "validate:error-monitoring": "node --import tsx --test src/lib/platform/error-monitoring.test.ts && tsx scripts/validate-error-monitoring.ts",
     "report:route-performance": "tsx scripts/report-route-performance.ts",
     "validate:source-input-manifest": "tsx scripts/validate-source-input-manifest.ts",
+    "validate:bills-source:live": "tsx scripts/validate-bill-source-live.ts",
     "validate:territory-engravings": "tsx scripts/validate-territory-engravings.ts",
     "generate:ci-normalization-table": "tsx scripts/generate-ci-normalization-table.ts",
     "generate:pca-analysis": "tsx scripts/generate-pca-analysis.ts",

@@ -2,7 +2,13 @@ import { eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "@/lib/db/schema";
 import { governmentBodies } from "@/lib/db/schema";
-import type { BillIngestDraft } from "../types";
+import type { BillFetchBatch, BillIngestDraft } from "../types";
+import {
+  failedBillSourceHttpOutcome,
+  failedBillSourceOutcome,
+  failedBillSourceRequestOutcome,
+  finalizeBillSourceMapping,
+} from "../source-outcome";
 import { statusToStage } from "../stage";
 
 const SOURCE_ID = "legisinfo_ca";
@@ -13,49 +19,106 @@ const SOURCE_ID = "legisinfo_ca";
  *
  * License: Open Government Licence – Canada (CC-BY-equivalent).
  *
- * Discovery notes (as of 2026-04):
- *  - The HTML "?download=json" button on `/legisinfo/en/bills` actually
- *    points at `/legisinfo/en/bills/json?parlsession=<session>`. That's
- *    the endpoint we hit.
- *  - All entries in a session response have `IsFromCurrentSession=true`,
- *    so no filtering needed.
- *  - `OriginatingChamberId` 1 = House of Commons, 2 = Senate. Used to
+ * Contract verified against the publisher response on 2026-09-17:
+ *  - `/legisinfo/en/bills/json` returns the active session. The optional
+ *    `parlsession` query is accepted by GET but is not required.
+ *  - `ParliamentNumber` + `SessionNumber` identify the session.
+ *  - `OriginatingChamberOrganizationId` 1 = House, 2 = Senate. Used to
  *    populate `bills.body_id` (first H.1/H.2 source where we do this).
  */
-const PARL_SESSION = "45-1";
+const BULK_URL = "https://www.parl.ca/legisinfo/en/bills/json";
 
 interface RawBill {
-  BillId?: number;
-  BillNumberFormatted?: string;
+  Id?: number;
+  NumberCode?: string;
   LongTitleEn?: string;
   ShortTitleEn?: string;
-  CurrentStatusEn?: string;
-  LatestCompletedMajorStageEn?: string;
-  LatestActivityEn?: string;
-  LatestActivityDateTime?: string;
+  StatusNameEn?: string;
+  LatestCompletedMajorStageNameEn?: string;
+  LatestCompletedMajorStageDateTime?: string | null;
+  LatestBillEventTypeNameEn?: string | null;
+  LatestBillEventDateTime?: string | null;
   ReceivedRoyalAssentDateTime?: string | null;
   PassedHouseThirdReadingDateTime?: string | null;
   PassedSenateThirdReadingDateTime?: string | null;
+  PassedHouseSecondReadingDateTime?: string | null;
+  PassedSenateSecondReadingDateTime?: string | null;
   PassedHouseFirstReadingDateTime?: string | null;
   PassedSenateFirstReadingDateTime?: string | null;
-  OriginatingChamberId?: number;
-  ParlSessionCode?: string;
-  SponsorEn?: string | null;
-  IsFromCurrentSession?: boolean;
+  OriginatingChamberOrganizationId?: number;
+  ParliamentNumber?: number;
+  SessionNumber?: number;
+  SponsorPersonName?: string | null;
+  IsSessionOngoing?: boolean;
 }
 
-async function fetchRaw(): Promise<RawBill[]> {
-  const url = `https://www.parl.ca/legisinfo/en/bills/json?parlsession=${PARL_SESSION}`;
-  const res = await fetch(url, {
-    cache: "no-store",
-    headers: {
-      "User-Agent": "civica-bills-sync/1.0 (https://civicaatlas.org)",
-      Accept: "application/json",
-    },
-  });
-  if (!res.ok) return [];
-  const json = (await res.json()) as RawBill[];
-  return Array.isArray(json) ? json : [];
+async function fetchRaw(): Promise<{
+  rows: RawBill[];
+  outcome: BillFetchBatch["sourceOutcomes"][number];
+}> {
+  try {
+    const res = await fetch(BULK_URL, {
+      cache: "no-store",
+      headers: {
+        "User-Agent": "civica-bills-sync/1.0 (https://civicaatlas.org)",
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(60_000),
+    });
+    if (!res.ok) {
+      return {
+        rows: [],
+        outcome: failedBillSourceHttpOutcome(SOURCE_ID, res.status),
+      };
+    }
+    let json: unknown;
+    try {
+      json = await res.json();
+    } catch {
+      return {
+        rows: [],
+        outcome: failedBillSourceOutcome(
+          SOURCE_ID,
+          "source_payload_invalid",
+          "publisher response was not valid JSON",
+        ),
+      };
+    }
+    if (!Array.isArray(json)) {
+      return {
+        rows: [],
+        outcome: failedBillSourceOutcome(
+          SOURCE_ID,
+          "source_schema_invalid",
+          "publisher response was not a bill array",
+        ),
+      };
+    }
+    if (json.length === 0) {
+      return {
+        rows: [],
+        outcome: failedBillSourceOutcome(
+          SOURCE_ID,
+          "source_empty_unexpected",
+          "active-session feed returned no bills",
+        ),
+      };
+    }
+    return {
+      rows: json as RawBill[],
+      outcome: {
+        sourceId: SOURCE_ID,
+        status: "success",
+        fetched: json.length,
+        mapped: 0,
+      },
+    };
+  } catch (error) {
+    return {
+      rows: [],
+      outcome: failedBillSourceRequestOutcome(SOURCE_ID, error),
+    };
+  }
 }
 
 /**
@@ -66,26 +129,27 @@ async function fetchRaw(): Promise<RawBill[]> {
  */
 function structuralStage(b: RawBill): number {
   if (b.ReceivedRoyalAssentDateTime) return 4;
-  if (
-    b.PassedHouseThirdReadingDateTime ||
-    b.PassedSenateThirdReadingDateTime
-  ) {
+  if (b.PassedHouseThirdReadingDateTime || b.PassedSenateThirdReadingDateTime) {
     return 3;
   }
   return statusToStage(
-    b.LatestCompletedMajorStageEn ?? b.CurrentStatusEn ?? null,
+    b.LatestCompletedMajorStageNameEn ?? b.StatusNameEn ?? null,
   );
 }
 
 function isoDate(value: string | null | undefined): string | null {
   if (!value) return null;
-  return value.slice(0, 10);
+  const date = value.slice(0, 10);
+  return /^(?:19|20)\d{2}-\d{2}-\d{2}$/.test(date) ? date : null;
 }
 
 function publicUrl(b: RawBill): string {
-  const session = b.ParlSessionCode ?? PARL_SESSION;
-  const number = (b.BillNumberFormatted ?? "").toLowerCase();
-  return number
+  const session =
+    b.ParliamentNumber && b.SessionNumber
+      ? `${b.ParliamentNumber}-${b.SessionNumber}`
+      : null;
+  const number = (b.NumberCode ?? "").toLowerCase();
+  return session && number
     ? `https://www.parl.ca/legisinfo/en/bill/${session}/${number}`
     : `https://www.parl.ca/legisinfo/en/bills`;
 }
@@ -96,7 +160,7 @@ function publicUrl(b: RawBill): string {
  * API route concatenates the two as "<title> - <longTitle>" for display.
  */
 function pickTitle(b: RawBill): { title: string; longTitle: string | null } {
-  const identifier = b.BillNumberFormatted?.trim() || "";
+  const identifier = b.NumberCode?.trim() || "";
   const formal = b.LongTitleEn?.trim() || b.ShortTitleEn?.trim() || "Untitled";
   return identifier
     ? { title: identifier, longTitle: formal }
@@ -104,7 +168,7 @@ function pickTitle(b: RawBill): { title: string; longTitle: string | null } {
 }
 
 /**
- * Fetch the active session and shape into `BillIngestDraft[]`.
+ * Fetch the active session and shape it into a source-evidenced batch.
  * Resolves `bodyId` from `governmentBodies` keyed on `chamber_type`.
  */
 export async function fetchCABillsForSync(opts: {
@@ -113,8 +177,11 @@ export async function fetchCABillsForSync(opts: {
   db: NeonHttpDatabase<typeof schema>;
   /** How many of the most-recently-active bills to keep. Default 100. */
   limit?: number;
-}): Promise<BillIngestDraft[]> {
-  const raw = await fetchRaw();
+}): Promise<BillFetchBatch> {
+  const fetched = await fetchRaw();
+  if (fetched.outcome.status === "failed") {
+    return { drafts: [], sourceOutcomes: [fetched.outcome] };
+  }
 
   const bodies = await opts.db
     .select({
@@ -129,46 +196,83 @@ export async function fetchCABillsForSync(opts: {
   }
 
   // Sort by latest activity desc, slice to limit.
-  const sorted = [...raw].sort((a, b) => {
-    const da = a.LatestActivityDateTime ?? "";
-    const db = b.LatestActivityDateTime ?? "";
+  const sorted = [...fetched.rows].sort((a, b) => {
+    const da = latestActionDate(a) ?? "";
+    const db = latestActionDate(b) ?? "";
     return db.localeCompare(da);
   });
   const limited = sorted.slice(0, opts.limit ?? 100);
 
-  return limited.map((b) => {
+  const drafts = limited.flatMap((b): BillIngestDraft[] => {
+    if (
+      !b.Id ||
+      !b.NumberCode?.trim() ||
+      !(b.LongTitleEn?.trim() || b.ShortTitleEn?.trim()) ||
+      !b.ParliamentNumber ||
+      !b.SessionNumber ||
+      ![1, 2].includes(b.OriginatingChamberOrganizationId ?? 0)
+    ) {
+      return [];
+    }
     const { title, longTitle } = pickTitle(b);
-    const lastAction =
-      isoDate(b.LatestActivityDateTime) ??
-      new Date().toISOString().slice(0, 10);
+    const lastAction = latestActionDate(b);
+    if (!lastAction) return [];
     const introduced =
-      isoDate(
-        b.PassedHouseFirstReadingDateTime ??
-          b.PassedSenateFirstReadingDateTime,
-      );
-    const chamberKey = b.OriginatingChamberId === 2 ? "upper" : "lower";
+      isoDate(b.PassedHouseFirstReadingDateTime) ??
+      isoDate(b.PassedSenateFirstReadingDateTime);
+    const chamberKey =
+      b.OriginatingChamberOrganizationId === 2 ? "upper" : "lower";
     const bodyId = bodyByChamber.get(chamberKey) ?? null;
 
-    return {
-      jurisdictionId: opts.jurisdictionId,
-      bodyId,
-      sourceId: SOURCE_ID,
-      externalId: String(b.BillId ?? b.BillNumberFormatted ?? ""),
-      title,
-      longTitle,
-      stage: structuralStage(b),
-      rawStatus: b.CurrentStatusEn ?? null,
-      introducedDate: introduced,
-      lastActionDate: lastAction,
-      lastActionText: b.LatestActivityEn ?? null,
-      sponsorName: b.SponsorEn ?? null,
-      sponsorParty: null,
-      url: publicUrl(b),
-      textUrl: null,
-      voteYes: null,
-      voteNo: null,
-      voteAbstain: null,
-      raw: b,
-    };
+    return [
+      {
+        jurisdictionId: opts.jurisdictionId,
+        bodyId,
+        sourceId: SOURCE_ID,
+        externalId: String(b.Id),
+        title,
+        longTitle,
+        stage: structuralStage(b),
+        rawStatus: b.StatusNameEn ?? null,
+        introducedDate: introduced,
+        lastActionDate: lastAction,
+        lastActionText: b.LatestBillEventTypeNameEn ?? b.StatusNameEn ?? null,
+        sponsorName: b.SponsorPersonName?.trim() || null,
+        sponsorParty: null,
+        url: publicUrl(b),
+        textUrl: null,
+        voteYes: null,
+        voteNo: null,
+        voteAbstain: null,
+        raw: b,
+      },
+    ];
   });
+
+  const outcome = finalizeBillSourceMapping(
+    { ...fetched.outcome, fetched: limited.length },
+    drafts.length,
+    {
+      requireCompleteMapping: true,
+      zeroMappedError: `${limited.length - drafts.length} Canadian bill row(s) did not match the current LEGISinfo schema`,
+    },
+  );
+  return { drafts, sourceOutcomes: [outcome] };
+}
+
+function latestActionDate(b: RawBill): string | null {
+  const dates = [
+    b.LatestBillEventDateTime,
+    b.LatestCompletedMajorStageDateTime,
+    b.ReceivedRoyalAssentDateTime,
+    b.PassedHouseThirdReadingDateTime,
+    b.PassedSenateThirdReadingDateTime,
+    b.PassedHouseSecondReadingDateTime,
+    b.PassedSenateSecondReadingDateTime,
+    b.PassedHouseFirstReadingDateTime,
+    b.PassedSenateFirstReadingDateTime,
+  ]
+    .map(isoDate)
+    .filter((date): date is string => date !== null);
+  return dates.sort().at(-1) ?? null;
 }
