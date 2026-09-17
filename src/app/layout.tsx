@@ -6,7 +6,7 @@ import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo, CivicaLogoSprite } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { OG_IMAGES, OG_DEFAULT_IMAGE } from "@/lib/og";
+import { OG_IMAGES } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildOrganization, buildWebSite } from "@/lib/seo/jsonld";
 import { SITE_URL } from "@/lib/site";
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    images: [OG_DEFAULT_IMAGE],
+    images: OG_IMAGES,
   },
   robots: {
     index: true,
