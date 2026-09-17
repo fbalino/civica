@@ -7,7 +7,7 @@ Owner authorization: 2026-09-17, repair data updating so the owner does not have
 - The cabinet import requires `CIVICA_ATLAS_RELEASE_ID`, which was absent in Production. It checked this only after fetching upstream data.
 - Canada, Germany, and France bill jobs failed on all 30 recent daily runs; the cabinet job failed on 29 of 30. Every failed execution had one attempt. The three-attempt safety cap did not schedule another delivery.
 - The pipeline alert monitor returned failure for successfully detected alerts, and then included its own failed run as an alert input.
-- Canada used a source URL that now returned 404; Germany and France required further source-specific diagnosis. A publisher failure must not be converted into a successful or fresh import.
+- Canada returned a current JSON schema that no longer matched the adapter fields. An initial HEAD/redirect check was insufficient: the actual GET returned 185 bill rows. Germany used an expired temporary key; France's current source captures parsed successfully, so its retained generic error still required runtime diagnosis. A publisher or configuration failure must not be converted into a successful or fresh import.
 
 ## Delivery controls
 
