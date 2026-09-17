@@ -114,6 +114,17 @@ const applyOptions = {
   writeFact: fixtureFactWriter,
 };
 
+async function withoutAtlasReleaseEnvironment<T>(run: () => Promise<T>) {
+  const previous = process.env.CIVICA_ATLAS_RELEASE_ID;
+  delete process.env.CIVICA_ATLAS_RELEASE_ID;
+  try {
+    return await run();
+  } finally {
+    if (previous === undefined) delete process.env.CIVICA_ATLAS_RELEASE_ID;
+    else process.env.CIVICA_ATLAS_RELEASE_ID = previous;
+  }
+}
+
 function semantic(
   maps: Map<unknown, Map<string, Record<string, unknown>>>,
 ) {
@@ -151,12 +162,14 @@ test("Atlas seed dry-run is stable and writes nothing", async () => {
 
 test("Atlas seed apply fails closed without a named release", async () => {
   const state = harness();
-  await assert.rejects(
-    writeAtlasCountry(state.db, input, {
-      atlasReleaseId: "",
-      writeFact: fixtureFactWriter,
-    }),
-    /named Atlas release/,
+  await withoutAtlasReleaseEnvironment(() =>
+    assert.rejects(
+      writeAtlasCountry(state.db, input, {
+        atlasReleaseId: "",
+        writeFact: fixtureFactWriter,
+      }),
+      /named Atlas release/,
+    ),
   );
   assert.equal(state.writes(), 0);
 });
