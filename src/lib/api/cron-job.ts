@@ -252,12 +252,14 @@ function withInternalCronContext(
   executionKey: string,
   scheduleSlot: Date | null,
 ): Request {
-  const headers = new Headers(request.headers);
+  const headers = new Headers(
+    [...request.headers.entries()].filter(
+      ([name]) => name.toLowerCase() !== INTERNAL_SCHEDULE_SLOT_HEADER,
+    ),
+  );
   headers.set(INTERNAL_EXECUTION_KEY_HEADER, executionKey);
   if (scheduleSlot) {
     headers.set(INTERNAL_SCHEDULE_SLOT_HEADER, scheduleSlot.toISOString());
-  } else {
-    headers.delete(INTERNAL_SCHEDULE_SLOT_HEADER);
   }
   return new Request(request, { headers });
 }
