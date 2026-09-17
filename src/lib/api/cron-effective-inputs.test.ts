@@ -125,6 +125,37 @@ test("CIA route validates and propagates its named routine-refresh release", asy
   assert.equal(received[0]?.dryRun, true);
 });
 
+test("manual CIA delivery without a shard fails before schedule or domain I/O", async () => {
+  let databaseReads = 0;
+  let syncCalls = 0;
+  const handler = createCiaCabinetHandler({
+    database: {} as never,
+    environment: {
+      CIVICA_ATLAS_RELEASE_ID: "atlas-routine-refresh-2026-09-17",
+    },
+    buildSlugList: async () => {
+      databaseReads++;
+      return ["canada"];
+    },
+    sync: async () => {
+      syncCalls++;
+      return cabinetSummary(true);
+    },
+  });
+
+  const response = await handler(
+    request("/api/cron/factbook/sync-cia-cabinets?dryRun=1"),
+  );
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), {
+    ok: false,
+    step: "factbook.cia-cabinets.sync",
+    error: "Manual cabinet deliveries require an explicit shard (0-27)",
+  });
+  assert.equal(databaseReads, 0);
+  assert.equal(syncCalls, 0);
+});
+
 test("manual vintage retries require and retain an explicit label and cut across quarters", () => {
   const label = encodeURIComponent(
     "Civica Atlas Reconciled v0.3-beta — vintage 2026-Q2",

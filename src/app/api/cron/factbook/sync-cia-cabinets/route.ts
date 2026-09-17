@@ -104,9 +104,12 @@ export function createCiaCabinetHandler(
     const atlasReleaseId = resolveAtlasReleaseId(undefined, environment);
 
     const hasExplicitShard = new URL(request.url).searchParams.has("shard");
+    const manual = request.headers.has("idempotency-key");
     const shard = resolveCiaCabinetShard(
       request,
-      hasExplicitShard ? undefined : cronScheduleSlotFromRequest(request),
+      hasExplicitShard || manual
+        ? undefined
+        : cronScheduleSlotFromRequest(request),
     );
     if (!shard.ok) {
       return NextResponse.json(
