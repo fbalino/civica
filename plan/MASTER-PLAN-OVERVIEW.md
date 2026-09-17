@@ -1,5 +1,18 @@
 # Civica Academic Publication Readiness — Owner Overview
 
+## Current checkpoint — September 17, 2026
+
+Repository cleanup and release stabilization are complete. Production now
+serves the September release with the selected sharing card. The master
+checklist has 265 of 311 tasks complete and 46 remaining; G4 is still blocked.
+The map is deferred. Fernando will review the cleaned-up project before more
+roadmap work starts. Current evidence is in `plan/evidence/PLT-030/`, and the
+remaining work is separated in `plan/REMAINING-WORK-REPORT-2026-07-23.md`.
+
+The phases below describe the overall program, not a list of currently open
+tasks. The master checklist owns completion state. The Explore-menu decision
+is settled: the grouped dropdown selected August 17 replaces the old megamenu.
+
 ## The destination
 
 **Civica Atlas is a provenance-first comparative reference to how every country is governed.**
@@ -54,7 +67,8 @@ Run in parallel:
 
 - Pilot and normalize the engraving color system; regenerate only semantic/art failures.
 - Restore the illustration manifest and disclosure.
-- Fix the caption structure and create three Explore menu concepts before choosing one.
+- Retain the settled grouped Explore dropdown and carry its implementation
+  through the remaining visual-review gates.
 - Finish design-system, responsive, keyboard, contrast, motion, performance, and visual-regression work.
 - Add CI, deterministic lint, API/ingestion contracts, e2e/browser testing, accessibility, performance budgets, job/error monitoring, security, backup/restore, deployment, and rollback evidence.
 
@@ -98,7 +112,6 @@ Humans are reserved for work that is genuinely human:
 No decision is needed to begin the plan. Later gates will bring back only these material choices:
 
 - approve the engraving-grade pilot;
-- approve, revise, or reject the large rendered Explore candidate;
 - approve a shortlist/contact terms for independent reviewers;
 - decide a keep/rename outcome after evidence and professional advice;
 - approve the final disposition of Index/Pulse candidates after the declared tests and external review.

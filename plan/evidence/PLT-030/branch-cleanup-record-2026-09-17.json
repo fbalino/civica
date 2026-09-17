@@ -1,0 +1,291 @@
+{
+  "recorded_at": "2026-09-17",
+  "base_main": "583e4edfc67f4cf235ce8b70a44f603f67db42a9",
+  "scope": "Remote branch and obsolete-PR cleanup authorized by repository owner",
+  "pr_closures": [
+    {
+      "number": 2,
+      "branch": "fix/civ-63-data-coverage-top20",
+      "head": "283630625a01969ccdfb8cb2ff1fdf6f359bc8b1",
+      "reason": "Superseded retired routes/components and old direct data-repair script",
+      "status": "closed"
+    },
+    {
+      "number": 3,
+      "branch": "fix/civ-159-compare-reconcile",
+      "head": "eb86b3caf6109ced29239d04e679ad99c95a8d4c",
+      "reason": "Superseded retired src/app/index/compare architecture",
+      "status": "closed"
+    },
+    {
+      "number": 4,
+      "branch": "codex/full-ci-country-coverage",
+      "head": "1c48f32b5f02a6d6ce78b1d3bdabac969eaa26a6",
+      "reason": "Superseded pre-contract CI ingestion implementation",
+      "status": "closed"
+    },
+    {
+      "number": 6,
+      "title": "chore(deps): bump actions/checkout from 6 to 7",
+      "url": "https://github.com/fbalino/civica/pull/6",
+      "branch": "dependabot/github_actions/actions/checkout-7",
+      "head": "a45e7cb23a81a3409870faf8f35ab0cfc3d09f79",
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "status": "closed"
+    },
+    {
+      "number": 7,
+      "title": "chore(deps): bump actions/setup-node from 6 to 7",
+      "url": "https://github.com/fbalino/civica/pull/7",
+      "branch": "dependabot/github_actions/actions/setup-node-7",
+      "head": "2963b3fe25855831e581bc9d787f73223ebae93c",
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "status": "closed"
+    },
+    {
+      "number": 9,
+      "title": "chore(deps-dev): bump typescript from 5.9.3 to 7.0.2",
+      "url": "https://github.com/fbalino/civica/pull/9",
+      "branch": "dependabot/npm_and_yarn/typescript-7.0.2",
+      "head": "6c42c301d170acc03bd3b9022961701f71d828e5",
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "status": "closed"
+    },
+    {
+      "number": 10,
+      "title": "chore(deps): bump node-html-parser from 8.0.4 to 9.0.0",
+      "url": "https://github.com/fbalino/civica/pull/10",
+      "branch": "dependabot/npm_and_yarn/node-html-parser-9.0.0",
+      "head": "f309f20c616e87ee4069cf9fcc453dcfbd154262",
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "status": "closed"
+    },
+    {
+      "number": 11,
+      "title": "chore(deps-dev): bump eslint from 9.39.4 to 10.8.1",
+      "url": "https://github.com/fbalino/civica/pull/11",
+      "branch": "dependabot/npm_and_yarn/eslint-10.8.0",
+      "head": "f7cc451750213b10f47855b86723fe8295f9fef2",
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "status": "closed"
+    },
+    {
+      "number": 12,
+      "title": "chore(deps-dev): bump @types/node from 20.19.39 to 26.1.2",
+      "url": "https://github.com/fbalino/civica/pull/12",
+      "branch": "dependabot/npm_and_yarn/types/node-26.1.1",
+      "head": "e7af1ca6504129512a23a29b1d31afb9bbeb6b04",
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "status": "closed"
+    },
+    {
+      "number": 13,
+      "title": "chore(deps): bump maplibre-gl from 5.24.0 to 6.0.0",
+      "url": "https://github.com/fbalino/civica/pull/13",
+      "branch": "dependabot/npm_and_yarn/maplibre-gl-6.0.0",
+      "head": "335111aa2b1736434da05ed76c1006a804ed6b73",
+      "reason": "Superseded by validated PR #29; this version did not clear the current critical advisory",
+      "status": "closed"
+    },
+    {
+      "number": 20,
+      "title": "chore(deps): bump the minor-and-patch group across 1 directory with 20 updates",
+      "url": "https://github.com/fbalino/civica/pull/20",
+      "branch": "dependabot/npm_and_yarn/minor-and-patch-32a9cbbf5c",
+      "head": "cef4cc91fe8a73d65f05cd67ffc4a03b878fd4f7",
+      "reason": "Superseded by validated PR #29; these versions did not clear the current critical advisory",
+      "status": "closed"
+    }
+  ],
+  "deleted_remote_branches": [
+    {
+      "branch": "claude/serene-wilbur-375a03",
+      "head": "d7ae5d820c36402aa0de1e88c54f51f42d8ed4a4",
+      "pr": null,
+      "reason": "Exact ancestor of main"
+    },
+    {
+      "branch": "codex/civica-academic-readiness",
+      "head": "c1f28bccf1d097dbd9ba7908d94a1b85e48a7d9c",
+      "pr": null,
+      "reason": "Exact ancestor of main"
+    },
+    {
+      "branch": "codex/index-nav-dropdown",
+      "head": "5e15de7464ccee44c15f81683b4fb5a6805689ac",
+      "pr": null,
+      "reason": "Exact ancestor of main"
+    },
+    {
+      "branch": "feat/cac-option-a",
+      "head": "7d41d87130288583ffd6656517d7f4e5b888f996",
+      "pr": 18,
+      "reason": "Exact ancestor of main after merged PR"
+    },
+    {
+      "branch": "feat/home-nav-directory-cleanup",
+      "head": "aff687a8a22e86b07c4de1846bef24274b0c0008",
+      "pr": 24,
+      "reason": "Exact ancestor of main after merged PR"
+    },
+    {
+      "branch": "feat/pulse-subscription-runtime",
+      "head": "c76e78b1c5ff3c59cdc426037041486ab627b0b4",
+      "pr": 22,
+      "reason": "Exact ancestor of main after merged PR"
+    },
+    {
+      "branch": "fix/invocation-spike-telemetry-and-download",
+      "head": "949617f173796944e4ae118a6b61c2cdab42d94a",
+      "pr": 17,
+      "reason": "Exact ancestor of main after merged PR"
+    },
+    {
+      "branch": "fix/pul-040-change-record-and-cluster-test",
+      "head": "36b4f164fb61f0cb71f1671162452e2fc5fef5b8",
+      "pr": 25,
+      "reason": "Exact ancestor of main after merged PR"
+    },
+    {
+      "branch": "fix/pulse-runner-follow-ups",
+      "head": "669c75188e19a3926c592c87539f9576a7f9e4f1",
+      "pr": 23,
+      "reason": "Exact ancestor of main after merged PR"
+    },
+    {
+      "branch": "fix/qa-014-budget-revision",
+      "head": "2f05aca67234389df51e0a8f4a4eae2adf527007",
+      "pr": 19,
+      "reason": "Exact ancestor of main after merged PR"
+    },
+    {
+      "branch": "hotfix/pulse-classify-zero-lock",
+      "head": "a7caaf779bdf25e2a495a80be333b042c0c82706",
+      "pr": 21,
+      "reason": "Exact ancestor of main after merged PR"
+    },
+    {
+      "branch": "fix/civ-63-data-coverage-top20",
+      "head": "283630625a01969ccdfb8cb2ff1fdf6f359bc8b1",
+      "pr": 2,
+      "reason": "Owner-authorized obsolete PR cleanup"
+    },
+    {
+      "branch": "fix/civ-159-compare-reconcile",
+      "head": "eb86b3caf6109ced29239d04e679ad99c95a8d4c",
+      "pr": 3,
+      "reason": "Owner-authorized obsolete PR cleanup"
+    },
+    {
+      "branch": "codex/full-ci-country-coverage",
+      "head": "1c48f32b5f02a6d6ce78b1d3bdabac969eaa26a6",
+      "pr": 4,
+      "reason": "Owner-authorized obsolete PR cleanup"
+    },
+    {
+      "branch": "codex/design-system-hydration",
+      "head": "c332c3c3572713aa62d08ce8d3da5e7df277c1ab",
+      "pr": null,
+      "reason": "Superseded: current canonical DESIGN.md conflicts with its obsolete guidance, FactbookLegislatureChart replaced the old standalone hemicycle, and main later restored the theme-provider external-store implementation"
+    },
+    {
+      "branch": "dependabot/github_actions/actions/checkout-7",
+      "head": "a45e7cb23a81a3409870faf8f35ab0cfc3d09f79",
+      "pr": 6,
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "deletion_method": "GitHub automatically removed branch when PR was closed"
+    },
+    {
+      "branch": "dependabot/github_actions/actions/setup-node-7",
+      "head": "2963b3fe25855831e581bc9d787f73223ebae93c",
+      "pr": 7,
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "deletion_method": "GitHub automatically removed branch when PR was closed"
+    },
+    {
+      "branch": "dependabot/npm_and_yarn/typescript-7.0.2",
+      "head": "6c42c301d170acc03bd3b9022961701f71d828e5",
+      "pr": 9,
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "deletion_method": "GitHub automatically removed branch when PR was closed"
+    },
+    {
+      "branch": "dependabot/npm_and_yarn/node-html-parser-9.0.0",
+      "head": "f309f20c616e87ee4069cf9fcc453dcfbd154262",
+      "pr": 10,
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "deletion_method": "GitHub automatically removed branch when PR was closed"
+    },
+    {
+      "branch": "dependabot/npm_and_yarn/eslint-10.8.0",
+      "head": "f7cc451750213b10f47855b86723fe8295f9fef2",
+      "pr": 11,
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "deletion_method": "GitHub automatically removed branch when PR was closed"
+    },
+    {
+      "branch": "dependabot/npm_and_yarn/types/node-26.1.1",
+      "head": "e7af1ca6504129512a23a29b1d31afb9bbeb6b04",
+      "pr": 12,
+      "reason": "Deferred from release stabilization; maintenance intent retained in PLT030 evidence",
+      "deletion_method": "GitHub automatically removed branch when PR was closed"
+    },
+    {
+      "branch": "dependabot/npm_and_yarn/maplibre-gl-6.0.0",
+      "head": "335111aa2b1736434da05ed76c1006a804ed6b73",
+      "pr": 13,
+      "reason": "Superseded by validated PR #29; this version did not clear the current critical advisory",
+      "deletion_method": "GitHub automatically removed branch when PR was closed"
+    },
+    {
+      "branch": "dependabot/npm_and_yarn/minor-and-patch-32a9cbbf5c",
+      "head": "cef4cc91fe8a73d65f05cd67ffc4a03b878fd4f7",
+      "pr": 20,
+      "reason": "Superseded by validated PR #29; these versions did not clear the current critical advisory",
+      "deletion_method": "GitHub automatically removed branch when PR was closed"
+    }
+  ],
+  "result": {
+    "remaining_live_branch_count": 4,
+    "remaining_live_branches": [
+      "main",
+      "codex/fix/social-sharing-card",
+      "codex/fix/critical-dependencies",
+      "codex/docs/reconcile-current-checklist"
+    ],
+    "main_head_confirmed": "583e4edfc67f4cf235ce8b70a44f603f67db42a9"
+  },
+  "deferred_maintenance": {
+    "status": "closed deferred maintenance, not release blockers",
+    "pullRequests": [
+      6,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "disposition": "No upgrades applied. Links and exact heads retained above.",
+    "supersededSecurityPullRequests": [
+      13,
+      20
+    ],
+    "replacement": "https://github.com/fbalino/civica/pull/29"
+  },
+  "release_follow_through": {
+    "checkedAt": "2026-09-17T19:59:51.072Z",
+    "mergedPullRequests": [
+      26,
+      29,
+      30,
+      27
+    ],
+    "mergedBranchesRemoved": true,
+    "remainingLiveBranches": [
+      "codex/docs/reconcile-current-checklist",
+      "main"
+    ],
+    "mainHead": "5203cb7ba6d7da723a7f38b47cefeeb8c86568b4",
+    "finalStep": "PR #28 is the documentation reconciliation; delete its branch when its normal checks and merge complete."
+  }
+}

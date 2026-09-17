@@ -1,7 +1,7 @@
 # Civica G4 operations-readiness report
 
 **Contract:** `civica-g4-operations-readiness/v1`
-**Reviewed:** 2026-07-29
+**Reviewed:** 2026-09-17
 **Status:** blocked
 **Waivers:** none
 
@@ -54,15 +54,21 @@ and P1 operational finding below is closed.
   credential-free production build all passed. The worktree had no
   `.env.local` or database variable; exact command durations and the local
   dependency-tree limitation are retained under `plan/evidence/QA-021/`.
-- Hosted pull-request/main runs and branch-protection enforcement have not been
-  observed in this report. PLT-001's owner/platform check remains open.
-- The current G4 readiness record reports 256 of 310 tasks complete, 23 open P0 tasks,
-  50 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
+- Hosted pull-request and main runs passed on 2026-09-17, including
+  [PR #29](https://github.com/fbalino/civica/actions/runs/35265105969),
+  [main](https://github.com/fbalino/civica/actions/runs/35266026305),
+  [PR #30](https://github.com/fbalino/civica/actions/runs/35266056646), and
+  [PR #27](https://github.com/fbalino/civica/actions/runs/35266075382).
+  PLT-001 remains complete. The separate repository-setting follow-up remains
+  open: the September 17 read found main unprotected and no rulesets. No
+  protection change or bypass was made.
+- The current G4 readiness record reports 265 of 311 tasks complete, 21 open P0 tasks,
+  43 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 
 ## Jobs, freshness, and error monitoring
 
-- `civica-pipeline-observability/v1` closes 39 scheduled and 11 canonical
+- `civica-pipeline-observability/v1` closes 39 scheduled and 12 canonical
   manual production pipelines with bounded run identity, outcome, counts,
   source versions, cost, freshness, and alert states.
 - `civica-error-monitoring/v1` closes content-free server/client/cron/script
@@ -87,6 +93,21 @@ and P1 operational finding below is closed.
 
 ## Deployment, rollback, caches, and releases
 
+- **Current September 17 release:** PLT-030 is complete. Main `5203cb7b`
+  reached Ready at `dpl_77DvkLZewq1hzgf2kH45e1jUPnL7` with both canonical
+  domains attached. The inventory prerequisite, critical dependency repair,
+  durable 229-capital source repair, and selected sharing card are deployed.
+  Exact HTTP/health, reader, metadata, and image-byte evidence is retained in
+  `plan/evidence/PLT-030/production-release-check-2026-09-17.json`.
+  Application, database, and critical assets are operational; existing
+  freshness alerts and optional classification limits keep overall health
+  degraded. Eighteen lower-severity dependency findings remain. Neither this
+  deployment nor the bounded browser check is a G4 or academic sign-off.
+  The capital backup, restore, atomic apply, zero-write repeat, non-target
+  invariants, and ordinary-cache rehearsal are recorded in
+  `plan/evidence/PLT-030/canonical-capital-repair-2026-09-17.json`.
+  The earlier July records below are historical, not current alias evidence.
+
 - `civica-deployment-rehearsal/v1` passes its local 18-migration staged-order,
   compatibility, abort, validation-only deployment, cache/release boundary,
   and forward-only recovery fixtures.
@@ -97,14 +118,16 @@ and P1 operational finding below is closed.
   Vercel Preview, and passed release, cache, protected-route, idempotent
   non-model dry-run, unchanged-freshness, API, responsive-browser, migration,
   schema, and production-build checks. Production remained read-only at
-  `0032_sparkling_genesis`. QA-018 now awaits Fernando's dated disposition.
+  `0032_sparkling_genesis` during that historical rehearsal. QA-018 is complete;
+  the owner confirmation is retained with its date-correction note under
+  `plan/evidence/QA-018/OWNER-SIGNOFF-2026-08-09.md`.
 - On 2026-07-29, production advanced through authoritative migration head
   `0051_eminent_jocasta` after a retained recovery branch and zero-write
   preflight. The named immutable Conditions release passed exact manifest,
   replay, component, freshness-at-release, API, and browser checks; the
   model-free Pulse lifecycle/workspace repairs passed their retained-ledger
   validators. Cron jobs remained disabled.
-- The reviewed release source `f57feca0` then reached Ready in production as
+- Historically, the July 29 release source `f57feca0` reached Ready as
   deployment `dpl_6BeqkVNr4uMDhrS4gxD3uERxmqdZ`, with the canonical domains
   attached and no alias error. The application, database, and critical assets
   were operational; the health contract remained honestly degraded only
@@ -118,12 +141,14 @@ and P1 operational finding below is closed.
   deployments had no production alias; the child stayed at zero active
   leases with unchanged release/data state. A synthetic non-public correction
   and bounded monitoring event were linked and resolved with no Atlas data
-  change. The external status record and Fernando's dated disposition remain
-  open; no subscriber notice or owner sign-off is claimed.
+  change. QA-019 is checked complete under the August 9 written rehearsal
+  authority. Its separate external-status record and final packet disposition
+  remain in the manual queue; no subscriber notice or final disposition is claimed.
 - Conditions release freezing and the Pulse lifecycle/workspace reconciliation
-  are complete. The remaining production/external actions are the explicitly
-  listed Atlas history/correction journeys, source refreshes, Pulse drift/cycle,
-  and provider checks. This report does not authorize them.
+  are complete. ATL-020/024 also closed with the August 9 real Atlas correction
+  journey, and ATL-010/DAT-036/EXP-029 closed with the named August 10 Wikidata
+  release. These completed journeys are not queued again. Remaining Pulse
+  drift/cycle, provider, research, and manual follow-ups retain their own scope.
 
 ## Performance and browser support
 
@@ -139,30 +164,27 @@ and P1 operational finding below is closed.
 
 ## Open incidents and unwaived operational blockers
 
-1. **Hosted CI — owner/platform:** observe passing pull-request and `main`
-   workflows and require the canonical `verify` job through branch protection.
-2. **Isolated release disposition — owner:** review the completed QA-018
-   `0051` packet and record a dated approval or rejection.
-3. **Atlas history and corrections — owner/platform:** complete only a real,
-   supportable ATL-020 change-history journey and ATL-024 report/receipt/triage
-   journey, linking a correction when one is actually warranted. Synthetic
-   production records do not satisfy this blocker.
-4. **Rollback/correction disposition — owner/platform:** create the real
-   external status record without notifying subscribers, then review the
-   retained QA-019 packet and record Fernando's dated approval or rejection.
-5. **Cross-instance rate limiting — owner/platform:** complete the Preview
+1. **Repository enforcement — owner/platform:** the hosted CI runs are now
+   observed. Main is still unprotected with no ruleset; require `verify` and
+   retain the repository-setting evidence under PLT-001 when authorized.
+2. **Rollback/correction disposition — owner/platform:** complete QA-019's
+   separate non-notifying external-status record and final packet disposition.
+   The technical rehearsal task is already complete.
+3. **Cross-instance rate limiting — owner/platform:** complete the Preview
    concurrency, forwarding-header, fail-closed outage, and recovery proof.
-6. **Monitoring and status providers — owner/provider:** enable and verify
-   protected source maps, safe Runtime Logs alert handling, the public status
-   component configuration, and the non-notifying test incident.
-7. **Provider privacy/cost controls — owner/provider:** verify the Anthropic
-   retention arrangement, scoped model keys/workspaces, hard caps, and alerts.
-8. **Provider recovery — owner/platform:** complete the Neon-managed PITR drill
-   and decide the external-media recovery posture.
-9. **Program telemetry — owner:** complete PLT-029's subscription, paid-API,
+4. **Monitoring and status providers — owner/provider:** verify protected
+   source maps, safe Runtime Logs alert handling, public status configuration,
+   and the non-notifying test incident named in the manual queue.
+5. **Provider privacy/cost controls — owner/provider:** verify the retention
+   arrangement, scoped model keys/workspaces, hard caps, and alerts.
+6. **Provider recovery — owner/platform:** complete the Neon-managed PITR drill
+   and decide the external-media recovery posture. The local September repair
+   rehearsal does not satisfy a provider-managed PITR exercise.
+7. **Program telemetry — owner:** complete PLT-029's subscription, paid-API,
    external-human-spend, and effort ledger with no unexplained spend.
-10. **Visual and release gates:** close EXP-001/015/028 and all other open P0/P1
-    release blockers before G4 can pass.
+8. **Visual and release gates:** close EXP-001/028 and the remaining unwaived
+   P0/P1 blockers. EXP-015 and QA-018 are already owner-resolved. The map is
+   deferred at Fernando's direction; this cleanup does not approve G4.
 
 The rotated historical credential is no longer an active incident. Its
 registered hash and the optional shared-history purge remain documented under
@@ -171,7 +193,7 @@ PLT-007, without being treated as a waiver or open credential.
 ## Decision
 
 G4 operations readiness is **blocked**. Local contracts and rehearsals are
-substantial and currently reproducible, but hosted enforcement, provider
-controls, recovery, rollback, real production journeys, and owner review remain
-unverified. There are zero waivers. Rerun the exact validators and regenerate
+substantial; the September hosted release is evidenced under `plan/evidence/PLT-030/` and hosted CI under `plan/evidence/PLT-001/`. Repository
+enforcement, provider controls, provider-managed recovery, the residual manual
+dispositions, and remaining qualified reviews still prevent a G4 pass. There are zero waivers. Rerun the exact validators and regenerate
 the G4 readiness report after each blocker closes.

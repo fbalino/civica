@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 310
-- **Completed:** 263
-- **Remaining:** 47
-- **Progress:** 84.8%
-- **Priority mix:** P0 192 · P1 113 · P2 5
+- **Total tasks:** 311
+- **Completed:** 265
+- **Remaining:** 46
+- **Progress:** 85.2%
+- **Priority mix:** P0 193 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -248,7 +248,7 @@ Source: `plan/07-design-system-assets-and-reader-experience.md`
 - [x] **EXP-012** (P0) Integrate the editorial-illustration disclosure into captions, licensing, metadata, and accessible descriptions. _Done when: representative country/page/territory routes identify art as illustrative/non-documentary, captions remain concise, licensing links to the policy/manifest, screen-reader text is accurate, and no generated image is mistaken for source evidence._
 - [x] **EXP-013** (P0) Move the country hero caption into valid, collision-free structure. _Done when: caption semantics are valid, desktop hero reserves a content row/region rather than relying on hardcoded offsets, it never overlaps Map/Images controls across the supported width/text matrix, and screenshot/geometry tests include 769px and 1440px._
 - [x] **EXP-014** (P0) Create three design-system-compliant Explore navigation concepts before implementation: typography-first scholarly index, emblem-led compact menu, and true editorial mega menu. _Done when: each concept includes hierarchy, information architecture, keyboard/focus behavior, desktop/mobile relationship, performance budget, asset plan, light/dark states, and browser-rendered mockups under the dated mockup convention._
-- [ ] **EXP-015** (P0) Select and canonize one Explore concept. _Done when: owner decision is recorded, `DESIGN.md`, `/design-system`, shared component contract, tokens/assets, and acceptance screenshots are updated before the production navigation consumes the pattern._
+- [x] **EXP-015** (P0) Select and canonize one Explore concept. _Done when: owner decision is recorded, `DESIGN.md`, `/design-system`, shared component contract, tokens/assets, and acceptance screenshots are updated before the production navigation consumes the pattern. Owner rejected the image-led megamenu on 2026-08-17; the grouped dropdown is canonical. Evidence: `plan/evidence/EXP-015/`, `DESIGN.md`._
 - [ ] **EXP-016** (P1) Implement the selected Explore navigation with semantically distinct destination identity. _Done when: hierarchy communicates “start here” and research tools, all eight destinations are unambiguous, desktop/mobile share one data/identity model, focus/Escape/hover/touch behavior passes, and no decorative art substitutes for meaning._
 - [x] **EXP-017** (P1) Enforce a navigation/hero asset loading budget. _Done when: unopened menu assets and inactive theme variants do not incur the current full transfer cost, displayed 40px art is appropriately sized/compressed or sprite-based, active hero strategy is measured, and route-level image bytes meet the declared budget._
 - [x] **EXP-018** (P1) Synchronize desktop and mobile navigation semantics, ordering, labels, icons/art, current-route state, and external-link behavior. _Done when: a shared fixture drives both, automated comparisons find zero identity drift, screen-reader names match, and status/external links use correct semantics/security attributes._
@@ -312,6 +312,7 @@ Source: `plan/08-platform-security-performance-and-operations.md`
 - [x] **PLT-027** (P0) Close admin redirect, login, session-expiry, and audit-identity gaps. _Done when: a central same-origin redirect validator rejects scheme-relative/backslash/encoded-authority cases; login has durable throttling; signed session state includes identity/issued/expiry/session ID verified server-side; audit actor cannot be changed by an unsigned cookie; regression tests pass._
 - [x] **PLT-028** (P1) Move large research-feed filtering and pagination to server/query boundaries. _Done when: Pulse ledger/changelog and comparable feeds fetch at most the requested page plus bounded metadata, filters are URL-addressable, query counts/response bytes meet budgets, and a 5,000-row fixture does not serialize into the initial page._
 - [ ] **PLT-029** (P1) Report cumulative program cost and effort telemetry at every gate. _Done when: a documented ledger linked from `plan/PROGRESS.md` records, at each G-gate and at least weekly while work is active, the subscription plans in use, any paid API spend against the caps in `.orchestrator/state.json`, committed external human spend, and notable cost events; zero unexplained paid-API spend exists; and the reporting format is documented so future workers keep it current._
+- [x] **PLT-030** (P0) Stabilize the current release before beta or release claims. _Done when: each recorded release-stability finding has a dated reproduction against the named deployment or CI run, root cause and bounded remediation, rollback/containment posture, and passing replacement build, health, and affected reader-surface evidence; the country-directory/data drift and critical dependency-audit finding are resolved or explicitly constrained; and PLT-025 is refreshed without treating a local or historical result as current production proof. Evidence: `plan/evidence/PLT-030/`._
 
 ## Area 09 — Testing, QA, and Release Verification
 

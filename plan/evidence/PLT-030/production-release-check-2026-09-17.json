@@ -1,0 +1,121 @@
+{
+  "checkedAt": "2026-09-17T19:59:51.072Z",
+  "pages": [
+    {
+      "path": "/",
+      "url": "https://civicaatlas.org/",
+      "status": 200,
+      "durationMs": 1093,
+      "title": "Civica Atlas \u2014 How Every Country Is Governed",
+      "h1": "Civica Atlas"
+    },
+    {
+      "path": "/country/uruguay",
+      "url": "https://civicaatlas.org/country/uruguay",
+      "status": 200,
+      "durationMs": 1675,
+      "title": "Uruguay \u2014 Government & Political System \u00b7 Civica Atlas",
+      "h1": "Uruguay"
+    },
+    {
+      "path": "/about",
+      "url": "https://civicaatlas.org/about",
+      "status": 200,
+      "durationMs": 366,
+      "title": "About \u2014 A Provenance-First Reference Atlas \u00b7 Civica Atlas",
+      "h1": "About Civica Atlas"
+    },
+    {
+      "path": "/api/health",
+      "url": "https://civicaatlas.org/api/health",
+      "status": 200,
+      "durationMs": 668,
+      "health": {
+        "version": "civica-health-status/v1",
+        "checkedAt": "2026-09-17T19:59:50.640Z",
+        "overall": "degraded",
+        "components": [
+          {
+            "id": "application",
+            "state": "operational",
+            "optional": false,
+            "summary": "serving"
+          },
+          {
+            "id": "database",
+            "state": "operational",
+            "optional": false,
+            "summary": "available"
+          },
+          {
+            "id": "critical_assets",
+            "state": "operational",
+            "optional": false,
+            "summary": "configured_asset_available"
+          },
+          {
+            "id": "scheduled_data_freshness",
+            "state": "degraded",
+            "optional": false,
+            "summary": "freshness_alerts_open"
+          },
+          {
+            "id": "model_dependent_optional_services",
+            "state": "degraded",
+            "optional": true,
+            "summary": "automated_classification_limited"
+          }
+        ]
+      }
+    }
+  ],
+  "sharingMetadata": {
+    "og:title": "Civica Atlas \u2014 A world atlas of government.",
+    "og:description": "A provenance-first comparative reference to how every country is governed, with country profiles covering institutions, constitutions, elections, and source-linked facts.",
+    "og:url": "https://civicaatlas.org",
+    "og:image": "https://civicaatlas.org/og-atlas-2026-09.png",
+    "og:image:width": "1200",
+    "og:image:height": "630",
+    "og:image:alt": "Civica Atlas \u2014 A world atlas of government. Institutions, constitutions, elections\u2014and their sources.",
+    "og:type": "website",
+    "twitter:card": "summary_large_image",
+    "twitter:title": "Civica Atlas \u2014 A world atlas of government.",
+    "twitter:description": "A provenance-first comparative reference to how every country is governed, with country profiles covering institutions, constitutions, elections, and source-linked facts.",
+    "twitter:image": "https://civicaatlas.org/og-atlas-2026-09.png",
+    "twitter:image:alt": "Civica Atlas \u2014 A world atlas of government. Institutions, constitutions, elections\u2014and their sources.",
+    "twitter:image:width": "1200",
+    "twitter:image:height": "630"
+  },
+  "card": {
+    "url": "https://civicaatlas.org/og-atlas-2026-09.png",
+    "status": 200,
+    "contentType": "image/png",
+    "byteLength": 1405450,
+    "sha256": "ec62a5aea5a8d62cb79d6df448a2869fc67cda6a5bace020d0ebed05ee21d6a2",
+    "width": 1200,
+    "height": 630
+  },
+  "actualXPlatformPreview": "not_observed",
+  "result": "pass",
+  "deployment": {
+    "id": "dpl_77DvkLZewq1hzgf2kH45e1jUPnL7",
+    "state": "READY",
+    "sha": "5203cb7ba6d7da723a7f38b47cefeeb8c86568b4",
+    "aliases": [
+      "civicaatlas.org",
+      "civica-kappa.vercel.app",
+      "www.civicaatlas.org",
+      "civica-fbalinos-projects.vercel.app",
+      "civica-git-main-fbalinos-projects.vercel.app"
+    ],
+    "readyAt": 1789675156806,
+    "url": "civica-5femc53k8-fbalinos-projects.vercel.app",
+    "checkedAt": "2026-09-17T19:59:39.757Z"
+  },
+  "browser": {
+    "home": "Rendered normally in the Codex browser; engraved library hero, search, and country directory visible.",
+    "country": "Uruguay rendered with Montevideo in the Capital section; population source disclosure opened and displayed source records and resolver explanation.",
+    "consoleErrorsObserved": 0,
+    "boundary": "Bounded reader smoke; no map redesign or complete site acceptance implied."
+  }
+}

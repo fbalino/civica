@@ -1,29 +1,32 @@
 # Civica master checklist — remaining-work report
 
-**Reviewed:** 2026-08-10
+**Reviewed:** 2026-09-17
 
-**Checklist state:** 263 of 310 complete; 47 remain; 84.8%.
+**Checklist state:** 265 of 311 complete; 46 remain; 85.2%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
-Fourteen tasks are direct owner, qualified-human, counsel/privacy, or research
+Thirteen tasks are direct owner, qualified-human, counsel/privacy, or research
 participant work. Two require production, provider, or other external-system
 authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
-is currently running. The other 30 are downstream tasks that cannot honestly
-start until an earlier gate produces real evidence.
+is currently running. Thirty are downstream tasks that cannot honestly start
+until an earlier gate produces real evidence. The September release-stabilization
+task is complete, with dated production evidence; broader gates remain open.
 
 All currently safe, dependency-valid agent preparation is complete. There is
-no checklist item that an agent can finish now without one of those new inputs
-or authorities. This does not mean the agents are finished permanently:
+no checklist item that an agent can finish now within the cleanup-only scope
+without renewed roadmap direction or the named new inputs. EXP-038 T4 is
+engineering reconciliation and is parked for the owner's requested review,
+not misrepresented as another legal approval. This does not mean the agents are finished permanently:
 decisions, production journeys, source refreshes, human studies, and the
 prospective window will each re-enable implementation, analysis, remediation,
 publication, or reporting work.
 
 The machine-readable source is
-`data/readiness/remaining-work.v1.json`. Its validator compares the five
+`data/readiness/remaining-work.v1.json`. Its validator compares the six
 categories with every unchecked master-checklist ID and fails on an omission,
 duplicate, stale count, or newly agent-executable task.
 
@@ -35,16 +38,15 @@ must wait for G4 or G5.
 
 ## What needs action now
 
-### 1. Direct human, owner, or professional review — 14
+### 1. Direct human, owner, or professional review — 13
 
-IDs: BRD-003, BRD-010, BRD-012, EXP-001, EXP-009, EXP-015, EXP-025,
-EXP-038, GOV-012, IDX-022, IDX-034, PLT-029, QA-012, QA-013.
+IDs: BRD-003, BRD-010, BRD-012, EXP-001, EXP-009, EXP-025, EXP-038,
+GOV-012, IDX-022, IDX-034, PLT-029, QA-012, QA-013.
 
 The prepared decisions and reviews are:
 
-- owner approval, revision, or rejection of the exact rendered Explore
-  candidate, the three remaining English-copy dispositions (A4, T3, and T4),
-  and reviewer compensation posture;
+- the remaining EXP-038 correction-route reconciliation and reviewer
+  compensation posture;
 - qualified review of the rendered-module ledger, illustration candidates,
   visual baselines, screen-reader journeys, Index reader tasks, and
   constitution-to-practice coding;
@@ -55,10 +57,11 @@ These are not interchangeable approvals. For example, approving EXP-009
 candidates does not authorize replacing the production images, and approving
 EXP-038 drafts does not authorize deployment or a new legal claim.
 
-The generated Explore light-master batch is approved and its rendered
-implementation candidate is committed for review, but the exact desktop/mobile
-light/dark result remains undecided. The immediately applicable EXP-038 subset,
-including H5, is implemented; A4, T3, and T4 remain held. GOV-003 is complete:
+The image-led Explore candidate was superseded by Fernando's 2026-08-17
+grouped-dropdown decision, so EXP-015 is complete. The immediately applicable
+EXP-038 subset, including A4, H5, and T3, is implemented; its old T4 hold now
+requires engineering reconciliation against the active ATL-024 correction route.
+GOV-003 is complete:
 all seven owner fields are confirmed, the canonical disclosure is published in
 the source tree, and the current reviewer packets bind it unchanged. This does
 not supply any remaining EXP-038 disposition or authorize deployment.
@@ -110,9 +113,9 @@ preregistration.
 IDs: none.
 
 No prospective Pulse shadow period is currently running. PUL-026 remains
-downstream of PUL-040, which first requires authority-gated deployment and one
-compliant scheduled cycle. Its eventual 90-day clock cannot be backdated to a
-code freeze, a partial run, or the current date.
+downstream of PUL-040, which requires fresh proof of every frozen-method
+prerequisite. Its eventual 90-day clock cannot be backdated to a code freeze,
+a partial run, or the current date.
 
 ## What must wait
 
@@ -125,12 +128,12 @@ PUL-021, PUL-022, PUL-023, PUL-026, PUL-028, PUL-029, PUL-030.
 
 The principal chains are:
 
-1. EXP-015 rendered-result decision and canonization → EXP-016 reconciliation
-   and closure → EXP-028 blind audit. The implementation candidate exists, but
-   cannot bypass the owner decision.
+1. The settled EXP-015 grouped-dropdown contract → EXP-016 reconciliation and
+   closure → EXP-028 blind audit. The implementation must still carry current
+   evidence through those later gates.
 2. A production-authorized frozen longitudinal Conditions release → ATL-028
    construct study.
-3. Pulse drift baseline + v2.15 deployment/cycle → PUL-040 start → PUL-026
+3. Pulse drift baseline + fresh frozen-method prerequisite evidence → PUL-040 start → PUL-026
    90-day window → PUL-018–023 evaluation. Those results unlock the GOV-015
    Pulse review packet; the separate PUL-028/029 disposition → PUL-030 product
    release chain follows its own declared order.
@@ -145,24 +148,36 @@ Starting these early would either use the wrong design, analyze nonexistent
 data, contact reviewers before authorization, draft against an unfrozen
 release, or imply approvals that do not exist.
 
+### 6. Current release stabilization — 0
+
+IDs: none.
+
+PLT-030 is complete. The September 17 named production release supersedes
+August 24 and includes the bounded dependency, canonical-capital, and sharing
+card repairs. The exact backup, repair, replacement build, health, reader, and
+sharing delivery proof is retained under `plan/evidence/PLT-030/`. Existing
+health warnings and broader G4 blockers remain explicit.
+
 ## Recommended order
 
-1. Resolve the owner-review bundle: GOV-012, the exact EXP-015 rendered result,
-   EXP-009, EXP-038 A4/T3/T4, EXP-025/QA-013, and PLT-029 facts.
-2. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
+1. Fernando reviews the cleaned-up current release before broader work resumes.
+   The map stays deferred; PLT-030 no longer needs action.
+2. Resolve the owner-review bundle: GOV-012, EXP-009, the remaining EXP-038
+   reconciliation, EXP-025/QA-013, and PLT-029 facts.
+3. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
    IDX-034, BRD-003, BRD-010, and BRD-012.
-3. Establish the explicit Pulse drift baseline, deploy the locked method,
-   complete one full scheduled cycle, record
+4. Establish the explicit Pulse drift baseline, capture fresh frozen-method
+   prerequisite evidence, complete one full scheduled cycle, record
    the non-backdated PUL-040 start, and allow PUL-026 to run for 90 days.
-4. Create QA-019's external status record and record Fernando's retained-run
+5. Create QA-019's external status record and record Fernando's retained-run
    disposition so its canonical rehearsal record can become `complete`.
-5. Execute Pulse evaluation and disposition, regenerate the review packet,
+6. Execute Pulse evaluation and disposition, regenerate the review packet,
    rerun G4, and only then authorize reviewer contact.
-6. Complete G5, DOI/G6, and the post-review publication/outreach chain.
+7. Complete G5, DOI/G6, and the post-review publication/outreach chain.
 
 ## Gate status
 
-G4 remains blocked with 22 unchecked P0 tasks and 44 unchecked P0/P1 tasks.
+G4 remains blocked with 21 unchecked P0 tasks and 43 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,
