@@ -1,0 +1,82 @@
+{
+  "schema": "civica-scheduled-apply-verification/v1",
+  "verifiedAt": "2026-09-18T06:25:36.996Z",
+  "production": {
+    "id": "dpl_m9FD2vfFiLosJtTXfwaupunPjDZr",
+    "commit": "f108637c97aae416f8b6e04895ed530b74532c9a",
+    "state": "READY",
+    "canonicalDomainVerified": true
+  },
+  "verificationMode": "read-only production execution ledger, source timestamps and bounded bill-row counts",
+  "scheduledExecution": {
+    "job_id": "bills.fr",
+    "trigger_kind": "scheduled",
+    "request_mode": "apply",
+    "status": "succeeded",
+    "attempt_count": 1,
+    "schedule_slot": "2026-09-18T05:30:00.000Z",
+    "last_started_at": "2026-09-18T05:30:10.151Z",
+    "completed_at": "2026-09-18T05:30:19.372Z",
+    "response_status": 200,
+    "result_code": "handler_succeeded"
+  },
+  "pipelineOutcome": {
+    "pipeline_id": "bills.fr",
+    "schedule_slot": "2026-09-18T05:30:00.000Z",
+    "status": "succeeded",
+    "rows_read": 100,
+    "rows_written": 86,
+    "rows_rejected": null,
+    "freshness_source_ids": [
+      "data_assemblee_fr",
+      "senat_fr"
+    ],
+    "error_summary": null,
+    "started_at": "2026-09-18T05:30:10.157Z",
+    "completed_at": "2026-09-18T05:30:19.357Z"
+  },
+  "pipelineRowsWrittenLimitation": "The shared bills payload summarizer records inserted count only; the separate bounded row counts below include updates.",
+  "billMutationsWithinRun": {
+    "windowStart": "2026-09-18T05:30:10.157Z",
+    "windowEnd": "2026-09-18T05:30:19.357Z",
+    "inserted": 86,
+    "updated": 14,
+    "bySource": [
+      {
+        "sourceId": "data_assemblee_fr",
+        "inserted": 45,
+        "updated": 5,
+        "sourceRowCountAtVerification": 305
+      },
+      {
+        "sourceId": "senat_fr",
+        "inserted": 41,
+        "updated": 9,
+        "sourceRowCountAtVerification": 175
+      }
+    ]
+  },
+  "sourceFreshness": [
+    {
+      "id": "data_assemblee_fr",
+      "lastSyncAt": "2026-09-18T05:30:19.324Z",
+      "timestampStorage": "UTC timestamp without time zone",
+      "timestampRead": "Database text; no host-local Date parsing",
+      "withinSuccessfulRun": true,
+      "advancedSincePreviousCheck": true
+    },
+    {
+      "id": "senat_fr",
+      "lastSyncAt": "2026-09-18T05:30:19.324Z",
+      "timestampStorage": "UTC timestamp without time zone",
+      "timestampRead": "Database text; no host-local Date parsing",
+      "withinSuccessfulRun": true,
+      "advancedSincePreviousCheck": true
+    }
+  ],
+  "limitations": [
+    "Bounded row timestamps corroborate committed changes; the durable pipeline summary does not preserve the full fetched record list or exact unchanged count.",
+    "This verifies the September 18 French scheduled application only; the cabinet, Canadian, and German applications have separate dated evidence.",
+    "No manual cron execution, data write, paid call, or production change was made by this verification."
+  ]
+}

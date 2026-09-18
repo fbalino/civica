@@ -1,18 +1,18 @@
 {
   "schemaVersion": "civica-remaining-work/v1",
-  "reviewedAt": "2026-09-17",
+  "reviewedAt": "2026-09-18",
   "checklist": {
-    "total": 311,
-    "completed": 265,
-    "remaining": 46,
-    "progressPercent": 85.2
+    "total": 312,
+    "completed": 267,
+    "remaining": 45,
+    "progressPercent": 85.6
   },
   "agentExecutableNow": [],
   "categories": [
     {
       "id": "direct-human-owner-professional",
       "label": "Direct human, owner, or professional review",
-      "count": 13,
+      "count": 12,
       "taskIds": [
         "BRD-003",
         "BRD-010",
@@ -20,7 +20,6 @@
         "EXP-001",
         "EXP-009",
         "EXP-025",
-        "EXP-038",
         "GOV-012",
         "IDX-022",
         "IDX-034",
@@ -28,7 +27,7 @@
         "QA-012",
         "QA-013"
       ],
-      "nextStep": "Obtain the remaining EXP-038 engineering reconciliation, owner spend and honorarium facts, and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
+      "nextStep": "Obtain the owner spend and honorarium facts and the qualified visual, accessibility, legal/privacy, or research-participant reviews named in the prepared packets."
     },
     {
       "id": "production-staging-external-authority",

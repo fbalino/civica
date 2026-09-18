@@ -1,16 +1,16 @@
 # Civica Academic Publication Readiness — Owner Overview
 
-## Current checkpoint — September 17, 2026
+## Current checkpoint — September 18, 2026
 
 Repository cleanup and release stabilization are complete. Production now
 serves the September release with the selected sharing card. The master
-checklist has 266 of 312 tasks complete and 46 remaining; G4 is still blocked.
-The map is deferred. Recurring data-update repairs are merged under PLT-031;
-deployed dry-run verification passed, and the first ordinary scheduled
-applications remain the operational follow-up. Codex checks hourly while the local host is
-available, and routine failure email has been replaced by web visibility.
+checklist has 267 of 312 tasks complete and 45 remaining; G4 is still blocked.
+The map is deferred. PLT-031 is complete: the repaired cabinet and legislative
+imports each completed their first ordinary scheduled application with retained
+execution and source-freshness evidence. Routine maintenance remains authorized;
+the local heartbeat stays quiet unless owner input is needed.
 Current evidence is in `plan/evidence/PLT-030/` and `plan/evidence/PLT-031/`.
-The older remaining-work report is historical; the master checklist is current.
+The remaining-work report is reconciled to the current master checklist.
 
 The phases below describe the overall program, not a list of currently open
 tasks. The master checklist owns completion state. The Explore-menu decision
