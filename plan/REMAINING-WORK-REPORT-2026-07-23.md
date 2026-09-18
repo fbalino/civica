@@ -1,14 +1,14 @@
 # Civica master checklist — remaining-work report
 
-**Reviewed:** 2026-09-17
+**Reviewed:** 2026-09-18
 
-**Checklist state:** 265 of 311 complete; 46 remain; 85.2%.
+**Checklist state:** 267 of 312 complete; 45 remain; 85.6%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
-Thirteen tasks are direct owner, qualified-human, counsel/privacy, or research
+Twelve tasks are direct owner, qualified-human, counsel/privacy, or research
 participant work. Two require production, provider, or other external-system
 authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
@@ -17,10 +17,12 @@ until an earlier gate produces real evidence. The September release-stabilizatio
 task is complete, with dated production evidence; broader gates remain open.
 
 All currently safe, dependency-valid agent preparation is complete. There is
-no checklist item that an agent can finish now within the cleanup-only scope
-without renewed roadmap direction or the named new inputs. EXP-038 T4 is
-engineering reconciliation and is parked for the owner's requested review,
-not misrepresented as another legal approval. This does not mean the agents are finished permanently:
+no checklist item that an agent can finish now within the completed release
+and routine-repair scope without broader roadmap direction or the named new
+inputs. EXP-038's correction-route reconciliation is complete in PR #37;
+PLT-031's four repaired scheduled imports are now verified. Authorized routine
+monitoring and maintenance continue without another owner approval. This does
+not mean the agents are finished permanently:
 decisions, production journeys, source refreshes, human studies, and the
 prospective window will each re-enable implementation, analysis, remediation,
 publication, or reporting work.
@@ -38,15 +40,14 @@ must wait for G4 or G5.
 
 ## What needs action now
 
-### 1. Direct human, owner, or professional review — 13
+### 1. Direct human, owner, or professional review — 12
 
-IDs: BRD-003, BRD-010, BRD-012, EXP-001, EXP-009, EXP-025, EXP-038,
+IDs: BRD-003, BRD-010, BRD-012, EXP-001, EXP-009, EXP-025,
 GOV-012, IDX-022, IDX-034, PLT-029, QA-012, QA-013.
 
 The prepared decisions and reviews are:
 
-- the remaining EXP-038 correction-route reconciliation and reviewer
-  compensation posture;
+- the remaining owner spend and honorarium facts under PLT-029;
 - qualified review of the rendered-module ledger, illustration candidates,
   visual baselines, screen-reader journeys, Index reader tasks, and
   constitution-to-practice coding;
@@ -55,16 +56,15 @@ The prepared decisions and reviews are:
 
 These are not interchangeable approvals. For example, approving EXP-009
 candidates does not authorize replacing the production images, and approving
-EXP-038 drafts does not authorize deployment or a new legal claim.
+a disclosure draft does not by itself authorize deployment or a new legal claim.
 
 The image-led Explore candidate was superseded by Fernando's 2026-08-17
 grouped-dropdown decision, so EXP-015 is complete. The immediately applicable
-EXP-038 subset, including A4, H5, and T3, is implemented; its old T4 hold now
-requires engineering reconciliation against the active ATL-024 correction route.
-GOV-003 is complete:
-all seven owner fields are confirmed, the canonical disclosure is published in
-the source tree, and the current reviewer packets bind it unchanged. This does
-not supply any remaining EXP-038 disposition or authorize deployment.
+EXP-038 subset, including A4, H5, and T3, is implemented; T4 now routes
+corrections to the active ATL-024 form. EXP-038 closed in merged PR #37, with
+current disclosure v2 bound to the September packet and historical artifacts
+preserved. GOV-003 is complete: all seven owner fields are confirmed. These
+completed items do not waive the remaining research or review gates.
 
 QA-018 is closed: Fernando's written confirmation of the isolated attempt-06
 run is preserved with a date-correction note, and the exact-candidate
@@ -156,14 +156,17 @@ PLT-030 is complete. The September 17 named production release supersedes
 August 24 and includes the bounded dependency, canonical-capital, and sharing
 card repairs. The exact backup, repair, replacement build, health, reader, and
 sharing delivery proof is retained under `plan/evidence/PLT-030/`. Existing
-health warnings and broader G4 blockers remain explicit.
+health warnings and broader G4 blockers remain explicit. PLT-031 also closed
+on September 18 after the cabinet, Canadian, German, and French imports each
+succeeded in their ordinary scheduled slot with current source freshness;
+see `plan/evidence/PLT-031/`.
 
 ## Recommended order
 
 1. Fernando reviews the cleaned-up current release before broader work resumes.
    The map stays deferred; PLT-030 no longer needs action.
-2. Resolve the owner-review bundle: GOV-012, EXP-009, the remaining EXP-038
-   reconciliation, EXP-025/QA-013, and PLT-029 facts.
+2. Resolve the owner-review bundle: GOV-012, EXP-009, EXP-025/QA-013, and
+   PLT-029 facts.
 3. Obtain the qualified/professional reviews: EXP-001, QA-012, IDX-022,
    IDX-034, BRD-003, BRD-010, and BRD-012.
 4. Establish the explicit Pulse drift baseline, capture fresh frozen-method
@@ -177,7 +180,7 @@ health warnings and broader G4 blockers remain explicit.
 
 ## Gate status
 
-G4 remains blocked with 21 unchecked P0 tasks and 43 unchecked P0/P1 tasks.
+G4 remains blocked with 21 unchecked P0 tasks and 42 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,

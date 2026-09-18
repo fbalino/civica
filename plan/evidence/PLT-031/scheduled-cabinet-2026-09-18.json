@@ -1,0 +1,51 @@
+{
+  "schema": "civica-scheduled-apply-verification/v1",
+  "verifiedAt": "2026-09-18T01:25:10.026Z",
+  "production": {
+    "id": "dpl_m9FD2vfFiLosJtTXfwaupunPjDZr",
+    "commit": "f108637c97aae416f8b6e04895ed530b74532c9a",
+    "state": "READY",
+    "canonicalDomainVerified": true
+  },
+  "verificationMode": "read-only production ledger and source timestamps",
+  "scheduledExecution": {
+    "job_id": "factbook.cia-cabinets",
+    "trigger_kind": "scheduled",
+    "request_mode": "apply",
+    "status": "succeeded",
+    "attempt_count": 1,
+    "schedule_slot": "2026-09-18T01:00:00.000Z",
+    "last_started_at": "2026-09-18T01:00:33.613Z",
+    "completed_at": "2026-09-18T01:02:02.279Z",
+    "response_status": 200,
+    "result_code": "completed"
+  },
+  "pipelineOutcome": {
+    "pipeline_id": "factbook.cia-cabinets",
+    "schedule_slot": "2026-09-18T01:00:00.000Z",
+    "status": "succeeded",
+    "rows_read": 9,
+    "rows_written": 528,
+    "rows_rejected": 0,
+    "freshness_source_ids": [
+      "cia_world_leaders"
+    ],
+    "error_summary": null,
+    "started_at": "2026-09-18T01:00:33.627Z",
+    "completed_at": "2026-09-18T01:02:02.260Z"
+  },
+  "sourceFreshness": {
+    "id": "cia_world_leaders",
+    "lastSyncAt": "2026-09-18T01:02:02.250Z",
+    "timestampStorage": "UTC timestamp without time zone",
+    "timestampRead": "Database text in GMT session; no host-local Date parsing",
+    "withinSuccessfulRun": true,
+    "advancedSincePreviousCheck": true
+  },
+  "otherSourceTimestampsUnchanged": true,
+  "limitations": [
+    "528 is the pipeline-reported row mutation count, not a count of unique people or countries.",
+    "This proves the September 18 cabinet scheduled shard only. Canada, Germany, and France ordinary applications remain pending.",
+    "No manual cron execution, data write, paid call, or production change was made by this verification."
+  ]
+}

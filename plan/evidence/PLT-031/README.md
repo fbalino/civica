@@ -67,11 +67,37 @@ manual checks until the separate POST hosting boundary is revisited.
 
 ## Current status and limits
 
-PLT-031 remains open for the first ordinary post-repair scheduled applications:
-cabinet at September 18 01:00 UTC, Canada 04:00, Germany 05:00, and France 05:30.
-The dry runs establish deployed fetching/planning and no-write behavior; they
-do not establish a normal data application or advance source freshness. Codex
-owns this follow-up; the owner does not need to check each run.
+PLT-031 is complete as of September 18, 2026. Read-only production checks
+confirmed all four first ordinary post-repair scheduled applications on
+production commit `f108637c97aae416f8b6e04895ed530b74532c9a`, Ready as
+`dpl_m9FD2vfFiLosJtTXfwaupunPjDZr` on the canonical domain. Every execution
+succeeded on its first attempt with HTTP 200, a matching successful pipeline
+record, and actual target-source freshness advancing inside the successful
+write window:
+
+| Scheduled slot (UTC) | Job | Committed changes observed | Evidence |
+| --- | --- | --- | --- |
+| September 18 01:00 | Cabinet | 528 reported pipeline mutations | [Cabinet](scheduled-cabinet-2026-09-18.json) |
+| September 18 04:00 | Canada bills | 0 inserted, 100 updated | [Canada](scheduled-canada-2026-09-18.json) |
+| September 18 05:00 | Germany bills | 55 inserted, 22 updated | [Germany](scheduled-germany-2026-09-18.json) |
+| September 18 05:30 | France bills | 86 inserted, 14 updated across both official sources | [France](scheduled-france-2026-09-18.json) |
+
+The shared bills pipeline counter records inserts only; bounded bill-row
+creation/update timestamps corroborate updates separately. They do not retain
+the complete fetched record list or exact unchanged count. Cabinet mutations
+are not a count of unique countries or people. Source timestamps are stored as
+UTC without a time zone and were read as database text to avoid host-local
+Date conversion. The four evidence files retain each timestamp and its run
+window. No manual cron application, production data repair, or paid call was
+made by these checks.
+
+The September 17 dry-run record remains unchanged historical evidence of
+fetching/planning, duplicate suppression, and no-write behavior. The September
+18 records establish ordinary scheduled application and source freshness;
+they do not claim all sources or research stages are healthy. The canonical
+application, database, and assets remain operational; public health still
+discloses existing freshness and optional-classification warnings. Codex owns
+ongoing routine monitoring, so the owner does not need to inspect each run.
 
 The application retains structured Runtime Logs and execution records. On
 2026-09-17 the owner chose Codex to investigate instead of receiving repeated

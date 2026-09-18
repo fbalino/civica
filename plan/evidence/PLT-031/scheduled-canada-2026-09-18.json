@@ -1,0 +1,60 @@
+{
+  "schema": "civica-scheduled-apply-verification/v1",
+  "verifiedAt": "2026-09-18T04:26:16.527Z",
+  "production": {
+    "id": "dpl_m9FD2vfFiLosJtTXfwaupunPjDZr",
+    "commit": "f108637c97aae416f8b6e04895ed530b74532c9a",
+    "state": "READY",
+    "canonicalDomainVerified": true
+  },
+  "verificationMode": "read-only production execution ledger, source timestamp and bounded bill-row counts",
+  "scheduledExecution": {
+    "job_id": "bills.ca",
+    "trigger_kind": "scheduled",
+    "request_mode": "apply",
+    "status": "succeeded",
+    "attempt_count": 1,
+    "schedule_slot": "2026-09-18T04:00:00.000Z",
+    "last_started_at": "2026-09-18T04:00:05.191Z",
+    "completed_at": "2026-09-18T04:00:23.705Z",
+    "response_status": 200,
+    "result_code": "handler_succeeded"
+  },
+  "pipelineOutcome": {
+    "pipeline_id": "bills.ca",
+    "schedule_slot": "2026-09-18T04:00:00.000Z",
+    "status": "succeeded",
+    "rows_read": 100,
+    "rows_written": 0,
+    "rows_rejected": null,
+    "freshness_source_ids": [
+      "legisinfo_ca"
+    ],
+    "error_summary": null,
+    "started_at": "2026-09-18T04:00:05.196Z",
+    "completed_at": "2026-09-18T04:00:23.684Z"
+  },
+  "pipelineRowsWrittenLimitation": "The shared bills payload summarizer currently records inserted count only; zero here does not mean zero updates.",
+  "billMutationsWithinRun": {
+    "sourceId": "legisinfo_ca",
+    "windowStart": "2026-09-18T04:00:05.196Z",
+    "windowEnd": "2026-09-18T04:00:23.684Z",
+    "inserted": 0,
+    "updated": 100,
+    "sourceRowCountAtVerification": 137
+  },
+  "sourceFreshness": {
+    "id": "legisinfo_ca",
+    "lastSyncAt": "2026-09-18T04:00:23.596Z",
+    "timestampStorage": "UTC timestamp without time zone",
+    "timestampRead": "Database text; no host-local Date parsing",
+    "withinSuccessfulRun": true,
+    "advancedSincePreviousCheck": true
+  },
+  "limitations": [
+    "Bounded row timestamps corroborate committed updates; the durable pipeline summary does not preserve the full fetched record list or exact unchanged count.",
+    "This verifies the September 18 Canadian scheduled application only. Germany and France remain pending.",
+    "The scheduled reconciliation job completed with advisory findings; this is not an assertion that all data-quality findings are resolved.",
+    "No manual cron execution, data write, paid call, or production change was made by this verification."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "civica-scheduled-apply-verification/v1",
+  "verifiedAt": "2026-09-18T05:24:45.347Z",
+  "production": {
+    "id": "dpl_m9FD2vfFiLosJtTXfwaupunPjDZr",
+    "commit": "f108637c97aae416f8b6e04895ed530b74532c9a",
+    "state": "READY",
+    "canonicalDomainVerified": true
+  },
+  "verificationMode": "read-only production execution ledger, source timestamp and bounded bill-row counts",
+  "scheduledExecution": {
+    "job_id": "bills.de",
+    "trigger_kind": "scheduled",
+    "request_mode": "apply",
+    "status": "succeeded",
+    "attempt_count": 1,
+    "schedule_slot": "2026-09-18T05:00:00.000Z",
+    "last_started_at": "2026-09-18T05:00:02.202Z",
+    "completed_at": "2026-09-18T05:00:30.100Z",
+    "response_status": 200,
+    "result_code": "handler_succeeded"
+  },
+  "pipelineOutcome": {
+    "pipeline_id": "bills.de",
+    "schedule_slot": "2026-09-18T05:00:00.000Z",
+    "status": "succeeded",
+    "rows_read": 77,
+    "rows_written": 55,
+    "rows_rejected": null,
+    "freshness_source_ids": [
+      "bundestag_dip"
+    ],
+    "error_summary": null,
+    "started_at": "2026-09-18T05:00:02.210Z",
+    "completed_at": "2026-09-18T05:00:30.083Z"
+  },
+  "pipelineRowsWrittenLimitation": "The shared bills payload summarizer records inserted count only; the separate bounded row count below includes updates.",
+  "billMutationsWithinRun": {
+    "sourceId": "bundestag_dip",
+    "windowStart": "2026-09-18T05:00:02.210Z",
+    "windowEnd": "2026-09-18T05:00:30.083Z",
+    "inserted": 55,
+    "updated": 22,
+    "sourceRowCountAtVerification": 207
+  },
+  "sourceFreshness": {
+    "id": "bundestag_dip",
+    "lastSyncAt": "2026-09-18T05:00:30.045Z",
+    "timestampStorage": "UTC timestamp without time zone",
+    "timestampRead": "Database text; no host-local Date parsing",
+    "withinSuccessfulRun": true,
+    "advancedSincePreviousCheck": true
+  },
+  "limitations": [
+    "Bounded row timestamps corroborate committed changes; the durable pipeline summary does not preserve the full fetched record list or exact unchanged count.",
+    "This verifies the September 18 German scheduled application only. France remains pending.",
+    "No manual cron execution, data write, paid call, or production change was made by this verification."
+  ]
+}
