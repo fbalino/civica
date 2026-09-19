@@ -91,7 +91,11 @@ test("CIA 503 is retried, then becomes an aggregate failure", async () => {
   assert.deepEqual(waits, [3_000, 8_000]);
   assert.equal(state.reads(), 0);
   assert.deepEqual(plan.failed, [
-    { slug: "ghana", reason: "CIA World Leaders returned HTTP 503" },
+    {
+      slug: "ghana",
+      code: "upstream_http_error",
+      reason: "CIA World Leaders returned HTTP 503",
+    },
   ]);
   assert.equal(plan.stats.countriesFetchFailed, 1);
   assert.equal(plan.stats.countriesSkipped, 1);
@@ -110,6 +114,7 @@ test("CIA malformed HTTP 200 page becomes an aggregate schema failure", async ()
   assert.deepEqual(plan.failed, [
     {
       slug: "japan",
+      code: "upstream_schema_error",
       reason:
         "CIA World Leaders HTTP 200 page failed the leaders-section schema",
     },
@@ -135,7 +140,11 @@ test("CIA mixed successful and failed countries retain both plan outcomes", asyn
   assert.equal(plan.stats.positionsIngested, 1);
   assert.equal(plan.stats.countriesSkipped, 1);
   assert.deepEqual(plan.failed, [
-    { slug: "ghana", reason: "CIA World Leaders returned HTTP 503" },
+    {
+      slug: "ghana",
+      code: "upstream_http_error",
+      reason: "CIA World Leaders returned HTTP 503",
+    },
   ]);
   assert.equal(
     plan.countries.find(({ slug }) => slug === "uruguay")?.positions.length,

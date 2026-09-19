@@ -125,6 +125,56 @@ test("CIA route validates and propagates its named routine-refresh release", asy
   assert.equal(received[0]?.dryRun, true);
 });
 
+test("CIA route retains closed failure diagnostics and partial-write counters", async () => {
+  const failed = cabinetSummary(false);
+  Object.assign(failed, {
+    countriesApplied: 6,
+    countriesSkipped: 1,
+    skipped: [
+      {
+        slug: "papua-new-guinea",
+        code: "office_identity_conflict",
+        reason: "Office identity is ambiguous or unsafe",
+      },
+    ],
+    officesWritten: 144,
+    termsWritten: 142,
+    statementsWritten: 142,
+    totalRowsWritten: 428,
+    freshnessStamped: false,
+  });
+  const handler = createCiaCabinetHandler({
+    database: {} as never,
+    environment: {
+      CIVICA_ATLAS_RELEASE_ID: "atlas-routine-refresh-2026-09-17",
+    },
+    buildSlugList: async () => ["papua-new-guinea"],
+    sync: async () => failed,
+  });
+
+  const response = await handler(
+    request("/api/cron/factbook/sync-cia-cabinets?shard=0"),
+  );
+  const payload = await response.json();
+
+  assert.equal(response.status, 502);
+  assert.equal(payload.outcome, "cabinet_office_identity_conflict");
+  assert.equal(payload.countriesApplied, 6);
+  assert.equal(payload.countriesSkipped, 1);
+  assert.equal(payload.officesWritten, 144);
+  assert.equal(payload.termsWritten, 142);
+  assert.equal(payload.statementsWritten, 142);
+  assert.equal(payload.totalRowsWritten, 428);
+  assert.equal(payload.freshnessStamped, false);
+  assert.deepEqual(payload.failures, [
+    {
+      slug: "papua-new-guinea",
+      code: "office_identity_conflict",
+    },
+  ]);
+  assert.equal(JSON.stringify(payload).includes("Office identity"), false);
+});
+
 test("manual CIA delivery without a shard fails before schedule or domain I/O", async () => {
   let databaseReads = 0;
   let syncCalls = 0;

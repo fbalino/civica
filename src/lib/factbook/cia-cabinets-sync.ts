@@ -55,6 +55,7 @@ import { and, eq, ilike, isNull, sql } from "drizzle-orm";
 import { db as sharedDb } from "@/lib/db";
 import {
   jurisdictions,
+  offices,
   persons,
   terms,
   statements,
@@ -773,9 +774,37 @@ export interface PlannedCountry {
  * page failed the expected schema, or another country-scoped read/parse step
  * threw. Distinct from a clean 404, which is not a failure — see
  * `computeCabinetPlan`. */
+export type CabinetFailureCode =
+  | "upstream_http_error"
+  | "upstream_schema_error"
+  | "country_read_error"
+  | "office_identity_conflict"
+  | "persistence_error";
+
 export interface FailedCountry {
   slug: string;
+  code: CabinetFailureCode;
   reason: string;
+}
+
+function closedCabinetWriteFailure(slug: string, err: unknown): FailedCountry {
+  const message = (err as Error)?.message ?? "";
+  if (
+    message.includes(
+      "Office mutation did not resolve one stable row; identity is ambiguous or unsafe",
+    )
+  ) {
+    return {
+      slug,
+      code: "office_identity_conflict",
+      reason: "Office identity is ambiguous or unsafe",
+    };
+  }
+  return {
+    slug,
+    code: "persistence_error",
+    reason: "Country persistence failed",
+  };
 }
 
 export interface CabinetPlan {
@@ -862,9 +891,13 @@ export async function computeCabinetPlan(
   // Dedup person proposals across the whole sample (a human held once, many
   // offices). Keyed by lowercased normalized name.
   const stableIdByNewName = new Map<string, string>();
-  const recordCountryFailure = (slug: string, reason: string) => {
+  const recordCountryFailure = (
+    slug: string,
+    code: CabinetFailureCode,
+    reason: string,
+  ) => {
     plan.stats.countriesSkipped++;
-    plan.failed.push({ slug, reason });
+    plan.failed.push({ slug, code, reason });
   };
 
   for (let i = 0; i < slugs.length; i++) {
@@ -921,7 +954,7 @@ export async function computeCabinetPlan(
           continue;
         }
         const reason = `CIA World Leaders returned HTTP ${status}`;
-        recordCountryFailure(slug, reason);
+        recordCountryFailure(slug, "upstream_http_error", reason);
         log(`! ${slug}: ${reason}`);
         plan.countries.push(country);
         continue;
@@ -943,7 +976,7 @@ export async function computeCabinetPlan(
       if (parsed.parseFailed) {
         const reason =
           "CIA World Leaders HTTP 200 page failed the leaders-section schema";
-        recordCountryFailure(slug, reason);
+        recordCountryFailure(slug, "upstream_schema_error", reason);
         log(`! ${slug}: ${reason}`);
         plan.countries.push(country);
         continue;
@@ -1017,9 +1050,12 @@ export async function computeCabinetPlan(
       // timeout in findJurisdictionBySlug / resolvePerson, a parse throw) skips
       // THIS country and records it — the crawl runs to completion.
       if (!countedFetched) plan.stats.countriesFetched++;
-      const reason = (err as Error)?.message ?? String(err);
-      recordCountryFailure(slug, reason);
-      log(`⚠ skipped ${slug}: ${reason}`);
+      recordCountryFailure(
+        slug,
+        "country_read_error",
+        "Country fetch or read failed",
+      );
+      log(`! ${slug}: country_read_error`);
       continue;
     }
   }
@@ -1319,6 +1355,33 @@ async function upsertCabinetOffice(
   });
 }
 
+async function listExistingCabinetOffices(
+  db: CabinetSyncDb,
+  bodyId: string,
+): Promise<Array<{ id: string; name: string }>> {
+  return db
+    .select({ id: offices.id, name: offices.name })
+    .from(offices)
+    .where(eq(offices.bodyId, bodyId));
+}
+
+function exactOfficeIdsByTitle(
+  existing: Array<{ id: string; name: string }>,
+  eligibleTitles: ReadonlySet<string>,
+): Map<string, string> {
+  const byTitle = new Map<string, string>();
+  for (const office of existing) {
+    if (!eligibleTitles.has(office.name)) continue;
+    if (byTitle.has(office.name)) {
+      throw new Error(
+        "Office mutation did not resolve one stable row; identity is ambiguous or unsafe",
+      );
+    }
+    byTitle.set(office.name, office.id);
+  }
+  return byTitle;
+}
+
 /**
  * Resolve the person id to link a term to, per owner decision 1:
  *   - path 'existing' → the matched existing person id.
@@ -1549,7 +1612,7 @@ export async function syncCiaCabinets(
     countriesApplied: 0,
     countriesFetchFailed: plan.stats.countriesFetchFailed,
     countriesSkipped: plan.stats.countriesSkipped,
-    skipped: plan.failed,
+    skipped: [...plan.failed],
     countriesUnmatched: plan.stats.countriesUnmatched,
     officesWritten: 0,
     personsExisting: 0,
@@ -1628,15 +1691,35 @@ export async function syncCiaCabinets(
         { log, label: `upsertBody(${country.slug})` },
       );
 
-      let appliedAny = false;
-      for (const pos of country.positions) {
-        // Owner scope: drop diplomatic entirely.
+      const eligiblePositions = country.positions.filter((pos) => {
         if (pos.category === "diplomatic") {
           summary.diplomaticSkipped++;
-          continue;
+          return false;
         }
-        if (!INGEST_CATEGORIES.has(pos.category)) continue;
+        return INGEST_CATEGORIES.has(pos.category);
+      });
+      const existingOffices = await withDbRetry(
+        () => listExistingCabinetOffices(db, bodyId),
+        { log, label: `listOffices(${country.slug})` },
+      );
+      const existingOfficeIds = exactOfficeIdsByTitle(
+        existingOffices,
+        new Set(eligiblePositions.map(({ title }) => title)),
+      );
+      const exactExisting = eligiblePositions.filter((pos) =>
+        existingOfficeIds.has(pos.title),
+      );
+      const newOrAmbiguous = eligiblePositions.filter(
+        (pos) => !existingOfficeIds.has(pos.title),
+      );
+      const officeIds = new Map<PlannedPosition, string>();
 
+      // Move every unchanged, exact-title office to its current publisher
+      // position before inserting unknown titles. This makes an insertion that
+      // shifts later offices safe while preserving the shared writer's
+      // fail-closed same-slot guard for a genuine, unproven title rename.
+      for (const pos of [...exactExisting, ...newOrAmbiguous]) {
+        const stableId = existingOfficeIds.get(pos.title) ?? pos.officeId;
         const officeId = await withDbRetry(
           () =>
             upsertCabinetOffice(
@@ -1645,14 +1728,24 @@ export async function syncCiaCabinets(
               pos.title,
               pos.officeType,
               pos.order,
-              pos.officeId,
+              stableId,
               writers,
               history,
             ),
           { log, label: `upsertOffice(${country.slug})` },
         );
+        officeIds.set(pos, officeId);
         summary.officesWritten++;
-        appliedAny = true;
+      }
+
+      const appliedAny = officeIds.size > 0;
+      for (const pos of eligiblePositions) {
+        const officeId = officeIds.get(pos);
+        if (!officeId) {
+          throw new Error(
+            "Office mutation did not resolve one stable row; identity is ambiguous or unsafe",
+          );
+        }
 
         // Unnamed / vacant post: office created, NO term. Never invent a holder.
         if (!pos.rawName || !pos.normalizedName || !pos.personPath) {
@@ -1708,15 +1801,13 @@ export async function syncCiaCabinets(
         log(`  ✓ ${country.jurisdictionName ?? country.slug}`);
       }
     } catch (err) {
-      // A Neon failure while writing this country skips it and records the
-      // straggler — the apply loop continues to the last country.
+      // A country-scoped persistence failure records a closed diagnostic and
+      // continues. Raw database errors, SQL, and person data never enter the
+      // summary or progress logs.
       summary.countriesSkipped++;
-      const reason = (err as Error)?.message ?? String(err);
-      summary.skipped.push({
-        slug: country.slug,
-        reason: `apply write error: ${reason}`,
-      });
-      log(`⚠ skipped ${country.slug}: apply write error: ${reason}`);
+      const failure = closedCabinetWriteFailure(country.slug, err);
+      summary.skipped.push(failure);
+      log(`! ${country.slug}: ${failure.code}`);
       continue;
     }
   }
@@ -1753,7 +1844,7 @@ export async function syncCiaCabinets(
     log(
       `\n⚠ ${summary.skipped.length} country(ies) skipped after failures — the crawl still completed:`,
     );
-    for (const f of summary.skipped) log(`    ${f.slug}: ${f.reason}`);
+    for (const f of summary.skipped) log(`    ${f.slug}: ${f.code}`);
     log(
       `  Re-run to pick up the stragglers (writes are idempotent, so a full`,
     );
