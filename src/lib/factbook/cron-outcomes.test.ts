@@ -9,7 +9,13 @@ import {
 test("CIA cabinet cron rejects mixed upstream failures and missing freshness", () => {
   assert.deepEqual(
     ciaCabinetSyncCronOutcome({
-      skipped: [{ slug: "ghana", reason: "HTTP 503" }],
+      skipped: [
+        {
+          slug: "ghana",
+          code: "upstream_http_error",
+          reason: "HTTP 503",
+        },
+      ],
       totalRowsWritten: 3,
       freshnessStamped: false,
       dryRun: false,

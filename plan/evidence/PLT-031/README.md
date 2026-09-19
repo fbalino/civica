@@ -114,3 +114,9 @@ gates remain separate.
 - https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#cooldown
 - https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#groups
 - https://vercel.com/docs/git/vercel-for-github
+
+## September 19 cabinet roster insertion
+
+The next scheduled cabinet shard found a distinct importer edge: a newly listed office appeared before an unchanged office, so the unchanged office still occupied the new entry's display position. The shared identity guard refused an unproven rename. Current publisher pages parsed successfully, and an isolated restore reproduced the exact failure.
+
+The repair refreshes existing offices by exact title and UUID before inserting unknown titles. It preserves source order and the identity guard; an unexplained title replacement remains a failure. Closed failure categories and numeric partial-run counters now reach the existing cron and pipeline records without raw exceptions or SQL. The [rehearsal evidence](cabinet-roster-insertion-2026-09-19.json) records seven successful available pages, one new office, preserved existing identities, and semantic-row and Atlas entity-change idempotence. It is pre-merge evidence; production recovery requires a separate current deployment and execution check.

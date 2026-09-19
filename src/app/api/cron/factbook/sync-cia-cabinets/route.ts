@@ -26,6 +26,7 @@ import { db } from "@/lib/db";
 import {
   buildCiaSlugList,
   syncCiaCabinets,
+  type CabinetFailureCode,
   type CabinetSyncDb,
   type CabinetSyncOptions,
   type CiaCabinetSyncSummary,
@@ -43,6 +44,42 @@ export const maxDuration = 600;
 // Spread the directory across 28 shards so every calendar month (incl.
 // February) fully cycles. Days 29–31 map back onto shards 0–2 (idempotent).
 const SHARD_COUNT = 28;
+
+type CiaCabinetFailureOutcome =
+  | "cabinet_office_identity_conflict"
+  | "cabinet_read_failure"
+  | "cabinet_schema_failure"
+  | "cabinet_persistence_failure"
+  | "cabinet_mixed_failure"
+  | "cabinet_no_rows"
+  | "cabinet_source_freshness_not_stamped";
+
+function retainedCabinetFailureOutcome(
+  summary: CiaCabinetSyncSummary,
+  reason: string,
+): CiaCabinetFailureOutcome {
+  if (reason === "no_rows") return "cabinet_no_rows";
+  if (reason === "source_freshness_not_stamped") {
+    return "cabinet_source_freshness_not_stamped";
+  }
+  const category = (code: CabinetFailureCode) => {
+    switch (code) {
+      case "office_identity_conflict":
+        return "cabinet_office_identity_conflict" as const;
+      case "upstream_http_error":
+      case "country_read_error":
+        return "cabinet_read_failure" as const;
+      case "upstream_schema_error":
+        return "cabinet_schema_failure" as const;
+      case "persistence_error":
+        return "cabinet_persistence_failure" as const;
+    }
+  };
+  const categories = new Set(summary.skipped.map(({ code }) => category(code)));
+  return categories.size === 1
+    ? ([...categories][0] ?? "cabinet_mixed_failure")
+    : "cabinet_mixed_failure";
+}
 
 export function resolveCiaCabinetShard(
   request: Request,
@@ -152,15 +189,38 @@ export function createCiaCabinetHandler(
     const outcome = ciaCabinetSyncCronOutcome(summary);
 
     if (!outcome.ok) {
+      const retainedOutcome = retainedCabinetFailureOutcome(
+        summary,
+        outcome.reason ?? "incomplete_stage",
+      );
       return NextResponse.json(
         {
           ok: outcome.ok,
-          outcome: outcome.outcome,
+          outcome: retainedOutcome,
           healthOk: outcome.healthOk,
           reason: outcome.reason,
           step: "factbook.cia-cabinets.sync",
           dryRun,
           errorCount: Math.max(1, summary.skipped.length),
+          shardIndex,
+          shardCount: SHARD_COUNT,
+          countriesInShard: slugs.length,
+          countriesCrawled: summary.countriesCrawled,
+          countriesApplied: summary.countriesApplied,
+          countriesFetchFailed: summary.countriesFetchFailed,
+          countriesSkipped: summary.countriesSkipped,
+          countriesUnmatched: summary.countriesUnmatched,
+          officesWritten: summary.officesWritten,
+          termsWritten: summary.termsWritten,
+          personsExisting: summary.personsExisting,
+          personsQidCreated: summary.personsQidCreated,
+          personsIdlessCreated: summary.personsIdlessCreated,
+          vacantOffices: summary.vacantOffices,
+          diplomaticSkipped: summary.diplomaticSkipped,
+          statementsWritten: summary.statementsWritten,
+          totalRowsWritten: summary.totalRowsWritten,
+          freshnessStamped: summary.freshnessStamped,
+          failures: summary.skipped.map(({ slug, code }) => ({ slug, code })),
         },
         { status: outcome.httpStatus },
       );

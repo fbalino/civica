@@ -20,7 +20,13 @@ function harness() {
     return row;
   }
   const db = {
-    select: () => ({ from: (table: unknown) => ({ where: () => ({ limit: async () => (rows.get(table) ?? []).slice(0, 1) }) }) }),
+    select: () => ({ from: (table: unknown) => ({ where: () => {
+      const selected = rows.get(table) ?? [];
+      return {
+        limit: async () => selected.slice(0, 1),
+        then: (resolve: (value: Array<Record<string, unknown>>) => void) => resolve(selected),
+      };
+    } }) }),
     insert: (table: unknown) => ({ values: (value: Record<string, unknown>) => {
       let inserted: Record<string, unknown> | null = null;
       const run = () => inserted ??= insert(table, value);
@@ -59,8 +65,18 @@ function harness() {
           (candidate.bodyId === input.bodyId && candidate.name === input.name),
       );
       if (!row) {
+        const occupiedOrder = list.find(
+          (candidate) =>
+            candidate.bodyId === input.bodyId &&
+            candidate.displayOrder === input.displayOrder,
+        );
+        if (occupiedOrder) {
+          throw new Error(
+            "Office mutation did not resolve one stable row; identity is ambiguous or unsafe",
+          );
+        }
         row = insert(offices, {
-          id: "20000000-0000-4000-8000-000000000001",
+          id: `office-${list.length + 1}`,
           bodyId: input.bodyId,
           name: input.name,
           officeType: input.officeType,
@@ -69,6 +85,7 @@ function harness() {
         });
       } else {
         Object.assign(row, {
+          name: input.name,
           officeType: input.officeType,
           displayOrder: input.displayOrder,
         });
@@ -107,6 +124,30 @@ function semantic(rows: Map<unknown, Array<Record<string, unknown>>>) {
 
 const baseOptions = { slugs: ["canada"], plan, crawlDelayMs: 0, markSynced: (async () => ["cia_world_leaders"]) as never, atlasReleaseId: "atlas-test" };
 
+function planWithPositions(
+  positions: CabinetPlan["countries"][number]["positions"],
+): CabinetPlan {
+  return {
+    ...plan,
+    countries: [{ ...plan.countries[0], positions }],
+    stats: {
+      ...plan.stats,
+      positionsTotal: positions.length,
+      positionsIngested: positions.length,
+      named: positions.filter((position) => position.rawName).length,
+      vacant: positions.filter((position) => !position.rawName).length,
+      byCategory: {
+        head: 0,
+        deputy: 0,
+        cabinet: positions.length,
+        central_bank: 0,
+        diplomatic: 0,
+        other: 0,
+      },
+    },
+  };
+}
+
 test("CIA cabinet fixture applications create no duplicate canonical rows", async () => {
   const state = harness();
   await syncCiaCabinets({ ...baseOptions, db: state.db, entityWriters: state.entityWriters });
@@ -120,6 +161,151 @@ test("CIA cabinet fixture applications create no duplicate canonical rows", asyn
   assert.equal(state.rows.get(statements)?.length, 1);
   assert.equal(state.rows.get(statements)?.[0].subjectTable, "terms");
   assert.equal(state.rows.get(statements)?.[0].subjectId, state.rows.get(terms)?.[0].id);
+});
+
+test("CIA cabinet inserts a new office before an unchanged office without changing the retained identity", async () => {
+  const state = harness();
+  const bodyId = "10000000-0000-4000-8000-000000000001";
+  const financeOfficeId = "20000000-0000-4000-8000-000000000001";
+  const financePersonId = "30000000-0000-4000-8000-000000000001";
+  state.rows.get(governmentBodies)?.push({
+    id: bodyId,
+    jurisdictionId: "jurisdiction-1",
+    name: "Executive of Canada",
+    bodyType: "cabinet",
+    branch: "executive",
+  });
+  state.rows.get(offices)?.push({
+    id: financeOfficeId,
+    bodyId,
+    name: "Minister of Finance",
+    officeType: "cabinet",
+    isElected: false,
+    displayOrder: 15,
+  });
+  state.rows.get(persons)?.push({ id: financePersonId, name: "Jane Doe" });
+
+  const insertionPlan = planWithPositions([
+    {
+      title: "Minister of Environment",
+      rawName: null,
+      normalizedName: null,
+      order: 15,
+      category: "cabinet",
+      officeType: "cabinet",
+      personPath: null,
+      qid: null,
+      personId: null,
+    },
+    {
+      title: "Minister of Finance",
+      rawName: "Jane DOE",
+      normalizedName: "Jane Doe",
+      order: 16,
+      category: "cabinet",
+      officeType: "cabinet",
+      personPath: "existing",
+      qid: null,
+      personId: financePersonId,
+    },
+  ]);
+  const options = {
+    ...baseOptions,
+    plan: insertionPlan,
+    db: state.db,
+    entityWriters: state.entityWriters,
+  };
+
+  const first = await syncCiaCabinets(options);
+  const financeAfterFirst = state.rows
+    .get(offices)
+    ?.find((row) => row.name === "Minister of Finance");
+  const environmentAfterFirst = state.rows
+    .get(offices)
+    ?.find((row) => row.name === "Minister of Environment");
+  const firstTermId = state.rows.get(terms)?.[0]?.id;
+  const firstStatementId = state.rows.get(statements)?.[0]?.id;
+
+  assert.deepEqual(first.skipped, []);
+  assert.equal(financeAfterFirst?.id, financeOfficeId);
+  assert.equal(financeAfterFirst?.displayOrder, 16);
+  assert.equal(environmentAfterFirst?.displayOrder, 15);
+  assert.notEqual(environmentAfterFirst?.id, financeOfficeId);
+  assert.equal(state.rows.get(terms)?.length, 1);
+  assert.equal(state.rows.get(statements)?.length, 1);
+  assert.equal(state.rows.get(statements)?.[0]?.subjectId, firstTermId);
+  assert.equal(state.rows.get(statements)?.[0]?.sourceId, "cia_world_leaders");
+
+  const second = await syncCiaCabinets(options);
+  assert.deepEqual(second.skipped, []);
+  assert.equal(
+    state.rows.get(offices)?.find((row) => row.name === "Minister of Finance")?.id,
+    financeOfficeId,
+  );
+  assert.equal(state.rows.get(offices)?.length, 2);
+  assert.equal(state.rows.get(terms)?.length, 1);
+  assert.equal(state.rows.get(terms)?.[0]?.id, firstTermId);
+  assert.equal(state.rows.get(statements)?.length, 1);
+  assert.equal(state.rows.get(statements)?.[0]?.id, firstStatementId);
+});
+
+test("CIA cabinet still rejects a genuine same-slot title rename", async () => {
+  const state = harness();
+  const bodyId = "10000000-0000-4000-8000-000000000001";
+  state.rows.get(governmentBodies)?.push({
+    id: bodyId,
+    jurisdictionId: "jurisdiction-1",
+    name: "Executive of Canada",
+    bodyType: "cabinet",
+    branch: "executive",
+  });
+  state.rows.get(offices)?.push({
+    id: "20000000-0000-4000-8000-000000000001",
+    bodyId,
+    name: "Old Ministry Title",
+    officeType: "cabinet",
+    isElected: false,
+    displayOrder: 15,
+  });
+  const stamped: number[] = [];
+  const renamePlan = planWithPositions([
+    {
+      title: "New Ministry Title",
+      rawName: null,
+      normalizedName: null,
+      order: 15,
+      category: "cabinet",
+      officeType: "cabinet",
+      personPath: null,
+      qid: null,
+      personId: null,
+    },
+  ]);
+
+  const result = await syncCiaCabinets({
+    ...baseOptions,
+    plan: renamePlan,
+    db: state.db,
+    entityWriters: state.entityWriters,
+    markSynced: (async (_id: unknown, options: { rowsWritten: number }) => {
+      stamped.push(options.rowsWritten);
+      return [];
+    }) as never,
+  });
+
+  assert.equal(result.countriesSkipped, 1);
+  assert.deepEqual(result.skipped, [
+    {
+      slug: "canada",
+      code: "office_identity_conflict",
+      reason: "Office identity is ambiguous or unsafe",
+    },
+  ]);
+  assert.deepEqual(renamePlan.failed, []);
+  assert.equal(state.rows.get(offices)?.length, 1);
+  assert.equal(state.rows.get(offices)?.[0]?.name, "Old Ministry Title");
+  assert.deepEqual(stamped, [0]);
+  assert.equal(result.freshnessStamped, false);
 });
 
 test("CIA cabinet dry-run is stable and performs zero writes", async () => {
@@ -176,9 +362,9 @@ test("CIA cabinet apply fails closed before entity writes without a named releas
 test("CIA cabinet partial upstream failure cannot stamp freshness", async () => {
   const state = harness();
   const stamped: number[] = [];
-  const failedPlan = {
+  const failedPlan: CabinetPlan = {
     ...plan,
-    failed: [{ slug: "ghana", reason: "CIA World Leaders returned HTTP 503" }],
+    failed: [{ slug: "ghana", code: "upstream_http_error", reason: "CIA World Leaders returned HTTP 503" }],
     stats: {
       ...plan.stats,
       countriesFetched: 2,

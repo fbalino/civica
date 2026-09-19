@@ -1,6 +1,6 @@
 # Current handoff — Civica
 
-**Updated:** 2026-09-18
+**Updated:** 2026-09-19
 **Current objective:** maintain the repaired recurring data imports and routine operational visibility. The map and external academic review remain outside this engineering work.
 
 ## Current release work
@@ -13,6 +13,8 @@
 The map is deferred at Fernando's direction. The master checklist is 267/312 complete with 45 remaining after closing EXP-038 and PLT-031; G4 remains blocked by the uncompleted checklist. Existing freshness and optional-classification health warnings remain disclosed. Do not interpret this task as a beta, academic-release, or external-review approval.
 
 ## Active reliability work
+
+- The September 19 cabinet shard exposed a separate roster-insertion edge: a new office occupied the old display position of an unchanged office. The importer now updates exact-title office positions before creating new offices, retaining the existing identity guard. A fresh isolated production-snapshot rehearsal completed all seven available country pages, preserved existing office identities, and repeated without duplicate semantic rows or Atlas entity-change events. The pre-merge proof is `plan/evidence/PLT-031/cabinet-roster-insertion-2026-09-19.json`; current deployment/recovery outcomes are recorded by the local monitor in ignored `output/data-reliability/latest.json`.
 
 - PLT-031 is complete. Its cabinet configuration, three legislative adapters, bounded recovery, and durable alert transitions are merged; PRs #35 and #36 passed required CI/preview checks. The first ordinary scheduled cabinet, Canadian, German, and French applications all completed successfully on September 18 with retained terminal execution, pipeline, and source-freshness evidence under `plan/evidence/PLT-031/`. The September 17 dry-run/recovery evidence remains historical proof of the deployed repair boundary.
 - Manual deployed checks should use the documented GET plus stable `Idempotency-Key`: empty POST requests were rejected before execution by the no-body guard. The pipeline monitor deliberately retains HTTP 503 for open findings with `pipeline_alert_*` outcomes; it excludes itself from alert inputs. Diagnose its reported sources, not that monitor record as another failed ingestion.

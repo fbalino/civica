@@ -1,0 +1,151 @@
+{
+  "schema": "civica-cabinet-roster-insertion-rehearsal/v1",
+  "verifiedAt": "2026-09-19T02:01:56.640Z",
+  "scope": "Pre-merge reproduction and isolated repair verification; not a production recovery claim",
+  "scheduledFailure": {
+    "slot": "2026-09-19T01:00:00Z",
+    "jobId": "factbook.cia-cabinets",
+    "shardIndex": 18,
+    "httpStatus": 502,
+    "resultCode": "partial",
+    "attemptCount": 1,
+    "sourceFreshnessAdvanced": false
+  },
+  "diagnosis": {
+    "readOnlyPlan": {
+      "requestedPages": 9,
+      "parsedMatchedPages": 7,
+      "expectedNotFoundPages": 2,
+      "failedCountries": 0
+    },
+    "originalCodeReproduction": {
+      "failedCountry": "papua-new-guinea",
+      "safeError": "Office identity is ambiguous or unsafe",
+      "countriesApplied": 6,
+      "reportedRowMutations": 429,
+      "freshnessStamped": false
+    },
+    "cause": "A new publisher office inserted before an unchanged existing office encountered the old display-order slot. The identity safeguard correctly refused to infer a rename, but the importer had not moved unchanged offices to their current source positions first.",
+    "officialSource": {
+      "url": "https://www.cia.gov/resources/world-leaders/foreign-governments/papua-new-guinea/",
+      "retrievedAt": "2026-09-19T01:48:33.829Z",
+      "status": 200,
+      "sha256": "338d9f5d4ec93667f9631e9ccc11f56a7bc9fd9b8350d670a728d83fd2221622"
+    }
+  },
+  "recoveryEvidence": {
+    "readOnlySnapshot": {
+      "at": "2026-09-19T01:51:22.951Z",
+      "bytes": 197405425,
+      "sha256": "15cdf617ed51e61ebaf6e1411fd6d27c7853a88a4db54475f9c48710a7627e51",
+      "readOnly": true,
+      "directEndpoint": true
+    },
+    "isolatedRestorePassed": true,
+    "productionConnectionsDuringReplay": 0,
+    "publisherRequestsDuringReplay": 0,
+    "capturedPagesReused": true
+  },
+  "fixedReplay": {
+    "first": {
+      "startedAt": "2026-09-19T02:01:55.624Z",
+      "finishedAt": "2026-09-19T02:01:55.988Z",
+      "durationMs": 364,
+      "countriesCrawled": 9,
+      "countriesApplied": 7,
+      "countriesFetchFailed": 2,
+      "countriesSkipped": 0,
+      "skipped": [],
+      "countriesUnmatched": 0,
+      "officesWritten": 176,
+      "personsExisting": 169,
+      "personsQidCreated": 0,
+      "personsIdlessCreated": 4,
+      "termsWritten": 173,
+      "vacantOffices": 3,
+      "diplomaticSkipped": 14,
+      "statementsWritten": 173,
+      "totalRowsWritten": 522,
+      "freshnessStamped": true,
+      "dryRun": false
+    },
+    "repeat": {
+      "startedAt": "2026-09-19T02:01:56.222Z",
+      "finishedAt": "2026-09-19T02:01:56.535Z",
+      "durationMs": 313,
+      "countriesCrawled": 9,
+      "countriesApplied": 7,
+      "countriesFetchFailed": 2,
+      "countriesSkipped": 0,
+      "skipped": [],
+      "countriesUnmatched": 0,
+      "officesWritten": 176,
+      "personsExisting": 173,
+      "personsQidCreated": 0,
+      "personsIdlessCreated": 0,
+      "termsWritten": 173,
+      "vacantOffices": 3,
+      "diplomaticSkipped": 14,
+      "statementsWritten": 173,
+      "totalRowsWritten": 522,
+      "freshnessStamped": true,
+      "dryRun": false
+    },
+    "semanticRowFingerprintsStableOnRepeat": true,
+    "historyEventsStableOnRepeat": true,
+    "allExistingTargetOfficeUuidsAndTitlesPreserved": true,
+    "newOfficeCount": 1,
+    "unrelatedOfficeFingerprintUnchanged": true,
+    "otherSourceTimestampsUnchanged": true,
+    "historyEvents": [
+      {
+        "entity_type": "office",
+        "operation": "insert",
+        "count": 1
+      },
+      {
+        "entity_type": "office",
+        "operation": "update",
+        "count": 30
+      },
+      {
+        "entity_type": "person",
+        "operation": "insert",
+        "count": 4
+      }
+    ],
+    "historyRelation": "atlas_entity_change_history"
+  },
+  "safeguards": [
+    "The shared office identity guard is unchanged.",
+    "Actual unexplained title replacement still fails closed.",
+    "Only exact titles in the imported roster participate in duplicate detection; unrelated head offices are untouched.",
+    "Freshness remains false for partial, empty, or failed work.",
+    "Cron leases, idempotency, retry eligibility, source rights, and release identity are unchanged.",
+    "Closed failure categories and numeric counters are retained without raw exception text."
+  ],
+  "limitations": [
+    "522 counts reported office, term, and statement mutations; it is not a count of unique people or countries.",
+    "A repeat may refresh statement retrieval timestamps and source freshness after real writes; semantic rows and identity/history do not multiply.",
+    "Production deployment and recovered manual execution must be checked separately after normal merge.",
+    "History idempotence refers to public Atlas entity-change events. Append-only research audit records may legitimately retain refreshed retrieval timestamps."
+  ],
+  "localValidation": {
+    "focusedCabinetTests": {
+      "passed": 24
+    },
+    "cronSafetyTests": {
+      "passed": 299
+    },
+    "atlasChangeHistoryWriters": "passed",
+    "typecheck": "passed",
+    "dependencyAuditCriticalGate": "passed",
+    "isolatedSourceAndDatabaseReplay": "passed",
+    "credentialFreeProductionBuild": "passed",
+    "lintGate": "passed",
+    "secretScan": "passed",
+    "masterPlan": "passed",
+    "renderedModuleLedger": "passed",
+    "independentCodeReview": "no actionable findings"
+  }
+}
