@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 312
-- **Completed:** 267
+- **Total tasks:** 313
+- **Completed:** 268
 - **Remaining:** 45
 - **Progress:** 85.6%
-- **Priority mix:** P0 194 · P1 113 · P2 5
+- **Priority mix:** P0 195 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -229,6 +229,7 @@ Source: `plan/06-atlas-content-and-research-features.md`
 - [x] **ATL-030** (P1) Publish a Conditions codebook, replication artifact, and dedicated tests. _Done when: definitions, inputs, transformations, reference distributions, missingness, uncertainty/nonclaims, version, code/fixtures, sensitivity, coverage, and one-command reproduction are complete; no Conditions task relies on generic Index tests._
 - [x] **ATL-031** (P0) Enforce peer-lens domain, eligible universe, fallback, size, and vintage contracts. _Done when: governance measures cannot use material peers and Conditions cannot silently use governance peers, cohorts come from metric-observed eligible jurisdictions rather than all 253 records, special/fallback cases execute as documented, and UI/API show attempted/final n and upstream vintage._
 - [x] **ATL-032** (P1) Make government-type/regime trajectories historically honest. _Done when: each point joins a score/indicator release to the classification valid for that year with composition and n, or the surface is explicitly current cross-section and all “long-run trajectory” claims are removed; BR/CGV reference-year fixtures pass._
+- [x] **ATL-033** (P0) Correct the legislature majority threshold on every rendered chamber. _Done when: every rendered legislature majority threshold uses floor(statutory seats/2)+1 from one shared tested helper; odd-seat chambers render correctly on country, compare, and design-system surfaces; evidence in plan/evidence/ATL-033/._
 
 ## Area 07 — Design System, Assets, and Reader Experience
 

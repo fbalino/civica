@@ -181,7 +181,7 @@ Prefer shared primitives for new editorial UI:
 
 Every visible data point should carry provenance where possible. Use `SourceDot`; do not hand-roll provenance markers.
 
-The canonical legislature/hemicycle pattern is the factbook legislature component (`FactbookLegislatureChart`): rostrum, majority line, seat hover, stats grid, and all-party rows. Older standalone hemicycle demos are non-canonical.
+The canonical legislature/hemicycle pattern is the factbook legislature component (`FactbookLegislatureChart`): rostrum, majority line, seat hover, stats grid, and all-party rows. Older standalone hemicycle demos are non-canonical. The majority line is the absolute majority of statutory seats, `floor(statutory seats / 2) + 1`, taken from the shared `absoluteMajorityThreshold` helper in `src/lib/legislatures/majority.ts`.
 
 Tabs use Archivo body text with normal casing, matching the Atlas tab bar (`Structure`, `Bills`, `Leaders`, etc.). Do not use Roman numerals or monospace for tabs.
 

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { LegislatureChamber } from "@/lib/factbook/legislature";
 import type { ChamberCoalition } from "@/lib/db/queries-legislature";
+import { absoluteMajorityThreshold } from "@/lib/legislatures/majority";
 import { ChamberComposition } from "./ChamberComposition";
 import { PartyBrowser } from "./PartyBrowser";
 
@@ -125,7 +126,7 @@ export function FactbookLegislatureChart({
     [chamber.parties]
   );
 
-  const majorityLine = chamber.total > 0 ? Math.ceil(chamber.total / 2) + 1 : 0;
+  const majorityLine = absoluteMajorityThreshold(chamber.total);
 
   function toggleDim(partyId: string) {
     setDimmed((prev) => {
@@ -190,16 +191,18 @@ export function FactbookLegislatureChart({
               strokeWidth="0.6"
               strokeDasharray="2 3"
             />
-            <text
-              x={3}
-              y={-230}
-              fontFamily="var(--font-mono)"
-              fontSize="5"
-              letterSpacing="1"
-              fill="var(--color-accent)"
-            >
-              MAJORITY {majorityLine}
-            </text>
+            {majorityLine != null && (
+              <text
+                x={3}
+                y={-230}
+                fontFamily="var(--font-mono)"
+                fontSize="5"
+                letterSpacing="1"
+                fill="var(--color-accent)"
+              >
+                MAJORITY {majorityLine}
+              </text>
+            )}
             {/* Seats */}
             {seats.map((s, i) => {
               const p = seatParty[i];
@@ -266,7 +269,7 @@ export function FactbookLegislatureChart({
         </div>
         <div className="factbook-legislature-stat">
           <div className="factbook-legislature-stat-key">Majority line</div>
-          <div className="factbook-legislature-stat-val">{majorityLine || "—"}</div>
+          <div className="factbook-legislature-stat-val">{majorityLine ?? "—"}</div>
         </div>
         <div className="factbook-legislature-stat">
           <div className="factbook-legislature-stat-key">Largest party</div>
