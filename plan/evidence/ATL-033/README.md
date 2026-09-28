@@ -83,6 +83,20 @@ All commands ran inside the ATL-033 worktree. Exit status 0 unless noted.
 - read-only production query for the live-impact counts above
 - `git diff --check`
 
+## Browser evidence
+
+Local development server on this branch, 2026-09-28, reading the production
+database read-only:
+
+- `uruguay-senate-desktop-light.jpg`: `/country/uruguay/civica-data`, Senate
+  shows `MAJORITY 16` and "Majority line 16 of 31 seats".
+- `uruguay-house-desktop-dark.jpg`: same page in dark theme, House shows
+  `MAJORITY 50` and "Majority line 50 of 99 seats".
+- `compare-uruguay-chile-mobile-light.jpg`: `/compare?c=uruguay&c=chile` at
+  375px shows Uruguay 50 and Chile 78; page width equals viewport width (no
+  horizontal overflow). The same page's Senate charts read 16 (Uruguay) and 26
+  (Chile, 50 seats, unchanged).
+
 ## Limitations and follow-ups
 
 - Seats a chamber's composition source does not attribute to a party are still
@@ -92,6 +106,6 @@ All commands ran inside the ATL-033 worktree. Exit status 0 unless noted.
   different places. Consolidating them is a separate cleanup.
 - `src/components/GovStructureDiagram.tsx` is dead code that already used the
   correct formula; it was left untouched for a separate removal.
-- Desktop/mobile light/dark browser screenshots of the corrected surfaces are
-  to be added to this folder by the controller; this worktree ran no dev
-  server.
+- On phones, `/compare` chamber cards run labels and values together (for
+  example "Majority line50of 99 seats"). Production shows the same layout
+  before this change, so it is a separate responsive-layout follow-up.
