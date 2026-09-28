@@ -1,5 +1,9 @@
 import type { LegislatureChamber } from "@/lib/factbook/legislature";
 import type { ChamberCoalition } from "@/lib/db/queries-legislature";
+import {
+  absoluteMajorityThreshold,
+  holdsAbsoluteMajority,
+} from "@/lib/legislatures/majority";
 
 /**
  * Composition summary that sits ABOVE the canonical hemicycle for one chamber.
@@ -41,9 +45,9 @@ export function ChamberComposition({
   const largestShare = (largest.seats / total) * 100;
   const topTwoShare =
     ((largest.seats + (second?.seats ?? 0)) / total) * 100;
-  // Same formula as the canonical hemicycle (FactbookLegislatureChart) so a
-  // single chamber never shows two different majority numbers.
-  const majorityLine = Math.ceil(total / 2) + 1;
+  // Shared absolute-majority helper (src/lib/legislatures/majority.ts), also
+  // used by the canonical hemicycle, so one chamber shows one majority number.
+  const majorityLine = absoluteMajorityThreshold(total);
 
   // Coalition block is only meaningful when seats are flagged AND don't exceed
   // the chamber total (guards against an aggregation artefact).
@@ -54,7 +58,7 @@ export function ChamberComposition({
   const coalitionShare =
     coalitionSeats != null ? (coalitionSeats / total) * 100 : null;
   const hasMajority =
-    coalitionSeats != null ? coalitionSeats >= majorityLine : null;
+    coalitionSeats != null ? holdsAbsoluteMajority(coalitionSeats, total) : null;
 
   return (
     <div className="chamber-comp">
@@ -77,17 +81,19 @@ export function ChamberComposition({
             role="img"
             aria-label={`Governing coalition holds ${coalitionSeats} of ${total} seats (${fmtPct(
               coalitionShare
-            )}). Majority line at ${majorityLine}.`}
+            )}).${majorityLine != null ? ` Majority line at ${majorityLine}.` : ""}`}
           >
             <div
               className="chamber-comp-bar-gov"
               style={{ width: `${coalitionShare.toFixed(2)}%` }}
             />
-            <div
-              className="chamber-comp-bar-maj"
-              style={{ left: `${((majorityLine / total) * 100).toFixed(2)}%` }}
-              aria-hidden="true"
-            />
+            {majorityLine != null && (
+              <div
+                className="chamber-comp-bar-maj"
+                style={{ left: `${((majorityLine / total) * 100).toFixed(2)}%` }}
+                aria-hidden="true"
+              />
+            )}
           </div>
           <div className="chamber-comp-balance-legend">
             <span className="chamber-comp-leg chamber-comp-leg--gov">
@@ -130,7 +136,7 @@ export function ChamberComposition({
         )}
         <div className="chamber-comp-conc-cell">
           <span className="chamber-comp-conc-key">Majority line</span>
-          <span className="chamber-comp-conc-val">{majorityLine}</span>
+          <span className="chamber-comp-conc-val">{majorityLine ?? "—"}</span>
           <span className="chamber-comp-conc-sub">of {total} seats</span>
         </div>
       </div>
