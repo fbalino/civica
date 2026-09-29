@@ -1,12 +1,14 @@
 # DAT-037: CIA World Leaders cabinet-term integrity
 
-Status: open, awaiting the owner's review. The importer, reader, and repair
-code are implemented and tested on branch `claude/fix/cabinet-term-integrity`.
-Nothing has been written to production. The first isolated rehearsal
-(2026-09-28) found two rows the repair did not reach and a hand-entered date
-it should have kept; the repair was fixed, and the second rehearsal
-(2026-09-29, below) passed every check. The production sequence waits for the
-owner's review and written approval.
+Status: open, approved by the owner on 2026-09-29, production sequence not yet
+run. The importer, reader, and repair code are implemented and tested on
+branch `claude/fix/cabinet-term-integrity`. Nothing has been written to
+production. The first isolated rehearsal (2026-09-28) found two rows the
+repair did not reach and a hand-entered date it should have kept; the repair
+was fixed, and the second rehearsal (2026-09-29, below) passed every check.
+The owner approved applying the repair as rehearsed, with no public
+correction record: [`OWNER-APPROVAL-2026-09-29.md`](OWNER-APPROVAL-2026-09-29.md)
+and APR-D173 in `plan/DECISIONS.md`.
 
 ## The defect
 
@@ -113,10 +115,17 @@ runs that exact plan in one transaction: lock the cabinet tables, assert every
 target is still in its before-state or already in its after-state, assert no
 other cabinet row changed since the plan, apply guarded writes, assert the
 after-state and the unchanged non-targets. Any mismatch rolls everything back.
-Replaying an applied plan changes nothing. Apply requires an `in_review`
-correction record. A non-loopback host requires `--production-host`, the
-owner-approval file, and `--confirm=APPLY-<first 12 characters of the plan
-SHA-256>`.
+Replaying an applied plan changes nothing. Apply requires one explicit
+public-correction choice, recorded in the apply report:
+`--public-correction=waived-prelaunch` (the owner's prelaunch waiver,
+APR-D173) or `--correction-log-id=<uuid>` naming an existing `in_review`
+correction record; any other value, both, or neither is refused. A
+non-loopback host requires `--production-host`, the owner-approval file, and
+`--confirm=APPLY-<first 12 characters of the plan SHA-256>`. The approval file
+must be non-empty, name the method `cabinet-term-integrity-repair/v2`, contain
+the full SHA-256 of the plan being applied, and record APR-D173 when the
+waiver is used; the report records the file's own SHA-256. These checks live
+in `src/lib/factbook/cabinet-repair-authorization.ts` and its tests.
 
 Postflight (`--verify`): P1 no roster-typed term still holds a CIA page date
 (legacy hand-entered dates are counted and disclosed); P2 no duplicate pairs;
@@ -166,6 +175,8 @@ aside for the whole rehearsal so `DATABASE_URL` names only the loopback copy.
    changes unless a page changed in between).
 6. `--plan`, create an `in_review` correction row in the copy, `--apply`,
    `--verify`, `--plan` again (all zeros), and replay `--apply` (no change).
+   Both rehearsals used the correction-record path. A later rehearsal can use
+   `--public-correction=waived-prelaunch` instead.
 7. Record `plan/evidence/DAT-037/cabinet-term-integrity-rehearsal-<date>.json`:
    hashes, counts, IDs, timings, plan SHA-256, category counts, importer
    summaries, and the four formerly stuck countries' outcomes. No names, SQL
@@ -217,7 +228,13 @@ the run. The record says so.
 
 Record: [`cabinet-term-integrity-rehearsal-2026-09-29.json`](cabinet-term-integrity-rehearsal-2026-09-29.json).
 Result: passed. Code under test: commit `2802eb36` (repair method
-`cabinet-term-integrity-repair/v2`; the importer is unchanged).
+`cabinet-term-integrity-repair/v2`; the importer is unchanged). The branch was
+later rebased onto `main` after ATL-034; the rehearsal record's file hashes
+still match `cabinet-term-repair.ts`, `cabinet-roster.ts`,
+`cia-cabinets-sync.ts`, and `scripts/sync-cia-cabinets.ts` exactly. Only the
+repair's command-line wrapper changed afterwards, and only in how apply is
+authorized (the public-correction choice and the approval-file check); the
+plan, apply, and verify logic it calls is the rehearsed code.
 
 - A fresh 226 MB read-only snapshot restored with identical counts and row
   hashes. Every compared table had the same row count as in the first
@@ -251,12 +268,31 @@ Result: passed. Code under test: commit `2802eb36` (repair method
   evidence ledger.
 
 The copy, snapshot, logs, plan files, and captured pages were deleted after
-the run. The record says so.
+the run. The record says so. Its first cleanup note said only data-free tools
+were kept outside the repository; some data-bearing scratch files from the
+rehearsals had in fact been left outside the rehearsal directory. The
+controller deleted them on 2026-09-29, and both records now say so.
 
-## Production sequence (only after the owner reviews the rehearsal)
+## Browser check, 2026-09-29
 
-0. Record the owner's written approval in
-   `plan/evidence/DAT-037/OWNER-APPROVAL-<date>.md`.
+![Saudi Arabia's Leaders section in dark mode: 28 cabinet posts under "Other offices", credited "Cabinet roster: CIA World Leaders", with no start years](saudi-arabia-cabinet-desktop-dark.jpg)
+
+A local server ran the branch code against production data, read only.
+Saudi Arabia's cabinet (`saudi-arabia-cabinet-desktop-dark.jpg`, desktop,
+dark) lists 28 posts under "Other offices" with no "Since" year taken from a
+roster date, and credits "Cabinet roster: CIA World Leaders" with its source
+dot. In the same check, the head of state, whose dates come from Wikidata,
+kept "Since 2015". Production data still holds the stored page dates at this
+point, so this shows the reader-side guard working before the repair.
+
+## Production sequence (approved 2026-09-29)
+
+0. The owner's approval is recorded in
+   [`OWNER-APPROVAL-2026-09-29.md`](OWNER-APPROVAL-2026-09-29.md). No public
+   correction record is created (owner decision, APR-D173): Civica is
+   prelaunch with no readers, so a notice would tell no one anything, while
+   the approval file, this README, and the evidence history keep the full
+   trace.
 1. Merge through the normal pull request and checks; confirm the production
    deployment is Ready. From then on the daily shard runs the corrected
    importer, and the reader hides stored roster dates.
@@ -265,22 +301,27 @@ the run. The record says so.
    `Idempotency-Key`; shard 27 is empty). About 100 minutes at the measured
    227 seconds per shard. Check each execution, pipeline row, and freshness.
    Samoa, Uganda, Ukraine, and the United Kingdom converged on the restored
-   copy in the 2026-09-28 rehearsal.
+   copy in both rehearsals.
 3. Take a fresh read-only snapshot (DAT-021 procedure) as the recovery point.
 4. Disable all project cron jobs in Vercel for the apply window (a single job
    cannot be paused without a redeploy). Confirm no active cabinet lease.
-5. Create the public correction record (`in_review`) with the approved text.
-6. `repair:cabinet-terms -- --plan` on production; compare its categories with
-   the rehearsal; record the SHA-256.
-7. `--apply` with the plan file, expected SHA-256, release id, correction id,
-   approval file, and confirmation token; then `--verify` with the plan and
-   apply report; then `--plan` again (expect all zeros).
+5. `repair:cabinet-terms -- --plan --production-host=<host> --out=<plan>` on
+   production; compare its categories with the second rehearsal; record the
+   SHA-256.
+6. Append the production plan SHA-256 to the approval file on its own line
+   (the apply refuses the file without it).
+7. `--apply` with the plan file, expected SHA-256, release id,
+   `--public-correction=waived-prelaunch`, the approval file, and the
+   confirmation token; then `--verify` with the plan and apply report; then
+   `--plan` again (expect all zeros).
 8. Re-enable the cron jobs.
 9. Spot-check the United Kingdom, Saudi Arabia, Hungary, Samoa, Uganda,
-   Ukraine, Uruguay, Taiwan, and Sri Lanka country pages; resolve the
-   correction record with final counts; close the two pending Codex monitor
-   cabinet incidents; regenerate `src/lib/provenance/domain-coverage.generated.json`.
-10. Check DAT-037 with evidence and a `PROGRESS.md` line.
+   Ukraine, Uruguay, Taiwan, and Sri Lanka country pages; close the two
+   pending Codex monitor cabinet incidents; regenerate
+   `src/lib/provenance/domain-coverage.generated.json`.
+10. Commit the approval file with the appended SHA-256 and the apply and
+    verify summaries, then check DAT-037 with evidence and a `PROGRESS.md`
+    line.
 
 Rollback: runtime changes revert normally, but after step 7 the stored dates
 are cleared, and the pre-DAT-037 importer (which identifies terms by page
@@ -290,7 +331,10 @@ a forward fix. Data recovery is the step 3 snapshot or a reviewed forward
 compensation (`data-repair-cabinet-terms-compensation`); every changed row's
 before-state is also in `research_evidence_history`.
 
-## Owner decisions this branch assumes (recommended options)
+## Owner decisions (approved 2026-09-29)
+
+The owner approved all four in
+[`OWNER-APPROVAL-2026-09-29.md`](OWNER-APPROVAL-2026-09-29.md).
 
 1. A renamed or dropped title retires automatically and the new title becomes
    a new position. Implemented. The alternative (stop the country until someone
@@ -309,23 +353,16 @@ before-state is also in `research_evidence_history`.
    office's exact title for a different listed holder, and R5 leaves its date
    because it is not a CIA page date.
 
-Also for approval: applying the repair to production, and the correction text.
-Draft, to be finalized after the refresh with the real counts:
-
-> Civica-initiated correction (DAT-037): cabinet lists imported from the CIA
-> World Leaders directory used each page's "Last Updated" date as every
-> minister's start date. When that date changed, unchanged ministers were
-> stored again, positions held by several people showed only one, and
-> ministers no longer listed stayed current. Civica now imports the roster
-> without dates, shows every listed holder, retires holders the roster no
-> longer lists, and shows the roster's last-updated date as the source date.
-> A one-time repair removed the stored dates, repeated records, placeholder
-> entries, and misplaced source links.
-
-When decisions 1 and 2 are confirmed, record them as APR-D173 in
-`plan/DECISIONS.md`: CIA roster rows are undated listings identified by office
-and person; titles absent from the latest roster retire automatically; the
-roster date is a sourced body-level statement.
+The owner also approved applying the repair to production. An earlier draft
+of this README proposed a public correction notice; the owner decided that
+none is published ("Civica has no traffic, so you can just fix it without
+telling anybody"). The durable decision, including the waiver's scope, is
+APR-D173 in `plan/DECISIONS.md`: CIA roster rows are undated listings
+identified by office and person; titles absent from the latest roster retire
+automatically; the roster date is a sourced body-level statement; and a
+prelaunch data repair the owner approves may run without a public correction
+record. The public policy page still says material actions are recorded on
+the public corrections log and does not yet state that exception.
 
 ## Review points and how they were handled
 

@@ -1718,6 +1718,7 @@
     "rehearsalDirectoryExistsAfterCleanup": false,
     "worktreeEnvFileRestored": true,
     "worktreeEnvFileByteIdentical": true,
-    "retainedOutsideRepository": "the loopback adapter, page-capture shim, query scripts, and evidence builder only (no data), for any later rehearsal"
+    "retainedOutsideRepository": "the loopback adapter, page-capture shim, query scripts, and evidence builder, for any later rehearsal",
+    "cleanupCorrection": "A later check found data-bearing scratch files from the rehearsals left outside the rehearsal directory; the controller deleted them on 2026-09-29."
   }
 }

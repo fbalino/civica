@@ -12,8 +12,9 @@ the local heartbeat stays quiet unless owner input is needed.
 Current evidence is in `plan/evidence/PLT-030/` and `plan/evidence/PLT-031/`.
 The remaining-work report is reconciled to the current master checklist.
 DAT-037 (open, P0) fixes the CIA cabinet import that stored each page's "Last
-Updated" date as every minister's start date; its production repair waits for
-the owner's review of an isolated rehearsal (`plan/evidence/DAT-037/`).
+Updated" date as every minister's start date; the owner approved its
+rehearsed production repair on 2026-09-29, which runs after the merge
+(`plan/evidence/DAT-037/`).
 
 The phases below describe the overall program, not a list of currently open
 tasks. The master checklist owns completion state. The Explore-menu decision

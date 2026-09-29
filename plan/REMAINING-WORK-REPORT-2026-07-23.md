@@ -77,10 +77,10 @@ IDs: DAT-037, PUL-024, PUL-040.
 
 This batch includes:
 
-- the DAT-037 cabinet-roster sequence: the owner reviews the isolated
-  rehearsal, then approves the merge, one full corrected CIA World Leaders
-  refresh, the one-time stored-record repair under a public correction record,
-  and the read-only postflight (`plan/evidence/DAT-037/`);
+- the DAT-037 cabinet-roster sequence, approved by the owner on 2026-09-29
+  without a public correction record (APR-D173): the merge, one full
+  corrected CIA World Leaders refresh, the one-time stored-record repair, and
+  the read-only postflight (`plan/evidence/DAT-037/`);
 - an explicit Pulse drift baseline followed by an eligible observation, and
   one complete scheduled locked-method cycle that can establish PUL-040's
   non-backdated start.

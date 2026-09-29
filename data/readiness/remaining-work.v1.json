@@ -38,7 +38,7 @@
         "PUL-024",
         "PUL-040"
       ],
-      "nextStep": "Authorize only the remaining real production or external actions: the DAT-037 cabinet-roster sequence after the owner reviews its isolated rehearsal, a Pulse drift baseline followed by an eligible observation, and one complete scheduled locked-method cycle."
+      "nextStep": "Authorize only the remaining real production or external actions: the owner-approved DAT-037 cabinet-roster refresh, repair, and postflight, a Pulse drift baseline followed by an eligible observation, and one complete scheduled locked-method cycle."
     },
     {
       "id": "external-evidence-unavailable",
