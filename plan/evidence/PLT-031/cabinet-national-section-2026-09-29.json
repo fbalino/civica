@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "taskId": "PLT-031",
+  "recordedAt": "2026-09-29T14:14:08.280Z",
+  "state": "locally-validated-not-yet-deployed",
+  "incident": {
+    "pipeline": "factbook.cia-cabinets",
+    "country": "bosnia-and-herzegovina",
+    "shard": 2,
+    "observedAt": "2026-09-29T07:43:21Z",
+    "retainedFailure": "cabinet_schema_failure",
+    "cause": "The parser treated every leaders-section heading as a regional boundary. Bosnia starts its sovereign roster with National Govt., so parsing stopped before the first position."
+  },
+  "source": {
+    "sourceUrl": "https://www.cia.gov/resources/world-leaders/foreign-governments/bosnia-and-herzegovina/",
+    "sourceRetrievedAt": "2026-09-29T14:05:02.833Z",
+    "sourceSha256": "91e4bdf5beee1f35b2bd19a42be5a9638dd3de2c24eabf25e8d78a0db994fceb"
+  },
+  "sourceVintage": {
+    "publisherLastUpdated": "12/5/2023",
+    "interpretation": "2023-12-05",
+    "limitation": "Current retrieval is not a current appointment date or proof the publisher roster is up to date. Preserve the publisher date and do not create term start/end dates."
+  },
+  "repair": {
+    "scope": "Accept Bosnia's explicit unique leading National Govt. section only; stop at its next section. Classify its three presidency members and Council chair as heads excluded from cabinet import, and its two deputy Council chairs as deputies.",
+    "preserved": [
+      "Federation and Republika Srpska exclusion",
+      "China Hong Kong and Macau exclusion",
+      "existing country identity and roster guards",
+      "leases and idempotency",
+      "atomic provenance and source freshness APIs",
+      "head-office data",
+      "writer and schema contracts"
+    ]
+  },
+  "validation": {
+    "cabinetTests": 27,
+    "independentReview": "No actionable defects found in parser boundary, title scope, date retention, or regression tests.",
+    "credentialFreeBuild": "passed; 2353 unit tests passed, 3 intentionally skipped, plus build gates and Next production compilation",
+    "initialBuildEnvironmentFailure": "A shared node_modules symlink was outside the Turbopack root. A local dependency copy corrected the build environment; application configuration was not changed.",
+    "databaseReadOnlyPreview": {
+      "checkedAt": "2026-09-29T14:14:08.280Z",
+      "readOnlyTransactionVerified": true,
+      "readTransactions": 6,
+      "productionWrites": false,
+      "sourceUrl": "https://www.cia.gov/resources/world-leaders/foreign-governments/bosnia-and-herzegovina/",
+      "sourceRetrievedAt": "2026-09-29T14:05:02.833Z",
+      "sourceSha256": "91e4bdf5beee1f35b2bd19a42be5a9638dd3de2c24eabf25e8d78a0db994fceb",
+      "parsed": {
+        "failed": false,
+        "date": "12/5/2023",
+        "positions": 18,
+        "categories": {
+          "head": 4,
+          "deputy": 2,
+          "cabinet": 9,
+          "central_bank": 1,
+          "diplomatic": 2
+        }
+      },
+      "result": {
+        "startedAt": "2026-09-29T14:14:06.431Z",
+        "finishedAt": "2026-09-29T14:14:08.280Z",
+        "durationMs": 1849,
+        "countriesCrawled": 1,
+        "countriesApplied": 1,
+        "countriesVerified": 1,
+        "countriesUnchanged": 0,
+        "countriesFetchFailed": 0,
+        "countriesSkipped": 0,
+        "skipped": [],
+        "countriesUnmatched": 0,
+        "bodiesWritten": 0,
+        "officesWritten": 12,
+        "officesReleased": 0,
+        "officesMoved": 0,
+        "officesInserted": 12,
+        "personsExisting": 0,
+        "personsQidCreated": 0,
+        "personsIdlessCreated": 10,
+        "termsWritten": 12,
+        "termsInserted": 12,
+        "termsReinstated": 0,
+        "termsRetired": 0,
+        "vacantOffices": 0,
+        "diplomaticSkipped": 2,
+        "statementsWritten": 13,
+        "statementsInserted": 12,
+        "statementsUpdated": 0,
+        "rosterStatementsWritten": 1,
+        "rosterStampMissing": 0,
+        "totalRowsWritten": 47,
+        "freshnessStamped": false,
+        "dryRun": true
+      },
+      "limitation": "Dry-run counts are proposed mutations only. Database queries are forced into read-only transactions; no source freshness is advanced."
+    }
+  },
+  "deployment": {
+    "required": "Normal pull request with every configured check passing, followed by canonical production verification and the standard authenticated shard-2 dry run.",
+    "actual": "Not yet merged or deployed when this evidence was recorded. Current production evidence belongs in ignored output/data-reliability/latest.json."
+  },
+  "rollback": "Revert this parser change through a checked pull request if needed. Retain imported evidence and provenance; do not delete domain records. Never roll back past the DAT-037 writer repair without its documented cron pause and recovery procedure."
+}
