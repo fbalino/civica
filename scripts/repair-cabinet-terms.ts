@@ -9,14 +9,18 @@
  *       its own SHA-256; no names or payload text).
  *
  *   --apply --plan-file=<file> --expected-plan-sha256=<hex>
- *           --release-id=<label> --correction-log-id=<uuid> [--out=<file>]
+ *           --release-id=<label>
+ *           (--public-correction=waived-prelaunch | --correction-log-id=<uuid>)
+ *           [--out=<file>]
  *       Apply exactly that plan in one transaction. The transaction locks the
  *       cabinet tables, asserts every planned row is still in its planned
  *       before-state (or already repaired) and that no other cabinet row
  *       changed since the plan, applies guarded set-based writes, and asserts
- *       the after-state; any mismatch raises and rolls everything back. The
- *       correction record must exist and be `in_review`. Never stamps source
- *       freshness.
+ *       the after-state; any mismatch raises and rolls everything back. Never
+ *       stamps source freshness. The public-correction choice is explicit and
+ *       recorded in the apply report: `waived-prelaunch` is the owner's
+ *       prelaunch waiver (APR-D173, no public correction record); a
+ *       `--correction-log-id` must name an existing `in_review` record.
  *
  *   --verify [--plan-file=<file>] [--apply-report=<file>]
  *       Read-only postflight (P1–P11).
@@ -25,7 +29,10 @@
  * (localhost, 127.0.0.1, ::1) is allowed. Any other host requires
  * `--production-host=<exact host>`; `--apply` additionally requires
  * `--approval-evidence=<owner approval file>` and
- * `--confirm=APPLY-<first 12 characters of the plan SHA-256>`.
+ * `--confirm=APPLY-<first 12 characters of the plan SHA-256>`. The approval
+ * file (optional on loopback, checked whenever given) must be non-empty, name
+ * the plan's repair method, contain the full plan SHA-256 (the operator
+ * appends it after planning), and record APR-D173 when the waiver is used.
  */
 // civica-affected-relations: research_evidence_history,statements,terms
 import { config } from "dotenv";
@@ -42,7 +49,12 @@ import { PgDialect } from "drizzle-orm/pg-core";
 import { createBoundedServerlessDbFetch } from "../src/lib/db/serverless";
 import { resolveAtlasReleaseId } from "../src/lib/factbook/country-fact-history-writer";
 import {
+  checkApprovalEvidence,
+  parsePublicCorrectionChoice,
+} from "../src/lib/factbook/cabinet-repair-authorization";
+import {
   applyCabinetTermRepair,
+  CABINET_REPAIR_METHOD,
   loadCabinetRepairState,
   planCabinetTermRepair,
   verifyCabinetTermRepair,
@@ -173,27 +185,47 @@ async function main() {
   if (!expected || expected !== plan.planSha256) {
     fail("--expected-plan-sha256 must equal the plan file's SHA-256");
   }
+  if (plan.methodologyVersion !== CABINET_REPAIR_METHOD) {
+    fail(`the plan was built with ${String(plan.methodologyVersion)}, not ${CABINET_REPAIR_METHOD}`);
+  }
   const releaseId = resolveAtlasReleaseId(arg("release-id"));
-  const correctionLogId = arg("correction-log-id") ?? "";
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(correctionLogId)) {
-    fail("--correction-log-id must be the approved correction record UUID");
+  const correction = parsePublicCorrectionChoice({
+    publicCorrection: arg("public-correction"),
+    correctionLogId: arg("correction-log-id"),
+  });
+  if (!correction.ok) fail(correction.reason);
+  const choice = correction.value;
+  const evidence = arg("approval-evidence");
+  if (!loopback && !evidence) {
+    fail("--approval-evidence must name the owner's written approval record");
   }
-  if (!loopback) {
-    const evidence = arg("approval-evidence");
-    if (!evidence || !existsSync(evidence)) {
-      fail("--approval-evidence must name the owner's written approval record");
-    }
-    if (arg("confirm") !== `APPLY-${plan.planSha256.slice(0, 12)}`) {
-      fail(`--confirm must equal APPLY-${plan.planSha256.slice(0, 12)}`);
-    }
+  let approvalEvidence: { path: string; sha256: string } | null = null;
+  if (evidence) {
+    if (!existsSync(evidence)) fail("--approval-evidence must name an existing file");
+    const bytes = readFileSync(evidence);
+    const checked = checkApprovalEvidence(bytes.toString("utf8"), {
+      planSha256: plan.planSha256,
+      methodologyVersion: CABINET_REPAIR_METHOD,
+      choice,
+    });
+    if (!checked.ok) fail(checked.reason);
+    approvalEvidence = {
+      path: evidence,
+      sha256: createHash("sha256").update(bytes).digest("hex"),
+    };
   }
-  const [correction] = await executor.read([
-    sql`SELECT status FROM correction_log WHERE id = ${correctionLogId}::uuid`,
-  ]);
-  if (correction[0]?.status !== "in_review") {
-    fail(
-      `correction ${correctionLogId} must exist and be in_review before the linked repair; found ${String(correction[0]?.status ?? "missing")}`,
-    );
+  if (!loopback && arg("confirm") !== `APPLY-${plan.planSha256.slice(0, 12)}`) {
+    fail(`--confirm must equal APPLY-${plan.planSha256.slice(0, 12)}`);
+  }
+  if (choice.kind === "correction_record") {
+    const [correctionRows] = await executor.read([
+      sql`SELECT status FROM correction_log WHERE id = ${choice.correctionLogId}::uuid`,
+    ]);
+    if (correctionRows[0]?.status !== "in_review") {
+      fail(
+        `correction ${choice.correctionLogId} must exist and be in_review before the linked repair; found ${String(correctionRows[0]?.status ?? "missing")}`,
+      );
+    }
   }
 
   const result = await applyCabinetTermRepair(executor, plan);
@@ -202,7 +234,8 @@ async function main() {
       mode: "authorized_apply",
       targetHost: host,
       releaseId,
-      correctionLogId,
+      publicCorrection: choice,
+      approvalEvidence,
       planSha256: plan.planSha256,
       expectedHistoryRows: plan.expectedHistoryRows,
       result,

@@ -1630,7 +1630,7 @@
       "artifact": "scripts/repair-cabinet-terms.ts",
       "kind": "data",
       "historyStatus": "operational_data_change",
-      "sha256": "18646f3dc89496cedfd4d2da582f4eb65c5f59e37595094f21ccad2bada358b5",
+      "sha256": "ef1e860b27448b7f2b8421e6e6e59bfbf0188bcaad4969baba027e96c000bc68",
       "affectedRelations": [
         "research_evidence_history",
         "statements",

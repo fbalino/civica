@@ -362,7 +362,9 @@ flag and list position. The default mode writes nothing and
 emits a deterministic plan with row digests and non-target fingerprints. Apply
 runs that exact plan in one transaction that locks the cabinet tables, refuses
 any drift since the plan, and asserts the after-state; it requires an
-`in_review` correction record, never stamps source freshness, and a replay of
+explicit public-correction choice (the owner's prelaunch waiver, APR-D173, or
+an `in_review` correction record) and an owner-approval file that names the
+method and the plan's SHA-256, never stamps source freshness, and a replay of
 an applied plan changes nothing. Every deleted or updated row is retained by
 the DAT-016 history triggers. Recovery is the isolated pre-apply snapshot or a
 reviewed forward compensation named `data-repair-cabinet-terms-compensation`.
