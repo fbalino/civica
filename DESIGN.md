@@ -45,6 +45,10 @@ tokens:
     dark: var(--shadow-dark)
   border:
     hairline: var(--border-hairline)
+  legislature:
+    seat_unattributed: var(--color-seat-unattributed)
+    seat_unattributed_ring: var(--color-seat-unattributed-ring)
+    seat_unattributed_stroke: var(--stroke-seat-unattributed)
 ---
 
 # Civica Design System
@@ -182,6 +186,8 @@ Prefer shared primitives for new editorial UI:
 Every visible data point should carry provenance where possible. Use `SourceDot`; do not hand-roll provenance markers.
 
 The canonical legislature/hemicycle pattern is the factbook legislature component (`FactbookLegislatureChart`): rostrum, majority line, seat hover, stats grid, and all-party rows. Older standalone hemicycle demos are non-canonical. The majority line is the absolute majority of statutory seats, `floor(statutory seats / 2) + 1`, taken from the shared `absoluteMajorityThreshold` helper in `src/lib/legislatures/majority.ts`.
+
+The hemicycle always draws the chamber's statutory seat count, and party rows fill seats in order through the shared `attributeSeats` helper in `src/lib/legislatures/seat-attribution.ts`. Seats the composition source does not attribute to a party (vacancies, presiding officers, appointed members, partial releases, or a chamber with no party rows) render in the **unattributed seat state**: an open neutral seat, `var(--color-seat-unattributed)` inside a `var(--color-seat-unattributed-ring)` ring of `var(--stroke-seat-unattributed)`, in both themes. They never take a party colour and are never dimmed or selected with the party rows. Their hover tooltip reads "No party reported", a key under the hemicycle reads "No party reported · N seats" only when N is above zero, the chart's accessible description counts them, and the composition table lists them as a "No party reported" row. When party rows add up to more than the statutory total (an upstream aggregation or rounding artefact), the drawing stops at the statutory total — no extra seats appear — and the accessible description says how many seats the party rows report; the Party browser still lists every row as reported. The state is demoed on `/design-system` (Legislature seats swatches and the sample chamber).
 
 Tabs use Archivo body text with normal casing, matching the Atlas tab bar (`Structure`, `Bills`, `Leaders`, etc.). Do not use Roman numerals or monospace for tabs.
 

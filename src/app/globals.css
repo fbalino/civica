@@ -447,6 +447,14 @@
   --border-hairline: 1px;
   --stroke-icon-light: 1.5;
 
+  /* --- Legislature seats (hemicycle) ---
+     A seat the composition source does not attribute to any party is drawn
+     as an open, neutral seat: a quiet fill inside a muted ring. It never
+     borrows a party colour. */
+  --color-seat-unattributed: var(--color-select-bg);
+  --color-seat-unattributed-ring: var(--color-text-40);
+  --stroke-seat-unattributed: 0.5;
+
   /* --- Media geometry --- */
   --navigation-mobile-divider-mix: 64%;
   --navigation-mobile-selection-mix: 7%;
@@ -640,6 +648,10 @@ html:root {
   --ramp-indicator-4: #6e93ad;
   --ramp-indicator-5: #a9c6dd;
   --ramp-no-data: var(--color-select-bg);
+
+  /* Unattributed legislature seats — re-resolved against the dark surfaces. */
+  --color-seat-unattributed: var(--color-select-bg);
+  --color-seat-unattributed-ring: var(--color-text-40);
 
   --color-branch-executive-bg: rgba(212, 118, 78, 0.15);
   --color-branch-legislative-bg: rgba(78, 139, 212, 0.15);

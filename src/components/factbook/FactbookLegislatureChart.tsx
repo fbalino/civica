@@ -1,9 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 import type { LegislatureChamber } from "@/lib/factbook/legislature";
 import type { ChamberCoalition } from "@/lib/db/queries-legislature";
 import { absoluteMajorityThreshold } from "@/lib/legislatures/majority";
+import {
+  attributeSeats,
+  seatCountLabel,
+  UNATTRIBUTED_SEAT_LABEL,
+} from "@/lib/legislatures/seat-attribution";
 import { ChamberComposition } from "./ChamberComposition";
 import { PartyBrowser } from "./PartyBrowser";
 
@@ -96,30 +101,36 @@ export function FactbookLegislatureChart({
   const svgTitleId = `${svgIdBase}-title`;
   const svgDescId = `${svgIdBase}-description`;
   const svgTitle = `${chamber.name} seat composition`;
-  const svgDescription = `${chamber.parties
-    .map((party) => `${party.name}, ${party.seats} seats`)
-    .join("; ")}. The Party browser below provides the same party, seat, share, and coalition data as native document content.`;
 
   const seats = useMemo(
     () => (chamber.total > 0 ? seatLayout(chamber.total) : []),
     [chamber.total]
   );
 
-  const seatParty = useMemo(() => {
-    const out: Array<{ id: string; name: string; color: string }> = [];
-    let idx = 0;
-    chamber.parties.forEach((p) => {
-      for (let k = 0; k < p.seats && idx < seats.length; k++) {
-        out[idx++] = { id: p.id, name: p.name, color: p.color };
-      }
-    });
-    while (idx < seats.length) {
-      const last = chamber.parties[chamber.parties.length - 1];
-      if (!last) break;
-      out[idx++] = { id: last.id, name: last.name, color: last.color };
-    }
-    return out;
-  }, [chamber.parties, seats.length]);
+  // Seats the party rows do not cover are drawn as unattributed (neutral,
+  // never a party colour); party rows beyond the total are not drawn.
+  const attribution = useMemo(
+    () => attributeSeats(seats.length, chamber.parties),
+    [chamber.parties, seats.length]
+  );
+  const seatParty = attribution.seats;
+  const unattributedSeats = attribution.unattributedSeats;
+
+  const seatGroups = [
+    ...chamber.parties.map((party) => `${party.name}, ${party.seats} seats`),
+    ...(unattributedSeats > 0
+      ? [`${UNATTRIBUTED_SEAT_LABEL}, ${seatCountLabel(unattributedSeats)}`]
+      : []),
+  ];
+  const svgDescription = [
+    seatGroups.length > 0 ? `${seatGroups.join("; ")}.` : null,
+    attribution.excessPartySeats > 0
+      ? `The party rows add up to ${attribution.reportedPartySeats} seats, more than the chamber's ${seats.length}; the drawing shows ${seats.length} seats.`
+      : null,
+    "The Party browser below provides the same party, seat, share, and coalition data as native document content.",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const sortedParties = useMemo(
     () => [...chamber.parties].sort((a, b) => b.seats - a.seats),
@@ -207,6 +218,30 @@ export function FactbookLegislatureChart({
             {seats.map((s, i) => {
               const p = seatParty[i];
               if (!p) return null;
+              const label =
+                p.kind === "party" ? p.name : UNATTRIBUTED_SEAT_LABEL;
+              const showTip = (e: MouseEvent<SVGCircleElement>) =>
+                setHover({
+                  partyName: label,
+                  seatIndex: i,
+                  x: e.clientX,
+                  y: e.clientY,
+                });
+              if (p.kind === "unattributed") {
+                return (
+                  <circle
+                    key={i}
+                    cx={s.x}
+                    cy={s.y}
+                    r={2.1}
+                    className="factbook-legislature-seat factbook-legislature-seat--unattributed"
+                    data-seat-state="unattributed"
+                    onMouseEnter={showTip}
+                    onMouseMove={showTip}
+                    onMouseLeave={() => setHover(null)}
+                  />
+                );
+              }
               const isDim = dimmed.has(p.id);
               return (
                 <circle
@@ -218,22 +253,9 @@ export function FactbookLegislatureChart({
                   stroke="color-mix(in oklab, currentColor, black 20%)"
                   strokeWidth="0.2"
                   className={`factbook-legislature-seat${isDim ? " is-dim" : ""}`}
-                  onMouseEnter={(e) =>
-                    setHover({
-                      partyName: p.name,
-                      seatIndex: i,
-                      x: e.clientX,
-                      y: e.clientY,
-                    })
-                  }
-                  onMouseMove={(e) =>
-                    setHover({
-                      partyName: p.name,
-                      seatIndex: i,
-                      x: e.clientX,
-                      y: e.clientY,
-                    })
-                  }
+                  data-seat-party={p.id}
+                  onMouseEnter={showTip}
+                  onMouseMove={showTip}
                   onMouseLeave={() => setHover(null)}
                 />
               );
@@ -243,6 +265,15 @@ export function FactbookLegislatureChart({
           <div className="factbook-legislature-empty">
             Composition data not yet ingested
           </div>
+        )}
+        {unattributedSeats > 0 && (
+          <p className="factbook-legislature-key">
+            <span
+              className="factbook-legislature-key-swatch factbook-legislature-key-swatch--unattributed"
+              aria-hidden="true"
+            />
+            {UNATTRIBUTED_SEAT_LABEL} &middot; {seatCountLabel(unattributedSeats)}
+          </p>
         )}
         {hover && (
           <div
