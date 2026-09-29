@@ -90,7 +90,8 @@ export async function generateMetadata({
 //   7. Leaders         — current officeholder timeline.
 //   8. Bills           — recent legislative actions.
 //   9. Organizations   — international memberships footprint.
-//  10. Rankings        — curated source-native measures.
+//  10. Rankings        — the two publisher measures held in the frozen Index
+//                         release (V-Dem's own figure; Freedom House status).
 //
 // LAYOUT: a factbook-style stacked scroll (<CivicaDataSections>). Every visible
 // section renders one after another in a single scroll column — nothing hidden,
@@ -143,7 +144,8 @@ interface SectionSource {
 /**
  * Compact, full-width provenance strip at the foot of a section. Replaces the
  * old right-rail "Sources on this page" block — each section now carries only
- * the sources it actually renders, with the real `last_sync_at` date and a
+ * the sources it actually renders, with Civica's `last_sync_at` date for the
+ * source (a Civica retrieval clock, not a publisher vintage) and a
  * `<SourceDot>` (green=live, amber=frozen vintage).
  */
 function SourcesStrip({ sources }: { sources: SectionSource[] }) {
@@ -253,7 +255,8 @@ export default async function CountryCivicaDataTab({
   // --- Per-section provenance --------------------------------------------
   // Each section's Sources strip lists ONLY the sources that section renders,
   // with the real `last_sync_at` from the sources table. The <SourceDot>
-  // reads green/amber off the source id; the date column shows the vintage.
+  // reads green/amber off the source id; the date column shows Civica's last
+  // sync of that source, not a publisher vintage.
   const sourceById = new Map(allSources.map((s) => [s.id, s]));
   const syncDate = (id: string): string => {
     const d = sourceById.get(id)?.lastSyncAt ?? null;
@@ -298,8 +301,12 @@ export default async function CountryCivicaDataTab({
   const organizationsSources: SectionSource[] = organizations?.memberships.length
     ? [sourceEntry("wikidata")]
     : [];
-  // Rankings rows carry established source-native measures only. The former
-  // Civica composite is preserved research and is not returned here.
+  // Rankings rows carry the two publisher measures held in the frozen Index
+  // release. The former Civica composite is preserved research and is not
+  // returned here. Each row's own SourceDot names its publisher edition and
+  // manifest retrieval time, so this section renders no Sources strip: a later
+  // source sync date beside the release rows would describe different data
+  // (CLM-020). The names still feed the citation list below.
   const rankingsSources: SectionSource[] = scoresRows?.length
     ? dedup(scoresRows.map((r) => r.source)).map((id) => sourceEntry(id))
     : [];
@@ -432,15 +439,11 @@ export default async function CountryCivicaDataTab({
       </>
     ),
     rankings: (
-      <>
-        <ScoresAndRankings
-          jurisdictionId={jurisdiction.id}
-          countryName={jurisdiction.name}
-          variant="factbook"
-          rows={scoresRows}
-        />
-        <SourcesStrip sources={rankingsSources} />
-      </>
+      <ScoresAndRankings
+        jurisdictionId={jurisdiction.id}
+        countryName={jurisdiction.name}
+        rows={scoresRows}
+      />
     ),
   };
 

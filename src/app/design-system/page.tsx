@@ -8,6 +8,8 @@ import { StatusDot } from "@/components/editorial/StatusDot";
 import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
 import { ScorePosition } from "@/components/editorial/ScorePosition";
 import { SourceDot } from "@/components/SourceDot";
+import { ValueOriginNote } from "@/components/provenance/ValueOriginNote";
+import { shapeFreedomHouseScoreRow } from "@/lib/ci/publisher-scores";
 import { DataValueState } from "@/components/DataValueState";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { PageHero } from "@/components/PageHero";
@@ -866,6 +868,45 @@ export default function DesignSystemPage() {
                     state="experimental"
                     upstreamVintage={null}
                   />
+                </span>
+              </div>
+            </div>
+
+            <div className="ds-comp ds-comp--wide" id="value-origin-note">
+              <h4>Provenance — ValueOriginNote (real)</h4>
+              <p className="ds-component-note">
+                How a displayed value relates to the publisher named beside it
+                (<code>publisher-attribution/v1</code>). A Civica calculation
+                gets the &ldquo;Civica calculation&rdquo; chip and its formula; a
+                category produced by the publisher&apos;s own published rule
+                gets the rule note; the publisher&apos;s own figure (0.769
+                below) gets nothing.
+              </p>
+              <div
+                className="ds-row"
+                style={{
+                  alignItems: "center",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-14)",
+                  color: "var(--color-text-secondary)",
+                }}
+              >
+                <span>
+                  92 / 100
+                  <ValueOriginNote
+                    origin={{
+                      kind: "civica_calculation",
+                      transformationId: "conditions-hdi-fixed-bound/v2",
+                    }}
+                  />
+                </span>
+                <span>
+                  {shapeFreedomHouseScoreRow(2).scoreFormatted}
+                  <ValueOriginNote origin={shapeFreedomHouseScoreRow(2).valueOrigin} />
+                </span>
+                <span>
+                  0.769
+                  <ValueOriginNote origin={{ kind: "publisher_published" }} />
                 </span>
               </div>
             </div>

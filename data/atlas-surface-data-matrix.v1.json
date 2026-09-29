@@ -87,7 +87,8 @@
         "reference year",
         "source",
         "alignment status",
-        "native unit"
+        "native unit",
+        "Civica position with calculation marker"
       ],
       "provenance": [
         "Every calculation keeps the selected release, component source, reference year, alignment state, and value-state reason visible."
@@ -106,7 +107,8 @@
       },
       "tests": [
         "src/lib/atlas/atl-018-country-reader.test.ts",
-        "e2e/atl-018-data-states.spec.ts"
+        "e2e/atl-018-data-states.spec.ts",
+        "src/components/conditions/conditions-attribution.test.ts"
       ],
       "testGap": null,
       "owner": "Country Civica Data",
@@ -493,22 +495,19 @@
         }
       ],
       "storage": [
-        "ci_dimension_scores",
-        "country_metrics",
-        "sources"
+        "ci_dimension_scores"
       ],
       "fields": [
-        "V-Dem",
-        "Freedom House",
-        "RSF",
-        "HDI",
-        "CPI",
-        "rank",
-        "trend",
-        "as_of"
+        "V-Dem Liberal Democracy Index",
+        "Freedom House status",
+        "value origin",
+        "publisher edition",
+        "observation year",
+        "retrieval time",
+        "Civica release"
       ],
       "provenance": [
-        "Each row carries its named source id and the section source strip."
+        "Each row's SourceDot names the publisher edition, observation year, and manifest retrieval time; the Freedom House status carries its rule note (publisher-attribution/v1)."
       ],
       "coverage": [
         "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
@@ -524,12 +523,15 @@
       },
       "tests": [
         "src/lib/atlas/atl-018-country-reader.test.ts",
-        "e2e/atl-018-data-states.spec.ts"
+        "e2e/atl-018-data-states.spec.ts",
+        "src/lib/ci/publisher-scores.test.ts",
+        "src/components/scores/scores-rankings.test.ts",
+        "src/components/scores/scores-rankings-closure.test.ts"
       ],
       "testGap": null,
       "owner": "Country Civica Data",
       "releaseRelation": "excluded_experimental",
-      "releaseReason": "Index/Conditions and restricted metric rows are excluded from DAT-017."
+      "releaseReason": "Frozen Index release rows and restricted publisher values are excluded from DAT-017."
     },
     {
       "id": "country.constitution.reader",
@@ -2159,5 +2161,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "fb1be21a712fcb3a4fc50ffaebc9d18da109a61c0b56ff6e68bf9ac927017e6e"
+  "semanticSha256": "818c6265f0d8019312b6265cd052bbe3a6fd082eff406d1c5d888ab91ffef364"
 }

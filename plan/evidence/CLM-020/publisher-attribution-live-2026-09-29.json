@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "publisher-attribution-live/v1",
+  "checkedAt": "2026-09-29T06:49:30.129Z",
+  "transaction": "READ ONLY, REPEATABLE READ",
+  "ciRelease": "ci-beta-r5-2024-Q4",
+  "k1PanelRelease": "ci-k1-uncertainty-inputs-2024-v2",
+  "conditionsRelease": "conditions-production-20260729-v1",
+  "sample": [
+    "uruguay",
+    "japan",
+    "united-states",
+    "brazil",
+    "colombia",
+    "south-africa",
+    "hungary",
+    "india",
+    "mexico",
+    "tunisia",
+    "nigeria",
+    "niger",
+    "turkey",
+    "china",
+    "north-korea",
+    "monaco"
+  ],
+  "checks": [
+    {
+      "id": "country-scores.vdem.matches-publisher",
+      "status": "pass",
+      "counts": {
+        "releaseRows": 170,
+        "joinedToRetainedCopy": 169,
+        "failed": 0,
+        "withoutRetainedCopy": 1
+      },
+      "examples": [],
+      "note": "Every frozen-release V-Dem row, shaped for display, equals V-Dem's own figure in the K1 v2 exact-publisher panel at three decimals."
+    },
+    {
+      "id": "country-scores.fh.rule-applied",
+      "status": "pass",
+      "counts": {
+        "releaseRows": 190,
+        "joinedToRetainedCopy": 189,
+        "failed": 0,
+        "Not Free": 54,
+        "Partly Free": 55,
+        "Free": 81
+      },
+      "examples": [],
+      "note": "Every Freedom House row shows no number, and its status equals Freedom House's published rule applied to the K1 v2 retained ratings. This proves two retained copies agree; Freedom House's own Status column is not captured (follow-up F7)."
+    },
+    {
+      "id": "country-scores.legacy-row-rejected",
+      "status": "pass",
+      "counts": {
+        "releaseRows": 190,
+        "legacyRowsFlagged": 190
+      },
+      "examples": [
+        "brazil: former text \"Free (75/100)\" → score row freedom-house: shows 75, which is not the publisher's own figure (5)",
+        "china: former text \"Not Free (8/100)\" → score row freedom-house: shows 8, which is not the publisher's own figure (13)",
+        "hungary: former text \"Partly Free (67/100)\" → score row freedom-house: shows 67, which is not the publisher's own figure (6)",
+        "uruguay: former text \"Free (100/100)\" → score row freedom-house: shows 100, which is not the publisher's own figure (2)"
+      ],
+      "note": "Self-proof on live values: the pre-CLM-020 \"Status (N/100)\" text fails the value check for every release row."
+    },
+    {
+      "id": "country-scores.sample-contract",
+      "status": "pass",
+      "counts": {
+        "sampleCountries": 16,
+        "rowsChecked": 31,
+        "apiRowsWithheldForRights": 31
+      },
+      "examples": [],
+      "note": "Rows appear exactly where the frozen release holds them (Monaco keeps its WGI fallback and has no V-Dem row), carry only the v2 keys and the manifest clocks, and the public API withholds values whose publisher terms do not permit export."
+    },
+    {
+      "id": "conditions.position.contract",
+      "status": "pass",
+      "counts": {
+        "calculations": 295,
+        "scoredPositions": 101,
+        "failed": 0
+      },
+      "examples": [],
+      "note": "The live release parses under the strict API contract; every scored position carries a registered scoreOrigin, equals the fixed-bound map of its single component, and passes the value check as rendered with its marker."
+    },
+    {
+      "id": "conditions.hdi-year-duplicates-prior-year",
+      "status": "registered_exception",
+      "scope": {
+        "releaseId": "conditions-production-20260729-v1",
+        "componentId": "hdi"
+      },
+      "counts": {
+        "hdiComponents": 51,
+        "withPriorYearInSameSeries": 50,
+        "equalToPriorYear": 50
+      },
+      "examples": [
+        "india: labelled 2023 = 0.644; the same series' 2022 value is 0.644",
+        "japan: labelled 2023 = 0.92; the same series' 2022 value is 0.92",
+        "united-states: labelled 2023 = 0.927; the same series' 2022 value is 0.927"
+      ],
+      "note": "A Human Development value labelled year Y that equals the same retained series' value for Y−1 in at least 90% of countries is a year label on the prior year's figures. This comparison does not depend on which Human Development Report edition the owner adopts."
+    },
+    {
+      "id": "conditions.hdi-later-series-comparison",
+      "status": "unverified",
+      "counts": {
+        "compared": 51,
+        "differ": 50
+      },
+      "examples": [
+        "india: release 0.644 for 2023; indicator_history 0.685",
+        "japan: release 0.92 for 2023; indicator_history 0.925",
+        "united-states: release 0.927 for 2023; indicator_history 0.938"
+      ],
+      "note": "Informational. indicator_history holds a different, unnamed UNDP series (the CLM-020 review reports it as Human Development Report 2025 figures); an edition mismatch makes this comparison unable to decide which value is right."
+    },
+    {
+      "id": "conditions.gpi-and-economic-components",
+      "status": "unverified",
+      "counts": {},
+      "examples": [],
+      "note": "No second retained copy of the Global Peace Index or the World Bank economic inputs exists (the GPI edition is operator-supplied; the World Bank inputs exist only as a capture hash)."
+    }
+  ],
+  "registeredExceptionsMatched": [
+    {
+      "id": "conditions.hdi-reference-year",
+      "followUp": "CLM-021",
+      "reason": "Human Development values labelled reference year 2023 repeat the retained 2022 values of the same UNDP series (the Human Development Report 2023/24 figures for 2022)."
+    }
+  ],
+  "staleExceptions": [],
+  "unregisteredFailures": [],
+  "heuristicSignatures": {
+    "freedomHouseReleasePositionAt100": {
+      "n": 190,
+      "shareAtMax": 0.21578947368421053,
+      "shareAtMin": 0.06842105263157895,
+      "flagged": true
+    },
+    "freedomHouseOwnTotalScoreAt100": {
+      "n": 194,
+      "shareAtMax": 0.005154639175257732,
+      "shareAtMin": 0,
+      "flagged": false
+    },
+    "vdemDisplayedValues": {
+      "n": 170,
+      "shareAtMax": 0,
+      "shareAtMin": 0,
+      "flagged": false
+    }
+  }
+}

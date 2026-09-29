@@ -139,6 +139,13 @@ export const CLAIMS_DOCS_GATE_MANIFEST: GateManifest = {
       categories: ["registry-coverage", "terminology-policy"],
       description: "Compact renderer provenance coverage is measured, named exceptions stay public, and universal per-value claims remain prohibited.",
     },
+    {
+      id: "publisher-attribution",
+      npmScript: "validate:publisher-attribution",
+      categories: ["registry-coverage", "methodology-fixtures"],
+      description:
+        "Numbers beside a publisher's name are that publisher's own figure or carry the Civica-calculation marker; registered surfaces, SourceDot renderers, derived-field readers, exceptions, and follow-ups stay closed (CLM-020).",
+    },
   ],
 };
 

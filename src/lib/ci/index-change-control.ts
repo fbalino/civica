@@ -153,6 +153,7 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{
   { path: "src/lib/ci/tiers.ts", category: "band_or_rank" },
   { path: "src/lib/ci/rank-policy.ts", category: "band_or_rank" },
   { path: "src/lib/ci/governance-evidence.ts", category: "presentation" },
+  { path: "src/lib/ci/publisher-scores.ts", category: "presentation" },
   { path: "src/lib/ci/dimension-colors.ts", category: "presentation" },
   { path: "src/lib/ci/index-disposition.ts", category: "presentation" },
   { path: "src/lib/ci/misuse-audit.ts", category: "presentation" },

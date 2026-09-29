@@ -1347,3 +1347,34 @@ such readers, and a notice would be change-history theater. An honest record
 of the repair stays in the evidence and the audit history, so the waiver
 removes the notice, not the trace. Durable evidence:
 `plan/evidence/DAT-037/`, including `OWNER-APPROVAL-2026-09-29.md`.
+
+### APR-D174 — A number beside a publisher's name is that publisher's figure or visibly Civica's
+
+**Decision:** Under `publisher-attribution/v1` (owner decisions of
+2026-09-29), a number shown beside a publisher's name, source label, or
+`SourceDot` must equal that publisher's own figure at the printed precision or
+carry the `ValueOriginNote` "Civica calculation" marker with its registered
+explanation. A category Civica produces by applying the publisher's own
+published rule to captured publisher figures prints no number and carries its
+rule note. The country Rankings table therefore shows the Freedom House status
+with its Freedom in the World edition and no number, and no Civica V-Dem rank.
+Every such surface, every file that renders a `SourceDot` or `FactValueDot`,
+and every reader of a Civica-derived field is registered in
+`src/lib/provenance/publisher-attribution-registry.ts`; known gaps are
+exceptions tied to an open follow-up, and new exceptions or reader allowances
+need an approving decision or task and a deliberate baseline update.
+`npm run validate:publisher-attribution` runs inside `validate:claims-docs`;
+`npm run validate:publisher-attribution:live` compares displayed values with
+Civica's independent retained copies of the publisher figures in a read-only
+transaction.
+
+**Why:** The Rankings table printed Civica's fixed-bound rescale of Freedom
+House's political rights and civil liberties ratings, ((14 − sum) ÷ 12) × 100,
+as Freedom House's own score: 41 of 190 countries read "Free (100/100)",
+while Freedom House's own Total Score for the same edition reaches 100 for
+one country (Finland; Uruguay's is 96). The V-Dem row printed a Civica rank among the
+release's rows as a global rank, beside a banner saying Civica does not rank
+the country. No validator compared a displayed number with the publisher's own
+figure. The check fails on the former row and on unregistered readers, but it
+cannot see new arithmetic in a file that reads no registered field, so the
+rule is also a review rule. Durable evidence: `plan/evidence/CLM-020/`.

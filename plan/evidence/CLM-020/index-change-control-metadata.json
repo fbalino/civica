@@ -1,0 +1,39 @@
+{
+  "id": "publisher-attribution-2026-09-29",
+  "toVersion": "civica-index-publisher-attribution-v64",
+  "categories": [
+    "input",
+    "presentation"
+  ],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/CLM-020/README.md"
+    ],
+    "registry": [
+      "plan/evidence/CLM-020/publisher-attribution-registry.v1.json"
+    ],
+    "release_note": [
+      "plan/evidence/CLM-020/release-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/CLM-020/migration-plan.md"
+    ],
+    "golden_test": [
+      "src/lib/ci/publisher-scores.test.ts"
+    ],
+    "contract_test": [
+      "src/components/scores/scores-rankings.test.ts"
+    ]
+  },
+  "validations": [
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine",
+    "validate:publisher-attribution"
+  ]
+}

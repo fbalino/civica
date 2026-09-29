@@ -18,7 +18,10 @@ export interface CompareConditionsProps {
 /**
  * Side-by-side view of a single immutable Conditions release. It deliberately
  * reuses the country panel so the comparison cannot drop component units,
- * reference years, source names, or missingness decisions.
+ * reference years, source names, or missingness decisions. It hides Civica's
+ * 0 to 100 positions (`showCivicaPosition={false}`), so the banner's promise
+ * holds: the comparison shows publisher components and does not normalize,
+ * rank, or combine them (CLM-020).
  */
 export function CompareConditions({
   countries,
@@ -81,6 +84,7 @@ export function CompareConditions({
               release={release}
               showHeading={false}
               stacked
+              showCivicaPosition={false}
             />
           </div>
         ))}

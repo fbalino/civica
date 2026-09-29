@@ -1,11 +1,11 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "9242fe1acec6c758042eea2b7b719e01ff3add01b6d8be8a4a47ad12ae8b8481",
-    "plan/PROGRESS.md": "8c33929c51eb003fcdb356fc6866eb2fb4d08dfde5d4827152a78de4e2349596",
+    "plan/MASTER-CHECKLIST.md": "5aaf143e2482a260eba5b0457e628cfa7445f59e93668a8e408ee53cb67048c5",
+    "plan/PROGRESS.md": "3fb8e54ef46a0495884f90c242694b4a04f6120a1690d35c4285c1e86f7d728e",
     "plan/MANUAL-CHECKS.md": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
-    "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
+    "plan/02-positioning-claims-and-documentation.md": "c0c6a50b06386c184ef55c20f7ef3f7ae0a55d0292cd541404fc3203c4f61825",
     "plan/03-data-provenance-and-reproducibility.md": "882c22147289abde0ccade5f556f10f78dbf84fba2f1812d4156fa3c3959529f",
     "plan/04-civica-index-research-program.md": "6d879a9fecefeda072af4a41ccde7d8be1b77a555f42f9ebece4c38e01343b4b",
     "plan/05-pulse-event-ledger-and-validation.md": "469c04ca66b439905a60c39c69e1a8e20b55e4d0ec9e6c9482b8987da64d64d7",
@@ -22,13 +22,13 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 315,
-        "completed": 269,
-        "remaining": 46,
+        "total": 317,
+        "completed": 270,
+        "remaining": 47,
         "byPriority": {
           "P0": {
-            "total": 197,
-            "completed": 175
+            "total": 199,
+            "completed": 176
           },
           "P1": {
             "total": 113,
@@ -49,8 +49,8 @@
             "completed": 11
           },
           "02-positioning-claims-and-documentation.md": {
-            "total": 19,
-            "completed": 19
+            "total": 21,
+            "completed": 20
           },
           "03-data-provenance-and-reproducibility.md": {
             "total": 37,
@@ -88,6 +88,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "CLM-021",
         "DAT-037",
         "EXP-001",
         "EXP-028",
@@ -112,6 +113,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "CLM-021",
         "DAT-034",
         "DAT-037",
         "EXP-001",
@@ -240,7 +242,7 @@
         }
       ],
       "blockers": [
-        "22 unchecked P0 tasks prevent a green report"
+        "23 unchecked P0 tasks prevent a green report"
       ]
     },
     {
@@ -248,13 +250,13 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 315,
-        "completed": 269,
-        "remaining": 46,
+        "total": 317,
+        "completed": 270,
+        "remaining": 47,
         "byPriority": {
           "P0": {
-            "total": 197,
-            "completed": 175
+            "total": 199,
+            "completed": 176
           },
           "P1": {
             "total": 113,
@@ -275,8 +277,8 @@
             "completed": 11
           },
           "02-positioning-claims-and-documentation.md": {
-            "total": 19,
-            "completed": 19
+            "total": 21,
+            "completed": 20
           },
           "03-data-provenance-and-reproducibility.md": {
             "total": 37,
@@ -314,6 +316,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "CLM-021",
         "DAT-037",
         "EXP-001",
         "EXP-028",
@@ -338,6 +341,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "CLM-021",
         "DAT-034",
         "DAT-037",
         "EXP-001",
@@ -473,8 +477,8 @@
         }
       ],
       "blockers": [
-        "22 unchecked P0 tasks prevent a green report",
-        "43 unchecked P0/P1 tasks prevent G4"
+        "23 unchecked P0 tasks prevent a green report",
+        "44 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -482,13 +486,13 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 315,
-        "completed": 269,
-        "remaining": 46,
+        "total": 317,
+        "completed": 270,
+        "remaining": 47,
         "byPriority": {
           "P0": {
-            "total": 197,
-            "completed": 175
+            "total": 199,
+            "completed": 176
           },
           "P1": {
             "total": 113,
@@ -509,8 +513,8 @@
             "completed": 11
           },
           "02-positioning-claims-and-documentation.md": {
-            "total": 19,
-            "completed": 19
+            "total": 21,
+            "completed": 20
           },
           "03-data-provenance-and-reproducibility.md": {
             "total": 37,
@@ -548,6 +552,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "CLM-021",
         "DAT-037",
         "EXP-001",
         "EXP-028",
@@ -572,6 +577,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "CLM-021",
         "DAT-034",
         "DAT-037",
         "EXP-001",
@@ -693,7 +699,7 @@
         }
       ],
       "blockers": [
-        "22 unchecked P0 tasks prevent a green report",
+        "23 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
     },
@@ -702,13 +708,13 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 315,
-        "completed": 269,
-        "remaining": 46,
+        "total": 317,
+        "completed": 270,
+        "remaining": 47,
         "byPriority": {
           "P0": {
-            "total": 197,
-            "completed": 175
+            "total": 199,
+            "completed": 176
           },
           "P1": {
             "total": 113,
@@ -729,8 +735,8 @@
             "completed": 11
           },
           "02-positioning-claims-and-documentation.md": {
-            "total": 19,
-            "completed": 19
+            "total": 21,
+            "completed": 20
           },
           "03-data-provenance-and-reproducibility.md": {
             "total": 37,
@@ -768,6 +774,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "CLM-021",
         "DAT-037",
         "EXP-001",
         "EXP-028",
@@ -792,6 +799,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "CLM-021",
         "DAT-034",
         "DAT-037",
         "EXP-001",
@@ -913,7 +921,7 @@
         }
       ],
       "blockers": [
-        "22 unchecked P0 tasks prevent a green report",
+        "23 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
     }

@@ -15,9 +15,9 @@ import { CURRENT_CONDITIONS_METHODOLOGY_VERSION } from "@/lib/conditions/contrac
 import {
   buildConditionsPublicRelease,
   selectConditionsPublicRelease,
-  type ConditionsPublicCalculation,
   type ConditionsPublicComponent,
   type ConditionsPublicReleaseHeader,
+  type ConditionsStoredCalculation,
 } from "@/lib/conditions/public-release";
 import {
   buildGovernmentClassificationMap,
@@ -2226,6 +2226,7 @@ export async function getConditionsPublicRelease(
         calculation.reference_year AS "referenceYear",
         score.normalized_score AS "normalizedScore",
         score.raw_value AS "rawValue",
+        score.transformation_id AS "scoreTransformationId",
         score.source_id AS "scoreSourceId",
         scoreSource.name AS "scoreSourceName",
         score.indicator_id AS "scoreIndicatorId",
@@ -2273,7 +2274,7 @@ export async function getConditionsPublicRelease(
   const calculationRows = (Array.isArray(calculationResult)
     ? calculationResult
     : ((calculationResult as { rows?: unknown[] }).rows ?? [])) as Array<
-    Omit<ConditionsPublicCalculation, "components">
+    Omit<ConditionsStoredCalculation, "components">
   >;
   const componentRows = (Array.isArray(componentResult)
     ? componentResult

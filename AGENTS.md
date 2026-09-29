@@ -138,6 +138,35 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   dataset-wide metric. Run `npm run validate:provenance-claims` after changing
   public provenance copy or those four compact surfaces.
 
+## Publisher attribution
+
+- A number shown beside a publisher's name, source label, or `SourceDot` is
+  that publisher's own figure or carries the `ValueOriginNote` "Civica
+  calculation" marker (rescales, ranks, shares, sums, aggregates, and
+  projections). A category Civica produces by applying the publisher's own
+  published rule carries its rule note and prints no number
+  (`publisher-attribution/v1`, APR-D174).
+- `src/lib/provenance/publisher-attribution-registry.ts` registers every such
+  surface, every file that renders a `SourceDot` or `FactValueDot`, every
+  reader of a Civica-derived field (rescaled scores, ranks, composite tables,
+  the legacy `country_metrics` table), and every file that prints a 0-to-100
+  scale suffix ("/100", "/ 100", "out of 100"). Known gaps are exceptions tied
+  to a follow-up in `plan/evidence/CLM-020/follow-ups.md`; a new exception,
+  reader allowance, or scale-suffix allowance also needs an approving decision
+  or task and a deliberate
+  `npm run validate:publisher-attribution -- --update-baseline`.
+- Run `npm run validate:publisher-attribution` after changing a registered
+  surface, a `SourceDot` renderer, a reader of a derived field, a scale
+  suffix, or a Conditions transformation. Run
+  `npm run validate:publisher-attribution:live` (read-only, needs an injected
+  `DATABASE_URL`) after changing their builders or data.
+- `src/components/scores/scores-rankings-closure.test.ts` fails when the
+  country Rankings table shows anything its checked score rows do not
+  produce. The check still cannot see a new unscaled number in a file that
+  renders no `SourceDot` and reads no registered field (for example
+  "Freedom House: 83"), so treat the rule as a review rule too; F13 in
+  `plan/evidence/CLM-020/follow-ups.md` lists the remaining gaps.
+
 ## Research evidence retention
 
 - `research-evidence-retention/v1` protects 35 registered evidence-bearing relations with

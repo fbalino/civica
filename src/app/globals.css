@@ -912,6 +912,24 @@ a {
   }
 }
 
+/* ValueOriginNote — how a displayed value relates to the publisher named
+   beside it (publisher-attribution/v1). Chip + InfoTip; tokens only. The
+   marker keeps interface type whatever the value's size (a display-size
+   Conditions position or a table cell), so the em-sized InfoTip stays small;
+   it stays on one line with its trigger, and the value beside it may wrap. */
+.value-origin-note {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-inline-start: var(--space-2);
+  vertical-align: middle;
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-none);
+}
+
 /* ============================================================
    Layout containers
    ============================================================ */
