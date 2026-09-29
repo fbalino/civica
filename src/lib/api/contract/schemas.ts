@@ -1342,8 +1342,17 @@ export const zConditionsPublicCalculation = z
     alignmentPolicy: z.literal("all-components-same-reference-year/v1"),
     alignmentStatus: zConditionsAlignmentStatus,
     referenceYear: z.number().int().nullable(),
+    /** Civica's 0 to 100 position; always a Civica calculation (CLM-020). */
     normalizedScore: z.number().min(0).max(100).nullable(),
     rawValue: z.number().nullable(),
+    /** publisher-attribution/v1: present exactly when a position is scored. */
+    scoreOrigin: z
+      .object({
+        kind: z.literal("civica_calculation"),
+        transformationId: z.string().min(1),
+      })
+      .strict()
+      .nullable(),
     scoreSourceId: z.string().nullable(),
     scoreSourceName: z.string().nullable(),
     scoreIndicatorId: z.string().nullable(),
@@ -1466,6 +1475,12 @@ export const zConditionsPublicRelease = z
         (calculation.normalizedScore !== null || calculation.rawValue !== null)
       ) {
         report([...path], "economic stability must not publish a composite score");
+      }
+      if ((calculation.normalizedScore === null) !== (calculation.scoreOrigin === null)) {
+        report(
+          [...path, "scoreOrigin"],
+          "a scored position must carry its Civica-calculation origin, and an unscored calculation must not",
+        );
       }
     }
   });

@@ -79,6 +79,17 @@
       "includeGlobs": ["src/lib/factbook/reconcile/resolver.ts"],
       "thresholds": { "lines": 80, "branch": 65, "functions": 70 },
       "note": "source-precedence/v1 canonical-fact resolver (resolveFromRows), methodology worked examples. Measured 2026-07-12: lines 87.39 / branch 72.46 / functions 79.69."
+    },
+    {
+      "name": "publisher-attribution",
+      "testGlobs": ["src/lib/provenance/__tests__/publisher-attribution.test.ts"],
+      "includeGlobs": [
+        "src/lib/provenance/publisher-attribution.ts",
+        "src/lib/provenance/publisher-attribution-check.ts",
+        "src/lib/provenance/publisher-attribution-scan.ts"
+      ],
+      "thresholds": { "lines": 88, "branch": 73, "functions": 87 },
+      "note": "CLM-020 publisher-attribution/v1: displayed-value origin vocabulary, value checks, and the static scan with its seeded mutations. Measured 2026-09-29: lines 93.08 / branch 78.06 / functions 92.11."
     }
   ]
 }

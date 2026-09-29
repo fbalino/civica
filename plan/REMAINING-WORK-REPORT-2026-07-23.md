@@ -2,14 +2,14 @@
 
 **Reviewed:** 2026-09-18
 
-**Checklist state:** 269 of 315 complete; 46 remain; 85.4%.
+**Checklist state:** 270 of 317 complete; 47 remain; 85.2%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
 Twelve tasks are direct owner, qualified-human, counsel/privacy, or research
-participant work. Three require production, provider, or other external-system
+participant work. Four require production, provider, or other external-system
 authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
 is currently running. Thirty are downstream tasks that cannot honestly start
@@ -71,11 +71,17 @@ run is preserved with a date-correction note, and the exact-candidate
 attempt-07 technical rehearsal through `0051_eminent_jocasta` is complete and
 retained (`plan/evidence/QA-018/`).
 
-### 2. Production, staging, or external-system authority — 3
+### 2. Production, staging, or external-system authority — 4
 
-IDs: DAT-037, PUL-024, PUL-040.
+IDs: CLM-021, DAT-037, PUL-024, PUL-040.
 
 This batch includes:
+
+- the CLM-021 corrected Civica Conditions release: Fernando chooses the UNDP
+  Human Development Report edition, then approves one new immutable release
+  that supersedes `conditions-production-20260729-v1`, with a public
+  correction record. The Human Development values labelled 2023 in that release
+  are UNDP's 2022 figures (`plan/evidence/CLM-020/README.md`);
 
 - the DAT-037 cabinet-roster sequence, approved by the owner on 2026-09-29
   without a public correction record (APR-D173): the merge, one full
@@ -184,7 +190,7 @@ see `plan/evidence/PLT-031/`.
 
 ## Gate status
 
-G4 remains blocked with 22 unchecked P0 tasks and 43 unchecked P0/P1 tasks.
+G4 remains blocked with 23 unchecked P0 tasks and 44 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,

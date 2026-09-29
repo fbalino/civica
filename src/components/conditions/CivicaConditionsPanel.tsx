@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DataValueState } from "@/components/DataValueState";
 import { Chip } from "@/components/editorial/Pill";
 import { Banner } from "@/components/editorial/Banner";
+import { ValueOriginNote } from "@/components/provenance/ValueOriginNote";
 import {
   type ConditionsPublicCalculation,
   type ConditionsPublicRelease,
@@ -29,20 +30,47 @@ function formatNumber(value: number | null, maximumFractionDigits = 2) {
     : new Intl.NumberFormat("en", { maximumFractionDigits }).format(value);
 }
 
-function calculationScore(calculation: ConditionsPublicCalculation) {
+/**
+ * The card's headline line. A 0 to 100 position is a Civica calculation from
+ * the publisher's figure, so it always carries the ValueOriginNote marker and
+ * its formula (publisher-attribution/v1, CLM-020). The comparison view passes
+ * `showCivicaPosition={false}` and shows only the publisher components.
+ */
+function CalculationPosition({
+  calculation,
+  showCivicaPosition,
+}: {
+  calculation: ConditionsPublicCalculation;
+  showCivicaPosition: boolean;
+}) {
   if (calculation.dimension === "economic_stability") {
-    return "No composite published";
+    return <p className="conditions-country-score">No composite published</p>;
   }
-  if (calculation.normalizedScore !== null) {
-    return `${formatNumber(calculation.normalizedScore, 1)} / 100`;
+  if (calculation.normalizedScore === null) {
+    return <p className="conditions-country-score">Not scored</p>;
   }
-  return "Not scored";
+  if (!showCivicaPosition) return null;
+  return (
+    <p className="conditions-country-score">
+      {formatNumber(calculation.normalizedScore, 1)} / 100
+      <ValueOriginNote
+        origin={
+          calculation.scoreOrigin ?? {
+            kind: "civica_calculation",
+            transformationId: "unregistered",
+          }
+        }
+      />
+    </p>
+  );
 }
 
 function CountryConditionCard({
   calculation,
+  showCivicaPosition,
 }: {
   calculation: ConditionsPublicCalculation;
+  showCivicaPosition: boolean;
 }) {
   const source = calculation.scoreSourceName ?? calculation.scoreSourceId;
   return (
@@ -57,7 +85,10 @@ function CountryConditionCard({
               : "Component unavailable"}
         </Chip>
       </div>
-      <p className="conditions-country-score">{calculationScore(calculation)}</p>
+      <CalculationPosition
+        calculation={calculation}
+        showCivicaPosition={showCivicaPosition}
+      />
       <p className="conditions-country-meta">
         {calculation.referenceYear === null
           ? "No common reference year"
@@ -94,12 +125,15 @@ export function CivicaConditionsPanel({
   releaseStatus = "available",
   showHeading = true,
   stacked = false,
+  showCivicaPosition = true,
 }: {
   jurisdictionId: string;
   release: ConditionsPublicRelease | null;
   releaseStatus?: "available" | "unavailable";
   showHeading?: boolean;
   stacked?: boolean;
+  /** False on the comparison view, which shows publisher components only. */
+  showCivicaPosition?: boolean;
 }) {
   const calculations = release?.calculations.filter(
     (calculation) => calculation.jurisdictionId === jurisdictionId,
@@ -145,6 +179,7 @@ export function CivicaConditionsPanel({
             <CountryConditionCard
               key={calculation.calculationKey}
               calculation={calculation}
+              showCivicaPosition={showCivicaPosition}
             />
           ))}
         </div>

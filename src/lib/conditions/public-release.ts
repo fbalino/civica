@@ -1,3 +1,5 @@
+import type { CivicaCalculationOrigin } from "@/lib/provenance/publisher-attribution";
+
 import {
   CONDITIONS_DIMENSIONS,
   type ConditionsAlignmentStatus,
@@ -41,8 +43,13 @@ export interface ConditionsPublicCalculation {
   alignmentPolicy: string;
   alignmentStatus: ConditionsAlignmentStatus;
   referenceYear: number | null;
+  /** Civica's 0 to 100 position: a Civica calculation, never the
+   *  publisher's figure (which is `rawValue` and the component value). */
   normalizedScore: number | null;
   rawValue: number | null;
+  /** publisher-attribution/v1 origin of `normalizedScore`: every scored
+   *  position is a registered Civica calculation; unscored rows carry null. */
+  scoreOrigin: CivicaCalculationOrigin | null;
   scoreSourceId: string | null;
   scoreSourceName: string | null;
   scoreIndicatorId: string | null;
@@ -50,6 +57,15 @@ export interface ConditionsPublicCalculation {
   scoreLicenseUrl: string | null;
   components: readonly ConditionsPublicComponent[];
 }
+
+/**
+ * A calculation row as stored: the score's transformation identifier before
+ * it becomes the public `scoreOrigin`.
+ */
+export type ConditionsStoredCalculation = Omit<
+  ConditionsPublicCalculation,
+  "scoreOrigin"
+> & { scoreTransformationId: string | null };
 
 export interface ConditionsDimensionCoverage {
   dimension: ConditionsDimension;
@@ -92,7 +108,7 @@ export function selectConditionsPublicRelease(
 
 export function conditionsPublicReleaseErrors(input: {
   release: ConditionsPublicReleaseHeader;
-  calculations: readonly ConditionsPublicCalculation[];
+  calculations: readonly ConditionsStoredCalculation[];
 }): string[] {
   const errors: string[] = [];
   if (!/^conditions-[a-z0-9-]+-v[1-9][0-9]*$/.test(input.release.releaseId)) {
@@ -128,6 +144,12 @@ export function conditionsPublicReleaseErrors(input: {
     if (new Set(calculation.components.map((component) => component.componentId)).size !== calculation.components.length) {
       errors.push(`${calculation.calculationKey}: duplicate component ID`);
     }
+    if (calculation.normalizedScore !== null && !calculation.scoreTransformationId) {
+      errors.push(`${calculation.calculationKey}: scored calculation has no transformation id`);
+    }
+    if (calculation.normalizedScore === null && calculation.scoreTransformationId !== null) {
+      errors.push(`${calculation.calculationKey}: unscored calculation carries a transformation id`);
+    }
   }
   return errors;
 }
@@ -154,23 +176,33 @@ function dimensionCoverage(
 /**
  * Produces the release-selected public model used by the Conditions reader
  * and API. Coverage comes only from its calculation rows; it intentionally
- * has no general-country denominator or cross-dimension composite.
+ * has no general-country denominator or cross-dimension composite. Every
+ * scored position carries its Civica-calculation origin (CLM-020).
  */
 export function buildConditionsPublicRelease(input: {
   release: ConditionsPublicReleaseHeader;
-  calculations: readonly ConditionsPublicCalculation[];
+  calculations: readonly ConditionsStoredCalculation[];
 }): ConditionsPublicRelease {
   const errors = conditionsPublicReleaseErrors(input);
   if (errors.length) {
     throw new Error(`Invalid Conditions public release: ${errors.join(", ")}`);
   }
+  const calculations: ConditionsPublicCalculation[] = input.calculations.map(
+    ({ scoreTransformationId, ...calculation }) => ({
+      ...calculation,
+      scoreOrigin:
+        calculation.normalizedScore === null || scoreTransformationId === null
+          ? null
+          : { kind: "civica_calculation", transformationId: scoreTransformationId },
+    }),
+  );
   return {
     contract: CONDITIONS_PUBLIC_RELEASE_CONTRACT,
     release: input.release,
     coverage: CONDITIONS_DIMENSIONS.map((dimension) =>
-      dimensionCoverage(dimension, input.calculations),
+      dimensionCoverage(dimension, calculations),
     ),
-    calculations: [...input.calculations].sort(
+    calculations: calculations.sort(
       (left, right) =>
         left.countryName.localeCompare(right.countryName) ||
         left.dimension.localeCompare(right.dimension),

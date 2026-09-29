@@ -1,71 +1,38 @@
 /**
- * P1.1 — `<ScoresAndRankings>` data layer.
+ * Country publisher measures — the database read (CLM-020,
+ * publisher-attribution/v1).
  *
- * Pulls the canonical governance / democracy / freedom score rows for a
- * single country, in display order:
- *   1. V-Dem Liberal Democracy (native 0-1 + source-series rank)
- *   2. Freedom House status (Free / Partly Free / Not Free + score)
- *   3. RSF Press Freedom (ingested dimension history)
- *   4. UNDP HDI (0-1, with rank)
- *   5. Transparency CPI (0-100, with rank)
+ * Reads the two publisher figures held in the frozen Civica Index release
+ * (V-Dem's `v2x_libdem` value and Freedom House's political rights plus civil
+ * liberties sum) and shapes them through the pure contract in
+ * `src/lib/ci/publisher-scores.ts`, which owns the attribution rule, Freedom
+ * House's status rule, and the four clocks.
  *
- * Trend = current value vs the oldest comparable value we have, capped at
- * "4y trend" — when ≥ 4 years of history exist we compare to the value
- * 4y ago; otherwise we fall back to the oldest available point and the
- * caller is responsible for any "since YYYY" labelling. We pass through
- * a raw `trendDelta` so the consumer can format it however the row
- * format demands (V-Dem uses ±0.0X, HDI uses ±0.0XX).
+ * Attribution rule: this module never displays the release's normalized
+ * column (a Civica rescale) and computes no rank, trend, or composite. The
+ * release-row projection selects that column only because the release
+ * identity type requires it.
  */
 
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import {
-  ciDimensionScores,
-  countryMetrics,
-  jurisdictions,
-} from "@/lib/db/schema";
+import { ciDimensionScores, jurisdictions } from "@/lib/db/schema";
 import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import {
+  shapeFreedomHouseScoreRow,
+  shapeVdemScoreRow,
+  type ScoreRow,
+} from "@/lib/ci/publisher-scores";
+import {
   isCiReleaseConsistencyError,
-  publicCiReleaseIdentity,
   resolveCiRelease,
   selectCiReleaseDimensionRows,
 } from "@/lib/ci/release-selection";
 import { loadPublishedCiRelease } from "@/lib/ci/release-store";
 
-export interface ScoreRow {
-  /** Stable id used as React key + automation hook. */
-  id: string;
-  /** Display label, e.g. "V-Dem Liberal Democracy". */
-  label: string;
-  /** Native (or 0-100 normalised) numeric score. NULL means render
-   *  whatever we have from `scoreFormatted` only. */
-  score: number | null;
-  /** Pre-formatted value for the Value column. e.g. "41 / 100",
-   *  "Partly Free (47/100)", "0.535". */
-  scoreFormatted: string;
-  /** Global rank, when available. */
-  rank: number | null;
-  /** Total ranked countries, when available. */
-  totalRanked: number | null;
-  /** Trend bucket — direction-only. */
-  trend: "up" | "down" | "flat" | null;
-  /** Signed numeric delta (latest minus oldest in window). NULL if
-   *  no history is available. */
-  trendDelta: number | null;
-  /** Pre-formatted trend label including the unit ("+2.3", "−0.04"). */
-  trendFormatted: string | null;
-  /** Source id for `<SourceDot>` — must be a key in SOURCE_NAMES. */
-  source: string;
-  /** Display-friendly "as of" stamp. ISO date, year, or quarter. */
-  asOf: string | null;
-  /** Whether this row is immutable release evidence or current live context. */
-  freshness: "frozen_release" | "live_current";
-  /** Exact release identity for release-bound Index rows. */
-  release: ReturnType<typeof publicCiReleaseIdentity> | null;
-}
+// ---- Frozen Index-release coordinates -------------------------------------
 
-const FLAT_THRESHOLD = 0.0001;
+const CI_RELEASE = resolveCiRelease(CURRENT_CI_RELEASE_ID);
 
 /** Resolve a slug or id (tolerates both) into a jurisdictionId. The
  *  page already has the id but the public surfaces accept slugs, so
@@ -93,30 +60,6 @@ async function resolveJurisdiction(
   return rows[0] ?? null;
 }
 
-function fmtSigned(n: number, digits: number): string {
-  const sign = n > 0 ? "+" : n < 0 ? "−" : "";
-  return `${sign}${Math.abs(n).toFixed(digits)}`;
-}
-
-function trendBucket(delta: number | null): "up" | "down" | "flat" | null {
-  if (delta == null) return null;
-  if (Math.abs(delta) < FLAT_THRESHOLD) return "flat";
-  return delta > 0 ? "up" : "down";
-}
-
-// ---- Frozen Index-release coordinates -------------------------------------
-
-const CI_RELEASE = resolveCiRelease(CURRENT_CI_RELEASE_ID);
-const CI_RELEASE_IDENTITY = publicCiReleaseIdentity(CI_RELEASE);
-
-function releaseBoundScoreMetadata() {
-  return { freshness: "frozen_release" as const, release: CI_RELEASE_IDENTITY };
-}
-
-function liveScoreMetadata() {
-  return { freshness: "live_current" as const, release: null };
-}
-
 async function softFailOptionalScore(
   promise: Promise<ScoreRow | null>,
 ): Promise<ScoreRow | null> {
@@ -128,30 +71,25 @@ async function softFailOptionalScore(
   }
 }
 
-// ---- CI dimension rows (V-Dem, Freedom House) -----------------------------
-
-interface DimRowOpts {
-  jId: string;
-  dimension: string;
-  sourceId: string;
-  /** False only for non-Index live indicators such as RSF. */
-  releaseBound?: boolean;
-}
-
-async function fetchDimensionHistory({
-  jId,
-  dimension,
-  sourceId,
-  releaseBound = true,
-}: DimRowOpts) {
+/**
+ * The publisher's raw figure for one release row. V-Dem and Freedom House are
+ * read on separate paths: a jurisdiction whose democratic-quality row uses the
+ * disclosed WGI fallback (for example Monaco) has no V-Dem row, and its WGI
+ * value is never labelled V-Dem.
+ */
+async function fetchReleaseRawValue(
+  jId: string,
+  dimension: "democratic_quality" | "freedom_rights",
+  sourceId: "vdem" | "freedom_house",
+): Promise<number | null> {
   const rows = await db
     .select({
       releaseId: ciDimensionScores.releaseId,
       jurisdictionId: ciDimensionScores.jurisdictionId,
       dimension: ciDimensionScores.dimension,
       quarter: ciDimensionScores.quarter,
-      normalizedScore: ciDimensionScores.normalizedScore,
       rawValue: ciDimensionScores.rawValue,
+      normalizedScore: ciDimensionScores.normalizedScore,
       sourceId: ciDimensionScores.sourceId,
       indicatorId: ciDimensionScores.indicatorId,
       methodologyVersion: ciDimensionScores.methodologyVersion,
@@ -172,268 +110,13 @@ async function fetchDimensionHistory({
         eq(ciDimensionScores.jurisdictionId, jId),
         eq(ciDimensionScores.dimension, dimension),
         eq(ciDimensionScores.sourceId, sourceId),
-        ...(releaseBound
-          ? [
-              eq(
-                ciDimensionScores.methodologyVersion,
-                CI_RELEASE.methodologyVersion,
-              ),
-              eq(ciDimensionScores.quarter, CI_RELEASE.quarter),
-              eq(ciDimensionScores.releaseId, CI_RELEASE.releaseId),
-            ]
-          : []),
+        eq(ciDimensionScores.methodologyVersion, CI_RELEASE.methodologyVersion),
+        eq(ciDimensionScores.quarter, CI_RELEASE.quarter),
+        eq(ciDimensionScores.releaseId, CI_RELEASE.releaseId),
       ),
-    )
-    .orderBy(asc(ciDimensionScores.quarter));
-  return releaseBound
-    ? selectCiReleaseDimensionRows(rows, CI_RELEASE.releaseId)
-    : rows;
-}
-
-/** Compute global rank for a country on a (dimension, sourceId, quarter)
- *  by counting jurisdictions with strictly higher normalized scores. */
-async function rankWithinDimension(
-  jId: string,
-  dimension: string,
-  sourceId: string,
-  quarter: string,
-  releaseId: string,
-  methodologyVersion: string,
-): Promise<{ rank: number; total: number } | null> {
-  const result = await db.execute(sql`
-    SELECT
-      (
-        SELECT COUNT(*)::int
-        FROM ci_dimension_scores cds
-        WHERE cds.dimension = ${dimension}
-          AND cds.source_id = ${sourceId}
-          AND cds.quarter = ${quarter}
-          AND cds.release_id = ${releaseId}
-          AND cds.methodology_version = ${methodologyVersion}
-          AND cds.normalized_score > (
-            SELECT normalized_score FROM ci_dimension_scores
-            WHERE jurisdiction_id = ${jId}
-              AND dimension = ${dimension}
-              AND source_id = ${sourceId}
-              AND quarter = ${quarter}
-              AND release_id = ${releaseId}
-              AND methodology_version = ${methodologyVersion}
-            LIMIT 1
-          )
-      ) AS "higher",
-      (
-        SELECT COUNT(*)::int FROM ci_dimension_scores cds
-        WHERE cds.dimension = ${dimension}
-          AND cds.source_id = ${sourceId}
-          AND cds.quarter = ${quarter}
-          AND cds.release_id = ${releaseId}
-          AND cds.methodology_version = ${methodologyVersion}
-      ) AS "total"
-  `);
-  const row = (
-    Array.isArray(result)
-      ? result[0]
-      : (result as { rows?: unknown[] }).rows?.[0]
-  ) as { higher?: number; total?: number } | undefined;
-  if (!row || !row.total) return null;
-  return { rank: (row.higher ?? 0) + 1, total: row.total };
-}
-
-async function buildVDemRow(jId: string): Promise<ScoreRow | null> {
-  const history = await fetchDimensionHistory({
-    jId,
-    dimension: "democratic_quality",
-    sourceId: "vdem",
-  });
-  if (history.length === 0) return null;
-  const latest = history[history.length - 1];
-  if (latest.rawValue == null) return null;
-
-  // Trend in native space (0-1) — academically more meaningful than the
-  // normalized 0-100 score (which is pegged to an annually-shifting
-  // observed range).
-  const trendDelta =
-    history.length > 1 && history[0].rawValue != null
-      ? Number(latest.rawValue) - Number(history[0].rawValue)
-      : null;
-
-  const ranking = await rankWithinDimension(
-    jId,
-    "democratic_quality",
-    "vdem",
-    latest.quarter,
-    CI_RELEASE.releaseId,
-    CI_RELEASE.methodologyVersion,
-  );
-
-  const native = Number(latest.rawValue);
-  return {
-    id: "vdem-libdem",
-    label: "V-Dem Liberal Democracy",
-    score: native,
-    scoreFormatted: native.toFixed(2),
-    rank: ranking?.rank ?? null,
-    totalRanked: ranking?.total ?? null,
-    trend: trendBucket(trendDelta),
-    trendDelta,
-    trendFormatted: trendDelta != null ? fmtSigned(trendDelta, 2) : null,
-    source: "vdem",
-    asOf: latest.quarter,
-    ...releaseBoundScoreMetadata(),
-  };
-}
-
-function freedomHouseLabel(rawValue: number): string {
-  // `rawValue` is stored on the 2–14 SUM scale (avg × 2), not the retired
-  // 1–7 AVERAGE — see scripts/ingest-ci-freedom-house.ts:33-50 and the
-  // freedom_house bounds in src/lib/ci/normalize-v2.ts. Freedom in the
-  // World status thresholds on the average map to the sum as:
-  //   Free:        avg ≤ 2.5  ⇔ sum ≤ 5.0
-  //   Partly Free: avg ≤ 5.0  ⇔ sum ≤ 10.0
-  //   Not Free:    otherwise
-  if (rawValue <= 5.0) return "Free";
-  if (rawValue <= 10.0) return "Partly Free";
-  return "Not Free";
-}
-
-async function buildFreedomHouseRow(jId: string): Promise<ScoreRow | null> {
-  const history = await fetchDimensionHistory({
-    jId,
-    dimension: "freedom_rights",
-    sourceId: "freedom_house",
-  });
-  if (history.length === 0) return null;
-  const latest = history[history.length - 1];
-  if (latest.rawValue == null) return null;
-
-  const native = Number(latest.rawValue);
-  // FH is inverted (lower = freer). Flip the sign so up = improved.
-  const trendDelta =
-    history.length > 1 && history[0].rawValue != null
-      ? -(native - Number(history[0].rawValue))
-      : null;
-
-  const status = freedomHouseLabel(native);
-  // The CI normalised score is 0-100 (higher = freer). Show the score
-  // alongside the categorical label, since "Partly Free" alone is
-  // coarse.
-  const normalized = Math.round(latest.normalizedScore);
-
-  return {
-    id: "freedom-house",
-    label: "Freedom House Status",
-    score: normalized,
-    scoreFormatted: `${status} (${normalized}/100)`,
-    rank: null,
-    totalRanked: null,
-    trend: trendBucket(trendDelta),
-    trendDelta,
-    trendFormatted: trendDelta != null ? fmtSigned(trendDelta, 1) : null,
-    source: "freedom_house",
-    asOf: latest.quarter,
-    ...releaseBoundScoreMetadata(),
-  };
-}
-
-// ---- RSF Press Freedom -----------------------------------------------------
-
-async function buildRsfRow(jId: string): Promise<ScoreRow | null> {
-  const history = await fetchDimensionHistory({
-    jId,
-    dimension: "freedom_rights",
-    sourceId: "rsf_press_freedom",
-    releaseBound: false,
-  });
-  if (history.length === 0) return null;
-  const latest = history[history.length - 1];
-  if (latest.normalizedScore == null) return null;
-  const score = Math.round(Number(latest.normalizedScore));
-  const oldest = history[0];
-  const trendDelta =
-    history.length > 1 && oldest.normalizedScore != null
-      ? score - Number(oldest.normalizedScore)
-      : null;
-  return {
-    id: "rsf",
-    label: "Press Freedom (RSF)",
-    score,
-    scoreFormatted: `${score} / 100`,
-    rank: null,
-    totalRanked: null,
-    trend: trendBucket(trendDelta),
-    trendDelta,
-    trendFormatted: trendDelta != null ? fmtSigned(trendDelta, 1) : null,
-    source: "rsf_press_freedom",
-    asOf: latest.quarter,
-    ...liveScoreMetadata(),
-  };
-}
-
-// ---- country_metrics (HDI, CPI) -------------------------------------------
-
-interface MetricRowOpts {
-  jId: string;
-  metricId: "hdi" | "cpi";
-  label: string;
-  source: string;
-  /** Decimals for the value — HDI 3, CPI 0. */
-  digits: number;
-  /** When true, divisor is 1.0 (HDI). Otherwise ` / 100` is appended. */
-  fractional: boolean;
-  /** Decimals for the trend label. */
-  trendDigits: number;
-}
-
-async function buildMetricRow(opts: MetricRowOpts): Promise<ScoreRow | null> {
-  const history = await db
-    .select({
-      year: countryMetrics.year,
-      value: countryMetrics.value,
-      rank: countryMetrics.rank,
-      totalRanked: countryMetrics.totalRanked,
-    })
-    .from(countryMetrics)
-    .where(
-      and(
-        eq(countryMetrics.jurisdictionId, opts.jId),
-        eq(countryMetrics.metricId, opts.metricId),
-      ),
-    )
-    .orderBy(asc(countryMetrics.year));
-  if (history.length === 0) return null;
-  const latest = history[history.length - 1];
-
-  let trendDelta: number | null = null;
-  if (history.length > 1) {
-    // Find the row 4y ago, falling back to oldest.
-    const target = latest.year - 4;
-    const candidate =
-      [...history].reverse().find((r) => r.year <= target) ?? history[0];
-    if (candidate && candidate !== latest) {
-      trendDelta = Number(latest.value) - Number(candidate.value);
-    }
-  }
-
-  const value = Number(latest.value);
-  const formatted = opts.fractional
-    ? value.toFixed(opts.digits)
-    : `${value.toFixed(opts.digits)} / 100`;
-
-  return {
-    id: opts.metricId,
-    label: opts.label,
-    score: value,
-    scoreFormatted: formatted,
-    rank: latest.rank ?? null,
-    totalRanked: latest.totalRanked ?? null,
-    trend: trendBucket(trendDelta),
-    trendDelta,
-    trendFormatted:
-      trendDelta != null ? fmtSigned(trendDelta, opts.trendDigits) : null,
-    source: opts.source,
-    asOf: String(latest.year),
-    ...liveScoreMetadata(),
-  };
+    );
+  const [row] = selectCiReleaseDimensionRows(rows, CI_RELEASE.releaseId);
+  return row?.rawValue == null ? null : Number(row.rawValue);
 }
 
 // ---- Public entry point ----------------------------------------------------
@@ -444,46 +127,22 @@ export async function getScoresForJurisdiction(
   const jur = await resolveJurisdiction(jurisdictionIdOrSlug);
   if (!jur) return [];
 
-  // V-Dem and Freedom House are read from one closed Index release. Validate
-  // that release header and its public pointer before returning any auxiliary
-  // score rows. The retired Civica composite itself is deliberately absent
-  // from this general country-data query.
+  // Both rows come from one closed Index release. Validate that release
+  // header and its public pointer before returning any row. The retired
+  // Civica composite itself is deliberately absent from this query.
   await loadPublishedCiRelease(CURRENT_CI_RELEASE_ID);
 
-  // Run all data fetches in parallel — none depend on each other.
-  const [vdem, freedomHouse, hdi, cpi, rsf] = await Promise.all([
-    softFailOptionalScore(buildVDemRow(jur.id)),
-    softFailOptionalScore(buildFreedomHouseRow(jur.id)),
-    softFailOptionalScore(buildMetricRow({
-      jId: jur.id,
-      metricId: "hdi",
-      label: "Human Development Index",
-      source: "undp_hdi",
-      digits: 3,
-      fractional: true,
-      trendDigits: 3,
-    })),
-    softFailOptionalScore(buildMetricRow({
-      jId: jur.id,
-      metricId: "cpi",
-      label: "Corruption Perceptions Index",
-      source: "transparency_intl",
-      digits: 0,
-      fractional: false,
-      trendDigits: 1,
-    })),
-    softFailOptionalScore(buildRsfRow(jur.id)),
+  const [vdem, freedomHouse] = await Promise.all([
+    softFailOptionalScore(
+      fetchReleaseRawValue(jur.id, "democratic_quality", "vdem").then((raw) =>
+        raw == null ? null : shapeVdemScoreRow(raw),
+      ),
+    ),
+    softFailOptionalScore(
+      fetchReleaseRawValue(jur.id, "freedom_rights", "freedom_house").then(
+        (raw) => (raw == null ? null : shapeFreedomHouseScoreRow(raw)),
+      ),
+    ),
   ]);
-
-  // Source-native measures only. Dedicated, deprecated Index endpoints retain
-  // the composite during their announced transition window; this general
-  // country-data query does not.
-  const ordered: Array<ScoreRow | null> = [
-    vdem,
-    freedomHouse,
-    rsf,
-    hdi,
-    cpi,
-  ];
-  return ordered.filter((r): r is ScoreRow => r != null);
+  return [vdem, freedomHouse].filter((row): row is ScoreRow => row != null);
 }

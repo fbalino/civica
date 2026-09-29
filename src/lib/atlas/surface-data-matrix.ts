@@ -1003,6 +1003,7 @@ const civicaModules: Array<{
       "source",
       "alignment status",
       "native unit",
+      "Civica position with calculation marker",
     ],
     source:
       "Every calculation keeps the selected release, component source, reference year, alignment state, and value-state reason visible.",
@@ -1090,22 +1091,21 @@ const civicaModules: Array<{
       symbol: "getScoresForJurisdiction",
       file: "src/lib/db/queries-scores.ts",
     },
-    storage: ["ci_dimension_scores", "country_metrics", "sources"],
+    storage: ["ci_dimension_scores"],
     fields: [
-      "V-Dem",
-      "Freedom House",
-      "RSF",
-      "HDI",
-      "CPI",
-      "rank",
-      "trend",
-      "as_of",
+      "V-Dem Liberal Democracy Index",
+      "Freedom House status",
+      "value origin",
+      "publisher edition",
+      "observation year",
+      "retrieval time",
+      "Civica release",
     ],
     source:
-      "Each row carries its named source id and the section source strip.",
+      "Each row's SourceDot names the publisher edition, observation year, and manifest retrieval time; the Freedom House status carries its rule note (publisher-attribution/v1).",
     relation: "excluded_experimental",
     reason:
-      "Index/Conditions and restricted metric rows are excluded from DAT-017.",
+      "Frozen Index release rows and restricted publisher values are excluded from DAT-017.",
   },
 ];
 
@@ -1153,7 +1153,14 @@ countryRows.push(
             ? ["src/lib/ci/governance-evidence.test.ts"]
             : module.id === "longitudinal"
               ? ["src/lib/indicators/history-catalog.test.ts"]
-              : []),
+              : module.id === "rankings"
+                ? [
+                    "src/lib/ci/publisher-scores.test.ts",
+                    "src/components/scores/scores-rankings.test.ts",
+                  ]
+                : module.id === "conditions"
+                  ? ["src/components/conditions/conditions-attribution.test.ts"]
+                  : []),
       ],
       testGap: null,
       owner: "Country Civica Data",

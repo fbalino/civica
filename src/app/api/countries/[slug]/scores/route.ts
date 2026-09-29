@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getJurisdictionBySlug } from "@/lib/db/queries";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
+import { shapePublicCountryScores } from "@/lib/ci/publisher-scores";
+import { governanceEvidenceRights } from "@/lib/ci/governance-evidence";
 import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { parsePathContract } from "@/lib/api/request-contract";
@@ -9,13 +11,17 @@ import { isCiReleaseConsistencyError } from "@/lib/ci/release-selection";
 import { cacheControlFor } from "@/lib/platform/cache-consistency";
 
 /**
- * P1.1 — Scores & Rankings feed for the atlas Scores tab.
+ * GET /api/countries/:slug/scores — country-publisher-scores/v2 (CLM-020).
  *
- * The atlas tab lives behind a `"use client"` boundary so it can't render
- * the `<ScoresAndRankings>` server component directly; it fetches the
- * pre-computed row list here and renders `<ScoresAndRankingsView>` with
- * the result. Same query, same shape, same row order — no drift between
- * factbook and atlas.
+ * The same two publisher measures as the country Civica Data "Rankings"
+ * table: V-Dem's own Liberal Democracy Index figure and the Freedom House
+ * status produced by Freedom House's published rule, each with its publisher
+ * edition, observation year, manifest retrieval time, and Civica release. No
+ * Civica rescale, rank, or trend is returned.
+ *
+ * Values are rights-filtered with the same rule as the Governance Evidence
+ * API: a publisher's figure stays only when its verified terms permit public
+ * export; otherwise the row is withheld and links to the publisher's terms.
  */
 export async function GET(
   req: Request,
@@ -45,10 +51,7 @@ export async function GET(
       throw error;
     }
     return NextResponse.json(
-      {
-        country: jurisdiction.name,
-        rows,
-      },
+      shapePublicCountryScores(jurisdiction.name, rows, governanceEvidenceRights),
       {
         headers: {
           "Cache-Control": cacheControlFor("public-live"),

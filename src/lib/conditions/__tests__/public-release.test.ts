@@ -5,8 +5,8 @@ import {
   buildConditionsPublicRelease,
   conditionsPublicReleaseErrors,
   selectConditionsPublicRelease,
-  type ConditionsPublicCalculation,
   type ConditionsPublicReleaseHeader,
+  type ConditionsStoredCalculation,
 } from "../public-release";
 
 const releases: ConditionsPublicReleaseHeader[] = [
@@ -24,7 +24,7 @@ const releases: ConditionsPublicReleaseHeader[] = [
   },
 ];
 
-function calculation(input: Partial<ConditionsPublicCalculation> = {}): ConditionsPublicCalculation {
+function calculation(input: Partial<ConditionsStoredCalculation> = {}): ConditionsStoredCalculation {
   return {
     releaseId: "conditions-fixture-v2",
     jurisdictionId: "uruguay-id",
@@ -36,8 +36,9 @@ function calculation(input: Partial<ConditionsPublicCalculation> = {}): Conditio
     alignmentPolicy: "all-components-same-reference-year/v1",
     alignmentStatus: "aligned",
     referenceYear: 2024,
-    normalizedScore: 83.4,
+    normalizedScore: 83,
     rawValue: 0.83,
+    scoreTransformationId: "conditions-hdi-fixed-bound/v2",
     scoreSourceId: "undp_hdi",
     scoreSourceName: "UNDP",
     scoreIndicatorId: "hdi",
@@ -84,6 +85,7 @@ test("Conditions public coverage derives from calculations and keeps refused inp
         referenceYear: null,
         normalizedScore: null,
         rawValue: null,
+        scoreTransformationId: null,
         scoreSourceId: null,
         scoreSourceName: null,
         scoreIndicatorId: null,
@@ -126,6 +128,12 @@ test("Conditions public coverage derives from calculations and keeps refused inp
   });
 
   assert.equal(model.calculations[0].countryName, "Chile");
+  assert.equal(model.calculations[0].scoreOrigin, null);
+  assert.deepEqual(model.calculations[1].scoreOrigin, {
+    kind: "civica_calculation",
+    transformationId: "conditions-hdi-fixed-bound/v2",
+  });
+  assert.equal("scoreTransformationId" in model.calculations[1], false);
   assert.deepEqual(model.coverage, [
     {
       dimension: "human_development",
@@ -183,4 +191,25 @@ test("Conditions public release never exposes an economic-stability composite", 
     ],
   });
   assert.match(errors.join(" "), /economic stability must not publish a composite score/);
+});
+
+test("Conditions public release ties every scored position to its Civica transformation", () => {
+  const unlabelled = conditionsPublicReleaseErrors({
+    release: releases[1],
+    calculations: [calculation({ scoreTransformationId: null })],
+  });
+  assert.match(unlabelled.join(" "), /scored calculation has no transformation id/);
+
+  const stray = conditionsPublicReleaseErrors({
+    release: releases[1],
+    calculations: [
+      calculation({
+        alignmentStatus: "missing_component",
+        referenceYear: null,
+        normalizedScore: null,
+        rawValue: null,
+      }),
+    ],
+  });
+  assert.match(stray.join(" "), /unscored calculation carries a transformation id/);
 });

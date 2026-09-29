@@ -13,7 +13,11 @@ export interface ScoreFreshnessPresentation {
   variant: "sand" | "sage";
 }
 
-/** Plain-language presentation for the mixed release/current score table. */
+/**
+ * Plain-language presentation for a score row's Civica clock. The chip names
+ * Civica, so a reader never mistakes the release quarter for a publisher
+ * vintage (CLM-020).
+ */
 export function scoreFreshnessPresentation(
   row: ScoreFreshnessInput,
 ): ScoreFreshnessPresentation {
@@ -23,8 +27,8 @@ export function scoreFreshnessPresentation(
     }
     const quarter = row.release.quarter.replace("-", " ");
     return {
-      label: `Frozen release · ${quarter}`,
-      ariaLabel: `Frozen release: ${row.release.vintageLabel} (${row.release.releaseId})`,
+      label: `Civica release · ${quarter}`,
+      ariaLabel: `Frozen Civica release: ${row.release.vintageLabel} (${row.release.releaseId})`,
       variant: "sand",
     };
   }

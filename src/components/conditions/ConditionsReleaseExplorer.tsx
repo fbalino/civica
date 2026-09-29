@@ -10,6 +10,10 @@ import {
   type ConditionsPublicRelease,
 } from "@/lib/conditions/public-release";
 import { parseDataValueStatus } from "@/lib/data/value-state";
+import {
+  CIVICA_CALCULATION_COLUMN_LABEL,
+  describeDisplayedValueOrigin,
+} from "@/lib/provenance/publisher-attribution";
 
 const DIMENSION_LABEL: Record<string, string> = {
   human_development: "Human development",
@@ -66,6 +70,47 @@ function ComponentDetail({ component }: { component: ConditionsPublicComponent }
         <a href={component.licenseUrl}>{source}</a> · {component.indicatorId}
       </span>
     </li>
+  );
+}
+
+/**
+ * The registered explanation of every Civica calculation in the release, so
+ * the "Civica calculation / year" column always sits beside its formulas
+ * (publisher-attribution/v1, CLM-020).
+ */
+function CivicaCalculationFormulas({
+  calculations,
+}: {
+  calculations: readonly ConditionsPublicCalculation[];
+}) {
+  const transformationIds = [
+    ...new Set(
+      calculations.flatMap((calculation) =>
+        calculation.scoreOrigin ? [calculation.scoreOrigin.transformationId] : [],
+      ),
+    ),
+  ].sort();
+  if (transformationIds.length === 0) return null;
+  return (
+    <>
+      <p>
+        Civica calculates the 0 to 100 figures in the {CIVICA_CALCULATION_COLUMN_LABEL}{" "}
+        column from each publisher&apos;s own value, which stays listed with the
+        components:
+      </p>
+      <ul>
+        {transformationIds.map((transformationId) => (
+          <li key={transformationId}>
+            {
+              describeDisplayedValueOrigin({
+                kind: "civica_calculation",
+                transformationId,
+              })?.explanation
+            }
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 
@@ -194,13 +239,14 @@ export function ConditionsReleaseExplorer({
               Each row preserves the selected release, reference year, native
               source input, and the reason when a score is withheld.
             </p>
+            <CivicaCalculationFormulas calculations={release.calculations} />
             <DataTable>
               <thead>
                 <tr>
                   <th>Country</th>
                   <th>Condition</th>
-                  <th className="num">Published position / year</th>
-                  <th>Score source</th>
+                  <th className="num">{CIVICA_CALCULATION_COLUMN_LABEL}</th>
+                  <th>Publisher input</th>
                   <th>Source-native components</th>
                 </tr>
               </thead>

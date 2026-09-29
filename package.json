@@ -393,6 +393,8 @@
     "validate:terminology": "tsx scripts/validate-research-terminology.ts",
     "validate:policy-surface": "tsx scripts/validate-policy-surface.ts",
     "validate:claims-docs": "tsx scripts/validate-claims-docs.ts",
+    "validate:publisher-attribution": "tsx scripts/validate-publisher-attribution.ts",
+    "validate:publisher-attribution:live": "tsx scripts/validate-publisher-attribution-live.ts",
     "validate:governance-change": "node --import tsx --test src/lib/governance-change/explorer.test.ts && node --import tsx scripts/validate-governance-change.ts",
     "validate:internationalization": "node --import tsx --test src/lib/i18n/*.test.ts && node --import tsx scripts/validate-internationalization-readiness.ts",
     "verify:internationalization:browser": "tsx scripts/verify-internationalization-browser.ts",

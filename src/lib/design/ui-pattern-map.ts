@@ -291,6 +291,13 @@ export const UI_PATTERN_MAP: UiPatternFamily[] = [
         classes: ["editorial-tooltip"],
         note: "Canonical instant Tooltip / InfoTip instead of native title attributes.",
       },
+      {
+        pattern: "Displayed-value origin (Civica calculation / publisher rule)",
+        kind: "primitive",
+        primitives: ["src/components/provenance/ValueOriginNote.tsx"],
+        classes: ["value-origin-note"],
+        note: "Every non-publisher value beside a publisher's name renders ValueOriginNote (publisher-attribution/v1); never a hand-rolled label.",
+      },
     ],
   },
   {

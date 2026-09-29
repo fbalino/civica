@@ -346,9 +346,15 @@ const conditionsExampleResponse = zConditionsReleaseResponse.strict().parse(
         calculationKey: `conditions-calculation/v1/sha256:${"1".repeat(64)}`,
         alignmentPolicy: "all-components-same-reference-year/v1",
         alignmentStatus: "aligned",
-        referenceYear: 2024,
-        normalizedScore: 83.4,
+        // HDR 2025 reports UNDP's figures for 2023.
+        referenceYear: 2023,
+        // Civica position: 0.83 × 100 (conditions-hdi-fixed-bound/v2).
+        normalizedScore: 83,
         rawValue: 0.83,
+        scoreOrigin: {
+          kind: "civica_calculation",
+          transformationId: "conditions-hdi-fixed-bound/v2",
+        },
         scoreSourceId: "undp_hdi",
         scoreSourceName: "UNDP",
         scoreIndicatorId: "hdi",
@@ -359,7 +365,7 @@ const conditionsExampleResponse = zConditionsReleaseResponse.strict().parse(
             componentId: "hdi",
             nativeValue: 0.83,
             nativeUnit: "index_0_1",
-            referenceYear: 2024,
+            referenceYear: 2023,
             valueStatus: "observed",
             valueStatusReason: null,
             inclusionDecision: "included",
@@ -383,8 +389,13 @@ const conditionsExampleResponse = zConditionsReleaseResponse.strict().parse(
         alignmentPolicy: "all-components-same-reference-year/v1",
         alignmentStatus: "aligned",
         referenceYear: 2024,
-        normalizedScore: 75.6,
+        // Civica position: (5 − 1.4) ÷ 4 × 100 (conditions-gpi-fixed-bound/v2).
+        normalizedScore: 90,
         rawValue: 1.4,
+        scoreOrigin: {
+          kind: "civica_calculation",
+          transformationId: "conditions-gpi-fixed-bound/v2",
+        },
         scoreSourceId: "global_peace_index",
         scoreSourceName: "Institute for Economics & Peace",
         scoreIndicatorId: "gpi",
@@ -394,7 +405,7 @@ const conditionsExampleResponse = zConditionsReleaseResponse.strict().parse(
           {
             componentId: "global_peace_index",
             nativeValue: 1.4,
-            nativeUnit: "index",
+            nativeUnit: "index_1_5_inverted",
             referenceYear: 2024,
             valueStatus: "observed",
             valueStatusReason: null,
@@ -421,6 +432,7 @@ const conditionsExampleResponse = zConditionsReleaseResponse.strict().parse(
         referenceYear: 2024,
         normalizedScore: null,
         rawValue: null,
+        scoreOrigin: null,
         scoreSourceId: null,
         scoreSourceName: null,
         scoreIndicatorId: null,

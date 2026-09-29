@@ -154,7 +154,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/conditions/route.ts",
     versioned: true,
     summary:
-      "One selected immutable Civica Conditions release, with source-native component values, reference years, source lineage, alignment outcomes, and coverage derived from that release's calculation rows. Economic Stability has no composite score.",
+      "One selected immutable Civica Conditions release, with source-native component values, reference years, source lineage, alignment outcomes, and coverage derived from that release's calculation rows. A scored Human Development or Peace & Security position (normalizedScore, 0 to 100) is a Civica calculation from the publisher value, identified by scoreOrigin; the publisher's own figure is the component value. Economic Stability has no composite score.",
     params: [
       {
         name: "release",

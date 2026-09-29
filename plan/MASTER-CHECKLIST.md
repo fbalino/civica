@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 315
-- **Completed:** 269
-- **Remaining:** 46
-- **Progress:** 85.4%
-- **Priority mix:** P0 197 · P1 113 · P2 5
+- **Total tasks:** 317
+- **Completed:** 270
+- **Remaining:** 47
+- **Progress:** 85.2%
+- **Priority mix:** P0 199 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -33,6 +33,8 @@ Source: `plan/02-positioning-claims-and-documentation.md`
 - [x] **CLM-017** (P0) Add a claims-and-documentation CI gate. _Done when: one documented command validates registry coverage, numeric templates, internal routes/anchors, API examples, methodology fixtures, experimental labels, and prohibited claim language; the command fails on seeded stale-copy fixtures and runs in CI._
 - [x] **CLM-018** (P0) Replace blanket “all data is open/free to use” claims with exact mixed-rights language. _Done when: footer, about, licensing, terms, metadata, downloads, API docs, embeds, and citation surfaces distinguish free access from reuse rights; every reuse claim resolves to the source/release rights manifest; no global surface calls all data open._
 - [x] **CLM-019** (P0) Qualify universal per-value provenance claims to measured coverage or make them true. _Done when: every rendered empirical value class has accessible source/vintage/rights linkage or the public claim states the generated coverage percentage and named exceptions; home/Atlas/leaderboard/embed fixtures are included._
+- [x] **CLM-020** (P0) Make every number shown beside a publisher's name that publisher's own figure or a visibly marked Civica calculation. _Done when: the country Rankings table shows the Freedom House status with its Freedom in the World edition and no Civica number, shows no Civica V-Dem rank and no unverifiable legacy HDI/CPI row, and names each row's publisher edition, observation year, and manifest retrieval time; Civica Conditions positions carry the ValueOriginNote "Civica calculation" marker and formula, the comparison view shows publisher components only, and /api/v1/conditions marks positions with scoreOrigin; /api/countries/:slug/scores returns rights-filtered publisher rows with their origin; `npm run validate:publisher-attribution` runs inside `validate:claims-docs` and fails on the former "Free (100/100)" row, on an unregistered reader of a Civica-derived field, on an unclassified SourceDot renderer, and on an exception without an open follow-up; `npm run validate:publisher-attribution:live` reports zero unregistered differences; evidence in plan/evidence/CLM-020/._
+- [ ] **CLM-021** (P0) Correct the Civica Conditions Human Development observation year. _Done when: a corrected immutable Conditions release supersedes conditions-production-20260729-v1 under the correction policy; every Human Development value shown is UNDP's figure for the year displayed and names its Human Development Report edition; the country card, explorer, and /api/v1/conditions show the corrected year; the conditions.hdi-reference-year exception is removed from the publisher-attribution registry and `npm run validate:publisher-attribution:live` passes; a public correction record names the affected release and countries; evidence in plan/evidence/CLM-021/._
 
 ## Area 03 — Data, Provenance, Rights, and Reproducibility
 

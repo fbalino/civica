@@ -1080,3 +1080,12 @@ APR-D172 in `plan/DECISIONS.md`.
 - Event and chamber-contest identity remain separate; calendar projections
   collapse unnamed chamber estimates, while detailed named contests may remain
   distinct. Durable record: APR-D161.
+
+## 2026-09-29 — A number beside a publisher's name is the publisher's figure or visibly Civica's
+
+- Show the publisher's own figure, or mark a Civica rescale, rank, share,
+  sum, aggregate, or projection with `ValueOriginNote`; a status produced by
+  the publisher's own rule prints no number and carries its rule note.
+- Register surfaces, `SourceDot` renderers, and derived-field readers in
+  `src/lib/provenance/publisher-attribution-registry.ts`; run
+  `npm run validate:publisher-attribution`. Durable record: APR-D174.

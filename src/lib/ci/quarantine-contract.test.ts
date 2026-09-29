@@ -49,8 +49,8 @@ test("auxiliary score freshness is explicit and release identities fail closed",
       },
     }),
     {
-      label: "Frozen release · 2024 Q4",
-      ariaLabel: "Frozen release: Civica Index 2024 Q4 (Beta-R5) (ci-beta-r5-2024-Q4)",
+      label: "Civica release · 2024 Q4",
+      ariaLabel: "Frozen Civica release: Civica Index 2024 Q4 (Beta-R5) (ci-beta-r5-2024-Q4)",
       variant: "sand",
     },
   );

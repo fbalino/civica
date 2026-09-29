@@ -1,60 +1,47 @@
 /**
- * P1.1 — `<ScoresAndRankings>`
+ * `<ScoresAndRankings>` — the country Civica Data "Rankings" section
+ * (CLM-020, publisher-attribution/v1).
  *
- * Server-rendered table of governance / democracy / freedom scores for
- * a country. Used by:
- *   - factbook reader page (/factbook/[slug])  — section "Scores & Rankings"
- *   - atlas country page    (/atlas/[slug]/scores)
+ * A server-rendered `DataTable` of the two publisher measures held in the
+ * frozen Civica Index release, with three columns:
+ *   - Measure: the publisher measure plus a chip naming the Civica release
+ *     that holds the row;
+ *   - Value: the publisher's own figure (V-Dem 0.769) or the Freedom House
+ *     status with its edition ("Free · Freedom in the World 2024"). A value
+ *     produced by applying the publisher's published rule carries a
+ *     `ValueOriginNote`;
+ *   - Observation year: the year the publisher's figure describes, with a
+ *     `SourceDot` naming the manifest retrieval time and the publisher edition.
  *
- * Renders a compact, dense table; one row per available score. Returns
- * `null` when no rows are available so the parent can hide the section.
- *
- * Design contract:
- *   - All styling via role tokens (see DESIGN.md). No hex/rgb/oklch.
- *   - Provenance via `<SourceDot>` per row.
- *   - Trend arrows + tier-colored text via `--color-success` /
- *     `--color-danger` / `--color-text-40`.
- *   - Source-native publisher measures use one neutral row treatment.
- *
- * The atlas tab passes pre-fetched rows in (it lives behind a client
- * boundary) — pass `rows` directly. The factbook section calls without
- * `rows` and the component fetches.
+ * The table carries no Civica calculation: no rescale, rank, trend, or
+ * composite. Styling comes from the canonical `DataTable`, `Chip`,
+ * `ValueOriginNote`, and `SourceDot` primitives (no local CSS). The two
+ * "temporarily unavailable" banners keep a query outage distinct from an empty
+ * result.
  */
 
-import "@/components/scores/scores.css";
 import { Chip } from "@/components/editorial/Pill";
-import { SourceDot } from "@/components/SourceDot";
 import { Banner } from "@/components/editorial/Banner";
+import { DataTable } from "@/components/editorial/DataTable";
+import { SourceDot } from "@/components/SourceDot";
+import { ValueOriginNote } from "@/components/provenance/ValueOriginNote";
 import { scoreFreshnessPresentation } from "@/components/scores/freshness-label";
-import {
-  getScoresForJurisdiction,
-  type ScoreRow,
-} from "@/lib/db/queries-scores";
+import type { ScoreRow } from "@/lib/ci/publisher-scores";
+import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
 
 export interface ScoresAndRankingsProps {
   /** UUID jurisdictionId or slug. */
   jurisdictionId: string;
   /** Country name — used in empty-state copy. */
   countryName: string;
-  /** Visual variant. Atlas pane is narrow (~640px); factbook section is
-   *  wider (~960px). The component reads the same in both. */
-  variant?: "atlas" | "factbook";
-  /** Pre-fetched rows. When present the component skips the DB call.
-   *  This is how the atlas client tab integrates without crossing the
-   *  server/client boundary. */
+  /** Pre-fetched rows. When present the component skips the DB call; null
+   *  means the query was unavailable. */
   rows?: ScoreRow[] | null;
 }
-
-const ARROW_BY_TREND: Record<NonNullable<ScoreRow["trend"]>, string> = {
-  up: "↗", // ↗
-  down: "↘", // ↘
-  flat: "→", // →
-};
 
 export async function ScoresAndRankings({
   jurisdictionId,
   countryName,
-  variant = "factbook",
   rows: prefetched,
 }: ScoresAndRankingsProps) {
   if (prefetched === null) {
@@ -82,116 +69,72 @@ export async function ScoresAndRankings({
     }
   }
 
-  return (
-    <ScoresAndRankingsView
-      rows={rows}
-      countryName={countryName}
-      variant={variant}
-    />
-  );
+  return <ScoresAndRankingsView rows={rows} countryName={countryName} />;
 }
 
-/**
- * Pure presentational wrapper. Server- and client-renderable; the atlas
- * client tab uses this directly with pre-fetched rows so it avoids the
- * server/client boundary crossing problem.
- */
+/** Pure presentational table; server-renderable without a database. */
 export function ScoresAndRankingsView({
   rows,
   countryName,
-  variant = "factbook",
 }: {
-  rows: ScoreRow[];
+  rows: readonly ScoreRow[];
   countryName: string;
-  variant?: "atlas" | "factbook";
 }) {
   if (rows.length === 0) {
     return (
-      <div
-        className={`scores-rankings scores-rankings--${variant}`}
-        aria-label={`Scores and rankings for ${countryName}`}
-      >
-        <div className="scores-rankings__empty">No score data available</div>
-      </div>
+      <p className="editorial-empty">
+        Civica&apos;s frozen release holds no V-Dem or Freedom House row for{" "}
+        {countryName}. This is a coverage state, not a judgment about the
+        country.
+      </p>
     );
   }
 
   return (
-    <div
-      className={`scores-rankings scores-rankings--${variant}`}
-      aria-label={`Scores and rankings for ${countryName}`}
+    <DataTable
+      className="editorial-data-table--compact"
+      aria-label={`Publisher measures for ${countryName}`}
     >
-      <div
-        className="scores-rankings__head"
-        role="row"
-        aria-label="Score columns"
-      >
-        <span>Score</span>
-        <span>Value</span>
-        <span>Global rank</span>
-        <span>Trend</span>
-        <span>As of</span>
-      </div>
-
-      {rows.map((row) => {
-        const freshness = scoreFreshnessPresentation(row);
-        const arrow = row.trend ? ARROW_BY_TREND[row.trend] : null;
-        const trendClass = row.trend
-          ? `scores-rankings__trend scores-rankings__trend--${row.trend}`
-          : "scores-rankings__trend";
-        const rankText =
-          row.rank != null && row.totalRanked != null
-            ? `${row.rank} / ${row.totalRanked}`
-            : row.rank != null
-              ? `${row.rank}`
-              : "—";
-
-        return (
-          <div
-            key={row.id}
-            className="scores-rankings__row"
-            role="row"
-          >
-            <span className="scores-rankings__label">
-              <span>{row.label}</span>
-              <Chip
-                variant={freshness.variant}
-                size="sm"
-                aria-label={freshness.ariaLabel}
-              >
-                {freshness.label}
-              </Chip>
-            </span>
-
-            <span className="scores-rankings__value">
-              <span>{row.scoreFormatted}</span>
-              {row.asOf ? (
-                <span className="scores-rankings__as-of-inline">
-                  as of {row.asOf}
-                </span>
-              ) : null}
-            </span>
-
-            <span className="scores-rankings__rank">{rankText}</span>
-
-            <span className={trendClass}>
-              {arrow ? <span aria-hidden>{arrow}</span> : null}
-              {row.trendFormatted ? (
-                <span>{row.trendFormatted}</span>
-              ) : row.trend === "flat" ? (
-                <span aria-hidden>—</span>
-              ) : null}
-            </span>
-
-            <span className="scores-rankings__as-of">
-              <span className="scores-rankings__as-of-date">
-                {row.asOf ?? "—"}
-              </span>
-              <SourceDot source={row.source} retrievedAt={row.asOf} />
-            </span>
-          </div>
-        );
-      })}
-    </div>
+      <thead>
+        <tr>
+          <th scope="col">Measure</th>
+          <th scope="col">Value</th>
+          <th scope="col" className="num">
+            Observation year
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => {
+          const freshness = scoreFreshnessPresentation(row);
+          return (
+            <tr key={row.id}>
+              <th scope="row">
+                {row.label}{" "}
+                <Chip
+                  variant={freshness.variant}
+                  size="sm"
+                  aria-label={freshness.ariaLabel}
+                >
+                  {freshness.label}
+                </Chip>
+              </th>
+              <td>
+                {row.scoreFormatted}
+                <ValueOriginNote origin={row.valueOrigin} />
+              </td>
+              <td className="num">
+                {row.observationPeriod}{" "}
+                <SourceDot
+                  source={row.source}
+                  retrievedAt={row.retrievedAt}
+                  upstreamVintage={`${row.publisherEdition}, ${row.observationPeriodLabel}`}
+                />
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </DataTable>
   );
 }

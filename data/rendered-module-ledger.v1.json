@@ -23637,6 +23637,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/country/[slug]/civica-data/page.tsx:src/components/provenance/ValueOriginNote.tsx",
+      "route": "/country/[slug]/civica-data",
+      "routeSource": "src/app/(reader)/country/[slug]/civica-data/page.tsx",
+      "moduleSource": "src/components/provenance/ValueOriginNote.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/country/[slug]/civica-data/page.tsx:src/components/research/ResearchVisualizationDisclosure.tsx",
       "route": "/country/[slug]/civica-data",
       "routeSource": "src/app/(reader)/country/[slug]/civica-data/page.tsx",
@@ -44343,6 +44372,35 @@
       }
     },
     {
+      "id": "src/app/compare/page.tsx:src/components/provenance/ValueOriginNote.tsx",
+      "route": "/compare",
+      "routeSource": "src/app/compare/page.tsx",
+      "moduleSource": "src/components/provenance/ValueOriginNote.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/compare/page.tsx:src/components/research/ResearchVisualizationDisclosure.tsx",
       "route": "/compare",
       "routeSource": "src/app/compare/page.tsx",
@@ -48001,6 +48059,35 @@
       "route": "/design-system",
       "routeSource": "src/app/design-system/page.tsx",
       "moduleSource": "src/components/parties/IdeologyCompass.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/design-system/page.tsx:src/components/provenance/ValueOriginNote.tsx",
+      "route": "/design-system",
+      "routeSource": "src/app/design-system/page.tsx",
+      "moduleSource": "src/components/provenance/ValueOriginNote.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {

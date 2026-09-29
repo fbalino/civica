@@ -226,7 +226,7 @@ export interface ConditionsReleaseValidationReport {
   errors: string[];
 }
 
-const EXPECTED_PARAMETER_CONTRACT: Record<
+export const EXPECTED_PARAMETER_CONTRACT: Record<
   ConditionsComponentId,
   {
     direction: ConditionsDirection;
