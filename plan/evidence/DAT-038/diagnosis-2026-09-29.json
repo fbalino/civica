@@ -83,6 +83,6 @@
   },
   "decision": "Neither regenerate the 2026-07-12 audit nor treat a writer as faulty. Regeneration would only bind the new timestamps until the next Pulse ingest that carries an IPU election breaks it again. Bind source identity and license, not sync time (APR-D175).",
   "notInScope": {
-    "pulseIngestRunLedger": "All 98 failed/partial pulse.v2.ingest runs since 2026-08-15 are recorded with rows_written 0 and no freshness sources, although partial runs committed raw events and advanced source freshness (for example 2 IPU and 2 HRW rows on 2026-09-25). This is a separate run-ledger reporting gap, not an election-audit defect."
+    "pulseIngestRunLedger": "All 98 failed pulse.v2.ingest runs since 2026-08-15 (93 partial, 5 handler exceptions) are recorded with rows_written 0 and no freshness sources, although partial runs committed raw events and advanced source freshness (for example 2 IPU and 2 HRW rows on 2026-09-25). This is a separate run-ledger reporting gap, not an election-audit defect, tracked as PLT-032."
   }
 }

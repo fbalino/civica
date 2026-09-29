@@ -73,7 +73,7 @@ validators, typecheck, lint, and the full unit suite pass.
 
 ## Separate finding
 
-The production run ledger records all 98 failed/partial `pulse.v2.ingest`
-runs since 2026-08-15 with zero rows written and no freshness sources, even
-though partial runs committed raw events and advanced freshness. That is a
-run-ledger reporting gap, tracked outside this task.
+The production run ledger records all 98 failed `pulse.v2.ingest` runs since
+2026-08-15 (93 partial, 5 handler exceptions) with zero rows written and no
+freshness sources, even though partial runs committed raw events and advanced
+freshness. That is a run-ledger reporting gap, tracked as PLT-032.
