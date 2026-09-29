@@ -11,7 +11,8 @@
  *
  * The importer (`cia-cabinets-sync.ts`) and the one-time repair
  * (`scripts/repair-cabinet-terms.ts`) share this module so they always choose
- * the same surviving row and apply the same ownership rules.
+ * the same surviving row and apply the same ownership rules (the repair also
+ * counts offices the importer released; see `isCiaOwnedOffice`).
  */
 import { createHash } from "node:crypto";
 
@@ -93,18 +94,53 @@ export const VACANT_PERSON_NAME_RE = /^\(?vacant\)?$/i;
 
 /**
  * A CIA-owned office is a CIA-typed office in the executive body that the
- * roster placed in a list position or that carries CIA provenance on one of
- * its terms. Head offices (owned by the Wikidata spine) and the legacy
- * hand-entered offices (no position, no provenance) are never CIA-owned.
+ * roster placed in a list position, that carries CIA provenance on one of its
+ * terms, or whose list position the importer released. Head offices (owned by
+ * the Wikidata spine) and the legacy hand-entered offices (never listed, no
+ * provenance) are never CIA-owned.
+ *
+ * `releasedFromRoster` comes from the append-only evidence ledger (an office
+ * update whose before-state had a list position and whose after-state has
+ * none), so a release cannot erase ownership. The one-time repair and its
+ * postflight read it; the importer does not need it, because its release
+ * retires every holder in the same transaction and it only writes to a
+ * released office again when the page lists that title again.
  */
 export function isCiaOwnedOffice(office: {
   officeType: string;
   displayOrder: number | null;
   hasCiaProvenance: boolean;
+  releasedFromRoster?: boolean;
 }): boolean {
   return (
     isCiaRosterOfficeType(office.officeType) &&
-    (office.displayOrder !== null || office.hasCiaProvenance)
+    (office.displayOrder !== null ||
+      office.hasCiaProvenance ||
+      office.releasedFromRoster === true)
+  );
+}
+
+/**
+ * Whether a roster term's stored dates are CIA page dates ("Last Updated"
+ * stamps the former importer wrote as start dates) rather than legacy
+ * hand-entered dates. They are when the term carries CIA provenance, or when
+ * every stored date is one of the country's page stamps: a date that CIA-sourced
+ * roster terms of that country carry, or carried before a repair removed it.
+ * A hand-entered legacy row on an office the importer later adopted by title
+ * is neither, so its own date is kept.
+ */
+export function isCiaPageDatedTerm(
+  term: {
+    startDate: string | null;
+    endDate: string | null;
+    carriesCiaProvenance: boolean;
+  },
+  countryPageStamps: ReadonlySet<string>,
+): boolean {
+  if (term.startDate === null && term.endDate === null) return false;
+  if (term.carriesCiaProvenance) return true;
+  return [term.startDate, term.endDate].every(
+    (date) => date === null || countryPageStamps.has(date),
   );
 }
 

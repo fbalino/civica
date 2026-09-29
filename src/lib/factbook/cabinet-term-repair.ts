@@ -11,7 +11,14 @@
  *   R3  CIA or Wikidata statements attached to the wrong term, re-homed to the
  *       term they describe or deleted when that term already has its own;
  *   R4  unsourced legacy cabinet rows the imported roster supersedes;
- *   R5  page "Last Updated" dates stored as term start dates.
+ *   R5  page "Last Updated" dates stored as term start dates (never a legacy
+ *       hand-entered date; see `isCiaPageDatedTerm`).
+ *
+ * R1, R2, and R5 act on CIA-owned offices: listed, carrying CIA provenance,
+ * or released by the importer according to the append-only evidence ledger,
+ * so the importer's release of a statement-less office cannot take it out of
+ * scope. The postflight's date and placeholder checks (P1, P5) look at every
+ * roster-typed term, so they cannot share a scope blind spot with the plan.
  *
  * Planning is pure and deterministic. Apply runs one transaction whose first
  * statements lock the affected tables and assert that every planned row is
@@ -26,18 +33,20 @@ import { sql, type SQL } from "drizzle-orm";
 import {
   CABINET_MEMBER_PREDICATE,
   CABINET_ROSTER_PREDICATE,
+  CIA_ROSTER_OFFICE_TYPES,
   CIA_ROSTER_SOURCE_ID,
   VACANT_PERSON_NAME_RE,
   ciaRosterPageUrlForJurisdiction,
   compareCabinetTermSurvivor,
   isCiaOwnedOffice,
+  isCiaPageDatedTerm,
   isCiaRosterOfficeType,
   isHeadOfficeType,
   timestampEpoch,
 } from "@/lib/factbook/cabinet-roster";
 
-export const CABINET_REPAIR_PLAN_SCHEMA = "civica-cabinet-term-repair-plan/v1";
-export const CABINET_REPAIR_METHOD = "cabinet-term-integrity-repair/v1";
+export const CABINET_REPAIR_PLAN_SCHEMA = "civica-cabinet-term-repair-plan/v2";
+export const CABINET_REPAIR_METHOD = "cabinet-term-integrity-repair/v2";
 
 type Row = Record<string, unknown>;
 
@@ -192,6 +201,8 @@ export interface RepairOffice {
   name: string;
   officeType: string;
   displayOrder: number | null;
+  /** The evidence ledger records the importer releasing its list position. */
+  releasedFromRoster: boolean;
   digest: string;
 }
 
@@ -206,7 +217,18 @@ export interface CabinetRepairState {
   persons: Array<{ id: string; digest: string }>;
   bodies: Array<{ id: string; digest: string }>;
   ciaSourceLastSyncAt: string | null;
+  /**
+   * Dates the evidence ledger shows were removed from roster-typed terms, by
+   * country. Only this repair removes stored dates, and only CIA page dates,
+   * so these keep a country's page stamps known after the repair has cleared
+   * them from the terms themselves.
+   */
+  removedRosterDates: Array<{ jurisdictionId: string; date: string }>;
 }
+
+const ROSTER_TYPES_SQL = sql`SELECT jsonb_array_elements_text(${JSON.stringify(
+  CIA_ROSTER_OFFICE_TYPES,
+)}::jsonb)`;
 
 const EXECUTIVE_TERMS = sql`
   SELECT t.id FROM terms t
@@ -259,6 +281,26 @@ function stateQueries(): SQL[] {
         FROM government_bodies b WHERE b.branch = 'executive'`,
     sql`SELECT last_sync_at::text AS last_sync_at FROM sources
         WHERE id = ${CIA_ROSTER_SOURCE_ID}`,
+    // The importer's release of a list position, as the DAT-016 trigger
+    // recorded it. The ledger is append-only, so this outlives the release.
+    sql`SELECT DISTINCT h.entity_id AS id
+        FROM research_evidence_history h
+        WHERE h.entity_table = 'offices' AND h.operation = 'update'
+          AND h.before->>'display_order' IS NOT NULL
+          AND h.after->>'display_order' IS NULL
+          AND h.entity_id IN (
+            SELECT o.id::text FROM offices o
+            JOIN government_bodies b ON b.id = o.body_id AND b.branch = 'executive')`,
+    sql`SELECT DISTINCT b.jurisdiction_id::text AS jurisdiction_id, d.removed AS date
+        FROM research_evidence_history h
+        JOIN offices o ON o.id::text = h.before->>'office_id'
+        JOIN government_bodies b ON b.id = o.body_id AND b.branch = 'executive'
+        CROSS JOIN LATERAL (VALUES
+          (h.before->>'start_date', h.after->>'start_date'),
+          (h.before->>'end_date', h.after->>'end_date')) AS d(removed, kept)
+        WHERE h.entity_table = 'terms' AND h.operation = 'update'
+          AND o.office_type IN (${ROSTER_TYPES_SQL})
+          AND d.removed IS NOT NULL AND d.kept IS NULL`,
   ];
 }
 
@@ -297,7 +339,10 @@ export async function loadCabinetRepairState(
     personRows,
     bodyRows,
     sourceRows,
+    releasedRows,
+    removedDateRows,
   ] = await executor.read(stateQueries());
+  const released = new Set(releasedRows.map((row) => String(row.id)));
   return {
     jurisdictionSlugs: new Map(
       jurisdictionRows.map((row) => [String(row.id), String(row.slug)]),
@@ -312,6 +357,7 @@ export async function loadCabinetRepairState(
         row.display_order === null || row.display_order === undefined
           ? null
           : Number(row.display_order),
+      releasedFromRoster: released.has(String(row.id)),
       digest: String(row.digest),
     })),
     terms: termRows.map((row) => ({
@@ -336,6 +382,111 @@ export async function loadCabinetRepairState(
     persons: personRows.map((row) => ({ id: String(row.id), digest: String(row.digest) })),
     bodies: bodyRows.map((row) => ({ id: String(row.id), digest: String(row.digest) })),
     ciaSourceLastSyncAt: text(sourceRows[0]?.last_sync_at),
+    removedRosterDates: removedDateRows.map((row) => ({
+      jurisdictionId: String(row.jurisdiction_id),
+      date: String(row.date),
+    })),
+  };
+}
+
+// ─── Scope (shared by the plan and the postflight) ──────────────────────────
+
+interface CabinetRepairScope {
+  officeById: Map<string, RepairOffice>;
+  termById: Map<string, RepairTerm>;
+  statementsByTerm: Map<string, RepairStatement[]>;
+  /** The term's own CIA `cabinet_member` statement, if any. */
+  ciaStatementOf(termId: string): RepairStatement | null;
+  ownedOffices: Set<string>;
+  /** Owned only through the importer's recorded release. */
+  ownedByReleaseOnly: Set<string>;
+  /** Terms on roster-typed offices of executive bodies, whoever owns them. */
+  rosterTerms: RepairTerm[];
+  /** Stored dates are CIA page dates (see `isCiaPageDatedTerm`). */
+  isCiaPageDated(term: RepairTerm): boolean;
+}
+
+function isPlaceholderTerm(term: RepairTerm): boolean {
+  return term.personQid === null && VACANT_PERSON_NAME_RE.test(term.personName.trim());
+}
+
+/**
+ * One definition of ownership and of a CIA page date for the plan and the
+ * postflight, so neither can drift from the other.
+ */
+function cabinetRepairScope(state: CabinetRepairState): CabinetRepairScope {
+  const officeById = new Map(state.offices.map((office) => [office.id, office]));
+  const termById = new Map(state.terms.map((term) => [term.id, term]));
+  const statementsByTerm = new Map<string, RepairStatement[]>();
+  for (const statement of state.statements) {
+    const list = statementsByTerm.get(statement.subjectId) ?? [];
+    list.push(statement);
+    statementsByTerm.set(statement.subjectId, list);
+  }
+  const ciaStatementOf = (termId: string) =>
+    (statementsByTerm.get(termId) ?? []).find(
+      (statement) =>
+        statement.sourceId === CIA_ROSTER_SOURCE_ID &&
+        statement.predicate === CABINET_MEMBER_PREDICATE,
+    ) ?? null;
+  const provenanceOffices = new Set(
+    state.terms
+      .filter((term) => ciaStatementOf(term.id) !== null)
+      .map((term) => term.officeId),
+  );
+  const ownedOffices = new Set<string>();
+  const ownedByReleaseOnly = new Set<string>();
+  for (const office of state.offices) {
+    const owned = isCiaOwnedOffice({
+      officeType: office.officeType,
+      displayOrder: office.displayOrder,
+      hasCiaProvenance: provenanceOffices.has(office.id),
+      releasedFromRoster: office.releasedFromRoster,
+    });
+    if (!owned) continue;
+    ownedOffices.add(office.id);
+    if (office.displayOrder === null && !provenanceOffices.has(office.id)) {
+      ownedByReleaseOnly.add(office.id);
+    }
+  }
+  const rosterTerms = state.terms.filter((term) =>
+    isCiaRosterOfficeType(officeById.get(term.officeId)?.officeType),
+  );
+  // A country's CIA page stamps: dates its CIA-sourced roster terms carry,
+  // plus dates the ledger shows were removed from its roster terms.
+  const pageStamps = new Map<string, Set<string>>();
+  const addStamp = (jurisdictionId: string, date: string | null) => {
+    if (date === null) return;
+    const stamps = pageStamps.get(jurisdictionId) ?? new Set<string>();
+    stamps.add(date);
+    pageStamps.set(jurisdictionId, stamps);
+  };
+  for (const term of rosterTerms) {
+    if (ciaStatementOf(term.id) === null) continue;
+    addStamp(term.jurisdictionId, term.startDate);
+    addStamp(term.jurisdictionId, term.endDate);
+  }
+  for (const removed of state.removedRosterDates) {
+    addStamp(removed.jurisdictionId, removed.date);
+  }
+  const noStamps = new Set<string>();
+  return {
+    officeById,
+    termById,
+    statementsByTerm,
+    ciaStatementOf,
+    ownedOffices,
+    ownedByReleaseOnly,
+    rosterTerms,
+    isCiaPageDated: (term) =>
+      isCiaPageDatedTerm(
+        {
+          startDate: term.startDate,
+          endDate: term.endDate,
+          carriesCiaProvenance: ciaStatementOf(term.id) !== null,
+        },
+        pageStamps.get(term.jurisdictionId) ?? noStamps,
+      ),
   };
 }
 
@@ -375,6 +526,9 @@ export interface CabinetRepairPlan {
   /** Evidence, not targets: the undated/unlisted state the plan leaves. */
   observations: {
     ciaOwnedOffices: number;
+    /** Unlisted offices without CIA provenance owned through the ledger's
+     * record of the importer releasing them. */
+    ciaOwnedOfficesReleasedWithoutProvenance: number;
     ciaOwnedTerms: number;
     survivingCiaOwnedTerms: number;
     currentCiaOwnedTermsWithoutProvenance: number;
@@ -383,6 +537,9 @@ export interface CabinetRepairPlan {
     jurisdictionsWithRosterStatement: number;
     jurisdictionsWithoutRosterStatement: string[];
     legacyCurrentTermsKept: number;
+    /** Surviving owned terms whose stored date is a legacy hand-entered date,
+     * not a CIA page date, so R5 leaves it (a legacy office adopted by title). */
+    legacyDatedTermsKept: number;
   };
   targets: {
     termDeletes: PlannedRowChange[];
@@ -414,37 +571,8 @@ function sortById<T extends { id: string }>(rows: T[]): T[] {
  * cannot be repaired by rule (the repair then needs a human decision).
  */
 export function planCabinetTermRepair(state: CabinetRepairState): CabinetRepairPlan {
-  const officeById = new Map(state.offices.map((office) => [office.id, office]));
-  const termById = new Map(state.terms.map((term) => [term.id, term]));
-  const statementsByTerm = new Map<string, RepairStatement[]>();
-  for (const statement of state.statements) {
-    const list = statementsByTerm.get(statement.subjectId) ?? [];
-    list.push(statement);
-    statementsByTerm.set(statement.subjectId, list);
-  }
-  const ciaStatementOf = (termId: string) =>
-    (statementsByTerm.get(termId) ?? []).find(
-      (statement) =>
-        statement.sourceId === CIA_ROSTER_SOURCE_ID &&
-        statement.predicate === CABINET_MEMBER_PREDICATE,
-    ) ?? null;
-
-  const provenanceOffices = new Set(
-    state.terms
-      .filter((term) => ciaStatementOf(term.id) !== null)
-      .map((term) => term.officeId),
-  );
-  const ownedOffices = new Set(
-    state.offices
-      .filter((office) =>
-        isCiaOwnedOffice({
-          officeType: office.officeType,
-          displayOrder: office.displayOrder,
-          hasCiaProvenance: provenanceOffices.has(office.id),
-        }),
-      )
-      .map((office) => office.id),
-  );
+  const scope = cabinetRepairScope(state);
+  const { officeById, termById, statementsByTerm, ciaStatementOf, ownedOffices } = scope;
   const pageForJurisdiction = (jurisdictionId: string) => {
     const slug = state.jurisdictionSlugs.get(jurisdictionId);
     return slug ? ciaRosterPageUrlForJurisdiction(slug) : null;
@@ -476,9 +604,7 @@ export function planCabinetTermRepair(state: CabinetRepairState): CabinetRepairP
 
   // R1 — placeholder "Vacant" pseudo-person terms.
   let r1Statements = 0;
-  const r1Terms = ownedTerms.filter(
-    (term) => term.personQid === null && VACANT_PERSON_NAME_RE.test(term.personName.trim()),
-  );
+  const r1Terms = ownedTerms.filter(isPlaceholderTerm);
   for (const term of r1Terms) {
     r1Statements += (statementsByTerm.get(term.id) ?? []).length;
     deleteStatementsOf(term.id, false);
@@ -732,19 +858,28 @@ export function planCabinetTermRepair(state: CabinetRepairState): CabinetRepairP
     legacyRetired++;
   }
 
-  // R5 (+ R2 current-flag transfer) — surviving CIA-owned terms end undated.
+  // R5 (+ R2 current-flag transfer) — surviving CIA-owned terms lose their
+  // CIA page dates. A legacy hand-entered date on an office the importer
+  // adopted by title is not a page date and stays.
   let datesCleared = 0;
+  let legacyDatedKept = 0;
   for (const survivor of survivors.values()) {
     const isCurrent = survivorCurrent.get(survivor.id) ?? survivor.isCurrent === true;
-    const clearDates = survivor.startDate !== null || survivor.endDate !== null;
+    const hasDates = survivor.startDate !== null || survivor.endDate !== null;
+    const clearDates = hasDates && scope.isCiaPageDated(survivor);
+    if (hasDates && !clearDates) legacyDatedKept++;
     if (!clearDates && isCurrent === (survivor.isCurrent === true)) continue;
     if (clearDates) datesCleared++;
     termUpdates.set(survivor.id, {
       id: survivor.id,
       before: survivor.digest,
-      after: termDigest({ ...survivor, isCurrent, startDate: null, endDate: null }),
+      after: termDigest({
+        ...survivor,
+        isCurrent,
+        ...(clearDates ? { startDate: null, endDate: null } : {}),
+      }),
       isCurrent,
-      clearDates: true,
+      clearDates,
     });
   }
 
@@ -808,6 +943,7 @@ export function planCabinetTermRepair(state: CabinetRepairState): CabinetRepairP
     categories,
     observations: {
       ciaOwnedOffices: ownedOffices.size,
+      ciaOwnedOfficesReleasedWithoutProvenance: scope.ownedByReleaseOnly.size,
       ciaOwnedTerms: ownedTerms.length,
       survivingCiaOwnedTerms: survivingOwned.length,
       currentCiaOwnedTermsWithoutProvenance: survivingOwned.filter(
@@ -822,6 +958,7 @@ export function planCabinetTermRepair(state: CabinetRepairState): CabinetRepairP
       ).length,
       jurisdictionsWithoutRosterStatement: withoutRoster,
       legacyCurrentTermsKept: legacyKept,
+      legacyDatedTermsKept: legacyDatedKept,
     },
     targets,
     nonTarget,
@@ -1052,7 +1189,9 @@ function checkCount(observed: number) {
 
 /**
  * P1–P8 invariants plus, when a plan and apply report are supplied, the
- * freshness (P10) and history-accounting (P11) checks. Reads only.
+ * freshness (P10) and history-accounting (P11) checks. Reads only. P2, P3,
+ * P4, and P7 use the plan's ownership rule; P1 and P5 check every roster-typed
+ * term, so a gap in the plan's scope fails here instead of passing silently.
  */
 export async function verifyCabinetTermRepair(
   executor: CabinetRepairExecutor,
@@ -1070,34 +1209,9 @@ export async function verifyCabinetTermRepair(
       `postflight re-plan failed: ${(error as Error).message}`,
     );
   }
-  const officeById = new Map(state.offices.map((office) => [office.id, office]));
-  const statementsByTerm = new Map<string, RepairStatement[]>();
-  for (const statement of state.statements) {
-    const list = statementsByTerm.get(statement.subjectId) ?? [];
-    list.push(statement);
-    statementsByTerm.set(statement.subjectId, list);
-  }
-  const provenanceOffices = new Set(
-    state.terms
-      .filter((term) =>
-        (statementsByTerm.get(term.id) ?? []).some(
-          (statement) => statement.sourceId === CIA_ROSTER_SOURCE_ID,
-        ),
-      )
-      .map((term) => term.officeId),
-  );
-  const owned = (officeId: string) => {
-    const office = officeById.get(officeId);
-    return (
-      !!office &&
-      isCiaOwnedOffice({
-        officeType: office.officeType,
-        displayOrder: office.displayOrder,
-        hasCiaProvenance: provenanceOffices.has(office.id),
-      })
-    );
-  };
-  const ownedTerms = state.terms.filter((term) => owned(term.officeId));
+  const scope = cabinetRepairScope(state);
+  const { officeById, termById, statementsByTerm, ownedOffices } = scope;
+  const ownedTerms = state.terms.filter((term) => ownedOffices.has(term.officeId));
   const pairs = new Map<string, number>();
   for (const term of ownedTerms) {
     const key = `${term.officeId}|${term.personId}`;
@@ -1119,7 +1233,7 @@ export async function verifyCabinetTermRepair(
     );
   });
   const ciaOnHead = state.statements.filter((statement) => {
-    const term = state.terms.find((candidate) => candidate.id === statement.subjectId);
+    const term = termById.get(statement.subjectId);
     return (
       statement.sourceId === CIA_ROSTER_SOURCE_ID &&
       !!term &&
@@ -1127,12 +1241,15 @@ export async function verifyCabinetTermRepair(
     );
   });
   const wikidataOnOwned = state.statements.filter((statement) => {
-    const term = state.terms.find((candidate) => candidate.id === statement.subjectId);
-    return statement.sourceId === "wikidata" && !!term && owned(term.officeId);
+    const term = termById.get(statement.subjectId);
+    return statement.sourceId === "wikidata" && !!term && ownedOffices.has(term.officeId);
   });
-  const placeholders = ownedTerms.filter(
-    (term) => term.personQid === null && VACANT_PERSON_NAME_RE.test(term.personName.trim()),
+  // P1 and P5 look at every roster-typed term, not only the repair's scope.
+  const datedRosterTerms = scope.rosterTerms.filter(
+    (term) => term.startDate !== null || term.endDate !== null,
   );
+  const pageDated = datedRosterTerms.filter((term) => scope.isCiaPageDated(term));
+  const placeholders = scope.rosterTerms.filter(isPlaceholderTerm);
   const rosterBodies = new Set(state.rosterStatements.map((row) => row.subjectId));
   const bodiesWithCurrent = new Set(
     current.map((term) => officeById.get(term.officeId)?.bodyId).filter(Boolean) as string[],
@@ -1145,16 +1262,18 @@ export async function verifyCabinetTermRepair(
   );
   const positions = new Map<string, number>();
   for (const office of state.offices) {
-    if (!owned(office.id) || office.displayOrder === null) continue;
+    if (!ownedOffices.has(office.id) || office.displayOrder === null) continue;
     const key = `${office.bodyId}|${office.displayOrder}`;
     positions.set(key, (positions.get(key) ?? 0) + 1);
   }
   const replanWrites = Object.values(replan.categories).reduce((sum, value) => sum + value, 0);
 
   const checks: CabinetRepairVerification["checks"] = {
-    P1_ciaOwnedTermsWithDates: checkCount(
-      ownedTerms.filter((term) => term.startDate !== null || term.endDate !== null).length,
-    ),
+    P1_rosterTermsWithCiaPageDates: checkCount(pageDated.length),
+    P1_legacyDatedRosterTerms_disclosed: {
+      pass: true,
+      observed: datedRosterTerms.length - pageDated.length,
+    },
     P2_duplicatePairs: checkCount([...pairs.values()].filter((n) => n > 1).length),
     P3_currentTermsWithoutExactProvenance: checkCount(badProvenance.length),
     P3_retiredTermsWithoutProvenance_disclosed: {

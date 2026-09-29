@@ -16,6 +16,7 @@ import {
   verifyCabinetTermRepair,
   type CabinetRepairExecutor,
 } from "../cabinet-term-repair";
+import { syncCiaCabinets } from "../cia-cabinets-sync";
 import { createCabinetFixture, type CabinetFixture } from "./cabinet-fixture-database";
 
 const PAGE_BASE = "https://www.cia.gov/resources/world-leaders/foreign-governments";
@@ -235,6 +236,8 @@ test("repair plan selects every defect class deterministically and carries no na
     });
     assert.deepEqual(plan.observations.jurisdictionsWithoutRosterStatement, []);
     assert.equal(plan.observations.legacyCurrentTermsKept, 1);
+    assert.equal(plan.observations.legacyDatedTermsKept, 0);
+    assert.equal(plan.observations.ciaOwnedOfficesReleasedWithoutProvenance, 0);
     assert.equal(plan.observations.currentCiaOwnedTermsWithoutProvenance, 1);
     assert.deepEqual(
       plan.targets.statementRehomes
@@ -318,7 +321,7 @@ test("repair apply fixes every class atomically and leaves heads, US legacy rows
       transactionStartedAt: applied.transactionStartedAt,
     });
     for (const check of [
-      "P1_ciaOwnedTermsWithDates",
+      "P1_rosterTermsWithCiaPageDates",
       "P2_duplicatePairs",
       "P4_ciaStatementsOnHeadTerms",
       "P4_wikidataStatementsOnCiaTerms",
@@ -332,6 +335,8 @@ test("repair apply fixes every class atomically and leaves heads, US legacy rows
     // The moved statement leaves Trade current without provenance until the
     // importer's convergence pass writes a fresh one; P3 reports it.
     assert.equal(verification.checks.P3_currentTermsWithoutExactProvenance.observed, 1);
+    // The unsourced UK and US legacy rows keep their hand-entered dates.
+    assert.equal(verification.checks.P1_legacyDatedRosterTerms_disclosed.observed, 2);
   } finally {
     await fx.close();
   }
@@ -426,4 +431,281 @@ test("the plan fails closed on defects that need a human decision", async () => 
   } finally {
     await orphan.close();
   }
+});
+
+// ─── Offices the importer released, and legacy rows it adopted ──────────────
+//
+// These scenarios run the real importer against the fixture first, so the
+// office release and adoption are recorded exactly as production records them
+// (the importer's office write plus the DAT-016 retention trigger).
+
+const FIXTURIA_PAGE = `${PAGE_BASE}/fixturia/`;
+
+type RosterPosition = [title: string, holder: string | null];
+
+function rosterPage(stamp: string, positions: readonly RosterPosition[]) {
+  return `<html><h1>Fixturia</h1><h2>Leaders and Cabinet Members</h2>
+    <div class="last-updated"><b>Last Updated</b>: <span>${stamp}</span></div>
+    ${positions
+      .map(
+        ([title, holder]) =>
+          `<div class="leader-info"><h4>${title}</h4>${holder === null ? "" : `<p>${holder}</p>`}</div>`,
+      )
+      .join("\n")}
+    <h2>Explore Foreign Governments</h2></html>`;
+}
+
+async function importRoster(fx: CabinetFixture, html: string) {
+  const result = await syncCiaCabinets({
+    db: fx.db,
+    slugs: ["fixturia"],
+    crawlDelayMs: 0,
+    atlasReleaseId: "atlas-test",
+    fetchCountryPage: async () => ({ ok: true, status: 200, html }),
+    retryWait: async () => {},
+  });
+  assert.deepEqual(result.skipped, []);
+  return result;
+}
+
+async function freshFixturia(): Promise<CabinetFixture> {
+  if (!shared) throw new Error("fixture database not initialized");
+  await shared.reset();
+  await shared.query(`INSERT INTO jurisdictions (id, slug, name) VALUES ($1, 'fixturia', 'Fixturia')`, [
+    J.fix,
+  ]);
+  await shared.query(
+    `INSERT INTO government_bodies (id, jurisdiction_id, name, body_type, branch, hierarchy_level)
+     VALUES ($1, $2, 'Executive of Fixturia', 'cabinet', 'executive', 0)`,
+    [B.fix, J.fix],
+  );
+  return { ...shared, close: async () => {} };
+}
+
+async function seedRows(
+  fx: CabinetFixture,
+  rows: {
+    offices?: Array<[id: string, name: string, order: number | null]>;
+    persons?: Array<[id: string, name: string, qid: string | null]>;
+    terms?: Array<[id: string, office: string, person: string, current: boolean, start: string | null]>;
+    ciaStatements?: Array<[term: string, title: string, retrievedAt: string]>;
+  },
+) {
+  for (const [officeId, name, order] of rows.offices ?? []) {
+    await fx.query(
+      `INSERT INTO offices (id, body_id, name, office_type, is_elected, display_order)
+       VALUES ($1, $2, $3, 'cabinet', false, $4)`,
+      [officeId, B.fix, name, order],
+    );
+  }
+  for (const [personId, name, qid] of rows.persons ?? []) {
+    await fx.query(`INSERT INTO persons (id, name, wikidata_qid) VALUES ($1, $2, $3)`, [personId, name, qid]);
+  }
+  for (const [termId, officeId, personId, current, start] of rows.terms ?? []) {
+    await fx.query(
+      `INSERT INTO terms (id, office_id, person_id, is_current, start_date) VALUES ($1, $2, $3, $4, $5)`,
+      [termId, officeId, personId, current, start],
+    );
+  }
+  for (const [termId, title, retrievedAt] of rows.ciaStatements ?? []) {
+    await fx.query(
+      `INSERT INTO statements (subject_table, subject_id, predicate, object_value, source_id,
+         source_url, source_license, retrieved_at)
+       VALUES ('terms', $1, 'cabinet_member', $2, 'cia_world_leaders', $3, 'public_domain', $4)`,
+      [termId, title, FIXTURIA_PAGE, retrievedAt],
+    );
+  }
+}
+
+const R = {
+  finance: id(6, 1),
+  water: id(6, 2),
+  chancellor: id(6, 3),
+  foreign: id(6, 4),
+  jane: id(7, 1),
+  walt: id(7, 2),
+  vacant: id(7, 3),
+  reeves: id(7, 4),
+  lammy: id(7, 5),
+  janeTerm: id(8, 1),
+  waltTerm: id(8, 2),
+  vacantTerm: id(8, 3),
+  reevesTerm: id(8, 4),
+  lammyTerm: id(8, 5),
+};
+
+test("an office the importer released stays in scope although no term on it carries CIA provenance", async () => {
+  const fx = await freshFixturia();
+  // Former importer state: every term carries the page date; DAT-028 left the
+  // Water terms without a statement, and one of them is CIA's "Vacant".
+  await seedRows(fx, {
+    offices: [
+      [R.finance, "Min. of Finance", 0],
+      [R.water, "Min. of Water", 1],
+    ],
+    persons: [
+      [R.jane, "Jane Doe", null],
+      [R.walt, "Walt Waters", null],
+      [R.vacant, "Vacant", null],
+    ],
+    terms: [
+      [R.janeTerm, R.finance, R.jane, true, "2026-07-01"],
+      [R.waltTerm, R.water, R.walt, true, "2026-07-01"],
+      [R.vacantTerm, R.water, R.vacant, true, "2026-07-01"],
+    ],
+    ciaStatements: [[R.janeTerm, "Min. of Finance", "2026-07-01 00:00:00"]],
+  });
+
+  // The corrected importer's refresh no longer lists Water: it releases the
+  // office's list position and retires both of its terms.
+  const refresh = await importRoster(fx, rosterPage("8/1/2026", [["Min. of Finance", "Jane DOE"]]));
+  assert.equal(refresh.officesReleased, 1);
+  assert.deepEqual(await fx.query(`SELECT display_order FROM offices WHERE id = $1`, [R.water]), [
+    { display_order: null },
+  ]);
+  assert.equal(
+    await fx.count("statements", "subject_id IN ($1, $2)", [R.waltTerm, R.vacantTerm]),
+    0,
+  );
+
+  const run = executor(fx);
+  const plan = planCabinetTermRepair(await loadCabinetRepairState(run));
+  assert.equal(plan.categories.r1PlaceholderTerms, 1);
+  assert.deepEqual(
+    plan.targets.termDeletes.map((row) => row.id),
+    [R.vacantTerm],
+  );
+  assert.equal(
+    plan.targets.termUpdates.some((row) => row.id === R.waltTerm && row.clearDates),
+    true,
+  );
+  assert.equal(plan.observations.ciaOwnedOfficesReleasedWithoutProvenance, 1);
+
+  const applied = await applyCabinetTermRepair(run, plan);
+  assert.equal(await fx.count("terms", "id = $1", [R.vacantTerm]), 0);
+  assert.equal(
+    await fx.count("terms", "id = $1 AND start_date IS NULL AND is_current = false", [R.waltTerm]),
+    1,
+  );
+  assert.equal(
+    await fx.count("terms", "id = $1 AND start_date IS NULL AND is_current", [R.janeTerm]),
+    1,
+  );
+
+  const verification = await verifyCabinetTermRepair(run, {
+    plan,
+    transactionStartedAt: applied.transactionStartedAt,
+  });
+  assert.equal(verification.pass, true, JSON.stringify(verification.checks));
+  assert.equal(verification.checks.P1_rosterTermsWithCiaPageDates.observed, 0);
+  assert.equal(verification.checks.P5_placeholderTerms.observed, 0);
+  assert.equal(verification.checks.P2_duplicatePairs.observed, 0);
+  assert.equal(verification.checks.P7_unlistedOfficesWithCurrentHolders.observed, 0);
+  // The importer's next visit neither re-dates nor re-lists anything.
+  const again = await importRoster(fx, rosterPage("8/1/2026", [["Min. of Finance", "Jane DOE"]]));
+  assert.equal(again.totalRowsWritten, 0);
+});
+
+test("a hand-entered legacy row keeps its own date when the importer adopts its title", async () => {
+  const fx = await freshFixturia();
+  await seedRows(fx, {
+    offices: [
+      [R.finance, "Min. of Finance", 0],
+      [R.chancellor, "Chancellor of the Exchequer", null],
+      [R.foreign, "Foreign Secretary", null],
+    ],
+    persons: [
+      [R.jane, "Jane Doe", null],
+      [R.reeves, "Rachel Oldhand", "Q5045258"],
+      [R.lammy, "David Oldhand", "Q333136"],
+    ],
+    terms: [
+      [R.janeTerm, R.finance, R.jane, true, "2026-07-23"],
+      [R.reevesTerm, R.chancellor, R.reeves, true, "2024-07-05"],
+      [R.lammyTerm, R.foreign, R.lammy, true, "2024-07-05"],
+    ],
+    ciaStatements: [[R.janeTerm, "Min. of Finance", "2026-07-23 00:00:00"]],
+  });
+  await fx.query(
+    `UPDATE terms SET party_name = 'Labour', party_color = '#E4003B' WHERE id IN ($1, $2)`,
+    [R.reevesTerm, R.lammyTerm],
+  );
+
+  // The roster now names the legacy Chancellor title with a different holder:
+  // the importer adopts the office and retires the hand-entered row.
+  await importRoster(
+    fx,
+    rosterPage("9/1/2026", [
+      ["Min. of Finance", "Jane DOE"],
+      ["Chancellor of the Exchequer", "John HEALEY"],
+    ]),
+  );
+  assert.equal(await fx.count("offices", "id = $1 AND display_order = 1", [R.chancellor]), 1);
+  assert.equal(await fx.count("terms", "id = $1 AND NOT is_current", [R.reevesTerm]), 1);
+
+  const run = executor(fx);
+  const plan = planCabinetTermRepair(await loadCabinetRepairState(run));
+  assert.equal(
+    plan.targets.termUpdates.some((row) => row.id === R.reevesTerm),
+    false,
+    "the adopted legacy row's own date is not a CIA page date",
+  );
+  assert.equal(plan.observations.legacyDatedTermsKept, 1);
+  assert.equal(plan.categories.r4LegacyRetired, 1);
+  assert.equal(plan.categories.r5DatesCleared, 1);
+
+  const applied = await applyCabinetTermRepair(run, plan);
+  assert.deepEqual(
+    await fx.query(
+      `SELECT id::text AS id, start_date::text AS start_date, is_current FROM terms
+       WHERE id IN ($1, $2, $3) ORDER BY id`,
+      [R.janeTerm, R.reevesTerm, R.lammyTerm],
+    ),
+    [
+      { id: R.janeTerm, start_date: null, is_current: true },
+      { id: R.reevesTerm, start_date: "2024-07-05", is_current: false },
+      { id: R.lammyTerm, start_date: "2024-07-05", is_current: false },
+    ],
+  );
+  const verification = await verifyCabinetTermRepair(run, {
+    plan,
+    transactionStartedAt: applied.transactionStartedAt,
+  });
+  assert.equal(verification.pass, true, JSON.stringify(verification.checks));
+  assert.equal(verification.checks.P1_legacyDatedRosterTerms_disclosed.observed, 2);
+});
+
+test("a page-dated roster term outside the repair's reach fails the postflight", async () => {
+  const fx = await freshFixturia();
+  // An unlisted office with no recorded release and no provenance is outside
+  // the repair's scope, but its term carries the country's page date and one
+  // of its holders is CIA's placeholder. The postflight must not share that
+  // blind spot.
+  await seedRows(fx, {
+    offices: [
+      [R.finance, "Min. of Finance", 0],
+      [R.water, "Min. of Water", null],
+    ],
+    persons: [
+      [R.jane, "Jane Doe", null],
+      [R.walt, "Walt Waters", null],
+      [R.vacant, "Vacant", null],
+    ],
+    terms: [
+      [R.janeTerm, R.finance, R.jane, true, "2026-07-01"],
+      [R.waltTerm, R.water, R.walt, false, "2026-07-01"],
+      [R.vacantTerm, R.water, R.vacant, false, "2026-07-01"],
+    ],
+    ciaStatements: [[R.janeTerm, "Min. of Finance", "2026-07-01 00:00:00"]],
+  });
+  const run = executor(fx);
+  const plan = planCabinetTermRepair(await loadCabinetRepairState(run));
+  const applied = await applyCabinetTermRepair(run, plan);
+  const verification = await verifyCabinetTermRepair(run, {
+    plan,
+    transactionStartedAt: applied.transactionStartedAt,
+  });
+  assert.equal(verification.pass, false);
+  assert.equal(verification.checks.P1_rosterTermsWithCiaPageDates.observed, 2);
+  assert.equal(verification.checks.P5_placeholderTerms.observed, 1);
 });

@@ -86,9 +86,16 @@ No Index change-control file was edited.
 
 `npm run repair:cabinet-terms` (`scripts/repair-cabinet-terms.ts`, logic in
 `src/lib/factbook/cabinet-term-repair.ts`, registered as
-`data-repair-cabinet-terms`). It needs no inference about older rosters,
-because the corrected importer's live refresh owns every current flag, list
-position, and term statement. Categories:
+`data-repair-cabinet-terms`, method `cabinet-term-integrity-repair/v2`). It
+needs no inference about older rosters, because the corrected importer's live
+refresh owns every current flag, list position, and term statement.
+
+R1, R2, and R5 act on CIA-owned offices: offices the roster lists, offices
+with a CIA statement on one of their terms, and offices whose list position the
+importer released. The repair reads the release from the append-only evidence
+ledger (an `offices` update whose before-state had a list position and whose
+after-state has none), so releasing a title whose terms carry no CIA statement
+cannot take that title out of scope. Categories:
 
 | Step | Action |
 | --- | --- |
@@ -96,7 +103,7 @@ position, and term statement. Categories:
 | R2 | Collapse duplicate office/person rows to the shared survivor; delete loser rows and their CIA statements (a loser with any other publisher's statement stops the plan) |
 | R3 | Re-home a misplaced CIA or Wikidata statement to the term it describes, or delete it when that term already has its own; a statement with no single target stops the plan (never relabelled) |
 | R4 | Retire unsourced legacy cabinet rows in a country whose executive body has an imported roster (the three UK rows); US legacy rows stay current and are labeled unsourced |
-| R5 | Clear stored start and end dates on every surviving roster term |
+| R5 | Clear CIA page dates on surviving roster terms: the dates of a term that carries CIA provenance, and dates equal to one of the country's page stamps (a date its CIA-sourced roster terms carry, or carried before the repair removed it). A legacy hand-entered date is kept, also on a legacy office the importer adopted by its exact title |
 
 Plan mode writes nothing. The plan holds IDs, row digests, category counts,
 non-target fingerprints, and its own SHA-256; no names or payload text. Apply
@@ -109,17 +116,21 @@ correction record. A non-loopback host requires `--production-host`, the
 owner-approval file, and `--confirm=APPLY-<first 12 characters of the plan
 SHA-256>`.
 
-Postflight (`--verify`): P1 no dated roster terms; P2 no duplicate pairs; P3
-every current roster term has exactly one CIA statement naming its office and
-country page (retired terms without provenance are counted and disclosed); P4
-no CIA statement on a head term and no Wikidata statement on a roster term;
-P5 no placeholder terms; P6 every executive body with current roster terms
-has one ISO roster date; P7 no current holder on a released title and no
-shared list position; P8 a re-plan proposes nothing; P10 CIA source freshness
-unchanged by the repair; P11 history rows recorded at the transaction time
-equal the plan's expected count. The transaction's non-target fingerprints
-cover terms, statements, offices, and bodies of executive bodies and the
-people they reference.
+Postflight (`--verify`): P1 no roster-typed term still holds a CIA page date
+(legacy hand-entered dates are counted and disclosed); P2 no duplicate pairs;
+P3 every current roster term has exactly one CIA statement naming its office
+and country page (retired terms without provenance are counted and
+disclosed); P4 no CIA statement on a head term and no Wikidata statement on a
+roster term; P5 no placeholder terms; P6 every executive body with current
+roster terms has one ISO roster date; P7 no current holder on a released
+title and no shared list position; P8 a re-plan proposes nothing; P10 CIA
+source freshness unchanged by the repair; P11 history rows recorded at the
+transaction time equal the plan's expected count. P2, P3, P4, and P7 use the
+repair's ownership rule. P1 and P5 check every roster-typed term in an
+executive body, inside or outside that rule, so a gap in the repair's scope
+fails the postflight instead of passing unseen. The transaction's non-target
+fingerprints cover terms, statements, offices, and bodies of executive bodies
+and the people they reference.
 
 ## Isolated rehearsal (before any production change)
 
@@ -246,7 +257,10 @@ before-state is also in `research_evidence_history`.
    roster.
 4. New: retire the three unsourced UK legacy rows (the live CIA roster names
    different holders), and label the five US legacy rows as unsourced rather
-   than retiring them.
+   than retiring them. All eight keep their hand-entered dates. Two UK rows are
+   retired by R4; the importer retires the third when it adopts that legacy
+   office's exact title for a different listed holder, and R5 leaves its date
+   because it is not a CIA page date.
 
 Also for approval: applying the repair to production, and the correction text.
 Draft, to be finalized after the refresh with the real counts:
@@ -288,6 +302,18 @@ Adopted from the design critique:
 - P3 limited to current terms with retired gaps disclosed; P9 and P11 scoped
   to the repair's own transaction.
 - No reconstructed retrieval times: the repair writes no new statements.
+
+Adopted from the review of the first rehearsal (2026-09-28):
+
+- Scope that a release cannot erase: the repair's ownership rule counts an
+  office the importer released, read from the append-only evidence ledger,
+  so the statement-less Colombia and Fiji offices stay in reach. P1 and P5 now
+  check every roster-typed term rather than only the repair's scope.
+- No false positives on real dates: R5 clears only CIA page dates, so the
+  adopted UK legacy row keeps its hand-entered date like the two R4 rows.
+  The PGlite suite covers both cases with the real importer releasing and
+  adopting offices, plus a case where a page-dated term outside the repair's
+  scope makes the postflight fail.
 
 Not adopted:
 

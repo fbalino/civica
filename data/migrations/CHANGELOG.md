@@ -353,9 +353,12 @@ CIA World Leaders importer left in cabinet terms: terms held by CIA's
 survivor the corrected importer keeps), CIA or Wikidata statements attached to
 the wrong term (re-homed to the term they describe, or deleted when that term
 already has its own), unsourced legacy cabinet rows superseded by an imported
-roster, and page "Last Updated" dates stored as term start dates. It never
-infers which older roster listed whom; the corrected importer's live refresh
-owns every current flag and list position. The default mode writes nothing and
+roster, and page "Last Updated" dates stored as term start dates. Its scope
+includes offices whose list position the importer released, read from the
+append-only evidence ledger, and it keeps legacy hand-entered dates, including
+on a legacy office the importer adopted by title. It never infers which older
+roster listed whom; the corrected importer's live refresh owns every current
+flag and list position. The default mode writes nothing and
 emits a deterministic plan with row digests and non-target fingerprints. Apply
 runs that exact plan in one transaction that locks the cabinet tables, refuses
 any drift since the plan, and asserts the after-state; it requires an
