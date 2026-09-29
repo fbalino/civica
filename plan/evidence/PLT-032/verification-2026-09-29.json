@@ -1,0 +1,45 @@
+{
+  "task": "PLT-032",
+  "recordedAt": "2026-09-29",
+  "regressionTests": {
+    "file": "src/lib/platform/pipeline-observability.test.ts",
+    "fixture": "the partial pulse.v2.ingest response, built with the same helpers the route uses (pulseV2IngestCronOutcome, summarizeCronReports) and ordered as production orders connectors",
+    "tests": [
+      "a partial Pulse ingest records its run totals and the sources its writer stamped",
+      "a failed run records only reported stamps the database confirms",
+      "a successful run checks registered and reported sources together",
+      "a run-level total outranks a nested per-item counter"
+    ],
+    "againstFormerLedger": "all four fail (the former ledger records 0/0/0 from the first connector, no freshness for a failed run, and 'empty' for a successful run); the six existing tests pass",
+    "againstThisChange": "pipeline-observability and cron-job suites 41/41 pass"
+  },
+  "otherRoutes": {
+    "method": "read-only audit of all 42 routes under src/app/api/cron, comparing the former and new counter rules on each response shape",
+    "changedPicks": [
+      "pulse.v2.ingest: rows read, written, and rejected now come from totalFetched, totalInserted, and totalUnmatched",
+      "factbook.sync-classifications: rows rejected now comes from totalErrors instead of worldBank.errors"
+    ],
+    "correctPicksChanged": 0
+  },
+  "validation": {
+    "validate:cron-safety": "PASS",
+    "validate:sync-freshness": "PASS",
+    "validate:production-adapters": "PASS",
+    "validate:route-performance-telemetry": "PASS (includes validate:pipeline-observability)",
+    "validate:pipeline-observability": "PASS (39 scheduled and 12 manual pipelines closed)",
+    "validate:index-change-control": "PASS (no protected Index file changed)",
+    "validate:data-dictionary": "PASS",
+    "validate:claims-docs": "PASS",
+    "validate:lint": "PASS",
+    "validate:secrets": "PASS",
+    "validate:ci-workflow": "PASS",
+    "validate:module-coverage": "PASS",
+    "plan/tools/validate-master-plan.mjs": "PASS",
+    "validate:readiness-reports": "PASS (regenerated with generate:readiness-reports)",
+    "validate:remaining-work-report": "PASS",
+    "validate:operations-readiness": "PASS",
+    "typecheck": "PASS",
+    "npm test": "2,356 tests: 2,353 pass, 3 skipped, 0 fail"
+  },
+  "production": "No production write. The corrected ledger takes effect on the first scheduled ingest after deployment; earlier rows keep their recorded values."
+}

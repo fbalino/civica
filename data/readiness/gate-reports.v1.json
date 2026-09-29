@@ -1,8 +1,8 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "be32e1de8b1144191ec874d377639366311d3d61b690d24a66c34d071573cf21",
-    "plan/PROGRESS.md": "36f475655b85558e0c5d784c549a1443f81e8899483e8a7f743b425bc69b310b",
+    "plan/MASTER-CHECKLIST.md": "6ccd75ab4535d5e0c4a914727dc87d99038091ea8460a4d31c5b82f49c7bc6fb",
+    "plan/PROGRESS.md": "10ff6e524fb93620d4322d734ab716d2e6fad69fc84842b79695f7c985fc10be",
     "plan/MANUAL-CHECKS.md": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "c0c6a50b06386c184ef55c20f7ef3f7ae0a55d0292cd541404fc3203c4f61825",
@@ -11,7 +11,7 @@
     "plan/05-pulse-event-ledger-and-validation.md": "7c27d1af083fad276f91545a0e6bda72e45321c9baef73461c674e62932e6dc1",
     "plan/06-atlas-content-and-research-features.md": "d166432c150d9f12a1168971fc3716aa7354f24f996a88007660b546b4d785f6",
     "plan/07-design-system-assets-and-reader-experience.md": "10dd3f0d32840eec2423362440d2a95e26c11c26b001d30c1b67380b79a768bf",
-    "plan/08-platform-security-performance-and-operations.md": "508f528ab42add8f656617c57fc0ba28fcfae23b853f3269cce374b7f154aba6",
+    "plan/08-platform-security-performance-and-operations.md": "6f7e8f7a6bd3a22183f6b137a9aed9a8488a75c24e80a717714e8ed502413904",
     "plan/09-testing-qa-and-release.md": "2a2a7d2d6bd8fae6efab1d02b17cbc00ddb67e6374f81fe7d5dfb3d26f872014",
     "plan/10-academic-governance-review-and-outreach.md": "d92e4b4bc3392dccd81ad135c257304ed60edaece5d2cd7f28a6123a5e02baa6",
     "plan/11-brand-legal-and-licensing.md": "7c3989aa13da0480d17780fef6701811dd717f37dd5f216dca45f8f5a286d52b"
@@ -22,8 +22,8 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 319,
-        "completed": 272,
+        "total": 320,
+        "completed": 273,
         "remaining": 47,
         "byPriority": {
           "P0": {
@@ -31,8 +31,8 @@
             "completed": 177
           },
           "P1": {
-            "total": 115,
-            "completed": 93
+            "total": 116,
+            "completed": 94
           },
           "P2": {
             "total": 5,
@@ -69,8 +69,8 @@
             "completed": 39
           },
           "08-platform-security-performance-and-operations.md": {
-            "total": 31,
-            "completed": 29
+            "total": 32,
+            "completed": 30
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 44,
@@ -249,8 +249,8 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 319,
-        "completed": 272,
+        "total": 320,
+        "completed": 273,
         "remaining": 47,
         "byPriority": {
           "P0": {
@@ -258,8 +258,8 @@
             "completed": 177
           },
           "P1": {
-            "total": 115,
-            "completed": 93
+            "total": 116,
+            "completed": 94
           },
           "P2": {
             "total": 5,
@@ -296,8 +296,8 @@
             "completed": 39
           },
           "08-platform-security-performance-and-operations.md": {
-            "total": 31,
-            "completed": 29
+            "total": 32,
+            "completed": 30
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 44,
@@ -484,8 +484,8 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 319,
-        "completed": 272,
+        "total": 320,
+        "completed": 273,
         "remaining": 47,
         "byPriority": {
           "P0": {
@@ -493,8 +493,8 @@
             "completed": 177
           },
           "P1": {
-            "total": 115,
-            "completed": 93
+            "total": 116,
+            "completed": 94
           },
           "P2": {
             "total": 5,
@@ -531,8 +531,8 @@
             "completed": 39
           },
           "08-platform-security-performance-and-operations.md": {
-            "total": 31,
-            "completed": 29
+            "total": 32,
+            "completed": 30
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 44,
@@ -705,8 +705,8 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 319,
-        "completed": 272,
+        "total": 320,
+        "completed": 273,
         "remaining": 47,
         "byPriority": {
           "P0": {
@@ -714,8 +714,8 @@
             "completed": 177
           },
           "P1": {
-            "total": 115,
-            "completed": 93
+            "total": 116,
+            "completed": 94
           },
           "P2": {
             "total": 5,
@@ -752,8 +752,8 @@
             "completed": 39
           },
           "08-platform-security-performance-and-operations.md": {
-            "total": 31,
-            "completed": 29
+            "total": 32,
+            "completed": 30
           },
           "05-pulse-event-ledger-and-validation.md": {
             "total": 44,

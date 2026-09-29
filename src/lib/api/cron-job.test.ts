@@ -204,6 +204,10 @@ class MemoryPipelineRunStore implements PipelineRunStore {
   async finish(input: Parameters<PipelineRunStore["finish"]>[0]) {
     this.finishes.push(input);
   }
+
+  async advancedSources() {
+    return [];
+  }
 }
 
 const FIXED_NOW = new Date("2026-07-14T08:05:00.000Z");

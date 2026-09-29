@@ -8,6 +8,14 @@ source version/vintage handles, source freshness result, a reliable cost only
 when the runner supplies one, and a short safe failure code. It never stores a
 request body, credentials, raw publisher data, source URLs, or exception text.
 
+The freshness result lists the sources whose sanctioned `last_sync_at` stamp
+advanced during the run, as the database shows at finalization. A successful
+run checks every registered source plus any source its writer reports in a
+`sourcesStamped` array. A failed run checks only reported sources, because a
+partial run can still commit rows: Pulse ingest publishes the connectors that
+worked and finishes partial when any connector fails. A source that is neither
+registered nor reported is never attributed to the run.
+
 Scheduled routes create a run only after PLT-010's authenticated delivery lock
 has been acquired. Canonical manual production commands run through
 `npm run run:production-pipeline -- --pipeline=<id> -- <command>` and retain

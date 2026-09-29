@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 319
-- **Completed:** 272
+- **Total tasks:** 320
+- **Completed:** 273
 - **Remaining:** 47
 - **Progress:** 85.3%
-- **Priority mix:** P0 199 · P1 115 · P2 5
+- **Priority mix:** P0 199 · P1 116 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -321,6 +321,7 @@ Source: `plan/08-platform-security-performance-and-operations.md`
 - [ ] **PLT-029** (P1) Report cumulative program cost and effort telemetry at every gate. _Done when: a documented ledger linked from `plan/PROGRESS.md` records, at each G-gate and at least weekly while work is active, the subscription plans in use, any paid API spend against the caps in `.orchestrator/state.json`, committed external human spend, and notable cost events; zero unexplained paid-API spend exists; and the reporting format is documented so future workers keep it current._
 - [x] **PLT-030** (P0) Stabilize the current release before beta or release claims. _Done when: each recorded release-stability finding has a dated reproduction against the named deployment or CI run, root cause and bounded remediation, rollback/containment posture, and passing replacement build, health, and affected reader-surface evidence; the country-directory/data drift and critical dependency-audit finding are resolved or explicitly constrained; and PLT-025 is refreshed without treating a local or historical result as current production proof. Evidence: `plan/evidence/PLT-030/`._
 - [x] **PLT-031** (P0) Repair recurring data imports and make routine operations recover without owner babysitting. _Done when: confirmed cabinet and legislative import defects are repaired with source-contract tests and current execution evidence; transient scheduled failures retry automatically with bounded backoff, idempotency, and fenced leases; alert monitors cannot alert on their own findings as failed work; persistent configuration or publisher failures retain actionable safe diagnoses; and routine delivery notifications are reduced without hiding security or production failures. Evidence: `plan/evidence/PLT-031/`._
+- [x] **PLT-032** (P1) Make production run records report what a partial Pulse ingest actually committed. _Done when: a read-only diagnosis explains why partial `pulse.v2.ingest` runs record zero rows and no freshness sources while their writer commits rows and stamps sources; the run record's read, written, and rejected counters come from the run's totals rather than one connector's report; a failed run records the sources its own writer reports and the database confirms, and a successful run adds those to its registered sources, without changing how or when freshness is stamped; a regression test built from the route's response shape fails on the former rules; and the cause of the daily partial outcome is documented. Evidence: `plan/evidence/PLT-032/`._
 
 ## Area 09 — Testing, QA, and Release Verification
 
