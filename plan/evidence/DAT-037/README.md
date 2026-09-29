@@ -1,9 +1,10 @@
 # DAT-037: CIA World Leaders cabinet-term integrity
 
-Status: open. The importer, reader, and repair code are implemented and
-tested on branch `claude/fix/cabinet-term-integrity`. Nothing has been written
-to production. The next steps are an isolated rehearsal, the owner's review of
-its result, and then the owner-approved production sequence below.
+Status: open and blocked. The importer, reader, and repair code are
+implemented and tested on branch `claude/fix/cabinet-term-integrity`. Nothing
+has been written to production. The first isolated rehearsal (2026-09-28,
+below) found two rows the repair does not reach, so the production sequence
+waits for a repair fix, a second rehearsal, and then the owner's review.
 
 ## The defect
 
@@ -148,11 +149,51 @@ aside for the whole rehearsal so `DATABASE_URL` names only the loopback copy.
    changes unless a page changed in between).
 6. `--plan`, create an `in_review` correction row in the copy, `--apply`,
    `--verify`, `--plan` again (all zeros), and replay `--apply` (no change).
-7. Record `plan/evidence/DAT-037/rehearsal-<date>.json`: hashes, counts, IDs,
-   timings, plan SHA-256, category counts, importer summaries, and the four
-   formerly stuck countries' outcomes. No names, SQL payloads, or page bytes.
+7. Record `plan/evidence/DAT-037/cabinet-term-integrity-rehearsal-<date>.json`:
+   hashes, counts, IDs, timings, plan SHA-256, category counts, importer
+   summaries, and the four formerly stuck countries' outcomes. No names, SQL
+   payloads, or page bytes.
 8. Stop the cluster; delete the cluster directory, dump, and plan files; say
    so in the evidence.
+
+## Rehearsal result, 2026-09-28
+
+Record: [`cabinet-term-integrity-rehearsal-2026-09-28.json`](cabinet-term-integrity-rehearsal-2026-09-28.json).
+Result: blocked. Two required checks fail.
+
+- The copy matched production exactly: a 226 MB read-only snapshot, restored
+  with identical counts and row hashes for terms, statements, offices, bodies,
+  people, sources, jurisdictions, corrections, and the evidence history.
+- The corrected importer read all 237 candidate pages and updated all 197
+  countries that have one, including Samoa, Uganda, Ukraine, and the United
+  Kingdom. Bosnia and Herzegovina failed the page schema as before. A repeat
+  pass over 18 countries wrote nothing. For those 18 countries, a separate
+  parser compared the exact page bytes with the stored roster. Every listed
+  minister and official is current and no one else is (heads and diplomats
+  stay outside the roster by design): 12 Saudi Ministers of State, the 13
+  stale Hungarian holders retired, and 17 multi-holder titles complete.
+- The repair applied its plan in one transaction: 5,714 row changes and
+  5,714 history rows. Its own postflight passed, a replay changed nothing,
+  a new plan proposed nothing, and a later importer pass wrote nothing.
+  No duplicate pairs remain. The France and Kosovo head terms are unchanged.
+  The three live validators passed against the copy.
+- Failure: two retired terms still carry a CIA page date as their start
+  date. They are Colombia `0dba8830-fc0c-4173-b08a-d9d7a4867aea`, which is
+  also a "Vacant" placeholder, and Fiji
+  `9cebaed3-748b-4ad8-ac9d-e3c75681eae1`. The repair plan made before the
+  refresh targeted both. The refresh then released their titles' list
+  positions, and neither office has a CIA statement. The repair only covers
+  offices that are listed or carry CIA provenance, and P1 and P5 check only
+  those offices, so neither the repair nor its postflight reaches these rows.
+- Fix before production: include offices whose list position the importer
+  released in the repair's scope and in P1 and P5. Then rehearse again.
+- Observation for decision 4: the importer adopted one United Kingdom legacy
+  office with the listed title and a different holder, so R5 clears that
+  former holder's hand-entered date. The two legacy rows that R4 retires keep
+  theirs.
+
+The copy, snapshot, logs, plan files, and captured pages were deleted after
+the run. The record says so.
 
 ## Production sequence (only after the owner reviews the rehearsal)
 
@@ -165,8 +206,8 @@ aside for the whole rehearsal so `DATABASE_URL` names only the loopback copy.
    `factbook.cia-cabinets` (`?shard=0` through `?shard=26`, each with its own
    `Idempotency-Key`; shard 27 is empty). About 100 minutes at the measured
    227 seconds per shard. Check each execution, pipeline row, and freshness.
-   Samoa, Uganda, Ukraine, and the United Kingdom are expected to converge
-   here; the rehearsal confirms it on the restored copy.
+   Samoa, Uganda, Ukraine, and the United Kingdom converged on the restored
+   copy in the 2026-09-28 rehearsal.
 3. Take a fresh read-only snapshot (DAT-021 procedure) as the recovery point.
 4. Disable all project cron jobs in Vercel for the apply window (a single job
    cannot be paused without a redeploy). Confirm no active cabinet lease.
