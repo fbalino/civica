@@ -56,6 +56,7 @@
   "dailyPartial": {
     "cause": "GDELT. Its connector failed in 96 ingest runs from 2026-08-17 to 2026-09-29, every recent run, with a 10-second connect timeout to api.gdeltproject.org:443. GDELT last succeeded on 2026-09-21.",
     "earlierFailures": "Amnesty failed in 20 runs from 2026-08-17 to 2026-08-20 and has not failed since; IPU failed in 2 runs on 2026-08-17.",
-    "notChanged": "Not fixed here: it is an upstream reachability problem, and the partial-availability policy already publishes the working connectors. The ledger correctly keeps these runs as failed with error summary 'partial', so the pipeline alert stays open until GDELT is reachable or deliberately retired."
+    "reachability": "GDELT is up but almost never accepts connections from Vercel: on 2026-09-29 it accepted a connection from the owner's Mac in 0.6 s (HTTP 429), while the only Vercel success since mid-August was a manual delivery through the deployed route on 2026-09-21 (cron_job_executions trigger_kind manual, release fe926435).",
+    "notChanged": "Not fixed here. The partial-availability policy already publishes the working connectors, and the ledger correctly keeps these runs as failed with error summary 'partial', so the pipeline alert stays open until GDELT is fetched from somewhere it answers."
   }
 }

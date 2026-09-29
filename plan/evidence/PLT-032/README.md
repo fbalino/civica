@@ -59,11 +59,14 @@ rows read.
 ## Why the ingest is partial every day
 
 GDELT. Its connector failed in 96 runs from 17 August to 29 September, every
-recent run, on a 10-second connection timeout to `api.gdeltproject.org`. GDELT
-last answered on 21 September. Amnesty failed for three days in August and has
-recovered. This is an upstream reachability problem and is not changed here.
-The run record keeps these runs as failed with the summary `partial`, so the
-pipeline alert remains open until GDELT is reachable or deliberately retired.
+recent run, on a 10-second connection timeout to `api.gdeltproject.org`.
+GDELT itself is up: on 29 September it accepted a connection from the owner's
+Mac in 0.6 seconds (answering HTTP 429). From Vercel's servers it almost never
+connects; the only success since mid-August was a manual delivery through the
+deployed route on 21 September. Amnesty failed for three days in August and
+has recovered. This task does not change GDELT fetching; the run record keeps
+these runs as failed with the summary `partial`, so the pipeline alert stays
+open until GDELT is fetched from somewhere it answers.
 
 ## Verification
 
