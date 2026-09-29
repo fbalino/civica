@@ -4,7 +4,9 @@ import { getAllPosts } from "@/lib/blog";
 import { ORGANIZATIONS } from "@/lib/data/international-organizations";
 import { absoluteUrl, METADATA_CONTENT_RELEASE_DATE } from "@/lib/site";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
@@ -90,11 +92,14 @@ function jurisdictionLastModified(row: Pick<JurisdictionRow, "updatedAt" | "crea
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let countries: JurisdictionRow[] = [];
-  try {
+  if (process.env.DATABASE_URL) {
+    // A configured database that fails throws, so the page cache keeps the
+    // last good sitemap instead of caching one without country pages
+    // (PLT-033). The daily page warm-up also reads this list.
     countries = await getAllReferenceJurisdictions();
-  } catch {
-    // DB not available during build
   }
+  // Without DATABASE_URL (the credential-free CI build) the sitemap lists
+  // only the static, organization, comparison, and blog routes.
 
   const staticPages: MetadataRoute.Sitemap = PUBLIC_STATIC_ROUTES.map(
     ({ path, changeFrequency, priority }) => ({

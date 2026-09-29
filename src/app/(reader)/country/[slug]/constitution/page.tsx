@@ -18,7 +18,15 @@ import {
 } from "@/lib/atlas/surface-query-state";
 import "@/app/civica-data.css";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
+
+// No paths render at build time. Each one renders on its first visit (or the
+// daily warm-up) and is then served from the page cache.
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return [];
+}
 
 // Per-tab metadata. The shared layout's generateMetadata sets the Factbook
 // title + /country/[slug] canonical (correct for the base tab); metadata

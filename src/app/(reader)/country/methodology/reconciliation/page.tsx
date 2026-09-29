@@ -16,7 +16,9 @@ import {
   disputeSla,
 } from "@/lib/content/site-state";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 // Worked Example 1 (Argentina inflation) derives its threshold from the
 // fact-keys registry rather than retyping it, so the prose can never drift

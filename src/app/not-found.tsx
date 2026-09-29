@@ -7,7 +7,9 @@ import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 import "./not-found.css";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Page Not Found — 404",

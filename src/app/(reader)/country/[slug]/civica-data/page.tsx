@@ -47,7 +47,15 @@ import {
 import type { Metadata } from "next";
 import "@/app/civica-data.css";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
+
+// No paths render at build time. Each one renders on its first visit (or the
+// daily warm-up) and is then served from the page cache.
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return [];
+}
 
 // Per-tab metadata. The shared layout's generateMetadata sets the Factbook
 // title + /country/[slug] canonical (correct for the base tab); metadata
@@ -60,7 +68,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  // A database failure throws (PLT-026) so a cached page never records a
+  // "not found" title for a real country.
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) return { title: "Country Not Found" };
   const title = `${jurisdiction.name} — Governance Evidence & Country Data`;
   const description = `Evidence coverage, source-native governance observations, indicator history, government structure, legislature, leaders, bills, and international memberships for ${jurisdiction.name}.`;
@@ -173,15 +183,15 @@ function SourcesStrip({ sources }: { sources: SectionSource[] }) {
 
 export default async function CountryCivicaDataTab({
   params,
-  searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ section?: string }>;
 }) {
   const { slug } = await params;
-  const { section: sectionParam } = await searchParams;
 
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  // getJurisdictionBySlug returns null only for a genuinely absent slug; a
+  // database failure throws to the error boundary (PLT-026), so the page cache
+  // never stores a false 404 for a real country.
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
   // Keep a fulfilled empty result distinct from an unavailable query. The
@@ -453,17 +463,6 @@ export default async function CountryCivicaDataTab({
     content: contentById[s.id],
   }));
 
-  // Default to the deep-linked section when it names a visible section, else
-  // Evidence coverage. SSR
-  // paints this section's body.
-  const requestedDefault =
-    sectionParam && visibleSections.some((s) => s.id === sectionParam)
-      ? sectionParam
-      : "evidence-coverage";
-  const defaultId = visibleSections.some((s) => s.id === requestedDefault)
-    ? requestedDefault
-    : visibleSections[0].id;
-
   // --- Citation footer ----------------------------------------------------
   // "Cite this page" box for the Civica Data tab. The data's vintage is the
   // source-native evidence reference year. Source names are deduped across every visible section's
@@ -513,7 +512,6 @@ export default async function CountryCivicaDataTab({
 
         <CivicaDataSections
           items={items}
-          defaultId={defaultId}
           footer={
             <section
               id="cite"

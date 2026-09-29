@@ -7,7 +7,9 @@ import { PageHero } from "@/components/PageHero";
 import ElectoralSystemsClient from "./ElectoralSystemsClient";
 import type { SystemKey, SystemCountry } from "@/lib/elections/electoral-systems";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "How Electoral Systems Work — FPTP, PR, Mixed & More",

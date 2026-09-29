@@ -7,18 +7,194 @@ import { ROUTE_INVENTORY } from "@/lib/api/route-inventory/registry";
 /**
  * PLT-014 — one closed cache/freshness vocabulary for public surfaces.
  *
- * Mutable database reads are deliberately request-live. Next.js route handlers
- * are uncached by default and database-backed pages must resolve to
- * `revalidate = 0`; there is therefore no cache entry to invalidate after a
- * write and no stale value to serve when a revalidation attempt fails.
- *
- * The only shared public caches are checked, build-owned artifacts and frozen,
+ * API route handlers that read mutable database rows are request-live: they
+ * are uncached by default and emit `no-store`. The only shared public caches
+ * for route handlers are checked, build-owned artifacts and frozen,
  * version-addressed releases. Checked artifacts must revalidate at expiry and
  * never opt into stale-while-revalidate/stale-if-error. Frozen release URLs are
  * immutable and are replaced by a new URL rather than overwritten.
+ *
+ * PLT-033 (APR-D177) — database-backed public pages are cached. Each one
+ * declares the literal `revalidate = 86400` backstop, and the daily
+ * `operations.refresh-pages` job invalidates every page and re-renders the
+ * sitemap after the day's imports. A page stays request-live only when it is
+ * listed in `LIVE_PAGE_ROUTES`: it is private to a signed-in session, or it
+ * reads per-request input (`searchParams`, headers, cookies) that Next.js
+ * cannot serve from a shared page cache.
  */
 export const CACHE_CONSISTENCY_SCHEMA_VERSION =
   "civica-cache-consistency/v1" as const;
+
+/**
+ * The only revalidate literal a cached database-backed page may declare
+ * (24 hours). Next.js requires a statically analyzable literal, so pages write
+ * `export const revalidate = 86400;` and the cache gate checks the value.
+ */
+export const PAGE_CACHE_REVALIDATE_SECONDS = 86400 as const;
+
+export type LivePageReason = "private-session" | "request-input";
+
+export interface LivePageRoute {
+  /** Route module that declares `revalidate = 0` (a page or a layout). */
+  file: string;
+  /** URL path the module serves; a layout covers its whole subtree. */
+  routePath: string;
+  reason: LivePageReason;
+  note: string;
+}
+
+/**
+ * Closed allowlist of database-backed pages that render per request.
+ * The cache gate rejects a stale entry, an entry whose module does not
+ * declare `revalidate = 0`, and a `request-input` entry whose pages no longer
+ * read request input.
+ */
+export const LIVE_PAGE_ROUTES: readonly LivePageRoute[] = Object.freeze([
+  {
+    file: "src/app/(admin)/layout.tsx",
+    routePath: "/admin",
+    reason: "private-session",
+    note: "Owner admin workspace behind the signed admin session.",
+  },
+  {
+    file: "src/app/(coding)/admin/pulse-coding/layout.tsx",
+    routePath: "/admin/pulse-coding",
+    reason: "private-session",
+    note: "Pulse coder workspace behind the signed coding session.",
+  },
+  {
+    file: "src/app/admin/sign-in/page.tsx",
+    routePath: "/admin/sign-in",
+    reason: "private-session",
+    note: "Reads the admin session cookie and the sign-in error/redirect query.",
+  },
+  {
+    file: "src/app/(reader)/atlas/page.tsx",
+    routePath: "/atlas",
+    reason: "request-input",
+    note: "Map layer, filter, and selection come from the query string.",
+  },
+  {
+    file: "src/app/(reader)/civica-index/corrections/page.tsx",
+    routePath: "/civica-index/corrections",
+    reason: "request-input",
+    note: "Pagination and the post-submission confirmation come from the query string.",
+  },
+  {
+    file: "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
+    routePath: "/civica-index/pulse-changelog",
+    reason: "request-input",
+    note: "Server-side filters and pagination (PLT-028) come from the query string.",
+  },
+  {
+    file: "src/app/(reader)/country/methodology/reconciliation/disputes/page.tsx",
+    routePath: "/country/methodology/reconciliation/disputes",
+    reason: "request-input",
+    note: "Server-side filters and pagination come from the query string.",
+  },
+  {
+    file: "src/app/(reader)/governance-change/page.tsx",
+    routePath: "/governance-change",
+    reason: "request-input",
+    note: "The comparison window and its coverage claim come from the query string.",
+  },
+  {
+    file: "src/app/(reader)/report-data-issue/page.tsx",
+    routePath: "/report-data-issue",
+    reason: "request-input",
+    note: "The report form is prefilled from the query string.",
+  },
+  {
+    file: "src/app/civica-conditions/page.tsx",
+    routePath: "/civica-conditions",
+    reason: "request-input",
+    note: "The selected Conditions release comes from the query string.",
+  },
+  {
+    file: "src/app/compare/page.tsx",
+    routePath: "/compare",
+    reason: "request-input",
+    note: "The compared countries come from the query string.",
+  },
+  {
+    file: "src/app/constitution/page.tsx",
+    routePath: "/constitution",
+    reason: "request-input",
+    note: "Country and topic filters come from the query string.",
+  },
+  {
+    file: "src/app/constitution/search/page.tsx",
+    routePath: "/constitution/search",
+    reason: "request-input",
+    note: "Full-text query plus the rate limiter's request headers.",
+  },
+  {
+    file: "src/app/governance-evidence/page.tsx",
+    routePath: "/governance-evidence",
+    reason: "request-input",
+    note: "The selected country comes from the query string; the layout defers work to request time.",
+  },
+]);
+
+/** URL path a page or layout module serves (route groups removed). */
+export function routePathForModule(file: string): string {
+  const withoutRoot = file.replace(/^src\/app/, "");
+  const directory = withoutRoot.replace(/\/(?:page|layout|not-found|sitemap)\.[cm]?[jt]sx?$/, "");
+  const segments = directory
+    .split("/")
+    .filter((segment) => segment && !/^\(.+\)$/.test(segment));
+  return `/${segments.join("/")}`;
+}
+
+/**
+ * True when a public URL path is served by a request-live page. Layout
+ * entries cover their subtree; page entries cover exactly one path.
+ */
+export function isLivePagePath(
+  pathname: string,
+  routes: readonly LivePageRoute[] = LIVE_PAGE_ROUTES,
+): boolean {
+  const normalized = pathname.replace(/\/+$/, "") || "/";
+  return routes.some((route) =>
+    /\/layout\.[cm]?[jt]sx?$/.test(route.file)
+      ? normalized === route.routePath ||
+        normalized.startsWith(`${route.routePath}/`)
+      : normalized === route.routePath,
+  );
+}
+
+export function livePageRouteErrors(
+  routes: readonly LivePageRoute[] = LIVE_PAGE_ROUTES,
+): string[] {
+  const errors: string[] = [];
+  const files = new Set<string>();
+  for (const route of routes) {
+    if (files.has(route.file)) errors.push(`${route.file}: duplicate live page`);
+    files.add(route.file);
+    if (!/^src\/app\/.+\/(?:page|layout)\.tsx$/.test(route.file)) {
+      errors.push(`${route.file}: live page entry must name a page or layout module`);
+    }
+    const modulePath = routePathForModule(route.file);
+    const isLayout = /\/layout\.tsx$/.test(route.file);
+    // A route-group layout sits above its first URL segment, so its declared
+    // subtree may be narrower than the module path; the cache gate proves
+    // every page it wraps is inside that subtree.
+    const pathMatches = isLayout
+      ? route.routePath === modulePath ||
+        route.routePath.startsWith(modulePath === "/" ? "/" : `${modulePath}/`)
+      : route.routePath === modulePath;
+    if (!pathMatches) {
+      errors.push(
+        `${route.file}: routePath ${route.routePath} does not match ${modulePath}`,
+      );
+    }
+    if (route.reason === "private-session" && !route.routePath.startsWith("/admin")) {
+      errors.push(`${route.file}: private-session pages must live under /admin`);
+    }
+    if (!route.note.trim()) errors.push(`${route.file}: live page entry needs a note`);
+  }
+  return errors;
+}
 
 export type CacheProfileId =
   | "public-live"

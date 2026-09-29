@@ -30,7 +30,15 @@ import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
 import { captureAtlasSurfaceQuery } from "@/lib/atlas/surface-query-state";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
+
+// No paths render at build time. Each one renders on its first visit (or the
+// daily warm-up) and is then served from the page cache.
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return [];
+}
 
 // Factbook tab of the unified /country/[slug] page. Renders ONLY the
 // CIA-sourced sections. The Government section here is the CIA prose

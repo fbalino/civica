@@ -20,7 +20,9 @@ import {
 } from "@/lib/content/site-state";
 import { PROVENANCE_COVERAGE_SUMMARY } from "@/lib/claims/provenance-coverage";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "How We Approach Data — Sources & Reconciliation",
