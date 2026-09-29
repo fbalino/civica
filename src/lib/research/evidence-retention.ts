@@ -83,6 +83,13 @@ export const DESTRUCTIVE_WRITE_PATHS = [
     path: "scripts/cleanup-bad-offices.ts",
     relations: ["government_bodies", "offices", "persons", "terms"],
   },
+  {
+    // DAT-037 one-time repair (run by scripts/repair-cabinet-terms.ts):
+    // placeholder and duplicate cabinet terms and misplaced statements. The
+    // DAT-016 triggers retain every deleted row.
+    path: "src/lib/factbook/cabinet-term-repair.ts",
+    relations: ["statements", "terms"],
+  },
   { path: "scripts/seed-backtest-cases.ts", relations: ["backtest_events"] },
   {
     path: "src/lib/constitute/sync-constitutions.ts",

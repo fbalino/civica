@@ -21,48 +21,62 @@
  *
  * Judiciary is NOT in the CIA lists → out of scope (separate P4b).
  *
- * Design mirrors `officeholders-sync.ts`: keep it pure-ish — take a `db`
- * instance (defaulting to the shared client) and a progress log sink, expose a
- * `computeCabinetPlan()` (pure read, writes NOTHING) → `reportCabinetPlan()`
- * dry-run split, and (in the apply path, a later round) stamp
- * `sources.last_sync_at` via `markSourcesSynced("cia_world_leaders", …)` — the
- * one sanctioned path — only when rows were actually written.
+ * DAT-037 roster contract (see `cabinet-roster.ts`): CIA publishes titles and
+ * current holders plus one page-level "Last Updated" date, never appointment
+ * dates. A cabinet term is identified by `(office, person)` and never stores a
+ * start date. Each run reconciles every listed title's current holders to
+ * exactly the people the page lists (multi-seat titles keep every holder),
+ * releases the list position of titles the page no longer lists and retires
+ * their holders, writes nothing for an unchanged roster, and records the page
+ * date as one sourced body-level statement. Each country's writes commit in
+ * one Neon transaction.
  *
- * THREE code-fixes carried by this workstream (see the plan §2.5):
- *   (a) office dedup keys on `(bodyId, name)`, NOT `(bodyId, officeType)` —
- *       otherwise N cabinet ministers (all office_type='cabinet') collapse to
- *       one. Implemented here in `upsertCabinetOffice` (apply path).
- *   (b) `OFFICE_RANK` in `queries.ts` used `judicial` but the stored type is
- *       `judicial_leader` — fixed in that file alongside this build.
- *   (c) provenance is mandatory — the apply path writes a `statements` row per
- *       term and calls `markSourcesSynced`. (The legacy hardcoded US/UK
- *       cabinets in `scripts/enrich-hierarchy.ts` wrote neither.)
+ * `computeCabinetPlan()` fetches and parses pages (reads jurisdictions only);
+ * the apply path re-reads each country's stored roster, resolves people with
+ * a deterministic tiered match, plans the reconciliation with the pure
+ * `planCountryRoster()`, and stamps `sources.last_sync_at` via
+ * `markSourcesSynced("cia_world_leaders", …)` only when rows actually changed.
  *
- * P4 APPLY (2026-07-01): the real write path is now wired below
- * (`syncCiaCabinets`). It reuses the exact `computeCabinetPlan` the dry run
- * reported on, then persists offices / persons / terms / statements and stamps
- * `markSourcesSynced`. Scope decision (owner-approved after a clean dry run):
- * ingest cabinet + central-bank + deputy + other; DROP the `diplomatic`
- * category (Ambassador-to-US / UN-rep). The `united-states` page is skipped
- * (404 — foreign governments only) and sub-national HK/Macau blocks are cut at
- * the section boundary by `parseCountryHtml`.
+ * The apply path persists cabinet + central-bank + deputy + other categories
+ * and DROPS the `diplomatic` category (Ambassador-to-US / UN-rep). The
+ * `united-states` page is skipped (404 — foreign governments only) and
+ * sub-national HK/Macau blocks are cut at the section boundary by
+ * `parseCountryHtml`.
  */
 import dns from "node:dns";
 import { randomUUID } from "node:crypto";
 
-import { and, eq, ilike, isNull, sql } from "drizzle-orm";
+import { and, eq, ilike, isNull, sql, type SQL } from "drizzle-orm";
+import type { BatchItem } from "drizzle-orm/batch";
 
 import { db as sharedDb } from "@/lib/db";
 import {
   jurisdictions,
-  offices,
   persons,
   terms,
   statements,
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import {
+  CABINET_MEMBER_PREDICATE,
+  CABINET_ROSTER_PREDICATE,
+  CIA_ROSTER_LICENSE,
+  CIA_ROSTER_OFFICE_TYPES,
+  CIA_SLUG_OVERRIDES,
+  isVacantHolderText,
+  parseRosterStamp,
+  planCountryRoster,
+  rosterContentHash,
+  type CountryRosterPlan,
+  type CountryRosterState,
+  type RosterHolder,
+  type RosterTitle,
+} from "@/lib/factbook/cabinet-roster";
 import { resolveAtlasReleaseId } from "@/lib/factbook/country-fact-history-writer";
 import {
+  buildGovernmentBodyHistoryStatement,
+  buildOfficeHistoryStatement,
+  buildPersonHistoryStatement,
   governmentEntityHistoryWriters,
   type GovernmentEntityHistoryContext,
   type GovernmentEntityHistoryWriters,
@@ -260,11 +274,12 @@ export interface CabinetSyncOptions {
   plan?: CabinetPlan;
   markSynced?: typeof markSourcesSynced;
   atlasReleaseId?: string;
-  entityWriters?: GovernmentEntityHistoryWriters;
   /** Database-free fixture seam for HTTP/status/schema regression tests. */
   fetchCountryPage?: (slug: string) => Promise<CabinetCountryFetchResult>;
   /** Fixture seam that avoids real retry backoff waits. */
   retryWait?: (delayMs: number) => Promise<void>;
+  /** Fixture seam for deterministic office/term/person UUIDs. */
+  newId?: () => string;
 }
 
 // ─── Position category classification ────────────────────────────────────────
@@ -327,6 +342,13 @@ const CABINET_RE =
   /(\bmin\.?\b|\bminister\b|\bsec\.?\s+(of|for|gen\.?)\b|\bsecretary\b|\battorney gen(eral|\.)?\b|\bstate councilor\b|\bstate councillor\b|\bsolicitor gen(eral|\.)?\b|\bcomptroller\b|\bauditor gen(eral|\.)?\b|\bprosecutor gen(eral|\.)?\b|\bchief cabinet\b|\bcabinet sec\b|\bchmn\.?\b|\bchairman\b|\bchairperson\b|\bchief of the\b|\bhead,\s|\bkeeper of the seals\b|\bnational security adviser\b)/i;
 
 /**
+ * Cabinet posts whose titles begin with a head-of-state token. "Chancellor of
+ * the Exchequer" (UK finance minister) and "Chancellor of the Duchy of
+ * Lancaster" are ministers, not heads of government.
+ */
+const CABINET_CHANCELLOR_RE = /^chancellor of the (exchequer|duchy)\b/i;
+
+/**
  * Classify a CIA position title into a category. Order matters: head first
  * (skip), then the specific non-cabinet buckets (central bank, diplomatic),
  * then deputy, then the broad cabinet catch, then "other".
@@ -336,6 +358,7 @@ export function classifyPosition(title: string): PositionCategory {
   // Central bank FIRST — a "Pres., Bundesbank" / "Governor, Bank of X" must not
   // be mistaken for a country president or a minister.
   if (CENTRAL_BANK_RE.test(t)) return "central_bank";
+  if (CABINET_CHANCELLOR_RE.test(t)) return "cabinet";
   if (HEAD_TITLE_RE.test(t)) return "head";
   if (DIPLOMATIC_RE.test(t)) return "diplomatic";
   if (DEPUTY_TITLE_RE.test(t)) return "deputy";
@@ -443,7 +466,12 @@ export function parseCountryHtml(slug: string, html: string): ParsedCountry {
     const title = stripTags(m[1]);
     const rawNameStr = m[2] != null ? stripTags(m[2]) : "";
     if (!title) continue;
-    const rawName = rawNameStr.length > 0 ? rawNameStr : null;
+    // CIA prints "Vacant" (and variants) for an unfilled post. It is a listed
+    // title with no holder, never a person.
+    const rawName =
+      rawNameStr.length > 0 && !isVacantHolderText(rawNameStr)
+        ? rawNameStr
+        : null;
     result.positions.push({
       title,
       rawName,
@@ -639,18 +667,14 @@ async function findJurisdictionBySlug(
   return byName.length > 0 ? byName[0] : null;
 }
 
-// ─── Person identity resolution (owner decision 1) ───────────────────────────
+// ─── Person identity resolution (owner decision 1, DAT-037 tiers) ────────────
 
-export type PersonPath = "existing" | "qid" | "new";
-
-export interface PersonResolution {
-  path: PersonPath;
-  /** Existing person id when path='existing'. */
-  personId: string | null;
-  /** Resolved Wikidata QID when path='qid'. */
-  qid: string | null;
-  /** Normalized display name. */
-  name: string;
+/** A roster name matched more than one stored person at the deciding tier. */
+export class CabinetPersonIdentityError extends Error {
+  constructor() {
+    super("Cabinet person identity is ambiguous");
+    this.name = "CabinetPersonIdentityError";
+  }
 }
 
 /**
@@ -703,37 +727,134 @@ async function searchWikidataPersonQid(
   return null;
 }
 
-/**
- * Resolve a CIA-listed person to an existing row or a proposed new (ID-less)
- * person — per owner decision 1. The crawl/apply path does NO Wikidata call:
- *
- *   1. Exact (case-insensitive) name match to an existing `persons` row → reuse.
- *   2. else propose a new ID-less person (`wikidata_qid = null`).
- *
- * QID attachment is a separate, deferred concern — see `backfillCabinetQids()`.
- * This keeps the per-country cost to the 10s CIA crawl-delay + local DB writes.
- *
- * READ-ONLY: this only READS `persons`. It never writes and never hits the
- * network.
- */
-export async function resolvePerson(
-  db: CabinetSyncDb,
-  rawName: string,
-): Promise<PersonResolution> {
-  const name = normalizeCiaName(rawName);
+export interface RosterNameEntry {
+  title: string;
+  /** Normalized display name (`normalizeCiaName`). */
+  name: string;
+}
 
-  // 1. Exact name match (case-insensitive).
-  const exact = await db
-    .select({ id: persons.id, qid: persons.wikidataQid })
-    .from(persons)
-    .where(ilike(persons.name, name))
-    .limit(1);
-  if (exact.length > 0) {
-    return { path: "existing", personId: exact[0].id, qid: exact[0].qid, name };
+function rowsFromResult<T>(result: unknown): T[] {
+  if (Array.isArray(result)) return result as T[];
+  return ((result as { rows?: T[] } | null)?.rows ?? []) as T[];
+}
+
+async function executeRows<T>(
+  database: CabinetSyncDb,
+  statement: SQL,
+): Promise<T[]> {
+  return rowsFromResult<T>(await database.execute(statement));
+}
+
+/**
+ * Resolve every listed name to one person — per owner decision 1 (exact name,
+ * never fuzzy; otherwise a new QID-less person) with a deterministic order
+ * among exact-name matches:
+ *
+ *   1. someone who already holds a term on this title's office;
+ *   2. then someone who holds a term on another roster-typed office of this
+ *      jurisdiction (roster continuity);
+ *   3. then someone who holds any term in this jurisdiction;
+ *   4. then someone with a Wikidata QID;
+ *   5. then anyone else with that exact name.
+ *
+ * The first non-empty tier decides. More than one person in that tier is
+ * ambiguous and fails the country closed rather than choosing arbitrarily.
+ * Matching uses PostgreSQL `lower()` equality, so `_` and `%` in a name are
+ * literal characters. READ-ONLY: never writes and never hits the network.
+ */
+export async function resolveRosterPersons(
+  db: CabinetSyncDb,
+  input: {
+    jurisdictionId: string;
+    entries: readonly RosterNameEntry[];
+    officeIdByTitle: ReadonlyMap<string, string>;
+    /** Run-scoped allocation of new QID-less person ids, keyed per country. */
+    newPersonIds: Map<string, string>;
+    newId: () => string;
+  },
+): Promise<Map<string, RosterHolder>> {
+  const names = [...new Set(input.entries.map((entry) => entry.name))];
+  const resolved = new Map<string, RosterHolder>();
+  if (names.length === 0) return resolved;
+
+  const candidates = await executeRows<{
+    input: string;
+    id: string;
+    qid: string | null;
+  }>(
+    db,
+    sql`SELECT r.input AS input, p.id::text AS id, p.wikidata_qid AS qid
+        FROM jsonb_array_elements_text(${JSON.stringify(names)}::jsonb) AS r(input)
+        JOIN persons p ON lower(p.name) = lower(r.input)`,
+  );
+  const candidateIds = [...new Set(candidates.map((row) => row.id))];
+  const holdings =
+    candidateIds.length === 0
+      ? []
+      : await executeRows<{
+          person_id: string;
+          office_id: string;
+          office_type: string;
+        }>(
+          db,
+          sql`SELECT DISTINCT t.person_id::text AS person_id,
+                     t.office_id::text AS office_id,
+                     o.office_type AS office_type
+              FROM terms t
+              JOIN offices o ON o.id = t.office_id
+              JOIN government_bodies b ON b.id = o.body_id
+              WHERE b.jurisdiction_id = ${input.jurisdictionId}::uuid
+                AND t.person_id IN (
+                  SELECT jsonb_array_elements_text(${JSON.stringify(candidateIds)}::jsonb)::uuid
+                )`,
+        );
+  const officesByPerson = new Map<string, Set<string>>();
+  const rosterHolders = new Set<string>();
+  for (const row of holdings) {
+    const set = officesByPerson.get(row.person_id) ?? new Set<string>();
+    set.add(row.office_id);
+    officesByPerson.set(row.person_id, set);
+    if ((CIA_ROSTER_OFFICE_TYPES as readonly string[]).includes(row.office_type)) {
+      rosterHolders.add(row.person_id);
+    }
+  }
+  const candidatesByName = new Map<string, Array<{ id: string; qid: string | null }>>();
+  for (const row of candidates) {
+    const list = candidatesByName.get(row.input) ?? [];
+    if (!list.some((existing) => existing.id === row.id)) {
+      list.push({ id: row.id, qid: row.qid });
+    }
+    candidatesByName.set(row.input, list);
   }
 
-  // 2. Propose a new ID-less person. QID attaches later via the backfill.
-  return { path: "new", personId: null, qid: null, name };
+  for (const entry of input.entries) {
+    const key = `${entry.title}\u001f${entry.name}`;
+    const matches = candidatesByName.get(entry.name) ?? [];
+    if (matches.length === 0) {
+      const newKey = `${input.jurisdictionId}\u001f${entry.name.toLowerCase()}`;
+      let personId = input.newPersonIds.get(newKey);
+      if (!personId) {
+        personId = input.newId();
+        input.newPersonIds.set(newKey, personId);
+      }
+      resolved.set(key, { personId, isNew: true, name: entry.name });
+      continue;
+    }
+    const officeId = input.officeIdByTitle.get(entry.title);
+    const tiers = [
+      matches.filter(
+        (match) => officeId !== undefined && officesByPerson.get(match.id)?.has(officeId),
+      ),
+      matches.filter((match) => rosterHolders.has(match.id)),
+      matches.filter((match) => officesByPerson.has(match.id)),
+      matches.filter((match) => match.qid !== null),
+      matches,
+    ];
+    const deciding = tiers.find((tier) => tier.length > 0) ?? [];
+    if (deciding.length !== 1) throw new CabinetPersonIdentityError();
+    resolved.set(key, { personId: deciding[0].id, isNew: false, name: entry.name });
+  }
+  return resolved;
 }
 
 // ─── Dry-run plan ────────────────────────────────────────────────────────────
@@ -745,17 +866,6 @@ export interface PlannedPosition {
   order: number;
   category: PositionCategory;
   officeType: string;
-  /** null when the post is unnamed/vacant (office created, no term). */
-  personPath: PersonPath | null;
-  qid: string | null;
-  /**
-   * Existing person id when `personPath === 'existing'`. Carried on the plan so
-   * the apply path reuses the resolution instead of re-querying Wikidata (the
-   * jurisdiction/person resolution already ran once in `computeCabinetPlan`).
-   */
-  personId: string | null;
-  /** Stable office UUID when the read plan matched an existing exact title. */
-  officeId?: string | null;
 }
 
 export interface PlannedCountry {
@@ -764,6 +874,10 @@ export interface PlannedCountry {
   jurisdictionId: string | null;
   jurisdictionName: string | null;
   lastUpdated: string | null;
+  /** ISO form of `lastUpdated`, or null when absent/unparseable. */
+  rosterStamp: string | null;
+  /** When this page response was retrieved (ISO, UTC). */
+  retrievedAt: string | null;
   fetchStatus: number;
   parseFailed: boolean;
   jurisdictionMatched: boolean;
@@ -771,14 +885,17 @@ export interface PlannedCountry {
 }
 
 /** A country skipped because its fetch failed after all retries, its HTTP 200
- * page failed the expected schema, or another country-scoped read/parse step
- * threw. Distinct from a clean 404, which is not a failure — see
- * `computeCabinetPlan`. */
+ * page failed the expected schema, another country-scoped read/parse step
+ * threw, or a closed roster/identity guard refused the write. Distinct from a
+ * clean 404, which is not a failure — see `computeCabinetPlan`. */
 export type CabinetFailureCode =
   | "upstream_http_error"
   | "upstream_schema_error"
   | "country_read_error"
   | "office_identity_conflict"
+  | "person_identity_ambiguous"
+  | "roster_contraction_guard"
+  | "roster_stamp_regressed"
   | "persistence_error";
 
 export interface FailedCountry {
@@ -787,23 +904,44 @@ export interface FailedCountry {
   reason: string;
 }
 
+const FAILURE_REASONS: Record<
+  Exclude<CabinetFailureCode, "upstream_http_error" | "upstream_schema_error" | "country_read_error">,
+  string
+> = {
+  office_identity_conflict: "Office identity is ambiguous or unsafe",
+  person_identity_ambiguous: "Person identity is ambiguous",
+  roster_contraction_guard:
+    "Roster contraction exceeds the safe automatic retirement limit",
+  roster_stamp_regressed: "Roster date is older than the stored roster date",
+  persistence_error: "Country persistence failed",
+};
+
 function closedCabinetWriteFailure(slug: string, err: unknown): FailedCountry {
+  if (err instanceof CabinetPersonIdentityError) {
+    return {
+      slug,
+      code: "person_identity_ambiguous",
+      reason: FAILURE_REASONS.person_identity_ambiguous,
+    };
+  }
   const message = (err as Error)?.message ?? "";
   if (
     message.includes(
       "Office mutation did not resolve one stable row; identity is ambiguous or unsafe",
-    )
+    ) ||
+    message.includes("civica_assertion_failed:office_identity_conflict") ||
+    message.includes("terms_office_id_offices_id_fk")
   ) {
     return {
       slug,
       code: "office_identity_conflict",
-      reason: "Office identity is ambiguous or unsafe",
+      reason: FAILURE_REASONS.office_identity_conflict,
     };
   }
   return {
     slug,
     code: "persistence_error",
-    reason: "Country persistence failed",
+    reason: FAILURE_REASONS.persistence_error,
   };
 }
 
@@ -828,17 +966,9 @@ export interface CabinetPlan {
     positionsIngested: number;
     /** Positions with a named holder → a term. */
     named: number;
-    /** Positions with no name → office created, no term (vacant). */
+    /** Positions with no name (or CIA's "Vacant") → listed office, no term. */
     vacant: number;
     byCategory: Record<PositionCategory, number>;
-    // Person identity split (over NAMED, ingested positions).
-    personExisting: number;
-    personQid: number;
-    personNew: number;
-    /** Distinct proposed NEW persons (QID-less) across the sample. */
-    distinctNewPersons: number;
-    /** Distinct proposed QID-attached persons across the sample. */
-    distinctQidPersons: number;
   };
 }
 
@@ -852,10 +982,9 @@ const EMPTY_BY_CATEGORY = (): Record<PositionCategory, number> => ({
 });
 
 /**
- * Fetch the sample, parse, resolve jurisdictions + persons, and assemble the
- * proposed change set. Pure READ — hits cia.gov (HTML) and reads
- * `jurisdictions` / `persons`. Does NOT hit Wikidata: person identity is an
- * exact-name match → else new ID-less. Writes NOTHING.
+ * Fetch the sample, parse, and resolve jurisdictions. Pure READ — hits cia.gov
+ * (HTML) and reads `jurisdictions`. Person identity is resolved later, per
+ * country, against the stored roster it will reconcile. Writes NOTHING.
  */
 export async function computeCabinetPlan(
   options: CabinetSyncOptions = {},
@@ -880,17 +1009,9 @@ export async function computeCabinetPlan(
       named: 0,
       vacant: 0,
       byCategory: EMPTY_BY_CATEGORY(),
-      personExisting: 0,
-      personQid: 0,
-      personNew: 0,
-      distinctNewPersons: 0,
-      distinctQidPersons: 0,
     },
   };
 
-  // Dedup person proposals across the whole sample (a human held once, many
-  // offices). Keyed by lowercased normalized name.
-  const stableIdByNewName = new Map<string, string>();
   const recordCountryFailure = (
     slug: string,
     code: CabinetFailureCode,
@@ -908,16 +1029,14 @@ export async function computeCabinetPlan(
 
     // ── ENTIRE per-country body is guarded ──────────────────────────────────
     // ONE try/catch wraps the whole iteration: the CIA fetch, the
-    // `findJurisdictionBySlug` Neon read, parse, and every per-position
-    // `resolvePerson` Neon read. On ANY thrown error (network, Neon
-    // ConnectTimeout, parse edge, anything), we log `⚠ skipped <slug>`, push to
-    // `failed[]`, and `continue`. NOTHING a single country does may abort the
-    // ~194-country crawl. (The prior bug: `findJurisdictionBySlug` sat OUTSIDE
-    // the guards, so a Neon timeout there killed the whole run at ~country 25.)
-    // Every per-country Neon call is additionally wrapped in `withDbRetry` so a
-    // transient serverless-HTTP blip retries before it ever reaches this catch.
-    // Counted once per iteration whether the body succeeds or the catch fires,
-    // so a fetch-then-DB-timeout skip isn't double-counted in `countriesFetched`.
+    // `findJurisdictionBySlug` Neon read, and parse. On ANY thrown error
+    // (network, Neon ConnectTimeout, parse edge, anything), we log
+    // `⚠ skipped <slug>`, push to `failed[]`, and `continue`. NOTHING a single
+    // country does may abort the ~194-country crawl. Every per-country Neon
+    // call is additionally wrapped in `withDbRetry` so a transient
+    // serverless-HTTP blip retries before it ever reaches this catch. Counted
+    // once per iteration whether the body succeeds or the catch fires, so a
+    // fetch-then-DB-timeout skip isn't double-counted in `countriesFetched`.
     let countedFetched = false;
     try {
       // Resilient fetch: a network/timeout error retries (backoff) internally.
@@ -927,6 +1046,7 @@ export async function computeCabinetPlan(
         fetcher: options.fetchCountryPage,
         wait: options.retryWait,
       });
+      const retrievedAt = new Date().toISOString();
       plan.stats.countriesFetched++;
       countedFetched = true;
 
@@ -936,6 +1056,8 @@ export async function computeCabinetPlan(
         jurisdictionId: null,
         jurisdictionName: null,
         lastUpdated: null,
+        rosterStamp: null,
+        retrievedAt,
         fetchStatus: status,
         parseFailed: false,
         jurisdictionMatched: false,
@@ -972,6 +1094,7 @@ export async function computeCabinetPlan(
       const parsed = parseCountryHtml(slug, html);
       country.countryName = parsed.countryName;
       country.lastUpdated = parsed.lastUpdated;
+      country.rosterStamp = parseRosterStamp(parsed.lastUpdated);
       country.parseFailed = parsed.parseFailed;
       if (parsed.parseFailed) {
         const reason =
@@ -992,63 +1115,27 @@ export async function computeCabinetPlan(
           continue; // spine owns heads
         }
         plan.stats.positionsIngested++;
+        if (pos.rawName) plan.stats.named++;
+        else plan.stats.vacant++;
 
-        const officeType = officeTypeForCategory(pos.category);
-        const planned: PlannedPosition = {
+        country.positions.push({
           title: pos.title,
           rawName: pos.rawName,
           normalizedName: pos.rawName ? normalizeCiaName(pos.rawName) : null,
           order: pos.order,
           category: pos.category,
-          officeType,
-          personPath: null,
-          qid: null,
-          personId: null,
-        };
-
-        if (!pos.rawName) {
-          // Unnamed / vacant post: office created, no term. Never invent a holder.
-          plan.stats.vacant++;
-          country.positions.push(planned);
-          continue;
-        }
-        plan.stats.named++;
-
-        // Fast, network-free identity resolution: exact-name match → else new
-        // ID-less person. NO Wikidata call here — QID attachment is deferred to
-        // `backfillCabinetQids()`. The Neon read is retry-wrapped.
-        const resolution = await withDbRetry(
-          () => resolvePerson(db, pos.rawName as string),
-          { log, label: `resolvePerson(${slug})` },
-        );
-        planned.personPath = resolution.path;
-        planned.qid = resolution.qid;
-        planned.personId = resolution.personId;
-
-        if (resolution.path === "existing") plan.stats.personExisting++;
-        else {
-          plan.stats.personNew++;
-          const key = resolution.name.toLowerCase();
-          let stableId = stableIdByNewName.get(key);
-          if (!stableId) {
-            stableId = randomUUID();
-            stableIdByNewName.set(key, stableId);
-            plan.stats.distinctNewPersons++;
-          }
-          planned.personId = stableId;
-        }
-
-        country.positions.push(planned);
+          officeType: officeTypeForCategory(pos.category),
+        });
       }
 
       log(
         `  ✓ ${slug}: ${parsed.positions.length} positions (${country.positions.length} to ingest)`,
       );
       plan.countries.push(country);
-    } catch (err) {
+    } catch {
       // ANY failure in the per-country body (fetch after retries, a Neon
-      // timeout in findJurisdictionBySlug / resolvePerson, a parse throw) skips
-      // THIS country and records it — the crawl runs to completion.
+      // timeout in findJurisdictionBySlug, a parse throw) skips THIS country
+      // and records it — the crawl runs to completion.
       if (!countedFetched) plan.stats.countriesFetched++;
       recordCountryFailure(
         slug,
@@ -1099,7 +1186,7 @@ export function reportCabinetPlan(
   log(`  → head rows skipped (spine):  ${s.headsSkipped}`);
   log(`  → positions to ingest:        ${s.positionsIngested}`);
   log(`     · named (→ term):          ${s.named}`);
-  log(`     · unnamed (vacant office): ${s.vacant}`);
+  log(`     · unnamed or vacant:       ${s.vacant}`);
   log(`  Avg positions / country:      ${avgPerCountry.toFixed(1)}`);
   log(`  Avg ingested / country:       ${avgIngestPerCountry.toFixed(1)}`);
 
@@ -1127,54 +1214,11 @@ export function reportCabinetPlan(
     `  Positions listed:   ~${Math.round(avgPerCountry * FULL_DIRECTORY_COUNT).toLocaleString("en-US")}`,
   );
   log(
-    `  Offices to create:  ~${Math.round(avgIngestPerCountry * FULL_DIRECTORY_COUNT).toLocaleString("en-US")}`,
+    `  Offices listed:     ~${Math.round(avgIngestPerCountry * FULL_DIRECTORY_COUNT).toLocaleString("en-US")}`,
   );
-  for (const cat of [
-    "cabinet",
-    "central_bank",
-    "diplomatic",
-    "deputy",
-    "other",
-  ] as PositionCategory[]) {
-    const avg = s.byCategory[cat] / parsed;
-    log(
-      `    · ${cat.padEnd(13)} ~${Math.round(avg * FULL_DIRECTORY_COUNT).toLocaleString("en-US")}`,
-    );
-  }
-
-  log("\nPERSON IDENTITY SPLIT (over named, ingested positions)");
-  log("  (crawl is network-free: exact-match → else new ID-less;");
-  log("   QID attachment is the deferred `--backfill-qids` pass)");
-  const namedTotal = s.named || 1;
-  log(
-    `  Exact-match existing person:  ${s.personExisting} (${pct(s.personExisting, namedTotal)}%)`,
-  );
-  log(
-    `  Create ID-less (no QID yet):  ${s.personNew} (${pct(s.personNew, namedTotal)}%)  → ${s.distinctNewPersons} distinct new ID-less persons`,
-  );
-  log("");
-  log(
-    `  Person-QID invariant impact: today 351/351 persons carry a QID (100%).`,
-  );
-  const projNew = Math.round(
-    (s.distinctNewPersons / parsed) * FULL_DIRECTORY_COUNT,
-  );
-  log(
-    `  Extrapolated full run adds ~${projNew.toLocaleString("en-US")} ID-less persons`,
-  );
-  log(
-    `  across ~195 countries; the deferred backfill later attaches QIDs where`,
-  );
-  log(`  confident (never fuzzy-merged).`);
-  if (projNew > 0) {
-    const newCoverage = pct(351, 351 + projNew);
-    log(
-      `  → QID coverage drops to ~${newCoverage}% until the backfill runs.`,
-    );
-  }
 
   // Per-country samples (first 3 matched countries with positions).
-  log("\nSAMPLE — parsed positions → proposed office_type + person path");
+  log("\nSAMPLE — parsed positions → proposed office_type");
   const sampleCountries = plan.countries
     .filter((c) => c.jurisdictionMatched && c.positions.length > 0)
     .slice(0, 3);
@@ -1184,36 +1228,22 @@ export function reportCabinetPlan(
     );
     for (const p of c.positions.slice(0, 16)) {
       const holder = p.normalizedName ?? "(vacant — no holder)";
-      const path =
-        p.personPath === null
-          ? "vacant"
-          : p.personPath === "qid"
-            ? `QID ${p.qid}`
-            : p.personPath;
-      log(
-        `    [${p.officeType}] "${p.title}" → ${holder}  ·  ${path}`,
-      );
+      log(`    [${p.officeType}] "${p.title}" → ${holder}`);
     }
     if (c.positions.length > 16) {
       log(`    … and ${c.positions.length - 16} more`);
     }
   }
 
-  log("\nAPPLY-PATH WRITE SHAPE (NOT run this round)");
+  log("\nAPPLY-PATH WRITE SHAPE (DAT-037 roster reconciliation)");
+  log('  · reuse the "Executive of <country>" body; offices keyed on exact title');
+  log("  · titles no longer listed release their list position; holders retire");
+  log("  · current holders of each listed title = exactly the listed people");
+  log("  · terms keyed on (office, person); no start date is ever written");
   log(
-    "  · reuse existing \"Executive of <country>\" body (cabinet/executive)",
+    `  · one '${CABINET_MEMBER_PREDICATE}' statement per term and one '${CABINET_ROSTER_PREDICATE}' statement per country (source '${CIA_WORLD_LEADERS_SOURCE_ID}')`,
   );
-  log(
-    "  · offices dedup on (bodyId, name) [fix a]; office_type = category tag;",
-  );
-  log("    display_order = CIA list index (additive column, staged not pushed)");
-  log(
-    "  · persons: existing id / new{qid:null}; terms current;",
-  );
-  log(
-    `  · statements provenance per term (predicate 'cabinet_member', source '${CIA_WORLD_LEADERS_SOURCE_ID}')`,
-  );
-  log(`  · markSourcesSynced("${CIA_WORLD_LEADERS_SOURCE_ID}") on write`);
+  log("  · unchanged rosters write nothing and do not stamp freshness");
   log("");
 }
 
@@ -1230,19 +1260,10 @@ export function reportCabinetPlan(
 
 /**
  * Civica jurisdiction slug → CIA World Leaders slug, for the confirmed
- * divergences (verified live 2026-07-01 via HEAD probes). Anything not here
- * uses the Civica slug unchanged.
+ * divergences. Defined with the roster contract (`cabinet-roster.ts`) so the
+ * one-time repair maps pages to jurisdictions exactly as the importer does.
  */
-export const CIA_SLUG_OVERRIDES: Record<string, string> = {
-  drc: "congo-democratic-republic-of-the",
-  "congo-brazzaville": "congo-republic-of-the",
-  "the-bahamas": "bahamas-the",
-  "the-gambia": "gambia-the",
-  "the-dominican": "dominican-republic",
-  "c-te-d-ivoire": "cote-divoire",
-  "north-korea": "korea-north",
-  "south-korea": "korea-south",
-};
+export { CIA_SLUG_OVERRIDES };
 
 /**
  * Civica jurisdiction slugs that are NOT foreign sovereign governments in the
@@ -1301,223 +1322,7 @@ const CIA_SLUG_TO_JURIS_SLUG: Record<string, string> = Object.fromEntries(
   Object.entries(CIA_SLUG_OVERRIDES).map(([ours, cia]) => [cia, ours]),
 );
 
-// ─── Apply-path write helpers (mirror officeholders-sync, with fix a) ────────
-
-/**
- * Reuse the country's existing `"Executive of <country>"` body
- * (`body_type='cabinet'`, `branch='executive'`) — 197 already exist. Create it
- * only if missing. Keyed on (jurisdictionId, branch='executive'), matching
- * `officeholders-sync.upsertBody`.
- */
-async function upsertExecutiveBody(
-  db: CabinetSyncDb,
-  jurisdictionId: string,
-  countryName: string,
-  writers: GovernmentEntityHistoryWriters,
-  history: GovernmentEntityHistoryContext,
-): Promise<string> {
-  return writers.upsertBody(db, {
-    jurisdictionId,
-    name: `Executive of ${countryName}`,
-    bodyType: "cabinet",
-    branch: "executive",
-    hierarchyLevel: 0,
-    history,
-  });
-}
-
-/**
- * Cabinet-safe office upsert. FIX (a): dedup on `(bodyId, name)`, NOT
- * `(bodyId, officeType)` — the latter collapses N ministers (all
- * `office_type='cabinet'`) into one. Updates `office_type` + `display_order`
- * on an existing (bodyId, name) match so re-runs stay idempotent and keep the
- * CIA list order fresh.
- */
-async function upsertCabinetOffice(
-  db: CabinetSyncDb,
-  bodyId: string,
-  name: string,
-  officeType: string,
-  displayOrder: number,
-  stableId: string | null | undefined,
-  writers: GovernmentEntityHistoryWriters,
-  history: GovernmentEntityHistoryContext,
-): Promise<string> {
-  return writers.upsertOffice(db, {
-    bodyId,
-    stableId,
-    name,
-    officeType,
-    isElected: false,
-    displayOrder,
-    identityMode: "exact_title",
-    history,
-  });
-}
-
-async function listExistingCabinetOffices(
-  db: CabinetSyncDb,
-  bodyId: string,
-): Promise<Array<{ id: string; name: string }>> {
-  return db
-    .select({ id: offices.id, name: offices.name })
-    .from(offices)
-    .where(eq(offices.bodyId, bodyId));
-}
-
-function exactOfficeIdsByTitle(
-  existing: Array<{ id: string; name: string }>,
-  eligibleTitles: ReadonlySet<string>,
-): Map<string, string> {
-  const byTitle = new Map<string, string>();
-  for (const office of existing) {
-    if (!eligibleTitles.has(office.name)) continue;
-    if (byTitle.has(office.name)) {
-      throw new Error(
-        "Office mutation did not resolve one stable row; identity is ambiguous or unsafe",
-      );
-    }
-    byTitle.set(office.name, office.id);
-  }
-  return byTitle;
-}
-
-/**
- * Resolve the person id to link a term to, per owner decision 1:
- *   - path 'existing' → the matched existing person id.
- *   - path 'qid'      → upsert-by-QID (dedup on wikidata_qid; a person with
- *                       that QID may already exist from a race, so re-check).
- *   - path 'new'      → create a QID-less person.
- * Never fuzzy-merges. Returns the person id.
- */
-async function persistPerson(
-  db: CabinetSyncDb,
-  resolution: PersonResolution,
-  stableId: string,
-  writers: GovernmentEntityHistoryWriters,
-  history: GovernmentEntityHistoryContext,
-): Promise<string> {
-  if (resolution.path === "existing" && resolution.personId) {
-    return resolution.personId;
-  }
-
-  if (resolution.path === "qid" && resolution.qid) {
-    return writers.mutatePerson(db, {
-      stableId,
-      identityQid: resolution.qid,
-      insertName: resolution.name,
-      values: { name: resolution.name, wikidataQid: resolution.qid },
-      history,
-    });
-  }
-
-  // QID-less names are mutable display text, never an identity key. The plan
-  // must carry/reuse an explicit UUID (or this apply allocates one once per
-  // normalized name) before the atomic mutation boundary is entered.
-  return writers.mutatePerson(db, {
-    stableId,
-    insertName: resolution.name,
-    values: { name: resolution.name, wikidataQid: null },
-    history,
-  });
-}
-
-/**
- * Idempotent term upsert — identical semantics to
- * `officeholders-sync.upsertTerm`: reuse an existing
- * (officeId, personId, startDate) row and flip every OTHER term on the office
- * to non-current, so re-running the sync never accumulates duplicate rows.
- */
-async function upsertCabinetTerm(
-  db: CabinetSyncDb,
-  officeId: string,
-  personId: string,
-  startDate: string | null,
-): Promise<string> {
-  const existing = await db
-    .select({ id: terms.id, isCurrent: terms.isCurrent })
-    .from(terms)
-    .where(
-      sql`${terms.officeId} = ${officeId} AND ${terms.personId} = ${personId} AND ${terms.startDate} IS NOT DISTINCT FROM ${startDate}`,
-    )
-    .limit(1);
-
-  if (existing.length > 0) {
-    await db
-      .update(terms)
-      .set({ isCurrent: false })
-      .where(
-        sql`${terms.officeId} = ${officeId} AND ${terms.id} <> ${existing[0].id} AND ${terms.isCurrent} = true`,
-      );
-    if (!existing[0].isCurrent) {
-      await db
-        .update(terms)
-        .set({ isCurrent: true })
-        .where(eq(terms.id, existing[0].id));
-    }
-    return existing[0].id;
-  }
-
-  await db
-    .update(terms)
-    .set({ isCurrent: false })
-    .where(sql`${terms.officeId} = ${officeId} AND ${terms.isCurrent} = true`);
-
-  const inserted = await db.insert(terms).values({
-    officeId, personId, startDate, isCurrent: true,
-  }).returning({ id: terms.id });
-  return inserted[0].id;
-}
-
-/**
- * Provenance row for a cabinet term. Mirrors
- * `officeholders-sync.upsertStatement` (subject_table='terms', subject_id is
- * the term id), but sourced to
- * `cia_world_leaders` (public domain) with the per-country page URL. Idempotent
- * on (subject_table, subject_id, predicate).
- */
-async function upsertCabinetStatement(
-  db: CabinetSyncDb,
-  termId: string,
-  predicate: string,
-  objectValue: string,
-  sourceUrl: string,
-): Promise<void> {
-  const existing = await db
-    .select({ id: statements.id })
-    .from(statements)
-    .where(
-      sql`${statements.subjectTable} = ${"terms"} AND ${statements.subjectId} = ${termId} AND ${statements.predicate} = ${predicate} AND ${statements.sourceId} = ${CIA_WORLD_LEADERS_SOURCE_ID}`,
-    )
-    .limit(1);
-
-  if (existing.length > 0) {
-    await db
-      .update(statements)
-      .set({
-        objectValue,
-        sourceId: CIA_WORLD_LEADERS_SOURCE_ID,
-        sourceUrl,
-        sourceLicense: "public_domain",
-        retrievedAt: new Date(),
-      })
-      .where(eq(statements.id, existing[0].id));
-    return;
-  }
-
-  await db.insert(statements).values({
-    subjectTable: "terms",
-    subjectId: termId,
-    predicate,
-    objectValue,
-    sourceId: CIA_WORLD_LEADERS_SOURCE_ID,
-    sourceUrl,
-    sourceLicense: "public_domain",
-    retrievedAt: new Date(),
-  });
-}
-
-// ─── Apply orchestrator ──────────────────────────────────────────────────────
+// ─── Apply path (DAT-037 roster reconciliation) ──────────────────────────────
 
 /**
  * Categories persisted by the apply path. Owner scope decision (2026-07-01):
@@ -1532,15 +1337,348 @@ const INGEST_CATEGORIES: ReadonlySet<PositionCategory> = new Set([
   "other",
 ]);
 
-/** Parse a CIA "Last Updated: M/D/YYYY" stamp to an ISO yyyy-mm-dd, or null. */
-function parseLastUpdated(raw: string | null): string | null {
-  if (!raw) return null;
-  const m = raw.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (!m) return null;
-  const [, mo, da, yr] = m;
-  const iso = `${yr}-${mo.padStart(2, "0")}-${da.padStart(2, "0")}`;
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? null : iso;
+/** Methodology label recorded on every Atlas entity event this path writes. */
+export const CIA_CABINET_METHODOLOGY_VERSION = "cia-world-leaders-sync/v2";
+
+interface ExecutiveBodyRow {
+  id: string;
+  name: string;
+  body_type: string;
+  branch: string | null;
+  hierarchy_level: number | null;
+}
+
+class CabinetExecutiveBodyConflictError extends Error {
+  constructor() {
+    super(
+      "Office mutation did not resolve one stable row; identity is ambiguous or unsafe",
+    );
+    this.name = "CabinetExecutiveBodyConflictError";
+  }
+}
+
+/**
+ * Read one country's stored executive roster: its executive body, every
+ * office in that body, the terms on roster-typed offices with their own CIA
+ * statement, and the body-level roster statement.
+ */
+export async function readCountryRosterState(
+  db: CabinetSyncDb,
+  jurisdictionId: string,
+): Promise<{ body: ExecutiveBodyRow | null; state: CountryRosterState }> {
+  const bodies = await executeRows<ExecutiveBodyRow>(
+    db,
+    sql`SELECT id::text AS id, name, body_type, branch, hierarchy_level
+        FROM government_bodies
+        WHERE jurisdiction_id = ${jurisdictionId}::uuid AND branch = 'executive'
+        ORDER BY id`,
+  );
+  if (bodies.length > 1) throw new CabinetExecutiveBodyConflictError();
+  const body = bodies[0] ?? null;
+  if (!body) {
+    return { body: null, state: { offices: [], terms: [], rosterStatement: null } };
+  }
+  const officeRows = await executeRows<{
+    id: string;
+    name: string;
+    office_type: string;
+    display_order: number | null;
+    is_elected: boolean | null;
+  }>(
+    db,
+    sql`SELECT id::text AS id, name, office_type, display_order, is_elected
+        FROM offices WHERE body_id = ${body.id}::uuid ORDER BY id`,
+  );
+  const termRows = await executeRows<{
+    id: string;
+    office_id: string;
+    person_id: string;
+    is_current: boolean | null;
+    start_date: string | null;
+    statement_id: string | null;
+    object_value: string | null;
+    source_url: string | null;
+    source_license: string | null;
+    retrieved_at: string | null;
+  }>(
+    db,
+    sql`SELECT t.id::text AS id, t.office_id::text AS office_id,
+               t.person_id::text AS person_id, t.is_current,
+               t.start_date::text AS start_date, s.id::text AS statement_id,
+               s.object_value, s.source_url, s.source_license,
+               s.retrieved_at::text AS retrieved_at
+        FROM terms t
+        JOIN offices o ON o.id = t.office_id
+        LEFT JOIN statements s
+          ON s.subject_table = 'terms' AND s.subject_id = t.id
+         AND s.predicate = ${CABINET_MEMBER_PREDICATE}
+         AND s.source_id = ${CIA_WORLD_LEADERS_SOURCE_ID}
+        WHERE o.body_id = ${body.id}::uuid
+          AND o.office_type IN (
+            SELECT jsonb_array_elements_text(${JSON.stringify(CIA_ROSTER_OFFICE_TYPES)}::jsonb)
+          )
+        ORDER BY t.id`,
+  );
+  const rosterRows = await executeRows<{
+    id: string;
+    object_value: string | null;
+    source_hash: string | null;
+    source_url: string | null;
+    source_license: string | null;
+  }>(
+    db,
+    sql`SELECT id::text AS id, object_value, source_hash, source_url, source_license
+        FROM statements
+        WHERE subject_table = 'government_bodies'
+          AND subject_id = ${body.id}::uuid
+          AND predicate = ${CABINET_ROSTER_PREDICATE}
+          AND source_id = ${CIA_WORLD_LEADERS_SOURCE_ID}`,
+  );
+  const roster = rosterRows[0] ?? null;
+  return {
+    body,
+    state: {
+      offices: officeRows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        officeType: row.office_type,
+        displayOrder: row.display_order,
+        isElected: row.is_elected,
+      })),
+      terms: termRows.map((row) => ({
+        id: row.id,
+        officeId: row.office_id,
+        personId: row.person_id,
+        isCurrent: row.is_current,
+        startDate: row.start_date,
+        cia: row.statement_id
+          ? {
+              statementId: row.statement_id,
+              objectValue: row.object_value,
+              sourceUrl: row.source_url,
+              sourceLicense: row.source_license,
+              retrievedAt: row.retrieved_at,
+            }
+          : null,
+      })),
+      rosterStatement: roster
+        ? {
+            id: roster.id,
+            objectValue: roster.object_value,
+            sourceHash: roster.source_hash,
+            sourceUrl: roster.source_url,
+            sourceLicense: roster.source_license,
+          }
+        : null,
+    },
+  };
+}
+
+/** Group eligible positions by exact title, keeping publisher order. */
+export function groupRosterTitles(
+  positions: readonly PlannedPosition[],
+  holders: ReadonlyMap<string, RosterHolder>,
+): RosterTitle[] {
+  const byTitle = new Map<string, RosterTitle>();
+  for (const position of positions) {
+    let title = byTitle.get(position.title);
+    if (!title) {
+      title = {
+        title: position.title,
+        officeType: position.officeType,
+        firstOrder: position.order,
+        holders: [],
+      };
+      byTitle.set(position.title, title);
+    }
+    if (!position.normalizedName) continue;
+    const holder = holders.get(`${position.title}\u001f${position.normalizedName}`);
+    if (!holder) {
+      throw new Error("Cabinet roster holder was not resolved before planning");
+    }
+    if (!title.holders.some((existing) => existing.personId === holder.personId)) {
+      title.holders.push(holder);
+    }
+  }
+  return [...byTitle.values()];
+}
+
+interface CountryBatchInput {
+  db: CabinetSyncDb;
+  bodyId: string;
+  bodyWrite: SQL | null;
+  plan: CountryRosterPlan;
+  sourceUrl: string;
+  retrievedAt: string;
+  history: GovernmentEntityHistoryContext;
+}
+
+/**
+ * Build one country's writes as an ordered, non-interactive Neon transaction.
+ * Every term and statement write is idempotent (guarded updates, conflict-safe
+ * inserts), so a replay after an unknown commit outcome writes nothing new.
+ * The final assertion raises, rolling the whole country back, unless every
+ * listed and released office ended in its planned position.
+ */
+export function buildCountryRosterBatch(input: CountryBatchInput): SQL[] {
+  const { plan, bodyId } = input;
+  const statementsOut: SQL[] = [];
+  if (input.bodyWrite) statementsOut.push(input.bodyWrite);
+
+  const releaseHistory: GovernmentEntityHistoryContext = {
+    ...input.history,
+    reason: "No longer listed in the CIA World Leaders roster",
+  };
+  const order = { release: 0, move: 1, insert: 2 } as const;
+  for (const write of [...plan.officeWrites].sort(
+    (a, b) => order[a.kind] - order[b.kind],
+  )) {
+    statementsOut.push(
+      write.kind === "insert"
+        ? buildOfficeHistoryStatement(
+            {
+              bodyId,
+              name: write.name,
+              officeType: write.officeType,
+              isElected: write.isElected,
+              displayOrder: write.displayOrder,
+              identityMode: "exact_title",
+              history: input.history,
+            },
+            write.officeId,
+          )
+        : buildOfficeHistoryStatement({
+            bodyId,
+            stableId: write.officeId,
+            name: write.name,
+            officeType: write.officeType,
+            isElected: write.isElected,
+            displayOrder: write.displayOrder,
+            identityMode: "exact_title",
+            history: write.kind === "release" ? releaseHistory : input.history,
+          }),
+    );
+  }
+
+  for (const person of plan.personInserts) {
+    statementsOut.push(
+      buildPersonHistoryStatement(
+        {
+          stableId: person.personId,
+          insertName: person.name,
+          values: { name: person.name, wikidataQid: null },
+          history: input.history,
+        },
+        person.personId,
+      ),
+    );
+  }
+
+  if (plan.termsRetired.length > 0) {
+    statementsOut.push(sql`
+      UPDATE terms SET is_current = false
+      WHERE id IN (SELECT jsonb_array_elements_text(${JSON.stringify(plan.termsRetired)}::jsonb)::uuid)
+        AND is_current IS DISTINCT FROM false`);
+  }
+  if (plan.termsReinstated.length > 0) {
+    statementsOut.push(sql`
+      UPDATE terms SET is_current = true
+      WHERE id IN (SELECT jsonb_array_elements_text(${JSON.stringify(plan.termsReinstated)}::jsonb)::uuid)
+        AND is_current IS DISTINCT FROM true`);
+  }
+  if (plan.termInserts.length > 0) {
+    // Undated listing: CIA publishes no appointment date, so none is stored.
+    statementsOut.push(sql`
+      INSERT INTO terms (id, office_id, person_id, start_date, end_date, is_current)
+      SELECT x."termId", x."officeId", x."personId", NULL, NULL, true
+      FROM jsonb_to_recordset(${JSON.stringify(plan.termInserts)}::jsonb)
+        AS x("termId" uuid, "officeId" uuid, "personId" uuid)
+      ON CONFLICT (id) DO NOTHING`);
+  }
+  if (plan.statementWrites.length > 0) {
+    const rows = plan.statementWrites.map(({ termId, objectValue }) => ({
+      subjectId: termId,
+      objectValue,
+    }));
+    // `retrieved_at` records the retrieval that established this content; an
+    // unchanged statement is left untouched.
+    statementsOut.push(sql`
+      INSERT INTO statements (
+        subject_table, subject_id, predicate, object_value, source_id,
+        source_url, source_license, retrieved_at
+      )
+      SELECT 'terms', x."subjectId", ${CABINET_MEMBER_PREDICATE}, x."objectValue",
+             ${CIA_WORLD_LEADERS_SOURCE_ID}, ${input.sourceUrl}, ${CIA_ROSTER_LICENSE},
+             ${input.retrievedAt}::timestamp
+      FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
+        AS x("subjectId" uuid, "objectValue" text)
+      ON CONFLICT (subject_table, subject_id, predicate, source_id) DO UPDATE SET
+        object_value = EXCLUDED.object_value,
+        source_url = EXCLUDED.source_url,
+        source_license = EXCLUDED.source_license,
+        retrieved_at = EXCLUDED.retrieved_at
+      WHERE (statements.object_value, statements.source_url, statements.source_license)
+        IS DISTINCT FROM (EXCLUDED.object_value, EXCLUDED.source_url, EXCLUDED.source_license)`);
+  }
+  if (plan.rosterStatement) {
+    statementsOut.push(sql`
+      INSERT INTO statements (
+        subject_table, subject_id, predicate, object_value, source_id,
+        source_url, source_license, retrieved_at, source_hash
+      )
+      VALUES (
+        'government_bodies', ${bodyId}::uuid, ${CABINET_ROSTER_PREDICATE},
+        ${plan.rosterStatement.objectValue}, ${CIA_WORLD_LEADERS_SOURCE_ID},
+        ${input.sourceUrl}, ${CIA_ROSTER_LICENSE}, ${input.retrievedAt}::timestamp,
+        ${plan.rosterStatement.sourceHash}
+      )
+      ON CONFLICT (subject_table, subject_id, predicate, source_id) DO UPDATE SET
+        object_value = EXCLUDED.object_value,
+        source_url = EXCLUDED.source_url,
+        source_license = EXCLUDED.source_license,
+        source_hash = EXCLUDED.source_hash,
+        retrieved_at = EXCLUDED.retrieved_at
+      WHERE (statements.object_value, statements.source_hash, statements.source_url, statements.source_license)
+        IS DISTINCT FROM (EXCLUDED.object_value, EXCLUDED.source_hash, EXCLUDED.source_url, EXCLUDED.source_license)`);
+  }
+
+  const expectedOffices = [
+    ...plan.listedOffices,
+    ...plan.releasedOfficeIds.map((officeId) => ({
+      officeId,
+      name:
+        plan.officeWrites.find((write) => write.officeId === officeId)?.name ?? "",
+      displayOrder: null,
+    })),
+  ];
+  if (expectedOffices.length > 0) {
+    // A blocked office write (for example the shared writer's same-position
+    // rename guard) leaves no row; this raises and rolls the country back.
+    statementsOut.push(sql`
+      SELECT CASE WHEN x.mismatches = 0 THEN 1
+        ELSE ('civica_assertion_failed:office_identity_conflict:' || x.mismatches::text)::integer
+      END AS verified
+      FROM (
+        SELECT count(*)::integer AS mismatches
+        FROM jsonb_to_recordset(${JSON.stringify(expectedOffices)}::jsonb)
+          AS e("officeId" uuid, name text, "displayOrder" integer)
+        LEFT JOIN offices o ON o.id = e."officeId" AND o.body_id = ${bodyId}::uuid
+        WHERE o.id IS NULL
+           OR o.name IS DISTINCT FROM e.name
+           OR o.display_order IS DISTINCT FROM e."displayOrder"
+      ) x`);
+  }
+  return statementsOut;
+}
+
+async function executeCountryBatch(
+  db: CabinetSyncDb,
+  statementsIn: readonly SQL[],
+): Promise<void> {
+  if (statementsIn.length === 0) return;
+  const queries = statementsIn.map((statement) => db.execute(statement));
+  const [first, ...rest] = queries;
+  await db.batch([first, ...rest] as unknown as [BatchItem<"pg">, ...BatchItem<"pg">[]]);
 }
 
 export interface CiaCabinetSyncSummary {
@@ -1548,36 +1686,61 @@ export interface CiaCabinetSyncSummary {
   finishedAt: string;
   durationMs: number;
   countriesCrawled: number;
+  /** Countries whose roster changed and was written (or would be, dry run). */
   countriesApplied: number;
+  /** Countries whose roster was reconciled, including unchanged ones. */
+  countriesVerified: number;
+  /** Verified countries whose stored roster already matched the page. */
+  countriesUnchanged: number;
   countriesFetchFailed: number;
-  /** Countries skipped after an upstream/schema/read/write failure. */
+  /** Countries skipped after an upstream/schema/read/guard/write failure. */
   countriesSkipped: number;
   /** The skipped slugs + reasons, so a targeted re-run can pick up stragglers. */
   skipped: FailedCountry[];
   countriesUnmatched: number;
+  bodiesWritten: number;
+  /** Office rows changed: released + moved + inserted. */
   officesWritten: number;
+  officesReleased: number;
+  officesMoved: number;
+  officesInserted: number;
+  /** Listed holders matched to an existing person (a read, not a write). */
   personsExisting: number;
+  /** Retained for response compatibility; the crawl never creates QID persons. */
   personsQidCreated: number;
+  /** QID-less persons created for names with no stored match. */
   personsIdlessCreated: number;
+  /** Term rows changed: inserted + reinstated + retired. */
   termsWritten: number;
+  termsInserted: number;
+  termsReinstated: number;
+  termsRetired: number;
+  /** Listed titles with no holder (CIA's "Vacant" or an unnamed post). */
   vacantOffices: number;
   diplomaticSkipped: number;
+  /** Statement rows changed: term inserts + term updates + roster writes. */
   statementsWritten: number;
+  statementsInserted: number;
+  statementsUpdated: number;
+  rosterStatementsWritten: number;
+  /** Pages without a parseable "Last Updated" date (roster date kept). */
+  rosterStampMissing: number;
+  /** Every real row mutation this run (zero for an unchanged shard). */
   totalRowsWritten: number;
   freshnessStamped: boolean;
   dryRun: boolean;
 }
 
 /**
- * The FULL CIA World Leaders cabinet apply. Reuses `computeCabinetPlan` (the
- * exact read the dry run reported on), then persists offices / persons / terms
- * / statements and stamps `markSourcesSynced("cia_world_leaders")`.
+ * The CIA World Leaders cabinet apply. Reuses `computeCabinetPlan` (the exact
+ * fetch/parse the dry run reported on), then, country by country, reconciles
+ * the stored roster with the page and commits each country's writes in one
+ * transaction. Stamps `markSourcesSynced("cia_world_leaders")` only when rows
+ * actually changed and no country was skipped.
  *
  * `slugs` defaults to the full `buildCiaSlugList()` crawl (~194 candidates,
- * 404-tolerant). The cron route and the CLI both call this; the CLI can pass a
- * sample. Cost is now just the 10s crawl-delay × ~194 pages + local DB writes
- * (no per-person Wikidata call) ≈ 35–45 min. QID attachment is the separate,
- * deferred `backfillCabinetQids()` pass.
+ * 404-tolerant). The cron route and the CLI both call this. QID attachment is
+ * the separate, deferred `backfillCabinetQids()` pass.
  */
 export async function syncCiaCabinets(
   options: CabinetSyncOptions = {},
@@ -1589,12 +1752,13 @@ export async function syncCiaCabinets(
   const atlasReleaseId = resolveAtlasReleaseId(options.atlasReleaseId);
   const db = options.db ?? sharedDb;
   const log = options.onProgress ?? (() => {});
-  const writers = options.entityWriters ?? governmentEntityHistoryWriters;
+  const newId = options.newId ?? randomUUID;
+  const dryRun = options.dryRun ?? false;
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
 
   const slugs = options.slugs ?? (await buildCiaSlugList(db));
-  log(`=== CIA World Leaders Cabinet Sync (APPLY) ===`);
+  log(`=== CIA World Leaders Cabinet Sync (${dryRun ? "DRY RUN" : "APPLY"}) ===`);
   log(`Crawling ${slugs.length} CIA candidate pages …`);
 
   const plan = options.plan ?? await computeCabinetPlan({
@@ -1602,6 +1766,8 @@ export async function syncCiaCabinets(
     slugs,
     crawlDelayMs: options.crawlDelayMs,
     onProgress: log,
+    fetchCountryPage: options.fetchCountryPage,
+    retryWait: options.retryWait,
   });
 
   const summary: CiaCabinetSyncSummary = {
@@ -1610,200 +1776,184 @@ export async function syncCiaCabinets(
     durationMs: 0,
     countriesCrawled: plan.stats.countriesFetched,
     countriesApplied: 0,
+    countriesVerified: 0,
+    countriesUnchanged: 0,
     countriesFetchFailed: plan.stats.countriesFetchFailed,
     countriesSkipped: plan.stats.countriesSkipped,
     skipped: [...plan.failed],
     countriesUnmatched: plan.stats.countriesUnmatched,
+    bodiesWritten: 0,
     officesWritten: 0,
+    officesReleased: 0,
+    officesMoved: 0,
+    officesInserted: 0,
     personsExisting: 0,
     personsQidCreated: 0,
     personsIdlessCreated: 0,
     termsWritten: 0,
+    termsInserted: 0,
+    termsReinstated: 0,
+    termsRetired: 0,
     vacantOffices: 0,
     diplomaticSkipped: 0,
     statementsWritten: 0,
+    statementsInserted: 0,
+    statementsUpdated: 0,
+    rosterStatementsWritten: 0,
+    rosterStampMissing: 0,
     totalRowsWritten: 0,
     freshnessStamped: false,
-    dryRun: options.dryRun ?? false,
+    dryRun,
   };
-
-  if (options.dryRun) {
-    for (const country of plan.countries) {
-      if (!country.jurisdictionMatched || country.parseFailed) continue;
-      let appliedAny = false;
-      for (const pos of country.positions) {
-        if (pos.category === "diplomatic") {
-          summary.diplomaticSkipped++;
-          continue;
-        }
-        if (!INGEST_CATEGORIES.has(pos.category)) continue;
-        summary.officesWritten++;
-        appliedAny = true;
-        if (!pos.rawName || !pos.personPath) {
-          summary.vacantOffices++;
-          continue;
-        }
-        summary.termsWritten++;
-        summary.statementsWritten++;
-        if (pos.personPath === "existing") summary.personsExisting++;
-        else if (pos.personPath === "qid") summary.personsQidCreated++;
-        else summary.personsIdlessCreated++;
-      }
-      if (appliedAny) summary.countriesApplied++;
-    }
-    summary.totalRowsWritten = summary.officesWritten + summary.termsWritten + summary.statementsWritten;
-    const finishedAtMs = Date.now();
-    summary.finishedAt = new Date(finishedAtMs).toISOString();
-    summary.durationMs = finishedAtMs - startedAtMs;
-    return summary;
-  }
   const history: GovernmentEntityHistoryContext = {
     changeKind: "routine_refresh",
     reason: "CIA World Leaders government roster refresh",
-    methodologyVersion: "cia-world-leaders-sync/v1",
+    methodologyVersion: CIA_CABINET_METHODOLOGY_VERSION,
     releaseId: atlasReleaseId,
   };
-  const qidlessStableIds = new Map<string, string>();
+  const newPersonIds = new Map<string, string>();
 
-  log(`=== Applying — persisting offices / persons / terms / statements ===`);
+  log(`=== Reconciling stored rosters with the CIA pages ===`);
   for (const country of plan.countries) {
     if (!country.jurisdictionMatched || !country.jurisdictionId) continue;
-    if (country.parseFailed || country.positions.length === 0) continue;
+    if (country.parseFailed) continue;
+    const jurisdictionId = country.jurisdictionId;
 
-    // Guard the ENTIRE per-country write body: a Neon timeout on any office /
-    // person / term / statement write skips THIS country (recorded in
-    // `skipped[]`) instead of aborting the apply after ~25 countries. Each Neon
-    // call is additionally `withDbRetry`-wrapped so a transient blip retries
-    // first. Writes are idempotent, so a partially-written country is safely
-    // completed by a re-run.
+    // Guard the ENTIRE per-country body: a read, identity guard, or write
+    // failure skips THIS country (recorded in `skipped[]`) and the run
+    // continues. Each country's writes commit atomically or not at all.
     try {
       const sourceUrl = `${CIA_BASE}/${country.slug}/`;
-      const startDate = parseLastUpdated(country.lastUpdated);
-      const bodyId = await withDbRetry(
-        () =>
-          upsertExecutiveBody(
-            db,
-            country.jurisdictionId as string,
-            country.jurisdictionName ?? country.countryName ?? country.slug,
-            writers,
-            history,
-          ),
-        { log, label: `upsertBody(${country.slug})` },
-      );
-
-      const eligiblePositions = country.positions.filter((pos) => {
+      const retrievedAt = country.retrievedAt ?? new Date().toISOString();
+      let diplomatic = 0;
+      const eligible = country.positions.filter((pos) => {
         if (pos.category === "diplomatic") {
-          summary.diplomaticSkipped++;
+          diplomatic++;
           return false;
         }
         return INGEST_CATEGORIES.has(pos.category);
       });
-      const existingOffices = await withDbRetry(
-        () => listExistingCabinetOffices(db, bodyId),
-        { log, label: `listOffices(${country.slug})` },
-      );
-      const existingOfficeIds = exactOfficeIdsByTitle(
-        existingOffices,
-        new Set(eligiblePositions.map(({ title }) => title)),
-      );
-      const exactExisting = eligiblePositions.filter((pos) =>
-        existingOfficeIds.has(pos.title),
-      );
-      const newOrAmbiguous = eligiblePositions.filter(
-        (pos) => !existingOfficeIds.has(pos.title),
-      );
-      const officeIds = new Map<PlannedPosition, string>();
 
-      // Move every unchanged, exact-title office to its current publisher
-      // position before inserting unknown titles. This makes an insertion that
-      // shifts later offices safe while preserving the shared writer's
-      // fail-closed same-slot guard for a genuine, unproven title rename.
-      for (const pos of [...exactExisting, ...newOrAmbiguous]) {
-        const stableId = existingOfficeIds.get(pos.title) ?? pos.officeId;
-        const officeId = await withDbRetry(
-          () =>
-            upsertCabinetOffice(
-              db,
-              bodyId,
-              pos.title,
-              pos.officeType,
-              pos.order,
-              stableId,
-              writers,
+      const { body, state } = await withDbRetry(
+        () => readCountryRosterState(db, jurisdictionId),
+        { log, label: `readRoster(${country.slug})` },
+      );
+      const officeIdByTitle = new Map(
+        state.offices
+          .filter((office) =>
+            (CIA_ROSTER_OFFICE_TYPES as readonly string[]).includes(office.officeType),
+          )
+          .map((office) => [office.name, office.id]),
+      );
+      const holders = await withDbRetry(
+        () =>
+          resolveRosterPersons(db, {
+            jurisdictionId,
+            entries: eligible
+              .filter((pos) => pos.normalizedName)
+              .map((pos) => ({ title: pos.title, name: pos.normalizedName as string })),
+            officeIdByTitle,
+            newPersonIds,
+            newId,
+          }),
+        { log, label: `resolvePersons(${country.slug})` },
+      );
+      const titles = groupRosterTitles(eligible, holders);
+      const rosterPlan = planCountryRoster({
+        titles,
+        rosterStamp: country.rosterStamp,
+        rosterHash: rosterContentHash(
+          eligible.map((pos) => ({ title: pos.title, holder: pos.normalizedName })),
+        ),
+        sourceUrl,
+        state,
+        newId,
+      });
+      if (rosterPlan.guard) {
+        summary.countriesSkipped++;
+        summary.skipped.push({
+          slug: country.slug,
+          code: rosterPlan.guard,
+          reason: FAILURE_REASONS[rosterPlan.guard],
+        });
+        log(`! ${country.slug}: ${rosterPlan.guard}`);
+        continue;
+      }
+
+      // The executive body is shared with the Wikidata officeholder sync,
+      // which names it from the Wikidata state label. The roster only needs
+      // the body to exist, so an existing body is never rewritten here (the
+      // former unconditional upsert renamed it back and forth).
+      const bodyId = body?.id ?? newId();
+      const bodyWrite = body
+        ? null
+        : buildGovernmentBodyHistoryStatement(
+            {
+              jurisdictionId,
+              name: `Executive of ${
+                country.jurisdictionName ?? country.countryName ?? country.slug
+              }`,
+              bodyType: "cabinet",
+              branch: "executive",
+              hierarchyLevel: 0,
               history,
-            ),
-          { log, label: `upsertOffice(${country.slug})` },
-        );
-        officeIds.set(pos, officeId);
-        summary.officesWritten++;
-      }
-
-      const appliedAny = officeIds.size > 0;
-      for (const pos of eligiblePositions) {
-        const officeId = officeIds.get(pos);
-        if (!officeId) {
-          throw new Error(
-            "Office mutation did not resolve one stable row; identity is ambiguous or unsafe",
+            },
+            bodyId,
           );
-        }
 
-        // Unnamed / vacant post: office created, NO term. Never invent a holder.
-        if (!pos.rawName || !pos.normalizedName || !pos.personPath) {
-          summary.vacantOffices++;
-          continue;
-        }
+      const released = rosterPlan.officeWrites.filter((w) => w.kind === "release").length;
+      const moved = rosterPlan.officeWrites.filter((w) => w.kind === "move").length;
+      const inserted = rosterPlan.officeWrites.filter((w) => w.kind === "insert").length;
+      const statementInserts = rosterPlan.statementWrites.filter((w) => w.kind === "insert").length;
+      const statementUpdates = rosterPlan.statementWrites.length - statementInserts;
+      const mutations = rosterPlan.mutationCount + (bodyWrite ? 1 : 0);
 
-        // Reuse the plan's already-computed person resolution (jurisdiction +
-        // person resolution ran once in computeCabinetPlan) — no re-query.
-        const personId = await withDbRetry(
-          () => {
-            const normalizedKey = (pos.normalizedName as string).toLowerCase();
-            const stableId =
-              pos.personId ??
-              qidlessStableIds.get(normalizedKey) ??
-              randomUUID();
-            qidlessStableIds.set(normalizedKey, stableId);
-            return persistPerson(db, {
-              path: pos.personPath as PersonPath,
-              personId: pos.personId,
-              qid: pos.qid,
-              name: pos.normalizedName as string,
-            }, stableId, writers, history);
-          },
-          { log, label: `persistPerson(${country.slug})` },
-        );
-        if (pos.personPath === "existing") summary.personsExisting++;
-        else if (pos.personPath === "qid") summary.personsQidCreated++;
-        else summary.personsIdlessCreated++;
-
-        const termId = await withDbRetry(
-          () => upsertCabinetTerm(db, officeId, personId, startDate),
-          { log, label: `upsertTerm(${country.slug})` },
-        );
-        summary.termsWritten++;
-
-        await withDbRetry(
-          () =>
-            upsertCabinetStatement(
-              db,
-              termId,
-              "cabinet_member",
-              pos.title,
-              sourceUrl,
-            ),
-          { log, label: `upsertStatement(${country.slug})` },
-        );
-        summary.statementsWritten++;
+      if (mutations > 0 && !dryRun) {
+        const batch = buildCountryRosterBatch({
+          db,
+          bodyId,
+          bodyWrite,
+          plan: rosterPlan,
+          sourceUrl,
+          retrievedAt,
+          history,
+        });
+        await withDbRetry(() => executeCountryBatch(db, batch), {
+          log,
+          label: `commitRoster(${country.slug})`,
+        });
       }
 
-      if (appliedAny) {
-        summary.countriesApplied++;
-        log(`  ✓ ${country.jurisdictionName ?? country.slug}`);
+      // Counters record committed (or, for a dry run, planned) mutations only.
+      summary.countriesVerified++;
+      summary.diplomaticSkipped += diplomatic;
+      summary.vacantOffices += titles.filter((title) => title.holders.length === 0).length;
+      summary.personsExisting += titles
+        .flatMap((title) => title.holders)
+        .filter((holder) => !holder.isNew).length;
+      if (rosterPlan.rosterStampMissing) summary.rosterStampMissing++;
+      if (mutations === 0) {
+        summary.countriesUnchanged++;
+        continue;
       }
+      summary.countriesApplied++;
+      summary.bodiesWritten += bodyWrite ? 1 : 0;
+      summary.officesReleased += released;
+      summary.officesMoved += moved;
+      summary.officesInserted += inserted;
+      summary.personsIdlessCreated += rosterPlan.personInserts.length;
+      summary.termsInserted += rosterPlan.termInserts.length;
+      summary.termsReinstated += rosterPlan.termsReinstated.length;
+      summary.termsRetired += rosterPlan.termsRetired.length;
+      summary.statementsInserted += statementInserts;
+      summary.statementsUpdated += statementUpdates;
+      summary.rosterStatementsWritten += rosterPlan.rosterStatement ? 1 : 0;
+      summary.totalRowsWritten += mutations;
+      log(`  ✓ ${country.jurisdictionName ?? country.slug}: ${mutations} row change(s)`);
     } catch (err) {
-      // A country-scoped persistence failure records a closed diagnostic and
-      // continues. Raw database errors, SQL, and person data never enter the
-      // summary or progress logs.
+      // A country-scoped failure records a closed diagnostic and continues.
+      // Raw database errors, SQL, and person data never enter the summary or
+      // progress logs.
       summary.countriesSkipped++;
       const failure = closedCabinetWriteFailure(country.slug, err);
       summary.skipped.push(failure);
@@ -1812,32 +1962,44 @@ export async function syncCiaCabinets(
     }
   }
 
-  summary.totalRowsWritten =
-    summary.officesWritten + summary.termsWritten + summary.statementsWritten;
+  summary.officesWritten =
+    summary.officesReleased + summary.officesMoved + summary.officesInserted;
+  summary.termsWritten =
+    summary.termsInserted + summary.termsReinstated + summary.termsRetired;
+  summary.statementsWritten =
+    summary.statementsInserted +
+    summary.statementsUpdated +
+    summary.rosterStatementsWritten;
 
-  const stamped = await (options.markSynced ?? markSourcesSynced)(CIA_WORLD_LEADERS_SOURCE_ID, {
-    rowsWritten: summary.skipped.length === 0 ? summary.totalRowsWritten : 0,
-    executor: db,
-  });
-  summary.freshnessStamped = stamped.length > 0;
+  if (!dryRun) {
+    const stamped = await (options.markSynced ?? markSourcesSynced)(
+      CIA_WORLD_LEADERS_SOURCE_ID,
+      {
+        rowsWritten: summary.skipped.length === 0 ? summary.totalRowsWritten : 0,
+        executor: db,
+      },
+    );
+    summary.freshnessStamped = stamped.length > 0;
+  }
 
   const finishedAtMs = Date.now();
   summary.finishedAt = new Date(finishedAtMs).toISOString();
   summary.durationMs = finishedAtMs - startedAtMs;
 
-  log(`=== CIA Cabinet Sync Complete ===`);
+  log(`=== CIA Cabinet Sync Complete${dryRun ? " (DRY RUN — nothing written)" : ""} ===`);
   log(`Countries crawled:        ${summary.countriesCrawled}`);
-  log(`Countries applied:        ${summary.countriesApplied}`);
+  log(`Countries verified:       ${summary.countriesVerified}`);
+  log(`  · unchanged:            ${summary.countriesUnchanged}`);
+  log(`  · changed:              ${summary.countriesApplied}`);
   log(`Countries skipped (fail): ${summary.countriesSkipped}`);
   log(`HTTP non-2xx (e.g. 404):  ${summary.countriesFetchFailed}`);
-  log(`Offices written:          ${summary.officesWritten}`);
-  log(`  · vacant (no term):     ${summary.vacantOffices}`);
-  log(`Terms written:            ${summary.termsWritten}`);
+  log(`Offices released/moved/inserted: ${summary.officesReleased}/${summary.officesMoved}/${summary.officesInserted}`);
+  log(`Listed vacant titles:     ${summary.vacantOffices}`);
+  log(`Terms inserted/reinstated/retired: ${summary.termsInserted}/${summary.termsReinstated}/${summary.termsRetired}`);
   log(`Persons — existing:       ${summary.personsExisting}`);
-  log(`Persons — QID-created:    ${summary.personsQidCreated}`);
-  log(`Persons — ID-less:        ${summary.personsIdlessCreated}`);
+  log(`Persons — ID-less new:    ${summary.personsIdlessCreated}`);
   log(`Diplomatic dropped:       ${summary.diplomaticSkipped}`);
-  log(`Statements written:       ${summary.statementsWritten}`);
+  log(`Statements inserted/updated/roster: ${summary.statementsInserted}/${summary.statementsUpdated}/${summary.rosterStatementsWritten}`);
   log(`Total rows written:       ${summary.totalRowsWritten}`);
   log(`Freshness stamped:        ${summary.freshnessStamped}`);
   if (summary.skipped.length > 0) {
@@ -1846,13 +2008,10 @@ export async function syncCiaCabinets(
     );
     for (const f of summary.skipped) log(`    ${f.slug}: ${f.code}`);
     log(
-      `  Re-run to pick up the stragglers (writes are idempotent, so a full`,
-    );
-    log(
-      `  re-apply is safe): [${summary.skipped.map((f) => f.slug).join(", ")}]`,
+      `  Re-run to pick up the stragglers (unchanged countries write nothing): [${summary.skipped.map((f) => f.slug).join(", ")}]`,
     );
   } else {
-    log(`\n✓ All crawled countries completed (no network skips).`);
+    log(`\n✓ All crawled countries completed (no skips).`);
   }
 
   return summary;

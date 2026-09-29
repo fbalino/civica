@@ -15,7 +15,8 @@
  * full directory cycles through once per month. Shard membership is stable
  * (the slug list is sorted + deterministic), so each country refreshes on a
  * fixed day-of-month. Writes are idempotent, so days 29–31 harmlessly re-crawl
- * shards 0–2. Freshness re-stamps on any day a shard writes rows.
+ * shards 0–2. Freshness re-stamps only on a day a shard changes rows (DAT-037):
+ * an unchanged roster is a successful run that writes nothing.
  */
 import { NextResponse } from "next/server";
 import {
@@ -47,6 +48,8 @@ const SHARD_COUNT = 28;
 
 type CiaCabinetFailureOutcome =
   | "cabinet_office_identity_conflict"
+  | "cabinet_person_identity_conflict"
+  | "cabinet_roster_guard_failure"
   | "cabinet_read_failure"
   | "cabinet_schema_failure"
   | "cabinet_persistence_failure"
@@ -66,6 +69,11 @@ function retainedCabinetFailureOutcome(
     switch (code) {
       case "office_identity_conflict":
         return "cabinet_office_identity_conflict" as const;
+      case "person_identity_ambiguous":
+        return "cabinet_person_identity_conflict" as const;
+      case "roster_contraction_guard":
+      case "roster_stamp_regressed":
+        return "cabinet_roster_guard_failure" as const;
       case "upstream_http_error":
       case "country_read_error":
         return "cabinet_read_failure" as const;
@@ -207,10 +215,13 @@ export function createCiaCabinetHandler(
           countriesInShard: slugs.length,
           countriesCrawled: summary.countriesCrawled,
           countriesApplied: summary.countriesApplied,
+          countriesVerified: summary.countriesVerified,
+          countriesUnchanged: summary.countriesUnchanged,
           countriesFetchFailed: summary.countriesFetchFailed,
           countriesSkipped: summary.countriesSkipped,
           countriesUnmatched: summary.countriesUnmatched,
           officesWritten: summary.officesWritten,
+          officesReleased: summary.officesReleased,
           termsWritten: summary.termsWritten,
           personsExisting: summary.personsExisting,
           personsQidCreated: summary.personsQidCreated,
@@ -240,9 +251,12 @@ export function createCiaCabinetHandler(
       countriesInShard: slugs.length,
       countriesCrawled: summary.countriesCrawled,
       countriesApplied: summary.countriesApplied,
+      countriesVerified: summary.countriesVerified,
+      countriesUnchanged: summary.countriesUnchanged,
       countriesFetchFailed: summary.countriesFetchFailed,
       countriesUnmatched: summary.countriesUnmatched,
       officesWritten: summary.officesWritten,
+      officesReleased: summary.officesReleased,
       termsWritten: summary.termsWritten,
       personsExisting: summary.personsExisting,
       personsQidCreated: summary.personsQidCreated,

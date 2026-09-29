@@ -387,6 +387,7 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "bridge-cia-legacy-to-canonical",
     "cleanup-bad-offices",
     "create-rate-limits-table",
+    "repair-cabinet-terms",
     "repair-pulse-agreement",
     "reseed-bug3-corrupted",
     "restore-overdemoted-disputes",

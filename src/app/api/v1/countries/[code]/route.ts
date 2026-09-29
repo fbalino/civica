@@ -44,6 +44,10 @@ import {
   parsePathContract,
   parseQueryContract,
 } from "@/lib/api/request-contract";
+import {
+  isUnlistedRosterOffice,
+  publishedTermStartDate,
+} from "@/lib/factbook/cabinet-roster";
 
 type CountryDetailGovernment = z.infer<typeof zCountryDetail>["government"];
 type CountryDetailBody = CountryDetailGovernment[string][number];
@@ -280,14 +284,30 @@ export async function GET(
       if (entry) provenance[flatField] = entry;
     }
 
+    // DAT-037: one deterministic holder per office (a multi-seat roster title
+    // keeps every holder in storage; this field publishes the first by name),
+    // no historical unlisted roster titles, and no stored date on an undated
+    // roster office.
+    const orderedTerms = [...currentTerms].sort(
+      (a, b) =>
+        a.person.name.localeCompare(b.person.name, "en") ||
+        (a.person.id < b.person.id ? -1 : a.person.id > b.person.id ? 1 : 0),
+    );
     const branches = bodies.reduce<CountryDetailGovernment>((acc, body) => {
       const branch = body.branch ?? "other";
       if (!acc[branch]) acc[branch] = [];
 
       const bodyOffices = allOffices
         .filter((o) => o.bodyId === body.id)
+        .filter(
+          (o) =>
+            !isUnlistedRosterOffice(
+              o,
+              orderedTerms.some((t) => t.term.officeId === o.id),
+            ),
+        )
         .map((office) => {
-          const holder = currentTerms.find(
+          const holder = orderedTerms.find(
             (t) => t.term.officeId === office.id,
           );
           return {
@@ -299,7 +319,10 @@ export async function GET(
               ? {
                   name: holder.person.name,
                   party: holder.term.partyName,
-                  since: holder.term.startDate,
+                  since: publishedTermStartDate(
+                    office.officeType,
+                    holder.term.startDate,
+                  ),
                   photoUrl: holder.person.photoUrl,
                 }
               : null,

@@ -4,6 +4,7 @@ import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { parsePathContract } from "@/lib/api/request-contract";
 import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import { publishedTermStartDate } from "@/lib/factbook/cabinet-roster";
 
 export async function GET(
   req: Request,
@@ -42,7 +43,13 @@ export async function GET(
         seen.set(key, { ...l, endDate: existing.endDate });
       }
     }
-    const leaders = Array.from(seen.values());
+    // DAT-037: roster offices are undated listings; a stored date on one is
+    // not a tenure date and is never published.
+    const leaders = Array.from(seen.values()).map((leader) => ({
+      ...leader,
+      startDate: publishedTermStartDate(leader.officeType, leader.startDate),
+      endDate: publishedTermStartDate(leader.officeType, leader.endDate),
+    }));
 
     return NextResponse.json({
       country: jurisdiction.name,

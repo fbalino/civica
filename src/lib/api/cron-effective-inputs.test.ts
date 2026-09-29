@@ -45,18 +45,31 @@ function cabinetSummary(dryRun: boolean): CiaCabinetSyncSummary {
     durationMs: 1_000,
     countriesCrawled: 1,
     countriesApplied: 1,
+    countriesVerified: 1,
+    countriesUnchanged: 0,
     countriesFetchFailed: 0,
     countriesSkipped: 0,
     skipped: [],
     countriesUnmatched: 0,
+    bodiesWritten: 0,
     officesWritten: 1,
+    officesReleased: 0,
+    officesMoved: 0,
+    officesInserted: 1,
     personsExisting: 1,
     personsQidCreated: 0,
     personsIdlessCreated: 0,
     termsWritten: 1,
+    termsInserted: 1,
+    termsReinstated: 0,
+    termsRetired: 0,
     vacantOffices: 0,
     diplomaticSkipped: 0,
     statementsWritten: 1,
+    statementsInserted: 1,
+    statementsUpdated: 0,
+    rosterStatementsWritten: 0,
+    rosterStampMissing: 0,
     totalRowsWritten: 3,
     freshnessStamped: !dryRun,
     dryRun,
@@ -173,6 +186,84 @@ test("CIA route retains closed failure diagnostics and partial-write counters", 
     },
   ]);
   assert.equal(JSON.stringify(payload).includes("Office identity"), false);
+});
+
+test("CIA route completes an unchanged roster shard without stamping freshness", async () => {
+  const unchanged = cabinetSummary(false);
+  Object.assign(unchanged, {
+    countriesCrawled: 9,
+    countriesApplied: 0,
+    countriesVerified: 9,
+    countriesUnchanged: 9,
+    officesWritten: 0,
+    officesInserted: 0,
+    termsWritten: 0,
+    termsInserted: 0,
+    statementsWritten: 0,
+    statementsInserted: 0,
+    totalRowsWritten: 0,
+    freshnessStamped: false,
+  });
+  const handler = createCiaCabinetHandler({
+    database: {} as never,
+    environment: {
+      CIVICA_ATLAS_RELEASE_ID: "atlas-routine-refresh-2026-09-17",
+    },
+    buildSlugList: async () => ["canada"],
+    sync: async () => unchanged,
+  });
+
+  const response = await handler(
+    request("/api/cron/factbook/sync-cia-cabinets?shard=0"),
+  );
+  const payload = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(payload.ok, true);
+  assert.equal(payload.outcome, "completed");
+  assert.equal(payload.healthOk, true);
+  assert.equal(payload.countriesVerified, 9);
+  assert.equal(payload.countriesUnchanged, 9);
+  assert.equal(payload.totalRowsWritten, 0);
+  assert.equal(payload.freshnessStamped, false);
+});
+
+test("CIA route maps roster guards and person identity to closed non-retryable outcomes", async () => {
+  const cases = [
+    [["roster_contraction_guard"], "cabinet_roster_guard_failure"],
+    [["roster_stamp_regressed"], "cabinet_roster_guard_failure"],
+    [["person_identity_ambiguous"], "cabinet_person_identity_conflict"],
+    [
+      ["roster_contraction_guard", "person_identity_ambiguous"],
+      "cabinet_mixed_failure",
+    ],
+  ] as const;
+  for (const [codes, outcome] of cases) {
+    const failed = cabinetSummary(false);
+    Object.assign(failed, {
+      countriesSkipped: codes.length,
+      skipped: codes.map((code, index) => ({
+        slug: `country-${index}`,
+        code,
+        reason: "closed",
+      })),
+      freshnessStamped: false,
+    });
+    const handler = createCiaCabinetHandler({
+      database: {} as never,
+      environment: {
+        CIVICA_ATLAS_RELEASE_ID: "atlas-routine-refresh-2026-09-17",
+      },
+      buildSlugList: async () => ["canada"],
+      sync: async () => failed,
+    });
+    const response = await handler(
+      request("/api/cron/factbook/sync-cia-cabinets?shard=0"),
+    );
+    const payload = await response.json();
+    assert.equal(response.status, 502);
+    assert.equal(payload.outcome, outcome);
+    assert.equal(JSON.stringify(payload).includes("closed"), false);
+  }
 });
 
 test("manual CIA delivery without a shard fails before schedule or domain I/O", async () => {

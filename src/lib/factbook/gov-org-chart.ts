@@ -23,7 +23,18 @@
 //   - offices.reportsToOfficeId      → "reports to" relation (rare; 8 of 389)
 //   - terms (current)                → current officeholder + start date
 //   - terms.partyName / partyColor   → holder party affiliation (sparse; 11 of 389)
+//
+// DAT-037: CIA World Leaders roster offices (cabinet, deputy, central-bank,
+// and other listed officials) are undated listings. They never show a "since"
+// year, every listed holder of a multi-seat title gets a card, and a title the
+// latest roster no longer lists (released position, nobody current) is
+// historical and hidden rather than shown as vacant.
 
+import {
+  isCiaRosterOfficeType,
+  isUnlistedRosterOffice,
+  publishedTermStartDate,
+} from "@/lib/factbook/cabinet-roster";
 import { titleCaseTitle } from "@/lib/text/title-case";
 
 // ─── Public model (what the renderer consumes) ─────────────────────────────
@@ -79,8 +90,15 @@ export interface GovBranch {
 
 export interface GovStructure {
   branches: GovBranch[];
-  /** Source attribution string for the SourceDot. */
+  /** Plain-language attribution for the officeholders shown. */
   source: string;
+  /** The executive body whose cabinet roster provenance the note cites. */
+  executiveBodyId?: string;
+  /** True when listed CIA World Leaders roster offices are shown. */
+  hasRosterOffices: boolean;
+  /** True when roster-type offices without a list position have holders
+   *  (older hand-entered records without a cited source). */
+  hasUnsourcedOffices: boolean;
   /** Total cards rendered — used by the caller's visibility gate. */
   nodeCount: number;
   /** True when both head-of-state and head-of-government resolve to the same
@@ -111,6 +129,8 @@ export interface GovOfficeInput {
   name: string;
   officeType: string;
   reportsToOfficeId?: string | null;
+  /** CIA roster list position; null once the roster stops listing it. */
+  displayOrder?: number | null;
 }
 
 export interface GovTermInput {
@@ -120,7 +140,7 @@ export interface GovTermInput {
     partyName?: string | null;
     partyColor?: string | null;
   };
-  person: { name: string };
+  person: { name: string; id?: string };
 }
 
 export interface BuildGovStructureInput {
@@ -188,10 +208,19 @@ function yearOf(value: string | Date | null | undefined): number | undefined {
 }
 
 interface CurrentHolder {
+  key: string;
   name: string;
   sinceYear?: number;
   party?: string;
   partyColor?: string;
+}
+
+/** Stable holder order: name, then person id (roster pages give no order
+ *  within one title that survives storage). */
+function compareHolders(a: CurrentHolder, b: CurrentHolder): number {
+  const byName = a.name.localeCompare(b.name, "en");
+  if (byName !== 0) return byName;
+  return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
 }
 
 // ─── Builder ─────────────────────────────────────────────────────────────────
@@ -210,30 +239,54 @@ export function buildGovStructure(
 
   if (offices.length === 0 && bodies.length <= 1) return null;
 
-  // Current holder per office (first non-QID term wins).
-  const holderByOffice = new Map<string, CurrentHolder>();
+  const officeTypeById = new Map(offices.map((o) => [o.id, o.officeType]));
+
+  // Every current, named holder per office, in a stable order.
+  const holdersByOffice = new Map<string, CurrentHolder[]>();
   for (const t of currentTerms) {
     const name = t.person?.name;
     if (!name || isQid(name)) continue;
-    if (holderByOffice.has(t.term.officeId)) continue;
-    holderByOffice.set(t.term.officeId, {
+    const list = holdersByOffice.get(t.term.officeId) ?? [];
+    const key = t.person.id ?? `${name}:${list.length}`;
+    if (list.some((holder) => holder.key === key)) continue;
+    list.push({
+      key,
       name,
-      sinceYear: yearOf(t.term.startDate),
+      sinceYear: yearOf(
+        publishedTermStartDate(
+          officeTypeById.get(t.term.officeId),
+          t.term.startDate ?? null,
+        ),
+      ),
       party: t.term.partyName ?? undefined,
       partyColor: t.term.partyColor ?? undefined,
     });
+    holdersByOffice.set(t.term.officeId, list);
   }
+  for (const list of holdersByOffice.values()) list.sort(compareHolders);
+  const holderByOffice = new Map<string, CurrentHolder>();
+  for (const [officeId, list] of holdersByOffice) {
+    if (list[0]) holderByOffice.set(officeId, list[0]);
+  }
+
+  // A roster title the latest CIA page no longer lists is historical.
+  const visibleOffices = offices.filter(
+    (o) => !isUnlistedRosterOffice(o, holderByOffice.has(o.id)),
+  );
 
   const bodyById = new Map(bodies.map((b) => [b.id, b]));
 
-  function roleFromOffice(o: GovOfficeInput, title?: string): GovRole {
-    const holder = holderByOffice.get(o.id);
+  function roleFromHolder(
+    o: GovOfficeInput,
+    holder: CurrentHolder | undefined,
+    id: string,
+  ): GovRole {
     return {
-      id: `office:${o.id}`,
+      id,
       // Display-only title-casing of stored office names (some are raw
       // lowercase Wikidata labels, e.g. "monarch of Spain"). Never mutates
       // stored data; safe on already-correct titles. See title-case.ts.
-      title: titleCaseTitle(title ?? o.name),
+      title: titleCaseTitle(o.name),
       holderName: holder?.name,
       sinceYear: holder?.sinceYear,
       party: holder?.party,
@@ -243,12 +296,25 @@ export function buildGovStructure(
     };
   }
 
+  /** Roster offices list every current holder; other offices show one. */
+  function rolesFromOffice(o: GovOfficeInput): GovRole[] {
+    const holders = holdersByOffice.get(o.id) ?? [];
+    if (isCiaRosterOfficeType(o.officeType) && holders.length > 1) {
+      return holders.map((holder) =>
+        roleFromHolder(o, holder, `office:${o.id}:${holder.key}`),
+      );
+    }
+    return [roleFromHolder(o, holderByOffice.get(o.id), `office:${o.id}`)];
+  }
+
   // ── Detect a shared head (HoS === HoG, same person) ──────────────────────
   // Presidential systems and absolute monarchies store two offices held by
   // one person. Merge them into a single principal card so the chart doesn't
   // show the same human twice.
-  const hosOffice = offices.find((o) => o.officeType === "head_of_state");
-  const hogOffice = offices.find((o) => o.officeType === "head_of_government");
+  const hosOffice = visibleOffices.find((o) => o.officeType === "head_of_state");
+  const hogOffice = visibleOffices.find(
+    (o) => o.officeType === "head_of_government",
+  );
   const hosHolder = hosOffice ? holderByOffice.get(hosOffice.id) : undefined;
   const hogHolder = hogOffice ? holderByOffice.get(hogOffice.id) : undefined;
   const headsMerged =
@@ -287,7 +353,7 @@ export function buildGovStructure(
   // Leadership offices attached to a specific legislative/judicial body.
   const rolesByBody = new Map<string, GovRole[]>();
 
-  for (const o of offices) {
+  for (const o of visibleOffices) {
     if (mergedOfficeIds.has(o.id)) continue;
     const body = bodyById.get(o.bodyId);
     const branchKind = normaliseBranch(body?.branch);
@@ -299,11 +365,11 @@ export function buildGovStructure(
       body.bodyType !== "cabinet"
     ) {
       const arr = rolesByBody.get(body.id) ?? [];
-      arr.push(roleFromOffice(o));
+      arr.push(...rolesFromOffice(o));
       rolesByBody.set(body.id, arr);
       continue;
     }
-    branchRoles[branchKind].push(roleFromOffice(o));
+    branchRoles[branchKind].push(...rolesFromOffice(o));
   }
 
   // ── Build chambers (legislative & judicial named bodies) ─────────────────
@@ -380,9 +446,27 @@ export function buildGovStructure(
     }
   }
 
+  const rosterTyped = visibleOffices.filter((o) => isCiaRosterOfficeType(o.officeType));
+  const hasRosterOffices = rosterTyped.some(
+    (o) => o.displayOrder !== null && o.displayOrder !== undefined,
+  );
+  const hasUnsourcedOffices = rosterTyped.some(
+    (o) =>
+      (o.displayOrder === null || o.displayOrder === undefined) &&
+      holderByOffice.has(o.id),
+  );
+  const executiveBody = bodies.find(
+    (b) => normaliseBranch(b.branch) === "executive",
+  );
+
   return {
     branches,
-    source: "Civica · CIA World Factbook + Wikidata officeholders",
+    source: hasRosterOffices
+      ? "Heads of state and government from Wikidata; other offices from the CIA World Leaders roster"
+      : "Officeholders from Wikidata",
+    executiveBodyId: executiveBody?.id,
+    hasRosterOffices,
+    hasUnsourcedOffices,
     nodeCount,
     headsMerged,
     officeholderCount: named.size,

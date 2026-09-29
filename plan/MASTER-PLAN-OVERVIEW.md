@@ -4,13 +4,16 @@
 
 Repository cleanup and release stabilization are complete. Production now
 serves the September release with the selected sharing card. The master
-checklist has 269 of 314 tasks complete and 45 remaining; G4 is still blocked.
+checklist has 269 of 315 tasks complete and 46 remaining; G4 is still blocked.
 The map is deferred. PLT-031 is complete: the repaired cabinet and legislative
 imports each completed their first ordinary scheduled application with retained
 execution and source-freshness evidence. Routine maintenance remains authorized;
 the local heartbeat stays quiet unless owner input is needed.
 Current evidence is in `plan/evidence/PLT-030/` and `plan/evidence/PLT-031/`.
 The remaining-work report is reconciled to the current master checklist.
+DAT-037 (open, P0) fixes the CIA cabinet import that stored each page's "Last
+Updated" date as every minister's start date; its production repair waits for
+the owner's review of an isolated rehearsal (`plan/evidence/DAT-037/`).
 
 The phases below describe the overall program, not a list of currently open
 tasks. The master checklist owns completion state. The Explore-menu decision

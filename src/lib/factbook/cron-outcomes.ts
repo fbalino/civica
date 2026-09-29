@@ -14,10 +14,20 @@ export interface FactbookCronOutcome {
     | "verification_findings";
 }
 
+/**
+ * DAT-037: a CIA roster run succeeds when every crawled country was verified
+ * without a skip, even when nothing changed. Unchanged rosters write zero rows
+ * and correctly leave freshness alone; only a run that changed rows must also
+ * have stamped freshness.
+ */
 export function ciaCabinetSyncCronOutcome(
   summary: Pick<
     CiaCabinetSyncSummary,
-    "skipped" | "totalRowsWritten" | "freshnessStamped" | "dryRun"
+    | "skipped"
+    | "totalRowsWritten"
+    | "freshnessStamped"
+    | "dryRun"
+    | "countriesVerified"
   >,
 ): FactbookCronOutcome {
   if (summary.skipped.length > 0) {
@@ -29,7 +39,7 @@ export function ciaCabinetSyncCronOutcome(
       reason: "incomplete_stage",
     };
   }
-  if (summary.totalRowsWritten === 0) {
+  if (summary.countriesVerified === 0) {
     return {
       ok: false,
       outcome: "partial",
@@ -38,7 +48,11 @@ export function ciaCabinetSyncCronOutcome(
       reason: "no_rows",
     };
   }
-  if (!summary.dryRun && !summary.freshnessStamped) {
+  if (
+    !summary.dryRun &&
+    summary.totalRowsWritten > 0 &&
+    !summary.freshnessStamped
+  ) {
     return {
       ok: false,
       outcome: "partial",

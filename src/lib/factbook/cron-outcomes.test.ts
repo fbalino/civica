@@ -19,6 +19,7 @@ test("CIA cabinet cron rejects mixed upstream failures and missing freshness", (
       totalRowsWritten: 3,
       freshnessStamped: false,
       dryRun: false,
+      countriesVerified: 1,
     }),
     {
       ok: false,
@@ -34,6 +35,7 @@ test("CIA cabinet cron rejects mixed upstream failures and missing freshness", (
       totalRowsWritten: 3,
       freshnessStamped: false,
       dryRun: false,
+      countriesVerified: 1,
     }),
     {
       ok: false,
@@ -45,19 +47,48 @@ test("CIA cabinet cron rejects mixed upstream failures and missing freshness", (
   );
 });
 
-test("CIA cabinet cron accepts a clean write and dry-run plan", () => {
+test("CIA cabinet cron rejects a run that verified no country", () => {
+  assert.deepEqual(
+    ciaCabinetSyncCronOutcome({
+      skipped: [],
+      totalRowsWritten: 0,
+      freshnessStamped: false,
+      dryRun: false,
+      countriesVerified: 0,
+    }),
+    {
+      ok: false,
+      outcome: "partial",
+      healthOk: false,
+      httpStatus: 502,
+      reason: "no_rows",
+    },
+  );
+});
+
+test("CIA cabinet cron accepts a clean write, an unchanged roster, and a dry-run plan", () => {
   for (const input of [
     {
       skipped: [],
       totalRowsWritten: 3,
       freshnessStamped: true,
       dryRun: false,
+      countriesVerified: 1,
+    },
+    // DAT-037: an unchanged shard writes nothing and correctly does not stamp.
+    {
+      skipped: [],
+      totalRowsWritten: 0,
+      freshnessStamped: false,
+      dryRun: false,
+      countriesVerified: 9,
     },
     {
       skipped: [],
       totalRowsWritten: 3,
       freshnessStamped: false,
       dryRun: true,
+      countriesVerified: 1,
     },
   ]) {
     assert.deepEqual(ciaCabinetSyncCronOutcome(input), {

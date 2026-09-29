@@ -16,9 +16,11 @@ import { resolveAtlasReleaseId } from "../src/lib/factbook/country-fact-history-
 // route also uses).
 //
 // Modes:
-//   --dry-run (or DRY_RUN=1)  → fetch a SAMPLE, parse, resolve jurisdictions +
-//                               persons, and PRINT the proposed change set.
-//                               Writes NOTHING to the DB.
+//   --dry-run (or DRY_RUN=1)  → fetch a SAMPLE (or --only=<slugs> / --full),
+//                               parse, resolve jurisdictions, then reconcile
+//                               each stored roster read-only (DAT-037) and
+//                               PRINT the proposed change counts. Writes
+//                               NOTHING to the DB.
 //   --apply   (or APPLY=1)    → the FULL crawl (~194 CIA pages, 404-tolerant),
 //                               persisting offices / persons / terms /
 //                               statements and stamping markSourcesSynced.
@@ -106,23 +108,39 @@ function onlySlugsFromArgs(): string[] | undefined {
 async function runDryRun() {
   // A preview is an operational readiness check, so validate the same history
   // identity an apply would use before making any source or database request.
-  resolveAtlasReleaseId(ATLAS_RELEASE_ID);
+  const atlasReleaseId = resolveAtlasReleaseId(ATLAS_RELEASE_ID);
+  const only = onlySlugsFromArgs();
+  const full = process.argv.includes("--full");
+  const base = full || only ? await buildCiaSlugList() : SAMPLE_SLUGS;
+  const slugs = only ? base.filter((s) => only.includes(s.toLowerCase())) : base;
   console.log("=== CIA World Leaders Cabinet Import (DRY RUN) ===");
-  console.log(`Sample: ${SAMPLE_SLUGS.length} countries`);
+  console.log(`Scope: ${slugs.length} countries`);
   console.log(
     "Fetching cia.gov with a browser UA, honoring the crawl-delay …\n",
   );
 
+  const progress = (line: string) => {
+    if (line.startsWith("!")) console.error(line);
+    else console.log(line);
+  };
   const plan = await computeCabinetPlan({
-    slugs: SAMPLE_SLUGS,
+    slugs,
     crawlDelayMs: crawlDelayFromArgs(),
-    onProgress: (line) => {
-      if (line.startsWith("!")) console.error(line);
-      else console.log(line);
-    },
+    onProgress: progress,
   });
 
   reportCabinetPlan(plan);
+
+  // Read-only reconciliation against the stored rosters (no writes, no stamp).
+  const summary = await syncCiaCabinets({
+    atlasReleaseId,
+    slugs,
+    plan,
+    dryRun: true,
+    onProgress: progress,
+  });
+  console.log("\n=== RECONCILIATION DRY RUN (JSON) ===");
+  console.log(JSON.stringify(summary, null, 2));
 
   // Dry runs never advance freshness (guarded by dryRun + rowsWritten=0).
   await markSourcesSynced("cia_world_leaders", {

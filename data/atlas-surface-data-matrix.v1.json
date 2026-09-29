@@ -237,7 +237,8 @@
         "government_bodies",
         "offices",
         "terms",
-        "persons"
+        "persons",
+        "statements"
       ],
       "fields": [
         "branches",
@@ -246,7 +247,7 @@
         "current terms"
       ],
       "provenance": [
-        "Wikidata section source strip and last_sync_at."
+        "Wikidata heads of state and government and the CIA World Leaders cabinet roster; the roster date comes from the sourced roster statement."
       ],
       "coverage": [
         "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
@@ -287,7 +288,8 @@
       "storage": [
         "offices",
         "terms",
-        "persons"
+        "persons",
+        "statements"
       ],
       "fields": [
         "office",
@@ -296,7 +298,7 @@
         "current status"
       ],
       "provenance": [
-        "Wikidata section source strip and last_sync_at."
+        "Wikidata heads of state and government with term dates, and the undated CIA World Leaders cabinet roster; the roster date comes from the sourced roster statement."
       ],
       "coverage": [
         "The documented section is always present. A fulfilled empty result and an unavailable query render distinct named states instead of removing the module."
@@ -2157,5 +2159,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "371bb640b254971b4ca9159e66f5300cba5f56141e2987a516be63a5282793f6"
+  "semanticSha256": "fb1be21a712fcb3a4fc50ffaebc9d18da109a61c0b56ff6e68bf9ac927017e6e"
 }
