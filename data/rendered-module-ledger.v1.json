@@ -21933,24 +21933,24 @@
       "role": "page",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-v-government-3.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-12-sec07-leaders.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-saudi-arabia-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-kosovo-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-11"
         }
       }
     },
@@ -21962,24 +21962,24 @@
       "role": "layout",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-monaco-99-full-page.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-kosovo-28-first-viewport-with-consent.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-31-viewport-sidebar-list.webp",
+          "findingId": "EXP-001-CD-71"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-kosovo-07-viewport-top.webp",
+          "findingId": "EXP-001-CD-71"
         }
       }
     },
@@ -21991,24 +21991,24 @@
       "role": "layout",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-99-full-page.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-00-full-page.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-99-full-page.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-07-viewport-top.webp",
+          "findingId": null
         }
       }
     },
@@ -22020,24 +22020,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-00-consent-banner.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-kosovo-27-consent-banner.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-monaco-00-consent-banner.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-00-consent-banner.webp",
+          "findingId": null
         }
       }
     },
@@ -22049,24 +22049,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-00-consent-banner.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-kosovo-27-consent-banner.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-monaco-00-consent-banner.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-00-consent-banner.webp",
+          "findingId": null
         }
       }
     },
@@ -22078,24 +22078,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-fact-panel.webp",
+          "findingId": "EXP-001-CD-60"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-23-fact-value-panel.webp",
+          "findingId": "EXP-001-CD-60"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-kosovo-33-fact-value-panel-open.webp",
+          "findingId": "EXP-001-CD-60"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-08-fact-value-panel.webp",
+          "findingId": "EXP-001-CD-60"
         }
       }
     },
@@ -22107,24 +22107,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-chart-hover-late.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-08-sec03-indicator-history.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-12-indicator-history.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-12-indicator-history.webp",
+          "findingId": "EXP-001-CD-11"
         }
       }
     },
@@ -22136,24 +22136,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-chart-hover-late.webp",
+          "findingId": "EXP-001-CD-21"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-08-sec03-indicator-history.webp",
+          "findingId": "EXP-001-CD-21"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-12-indicator-history.webp",
+          "findingId": "EXP-001-CD-27"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-12-indicator-history.webp",
+          "findingId": "EXP-001-CD-27"
         }
       }
     },
@@ -22165,24 +22165,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-cite-open.webp",
+          "findingId": "EXP-001-CD-48"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-25-cite-open.webp",
+          "findingId": "EXP-001-CD-48"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-35-cite-open.webp",
+          "findingId": "EXP-001-CD-48"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-followup-cite-open-viewport.webp",
+          "findingId": "EXP-001-CD-48"
         }
       }
     },
@@ -22195,23 +22195,23 @@
       "visual": {
         "desktop_light": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": null,
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "desktop_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": null,
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_light": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": null,
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": null,
+          "findingId": "EXP-001-CD-NOT-OPENED"
         }
       }
     },
@@ -22223,24 +22223,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-30-focus-tab13.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-01-site-header.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-34-mobile-menu-open.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-01b-mobile-menu-open.webp",
+          "findingId": null
         }
       }
     },
@@ -22252,24 +22252,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-switzerland-v-conditions-1.webp",
+          "findingId": "EXP-001-CD-09"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-09-sec04-conditions.webp",
+          "findingId": "EXP-001-CD-09"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-saudi-arabia-13-conditions.webp",
+          "findingId": "EXP-001-CD-09"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-13-conditions.webp",
+          "findingId": "EXP-001-CD-09"
         }
       }
     },
@@ -22281,24 +22281,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-v-evidence-coverage-1.webp",
+          "findingId": "EXP-001-CD-47"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-06-sec01-evidence-coverage.webp",
+          "findingId": "EXP-001-CD-47"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-saudi-arabia-13-conditions.webp",
+          "findingId": "EXP-001-CD-47"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-13-conditions.webp",
+          "findingId": "EXP-001-CD-47"
         }
       }
     },
@@ -22310,24 +22310,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-t-jump-focus.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-24-jump-input-focused.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-combo-26-input-focus.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-monaco-06-viewport-midpage-sticky.webp",
+          "findingId": null
         }
       }
     },
@@ -22339,24 +22339,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-04-tabbar.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-04-tabbar.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-30-viewport-tabbar-sidebar.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-03-tabbar.webp",
+          "findingId": null
         }
       }
     },
@@ -22368,24 +22368,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-kosovo-02-masthead.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-switzerland-02-masthead.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-02-country-masthead.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-02-masthead.webp",
+          "findingId": null
         }
       }
     },
@@ -22397,24 +22397,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-t-jump-focus.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-24-jump-input-focused.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-combo-26-input-focus.webp",
+          "findingId": "EXP-001-CD-73"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-monaco-06-viewport-midpage-sticky.webp",
+          "findingId": "EXP-001-CD-73"
         }
       }
     },
@@ -22426,24 +22426,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-monaco-v-governance-evidence-1.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-07-sec02-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-11-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-monaco-13-conditions.webp",
+          "findingId": null
         }
       }
     },
@@ -22455,24 +22455,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-v-legislature-1.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-07-sec02-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-11-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-kosovo-15-legislature.webp",
+          "findingId": null
         }
       }
     },
@@ -22484,24 +22484,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-kosovo-02-masthead.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-switzerland-02-masthead.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-02-country-masthead.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-02-masthead.webp",
+          "findingId": null
         }
       }
     },
@@ -22513,24 +22513,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-chart-hover-late.webp",
+          "findingId": "EXP-001-CD-20"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-08-sec03-indicator-history.webp",
+          "findingId": "EXP-001-CD-20"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-12-indicator-history.webp",
+          "findingId": "EXP-001-CD-20"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-12-indicator-history.webp",
+          "findingId": null
         }
       }
     },
@@ -22542,24 +22542,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-v-evidence-coverage-2.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-07-sec02-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-23"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-10-evidence-coverage.webp",
+          "findingId": "EXP-001-CD-23"
         }
       }
     },
@@ -22571,24 +22571,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-saudi-arabia-02-masthead.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-07-sec02-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-11-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-13-conditions.webp",
+          "findingId": null
         }
       }
     },
@@ -22600,24 +22600,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-06-sidebar.webp",
+          "findingId": "EXP-001-CD-54"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-05-left-rail.webp",
+          "findingId": "EXP-001-CD-54"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-31-viewport-sidebar-list.webp",
+          "findingId": "EXP-001-CD-54"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-05-sidebar.webp",
+          "findingId": "EXP-001-CD-54"
         }
       }
     },
@@ -22629,24 +22629,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-chart-hover-late.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-08-sec03-indicator-history.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-12-indicator-history.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-12-indicator-history.webp",
+          "findingId": null
         }
       }
     },
@@ -22658,24 +22658,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-kosovo-02-masthead.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-switzerland-02-masthead.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-02-country-masthead.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-02-masthead.webp",
+          "findingId": null
         }
       }
     },
@@ -22687,24 +22687,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-chart-hover-late.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-07-sec02-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-27"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-12-indicator-history.webp",
+          "findingId": "EXP-001-CD-27"
         }
       }
     },
@@ -22716,24 +22716,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-30-focus-tab13.webp",
+          "findingId": "EXP-001-CD-30"
         },
         "desktop_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-01-site-header.webp",
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_light": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-34-mobile-menu-open.webp",
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-01b-mobile-menu-open.webp",
+          "findingId": "EXP-001-CD-NOT-OPENED"
         }
       }
     },
@@ -22745,24 +22745,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-t-upper-house.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-11-sec06-legislature.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-united-kingdom-crop-15-legislature-keyfacts.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-15-legislature.webp",
+          "findingId": "EXP-001-CD-05"
         }
       }
     },
@@ -22774,24 +22774,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-t-drawer-focus.webp",
+          "findingId": "EXP-001-CD-32"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-uruguay-20-first-viewport.webp",
+          "findingId": "EXP-001-CD-32"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-36-viewport-page-bottom.webp",
+          "findingId": "EXP-001-CD-32"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-02-masthead.webp",
+          "findingId": "EXP-001-CD-32"
         }
       }
     },
@@ -22804,23 +22804,23 @@
       "visual": {
         "desktop_light": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": null,
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "desktop_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": null,
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_light": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": null,
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": null,
+          "findingId": "EXP-001-CD-NOT-OPENED"
         }
       }
     },
@@ -22832,24 +22832,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-t-map-modal-open.webp",
+          "findingId": "EXP-001-CD-18"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-02-masthead.webp",
+          "findingId": "EXP-001-CD-18"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-combo-42-map.webp",
+          "findingId": "EXP-001-CD-18"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-kosovo-followup2-map-tile-centered.webp",
+          "findingId": "EXP-001-CD-18"
         }
       }
     },
@@ -22861,24 +22861,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-t-map-modal-open.webp",
+          "findingId": "EXP-001-CD-18"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-02-masthead.webp",
+          "findingId": "EXP-001-CD-18"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-combo-42-map.webp",
+          "findingId": "EXP-001-CD-18"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-kosovo-followup2-map-tile-centered.webp",
+          "findingId": "EXP-001-CD-18"
         }
       }
     },
@@ -22890,24 +22890,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-united-kingdom-t-bill1.webp",
+          "findingId": "EXP-001-CD-55"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-13-sec08-bills.webp",
+          "findingId": "EXP-001-CD-55"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-united-kingdom-crop-17-bills-top.webp",
+          "findingId": "EXP-001-CD-55"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/crops-uk-bills.webp",
+          "findingId": "EXP-001-CD-55"
         }
       }
     },
@@ -22919,24 +22919,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-united-kingdom-t-bill1.webp",
+          "findingId": "EXP-001-CD-15"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-13-sec08-bills.webp",
+          "findingId": "EXP-001-CD-15"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-united-kingdom-crop-17-bills-top.webp",
+          "findingId": "EXP-001-CD-15"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/crops-uk-bills.webp",
+          "findingId": "EXP-001-CD-15"
         }
       }
     },
@@ -22948,24 +22948,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-t-jump-focus.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-24-jump-input-focused.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-combo-26-input-focus.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-monaco-06-viewport-midpage-sticky.webp",
+          "findingId": null
         }
       }
     },
@@ -22977,24 +22977,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-somalia-t-gov-chart.webp",
+          "findingId": "EXP-001-CD-01"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-saudi-arabia-10-sec05-government.webp",
+          "findingId": "EXP-001-CD-01"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-kosovo-14-government.webp",
+          "findingId": "EXP-001-CD-01"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-14-government.webp",
+          "findingId": "EXP-001-CD-01"
         }
       }
     },
@@ -23006,24 +23006,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-kosovo-02-masthead.webp",
+          "findingId": "EXP-001-CD-07"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-switzerland-02-masthead.webp",
+          "findingId": "EXP-001-CD-07"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-02-country-masthead.webp",
+          "findingId": "EXP-001-CD-07"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-02-masthead.webp",
+          "findingId": "EXP-001-CD-07"
         }
       }
     },
@@ -23035,24 +23035,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-switzerland-t-leaders.webp",
+          "findingId": "EXP-001-CD-01"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-12-sec07-leaders.webp",
+          "findingId": "EXP-001-CD-01"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-somalia-crop-16-leaders-top.webp",
+          "findingId": "EXP-001-CD-01"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-switzerland-16-leaders.webp",
+          "findingId": "EXP-001-CD-01"
         }
       }
     },
@@ -23064,24 +23064,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-t-upper-house.webp",
+          "findingId": "EXP-001-CD-06"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-11-sec06-legislature.webp",
+          "findingId": "EXP-001-CD-06"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-united-kingdom-crop-15-legislature-keyfacts.webp",
+          "findingId": "EXP-001-CD-06"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-15-legislature.webp",
+          "findingId": "EXP-001-CD-06"
         }
       }
     },
@@ -23093,24 +23093,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-t-upper-house.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-11-sec06-legislature.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-united-kingdom-crop-15-legislature-keyfacts.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-15-legislature.webp",
+          "findingId": "EXP-001-CD-05"
         }
       }
     },
@@ -23122,24 +23122,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-t-lightbox-open.webp",
+          "findingId": "EXP-001-CD-51"
         },
         "desktop_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-uruguay-02-masthead.webp",
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-43-lightbox-open.webp",
+          "findingId": "EXP-001-CD-51"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-followup-lightbox.webp",
+          "findingId": "EXP-001-CD-51"
         }
       }
     },
@@ -23151,24 +23151,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-switzerland-t-orgs.webp",
+          "findingId": "EXP-001-CD-14"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-switzerland-14-sec09-organizations.webp",
+          "findingId": "EXP-001-CD-14"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-united-kingdom-crop-18-organizations-top.webp",
+          "findingId": "EXP-001-CD-14"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/crops-uk-orgs.webp",
+          "findingId": "EXP-001-CD-14"
         }
       }
     },
@@ -23180,24 +23180,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-06-sidebar.webp",
+          "findingId": "EXP-001-CD-47"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-05-left-rail.webp",
+          "findingId": "EXP-001-CD-47"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-31-viewport-sidebar-list.webp",
+          "findingId": "EXP-001-CD-47"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-05-sidebar.webp",
+          "findingId": "EXP-001-CD-47"
         }
       }
     },
@@ -23209,24 +23209,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-t-jump-focus.webp",
+          "findingId": "EXP-001-CD-30"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-24-jump-input-focused.webp",
+          "findingId": "EXP-001-CD-31"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-combo-26-input-focus.webp",
+          "findingId": "EXP-001-CD-31"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-monaco-06-viewport-midpage-sticky.webp",
+          "findingId": "EXP-001-CD-31"
         }
       }
     },
@@ -23238,24 +23238,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-fact-panel.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-23-fact-value-panel.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-kosovo-33-fact-value-panel-open.webp",
+          "findingId": "EXP-001-CD-25"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-08-fact-value-panel.webp",
+          "findingId": "EXP-001-CD-25"
         }
       }
     },
@@ -23267,24 +23267,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-fact-panel.webp",
+          "findingId": "EXP-001-CD-13"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-23-fact-value-panel.webp",
+          "findingId": "EXP-001-CD-13"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-kosovo-33-fact-value-panel-open.webp",
+          "findingId": "EXP-001-CD-13"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-08-fact-value-panel.webp",
+          "findingId": "EXP-001-CD-13"
         }
       }
     },
@@ -23296,24 +23296,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-switzerland-t-leaders.webp",
+          "findingId": "EXP-001-CD-69"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-12-sec07-leaders.webp",
+          "findingId": "EXP-001-CD-69"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-somalia-crop-16-leaders-top.webp",
+          "findingId": "EXP-001-CD-69"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-switzerland-16-leaders.webp",
+          "findingId": "EXP-001-CD-69"
         }
       }
     },
@@ -23325,24 +23325,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-switzerland-t-leaders.webp",
+          "findingId": "EXP-001-CD-65"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-12-sec07-leaders.webp",
+          "findingId": "EXP-001-CD-65"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-somalia-crop-16-leaders-top.webp",
+          "findingId": "EXP-001-CD-65"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-switzerland-16-leaders.webp",
+          "findingId": "EXP-001-CD-65"
         }
       }
     },
@@ -23354,24 +23354,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-t-map-modal-open.webp",
+          "findingId": "EXP-001-CD-18"
         },
         "desktop_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-02-masthead.webp",
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-combo-42-map.webp",
+          "findingId": "EXP-001-CD-18"
         },
         "small_mobile_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-kosovo-followup2-map-tile-centered.webp",
+          "findingId": "EXP-001-CD-NOT-OPENED"
         }
       }
     },
@@ -23383,24 +23383,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-t-upper-house.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-11-sec06-legislature.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-united-kingdom-crop-15-legislature-keyfacts.webp",
+          "findingId": "EXP-001-CD-05"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-15-legislature.webp",
+          "findingId": "EXP-001-CD-05"
         }
       }
     },
@@ -23412,24 +23412,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-30-focus-tab13.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-01-site-header.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-34-mobile-menu-open.webp",
+          "findingId": "EXP-001-CD-73"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-01b-mobile-menu-open.webp",
+          "findingId": "EXP-001-CD-73"
         }
       }
     },
@@ -23441,24 +23441,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-30-focus-tab13.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-01-site-header.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-34-mobile-menu-open.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-01b-mobile-menu-open.webp",
+          "findingId": null
         }
       }
     },
@@ -23470,24 +23470,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-monaco-v-governance-evidence-1.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-monaco-07-sec02-governance-evidence.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-saudi-arabia-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-11"
         }
       }
     },
@@ -23499,24 +23499,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-h-status-open.webp",
+          "findingId": "EXP-001-CD-61"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-22-status-panel-open.webp",
+          "findingId": "EXP-001-CD-61"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-kosovo-32-jurisdiction-disclosure-open.webp",
+          "findingId": "EXP-001-CD-16"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-kosovo-followup2-status-disclosure-open.webp",
+          "findingId": "EXP-001-CD-16"
         }
       }
     },
@@ -23529,23 +23529,23 @@
       "visual": {
         "desktop_light": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-30-focus-tab13.webp",
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "desktop_dark": {
           "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-01-site-header.webp",
+          "findingId": "EXP-001-CD-NOT-OPENED"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-34-mobile-menu-open.webp",
+          "findingId": "EXP-001-CD-73"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-01b-mobile-menu-open.webp",
+          "findingId": "EXP-001-CD-73"
         }
       }
     },
@@ -23557,24 +23557,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-kosovo-02-masthead.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-switzerland-02-masthead.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-02-country-masthead.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-02-masthead.webp",
+          "findingId": null
         }
       }
     },
@@ -23586,24 +23586,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-30-focus-tab13.webp",
+          "findingId": "EXP-001-CD-30"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-01-site-header.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-34-mobile-menu-open.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-01b-mobile-menu-open.webp",
+          "findingId": null
         }
       }
     },
@@ -23615,24 +23615,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-switzerland-v-evidence-coverage-1.webp",
+          "findingId": "EXP-001-CD-13"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-somalia-06-sec01-evidence-coverage.webp",
+          "findingId": "EXP-001-CD-13"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-10-evidence-coverage.webp",
+          "findingId": "EXP-001-CD-13"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-10-evidence-coverage.webp",
+          "findingId": "EXP-001-CD-13"
         }
       }
     },
@@ -23644,24 +23644,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-v-conditions-1.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-07-sec02-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-33"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-19-rankings.webp",
+          "findingId": "EXP-001-CD-33"
         }
       }
     },
@@ -23673,24 +23673,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-v-legislature-3.webp",
+          "findingId": "EXP-001-CD-38"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-07-sec02-governance-evidence.webp",
+          "findingId": "EXP-001-CD-38"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-38"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/crops-uy-leg-foot.webp",
+          "findingId": "EXP-001-CD-38"
         }
       }
     },
@@ -23702,24 +23702,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-v-rankings-1.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-15-sec10-rankings.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-saudi-arabia-19-rankings.webp",
+          "findingId": "EXP-001-CD-11"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-19-rankings.webp",
+          "findingId": "EXP-001-CD-11"
         }
       }
     },
@@ -23731,24 +23731,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-t-footer-search-focus.webp",
+          "findingId": "EXP-001-CD-67"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-18-footer.webp",
+          "findingId": "EXP-001-CD-67"
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-22-footer.webp",
+          "findingId": "EXP-001-CD-67"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-22-footer.webp",
+          "findingId": "EXP-001-CD-67"
         }
       }
     },
@@ -23760,24 +23760,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-30-focus-tab13.webp",
+          "findingId": "EXP-001-CD-30"
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-01-site-header.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-34-mobile-menu-open.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-01b-mobile-menu-open.webp",
+          "findingId": null
         }
       }
     },
@@ -23789,24 +23789,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-v-governance-evidence-1.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-united-kingdom-07-sec02-governance-evidence.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-33"
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "finding",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-11-governance-evidence.webp",
+          "findingId": "EXP-001-CD-33"
         }
       }
     },
@@ -23818,24 +23818,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-kosovo-02-masthead.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-switzerland-02-masthead.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-02-country-masthead.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-02-masthead.webp",
+          "findingId": null
         }
       }
     },
@@ -23847,24 +23847,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-japan-99-full-page.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-uruguay-20-first-viewport.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-japan-01-site-header.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-japan-07-viewport-top.webp",
+          "findingId": null
         }
       }
     },
@@ -23876,24 +23876,24 @@
       "role": "component",
       "visual": {
         "desktop_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-light-uruguay-30-focus-tab13.webp",
+          "findingId": null
         },
         "desktop_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/desktop-dark-japan-01-site-header.webp",
+          "findingId": null
         },
         "small_mobile_light": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-light-uruguay-34-mobile-menu-open.webp",
+          "findingId": null
         },
         "small_mobile_dark": {
-          "disposition": "not_observed",
-          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
-          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+          "disposition": "clean",
+          "screenshot": "plan/evidence/EXP-001/civica-data-2026-09-29/mobile-dark-uruguay-01b-mobile-menu-open.webp",
+          "findingId": null
         }
       }
     },
