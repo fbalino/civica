@@ -14,8 +14,26 @@ browser checks. Pre-record results are in `README.md`.
 
 ## Browser checks (controller)
 
-No dev server was run for this change. Screenshots, when added, go in this
-directory as separate files and are listed here.
+Local development server on this branch, 2026-09-29, reading the production
+database; only page routes were requested (no local API routes).
+
+- `uruguay-rankings-desktop-light.jpg`: `/country/uruguay/civica-data`
+  Rankings has two rows, V-Dem Liberal Democracy Index 0.769 (observation
+  year 2024) and Freedom House status "Free · Freedom in the World 2024"
+  (observation year 2023), each with the chip "Civica release · 2024 Q4". No
+  "/100", "Global rank", or "as of" text appears on the page.
+- `uruguay-freedom-house-infotip-desktop-light.jpg`: clicking the info button
+  opens the note explaining that Civica applied Freedom House's published
+  status rule to the stored ratings. The button has the accessible name "How
+  this status was determined" and takes keyboard focus. The screenshot caught
+  the tooltip mid-fade; its computed background is the opaque ink token.
+- `japan-conditions-mobile-dark.jpg`: `/country/japan/civica-data` at 375px in
+  dark theme shows "92 / 100" and "91.6 / 100" each with a "Civica
+  calculation" chip and info note, above the publisher inputs 0.92 and 1.34.
+  Page width equals viewport width (no horizontal overflow).
+- Observed, not changed here: the Conditions input rows print raw unit codes
+  such as `percent_labor_force`, `index_0_1`, and `index_1_5_inverted` to
+  readers. Left for the screen-by-screen review.
 
 ## Review follow-up: gaps in the permanent check (2026-09-29)
 
