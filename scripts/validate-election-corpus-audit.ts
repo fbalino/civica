@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import artifact from "../src/lib/elections/corpus-audit.generated.json";
 import jurisdictionIdentity from "../src/lib/elections/jurisdiction-identity.generated.json";
 import { stableStringify } from "../src/lib/data/frozen-vintage";
+import { electionCorpusIntegrityFingerprint } from "../src/lib/elections/corpus-audit-integrity";
 import {
   ELECTION_CORPUS_AUDIT_VERSION,
   type ElectionAuditIssueCode,
@@ -54,6 +55,19 @@ if (
 ) {
   errors.push("row-content fingerprints do not cover the baseline exactly");
 }
+if (
+  report.baseline.fingerprintSha256 !==
+  electionCorpusIntegrityFingerprint({
+    rowFingerprints: rowContentFingerprints,
+    sources: report.sourceRights.map((row) => ({
+      id: row.sourceId,
+      license: row.statementLicense,
+    })),
+  })
+)
+  errors.push(
+    "baseline fingerprint does not reproduce from the checked rows and source identities",
+  );
 if (
   report.baseline.jurisdictionIdentityRowsSha256 !==
   sha256(jurisdictionIdentity.rows)

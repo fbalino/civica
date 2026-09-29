@@ -5,8 +5,8 @@
   "baseline": {
     "expectedRows": 915,
     "observedRows": 915,
-    "fingerprintSha256": "a9d59a25bdc1451f22c97e3fc7c968fbf6bd0cc7a8961ffcae32790b9a432e89",
-    "rule": "Every baseline election row, its complete public content, election statements, result rows, and election-referenced registered source records are bound to this fingerprint.",
+    "fingerprintSha256": "e60857010075f52cda3787335be8c0d0d2714d13d6afa1aa4ba79aa66417a876",
+    "rule": "Every baseline election row, its complete public content, election statements, result rows, and the identity and license of each election-referenced registered source are bound to this fingerprint. Source sync times are not bound: any pipeline that commits rows from the same publisher advances them, and qualification uses each statement's own retrieval time.",
     "jurisdictionIdentityRowsSha256": "5526b8307be42df87a95f7863d804302c39901b4ab34c716cb2abc9bea57ac0a"
   },
   "rowContentFingerprints": {
@@ -939,22 +939,19 @@
       "sourceId": "international_idea",
       "statementLicense": "CC-BY-NC-SA-4.0",
       "reviewStatus": "pending",
-      "publicExport": "non-commercial-only",
-      "lastSyncAt": "2026-07-05T15:22:35.000Z"
+      "publicExport": "non-commercial-only"
     },
     {
       "sourceId": "ipu_parline",
       "statementLicense": "CC-BY-NC-SA-4.0",
       "reviewStatus": "pending",
-      "publicExport": "non-commercial-only",
-      "lastSyncAt": "2026-07-05T15:26:07.892Z"
+      "publicExport": "non-commercial-only"
     },
     {
       "sourceId": "wikidata",
       "statementLicense": "CC0",
       "reviewStatus": "verified",
-      "publicExport": "allowed",
-      "lastSyncAt": "2026-07-08T02:02:32.520Z"
+      "publicExport": "allowed"
     }
   ],
   "raw": {

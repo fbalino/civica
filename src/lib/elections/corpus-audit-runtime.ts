@@ -36,7 +36,6 @@ export type ElectionCorpusAuditArtifact = {
     reviewStatus: "verified" | "pending";
     publicExport:
       "allowed" | "non-commercial-only" | "blocked" | "pending-review";
-    lastSyncAt: string | null;
   }>;
   qualified: {
     conceptualEvents: number;
