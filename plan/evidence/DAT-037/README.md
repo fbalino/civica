@@ -1,10 +1,12 @@
 # DAT-037: CIA World Leaders cabinet-term integrity
 
-Status: open and blocked. The importer, reader, and repair code are
-implemented and tested on branch `claude/fix/cabinet-term-integrity`. Nothing
-has been written to production. The first isolated rehearsal (2026-09-28,
-below) found two rows the repair does not reach, so the production sequence
-waits for a repair fix, a second rehearsal, and then the owner's review.
+Status: open, awaiting the owner's review. The importer, reader, and repair
+code are implemented and tested on branch `claude/fix/cabinet-term-integrity`.
+Nothing has been written to production. The first isolated rehearsal
+(2026-09-28) found two rows the repair did not reach and a hand-entered date
+it should have kept; the repair was fixed, and the second rehearsal
+(2026-09-29, below) passed every check. The production sequence waits for the
+owner's review and written approval.
 
 ## The defect
 
@@ -143,18 +145,22 @@ aside for the whole rehearsal so `DATABASE_URL` names only the loopback copy.
    `PGOPTIONS='-c default_transaction_read_only=on' pg_dump --format=custom
    --no-owner --no-privileges`; record bytes, SHA-256, and completion time.
 2. Restore into a new cluster listening only on 127.0.0.1 with
-   `timezone=UTC` (`initdb -A trust -E UTF8`, `pg_restore --no-owner
-   --no-privileges`); compare table counts and order-independent hashes of
-   terms, statements, offices, government bodies, and sources with production
-   (read-only).
+   `timezone=UTC` (`initdb -A trust -E UTF8 --locale=C
+   --locale-provider=builtin --builtin-locale=C.UTF-8`, started with
+   `LC_ALL=C` on macOS; `pg_restore --no-owner --no-privileges`); compare
+   table counts and order-independent hashes of terms, statements, offices,
+   government bodies, and sources with production (read-only). Another
+   ctype changes how record text quotes some non-ASCII characters, and the
+   row hashes stop matching.
 3. All application commands run through a loopback-only Neon HTTP adapter
    preloaded with `node --import tsx --import <adapter>`. The adapter executes
    Neon HTTP requests over the PostgreSQL wire protocol and refuses any
    non-loopback host; ordinary fetches (cia.gov) pass through. It lives with
    the rehearsal files, not in the repository.
 4. `repair:cabinet-terms -- --plan` before the refresh (reference counts).
-5. Convergence refresh on the copy: `scripts/sync-cia-cabinets.ts --apply`
-   over every CIA page at the 10-second crawl delay, then a repeat pass over
+5. Convergence refresh on the copy: `scripts/sync-cia-cabinets.ts --apply
+   --release-id=<label>` over every CIA page at the 10-second crawl delay,
+   then a repeat pass over
    Saudi Arabia, the UAE, Belgium, Russia, Hungary, Samoa, Uganda, Ukraine,
    the United Kingdom, Uruguay, Sri Lanka, Iraq, and Taiwan (expect zero row
    changes unless a page changed in between).
@@ -167,10 +173,10 @@ aside for the whole rehearsal so `DATABASE_URL` names only the loopback copy.
 8. Stop the cluster; delete the cluster directory, dump, and plan files; say
    so in the evidence.
 
-## Rehearsal result, 2026-09-28
+## First rehearsal, 2026-09-28
 
 Record: [`cabinet-term-integrity-rehearsal-2026-09-28.json`](cabinet-term-integrity-rehearsal-2026-09-28.json).
-Result: blocked. Two required checks fail.
+Result: blocked. Two required checks failed.
 
 - The copy matched production exactly: a 226 MB read-only snapshot, restored
   with identical counts and row hashes for terms, statements, offices, bodies,
@@ -196,12 +202,53 @@ Result: blocked. Two required checks fail.
   positions, and neither office has a CIA statement. The repair only covers
   offices that are listed or carry CIA provenance, and P1 and P5 check only
   those offices, so neither the repair nor its postflight reaches these rows.
-- Fix before production: include offices whose list position the importer
-  released in the repair's scope and in P1 and P5. Then rehearse again.
+- Fixed afterwards: offices whose list position the importer released stay
+  in the repair's scope, and P1 and P5 check every roster-typed term. See
+  the second rehearsal.
 - Observation for decision 4: the importer adopted one United Kingdom legacy
-  office with the listed title and a different holder, so R5 clears that
-  former holder's hand-entered date. The two legacy rows that R4 retires keep
-  theirs.
+  office with the listed title and a different holder, so this method's R5
+  cleared that former holder's hand-entered date while the two legacy rows
+  that R4 retires kept theirs. R5 now keeps it (second rehearsal).
+
+The copy, snapshot, logs, plan files, and captured pages were deleted after
+the run. The record says so.
+
+## Second rehearsal, 2026-09-29
+
+Record: [`cabinet-term-integrity-rehearsal-2026-09-29.json`](cabinet-term-integrity-rehearsal-2026-09-29.json).
+Result: passed. Code under test: commit `2802eb36` (repair method
+`cabinet-term-integrity-repair/v2`; the importer is unchanged).
+
+- A fresh 226 MB read-only snapshot restored with identical counts and row
+  hashes. Every compared table had the same row count as in the first
+  rehearsal.
+- The corrected importer's refresh of all 237 candidate pages gave the same
+  result as the first rehearsal, field for field: 197 countries updated,
+  148 offices released, Bosnia and Herzegovina skipped closed. The 18-country
+  repeat pass and page parse were not repeated because the importer did not
+  change.
+- The evidence ledger recorded all 148 releases. Four released offices
+  carried no CIA statement: Armenia and Ukraine (no terms), Colombia (the
+  dated "Vacant" placeholder), and Fiji (the dated retired term).
+- The plan deleted the Colombia placeholder (R1: 18 instead of 17), cleared
+  the Fiji date, and left the adopted United Kingdom legacy row's
+  hand-entered date alone. R5 still cleared 5,113 dates, and the plan made
+  5,715 row changes, one more than the first.
+- Apply changed 5,715 rows in one transaction with 5,715 history rows. Every
+  postflight check passed, including P1 and P5 across every roster-typed
+  term. A replay changed nothing, a new plan proposed nothing, and an
+  importer pass over Colombia, Fiji, Hungary, Saudi Arabia, and the United
+  Kingdom wrote nothing. The three live validators passed against the copy.
+- Independent queries: no CIA page date, placeholder, or duplicate remains.
+  The only dated roster rows are the eight hand-entered legacy rows, with
+  their dates unchanged: five United States rows (current), two United
+  Kingdom rows retired by R4, and the adopted United Kingdom row retired by
+  the importer. All 429 head terms are unchanged.
+- Negative control: giving the Fiji term back its old page date after the
+  repair made P1 and P8 fail, and clearing it again made them pass. The
+  postflight still recognises page dates once every CIA-sourced term is
+  undated, because it also reads the dates the repair removed from the
+  evidence ledger.
 
 The copy, snapshot, logs, plan files, and captured pages were deleted after
 the run. The record says so.
