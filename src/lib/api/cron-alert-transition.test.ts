@@ -246,3 +246,32 @@ test("clear closes an older open incident behind a newer observed signature", ()
   assert.equal(clear.state, "clear");
   assert.equal(clear.emission, "none");
 });
+
+test("a daily monitor reminds on the next run even when it starts a little early", () => {
+  // PLT-033: the health monitor runs daily with a 20-hour cooldown. A run that
+  // starts a few seconds before the previous emission's 24-hour mark must
+  // still remind rather than skip a day.
+  const opened = {
+    resultCode: `health_alert_open_${SIGNATURE}`,
+    completedAt: new Date("2026-09-16T10:15:40.000Z"),
+  };
+  const nextDay = cronAlertTransition({
+    namespace: "health",
+    now: new Date("2026-09-17T10:15:05.000Z"),
+    currentSignature: SIGNATURE,
+    requiredConsecutive: 2,
+    reminderCooldownMs: 20 * 60 * 60 * 1_000,
+    history: [opened],
+  });
+  assert.equal(nextDay.emission, "reminder");
+
+  const withDayCooldown = cronAlertTransition({
+    namespace: "health",
+    now: new Date("2026-09-17T10:15:05.000Z"),
+    currentSignature: SIGNATURE,
+    requiredConsecutive: 2,
+    reminderCooldownMs: 24 * 60 * 60 * 1_000,
+    history: [opened],
+  });
+  assert.equal(withDayCooldown.emission, "none");
+});

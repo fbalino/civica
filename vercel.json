@@ -111,7 +111,7 @@
     },
     {
       "path": "/api/cron/operations/health-alerts",
-      "schedule": "*/15 * * * *"
+      "schedule": "15 10 * * *"
     }
   ]
 }

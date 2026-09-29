@@ -23,8 +23,13 @@ authoritative `0041` migration.
   that active cron jobs may continue after an Instant Rollback. Civica's lease
   ledger is an additional safeguard, not permission to leave writers running.
 - All deployed cache behavior comes from `civica-cache-consistency/v1`:
-  mutable reads are `no-store`, checked artifacts must revalidate, and frozen
-  releases use a new versioned URL instead of a purge or overwrite.
+  mutable API reads are `no-store`, checked artifacts must revalidate, and
+  frozen releases use a new versioned URL instead of a purge or overwrite.
+  Database-backed public pages are cached for up to 24 hours (PLT-033); a
+  deployment prerenders the pages without a dynamic segment from the
+  configured database, and the daily `operations.refresh-pages` job
+  re-renders every page. After a production data repair, run that job
+  manually so readers do not wait for the next daily refresh.
 - The staged migrations retain existing reader columns and do not delete rows,
   tables, or columns. The PLT-014 release migration changes named-score writer
   rules, so an old deployment is read-compatible only. Do not re-enable old

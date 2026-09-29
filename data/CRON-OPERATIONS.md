@@ -220,14 +220,18 @@ and truncate operations are rejected.
 
 ## Automatic scheduled recovery
 
-The existing `operations.health-alerts` run also checks for bounded recovery
-work every 15 minutes. It re-delivers only an existing scheduled execution that
+The daily `operations.health-alerts` run (10:15 UTC) also checks for bounded
+recovery work. It re-delivers only an existing scheduled execution that
 is still within 48 hours, has attempts remaining, and is either an expired
 running attempt or a failed attempt with a closed transient outcome
 (`upstream_timeout`, `upstream_rate_limited`, `upstream_unavailable`,
 `upstream_network_error`, or `pipeline_observability_unavailable`). The first
-retry waits 15 minutes and the second waits 60 minutes; the shared three-attempt
-cap remains authoritative. Each health run dispatches at most four executions.
+retry waits at least 15 minutes and the second at least 60 minutes; because the
+monitor runs daily, each retry in practice happens at the next 10:15 UTC run.
+The shared three-attempt cap remains authoritative, and the 48-hour window
+leaves room for two daily retries. Each health run dispatches at most four
+executions, so after a broad overnight outage some jobs wait a further day or
+simply recover at their own next scheduled slot.
 
 Before acquiring a target, the destination route reads the retained row again
 and rejects a missing, repaired, capped, non-transient, or currently leased
@@ -257,8 +261,9 @@ release-quality validator or any publication gate.
 
 The health and pipeline monitors also use existing cron execution outcomes as
 a content-free transition ledger. Health incidents open after two consecutive
-non-core observations (core application/database outages open immediately),
-repeat at most once per 24 hours while unchanged, and emit one recovery line.
+daily non-core observations (core application/database outages open on the
+first run), repeat on each daily run while unchanged, and emit one recovery
+line.
 Pipeline alert sets open immediately, repeat after 72 hours while unchanged,
 and emit one recovery line. These transitions suppress duplicate Runtime Log
 lines without hiding current health payloads or changing pipeline-alert HTTP

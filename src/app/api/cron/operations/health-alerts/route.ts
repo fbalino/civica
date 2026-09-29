@@ -16,6 +16,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 800;
 
+const HEALTH_REMINDER_COOLDOWN_MS = 20 * 60 * 60 * 1_000;
+
 /**
  * The Vercel Runtime Log is the owner-facing alert channel. The durable cron
  * ledger evaluates persistence and suppresses unchanged incidents between
@@ -62,7 +64,9 @@ async function handler() {
     currentSignature: signature,
     immediate,
     requiredConsecutive: 2,
-    reminderCooldownMs: 24 * 60 * 60 * 1_000,
+    // The monitor runs daily (PLT-033). A cooldown just under one day keeps
+    // Vercel Cron start-time jitter from skipping every other reminder.
+    reminderCooldownMs: HEALTH_REMINDER_COOLDOWN_MS,
     history: await postgresCronAlertHistoryStore.load("operations.health-alerts"),
   });
   const decision = statusPageDecision(

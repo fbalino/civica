@@ -4,8 +4,8 @@
 It serves both independent monitors and the owner-operated public status page:
 
 - public endpoint: `GET /api/health`;
-- owner monitor: `operations.health-alerts`, every 15 minutes through Vercel
-  Cron; and
+- owner monitor: `operations.health-alerts`, once a day at 10:15 UTC through
+  Vercel Cron, after the daily page refresh; and
 - public communication: <https://statuspage.incident.io/civica-atlas>.
 
 The endpoint is request-live and explicitly `no-store`. The verified all-path
@@ -38,12 +38,21 @@ and every value from the environment.
 
 Fernando Baliño is the accountable owner. The `operations.health-alerts` Cron
 writes a safe `[health-alert]` JSON line to Vercel Runtime Logs when an incident
-opens, once per 24-hour reminder window while it remains unchanged, and once
-when it recovers. The cron execution ledger retains the content-free alert
+opens, as a reminder on each daily run while it remains unchanged (the
+cooldown is 20 hours so start-time jitter cannot skip a day), and once when it
+recovers. The cron execution ledger retains the content-free alert
 signature and transition, so the monitor itself evaluates consecutive
 observations and suppresses duplicate log lines. It intentionally succeeds
 after reporting an open condition, so the monitor does not create a second
 failed-pipeline alert.
+
+The monitor runs once a day so it does not keep the scale-to-zero production
+database awake (PLT-033, APR-D177). A database or application outage
+therefore opens at the next 10:15 UTC run, and a non-core condition opens on
+the second consecutive daily run. `/api/health` still answers every request,
+so an external uptime monitor pointed at it gives faster detection; each of
+its requests runs one `SELECT 1` and wakes the database for about five
+minutes.
 
 Use these fixed thresholds:
 
@@ -51,7 +60,7 @@ Use these fixed thresholds:
    an Incident.io incident as **Investigating** and mark `Website` and `Atlas
    data` affected.
 2. **Persistence-gated publication:** the same map asset, scheduled-data
-   freshness, or Ask Civica condition appears in **two consecutive 15-minute
+   freshness, or Ask Civica condition appears in **two consecutive daily
    health-monitor observations**, evaluated automatically from retained cron
    outcomes. Publish as **Investigating** and mark,
    respectively, `Atlas map`, `Atlas data`, or `Ask Civica` affected.

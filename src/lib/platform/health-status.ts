@@ -320,7 +320,7 @@ export function healthHttpStatus(report: HealthStatusReport): 200 | 503 {
 /**
  * Translate a health report into the manual Incident.io publish decision.
  * A core application/database failure publishes immediately. Other reader
- * impact must appear in two consecutive 15-minute monitor executions before
+ * impact must appear in two consecutive daily monitor executions before
  * publication, avoiding an incident for a single transient probe failure.
  */
 export function statusPageDecision(

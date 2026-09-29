@@ -43,7 +43,7 @@ overlap/duplicate delivery is possible; that is why a retained run record and
 expected-slot alert are both required. The platform's cron log is the owned
 alert channel until PLT-018 adds broader exception-routing infrastructure.
 
-The existing 15-minute health operation also provides bounded application
+The daily health operation (10:15 UTC) also provides bounded application
 recovery for retained transient failures and expired attempts. It retries the
 same logical execution after backoff under the existing lease, fence, and
 three-attempt cap. It does not turn a missed slot into a run, retry deterministic

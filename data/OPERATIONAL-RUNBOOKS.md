@@ -222,7 +222,7 @@ Each runbook was walked through against the current implementation.
   remain registered by hash pending Fernando's separate history-purge
   decision.
 - **PLT-020 health/status contract:** `data/HEALTH-STATUS.md` now makes the
-  public `/api/health` component probes, 15-minute owner monitor, fixed
+  public `/api/health` component probes, daily owner monitor, fixed
   Incident.io publication thresholds, and Fernando’s status-page responsibility
   the canonical path. The provider-side component-label confirmation remains in
   `plan/MANUAL-CHECKS.md`; it is not claimed by the repository.
