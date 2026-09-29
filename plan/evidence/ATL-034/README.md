@@ -137,24 +137,24 @@ need an owner review before re-approval:
 `/design-system` has no checked visual baseline; its sample chamber now shows
 4 unattributed seats.
 
-## Browser checks (controller)
+## Browser evidence
 
-Screenshots to be added to this folder by the controller:
+Local development server on this branch, 2026-09-29, reading the production
+database read-only:
 
-- `/country/uruguay/civica-data`, Senate: 16 / 9 / 5 party seats and 1 open
-  neutral seat; key "No party reported · 1 seat"; hovering that seat reads
-  "No party reported"; dimming the Colorado Party leaves the neutral seat
-  undimmed. Light and dark.
-- `/country/uruguay/civica-data`, House: 99 of 99 attributed; no key.
-- `/country/switzerland/civica-data`: both chambers fully neutral with keys
-  "No party reported · 200 seats" and "· 46 seats".
-- `/country/somalia/civica-data`: House of the People key
-  "No party reported · 266 seats".
-- `/country/solomon-islands/civica-data`: 50 seats drawn, no key, no overflow.
-- `/compare?c=uruguay&c=japan` at phone width: Uruguay Senate 1 and Japan
-  House of Councillors 123 unattributed.
-- `/design-system`: "Legislature seats" swatches in both themes; sample
-  chamber key "No party reported · 4 seats".
+- `uruguay-senate-desktop-dark.jpg`: `/country/uruguay/civica-data` Senate
+  draws 16 / 9 / 5 party seats and one open neutral seat, with the key
+  "No party reported · 1 seat". The House draws 99 of 99 attributed seats and
+  no key.
+- `switzerland-council-of-states-desktop-light.jpg`:
+  `/country/switzerland/civica-data` draws both chambers fully neutral, with
+  keys "No party reported · 200 seats" and "No party reported · 46 seats".
+- Rendered-markup checks on the same server: Somalia draws 275 and 54 seats
+  with keys for 266 and 45 unattributed seats; Solomon Islands draws exactly
+  50 seats with no key and no overflow; `/design-system` draws 150 seats with
+  the key "No party reported · 4 seats".
+- No hydration or runtime errors were logged after reloading the Switzerland
+  page.
 
 ## Follow-ups (not changed here)
 
