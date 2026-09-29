@@ -3,9 +3,9 @@
   "reviewedAt": "2026-09-18",
   "checklist": {
     "total": 317,
-    "completed": 270,
-    "remaining": 47,
-    "progressPercent": 85.2
+    "completed": 271,
+    "remaining": 46,
+    "progressPercent": 85.5
   },
   "agentExecutableNow": [],
   "categories": [
@@ -32,14 +32,13 @@
     {
       "id": "production-staging-external-authority",
       "label": "Production, staging, or external-system authority",
-      "count": 4,
+      "count": 3,
       "taskIds": [
         "CLM-021",
-        "DAT-037",
         "PUL-024",
         "PUL-040"
       ],
-      "nextStep": "Authorize only the remaining real production or external actions: the owner's Human Development Report edition choice and the CLM-021 corrected Conditions release, the owner-approved DAT-037 cabinet-roster refresh, repair, and postflight, a Pulse drift baseline followed by an eligible observation, and one complete scheduled locked-method cycle."
+      "nextStep": "Authorize only the remaining real production or external actions: the owner's Human Development Report edition choice and the CLM-021 corrected Conditions release, a Pulse drift baseline followed by an eligible observation, and one complete scheduled locked-method cycle."
     },
     {
       "id": "external-evidence-unavailable",

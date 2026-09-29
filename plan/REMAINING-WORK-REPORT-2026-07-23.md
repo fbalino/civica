@@ -2,14 +2,14 @@
 
 **Reviewed:** 2026-09-18
 
-**Checklist state:** 270 of 317 complete; 47 remain; 85.2%.
+**Checklist state:** 271 of 317 complete; 46 remain; 85.5%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
 Twelve tasks are direct owner, qualified-human, counsel/privacy, or research
-participant work. Four require production, provider, or other external-system
+participant work. Three require production, provider, or other external-system
 authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
 is currently running. Thirty are downstream tasks that cannot honestly start
@@ -71,9 +71,9 @@ run is preserved with a date-correction note, and the exact-candidate
 attempt-07 technical rehearsal through `0051_eminent_jocasta` is complete and
 retained (`plan/evidence/QA-018/`).
 
-### 2. Production, staging, or external-system authority — 4
+### 2. Production, staging, or external-system authority — 3
 
-IDs: CLM-021, DAT-037, PUL-024, PUL-040.
+IDs: CLM-021, PUL-024, PUL-040.
 
 This batch includes:
 
@@ -83,13 +83,13 @@ This batch includes:
   correction record. The Human Development values labelled 2023 in that release
   are UNDP's 2022 figures (`plan/evidence/CLM-020/README.md`);
 
-- the DAT-037 cabinet-roster sequence, approved by the owner on 2026-09-29
-  without a public correction record (APR-D173): the merge, one full
-  corrected CIA World Leaders refresh, the one-time stored-record repair, and
-  the read-only postflight (`plan/evidence/DAT-037/`);
 - an explicit Pulse drift baseline followed by an eligible observation, and
   one complete scheduled locked-method cycle that can establish PUL-040's
   non-backdated start.
+
+DAT-037 closed on 2026-09-29: the owner-approved cabinet-roster refresh,
+one-time repair, and read-only postflight ran on production and passed
+(`plan/evidence/DAT-037/`).
 
 The 2026-07-29 production batch advanced the authoritative migration ledger
 through `0051`, published and validated the named immutable Conditions release,
@@ -190,7 +190,7 @@ see `plan/evidence/PLT-031/`.
 
 ## Gate status
 
-G4 remains blocked with 23 unchecked P0 tasks and 44 unchecked P0/P1 tasks.
+G4 remains blocked with 22 unchecked P0 tasks and 43 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,
