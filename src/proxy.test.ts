@@ -20,18 +20,23 @@ function matchesProxy(pathname: string): boolean {
 }
 
 const MUST_MATCH = [
+  "/api/v1/countries/france",
+  "/api/v1/index",
+  "/api/rights-manifest",
+  "/api/cron/pulse/v2/ingest",
+  "/api/health",
+  "/api/countries/japan/scores",
+];
+
+// PLT-033: cached page documents, assets, and release downloads never invoke
+// the proxy, so a crawler reading cached pages cannot cause a database write.
+const MUST_NOT_MATCH = [
   "/",
   "/country/japan",
   "/country/japan/civica-data",
   "/country/japan/constitution",
   "/country/japan.rsc",
-  "/api/v1/countries/france",
-  "/api/v1/index",
-  "/api/rights-manifest",
-  "/api/cron/pulse-v2",
-  "/embed/usa",
   "/methodology/source-coverage",
-  "/methodology/provenance-coverage",
   "/civica-index/methodology/pulse",
   "/compare",
   "/atlas",
@@ -40,56 +45,27 @@ const MUST_MATCH = [
   "/organizations",
   "/blog/the-record-launch",
   "/admin/pulse-coding",
-  "/design-system",
-  "/licensing",
+  "/embed/usa",
   "/api-docs",
-  // Release downloads are real routes. Their extensions are deliberately not
-  // in the asset list, so they must keep reporting timing.
+  "/apiary",
   "/downloads/civica-atlas-2026-07-11.json.gz",
   "/downloads/civica-atlas-2026-07-11.manifest.json",
-];
-
-const MUST_NOT_MATCH = [
   "/_next/static/chunks/main-abc123.js",
-  "/_next/static/css/app.css",
-  "/_next/static/media/font.woff2",
   "/_next/image",
   "/_next/data/build-id/country/japan.json",
   "/favicon.ico",
   "/robots.txt",
   "/sitemap.xml",
-  // Served straight from `public/`, so they never sit under `_next/`.
   "/engravings/countries/japan.webp",
-  "/blog/the-record-launch/cover.webp",
-  "/og-default.png",
-  "/og-atlas-2026-09.png",
-  "/civica-logo.svg",
   "/fonts/archivo/archivo-normal-latin.woff2",
-  "/fonts/newsreader/newsreader-italic-latin.woff",
-  "/image-trials/sample.avif",
-  "/sample.jpg",
-  "/sample.jpeg",
-  "/sample.gif",
-  "/sample.ttf",
-  "/sample.otf",
-  "/sample.eot",
 ];
 
-test("the proxy matcher keeps every application and API route", () => {
+test("the proxy matcher keeps every API route", () => {
   const missed = MUST_MATCH.filter((pathname) => !matchesProxy(pathname));
   assert.deepEqual(missed, []);
 });
 
-test("the proxy matcher drops the _next tree and static image and font assets", () => {
+test("the proxy matcher never runs for page documents, assets, or downloads", () => {
   const leaked = MUST_NOT_MATCH.filter((pathname) => matchesProxy(pathname));
   assert.deepEqual(leaked, []);
-});
-
-test("the matcher exclusion is anchored to a trailing extension", () => {
-  // A path segment that merely contains an asset extension is still a route.
-  assert.equal(matchesProxy("/country/webp"), true);
-  assert.equal(matchesProxy("/blog/svg-rendering-notes"), true);
-  assert.equal(matchesProxy("/api/v1/countries/png"), true);
-  assert.equal(matchesProxy("/engravings/japan.webp.html"), true);
-  assert.equal(matchesProxy("/engravings/japan.webp"), false);
 });

@@ -6,22 +6,25 @@ slow or failing without creating a reader-analytics ledger.
 
 ## Collection scope
 
-The proxy runs on application document routes, `/api/*`, `/embed/*`, and the
-extension-bearing `/downloads/*` release routes. It deliberately does not run
-on:
+The proxy runs only for `/api/*` (`matcher: ["/api/:path*"]`). Within that
+scope, `isRequestTelemetryEligible()` admits only route handlers whose cache
+policy is `public-live` or `private-live`. Those handlers query the database
+in the same request, so a sampled write never wakes an idle database.
 
-- the whole `_next/` tree, including `_next/static`, `_next/image`, and
-  `_next/data`;
-- `favicon.ico`, `robots.txt`, and `sitemap.xml`; or
-- any path ending in a static image or font extension — `.webp`, `.avif`,
-  `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.ico`, `.woff2`, `.woff`, `.ttf`,
-  `.otf`, `.eot`.
+Page documents are never recorded. Database-backed pages are served from the
+page cache (PLT-033, APR-D177), and a write for each sampled page view would
+keep the database awake around the clock for crawler traffic alone. The proxy
+also never runs for the `_next/` tree, files served from `public/`,
+`/downloads/*` releases, `favicon.ico`, `robots.txt`, or `sitemap.xml`.
+Checked-artifact routes, immutable releases, and unknown `/api/*` paths reach
+the proxy but are not eligible, because none of them read the database.
 
-Civica serves its engravings and self-hosted fonts from `public/`, so those
-requests do not sit under `_next/static` and have to be excluded by extension.
-A byte-for-byte asset response carries no route-performance signal, and the
-exclusion is anchored to a trailing extension so a route whose path merely
-contains one of those words is still measured.
+Server errors keep their own unsampled path through `onRequestError`, so a
+page that fails while rendering is still recorded as a `server_error` row.
+Because page documents contribute no request samples, the `request_p95` and
+`server_error_rate` alerts evaluate API routes only; page render latency is
+visible in Vercel's function logs and in the daily `operations.refresh-pages`
+run duration.
 
 ## Sampling
 

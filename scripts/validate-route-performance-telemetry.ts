@@ -68,38 +68,20 @@ if (errors.length === 0) {
   if (/Math\s*\.\s*random/.test(proxy))
     errors.push("proxy must not inline a sampling draw");
 
-  // The proxy must not run on the build asset tree or on static image/font
-  // requests, which carry no route-performance signal.
-  // Anchored on the end of the config object: the matcher itself contains
-  // `]` characters inside its character classes.
+  // PLT-033: page documents are served from the page cache and must never
+  // trigger a telemetry write, which would wake an otherwise idle database.
+  // The proxy runs only for `/api/*` and samples only request-live handlers.
+  if (!telemetry.includes("export function isRequestTelemetryEligible("))
+    errors.push("telemetry contract omits the request-live eligibility gate");
+  if (!proxy.includes("isRequestTelemetryEligible(pathname, request.method)"))
+    errors.push("proxy must gate request telemetry on request-live eligibility");
   const matcherMatch = proxy.match(/matcher:\s*\[([\s\S]*?)\]\s*,?\s*\}\s*;/);
   if (!matcherMatch) {
     errors.push("proxy must declare a static matcher array");
-  } else {
-    const matcher = matcherMatch[1]!;
-    if (!matcher.includes("_next/"))
-      errors.push("proxy matcher must exclude the whole _next/ tree");
-    for (const extension of [
-      "webp",
-      "avif",
-      "png",
-      "jpg",
-      "jpeg",
-      "gif",
-      "svg",
-      "ico",
-      "woff2",
-      "woff",
-      "ttf",
-      "otf",
-      "eot",
-    ])
-      if (!new RegExp(`\\b${extension}\\b`).test(matcher))
-        errors.push(`proxy matcher must exclude .${extension} assets`);
-    if (!matcher.includes("$)"))
-      errors.push(
-        "proxy matcher must anchor the asset exclusion to a trailing extension",
-      );
+  } else if (matcherMatch[1]!.replace(/\s|,$/g, "") !== '"/api/:path*"') {
+    errors.push(
+      'proxy matcher must be exactly ["/api/:path*"] so cached pages, assets, and downloads never invoke it',
+    );
   }
 
   // Errors and jobs are unsampled, so any comparison against the sampled
@@ -141,6 +123,7 @@ if (errors.length === 0) {
       errors.push(`privacy policy must explicitly exclude ${label}`);
   for (const [label, pattern] of [
     ["the matcher scope", /## Collection scope/],
+    ["that page documents are never recorded", /page documents are never recorded/i],
     ["the request sample rate", /1 in 20|5%/],
     ["that jobs and errors are unsampled", /unsampled|not sampled/],
   ] as const)
