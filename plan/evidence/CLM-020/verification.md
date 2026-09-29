@@ -16,3 +16,27 @@ browser checks. Pre-record results are in `README.md`.
 
 No dev server was run for this change. Screenshots, when added, go in this
 directory as separate files and are listed here.
+
+## Review follow-up: gaps in the permanent check (2026-09-29)
+
+A review found two regressions that passed every gate; F13 in
+`follow-ups.md` describes them and what remains a review rule. This change
+adds `src/components/scores/scores-rankings-closure.test.ts` and the scan
+rules `scale-suffix-unregistered` and `scale-suffix-allowance-stale`. It
+changes no Index-protected file and no pinned evidence file, so it needs no
+new Index change-control record: `publisher-attribution-2026-09-29` still
+binds the protected files.
+
+| Command (worktree, 2026-09-29, `DATABASE_URL` unset) | Exit | Result |
+|---|---|---|
+| Scratch copy with the review's static "Freedom House score" row (83) added to `ScoresAndRankings.tsx`: `node --import tsx --test src/components/scores/scores-rankings-closure.test.ts src/components/scores/scores-rankings.test.ts` | 1 | The closure test fails 2 of its 3 tests ("the table body has 3 rows; expected one per score row (2)"); the pinned contract test still passes 4 of 4. Four more edits of the component (a fourth cell, a rank beside the V-Dem value, a number in a measure label, a number in the release chip) each fail the closure test; the contract test catches only the rank beside the value. |
+| `npx tsx scripts/validate-publisher-attribution.ts --source-override=<new component>=<review's badge file>` | 1 | `scale-suffix-unregistered` for the badge ("/100)"). The same override passed before this change. |
+| `npm run validate:publisher-attribution -- --update-baseline` | 0 | Baseline `publisher-attribution-baseline/v2` lists the 7 scale-suffix allowances. |
+| `npm run validate:publisher-attribution` | 0 | Self-proof with 16 seeded mutations, then a pass over 905 source files. |
+| `node --import tsx --test` on the publisher-attribution, closure, contract, golden, Conditions attribution, and Conditions public-release suites | 0 | 35 tests pass. |
+| `npm run validate:claims-docs` | 0 | All checks pass; its `npm test` child ran 2,352 tests: 2,349 pass, 0 fail, 3 skipped. |
+| `npm run validate:index-change-control`, then `npm run validate:index-change-control:run` | 0, 0 | Binds 118 protected files; reran all 9 declared validations. |
+| `npm run validate:atlas-surface-data-matrix` (regenerated), `npm run validate:verification-matrix` | 0 | The Rankings row lists the closure test. |
+| `npm run validate:module-coverage` | 0 | publisher-attribution: lines 94.28, branch 82.83, functions 93.68. |
+| `npm run typecheck`, `validate:lint`, `validate:design-tokens`, `validate:secrets`, `validate:doc-references`, `validate:doc-sources` | 0 | |
+| `npm run build:ci` (credential-free: `.env.local` moved out of the worktree for the run and restored) | 0 | `build:core` ran the gate with its 16-mutation self-proof, and `next build` completed. |

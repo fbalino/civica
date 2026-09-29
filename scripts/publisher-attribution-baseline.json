@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "publisher-attribution-baseline/v1",
+  "schemaVersion": "publisher-attribution-baseline/v2",
   "exceptions": [
     "api.metrics-strip-data",
     "conditions.hdi-reference-year",
@@ -58,5 +58,14 @@
     "src/lib/provenance/publisher-attribution-selfproof.ts",
     "src/lib/pulse/v2/decouple.ts",
     "src/lib/research/evidence-retention.ts"
+  ],
+  "scaleSuffixAllowances": [
+    "src/app/design-system/page.tsx",
+    "src/components/ci/CIPulseScoreDisplay.tsx",
+    "src/components/conditions/CivicaConditionsPanel.tsx",
+    "src/components/conditions/ConditionsReleaseExplorer.tsx",
+    "src/lib/brand/decision-criteria.ts",
+    "src/lib/provenance/publisher-attribution-check.ts",
+    "src/lib/provenance/publisher-attribution-selfproof.ts"
   ]
 }

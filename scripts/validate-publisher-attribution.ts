@@ -34,6 +34,7 @@ import {
   LIVE_CHECK_EXCEPTIONS,
   PROVENANCE_RENDERERS,
   PUBLISHER_ATTRIBUTION_SURFACES,
+  SCALE_SUFFIX_ALLOWANCES,
   baselineFromRegistry,
 } from "../src/lib/provenance/publisher-attribution-registry";
 import {
@@ -66,12 +67,15 @@ function sourceOverrides(): Map<string, string> {
 }
 
 function printRegistry(): void {
+  // v2 adds the scale-suffix allowances; the v1 snapshot pinned as CLM-020
+  // change-control evidence predates them.
   const snapshot = {
-    schemaVersion: "publisher-attribution-registry-snapshot/v1",
+    schemaVersion: "publisher-attribution-registry-snapshot/v2",
     rules: PUBLISHER_ATTRIBUTION_SCAN_RULES,
     surfaces: PUBLISHER_ATTRIBUTION_SURFACES,
     provenanceRenderers: PROVENANCE_RENDERERS,
     derivedFieldReaders: DERIVED_FIELD_READERS,
+    scaleSuffixAllowances: SCALE_SUFFIX_ALLOWANCES,
     liveCheckExceptions: LIVE_CHECK_EXCEPTIONS,
     baseline: baselineFromRegistry(),
   };
@@ -126,7 +130,7 @@ function main(): void {
   }
   const exceptions = PUBLISHER_ATTRIBUTION_SURFACES.filter((surface) => surface.exception).length;
   console.log(
-    `PASS — publisher-attribution/v1: ${PUBLISHER_ATTRIBUTION_SURFACES.length} surfaces (${exceptions} registered exceptions), ${PROVENANCE_RENDERERS.length} provenance renderers, ${DERIVED_FIELD_READERS.length} derived-field readers, ${LIVE_CHECK_EXCEPTIONS.length} live exception, ${input.sources.size} source files scanned.`,
+    `PASS — publisher-attribution/v1: ${PUBLISHER_ATTRIBUTION_SURFACES.length} surfaces (${exceptions} registered exceptions), ${PROVENANCE_RENDERERS.length} provenance renderers, ${DERIVED_FIELD_READERS.length} derived-field readers, ${SCALE_SUFFIX_ALLOWANCES.length} scale-suffix allowances, ${LIVE_CHECK_EXCEPTIONS.length} live exception, ${input.sources.size} source files scanned.`,
   );
 }
 

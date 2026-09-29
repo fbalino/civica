@@ -1157,6 +1157,7 @@ countryRows.push(
                 ? [
                     "src/lib/ci/publisher-scores.test.ts",
                     "src/components/scores/scores-rankings.test.ts",
+                    "src/components/scores/scores-rankings-closure.test.ts",
                   ]
                 : module.id === "conditions"
                   ? ["src/components/conditions/conditions-attribution.test.ts"]

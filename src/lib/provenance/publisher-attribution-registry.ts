@@ -12,16 +12,21 @@
  *   3. Derived-field readers — every source file that reads a Civica-derived
  *      field (rescaled scores, ranks, composite tables, the legacy
  *      country-metric table) is listed with the tokens it may use.
- *   4. The live exception ledger, the live sample, and the baseline ratchet:
- *      an exception or reader allowance that is not in
- *      `scripts/publisher-attribution-baseline.json` fails until it names an
- *      approving decision or task and the baseline is updated on purpose.
+ *   4. Scale suffixes — every source file whose code prints a 0-to-100 scale
+ *      suffix ("/100", "/ 100", "(83/100)", "out of 100") is listed with a
+ *      reason the scan checks. The former Freedom House row printed Civica's
+ *      rescale this way, so a new suffix fails until someone decides whose
+ *      number it follows.
+ *   5. The live exception ledger, the live sample, and the baseline ratchet:
+ *      an exception, reader allowance, or scale-suffix allowance that is not
+ *      in `scripts/publisher-attribution-baseline.json` fails until it names
+ *      an approving decision or task and the baseline is updated on purpose.
  *
- * Limits (also in plan/evidence/CLM-020/README.md): the scan cannot see new
- * inline arithmetic in a file that reads no registered field, and reader
- * allowances are per file, so a new derived read inside an allowed
- * multi-purpose file is not caught. The rule in DESIGN.md and AGENTS.md is a
- * review rule for those cases.
+ * Limits (current list: F13 in plan/evidence/CLM-020/follow-ups.md): the scan
+ * cannot see other new arithmetic in a file that reads no registered field
+ * and prints no scale suffix, and allowances are per file, so a new derived
+ * read or scale suffix inside an allowed file is not caught. The rule in
+ * DESIGN.md and AGENTS.md is a review rule for those cases.
  */
 
 import type { DisplayedValueOriginKind } from "./publisher-attribution";
@@ -125,6 +130,34 @@ export interface LiveCheckException {
   followUp: string;
   approvedBy: string;
   reason: string;
+}
+
+/**
+ * Why a file may print a 0-to-100 scale suffix. The scan checks each class's
+ * condition:
+ * - `civica_calculation_surface`: every named surface lists the file, is a
+ *   Civica calculation, has a visible disclosure, and carries no exception;
+ * - `not_rendered`: the rendered-module ledger does not mount the file, and
+ *   every application file that imports it is classified not_rendered too;
+ * - `design_system_demo`: a /design-system file that shows the scale beside
+ *   the ValueOriginNote marker;
+ * - `tooling`: the ledger does not mount the file, and only other tooling
+ *   imports it (scripts and tests are outside the scan).
+ */
+export type ScaleSuffixAllowanceClass =
+  | "civica_calculation_surface"
+  | "not_rendered"
+  | "design_system_demo"
+  | "tooling";
+
+export interface ScaleSuffixAllowance {
+  file: string;
+  class: ScaleSuffixAllowanceClass;
+  /** `civica_calculation_surface` only: the surfaces that disclose it. */
+  surfaceIds?: readonly string[];
+  note: string;
+  /** An APR decision id or a checklist task id that approved the allowance. */
+  approvedBy: string;
 }
 
 const CIVICA_DATA = "/country/[slug]/civica-data";
@@ -927,6 +960,53 @@ export const DERIVED_FIELD_READERS: readonly DerivedFieldReader[] = [
   },
 ];
 
+export const SCALE_SUFFIX_ALLOWANCES: readonly ScaleSuffixAllowance[] = [
+  {
+    file: "src/app/design-system/page.tsx",
+    class: "design_system_demo",
+    note: "The ValueOriginNote demo prints a Civica position on its 0 to 100 scale beside the Civica-calculation marker.",
+    approvedBy: "CLM-020",
+  },
+  {
+    file: "src/components/ci/CIPulseScoreDisplay.tsx",
+    class: "not_rendered",
+    note: "Retired Index display; its 0 to 100 score label is not mounted.",
+    approvedBy: "CLM-020",
+  },
+  {
+    file: "src/components/conditions/CivicaConditionsPanel.tsx",
+    class: "civica_calculation_surface",
+    surfaceIds: ["conditions.position.country"],
+    note: "Country Conditions cards print Civica's 0 to 100 position with the Civica-calculation marker.",
+    approvedBy: "CLM-020",
+  },
+  {
+    file: "src/components/conditions/ConditionsReleaseExplorer.tsx",
+    class: "civica_calculation_surface",
+    surfaceIds: ["conditions.position.explorer"],
+    note: "The Conditions explorer prints Civica's 0 to 100 position under the Civica-calculation column header.",
+    approvedBy: "CLM-020",
+  },
+  {
+    file: "src/lib/brand/decision-criteria.ts",
+    class: "tooling",
+    note: "Writes Civica's own brand-decision rubric, including a minimum weighted score on a 0 to 100 scale, into a plan document. It names no publisher; only its validator script and test import it.",
+    approvedBy: "CLM-020",
+  },
+  {
+    file: "src/lib/provenance/publisher-attribution-check.ts",
+    class: "tooling",
+    note: "Rebuilds the former Freedom House row so the checks can prove they reject it.",
+    approvedBy: "CLM-020",
+  },
+  {
+    file: "src/lib/provenance/publisher-attribution-selfproof.ts",
+    class: "tooling",
+    note: "Seeded mutations print scale suffixes to prove the scan fails.",
+    approvedBy: "CLM-020",
+  },
+];
+
 export const LIVE_CHECK_EXCEPTIONS: readonly LiveCheckException[] = [
   {
     id: "conditions.hdi-reference-year",
@@ -963,23 +1043,35 @@ export const PUBLISHER_ATTRIBUTION_LIVE_SAMPLE = [
   "monaco",
 ] as const;
 
+export const PUBLISHER_ATTRIBUTION_BASELINE_VERSION = "publisher-attribution-baseline/v2" as const;
+
 export interface PublisherAttributionBaseline {
-  schemaVersion: "publisher-attribution-baseline/v1";
+  schemaVersion: typeof PUBLISHER_ATTRIBUTION_BASELINE_VERSION;
   exceptions: string[];
   derivedFieldReaders: string[];
+  scaleSuffixAllowances: string[];
 }
+
+/** The ratcheted lists; the scan compares each with the checked baseline. */
+export const PUBLISHER_ATTRIBUTION_BASELINE_KEYS = [
+  "exceptions",
+  "derivedFieldReaders",
+  "scaleSuffixAllowances",
+] as const;
 
 export function baselineFromRegistry(
   surfaces: readonly PublisherAttributionSurface[] = PUBLISHER_ATTRIBUTION_SURFACES,
   readers: readonly DerivedFieldReader[] = DERIVED_FIELD_READERS,
   liveExceptions: readonly LiveCheckException[] = LIVE_CHECK_EXCEPTIONS,
+  scaleSuffixAllowances: readonly ScaleSuffixAllowance[] = SCALE_SUFFIX_ALLOWANCES,
 ): PublisherAttributionBaseline {
   return {
-    schemaVersion: "publisher-attribution-baseline/v1",
+    schemaVersion: PUBLISHER_ATTRIBUTION_BASELINE_VERSION,
     exceptions: [
       ...surfaces.filter((surface) => surface.exception).map((surface) => surface.id),
       ...liveExceptions.map((exception) => exception.id),
     ].sort(),
     derivedFieldReaders: readers.map((reader) => reader.file).sort(),
+    scaleSuffixAllowances: scaleSuffixAllowances.map((allowance) => allowance.file).sort(),
   };
 }

@@ -110,3 +110,35 @@ The owner decides whether to publish a correction note for the former Freedom
 House value ("Free (100/100)" and the other Civica 0 to 100 values shown as
 Freedom House's). Under `content/policies.md` it is a Major correction: a
 non-headline value was wrong.
+
+### F13
+
+What the permanent check still cannot see. A review on 2026-09-29 found two
+regressions that passed every gate: an unmarked "Freedom House score" row
+(83) added to the Rankings table, and a new file that printed "Freedom House:
+Free (83/100)" with no `SourceDot`. Each now fails a check. The first fails
+`src/components/scores/scores-rankings-closure.test.ts`, which renders the
+Rankings table and fails on any row, cell, caption, sibling, attribute, or
+number that its checked score rows do not produce. The second fails the scan
+rule `scale-suffix-unregistered`, which rejects a printed "/100", "/ 100", or
+"out of 100" in any application file that `SCALE_SUFFIX_ALLOWANCES` does not
+list; each allowance must meet its class's condition and is ratcheted in
+`scripts/publisher-attribution-baseline.json`.
+
+These cases remain review rules:
+
+- a new number without a scale suffix in a file that renders no `SourceDot`
+  and reads no registered field, such as "Freedom House: 83";
+- a new unmarked number, scale suffix, or derived read inside a file that
+  already has an allowance, such as a second position in
+  `CivicaConditionsPanel.tsx`;
+- registered surfaces other than the Rankings table, which have no rendered
+  closure test;
+- a scale split across expressions (`{position}/{100}`) and other scales
+  ("/ 10", "/ 7"), which the scan does not read.
+
+The README's Limitations section and the registry snapshot are pinned
+change-control evidence, so they describe the check before these additions.
+`--print-registry` now prints `publisher-attribution-registry-snapshot/v2`,
+which adds the scale-suffix allowances, and the baseline is
+`publisher-attribution-baseline/v2`.

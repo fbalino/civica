@@ -21,6 +21,7 @@ import {
 } from "./publisher-attribution-check";
 import { type PublisherAttributionBaseline } from "./publisher-attribution-registry";
 import {
+  checkedPublisherAttributionRegistry,
   isPublisherAttributionScanPath,
   scanPublisherAttribution,
   type PublisherAttributionScanInput,
@@ -196,6 +197,64 @@ export const PUBLISHER_ATTRIBUTION_SEEDED_MUTATIONS: readonly SeededMutation[] =
         clean,
         "src/components/example/NewSourcedFigure.tsx",
         'import { SourceDot } from "@/components/SourceDot";\nexport function NewSourcedFigure() {\n  return <span>64 / 100 <SourceDot source="global_peace_index" retrievedAt={null} /></span>;\n}\n',
+      ),
+  },
+  {
+    // The review regression of 2026-09-29: no SourceDot, no registered field.
+    label: "a new badge prints a Civica position as Freedom House's score out of 100",
+    rule: "scale-suffix-unregistered",
+    build: (clean) =>
+      withNewFile(
+        clean,
+        "src/components/example/FreedomHouseBadge.tsx",
+        "export function FreedomHouseBadge({ rawValue }: { rawValue: number }) {\n  const position = Math.round(((14 - rawValue) / 12) * 100);\n  return <p>Freedom House: Free ({position}/100)</p>;\n}\n",
+      ),
+  },
+  {
+    label: "the Rankings table prints a Civica position out of 100 beside a publisher value",
+    rule: "scale-suffix-unregistered",
+    build: (clean) =>
+      withSource(clean, "src/components/scores/ScoresAndRankings.tsx", (source) =>
+        source.replace(
+          "{row.scoreFormatted}",
+          "{row.scoreFormatted} ({Math.round(((14 - 2) / 12) * 100)}/100)",
+        ),
+      ),
+  },
+  {
+    label: "an application page imports tooling that may print a scale suffix",
+    rule: "allowlist-condition-failed",
+    build: (clean) =>
+      withNewFile(
+        clean,
+        "src/app/example/page.tsx",
+        'import { renderBrandNameDecisionCriteriaMarkdown } from "@/lib/brand/decision-criteria";\nexport default function Page() {\n  return <pre>{renderBrandNameDecisionCriteriaMarkdown()}</pre>;\n}\n',
+      ),
+  },
+  {
+    label: "a Civica-calculation surface that may print a scale suffix loses its disclosure",
+    rule: "allowlist-condition-failed",
+    build: (clean) => {
+      const registry = clean.registry ?? checkedPublisherAttributionRegistry();
+      return {
+        ...clean,
+        registry: {
+          ...registry,
+          surfaces: registry.surfaces.map((surface) =>
+            surface.id === "conditions.position.country"
+              ? { ...surface, disclosure: "none" as const }
+              : surface,
+          ),
+        },
+      };
+    },
+  },
+  {
+    label: "a file allowed a scale suffix stops printing one",
+    rule: "scale-suffix-allowance-stale",
+    build: (clean) =>
+      withSource(clean, "src/lib/brand/decision-criteria.ts", (source) =>
+        source.replace("/100**.", " points**."),
       ),
   },
   {

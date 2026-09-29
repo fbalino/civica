@@ -525,7 +525,8 @@
         "src/lib/atlas/atl-018-country-reader.test.ts",
         "e2e/atl-018-data-states.spec.ts",
         "src/lib/ci/publisher-scores.test.ts",
-        "src/components/scores/scores-rankings.test.ts"
+        "src/components/scores/scores-rankings.test.ts",
+        "src/components/scores/scores-rankings-closure.test.ts"
       ],
       "testGap": null,
       "owner": "Country Civica Data",
@@ -2160,5 +2161,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "132d44872d0eecc9b100a390b028975e651367746de65d5f2e56ff5e9aec6b07"
+  "semanticSha256": "818c6265f0d8019312b6265cd052bbe3a6fd082eff406d1c5d888ab91ffef364"
 }

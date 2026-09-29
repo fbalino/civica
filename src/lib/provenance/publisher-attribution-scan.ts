@@ -5,7 +5,9 @@
  *
  * Code is compared with comments removed (TypeScript printer) and whitespace
  * collapsed, so a comment can neither satisfy a required disclosure nor trip
- * a derived-field token.
+ * a derived-field token. Scale suffixes are read from the syntax tree, from
+ * string, template, and JSX text only, so arithmetic such as `x / 100`, a
+ * regular expression, or a comment never counts as a printed scale.
  */
 
 import ts from "typescript";
@@ -16,13 +18,16 @@ import {
   DERIVED_FIELD_TOKENS,
   LIVE_CHECK_EXCEPTIONS,
   PROVENANCE_RENDERERS,
+  PUBLISHER_ATTRIBUTION_BASELINE_KEYS,
   PUBLISHER_ATTRIBUTION_SURFACES,
+  SCALE_SUFFIX_ALLOWANCES,
   baselineFromRegistry,
   type DerivedFieldReader,
   type LiveCheckException,
   type ProvenanceRenderer,
   type PublisherAttributionBaseline,
   type PublisherAttributionSurface,
+  type ScaleSuffixAllowance,
 } from "./publisher-attribution-registry";
 
 export const PUBLISHER_ATTRIBUTION_SCAN_RULES = [
@@ -40,6 +45,8 @@ export const PUBLISHER_ATTRIBUTION_SCAN_RULES = [
   "score-row-ids-drift",
   "provenance-renderer-unregistered",
   "provenance-renderer-stale",
+  "scale-suffix-unregistered",
+  "scale-suffix-allowance-stale",
   "registry-baseline-drift",
 ] as const;
 export type PublisherAttributionScanRule =
@@ -63,6 +70,18 @@ export interface PublisherAttributionRegistryInput {
   renderers: readonly ProvenanceRenderer[];
   readers: readonly DerivedFieldReader[];
   liveExceptions: readonly LiveCheckException[];
+  scaleSuffixAllowances: readonly ScaleSuffixAllowance[];
+}
+
+/** The checked registry, which the scan reads unless a variant is passed. */
+export function checkedPublisherAttributionRegistry(): PublisherAttributionRegistryInput {
+  return {
+    surfaces: PUBLISHER_ATTRIBUTION_SURFACES,
+    renderers: PROVENANCE_RENDERERS,
+    readers: DERIVED_FIELD_READERS,
+    liveExceptions: LIVE_CHECK_EXCEPTIONS,
+    scaleSuffixAllowances: SCALE_SUFFIX_ALLOWANCES,
+  };
 }
 
 export interface PublisherAttributionScanInput {
@@ -161,16 +180,80 @@ function moduleSpecifierStem(path: string): string {
   return path.replace(/\.(ts|tsx)$/, "").split("/").at(-1)!;
 }
 
+/**
+ * Scanned files whose import or re-export specifier ends in `file`'s stem.
+ * Textual, so it can over-report a same-named module (fails closed).
+ */
+function importersOf(file: string, sources: ReadonlyMap<string, string>): string[] {
+  const stem = moduleSpecifierStem(file).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const importPattern = new RegExp(`from ["'][^"']*/${stem}["']`);
+  return [...sources]
+    .filter(([path, source]) => path !== file && importPattern.test(source))
+    .map(([path]) => path)
+    .sort();
+}
+
+/**
+ * A printed 0-to-100 scale after a number: "/100", "/ 100", "(83/100)", or
+ * "out of 100". A longer number ("/1000", "/100.5", "/100,000") does not
+ * match. A path segment such as "org/100" does, and fails closed.
+ */
+export const SCALE_SUFFIX_PATTERN = /(?:\/\s*100|\bout\s+of\s+100)(?!\d|[.,]\d)/i;
+
+/** Cheap raw-text screen; only files that pass it are parsed. */
+const SCALE_SUFFIX_SCREEN = /\/\s*100|out\s+of\s+100/i;
+
+const fragmentCache = new Map<string, readonly string[]>();
+
+/**
+ * Every string, template, and JSX text fragment in `source` that prints a
+ * scale suffix, whitespace-collapsed. Comments, regular expressions, and
+ * arithmetic are not text fragments, so they never match.
+ */
+export function scaleSuffixFragments(path: string, source: string): readonly string[] {
+  if (!SCALE_SUFFIX_SCREEN.test(source)) return [];
+  const key = `${path}\u0000${source}`;
+  const cached = fragmentCache.get(key);
+  if (cached !== undefined) return cached;
+  const sourceFile = ts.createSourceFile(
+    path,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const fragments: string[] = [];
+  const visit = (node: ts.Node): void => {
+    if (
+      ts.isJsxText(node) ||
+      ts.isStringLiteral(node) ||
+      ts.isNoSubstitutionTemplateLiteral(node) ||
+      ts.isTemplateHead(node) ||
+      ts.isTemplateMiddle(node) ||
+      ts.isTemplateTail(node)
+    ) {
+      const text = collapseWhitespace(node.text);
+      if (SCALE_SUFFIX_PATTERN.test(text)) fragments.push(text);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  if (fragmentCache.size > 2_000) fragmentCache.clear();
+  fragmentCache.set(key, fragments);
+  return fragments;
+}
+
+function quotedFragments(fragments: readonly string[]): string {
+  return fragments
+    .map((fragment) => `"${fragment.length > 60 ? `${fragment.slice(0, 57)}...` : fragment}"`)
+    .join(", ");
+}
+
 /** Runs every rule and returns the issues; an empty array is a pass. */
 export function scanPublisherAttribution(
   input: PublisherAttributionScanInput,
 ): PublisherAttributionScanIssue[] {
-  const registry = input.registry ?? {
-    surfaces: PUBLISHER_ATTRIBUTION_SURFACES,
-    renderers: PROVENANCE_RENDERERS,
-    readers: DERIVED_FIELD_READERS,
-    liveExceptions: LIVE_CHECK_EXCEPTIONS,
-  };
+  const registry = input.registry ?? checkedPublisherAttributionRegistry();
   const issues: PublisherAttributionScanIssue[] = [];
   const report = (
     rule: PublisherAttributionScanRule,
@@ -358,10 +441,7 @@ export function scanPublisherAttribution(
       );
     }
     if (reader.class === "imported_only_by_not_rendered") {
-      const stem = moduleSpecifierStem(reader.file);
-      const importPattern = new RegExp(`from ["'][^"']*/${stem}["']`);
-      for (const [path, source] of input.sources) {
-        if (path === reader.file || !importPattern.test(source)) continue;
+      for (const path of importersOf(reader.file, input.sources)) {
         if (!notRenderedFiles.has(path)) {
           report(
             "allowlist-condition-failed",
@@ -380,7 +460,116 @@ export function scanPublisherAttribution(
     }
   }
 
-  // 4. Conditions transformations and their reader explanations.
+  // 4. Scale suffixes. The former Freedom House row printed Civica's rescale
+  // as "Free (100/100)", so every file that prints "/100" needs a checked
+  // reason in SCALE_SUFFIX_ALLOWANCES.
+  const allowanceByFile = new Map(
+    registry.scaleSuffixAllowances.map((allowance) => [allowance.file, allowance]),
+  );
+  const suffixFiles = new Map<string, readonly string[]>();
+  for (const [path, source] of input.sources) {
+    const fragments = scaleSuffixFragments(path, source);
+    if (fragments.length > 0) suffixFiles.set(path, fragments);
+  }
+  for (const [path, fragments] of [...suffixFiles].sort(([a], [b]) => a.localeCompare(b))) {
+    if (!allowanceByFile.has(path)) {
+      report(
+        "scale-suffix-unregistered",
+        path,
+        `prints a 0-to-100 scale suffix (${quotedFragments(fragments)}) but is not in SCALE_SUFFIX_ALLOWANCES. Show the publisher's own figure on the publisher's scale, or mark the Civica position with ValueOriginNote on a registered Civica-calculation surface and list the file`,
+      );
+    }
+  }
+  const notRenderedAnywhere = new Set([
+    ...notRenderedFiles,
+    ...registry.scaleSuffixAllowances
+      .filter((allowance) => allowance.class === "not_rendered")
+      .map((allowance) => allowance.file),
+  ]);
+  const toolingFiles = new Set([
+    ...registry.scaleSuffixAllowances
+      .filter((allowance) => allowance.class === "tooling")
+      .map((allowance) => allowance.file),
+    ...registry.readers
+      .filter((reader) => reader.class === "attribution_tooling")
+      .map((reader) => reader.file),
+  ]);
+  for (const allowance of registry.scaleSuffixAllowances) {
+    const { file } = allowance;
+    if (!suffixFiles.has(file)) {
+      report(
+        "scale-suffix-allowance-stale",
+        file,
+        input.sources.has(file)
+          ? "is in SCALE_SUFFIX_ALLOWANCES but prints no scale suffix"
+          : "is in SCALE_SUFFIX_ALLOWANCES but does not exist",
+      );
+    }
+    if (!approvalResolves(allowance.approvedBy, input)) {
+      report("approval-unresolved", file, `approvedBy ${allowance.approvedBy} does not resolve`);
+    }
+    switch (allowance.class) {
+      case "civica_calculation_surface": {
+        const ids = allowance.surfaceIds ?? [];
+        if (ids.length === 0) {
+          report("allowlist-condition-failed", file, "a Civica-calculation scale allowance names no surface");
+        }
+        for (const id of ids) {
+          const surface = surfaceById.get(id);
+          if (
+            !surface ||
+            !surface.files.includes(file) ||
+            !surface.origins.includes("civica_calculation") ||
+            surface.disclosure === "none" ||
+            surface.exception
+          ) {
+            report(
+              "allowlist-condition-failed",
+              file,
+              `surface ${id} is not a disclosed Civica-calculation surface without an exception that lists this file`,
+            );
+          }
+        }
+        break;
+      }
+      case "not_rendered":
+      case "tooling": {
+        if (input.renderedModuleSources.has(file)) {
+          report(
+            "allowlist-condition-failed",
+            file,
+            `may print a scale suffix as ${allowance.class}, but the rendered-module ledger mounts it`,
+          );
+        }
+        const permitted = allowance.class === "not_rendered" ? notRenderedAnywhere : toolingFiles;
+        for (const importer of importersOf(file, input.sources)) {
+          if (!permitted.has(importer)) {
+            report(
+              "allowlist-condition-failed",
+              file,
+              `is imported by ${importer}, which is not classified ${allowance.class}`,
+            );
+          }
+        }
+        break;
+      }
+      case "design_system_demo": {
+        if (!file.startsWith("src/app/design-system/")) {
+          report("allowlist-condition-failed", file, "design_system_demo allowances must live under src/app/design-system/");
+        }
+        if (!(code(file) ?? "").includes("<ValueOriginNote")) {
+          report(
+            "allowlist-condition-failed",
+            file,
+            "the design-system demo no longer shows the ValueOriginNote marker beside its scale",
+          );
+        }
+        break;
+      }
+    }
+  }
+
+  // 5. Conditions transformations and their reader explanations.
   const rankedContract = Object.entries(input.conditionsParameterContract).filter(
     ([, entry]) => entry.direction !== "not_ranked",
   );
@@ -418,7 +607,7 @@ export function scanPublisherAttribution(
     }
   }
 
-  // 5. Live exception ledger.
+  // 6. Live exception ledger.
   for (const exception of registry.liveExceptions) {
     if (!followUpResolves(exception.followUp, input)) {
       report(
@@ -432,13 +621,29 @@ export function scanPublisherAttribution(
     }
   }
 
-  // 6. Baseline ratchet: exceptions and reader allowances change only on purpose.
-  const current = baselineFromRegistry(registry.surfaces, registry.readers, registry.liveExceptions);
-  for (const key of ["exceptions", "derivedFieldReaders"] as const) {
-    const known = new Set(input.baseline[key]);
+  // 7. Baseline ratchet: exceptions, reader allowances, and scale-suffix
+  // allowances change only on purpose.
+  const current = baselineFromRegistry(
+    registry.surfaces,
+    registry.readers,
+    registry.liveExceptions,
+    registry.scaleSuffixAllowances,
+  );
+  if (input.baseline.schemaVersion !== current.schemaVersion) {
+    report(
+      "registry-baseline-drift",
+      "schemaVersion",
+      `the checked baseline is ${String(input.baseline.schemaVersion)}; the registry writes ${current.schemaVersion}. Run \`npm run validate:publisher-attribution -- --update-baseline\``,
+    );
+  }
+  for (const key of PUBLISHER_ATTRIBUTION_BASELINE_KEYS) {
+    // An older baseline may lack a list; a missing list is empty, so its
+    // entries all report as new.
+    const checked: readonly string[] = input.baseline[key] ?? [];
+    const known = new Set(checked);
     const now = new Set(current[key]);
     const added = current[key].filter((entry) => !known.has(entry));
-    const removed = input.baseline[key].filter((entry) => !now.has(entry));
+    const removed = checked.filter((entry) => !now.has(entry));
     if (added.length > 0 || removed.length > 0) {
       report(
         "registry-baseline-drift",

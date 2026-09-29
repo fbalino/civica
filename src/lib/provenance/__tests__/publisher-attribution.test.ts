@@ -19,8 +19,13 @@ import {
   publisherAttributionErrors,
   scaleEndClusterSignature,
 } from "../publisher-attribution-check";
-import { baselineFromRegistry } from "../publisher-attribution-registry";
-import { scanPublisherAttribution } from "../publisher-attribution-scan";
+import { baselineFromRegistry, type ScaleSuffixAllowance } from "../publisher-attribution-registry";
+import {
+  SCALE_SUFFIX_PATTERN,
+  checkedPublisherAttributionRegistry,
+  scaleSuffixFragments,
+  scanPublisherAttribution,
+} from "../publisher-attribution-scan";
 import {
   PUBLISHER_ATTRIBUTION_SEEDED_MUTATIONS,
   formatPublisherAttributionIssue,
@@ -171,7 +176,11 @@ test("the static scan passes the repository and each seeded mutation fails with 
   assert.deepEqual(input.baseline, baselineFromRegistry());
   assert.deepEqual(proveValueCheck(), []);
   assert.deepEqual(proveScan(input), []);
-  assert.ok(PUBLISHER_ATTRIBUTION_SEEDED_MUTATIONS.length >= 10);
+  assert.ok(PUBLISHER_ATTRIBUTION_SEEDED_MUTATIONS.length >= 16);
+  const seededRules = new Set(PUBLISHER_ATTRIBUTION_SEEDED_MUTATIONS.map((mutation) => mutation.rule));
+  for (const rule of ["scale-suffix-unregistered", "scale-suffix-allowance-stale"] as const) {
+    assert.ok(seededRules.has(rule), `no seeded mutation proves ${rule}`);
+  }
 });
 
 test("the scan fails on the former Freedom House formatter and ignores comments", () => {
@@ -179,7 +188,7 @@ test("the scan fails on the former Freedom House formatter and ignores comments"
   const sources = new Map(input.sources);
   sources.set(
     "src/lib/db/queries-scores.ts",
-    `${sources.get("src/lib/db/queries-scores.ts")}\n// Math.round(latest.normalizedScore) in a comment is not code.\n`,
+    `${sources.get("src/lib/db/queries-scores.ts")}\n// Math.round(latest.normalizedScore) printed as "Free (100/100)" in a comment is not code.\n`,
   );
   assert.deepEqual(scanPublisherAttribution({ ...input, sources }), []);
   sources.set(
@@ -187,5 +196,154 @@ test("the scan fails on the former Freedom House formatter and ignores comments"
     `${sources.get("src/lib/db/queries-scores.ts")}\nexport const formerRow = (latest: { normalizedScore: number }) => \`Free (\${Math.round(latest.normalizedScore)}/100)\`;\n`,
   );
   const rules = scanPublisherAttribution({ ...input, sources }).map((issue) => issue.rule);
-  assert.deepEqual(rules, ["derived-field-not-allowed"]);
+  assert.deepEqual(rules, ["derived-field-not-allowed", "scale-suffix-unregistered"]);
+});
+
+test("the scan fails on the review's scale-suffix regression in a file it could not see before", () => {
+  // The review of 2026-09-29: a new file with no SourceDot and no registered
+  // field printed the former row's form. It passed every gate until the
+  // scale-suffix rule.
+  const input = readPublisherAttributionScanInput(process.cwd());
+  const sources = new Map(input.sources);
+  sources.set(
+    "src/components/zz/FhBadge.tsx",
+    "export function FhBadge({ rawValue }: { rawValue: number }) {\n  const position = Math.round(((14 - rawValue) / 12) * 100);\n  return <p>Freedom House: Free ({position}/100)</p>;\n}\n",
+  );
+  assert.deepEqual(scanPublisherAttribution({ ...input, sources }).map(formatPublisherAttributionIssue), [
+    '[scale-suffix-unregistered] src/components/zz/FhBadge.tsx: prints a 0-to-100 scale suffix ("/100)") but is not in SCALE_SUFFIX_ALLOWANCES. Show the publisher\'s own figure on the publisher\'s scale, or mark the Civica position with ValueOriginNote on a registered Civica-calculation surface and list the file',
+  ]);
+});
+
+test("scale suffixes are read from printed text, not arithmetic, patterns, or comments", () => {
+  const fragments = (source: string, path = "src/components/example/Fixture.tsx") =>
+    scaleSuffixFragments(path, source);
+  assert.deepEqual(
+    fragments("export const A = ({ p }: { p: number }) => <p>Free ({p}/100)</p>;"),
+    ["/100)"],
+  );
+  assert.deepEqual(fragments("export const B = ({ p }: { p: number }) => <p>{p} / 100</p>;"), [
+    "/ 100",
+  ]);
+  assert.deepEqual(fragments("export const C = (p: number) => `${p} / 100`;", "src/lib/c.ts"), [
+    "/ 100",
+  ]);
+  assert.deepEqual(fragments('export const D = "Free (100/100)";', "src/lib/d.ts"), [
+    "Free (100/100)",
+  ]);
+  assert.deepEqual(fragments('export const E = <Score label="/ 100" />;'), ["/ 100"]);
+  assert.deepEqual(fragments("export const F = 'scored 83 out of 100.';", "src/lib/f.ts"), [
+    "scored 83 out of 100.",
+  ]);
+  assert.deepEqual(fragments("export const G = `${1} / 100.`;", "src/lib/g.ts"), ["/ 100."]);
+  for (const silent of [
+    "export const H = (x: number) => x / 100;",
+    "export const I = Math.round(3.14159 * 100) / 100;",
+    "export const J = /100%\\s*uptime/i;",
+    "// Free (100/100) in a comment\nexport const K = 1;",
+    'export const L = "1/1000";',
+    'export const M = "1/100.5";',
+    'export const N = "per 1/100,000 people";',
+  ]) {
+    assert.deepEqual(fragments(silent, "src/lib/silent.ts"), [], silent);
+  }
+  assert.equal(SCALE_SUFFIX_PATTERN.test("0.769"), false);
+});
+
+test("each scale-suffix allowance class fails when its condition fails", () => {
+  const input = readPublisherAttributionScanInput(process.cwd());
+  const registry = checkedPublisherAttributionRegistry();
+  type RegistryChanges = Partial<ReturnType<typeof checkedPublisherAttributionRegistry>>;
+  const scanWith = (changes: RegistryChanges, overrides: Partial<typeof input> = {}) => {
+    const variant = { ...registry, ...changes };
+    return scanPublisherAttribution({
+      ...input,
+      ...overrides,
+      registry: variant,
+      baseline: baselineFromRegistry(
+        variant.surfaces,
+        variant.readers,
+        variant.liveExceptions,
+        variant.scaleSuffixAllowances,
+      ),
+    })
+      .map(formatPublisherAttributionIssue)
+      .join("\n");
+  };
+  const withAllowance = (file: string, change: Partial<ScaleSuffixAllowance>) =>
+    registry.scaleSuffixAllowances.map((allowance) =>
+      allowance.file === file ? { ...allowance, ...change } : allowance,
+    );
+  const panel = "src/components/conditions/CivicaConditionsPanel.tsx";
+
+  assert.equal(scanWith({}), "");
+  assert.match(
+    scanWith({ scaleSuffixAllowances: withAllowance(panel, { surfaceIds: [] }) }),
+    /\[allowlist-condition-failed\] src\/components\/conditions\/CivicaConditionsPanel\.tsx: a Civica-calculation scale allowance names no surface/,
+  );
+  assert.match(
+    scanWith({ scaleSuffixAllowances: withAllowance(panel, { surfaceIds: ["conditions.components"] }) }),
+    /surface conditions\.components is not a disclosed Civica-calculation surface/,
+  );
+  assert.match(
+    scanWith(
+      {},
+      {
+        renderedModuleSources: new Set([
+          ...input.renderedModuleSources,
+          "src/components/ci/CIPulseScoreDisplay.tsx",
+        ]),
+      },
+    ),
+    /CIPulseScoreDisplay\.tsx: may print a scale suffix as not_rendered, but the rendered-module ledger mounts it/,
+  );
+  const imported = new Map(input.sources);
+  imported.set(
+    "src/components/example/RetiredScoreCard.tsx",
+    'import { CIPulseScoreDisplay } from "@/components/ci/CIPulseScoreDisplay";\nexport const RetiredScoreCard = CIPulseScoreDisplay;\n',
+  );
+  assert.match(
+    scanWith({}, { sources: imported }),
+    /CIPulseScoreDisplay\.tsx: is imported by src\/components\/example\/RetiredScoreCard\.tsx, which is not classified not_rendered/,
+  );
+  const demo = "src/app/design-system/page.tsx";
+  const withoutMarker = new Map(input.sources);
+  withoutMarker.set(demo, input.sources.get(demo)!.replaceAll("<ValueOriginNote", "<span data-dropped"));
+  assert.match(
+    scanWith({}, { sources: withoutMarker }),
+    /design-system demo no longer shows the ValueOriginNote marker/,
+  );
+  assert.match(
+    scanWith({ scaleSuffixAllowances: withAllowance(demo, { file: "src/app/demo/page.tsx" }) }),
+    /\[allowlist-condition-failed\] src\/app\/demo\/page\.tsx: design_system_demo allowances must live under src\/app\/design-system\//,
+  );
+  const unlisted = scanWith({
+    scaleSuffixAllowances: [
+      ...registry.scaleSuffixAllowances,
+      { file: "src/lib/gone.ts", class: "tooling", note: "fixture", approvedBy: "NOPE" },
+    ],
+  });
+  assert.match(unlisted, /\[scale-suffix-allowance-stale\] src\/lib\/gone\.ts: is in SCALE_SUFFIX_ALLOWANCES but does not exist/);
+  assert.match(unlisted, /\[approval-unresolved\] src\/lib\/gone\.ts: approvedBy NOPE does not resolve/);
+});
+
+test("the baseline ratchet reports an older schema and a missing list", () => {
+  const input = readPublisherAttributionScanInput(process.cwd());
+  const current = baselineFromRegistry();
+  const older = {
+    schemaVersion: "publisher-attribution-baseline/v1",
+    exceptions: current.exceptions,
+    derivedFieldReaders: current.derivedFieldReaders,
+  } as unknown as typeof current;
+  const issues = scanPublisherAttribution({ ...input, baseline: older }).map(
+    formatPublisherAttributionIssue,
+  );
+  assert.equal(issues.length, 2, issues.join("\n"));
+  assert.match(
+    issues[0],
+    /^\[registry-baseline-drift\] schemaVersion: the checked baseline is publisher-attribution-baseline\/v1/,
+  );
+  assert.match(
+    issues[1],
+    /^\[registry-baseline-drift\] scaleSuffixAllowances: new: src\/app\/design-system\/page\.tsx/,
+  );
 });

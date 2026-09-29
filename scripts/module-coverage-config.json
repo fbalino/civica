@@ -89,7 +89,7 @@
         "src/lib/provenance/publisher-attribution-scan.ts"
       ],
       "thresholds": { "lines": 88, "branch": 73, "functions": 87 },
-      "note": "CLM-020 publisher-attribution/v1: displayed-value origin vocabulary, value checks, and the static scan with its seeded mutations. Measured 2026-09-29: lines 93.08 / branch 78.06 / functions 92.11."
+      "note": "CLM-020 publisher-attribution/v1: displayed-value origin vocabulary, value checks, and the static scan with its seeded mutations, including the scale-suffix rule. Measured 2026-09-29: lines 94.28 / branch 82.83 / functions 93.68."
     }
   ]
 }
