@@ -1,0 +1,61 @@
+{
+  "task": "PLT-032",
+  "recordedAt": "2026-09-29",
+  "target": "production Neon, read-only: every query ran inside a read-only transaction. Nothing was written to production.",
+  "symptom": {
+    "table": "production_pipeline_runs",
+    "pipelineId": "pulse.v2.ingest",
+    "since": "2026-08-15",
+    "runs": {
+      "failed/partial": 93,
+      "failed/handler_exception": 5,
+      "empty": 1
+    },
+    "rowsWrittenSum": 0,
+    "recentRows": "every run from 2026-09-24 to 2026-09-29 (two scheduled slots a day, 08:00 and 13:30 UTC) stores rows_read 0, rows_written 0, rows_rejected 0, and freshness_source_ids []"
+  },
+  "groundTruth": {
+    "pulsePipelineRuns": "Pulse's own ingest stage record (pulse_pipeline_runs) holds the correct totals, for example 2026-09-26 08:00: 36 fetched, 3 inserted, all from HRW, with gdelt failed.",
+    "rawEventsInserted": {
+      "2026-09-24": { "civicus_monitor": 2, "hrw": 3 },
+      "2026-09-25": { "hrw": 2, "ipu_parline": 2 },
+      "2026-09-26": { "hrw": 4 },
+      "2026-09-27": { "hrw": 1 },
+      "2026-09-28": { "civicus_monitor": 1 }
+    },
+    "sourceFreshness": {
+      "civicus_monitor": "2026-09-28T13:31:01.926Z",
+      "hrw": "2026-09-27T08:01:11.630Z",
+      "ipu_parline": "2026-09-25T08:01:11.373Z",
+      "gdelt": "2026-09-21T13:54:11.908Z",
+      "amnesty": "2026-08-22T12:31:02.301Z"
+    }
+  },
+  "causes": [
+    {
+      "id": "counters-from-first-connector",
+      "where": "src/lib/platform/pipeline-observability.ts summarizePipelinePayload",
+      "detail": "The ledger flattens the route response in key order and takes the first path ending in each candidate name. The ingest response lists per-connector reports (sorted by connector, ACLED first) before the run totals, so rows_read, rows_written, and rows_rejected are ACLED's fetched, inserted, and unmatchedCountry. ACLED is access-gated and reports zeros every run."
+    },
+    {
+      "id": "freshness-skipped-on-failure",
+      "where": "src/lib/platform/pipeline-observability.ts finishPipelineRun",
+      "detail": "Freshness was looked up only when the handler succeeded. A partial ingest returns HTTP 502 and is recorded as failed, although its atomic writer committed the working connectors' rows and stamped their sources."
+    },
+    {
+      "id": "unregistered-stamped-source",
+      "where": "src/lib/data/production-adapter-registry.ts",
+      "detail": "Even for a successful run the lookup covered only the four registered sources (amnesty, civicus_monitor, gdelt, hrw). The IPU connector writes and stamps ipu_parline, which is not registered for pulse.v2.ingest, so no ledger row could ever list it. The registry is a protected Index file; the fix instead verifies the sources the writer reports."
+    },
+    {
+      "id": "success-misclassified-empty",
+      "where": "same counter rule",
+      "detail": "The one fully successful run since 2026-08-15, a manual run at 2026-09-21 13:52 UTC when GDELT answered, fetched 284 items and inserted 250 GDELT events (pulse_pipeline_runs). The ledger recorded it as empty with rows_read 0, rows_written 0, rows_rejected 0, because the first connector's fetched count of 0 was read as the run's rows read. Its freshness result (gdelt) was correct because the run succeeded."
+    }
+  ],
+  "dailyPartial": {
+    "cause": "GDELT. Its connector failed in 96 ingest runs from 2026-08-17 to 2026-09-29, every recent run, with a 10-second connect timeout to api.gdeltproject.org:443. GDELT last succeeded on 2026-09-21.",
+    "earlierFailures": "Amnesty failed in 20 runs from 2026-08-17 to 2026-08-20 and has not failed since; IPU failed in 2 runs on 2026-08-17.",
+    "notChanged": "Not fixed here: it is an upstream reachability problem, and the partial-availability policy already publishes the working connectors. The ledger correctly keeps these runs as failed with error summary 'partial', so the pipeline alert stays open until GDELT is reachable or deliberately retired."
+  }
+}

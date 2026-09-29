@@ -79,6 +79,11 @@ export interface PipelineRunStore {
     freshnessSourceIds: string[];
     errorSummary: string | null;
   }): Promise<void>;
+  /** Of `sourceIds`, those whose sanctioned freshness stamp is at or after `since`. */
+  advancedSources(input: {
+    sourceIds: readonly string[];
+    since: Date;
+  }): Promise<string[]>;
 }
 
 export interface PipelineRunHandle {
@@ -174,9 +179,17 @@ function firstMetric(
   candidates: readonly string[],
 ): number | null {
   for (const candidate of candidates) {
-    const found = entries.find(([path]) =>
-      path.toLowerCase().endsWith(candidate.toLowerCase()),
-    );
+    const suffix = candidate.toLowerCase();
+    let found: [string, number] | undefined;
+    let foundDepth = Number.POSITIVE_INFINITY;
+    for (const entry of entries) {
+      if (!entry[0].toLowerCase().endsWith(suffix)) continue;
+      const depth = entry[0].split(".").length;
+      if (depth < foundDepth) {
+        found = entry;
+        foundDepth = depth;
+      }
+    }
     if (found) return found[1];
   }
   return null;
@@ -185,8 +198,11 @@ function firstMetric(
 /**
  * Map the bounded machine-readable response fields already returned by cron
  * routes to the cross-pipeline counters. Unknown stays null rather than being
- * silently converted to zero. The stored metrics retain these same fields and
- * never retain response prose, payload records, URLs, or exception content.
+ * silently converted to zero. Among paths matching a candidate, the least
+ * nested wins and key order breaks ties, so a run total such as
+ * `summary.totalInserted` outranks one connector's `summary.reports.0.inserted`.
+ * The stored metrics retain these same fields and never retain response
+ * prose, payload records, URLs, or exception content.
  */
 export function summarizePipelinePayload(payload: unknown): PipelineMetrics {
   const entries = numericPayloadEntries(payload);
@@ -213,6 +229,7 @@ export function summarizePipelinePayload(payload: unknown): PipelineMetrics {
     ]),
     rowsRejected: firstMetric(entries, [
       "rowsRejected",
+      "totalUnmatched",
       "unmatchedCountry",
       "countriesUnmatched",
       "errorCount",
@@ -339,6 +356,19 @@ export const postgresPipelineRunStore: PipelineRunStore = {
       throw new Error("Pipeline run finalization did not update one retained row");
     }
   },
+  async advancedSources(input) {
+    if (!input.sourceIds.length) return [];
+    const rows = await db
+      .select({ id: sources.id })
+      .from(sources)
+      .where(
+        and(
+          inArray(sources.id, [...input.sourceIds]),
+          gte(sources.lastSyncAt, input.since),
+        ),
+      );
+    return rows.map((row) => row.id).sort();
+  },
 };
 
 export async function startPipelineRun(
@@ -376,17 +406,27 @@ export async function startPipelineRun(
   return { ...handle, ...retainedRun };
 }
 
-export async function freshnessUpdatedSources(
-  pipelineId: string,
-  startedAt: Date,
-): Promise<string[]> {
-  const sourceIds = registeredPipeline(pipelineId).sourceIds;
-  if (!sourceIds.length) return [];
-  const rows = await db
-    .select({ id: sources.id })
-    .from(sources)
-    .where(and(inArray(sources.id, [...sourceIds]), gte(sources.lastSyncAt, startedAt)));
-  return rows.map((row) => row.id).sort();
+const SOURCE_ID = /^[a-z0-9][a-z0-9_.-]{0,79}$/;
+const MAX_FRESHNESS_SOURCES = 64;
+
+/**
+ * Source IDs a handler reports its writer stamped, from `sourcesStamped`
+ * arrays such as the Pulse ingest and bills writers return. They only name
+ * candidates; the database still decides which sources advanced.
+ */
+export function reportedStampedSources(payload: unknown, depth = 0): string[] {
+  if (depth > 4 || !payload || typeof payload !== "object") return [];
+  const found = new Set<string>();
+  for (const [key, child] of Object.entries(payload as Record<string, unknown>)) {
+    if (key === "sourcesStamped" && Array.isArray(child)) {
+      for (const value of child) {
+        if (typeof value === "string" && SOURCE_ID.test(value)) found.add(value);
+      }
+    } else {
+      for (const value of reportedStampedSources(child, depth + 1)) found.add(value);
+    }
+  }
+  return [...found].sort();
 }
 
 export async function finishPipelineRun(
@@ -397,8 +437,21 @@ export async function finishPipelineRun(
   const completedAt = input.completedAt ?? new Date();
   const metrics = summarizePipelinePayload(input.payload);
   const status = terminalStatus(pipeline, input.succeeded, metrics);
-  const freshnessSourceIds = input.succeeded
-    ? await freshnessUpdatedSources(input.pipelineId, input.startedAt)
+  // A failed run can still have committed rows: Pulse ingest publishes the
+  // connectors that worked and finishes partial. Such a run records only the
+  // sources its own writer reports and the database confirms; a successful
+  // run also checks every registered source.
+  const candidates = new Set(reportedStampedSources(input.payload));
+  if (input.succeeded) {
+    for (const sourceId of pipeline.sourceIds) candidates.add(sourceId);
+  }
+  const freshnessSourceIds = candidates.size
+    ? (
+        await store.advancedSources({
+          sourceIds: [...candidates].sort(),
+          since: input.startedAt,
+        })
+      ).slice(0, MAX_FRESHNESS_SOURCES)
     : [];
   await store.finish({
     id: input.id,
