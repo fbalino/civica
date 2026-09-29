@@ -7,10 +7,10 @@ module-level visual review remains open.
 
 `data/rendered-module-ledger.v1.json` currently contains:
 
-- 71 rendered route/error/document identities;
-- 211 unique source modules;
-- 1,643 route-to-module relationships; and
-- 6,572 required desktop/mobile × light/dark disposition cells.
+- 76 rendered route/error/document identities;
+- 225 unique source modules;
+- 1,985 route-to-module relationships; and
+- 7,940 required desktop/mobile × light/dark disposition cells.
 
 The source graph is derived from the Git index rather than unrelated
 working-tree edits. It includes tracked App Router pages, applicable layouts,
@@ -45,14 +45,20 @@ cell, and verifies screenshot existence. The canonical CI workflow runs that
 command before its other repository gates, so a new rendered route/module or
 stale review reference blocks the change.
 
+## Reviewed routes
+
+| Route | Date | Cells | Evidence |
+| --- | --- | --- | --- |
+| `/country/[slug]/civica-data` | 2026-09-29 | 272 exact-module cells: 157 finding, 99 clean, 16 not observed; 73 confirmed findings | [`civica-data-2026-09-29/`](civica-data-2026-09-29/README.md) |
+
 ## Remaining review
 
-All 6,572 visual cells remain intentionally open. A reviewer must locate exact
+Every other route's 7,668 visual cells remain intentionally open. A reviewer must locate exact
 modules in the named desktop/mobile and light/dark screenshots, add exact
 module-source records, and classify each as `clean`, `finding`, or
 `not_observed`. Route-level candidate context cannot satisfy that review.
 Private admin/reviewer content must use safe fixtures and must never be placed
 in checked screenshots.
 
-EXP-001 remains unchecked. This evidence closes the agent-owned discovery,
-persistence, and enforcement work without fabricating visual approval.
+EXP-001 remains unchecked. It closes only when every route has exact-module
+dispositions; one reviewed route does not approve the others.
