@@ -1,0 +1,59 @@
+{
+  "task": "DAT-038",
+  "recordedAt": "2026-09-29T13:56Z",
+  "checkedAudit": {
+    "path": "src/lib/elections/corpus-audit.generated.json",
+    "generatedAt": "2026-07-12T15:17:13.526Z",
+    "asOf": "2026-07-12",
+    "fingerprintSha256": "e60857010075f52cda3787335be8c0d0d2714d13d6afa1aa4ba79aa66417a876",
+    "method": "the corrected generator run against production with the checked generatedAt and asOf held fixed",
+    "differencesFromPriorCheckedAudit": [
+      "baseline.fingerprintSha256 (a9d59a25… to e6085701…)",
+      "baseline.rule names source identity and license and excludes sync times",
+      "sourceRights[].lastSyncAt removed for international_idea, ipu_parline, and wikidata"
+    ],
+    "unchanged": "all 915 rows, groups, dispositions, issue counts, raw and qualified counts, and row-content fingerprints"
+  },
+  "liveChecks": {
+    "target": "production Neon, read-only",
+    "audit:election-corpus:live": {
+      "exitCode": 0,
+      "result": "PASS — 915 election rows match e60857010075f52cda3787335be8c0d0d2714d13d6afa1aa4ba79aa66417a876."
+    },
+    "audit:source-coverage:live": {
+      "exitCode": 0,
+      "result": "PASS — live domain coverage matches the checked report."
+    }
+  },
+  "regressionTest": {
+    "file": "src/lib/elections/corpus-audit-runtime.test.ts",
+    "tests": [
+      "corpus fingerprint binds source identity and license, not sync time",
+      "checked corpus fingerprint reproduces from the checked rows and source identities"
+    ],
+    "againstFormerBinding": "fails: a later sync time changed the corpus fingerprint (01469e4a… against 78a2aca2…)",
+    "againstThisChange": "8/8 pass"
+  },
+  "credentialFreeValidation": {
+    "validate:election-corpus-audit": "PASS, now also recomputing the checked corpus fingerprint from the checked rows and source identities",
+    "validate:source-coverage": "PASS",
+    "validate:atlas-surface-data-matrix": "PASS",
+    "validate:index-change-control": "PASS (no protected Index file or pinned evidence changed)",
+    "validate:election-jurisdiction-identity": "PASS",
+    "validate:sync-freshness": "PASS",
+    "typecheck": "PASS",
+    "eslint (touched files)": "PASS",
+    "npm test": "2,354 tests: 2,351 pass, 3 skipped, 0 fail",
+    "validate:lint": "PASS (no new lint errors)",
+    "validate:secrets": "PASS",
+    "validate:claims-docs": "PASS",
+    "validate:module-coverage": "PASS",
+    "validate:ci-workflow": "PASS",
+    "validate:rendered-module-ledger": "PASS",
+    "plan/tools/validate-master-plan.mjs": "PASS",
+    "validate:readiness-reports": "PASS (regenerated with generate:readiness-reports)",
+    "validate:remaining-work-report": "PASS",
+    "validate:operations-readiness": "PASS",
+    "build:ci": "PASS (credential-free production build, no DATABASE_URL)"
+  }
+}

@@ -64,7 +64,7 @@ and P1 operational finding below is closed.
   checks, resolved conversations, and squash merge, with no bypass actors.
   PR #35 passed both required checks and merged through that protected path.
   Settings evidence is retained under `plan/evidence/PLT-031/`.
-- The current G4 readiness record reports 271 of 317 tasks complete, 22 open P0 tasks,
+- The current G4 readiness record reports 272 of 318 tasks complete, 22 open P0 tasks,
   43 open P0/P1 tasks, no evidence gaps, no mirror errors, and no waivers. A
   blocked report cannot be converted to pass by successful commands.
 

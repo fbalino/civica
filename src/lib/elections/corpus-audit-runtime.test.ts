@@ -9,6 +9,7 @@ import {
   matchesAuditedElectionContent,
 } from "./corpus-audit-runtime";
 import {
+  electionCorpusIntegrityFingerprint,
   electionIntegrityFingerprint,
   type ElectionIntegrityContent,
 } from "./corpus-audit-integrity";
@@ -180,4 +181,55 @@ test("row fingerprint binds every public election, result, and evidence field", 
   ];
   for (const mutation of mutations)
     assert.notEqual(electionIntegrityFingerprint(mutation), expected);
+});
+
+test("corpus fingerprint binds source identity and license, not sync time", () => {
+  const rowFingerprints = { "election-1": "a".repeat(64) };
+  const synced = (lastSyncAt: string) => [
+    { id: "ipu_parline", license: "CC-BY-NC-SA-4.0", lastSyncAt },
+    { id: "wikidata", license: "CC0", lastSyncAt },
+  ];
+  const expected = electionCorpusIntegrityFingerprint({
+    rowFingerprints,
+    sources: synced("2026-07-05T15:26:07.892Z"),
+  });
+  // A Pulse ingest or officeholder sync stamps the shared source row
+  // without touching any election; the corpus binding must not move.
+  assert.equal(
+    electionCorpusIntegrityFingerprint({
+      rowFingerprints,
+      sources: synced("2026-09-25T08:01:11.373Z"),
+    }),
+    expected,
+  );
+  const [ipu, wikidata] = synced("2026-07-05T15:26:07.892Z");
+  for (const sources of [
+    [{ ...ipu, license: "CC-BY-4.0" }, wikidata],
+    [{ ...ipu, id: "ipu_parline_v2" }, wikidata],
+    [ipu],
+  ])
+    assert.notEqual(
+      electionCorpusIntegrityFingerprint({ rowFingerprints, sources }),
+      expected,
+    );
+  assert.notEqual(
+    electionCorpusIntegrityFingerprint({
+      rowFingerprints: { "election-1": "b".repeat(64) },
+      sources: synced("2026-07-05T15:26:07.892Z"),
+    }),
+    expected,
+  );
+});
+
+test("checked corpus fingerprint reproduces from the checked rows and source identities", () => {
+  assert.equal(
+    electionCorpusIntegrityFingerprint({
+      rowFingerprints: ELECTION_CORPUS_AUDIT.rowContentFingerprints,
+      sources: ELECTION_CORPUS_AUDIT.sourceRights.map((row) => ({
+        id: row.sourceId,
+        license: row.statementLicense,
+      })),
+    }),
+    ELECTION_CORPUS_AUDIT.baseline.fingerprintSha256,
+  );
 });

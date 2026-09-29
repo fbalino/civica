@@ -133,21 +133,13 @@ export async function loadLiveElectionCorpusFingerprint() {
   ].sort();
   const sourceRows = referencedSourceIds.length
     ? await db
-        .select({
-          id: sources.id,
-          license: sources.license,
-          lastSyncAt: sources.lastSyncAt,
-        })
+        .select({ id: sources.id, license: sources.license })
         .from(sources)
         .where(inArray(sources.id, referencedSourceIds))
     : [];
   return electionCorpusIntegrityFingerprint({
     rowFingerprints,
-    sources: sourceRows.map((row) => ({
-      id: row.id,
-      license: row.license,
-      lastSyncAt: isoInstant(row.lastSyncAt),
-    })),
+    sources: sourceRows,
   });
 }
 

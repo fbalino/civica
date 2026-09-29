@@ -53,10 +53,16 @@ export interface ElectionIntegrityContent {
   statements: ElectionIntegrityStatement[];
 }
 
+/**
+ * A referenced source is bound by identity and license only. Its
+ * `last_sync_at` is excluded: any pipeline that commits rows from the same
+ * publisher advances it (Pulse ingest stamps `ipu_parline`, Wikidata fact
+ * and officeholder syncs stamp `wikidata`), and qualification reads each
+ * statement's own retrieval time instead.
+ */
 export interface ElectionIntegritySource {
   id: string;
   license: string;
-  lastSyncAt: string | null;
 }
 
 function sha256(value: unknown) {
@@ -87,6 +93,6 @@ export function electionCorpusIntegrityFingerprint(input: {
     rows: Object.entries(input.rowFingerprints).sort(([a], [b]) =>
       a.localeCompare(b),
     ),
-    sources: sorted(input.sources),
+    sources: sorted(input.sources.map(({ id, license }) => ({ id, license }))),
   });
 }

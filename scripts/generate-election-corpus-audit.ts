@@ -391,7 +391,6 @@ async function collect(generatedAt: string, asOf: string) {
   const integritySources = sources.map((row) => ({
     id: row.id,
     license: row.license,
-    lastSyncAt: isoInstant(row.last_sync_at),
   }));
   return {
     schemaVersion: ELECTION_CORPUS_AUDIT_VERSION,
@@ -404,7 +403,7 @@ async function collect(generatedAt: string, asOf: string) {
         rowFingerprints: rowContentFingerprints,
         sources: integritySources,
       }),
-      rule: "Every baseline election row, its complete public content, election statements, result rows, and election-referenced registered source records are bound to this fingerprint.",
+      rule: "Every baseline election row, its complete public content, election statements, result rows, and the identity and license of each election-referenced registered source are bound to this fingerprint. Source sync times are not bound: any pipeline that commits rows from the same publisher advances them, and qualification uses each statement's own retrieval time.",
       jurisdictionIdentityRowsSha256: jurisdictionIdentityArtifact.rowsSha256,
     },
     rowContentFingerprints,
@@ -427,7 +426,6 @@ async function collect(generatedAt: string, asOf: string) {
           statementLicense: source.license,
           reviewStatus: rights?.reviewStatus ?? "pending",
           publicExport: rights?.publicExport ?? "pending-review",
-          lastSyncAt: isoInstant(source.last_sync_at),
         };
       }),
     raw: {

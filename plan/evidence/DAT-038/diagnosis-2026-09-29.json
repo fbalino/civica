@@ -1,0 +1,88 @@
+{
+  "task": "DAT-038",
+  "recordedAt": "2026-09-29T13:56Z",
+  "target": "production Neon, read-only: every ad-hoc query ran inside a read-only transaction, and the repository's live paths issue SELECT statements only. Nothing was written to production.",
+  "observedFailure": {
+    "source": "plan/evidence/DAT-037/production-repair-2026-09-29.json (liveValidators.audit:source-coverage:live)",
+    "command": "npm run audit:source-coverage:live",
+    "exitCode": 1,
+    "liveCorpusFingerprint": "4f9cf1689b91e3129bbccfffe1412bcf142f3e13b4463dc447e2bf193166e018",
+    "checkedCorpusFingerprint": "a9d59a25bdc1451f22c97e3fc7c968fbf6bd0cc7a8961ffcae32790b9a432e89",
+    "checkedAuditAsOf": "2026-07-12"
+  },
+  "electionRows": {
+    "method": "loadLiveElectionContentFingerprints over every live election id, compared with the checked rowContentFingerprints",
+    "live": 915,
+    "checked": 915,
+    "identical": 915,
+    "changed": 0,
+    "added": 0,
+    "removed": 0
+  },
+  "changeHistory": {
+    "researchEvidenceHistorySince20260712": {
+      "elections": 0,
+      "election_results": 0,
+      "statementsWithElectionSubject": 0
+    },
+    "insertsSince20260712": {
+      "elections": 0,
+      "statementsWithElectionSubject": 0,
+      "latestElectionCreatedAt": "2026-07-05T15:42:31.480Z",
+      "latestElectionStatementCreatedAt": "2026-07-05T15:42:31.761Z"
+    }
+  },
+  "referencedSources": [
+    {
+      "id": "international_idea",
+      "licenseChanged": false,
+      "checkedLastSyncAt": "2026-07-05T15:22:35.000Z",
+      "liveLastSyncAt": "2026-07-05T15:22:35.000Z"
+    },
+    {
+      "id": "ipu_parline",
+      "licenseChanged": false,
+      "checkedLastSyncAt": "2026-07-05T15:26:07.892Z",
+      "liveLastSyncAt": "2026-09-25T08:01:11.373Z",
+      "writer": "Pulse v2 ingest. Its IPU connector (src/lib/pulse/v2/sources/ipu-actions.ts) stores recent IPU elections as Pulse raw events under source id ipu_parline, and src/lib/pulse/v2/upsert.ts stamps freshness for the sources of the rows it inserted (markSourcesSyncedFromInsertedRowsCte).",
+      "supportingRows": {
+        "ipuRawEventsInserted": {
+          "2026-08-17": 3,
+          "2026-08-25": 1,
+          "2026-09-18": 1,
+          "2026-09-25": 2
+        },
+        "lastIpuRawEventCreatedAt": "2026-09-25T08:01:11.460Z",
+        "scheduledPulseIngest": "pulse.v2.ingest 2026-09-25 08:00:15.459Z to 08:01:11.536Z",
+        "otherJobsInWindow": "operations.health-alerts only; no legislature or election job ran between 07:30 and 08:30"
+      },
+      "classification": "legitimate: rows from this publisher were committed, and the sanctioned helper stamped the shared publisher row"
+    },
+    {
+      "id": "wikidata",
+      "licenseChanged": false,
+      "checkedLastSyncAt": "2026-07-08T02:02:32.520Z",
+      "liveLastSyncAt": "2026-08-10T02:55:00.302Z",
+      "writer": "The owner-authorized DAT-036 Wikidata publisher refresh of 2026-08-09/10, whose targeted rerun stamped wikidata freshness through the sanctioned helper (plan/evidence/DAT-036/production-repair-2026-08-09.md). The domain-coverage snapshot was regenerated at 2026-08-10T02:57:44Z, immediately afterwards.",
+      "classification": "legitimate: an authorized refresh of non-election Wikidata facts"
+    }
+  ],
+  "fullAuditRegeneration": {
+    "method": "the unchanged generator run against production with the checked generatedAt and asOf held fixed, written to an ignored scratch path",
+    "differencesFromCheckedAudit": [
+      "baseline.fingerprintSha256 (a9d59a25… to 4f9cf168…)",
+      "sourceRights[ipu_parline].lastSyncAt",
+      "sourceRights[wikidata].lastSyncAt"
+    ],
+    "unchanged": "all 915 rows, 863 groups, disposition counts, issue counts, raw and qualified counts, and every row-content fingerprint"
+  },
+  "rootCause": "The corpus fingerprint bound each referenced source's last_sync_at. That column is one row per publisher and is advanced by any pipeline that commits rows from that publisher, including Pulse news ingest and Wikidata fact refreshes that never touch an election. The audit's qualification never reads it: a source's sync time is only a fallback for an event statement without its own retrieval time, and statements.retrieved_at is NOT NULL.",
+  "publicSurfaces": {
+    "failingClosed": false,
+    "reason": "Reader and API election surfaces (queries.ts, queries-legislature.ts, factbook/legislature.ts, load-atlas-data.ts) gate each row on its own content fingerprint, which never included source sync times. All 915 match, so every audited row that was public on 2026-07-12 remains public. Only the offline audits (audit:source-coverage:live, audit:election-corpus:live) read the corpus fingerprint."
+  },
+  "decision": "Neither regenerate the 2026-07-12 audit nor treat a writer as faulty. Regeneration would only bind the new timestamps until the next Pulse ingest that carries an IPU election breaks it again. Bind source identity and license, not sync time (APR-D175).",
+  "notInScope": {
+    "pulseIngestRunLedger": "All 98 failed/partial pulse.v2.ingest runs since 2026-08-15 are recorded with rows_written 0 and no freshness sources, although partial runs committed raw events and advanced source freshness (for example 2 IPU and 2 HRW rows on 2026-09-25). This is a separate run-ledger reporting gap, not an election-audit defect."
+  }
+}
