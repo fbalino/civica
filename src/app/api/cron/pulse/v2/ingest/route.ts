@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { cronExecutionKeyFromRequest, withCronJob } from "@/lib/api/cron-job";
 import { summarizeCronReports } from "@/lib/api/cron-output";
-import { createDb, ingestPulseV2 } from "@/lib/pulse/v2/ingest";
+import {
+  createDb,
+  ingestPulseV2,
+  PULSE_MAC_RETRIEVED_CONNECTORS,
+} from "@/lib/pulse/v2/ingest";
 import { pulseV2IngestCronOutcome } from "@/lib/pulse/v2/cron-outcomes";
 
 export const runtime = "nodejs";
@@ -14,7 +18,12 @@ async function handler(request: Request) {
   const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
   const cronExecutionKey = cronExecutionKeyFromRequest(request);
   const db = createDb();
-  const summary = await ingestPulseV2(db, { dryRun, cronExecutionKey });
+  // GDELT is retrieved by the owner-Mac runner; see PULSE_MAC_RETRIEVED_CONNECTORS.
+  const summary = await ingestPulseV2(db, {
+    dryRun,
+    cronExecutionKey,
+    skipConnectors: PULSE_MAC_RETRIEVED_CONNECTORS,
+  });
   const outcome = pulseV2IngestCronOutcome(summary);
   const safeSummary = {
     ...summary,

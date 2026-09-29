@@ -1399,3 +1399,22 @@ regenerating the audit would only have bound the next timestamp. Qualification
 reads each statement's own retrieval time, so the sync time added no
 protection. A license change still fails the check. Durable evidence:
 `plan/evidence/DAT-038/`.
+
+### APR-D176 — GDELT is retrieved from the owner-Mac runner, not Vercel
+
+**Decision:** On 2026-09-29 Fernando chose to move GDELT retrieval to the
+owner-Mac daily runner. The scheduled Vercel ingest skips every connector in
+`PULSE_MAC_RETRIEVED_CONNECTORS` (currently only `gdelt`) and keeps running the
+others. The runner retrieves GDELT with `pulse:v2:ingest -- --connectors=gdelt`
+through the same connector, atomic writer, and freshness path, before local
+clustering, and records the run in the production pipeline ledger. The Pulse
+method, connector set, query, and source basket are unchanged; only where the
+request is made moves.
+
+**Why:** GDELT failed in 96 scheduled ingest runs from 17 August to
+29 September on a 10-second connection timeout from Vercel, which made every
+run partial, while it accepts connections from the Mac (a zero-write dry run
+there retrieved 250 articles). The Mac already runs Pulse clustering and
+classification, so GDELT now depends on the same machine being awake; a
+missed day stays visible in the run ledger and the public source-coverage
+state rather than being backfilled. Durable evidence: `plan/evidence/PUL-044/`.

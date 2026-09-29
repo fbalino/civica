@@ -107,6 +107,42 @@ export interface PulseIngestOptions {
   cronExecutionKey?: string;
   /** Fixture seam for exercising the production pipeline-run lifecycle. */
   persistRun?: boolean;
+  /** Retrieve only these connectors. Unknown IDs fail before any write. */
+  onlyConnectors?: readonly string[];
+  /** Retrieve every connector except these. Unknown IDs fail before any write. */
+  skipConnectors?: readonly string[];
+}
+
+/**
+ * Connectors the owner-Mac runner retrieves instead of Vercel. GDELT almost
+ * never accepts connections from Vercel's servers but answers from the Mac,
+ * so the scheduled route skips it and `scripts/pulse/mac-daily-runner.sh`
+ * runs `pulse:v2:ingest -- --connectors=gdelt` (PUL-044).
+ */
+export const PULSE_MAC_RETRIEVED_CONNECTORS: readonly string[] = ["gdelt"];
+
+/** Apply an explicit connector selection, failing closed on unknown IDs. */
+export function selectPulseConnectorJobs<T extends { source: string }>(
+  jobs: readonly T[],
+  selection: Pick<PulseIngestOptions, "onlyConnectors" | "skipConnectors">,
+): T[] {
+  const { onlyConnectors, skipConnectors } = selection;
+  if (onlyConnectors && skipConnectors) {
+    throw new Error("Choose either onlyConnectors or skipConnectors, not both");
+  }
+  const named = onlyConnectors ?? skipConnectors;
+  if (!named) return [...jobs];
+  const known = new Set(jobs.map((job) => job.source));
+  const unknown = named.filter((id) => !known.has(id));
+  if (unknown.length) {
+    throw new Error(`Unknown Pulse connector: ${unknown.join(", ")}`);
+  }
+  const wanted = new Set(named);
+  const selected = jobs.filter((job) =>
+    onlyConnectors ? wanted.has(job.source) : !wanted.has(job.source),
+  );
+  if (!selected.length) throw new Error("No Pulse connector selected");
+  return selected;
 }
 
 export const PULSE_CONNECTOR_METRICS = [
@@ -231,6 +267,12 @@ export async function ingestPulseV2(
     });
   const persistRun =
     options.persistRun ?? (!options.dryRun && !options.jobs && !options.runRef);
+  // Validate the connector selection before the run row or any other write.
+  // Live fetchers read the jurisdiction map only when called.
+  selectPulseConnectorJobs(
+    options.jobs ?? liveConnectorJobs(new Map()),
+    options,
+  );
   if (persistRun) {
     const prepared = await preparePulsePipelineRun(db, run);
     if (prepared.state === "completed") {
@@ -238,7 +280,10 @@ export async function ingestPulseV2(
     }
   }
   const map = options.jurisdictionMap ?? (await buildJurisdictionMap(db));
-  const jobs = options.jobs ?? liveConnectorJobs(map);
+  const jobs = selectPulseConnectorJobs(
+    options.jobs ?? liveConnectorJobs(map),
+    options,
+  );
   const writeRows = options.writeRows ?? upsertRawEvents;
   // Fetch every connector before the first raw-event/outcome/freshness write.
   // Promise.all preserves job order while still allowing the network work to

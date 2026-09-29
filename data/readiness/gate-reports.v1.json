@@ -1,14 +1,14 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "de4388ea183269e602d7220ff8638ef620415d98a48f695d5e683c626481ce9c",
+    "plan/MASTER-CHECKLIST.md": "be32e1de8b1144191ec874d377639366311d3d61b690d24a66c34d071573cf21",
     "plan/PROGRESS.md": "36f475655b85558e0c5d784c549a1443f81e8899483e8a7f743b425bc69b310b",
     "plan/MANUAL-CHECKS.md": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "c0c6a50b06386c184ef55c20f7ef3f7ae0a55d0292cd541404fc3203c4f61825",
     "plan/03-data-provenance-and-reproducibility.md": "7bbb8afcc8381fe7ee2a3d9fbbd16f6c743ffd888564c8b581087bfb2f99d4b9",
     "plan/04-civica-index-research-program.md": "6d879a9fecefeda072af4a41ccde7d8be1b77a555f42f9ebece4c38e01343b4b",
-    "plan/05-pulse-event-ledger-and-validation.md": "469c04ca66b439905a60c39c69e1a8e20b55e4d0ec9e6c9482b8987da64d64d7",
+    "plan/05-pulse-event-ledger-and-validation.md": "7c27d1af083fad276f91545a0e6bda72e45321c9baef73461c674e62932e6dc1",
     "plan/06-atlas-content-and-research-features.md": "d166432c150d9f12a1168971fc3716aa7354f24f996a88007660b546b4d785f6",
     "plan/07-design-system-assets-and-reader-experience.md": "10dd3f0d32840eec2423362440d2a95e26c11c26b001d30c1b67380b79a768bf",
     "plan/08-platform-security-performance-and-operations.md": "508f528ab42add8f656617c57fc0ba28fcfae23b853f3269cce374b7f154aba6",
@@ -22,16 +22,16 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 318,
+        "total": 319,
         "completed": 272,
-        "remaining": 46,
+        "remaining": 47,
         "byPriority": {
           "P0": {
             "total": 199,
             "completed": 177
           },
           "P1": {
-            "total": 114,
+            "total": 115,
             "completed": 93
           },
           "P2": {
@@ -73,7 +73,7 @@
             "completed": 29
           },
           "05-pulse-event-ledger-and-validation.md": {
-            "total": 43,
+            "total": 44,
             "completed": 31
           },
           "09-testing-qa-and-release.md": {
@@ -148,6 +148,7 @@
         "PUL-029",
         "PUL-030",
         "PUL-040",
+        "PUL-044",
         "QA-012",
         "QA-013"
       ],
@@ -248,16 +249,16 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 318,
+        "total": 319,
         "completed": 272,
-        "remaining": 46,
+        "remaining": 47,
         "byPriority": {
           "P0": {
             "total": 199,
             "completed": 177
           },
           "P1": {
-            "total": 114,
+            "total": 115,
             "completed": 93
           },
           "P2": {
@@ -299,7 +300,7 @@
             "completed": 29
           },
           "05-pulse-event-ledger-and-validation.md": {
-            "total": 43,
+            "total": 44,
             "completed": 31
           },
           "09-testing-qa-and-release.md": {
@@ -374,6 +375,7 @@
         "PUL-029",
         "PUL-030",
         "PUL-040",
+        "PUL-044",
         "QA-012",
         "QA-013"
       ],
@@ -474,7 +476,7 @@
       ],
       "blockers": [
         "22 unchecked P0 tasks prevent a green report",
-        "43 unchecked P0/P1 tasks prevent G4"
+        "44 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -482,16 +484,16 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 318,
+        "total": 319,
         "completed": 272,
-        "remaining": 46,
+        "remaining": 47,
         "byPriority": {
           "P0": {
             "total": 199,
             "completed": 177
           },
           "P1": {
-            "total": 114,
+            "total": 115,
             "completed": 93
           },
           "P2": {
@@ -533,7 +535,7 @@
             "completed": 29
           },
           "05-pulse-event-ledger-and-validation.md": {
-            "total": 43,
+            "total": 44,
             "completed": 31
           },
           "09-testing-qa-and-release.md": {
@@ -608,6 +610,7 @@
         "PUL-029",
         "PUL-030",
         "PUL-040",
+        "PUL-044",
         "QA-012",
         "QA-013"
       ],
@@ -702,16 +705,16 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 318,
+        "total": 319,
         "completed": 272,
-        "remaining": 46,
+        "remaining": 47,
         "byPriority": {
           "P0": {
             "total": 199,
             "completed": 177
           },
           "P1": {
-            "total": 114,
+            "total": 115,
             "completed": 93
           },
           "P2": {
@@ -753,7 +756,7 @@
             "completed": 29
           },
           "05-pulse-event-ledger-and-validation.md": {
-            "total": 43,
+            "total": 44,
             "completed": 31
           },
           "09-testing-qa-and-release.md": {
@@ -828,6 +831,7 @@
         "PUL-029",
         "PUL-030",
         "PUL-040",
+        "PUL-044",
         "QA-012",
         "QA-013"
       ],
