@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 319
+- **Total tasks:** 320
 - **Completed:** 273
-- **Remaining:** 46
-- **Progress:** 85.6%
-- **Priority mix:** P0 199 · P1 115 · P2 5
+- **Remaining:** 47
+- **Progress:** 85.3%
+- **Priority mix:** P0 199 · P1 116 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -172,6 +172,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [x] **PUL-041** (P0) Materialize the remaining coder-ready evaluation packet releases. _Done when: the 384-item event-candidate census and 536-item system-negative draw exist as rights-safe unlabeled frozen packets with exact evidence/search context, packet/codebook/ontology hashes, analysis/reserve status, zero production/model/owner answer fields, workspace import support, and validators proving their counts and linkage to `pulse-evaluation-sampling-frame/v1` before recruitment or PUL-018 runs._
 - [x] **PUL-042** (P0) Decouple frozen evaluation-packet validation from the mutable live candidate pool. _Done when: the build validates the checked packet manifest from retained frozen population inputs rather than reconstructing it from mutable production tables; post-freeze or late-arriving live rows cannot drift the frozen packet release; seeded frozen-input or manifest tampering fails; and a separate read-only live audit reports population differences without rewriting the preregistered release._
 - [x] **PUL-043** (P0) Reconcile the private coding workspace with the immutable checked evaluation-packet release. _Done when: the disabled setup studies' packet-set and snapshot hashes match the retained frozen inputs and checked manifest, or an append-only superseding study preserves the mismatched rows; no label, assignment, evidence, or prior study state is overwritten; a zero-write plan names the exact changes; and `npm run validate:pulse-evaluation-packets:live` passes after the authorized migration or repair._
+- [ ] **PUL-044** (P1) Retrieve GDELT from the owner-Mac runner instead of Vercel. _Done when: the scheduled Vercel ingest skips GDELT while every other connector keeps running there; the owner-Mac daily runner retrieves GDELT through the same connector and atomic writer before local clustering and records each run in the production pipeline ledger; an unknown connector name fails before any retrieval or write; a zero-write dry run from the Mac retrieves GDELT; and after deployment the first scheduled Vercel ingest finishes without a GDELT failure while the first Mac run stores or de-duplicates GDELT events, stamps `gdelt` freshness, and leaves GDELT operating in `/api/v1/pulse/source-coverage` (APR-D176). Evidence: `plan/evidence/PUL-044/`._
 
 ## Area 06 — Atlas Content and Research Features
 

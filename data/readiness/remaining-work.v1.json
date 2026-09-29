@@ -2,10 +2,10 @@
   "schemaVersion": "civica-remaining-work/v1",
   "reviewedAt": "2026-09-18",
   "checklist": {
-    "total": 319,
+    "total": 320,
     "completed": 273,
-    "remaining": 46,
-    "progressPercent": 85.6
+    "remaining": 47,
+    "progressPercent": 85.3
   },
   "agentExecutableNow": [],
   "categories": [
@@ -32,13 +32,14 @@
     {
       "id": "production-staging-external-authority",
       "label": "Production, staging, or external-system authority",
-      "count": 3,
+      "count": 4,
       "taskIds": [
         "CLM-021",
         "PUL-024",
-        "PUL-040"
+        "PUL-040",
+        "PUL-044"
       ],
-      "nextStep": "Authorize only the remaining real production or external actions: the owner's Human Development Report edition choice and the CLM-021 corrected Conditions release, a Pulse drift baseline followed by an eligible observation, and one complete scheduled locked-method cycle."
+      "nextStep": "Authorize only the remaining real production or external actions: the owner's Human Development Report edition choice and the CLM-021 corrected Conditions release, a Pulse drift baseline followed by an eligible observation, and one complete scheduled locked-method cycle, and PUL-044's first production cycle after the GDELT move is merged and deployed."
     },
     {
       "id": "external-evidence-unavailable",

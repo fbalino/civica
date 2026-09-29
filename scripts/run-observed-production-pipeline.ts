@@ -1,5 +1,9 @@
 import { spawn } from "node:child_process";
 
+import { config } from "dotenv";
+// Like the other production scripts; an injected environment still wins.
+config({ path: ".env.local", quiet: true });
+
 import {
   finishPipelineRun,
   startPipelineRun,

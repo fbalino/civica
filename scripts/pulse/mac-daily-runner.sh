@@ -3,8 +3,9 @@
 #
 # Drives the daily Pulse cycle under the adopted subscription runtime
 # (plan/pulse-subscription-runtime-resolution-v1.md):
-#   1. ingest  — production cron route (model-free; content-idempotent)
-#   2. cluster — production cron route (model-free; content-idempotent)
+#   1. ingest  — production cron route for every connector except GDELT,
+#                then GDELT LOCALLY on this Mac (model-free; content-idempotent)
+#   2. cluster — LOCALLY on this Mac (model-free; content-idempotent)
 #   3. classify — LOCALLY on this Mac through the four subscription CLIs
 #                 (PULSE_CLASSIFY_TRANSPORT=subscription-cli; $0 marginal)
 #   4. score   — production cron route (model-free; content-idempotent)
@@ -100,6 +101,20 @@ stage_route() {
 log "=== Pulse daily cycle start day=$DAY ==="
 
 stage_route ingest "/api/cron/pulse/v2/ingest"
+
+# GDELT is retrieved here, not on Vercel: GDELT almost never accepts
+# connections from Vercel's servers but answers from this Mac (PUL-044). The
+# observed wrapper records the run in the production pipeline ledger. It runs
+# before clustering so the day's GDELT events are clustered the same day.
+if "$RUNNER_NODE" "$REPO/node_modules/.bin/tsx" \
+   scripts/run-observed-production-pipeline.ts --pipeline=pulse.v2.ingest -- \
+   "$RUNNER_NODE" "$REPO/node_modules/.bin/tsx" \
+   scripts/sync-pulse-v2-ingest.ts --connectors=gdelt >> "$LOG" 2>&1; then
+  log "stage=ingest-gdelt local run completed"
+else
+  log "stage=ingest-gdelt FAILED (see log above)"
+  FAILED="$FAILED ingest-gdelt"
+fi
 
 # Clustering runs LOCALLY: incident identity requires the semantic embedding
 # model, which loads on this Mac but not in serverless. The scheduled route

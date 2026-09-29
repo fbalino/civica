@@ -1,0 +1,23 @@
+{
+  "task": "PUL-044",
+  "recordedAt": "2026-09-29",
+  "host": "owner's Mac (not Vercel)",
+  "connectivity": {
+    "command": "curl to api.gdeltproject.org/api/v2/doc/doc",
+    "tcpConnectSeconds": 0.58,
+    "httpStatus": 429,
+    "dns": "IPv4 only (single A record)"
+  },
+  "dryRun": {
+    "command": "tsx scripts/sync-pulse-v2-ingest.ts --dry-run --connectors=gdelt",
+    "writes": 0,
+    "exitCode": 0,
+    "gdelt": {
+      "fetched": 250,
+      "planned": 250,
+      "unmatchedCountry": 10,
+      "articleEnrichment": "229 enriched, 21 fell back to the domain name"
+    },
+    "elapsedSeconds": 135.4
+  }
+}

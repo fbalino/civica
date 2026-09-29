@@ -7,7 +7,7 @@ const ROUTE_ROOT = "src/app/api/cron/pulse/v2";
 const contracts = [
   {
     route: "ingest",
-    call: "ingestPulseV2(db, { dryRun, cronExecutionKey })",
+    call: "ingestPulseV2(db, {",
   },
   {
     route: "cluster",
@@ -64,7 +64,7 @@ test("Pulse ingest forwards dry-run and its stable cron identity", () => {
   const source = readFileSync(`${ROUTE_ROOT}/ingest/route.ts`, "utf8");
   assert.match(
     source,
-    /ingestPulseV2\(db,\s*\{\s*dryRun,\s*cronExecutionKey,?\s*\}\)/,
+    /ingestPulseV2\(db,\s*\{\s*dryRun,\s*cronExecutionKey,?[\s\S]*?\}\)/,
   );
 });
 

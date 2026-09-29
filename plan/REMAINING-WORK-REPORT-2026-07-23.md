@@ -2,14 +2,14 @@
 
 **Reviewed:** 2026-09-18
 
-**Checklist state:** 273 of 319 complete; 46 remain; 85.6%.
+**Checklist state:** 273 of 320 complete; 47 remain; 85.3%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
 Twelve tasks are direct owner, qualified-human, counsel/privacy, or research
-participant work. Three require production, provider, or other external-system
+participant work. Four require production, provider, or other external-system
 authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
 is currently running. Thirty are downstream tasks that cannot honestly start
@@ -71,9 +71,9 @@ run is preserved with a date-correction note, and the exact-candidate
 attempt-07 technical rehearsal through `0051_eminent_jocasta` is complete and
 retained (`plan/evidence/QA-018/`).
 
-### 2. Production, staging, or external-system authority — 3
+### 2. Production, staging, or external-system authority — 4
 
-IDs: CLM-021, PUL-024, PUL-040.
+IDs: CLM-021, PUL-024, PUL-040, PUL-044.
 
 This batch includes:
 
@@ -85,7 +85,11 @@ This batch includes:
 
 - an explicit Pulse drift baseline followed by an eligible observation, and
   one complete scheduled locked-method cycle that can establish PUL-040's
-  non-backdated start.
+  non-backdated start;
+
+- PUL-044's first production cycle: after the owner merges and deploys the
+  GDELT move, the next scheduled Vercel ingest and owner-Mac daily run must
+  show GDELT retrieved on the Mac and no GDELT failure on Vercel.
 
 DAT-037 closed on 2026-09-29: the owner-approved cabinet-roster refresh,
 one-time repair, and read-only postflight ran on production and passed
@@ -190,7 +194,7 @@ see `plan/evidence/PLT-031/`.
 
 ## Gate status
 
-G4 remains blocked with 22 unchecked P0 tasks and 43 unchecked P0/P1 tasks.
+G4 remains blocked with 22 unchecked P0 tasks and 44 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,
