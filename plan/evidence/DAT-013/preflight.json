@@ -1626,6 +1626,29 @@
       "writesPerformed": 0
     },
     {
+      "id": "data-repair-cabinet-terms",
+      "artifact": "scripts/repair-cabinet-terms.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "ef1e860b27448b7f2b8421e6e6e59bfbf0188bcaad4969baba027e96c000bc68",
+      "affectedRelations": [
+        "research_evidence_history",
+        "statements",
+        "terms"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-repair-cabinet-terms-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=data-repair-cabinet-terms --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "research_evidence_history": 187644,
+        "statements": 7494,
+        "terms": 5854
+      },
+      "writesPerformed": 0
+    },
+    {
       "id": "data-repair-pulse-agreement",
       "artifact": "scripts/repair-pulse-agreement.ts",
       "kind": "data",

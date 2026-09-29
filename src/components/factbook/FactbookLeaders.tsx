@@ -1,5 +1,10 @@
 import { getLeaderTimeline } from "@/lib/db/queries";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
+import { publishedTermStartDate } from "@/lib/factbook/cabinet-roster";
+import {
+  formatRosterDate,
+  getCabinetRosterProvenance,
+} from "@/lib/factbook/cabinet-roster-provenance";
 import { titleCaseTitle } from "@/lib/text/title-case";
 import { SourceDot } from "@/components/SourceDot";
 import { Chip } from "@/components/editorial/Pill";
@@ -42,6 +47,11 @@ import "./leaders.css";
  * head of government); only a couple (US/UK) carry deputy/cabinet/legislative/
  * judicial breadth. Every sub-block below degrades cleanly when its data is
  * absent.
+ *
+ * DAT-037: cabinet, deputy, central-bank, and other roster offices come from
+ * the CIA World Leaders roster, which publishes no appointment dates. Their
+ * stored dates are never presented as tenure ("since", longest serving); the
+ * section credits the roster and its "Last Updated" date instead.
  */
 
 type LeaderRow = Awaited<ReturnType<typeof getLeaderTimeline>>[number];
@@ -207,8 +217,9 @@ function groupByPerson(rows: LeaderRow[]): PersonGroup[] {
       officeType: row.officeType,
       partyName: row.partyName,
       partyColor: row.partyColor,
-      startDate: row.startDate,
-      endDate: row.endDate,
+      // Roster offices are undated listings; never show a stored date as tenure.
+      startDate: publishedTermStartDate(row.officeType, row.startDate),
+      endDate: publishedTermStartDate(row.officeType, row.endDate),
       isCurrent: row.isCurrent ?? false,
     });
   }
@@ -258,6 +269,10 @@ export async function FactbookLeaders({
 
   const nowYear = new Date().getUTCFullYear();
   const groups = groupByPerson(rows);
+  // Soft-fails to null: a lookup outage drops the roster credit, never the
+  // section, and never produces a claim about where the offices came from.
+  const roster = await getCabinetRosterProvenance({ jurisdictionId });
+  const rosterUpdated = formatRosterDate(roster?.rosterUpdated ?? null);
 
   // ---- Principal leadership: head of state + head of government ----------
   // A single person can hold both (presidential systems). We render one card
@@ -518,7 +533,7 @@ export async function FactbookLeaders({
             dataAccess={{
               kind: "download",
               href: `/api/countries/${encodeURIComponent(countrySlug)}/leaders`,
-              label: "Download current-officeholder rows as JSON",
+              label: "Download officeholder rows, current and former, as JSON",
             }}
             tableLabel="Show tenure timeline table"
           >
@@ -550,6 +565,22 @@ export async function FactbookLeaders({
       {branches.length > 0 && (
         <section className="lead-block">
           <h3 className="lead-eyebrow">Other offices</h3>
+          {roster?.hasRosterRows && (
+            <p className="lead-dual-note">
+              {rosterUpdated
+                ? `Cabinet roster: CIA World Leaders, updated ${rosterUpdated}. `
+                : "Cabinet roster: CIA World Leaders. "}
+              <SourceDot
+                source="cia_world_leaders"
+                retrievedAt={roster.retrievedAt}
+                upstreamVintage={
+                  roster.rosterUpdated
+                    ? `Roster last updated ${roster.rosterUpdated}`
+                    : null
+                }
+              />
+            </p>
+          )}
           <div className="lead-others">
             {branches.map((branch) => {
               const accent = accentForOffice(branch.type);
@@ -624,9 +655,16 @@ export async function FactbookLeaders({
         <Chip variant="neutral" size="sm">
           Current officeholders only
         </Chip>
-        Officeholders, offices, and term start dates from Wikidata. Portraits and
-        birthdates are drawn from Wikidata and Wikimedia Commons where a freely
-        licensed image exists; leaders without one show a monogram.
+        Heads of state and government, with their term start dates, come from
+        Wikidata.
+        {roster?.hasRosterRows
+          ? " Other offices come from the CIA World Leaders roster, which lists officeholders without appointment dates."
+          : roster && branches.length > 0
+            ? " Other offices listed here are older Civica records without a cited source."
+            : ""}{" "}
+        Portraits and birthdates are drawn from Wikidata and Wikimedia Commons
+        where a freely licensed image exists; leaders without one show a
+        monogram.
       </p>
     </div>
   );

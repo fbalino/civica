@@ -109,6 +109,42 @@ existing public method and is not the frozen `atlas-2026-07-11` publication, a
 deployment identifier, or the one-off capital repair. A later revision must be
 named deliberately and documented before the environment value is changed.
 
+### CIA World Leaders cabinet roster (DAT-037)
+
+`factbook.cia-cabinets` reconciles each country's stored cabinet with the CIA
+World Leaders page. The page lists titles and current holders and one "Last
+Updated" date; it publishes no appointment dates, so the job never writes a
+term start or end date.
+
+- A term is identified by office and person. Each listed title's current
+  holders become exactly the people the page lists, including every holder of
+  a title listed several times. A title the page no longer lists releases its
+  list position and its holders become former holders; nothing is deleted.
+- The page date is one `cabinet_roster_last_updated` statement on the
+  executive body, with a SHA-256 of the normalized roster in `source_hash`.
+  It changes only when the date or roster content changes.
+- `retrieved_at` on these statements records the retrieval that established
+  their current content, not the latest check. Per-country verification is the
+  shard's successful execution record plus the `countriesVerified` and
+  `countriesUnchanged` counters in the pipeline row.
+- An unchanged shard is a successful run with `totalRowsWritten: 0` and no
+  freshness stamp. `no_rows` now means no country could be verified.
+- Each country commits in one transaction. Closed skips:
+  `cabinet_office_identity_conflict` (a listed title matches a head or other
+  non-roster office, or two stored offices share it),
+  `cabinet_person_identity_conflict` (a listed name matches more than one
+  stored person at the deciding tier), and `cabinet_roster_guard_failure` (the
+  page would retire an implausible share of the cabinet, or its date is older
+  than the stored roster date). None is retried automatically; investigate the
+  named country.
+
+Deployment caution: the pre-DAT-037 importer identifies terms by office,
+person, and page date. Once the one-time repair has cleared stored dates,
+running the old importer again would re-create dated duplicates on its first
+visit to every country. Disable the project's cron jobs before any Instant
+Rollback past DAT-037, and prefer a forward fix. The repair runbook is
+`plan/evidence/DAT-037/README.md`.
+
 ## Durable records
 
 Authoritative migration `0034_superb_the_fallen` creates three internal

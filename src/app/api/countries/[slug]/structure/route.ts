@@ -7,6 +7,10 @@ import { enforceRequestRateLimit } from "@/lib/api/rate-limit-request";
 import { getRequestRateLimitPolicy } from "@/lib/api/rate-limit-runtime-policy";
 import { parsePathContract } from "@/lib/api/request-contract";
 import { apiProblem, withSafeJsonErrors } from "@/lib/api/problem-response";
+import {
+  isUnlistedRosterOffice,
+  publishedTermStartDate,
+} from "@/lib/factbook/cabinet-roster";
 
 export async function GET(
   req: Request,
@@ -25,8 +29,19 @@ export async function GET(
     const jurisdiction = await getJurisdictionBySlug(slug);
     if (!jurisdiction) return apiProblem("NOT_FOUND");
 
-    const { bodies, offices, currentTerms, parties } =
-      await getGovernmentHierarchy(jurisdiction.id);
+    const {
+      bodies,
+      offices: allOffices,
+      currentTerms,
+      parties,
+    } = await getGovernmentHierarchy(jurisdiction.id);
+    // DAT-037: a roster title the latest CIA page no longer lists, with no
+    // current holder, is historical rather than a vacant current office.
+    const heldOffices = new Set(currentTerms.map((t) => t.term.officeId));
+    const offices = allOffices.filter(
+      (o) => !isUnlistedRosterOffice(o, heldOffices.has(o.id)),
+    );
+    const officeTypeById = new Map(allOffices.map((o) => [o.id, o.officeType]));
 
     return NextResponse.json({
       country: jurisdiction.name,
@@ -52,8 +67,14 @@ export async function GET(
           officeId: t.term.officeId,
           partyName: t.term.partyName,
           partyColor: t.term.partyColor,
-          startDate: t.term.startDate,
-          endDate: t.term.endDate,
+          startDate: publishedTermStartDate(
+            officeTypeById.get(t.term.officeId),
+            t.term.startDate,
+          ),
+          endDate: publishedTermStartDate(
+            officeTypeById.get(t.term.officeId),
+            t.term.endDate,
+          ),
         },
         person: {
           name: t.person.name,

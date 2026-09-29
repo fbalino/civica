@@ -1305,3 +1305,45 @@ because several frozen release artifacts pin `package-lock.json`, and adding a
 runtime dependency would change the hash of published, immutable research
 packages — analytics must not perturb a provenance artifact. The cost is that
 the bundle version is provider-controlled rather than lockfile-pinned.
+
+### APR-D173 — CIA cabinet rosters are undated listings; prelaunch repairs may skip a public correction record
+
+**Decision:** Rows imported from the CIA World Leaders directory are undated
+listings, identified by office and person. The page's "Last Updated" date is
+never a term start or end date; it is stored once per country as a sourced
+`cabinet_roster_last_updated` statement on the executive body, and the
+Government and Leaders sections credit it to CIA World Leaders. Each import
+makes a listed title's current holders exactly the people the latest roster
+lists, including every holder of a multi-seat title. A title absent from the
+latest roster retires automatically: it releases its list position and its
+holders become former holders, and a new title becomes a new position rather
+than an identity conflict. Nothing is inferred about which older roster
+listed whom.
+
+Separately, by the owner's decision of 2026-09-29, a data repair made while
+Civica is prelaunch may run without a public `correction_log` record. Scope:
+this waiver covers repairs of stored data that the owner explicitly approves
+while Civica has no public users (APR-D018 to APR-D020); the first use is the
+DAT-037 cabinet-term repair, applied with
+`--public-correction=waived-prelaunch`. The approval is still recorded in the
+task evidence, the repair still runs through its registered, rehearsed,
+guarded tool, and every changed row's before-state is still retained by the
+DAT-016 evidence history. The waiver does not cover frozen or published
+releases, citable artifacts, reader-submitted reports, or any repair after
+launch; the repair tool keeps the correction-record path
+(`--correction-log-id`) for those cases. This is an owner exception to the
+public policy page, which says material actions are recorded on the public
+corrections log (`content/policies.md#corrections`); that page does not yet
+state the prelaunch exception, and changing its wording is a separate public
+claims change.
+
+**Why:** The directory publishes titles and holders with one page-level
+date and no appointment dates. Using that date as term identity stored
+unchanged ministers again on every page update, kept only one holder of a
+shared title, never retired dropped titles, and let a stale list position
+block new titles (DAT-037). A public correction notice exists to tell readers
+what changed in something they may have relied on; before launch there are no
+such readers, and a notice would be change-history theater. An honest record
+of the repair stays in the evidence and the audit history, so the waiver
+removes the notice, not the trace. Durable evidence:
+`plan/evidence/DAT-037/`, including `OWNER-APPROVAL-2026-09-29.md`.

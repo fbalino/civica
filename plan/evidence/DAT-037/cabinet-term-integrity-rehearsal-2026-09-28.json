@@ -1,0 +1,2526 @@
+{
+  "schemaVersion": "civica-cabinet-term-integrity-rehearsal/v1",
+  "taskId": "DAT-037",
+  "verifiedAt": "2026-09-29T02:49:00Z",
+  "outcome": {
+    "status": "blocked_gap_found",
+    "productionReady": false,
+    "summary": "On an isolated restore of production, the corrected importer converged every country page it could parse (including Samoa, Uganda, Ukraine, and the United Kingdom), a repeat pass wrote nothing, and the repair applied exactly its plan, passed its own postflight, replayed as a no-op, and was left alone by the importer afterwards. The rehearsal still fails two required postflight checks: two retired terms keep a CIA page date as their start date and one of them is a 'Vacant' placeholder, because the refresh released their offices before the repair ran and the repair only covers offices that are listed or carry CIA provenance."
+  },
+  "scope": {
+    "database": "isolated local restore of a read-only production snapshot; production was never written",
+    "codeUnderTest": {
+      "branch": "claude/fix/cabinet-term-integrity",
+      "commit": "bfe774e98608c2d4fe21e18eda678be078498779",
+      "workingTreeClean": true,
+      "importerMethodology": "cia-world-leaders-sync/v2",
+      "repairPlanSchema": "civica-cabinet-term-repair-plan/v1",
+      "repairMethod": "cabinet-term-integrity-repair/v1"
+    },
+    "sequenceRehearsed": [
+      "read-only snapshot",
+      "restore and equivalence check",
+      "repair plan before the refresh (reference)",
+      "one-country importer dry run",
+      "full importer refresh of every CIA page",
+      "repeat importer pass (18 countries)",
+      "repair plan",
+      "in-review correction record (copy only)",
+      "repair apply",
+      "postflight verify",
+      "apply replay",
+      "re-plan",
+      "importer pass after the repair (3 countries)",
+      "live validators",
+      "cleanup"
+    ],
+    "ciaPageRequests": {
+      "total": 259,
+      "importerDryRun": 1,
+      "fullRefresh": 237,
+      "repeatPass": 18,
+      "afterRepair": 3,
+      "spacing": "importer's 10-second crawl delay between pages within each run; runs were sequential (smallest gap between runs, dry run to full refresh, about 10 seconds)"
+    }
+  },
+  "safety": {
+    "productionWrites": 0,
+    "productionOperations": [
+      "read-only count, row-hash, and database-settings queries inside BEGIN TRANSACTION READ ONLY",
+      "pg_dump custom-format snapshot from the direct endpoint with default_transaction_read_only=on"
+    ],
+    "applicationTarget": "every application command ran through a loopback-only Neon HTTP adapter (refuses non-loopback hosts) with DATABASE_URL naming 127.0.0.1:55434 and the worktree .env.local held outside the worktree",
+    "adapterSha256": "d2ba355b9d5e43a4d6ca26f98a3bcfa7d9cb0d08467bf41f011ea064ecf4da0f",
+    "pageCaptureShimSha256": "3307faa08d4e130b7033122573bb938a325d046e64a338f082e7733ca1934da9",
+    "adapterCommitted": false,
+    "tooling": {
+      "node": "v24.18.0",
+      "neonServerless": "1.0.2",
+      "postgresClient": "17.10 (Homebrew)",
+      "postgresRestoreServer": "17.10 (Homebrew)"
+    }
+  },
+  "snapshot": {
+    "format": "PostgreSQL custom (pg_dump --format=custom --no-owner --no-privileges)",
+    "byteLength": 226112327,
+    "sha256": "ac00f2098d7a18013493626ed26e3682c4b449598c67fa650ffe6c2176bfc779",
+    "startedAt": "2026-09-29T01:51:05Z",
+    "completedAt": "2026-09-29T01:53:03Z",
+    "pgDumpExitCode": 0,
+    "pgDumpStderrBytes": 0,
+    "sourceServer": "Neon PostgreSQL 17.11",
+    "client": "PostgreSQL 17.10 (Homebrew) pg_dump",
+    "connection": "direct (non-pooler) endpoint, PGOPTIONS default_transaction_read_only=on",
+    "productionCountsIdenticalBeforeAndAfterDump": true,
+    "committed": false
+  },
+  "restore": {
+    "target": "new PostgreSQL 17.10 cluster listening only on 127.0.0.1:55434 (unix sockets disabled), trust auth, timezone UTC, builtin C.UTF-8 locale provider (production: C.UTF-8, UTF8)",
+    "command": "pg_restore --no-owner --no-privileges -j 4",
+    "restoreSeconds": 20,
+    "restoreErrors": 0,
+    "equivalence": {
+      "terms": {
+        "production": 5854,
+        "restored": 5854,
+        "rowHashMatched": true
+      },
+      "statements": {
+        "production": 7494,
+        "restored": 7494,
+        "rowHashMatched": true
+      },
+      "offices": {
+        "production": 5327,
+        "restored": 5327,
+        "rowHashMatched": true
+      },
+      "government_bodies": {
+        "production": 483,
+        "restored": 483,
+        "rowHashMatched": true
+      },
+      "persons": {
+        "production": 5042,
+        "restored": 5042,
+        "rowHashMatched": true
+      },
+      "sources": {
+        "production": 57,
+        "restored": 57,
+        "rowHashMatched": true
+      },
+      "jurisdictions": {
+        "production": 253,
+        "restored": 253,
+        "rowHashMatched": true
+      },
+      "correction_log": {
+        "production": 3,
+        "restored": 3,
+        "rowHashMatched": true
+      },
+      "research_evidence_history": {
+        "production": 187644,
+        "restored": 187644,
+        "rowHashMatched": true
+      }
+    },
+    "publicBaseTables": {
+      "production": 103,
+      "restored": 103,
+      "tableListHashMatched": true
+    },
+    "researchEvidenceHistoryLatestRecordedAtMatched": true,
+    "hashMethod": "md5 of string_agg(row::text ORDER BY id) per table in a UTC session (research_evidence_history: ids only)",
+    "evidenceRetentionTriggersPresent": true
+  },
+  "steps": {
+    "planBeforeRefresh": {
+      "generatedAt": "2026-09-29T01:54:57.736Z",
+      "planSha256": "7913b607237233a10bdd4b3f7a4c66bf2b5888ddf25a4ada361a59f94dc1c901",
+      "planFileSha256": "b939c2d679136bb48f035d15db87b5a67b5b108bc3d98bfc27775ddb1f92c9bf",
+      "categories": {
+        "r1PlaceholderTerms": 18,
+        "r1PlaceholderStatements": 4,
+        "r2DuplicatePairs": 247,
+        "r2LoserTerms": 280,
+        "r2LoserStatements": 278,
+        "r2SurvivorReinstated": 0,
+        "r3CiaOnHeadDeleted": 2,
+        "r3CiaOnHeadRehomed": 0,
+        "r3CiaMisplacedDeleted": 0,
+        "r3CiaMisplacedRehomed": 53,
+        "r3WikidataDeleted": 15,
+        "r3WikidataRehomed": 1,
+        "r4LegacyRetired": 0,
+        "r5DatesCleared": 5113
+      },
+      "observations": {
+        "ciaOwnedOffices": 4925,
+        "ciaOwnedTerms": 5411,
+        "survivingCiaOwnedTerms": 5113,
+        "currentCiaOwnedTermsWithoutProvenance": 128,
+        "retiredCiaOwnedTermsWithoutProvenance": 16,
+        "jurisdictionsWithCiaTerms": 197,
+        "jurisdictionsWithRosterStatement": 0,
+        "jurisdictionsWithoutRosterStatement": 197,
+        "legacyCurrentTermsKept": 8
+      },
+      "targets": {
+        "termDeletes": 298,
+        "termUpdates": 5113,
+        "statementDeletes": 299,
+        "statementRehomes": 54
+      },
+      "expectedHistoryRows": 5764,
+      "snapshotCiaSourceLastSyncAt": "2026-09-27 01:00:57.28",
+      "wroteNothing": true
+    },
+    "importerDryRun": {
+      "command": "scripts/sync-cia-cabinets.ts --dry-run --only=uruguay",
+      "ciaPagesFetched": 1,
+      "summary": {
+        "countriesCrawled": 1,
+        "countriesVerified": 1,
+        "countriesApplied": 1,
+        "countriesUnchanged": 0,
+        "countriesSkipped": 0,
+        "totalRowsWritten": 1,
+        "rosterStatementsWritten": 1,
+        "termsInserted": 0,
+        "termsRetired": 0,
+        "termsReinstated": 0,
+        "freshnessStamped": false,
+        "dryRun": true
+      },
+      "hashedTablesIdenticalBeforeAndAfter": true
+    },
+    "fullRefresh": {
+      "startedAt": "2026-09-29T01:57:26Z",
+      "finishedAt": "2026-09-29T02:37:31Z",
+      "exitCode": 0,
+      "summary": {
+        "countriesCrawled": 237,
+        "countriesVerified": 197,
+        "countriesUnchanged": 0,
+        "countriesApplied": 197,
+        "countriesFetchFailed": 39,
+        "countriesSkipped": 1,
+        "skipped": [
+          {
+            "slug": "bosnia-and-herzegovina",
+            "code": "upstream_schema_error",
+            "reason": "CIA World Leaders HTTP 200 page failed the leaders-section schema"
+          }
+        ],
+        "countriesUnmatched": 0,
+        "bodiesWritten": 0,
+        "officesReleased": 148,
+        "officesMoved": 222,
+        "officesInserted": 156,
+        "personsExisting": 4848,
+        "personsIdlessCreated": 209,
+        "termsInserted": 307,
+        "termsReinstated": 163,
+        "termsRetired": 307,
+        "vacantOffices": 32,
+        "diplomaticSkipped": 377,
+        "statementsInserted": 445,
+        "statementsUpdated": 51,
+        "rosterStatementsWritten": 197,
+        "rosterStampMissing": 0,
+        "totalRowsWritten": 2205,
+        "freshnessStamped": false,
+        "dryRun": false,
+        "durationMs": 2404471
+      },
+      "historyRowsWritten": {
+        "offices.update": 370,
+        "statements.update": 51,
+        "terms.update": 470
+      },
+      "historyRowsTotal": 891,
+      "historyMatchesUpdateCounters": true,
+      "rowChangesByJurisdiction": {
+        "afghanistan": 9,
+        "albania": 1,
+        "algeria": 1,
+        "andorra": 3,
+        "angola": 1,
+        "antigua-and-barbuda": 1,
+        "argentina": 5,
+        "armenia": 34,
+        "aruba": 1,
+        "australia": 28,
+        "austria": 6,
+        "azerbaijan": 3,
+        "bahrain": 1,
+        "bangladesh": 189,
+        "barbados": 3,
+        "belarus": 5,
+        "belgium": 12,
+        "belize": 5,
+        "benin": 2,
+        "bermuda": 3,
+        "bhutan": 1,
+        "bolivia": 11,
+        "botswana": 1,
+        "brazil": 2,
+        "brunei": 3,
+        "bulgaria": 76,
+        "burkina-faso": 2,
+        "burma": 12,
+        "burundi": 1,
+        "c-te-d-ivoire": 7,
+        "cabo-verde": 1,
+        "cambodia": 5,
+        "cameroon": 9,
+        "canada": 19,
+        "central-african-republic": 5,
+        "chad": 8,
+        "chile": 11,
+        "china": 9,
+        "colombia": 120,
+        "comoros": 1,
+        "congo-brazzaville": 1,
+        "cook-islands": 35,
+        "costa-rica": 3,
+        "croatia": 1,
+        "cuba": 7,
+        "cyprus": 1,
+        "czechia": 9,
+        "denmark": 120,
+        "djibouti": 1,
+        "dominica": 2,
+        "drc": 2,
+        "ecuador": 98,
+        "egypt": 2,
+        "el-salvador": 3,
+        "equatorial-guinea": 2,
+        "eritrea": 1,
+        "estonia": 1,
+        "eswatini": 1,
+        "ethiopia": 2,
+        "fiji": 48,
+        "finland": 2,
+        "france": 1,
+        "gabon": 1,
+        "georgia": 7,
+        "germany": 3,
+        "ghana": 3,
+        "greece": 1,
+        "grenada": 1,
+        "guatemala": 5,
+        "guinea": 69,
+        "guinea-bissau": 1,
+        "guyana": 1,
+        "haiti": 1,
+        "holy-see-vatican-city": 1,
+        "honduras": 5,
+        "hungary": 29,
+        "iceland": 3,
+        "india": 42,
+        "indonesia": 1,
+        "iran": 1,
+        "iraq": 31,
+        "ireland": 1,
+        "israel": 3,
+        "italy": 5,
+        "jamaica": 7,
+        "japan": 1,
+        "jordan": 1,
+        "kazakhstan": 5,
+        "kenya": 1,
+        "kiribati": 1,
+        "kosovo": 112,
+        "kuwait": 3,
+        "kyrgyzstan": 17,
+        "laos": 7,
+        "latvia": 1,
+        "lebanon": 1,
+        "lesotho": 1,
+        "liberia": 1,
+        "libya": 5,
+        "liechtenstein": 1,
+        "lithuania": 1,
+        "luxembourg": 1,
+        "madagascar": 42,
+        "malawi": 24,
+        "malaysia": 3,
+        "maldives": 1,
+        "mali": 29,
+        "malta": 1,
+        "marshall-islands": 13,
+        "mauritania": 1,
+        "mauritius": 1,
+        "mexico": 1,
+        "moldova": 25,
+        "monaco": 1,
+        "mongolia": 3,
+        "montenegro": 82,
+        "morocco": 1,
+        "mozambique": 1,
+        "namibia": 1,
+        "nauru": 1,
+        "nepal": 1,
+        "netherlands": 3,
+        "new-zealand": 13,
+        "nicaragua": 28,
+        "niger": 1,
+        "nigeria": 1,
+        "niue": 1,
+        "north-korea": 26,
+        "north-macedonia": 4,
+        "norway": 1,
+        "oman": 1,
+        "pakistan": 1,
+        "palau": 1,
+        "panama": 1,
+        "papua-new-guinea": 1,
+        "paraguay": 1,
+        "peru": 3,
+        "philippines": 1,
+        "poland": 1,
+        "portugal": 1,
+        "qatar": 1,
+        "romania": 4,
+        "russia": 10,
+        "rwanda": 3,
+        "saint-kitts-and-nevis": 1,
+        "saint-lucia": 1,
+        "saint-vincent-and-the-grenadines": 1,
+        "samoa": 37,
+        "san-marino": 3,
+        "sao-tome-and-principe": 1,
+        "saudi-arabia": 13,
+        "senegal": 1,
+        "serbia": 5,
+        "seychelles": 1,
+        "sierra-leone": 1,
+        "singapore": 7,
+        "slovakia": 1,
+        "slovenia": 1,
+        "solomon-islands": 1,
+        "somalia": 3,
+        "south-africa": 1,
+        "south-korea": 1,
+        "south-sudan": 1,
+        "spain": 1,
+        "sri-lanka": 1,
+        "sudan": 7,
+        "suriname": 3,
+        "sweden": 1,
+        "switzerland": 1,
+        "syria": 1,
+        "taiwan": 18,
+        "tajikistan": 4,
+        "tanzania": 1,
+        "thailand": 12,
+        "the-bahamas": 115,
+        "the-dominican": 8,
+        "the-gambia": 1,
+        "timor-leste": 1,
+        "togo": 7,
+        "tonga": 1,
+        "trinidad-and-tobago": 1,
+        "tunisia": 1,
+        "turkey": 1,
+        "turkmenistan": 10,
+        "tuvalu": 1,
+        "uganda": 10,
+        "ukraine": 86,
+        "united-arab-emirates": 16,
+        "united-kingdom": 104,
+        "uruguay": 1,
+        "uzbekistan": 5,
+        "vanuatu": 1,
+        "venezuela": 5,
+        "vietnam": 5,
+        "yemen": 8,
+        "zambia": 1,
+        "zimbabwe": 3
+      },
+      "formerlyStuckCountries": {
+        "samoa": "converged",
+        "uganda": "converged",
+        "ukraine": "converged",
+        "united-kingdom": "converged"
+      },
+      "note": "Freshness was not stamped because one country (bosnia-and-herzegovina) failed the page schema; this matches the pre-existing crawl-list limitation and the importer's rule that a run with a skip never stamps."
+    },
+    "repeatPass": {
+      "startedAt": "2026-09-29T02:38:38Z",
+      "exitCode": 0,
+      "countries": [
+        "afghanistan",
+        "australia",
+        "belgium",
+        "bulgaria",
+        "hungary",
+        "iraq",
+        "north-korea",
+        "russia",
+        "samoa",
+        "saudi-arabia",
+        "sri-lanka",
+        "taiwan",
+        "thailand",
+        "uganda",
+        "ukraine",
+        "united-arab-emirates",
+        "united-kingdom",
+        "uruguay"
+      ],
+      "summary": {
+        "countriesCrawled": 18,
+        "countriesVerified": 18,
+        "countriesUnchanged": 18,
+        "countriesApplied": 0,
+        "countriesFetchFailed": 0,
+        "countriesSkipped": 0,
+        "skipped": [],
+        "countriesUnmatched": 0,
+        "bodiesWritten": 0,
+        "officesReleased": 0,
+        "officesMoved": 0,
+        "officesInserted": 0,
+        "personsExisting": 559,
+        "personsIdlessCreated": 0,
+        "termsInserted": 0,
+        "termsReinstated": 0,
+        "termsRetired": 0,
+        "vacantOffices": 10,
+        "diplomaticSkipped": 30,
+        "statementsInserted": 0,
+        "statementsUpdated": 0,
+        "rosterStatementsWritten": 0,
+        "rosterStampMissing": 0,
+        "totalRowsWritten": 0,
+        "freshnessStamped": false,
+        "dryRun": false,
+        "durationMs": 172969
+      },
+      "historyRowsWritten": 0,
+      "hashedTablesIdentical": true
+    },
+    "independentPageCheck": {
+      "method": "the exact page bytes the importer received in the repeat pass were parsed by a separate regex parser; for each country the listed (title, holder name) multiset was compared case-insensitively with current terms on listed roster offices",
+      "afterRepeatPass": {
+        "afghanistan": {
+          "pageSha256": "85c7c18f37792d228373896df7806573fd90a2674750af83fd0e776299b524e3",
+          "pageBytes": 450955,
+          "pageStatus": 200,
+          "pageNamedPositions": 13,
+          "storedCurrentOnListedOffices": 12,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 1,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 1
+          },
+          "multiSeatTitlesOnPage": 1,
+          "multiSeatTitlesAllHoldersCurrent": 1,
+          "maxSeatsOnOneTitle": 2,
+          "pageLastUpdatedIso": "2026-09-03",
+          "storedRosterDate": "2026-09-03"
+        },
+        "australia": {
+          "pageSha256": "705dc76c6ba73d6946b93cfcba39f20d7dad55e98c4d02817be394c97449fc16",
+          "pageBytes": 454165,
+          "pageStatus": 200,
+          "pageNamedPositions": 53,
+          "storedCurrentOnListedOffices": 50,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 3,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 1,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2026-08-17",
+          "storedRosterDate": "2026-08-17"
+        },
+        "belgium": {
+          "pageSha256": "cec134866ef8dbc35957ca8d7ef10ef65372d6d5c6d14a1d171c32dc46c84741",
+          "pageBytes": 451843,
+          "pageStatus": 200,
+          "pageNamedPositions": 24,
+          "storedCurrentOnListedOffices": 20,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 4,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 1,
+          "multiSeatTitlesAllHoldersCurrent": 1,
+          "maxSeatsOnOneTitle": 5,
+          "pageLastUpdatedIso": "2026-05-08",
+          "storedRosterDate": "2026-05-08"
+        },
+        "bulgaria": {
+          "pageSha256": "945216ba5310bc211cba10a296d1cad6e538a6270b6f46f2f9f81a4591c6c2ab",
+          "pageBytes": 451884,
+          "pageStatus": 200,
+          "pageNamedPositions": 27,
+          "storedCurrentOnListedOffices": 23,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 4,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 1,
+          "multiSeatTitlesAllHoldersCurrent": 1,
+          "maxSeatsOnOneTitle": 3,
+          "pageLastUpdatedIso": "2026-07-02",
+          "storedRosterDate": "2026-07-02"
+        },
+        "hungary": {
+          "pageSha256": "a3e35519b008941c40c2f7f56a1656486a1cec61dc516dbf11386c4d1df9b1a6",
+          "pageBytes": 451149,
+          "pageStatus": 200,
+          "pageNamedPositions": 19,
+          "storedCurrentOnListedOffices": 17,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 2,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2026-07-02",
+          "storedRosterDate": "2026-07-02"
+        },
+        "iraq": {
+          "pageSha256": "10f1f5694798ac94e2b007648edadc19dcc0423e8387ec3621b4f9b47aee7274",
+          "pageBytes": 452258,
+          "pageStatus": 200,
+          "pageNamedPositions": 21,
+          "storedCurrentOnListedOffices": 16,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 5,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 3
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2026-09-02",
+          "storedRosterDate": "2026-09-02"
+        },
+        "north-korea": {
+          "pageSha256": "4d1556e3c2705d7b7c67e1a6c5492d54917b43d2697e5f280eca2c070ac9faf5",
+          "pageBytes": 456548,
+          "pageStatus": 200,
+          "pageNamedPositions": 80,
+          "storedCurrentOnListedOffices": 79,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 1,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "diplomatic": 1
+          },
+          "multiSeatTitlesOnPage": 4,
+          "multiSeatTitlesAllHoldersCurrent": 4,
+          "maxSeatsOnOneTitle": 10,
+          "pageLastUpdatedIso": "2023-01-04",
+          "storedRosterDate": "2023-01-04"
+        },
+        "russia": {
+          "pageSha256": "e67dc1c807fe2bd542c27edbd0cd54d4e002aaaaf05396990003a089e3404e43",
+          "pageBytes": 453505,
+          "pageStatus": 200,
+          "pageNamedPositions": 40,
+          "storedCurrentOnListedOffices": 36,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 4,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 1,
+          "multiSeatTitlesAllHoldersCurrent": 1,
+          "maxSeatsOnOneTitle": 9,
+          "pageLastUpdatedIso": "2024-06-18",
+          "storedRosterDate": "2024-06-18"
+        },
+        "samoa": {
+          "pageSha256": "12f50e599f7118850532b175ca7e5b688bf080b3b06ad3cf57324e04f99eaec5",
+          "pageBytes": 452160,
+          "pageStatus": 200,
+          "pageNamedPositions": 24,
+          "storedCurrentOnListedOffices": 20,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 4,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2026-08-27",
+          "storedRosterDate": "2026-08-27"
+        },
+        "saudi-arabia": {
+          "pageSha256": "99da858f775f9ce19ca792fbe1953b1faa55efcbb5db7ccb730e856ac9dd541c",
+          "pageBytes": 454044,
+          "pageStatus": 200,
+          "pageNamedPositions": 43,
+          "storedCurrentOnListedOffices": 40,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 3,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 1,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 1,
+          "multiSeatTitlesAllHoldersCurrent": 1,
+          "maxSeatsOnOneTitle": 12,
+          "pageLastUpdatedIso": "2022-09-15",
+          "storedRosterDate": "2022-09-15"
+        },
+        "sri-lanka": {
+          "pageSha256": "8f09e3e446189b427faaa1ceeca5434c003f2a3580360e3eec19905eb4f84dc2",
+          "pageBytes": 452880,
+          "pageStatus": 200,
+          "pageNamedPositions": 30,
+          "storedCurrentOnListedOffices": 26,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 4,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2026-04-23",
+          "storedRosterDate": "2026-04-23"
+        },
+        "taiwan": {
+          "pageSha256": "715474667d90ebb0a6b79d8140e1239c45fd7a23d0d6ffe32e871c8d78e4ec29",
+          "pageBytes": 453323,
+          "pageStatus": 200,
+          "pageNamedPositions": 43,
+          "storedCurrentOnListedOffices": 42,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 1,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 1
+          },
+          "multiSeatTitlesOnPage": 2,
+          "multiSeatTitlesAllHoldersCurrent": 2,
+          "maxSeatsOnOneTitle": 5,
+          "pageLastUpdatedIso": "2026-07-14",
+          "storedRosterDate": "2026-07-14"
+        },
+        "thailand": {
+          "pageSha256": "b12a717d5b52cfadf50142ed128ddee15d29868901fb9a13fb6a68deb2354271",
+          "pageBytes": 452795,
+          "pageStatus": 200,
+          "pageNamedPositions": 35,
+          "storedCurrentOnListedOffices": 31,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 4,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 2,
+          "multiSeatTitlesAllHoldersCurrent": 2,
+          "maxSeatsOnOneTitle": 7,
+          "pageLastUpdatedIso": "2026-04-07",
+          "storedRosterDate": "2026-04-07"
+        },
+        "uganda": {
+          "pageSha256": "921372d1bc9a8f6beea2b5b1e0f2af2d1605353fa60131eadb7f34b4168b00d4",
+          "pageBytes": 452856,
+          "pageStatus": 200,
+          "pageNamedPositions": 32,
+          "storedCurrentOnListedOffices": 29,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 3,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 1
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2026-08-20",
+          "storedRosterDate": "2026-08-20"
+        },
+        "ukraine": {
+          "pageSha256": "76fe25fb98aa3060bcce2e7c846c691353adfee9ec967de8ddb3adb7a89505dd",
+          "pageBytes": 452203,
+          "pageStatus": 200,
+          "pageNamedPositions": 27,
+          "storedCurrentOnListedOffices": 24,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 3,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 1
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2026-09-04",
+          "storedRosterDate": "2026-09-04"
+        },
+        "united-arab-emirates": {
+          "pageSha256": "e9f74c60d50a71ac9192ea36ba3043fa099d1875160a1dacf7b7eed534c4fc4b",
+          "pageBytes": 455005,
+          "pageStatus": 200,
+          "pageNamedPositions": 52,
+          "storedCurrentOnListedOffices": 48,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 4,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 2,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 4,
+          "multiSeatTitlesAllHoldersCurrent": 4,
+          "maxSeatsOnOneTitle": 7,
+          "pageLastUpdatedIso": "2025-06-25",
+          "storedRosterDate": "2025-06-25"
+        },
+        "united-kingdom": {
+          "pageSha256": "a5ea06fd055c0057a073930b24b1632f5273520cad4f63cb1758428c30a76a40",
+          "pageBytes": 452802,
+          "pageStatus": 200,
+          "pageNamedPositions": 32,
+          "storedCurrentOnListedOffices": 29,
+          "storedCurrentOnUnlistedOffices": 2,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 3,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 1,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2026-07-23",
+          "storedRosterDate": "2026-07-23"
+        },
+        "uruguay": {
+          "pageSha256": "7a3f134f87b5e119351a229bcb5c16370b2915c27df2a782396be86609a1832b",
+          "pageBytes": 451333,
+          "pageStatus": 200,
+          "pageNamedPositions": 20,
+          "storedCurrentOnListedOffices": 17,
+          "storedCurrentOnUnlistedOffices": 0,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 3,
+          "pageHoldersNotStoredCurrentByPageCategory": {
+            "head": 1,
+            "diplomatic": 2
+          },
+          "multiSeatTitlesOnPage": 0,
+          "multiSeatTitlesAllHoldersCurrent": 0,
+          "maxSeatsOnOneTitle": 1,
+          "pageLastUpdatedIso": "2025-05-27",
+          "storedRosterDate": "2025-05-27"
+        }
+      },
+      "finalState": {
+        "countries": 18,
+        "countriesFailing": [],
+        "totals": {
+          "pageNamedPositions": 615,
+          "storedCurrentOnListedOffices": 559,
+          "storedCurrentNotOnPage": 0,
+          "pageHoldersNotStoredCurrent": 56,
+          "multiSeatTitlesOnPage": 17,
+          "multiSeatTitlesAllHoldersCurrent": 17
+        },
+        "pageHoldersNotStoredCurrentAreOnlyHeadsAndDiplomats": true
+      }
+    },
+    "repairPlan": {
+      "generatedAt": "2026-09-29T02:41:54.550Z",
+      "planSha256": "79169e8c952a2f7f57885f9a57f72e30f84ba1848da8e7d4b4928dda6cbbc967",
+      "planFileSha256": "f29e09dc9078c059d9c59a891dabcf6ef720cc0cf0630549de3f1dc67d2d280b",
+      "categories": {
+        "r1PlaceholderTerms": 17,
+        "r1PlaceholderStatements": 4,
+        "r2DuplicatePairs": 247,
+        "r2LoserTerms": 280,
+        "r2LoserStatements": 278,
+        "r2SurvivorReinstated": 0,
+        "r3CiaOnHeadDeleted": 2,
+        "r3CiaOnHeadRehomed": 0,
+        "r3CiaMisplacedDeleted": 0,
+        "r3CiaMisplacedRehomed": 2,
+        "r3WikidataDeleted": 15,
+        "r3WikidataRehomed": 1,
+        "r4LegacyRetired": 2,
+        "r5DatesCleared": 5113
+      },
+      "observations": {
+        "ciaOwnedOffices": 5078,
+        "ciaOwnedTerms": 5717,
+        "survivingCiaOwnedTerms": 5420,
+        "currentCiaOwnedTermsWithoutProvenance": 0,
+        "retiredCiaOwnedTermsWithoutProvenance": 6,
+        "jurisdictionsWithCiaTerms": 197,
+        "jurisdictionsWithRosterStatement": 197,
+        "jurisdictionsWithoutRosterStatement": 0,
+        "legacyCurrentTermsKept": 5
+      },
+      "targets": {
+        "termDeletes": 297,
+        "termUpdates": 5115,
+        "statementDeletes": 299,
+        "statementRehomes": 3
+      },
+      "expectedHistoryRows": 5714,
+      "snapshotCiaSourceLastSyncAt": "2026-09-27 01:00:57.28",
+      "wroteNothing": true
+    },
+    "correctionRecordOnCopy": {
+      "id": "3743c496-74f5-4731-849f-9dcd1b04aafe",
+      "status": "in_review",
+      "isPublic": false,
+      "note": "placeholder row on the copy only; the public text awaits owner approval"
+    },
+    "repairApply": {
+      "planSha256": "79169e8c952a2f7f57885f9a57f72e30f84ba1848da8e7d4b4928dda6cbbc967",
+      "releaseId": "cabinet-term-integrity-repair-rehearsal",
+      "result": {
+        "transactionStartedAt": "2026-09-29 02:43:29.98305",
+        "statementsDeleted": 299,
+        "statementsRehomed": 3,
+        "termsDeleted": 297,
+        "termsUpdated": 5115,
+        "rowsChanged": 5714
+      },
+      "expectedHistoryRows": 5714,
+      "historyRowsAtTransaction": {
+        "statements.delete": 299,
+        "statements.update": 3,
+        "terms.delete": 297,
+        "terms.update": 5115
+      },
+      "historyRowsAtTransactionTotal": 5714,
+      "durationSeconds": 1.76
+    },
+    "postflightVerify": {
+      "pass": true,
+      "checks": {
+        "P1_ciaOwnedTermsWithDates": {
+          "pass": true,
+          "observed": 0
+        },
+        "P2_duplicatePairs": {
+          "pass": true,
+          "observed": 0
+        },
+        "P3_currentTermsWithoutExactProvenance": {
+          "pass": true,
+          "observed": 0
+        },
+        "P3_retiredTermsWithoutProvenance_disclosed": {
+          "pass": true,
+          "observed": 5
+        },
+        "P4_ciaStatementsOnHeadTerms": {
+          "pass": true,
+          "observed": 0
+        },
+        "P4_wikidataStatementsOnCiaTerms": {
+          "pass": true,
+          "observed": 0
+        },
+        "P5_placeholderTerms": {
+          "pass": true,
+          "observed": 0
+        },
+        "P6_bodiesWithCurrentTermsWithoutRoster": {
+          "pass": true,
+          "observed": 0
+        },
+        "P6_rosterStatementsWithoutIsoDate": {
+          "pass": true,
+          "observed": 0
+        },
+        "P7_unlistedOfficesWithCurrentHolders": {
+          "pass": true,
+          "observed": 0
+        },
+        "P7_sharedListPositions": {
+          "pass": true,
+          "observed": 0
+        },
+        "P8_replanWrites": {
+          "pass": true,
+          "observed": 0
+        },
+        "P10_ciaSourceFreshnessUnchanged": {
+          "pass": true,
+          "observed": "2026-09-27 01:00:57.28"
+        },
+        "P11_historyRowsForTransaction": {
+          "pass": true,
+          "observed": 5714
+        }
+      },
+      "replan": {
+        "r1PlaceholderTerms": 0,
+        "r1PlaceholderStatements": 0,
+        "r2DuplicatePairs": 0,
+        "r2LoserTerms": 0,
+        "r2LoserStatements": 0,
+        "r2SurvivorReinstated": 0,
+        "r3CiaOnHeadDeleted": 0,
+        "r3CiaOnHeadRehomed": 0,
+        "r3CiaMisplacedDeleted": 0,
+        "r3CiaMisplacedRehomed": 0,
+        "r3WikidataDeleted": 0,
+        "r3WikidataRehomed": 0,
+        "r4LegacyRetired": 0,
+        "r5DatesCleared": 0
+      }
+    },
+    "applyReplay": {
+      "result": {
+        "transactionStartedAt": "2026-09-29 02:43:51.278717",
+        "statementsDeleted": 0,
+        "statementsRehomed": 0,
+        "termsDeleted": 0,
+        "termsUpdated": 0,
+        "rowsChanged": 0
+      },
+      "hashedTablesIdentical": true
+    },
+    "rePlan": {
+      "generatedAt": "2026-09-29T02:43:52.681Z",
+      "planSha256": "b0bec5bee5f034d8972de2aebb886bbd0b895fcc824f3d9d828bc32844c0c257",
+      "planFileSha256": "013bb2844ee1fd0fda3e76ca7e0a66e6b4922722440e86899442b8632d36f44c",
+      "categories": {
+        "r1PlaceholderTerms": 0,
+        "r1PlaceholderStatements": 0,
+        "r2DuplicatePairs": 0,
+        "r2LoserTerms": 0,
+        "r2LoserStatements": 0,
+        "r2SurvivorReinstated": 0,
+        "r3CiaOnHeadDeleted": 0,
+        "r3CiaOnHeadRehomed": 0,
+        "r3CiaMisplacedDeleted": 0,
+        "r3CiaMisplacedRehomed": 0,
+        "r3WikidataDeleted": 0,
+        "r3WikidataRehomed": 0,
+        "r4LegacyRetired": 0,
+        "r5DatesCleared": 0
+      },
+      "observations": {
+        "ciaOwnedOffices": 5077,
+        "ciaOwnedTerms": 5419,
+        "survivingCiaOwnedTerms": 5419,
+        "currentCiaOwnedTermsWithoutProvenance": 0,
+        "retiredCiaOwnedTermsWithoutProvenance": 5,
+        "jurisdictionsWithCiaTerms": 197,
+        "jurisdictionsWithRosterStatement": 197,
+        "jurisdictionsWithoutRosterStatement": 0,
+        "legacyCurrentTermsKept": 5
+      },
+      "targets": {
+        "termDeletes": 0,
+        "termUpdates": 0,
+        "statementDeletes": 0,
+        "statementRehomes": 0
+      },
+      "expectedHistoryRows": 0,
+      "snapshotCiaSourceLastSyncAt": "2026-09-27 01:00:57.28",
+      "wroteNothing": true
+    },
+    "importerAfterRepair": {
+      "countries": [
+        "hungary",
+        "saudi-arabia",
+        "united-kingdom"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "countriesCrawled": 3,
+        "countriesVerified": 3,
+        "countriesUnchanged": 3,
+        "countriesApplied": 0,
+        "countriesFetchFailed": 0,
+        "countriesSkipped": 0,
+        "skipped": [],
+        "countriesUnmatched": 0,
+        "bodiesWritten": 0,
+        "officesReleased": 0,
+        "officesMoved": 0,
+        "officesInserted": 0,
+        "personsExisting": 86,
+        "personsIdlessCreated": 0,
+        "termsInserted": 0,
+        "termsReinstated": 0,
+        "termsRetired": 0,
+        "vacantOffices": 0,
+        "diplomaticSkipped": 4,
+        "statementsInserted": 0,
+        "statementsUpdated": 0,
+        "rosterStatementsWritten": 0,
+        "rosterStampMissing": 0,
+        "totalRowsWritten": 0,
+        "freshnessStamped": false,
+        "dryRun": false,
+        "durationMs": 20564
+      },
+      "historyRowsWritten": 0,
+      "hashedTablesIdentical": true,
+      "verifyAfter": {
+        "pass": true,
+        "checks": {
+          "P1_ciaOwnedTermsWithDates": 0,
+          "P2_duplicatePairs": 0,
+          "P3_currentTermsWithoutExactProvenance": 0,
+          "P3_retiredTermsWithoutProvenance_disclosed": 5,
+          "P4_ciaStatementsOnHeadTerms": 0,
+          "P4_wikidataStatementsOnCiaTerms": 0,
+          "P5_placeholderTerms": 0,
+          "P6_bodiesWithCurrentTermsWithoutRoster": 0,
+          "P6_rosterStatementsWithoutIsoDate": 0,
+          "P7_unlistedOfficesWithCurrentHolders": 0,
+          "P7_sharedListPositions": 0,
+          "P8_replanWrites": 0
+        }
+      }
+    },
+    "liveValidators": {
+      "validate:statement-provenance:live": {
+        "exitCode": 0,
+        "result": "Live statements: 7837; orphans: 0; duplicate groups: 0; enforcement: closed"
+      },
+      "validate:research-evidence-retention:live": {
+        "exitCode": 0,
+        "result": "Live: 42 triggers; 194249 history rows; 2150 Pulse evaluation rows; 37 reconciliation rows."
+      },
+      "validate:stable-identifiers:live": {
+        "exitCode": 0,
+        "result": "8/8 entity kinds resolved against the loopback copy (the script's closing line says 'production' as fixed text)"
+      }
+    }
+  },
+  "postflight": {
+    "ciaStampedStartDatesRemaining": {
+      "pass": false,
+      "observed": 2,
+      "expected": 0,
+      "rows": [
+        {
+          "termId": "0dba8830-fc0c-4173-b08a-d9d7a4867aea",
+          "jurisdiction": "colombia",
+          "storedStartDate": "2025-09-11",
+          "isCurrent": false,
+          "officeId": "a6f7879a-077f-4c13-ae0e-a65c65e540d9",
+          "officeListPositionReleasedByRefresh": true
+        },
+        {
+          "termId": "9cebaed3-748b-4ad8-ac9d-e3c75681eae1",
+          "jurisdiction": "fiji",
+          "storedStartDate": "2026-03-09",
+          "isCurrent": false,
+          "officeId": "540aac3e-bd5d-4e1e-a72a-bb187af51610",
+          "officeListPositionReleasedByRefresh": true
+        }
+      ],
+      "detail": "Each stored date equals the only start date on that country's CIA-provenance terms before the repair (its page 'Last Updated' date). The pre-refresh plan targeted both rows (Colombia R1 delete, Fiji R5 date clear); the refresh released their offices and neither office carries CIA provenance, so the repair's ownership rule (listed or CIA provenance) no longer covers them and P1/P5 do not look at them."
+    },
+    "datedRosterTermsRemaining": {
+      "observed": 9,
+      "breakdown": {
+        "cia_stamp_escaped": 2,
+        "united_states_legacy_unsourced_kept_by_design": 5,
+        "united_kingdom_legacy_retired_by_R4_hand_entered_date": 2
+      }
+    },
+    "placeholderTermsRemaining": {
+      "pass": false,
+      "observed": 1,
+      "expected": 0,
+      "termIds": [
+        "0dba8830-fc0c-4173-b08a-d9d7a4867aea"
+      ]
+    },
+    "duplicateOfficePersonPairs": {
+      "pass": true,
+      "restored": 247,
+      "restoredExcessRows": 280,
+      "final": 0
+    },
+    "multiSeatListedHoldersCurrent": {
+      "pass": true,
+      "officesWithSeveralCurrentHolders": {
+        "restored": 0,
+        "final": 66
+      },
+      "preRefreshMultiSeatGroups": {
+        "pairs": 236,
+        "offices": 66,
+        "nonCurrentBefore": 170,
+        "after": {
+          "notCurrent_listedOffice": 8,
+          "current_listedOffice": 228
+        }
+      },
+      "notCurrentAfterRefreshExplained": "the 8 not-current pairs (afghanistan 1, bulgaria 3, sri-lanka 4) are people the live page no longer lists under that title (checked against the captured pages)"
+    },
+    "staleHoldersRetired": {
+      "pass": true,
+      "before": 28,
+      "stillCurrent": 6,
+      "deleted": 0,
+      "byCountry": {
+        "hungary": {
+          "before": 13,
+          "stillCurrent": 0,
+          "deleted": 0
+        },
+        "peru": {
+          "before": 1,
+          "stillCurrent": 0,
+          "deleted": 0
+        },
+        "taiwan": {
+          "before": 5,
+          "stillCurrent": 0,
+          "deleted": 0
+        },
+        "united-kingdom": {
+          "before": 3,
+          "stillCurrent": 2,
+          "deleted": 0
+        },
+        "united-states": {
+          "before": 4,
+          "stillCurrent": 4,
+          "deleted": 0
+        },
+        "venezuela": {
+          "before": 2,
+          "stillCurrent": 0,
+          "deleted": 0
+        }
+      },
+      "note": "still current: 4 United States legacy rows (kept by design) and, after the refresh, 2 United Kingdom legacy rows that R4 then retired"
+    },
+    "historyRowsEqualMutations": {
+      "pass": true,
+      "restoredTotal": 187644,
+      "finalTotal": 194249,
+      "fullRefresh": 891,
+      "repairApply": 5714,
+      "repeatPass": 0,
+      "applyReplay": 0,
+      "importerAfterRepair": 0,
+      "reconciles": true
+    },
+    "headTerms": {
+      "pass": true,
+      "allHeadTermsDigestUnchanged": true,
+      "allHeadTerms": 429,
+      "franceAndKosovo": {
+        "5774f658-67a4-4982-a669-457670aef46a": {
+          "termDigestUnchanged": true,
+          "startDate": "2017-05-14",
+          "wikidataStatementsUnchanged": true,
+          "ciaStatementsBefore": 1,
+          "ciaStatementsAfter": 0
+        },
+        "7ef1f2fe-57d0-44e1-867c-66b81f071672": {
+          "termDigestUnchanged": true,
+          "startDate": "2026-04-04",
+          "wikidataStatementsUnchanged": true,
+          "ciaStatementsBefore": 1,
+          "ciaStatementsAfter": 0
+        }
+      },
+      "note": "The head terms themselves, their dates, and their Wikidata statements are unchanged. The one misplaced CIA statement on each (CIA lists no heads) was deleted by R3 as designed (P4)."
+    },
+    "globalCounts": {
+      "terms_total": {
+        "restored": 5854,
+        "afterRefresh": 6161,
+        "final": 5864
+      },
+      "statements_total": {
+        "restored": 7494,
+        "afterRefresh": 8136,
+        "final": 7837
+      },
+      "offices_total": {
+        "restored": 5327,
+        "afterRefresh": 5483,
+        "final": 5483
+      },
+      "persons_total": {
+        "restored": 5042,
+        "afterRefresh": 5251,
+        "final": 5251
+      },
+      "research_evidence_history_total": {
+        "restored": 187644,
+        "afterRefresh": 188535,
+        "final": 194249
+      },
+      "roster_terms": {
+        "restored": 5419,
+        "afterRefresh": 5726,
+        "final": 5429
+      },
+      "roster_terms_current": {
+        "restored": 4915,
+        "afterRefresh": 5078,
+        "final": 5076
+      },
+      "roster_terms_dated": {
+        "restored": 5419,
+        "afterRefresh": 5419,
+        "final": 9
+      },
+      "roster_dup_pairs": {
+        "restored": 247,
+        "afterRefresh": 247,
+        "final": 0
+      },
+      "roster_dup_excess_rows": {
+        "restored": 280,
+        "afterRefresh": 280,
+        "final": 0
+      },
+      "roster_placeholder_terms": {
+        "restored": 18,
+        "afterRefresh": 18,
+        "final": 1
+      },
+      "roster_current_on_unlisted_office": {
+        "restored": 8,
+        "afterRefresh": 7,
+        "final": 5
+      },
+      "roster_listed_offices": {
+        "restored": 4925,
+        "afterRefresh": 4934,
+        "final": 4934
+      },
+      "roster_unlisted_offices": {
+        "restored": 8,
+        "afterRefresh": 155,
+        "final": 155
+      },
+      "roster_offices_multi_current": {
+        "restored": 0,
+        "afterRefresh": 66,
+        "final": 66
+      },
+      "roster_shared_list_positions": {
+        "restored": 23,
+        "afterRefresh": 0,
+        "final": 0
+      },
+      "roster_statements": {
+        "restored": 0,
+        "afterRefresh": 197,
+        "final": 197
+      },
+      "cia_member_statements": {
+        "restored": 5253,
+        "afterRefresh": 5698,
+        "final": 5414
+      },
+      "cia_source_last_sync_at": {
+        "restored": "2026-09-27 01:00:57.28",
+        "afterRefresh": "2026-09-27 01:00:57.28",
+        "final": "2026-09-27 01:00:57.28"
+      },
+      "jurisdictions_with_current_roster_terms": {
+        "restored": 198,
+        "afterRefresh": 198,
+        "final": 198
+      }
+    }
+  },
+  "spotChecks": {
+    "saudi-arabia": {
+      "restored": {
+        "listed_offices": 29,
+        "unlisted_offices": 0,
+        "roster_terms": 40,
+        "current_terms": 29,
+        "current_on_unlisted": 0,
+        "dated_terms": 40,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "22a0afa77a4c"
+      },
+      "afterRefresh": {
+        "listed_offices": 29,
+        "unlisted_offices": 0,
+        "roster_terms": 40,
+        "current_terms": 40,
+        "current_on_unlisted": 0,
+        "dated_terms": 40,
+        "dup_pairs": 0,
+        "multi_holder_offices": 1,
+        "max_on_one_office": 12,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2022-09-15",
+        "head_terms": 2,
+        "head_digest": "22a0afa77a4c"
+      },
+      "final": {
+        "listed_offices": 29,
+        "unlisted_offices": 0,
+        "roster_terms": 40,
+        "current_terms": 40,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 1,
+        "max_on_one_office": 12,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2022-09-15",
+        "head_terms": 2,
+        "head_digest": "22a0afa77a4c"
+      }
+    },
+    "russia": {
+      "restored": {
+        "listed_offices": 28,
+        "unlisted_offices": 0,
+        "roster_terms": 36,
+        "current_terms": 28,
+        "current_on_unlisted": 0,
+        "dated_terms": 36,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "6a29d2109e67"
+      },
+      "afterRefresh": {
+        "listed_offices": 28,
+        "unlisted_offices": 0,
+        "roster_terms": 36,
+        "current_terms": 36,
+        "current_on_unlisted": 0,
+        "dated_terms": 36,
+        "dup_pairs": 0,
+        "multi_holder_offices": 1,
+        "max_on_one_office": 9,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2024-06-18",
+        "head_terms": 2,
+        "head_digest": "6a29d2109e67"
+      },
+      "final": {
+        "listed_offices": 28,
+        "unlisted_offices": 0,
+        "roster_terms": 36,
+        "current_terms": 36,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 1,
+        "max_on_one_office": 9,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2024-06-18",
+        "head_terms": 2,
+        "head_digest": "6a29d2109e67"
+      }
+    },
+    "hungary": {
+      "restored": {
+        "listed_offices": 30,
+        "unlisted_offices": 0,
+        "roster_terms": 33,
+        "current_terms": 30,
+        "current_on_unlisted": 0,
+        "dated_terms": 33,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 1,
+        "current_older_stamp": 13,
+        "roster_date": null,
+        "head_terms": 4,
+        "head_digest": "76e36dfd75bc"
+      },
+      "afterRefresh": {
+        "listed_offices": 17,
+        "unlisted_offices": 13,
+        "roster_terms": 33,
+        "current_terms": 17,
+        "current_on_unlisted": 0,
+        "dated_terms": 33,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-07-02",
+        "head_terms": 4,
+        "head_digest": "76e36dfd75bc"
+      },
+      "final": {
+        "listed_offices": 17,
+        "unlisted_offices": 13,
+        "roster_terms": 33,
+        "current_terms": 17,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-07-02",
+        "head_terms": 4,
+        "head_digest": "76e36dfd75bc"
+      }
+    },
+    "uruguay": {
+      "restored": {
+        "listed_offices": 17,
+        "unlisted_offices": 0,
+        "roster_terms": 17,
+        "current_terms": 17,
+        "current_on_unlisted": 0,
+        "dated_terms": 17,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "a7ee6c2050ce"
+      },
+      "afterRefresh": {
+        "listed_offices": 17,
+        "unlisted_offices": 0,
+        "roster_terms": 17,
+        "current_terms": 17,
+        "current_on_unlisted": 0,
+        "dated_terms": 17,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2025-05-27",
+        "head_terms": 2,
+        "head_digest": "a7ee6c2050ce"
+      },
+      "final": {
+        "listed_offices": 17,
+        "unlisted_offices": 0,
+        "roster_terms": 17,
+        "current_terms": 17,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2025-05-27",
+        "head_terms": 2,
+        "head_digest": "a7ee6c2050ce"
+      }
+    },
+    "australia": {
+      "restored": {
+        "listed_offices": 50,
+        "unlisted_offices": 0,
+        "roster_terms": 50,
+        "current_terms": 50,
+        "current_on_unlisted": 0,
+        "dated_terms": 50,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 18,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 3,
+        "head_digest": "e10f17276103"
+      },
+      "afterRefresh": {
+        "listed_offices": 50,
+        "unlisted_offices": 0,
+        "roster_terms": 50,
+        "current_terms": 50,
+        "current_on_unlisted": 0,
+        "dated_terms": 50,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-17",
+        "head_terms": 3,
+        "head_digest": "e10f17276103"
+      },
+      "final": {
+        "listed_offices": 50,
+        "unlisted_offices": 0,
+        "roster_terms": 50,
+        "current_terms": 50,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-17",
+        "head_terms": 3,
+        "head_digest": "e10f17276103"
+      }
+    },
+    "samoa": {
+      "restored": {
+        "listed_offices": 20,
+        "unlisted_offices": 0,
+        "roster_terms": 20,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 20,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "52df4ec4abc7"
+      },
+      "afterRefresh": {
+        "listed_offices": 20,
+        "unlisted_offices": 4,
+        "roster_terms": 28,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 20,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-27",
+        "head_terms": 2,
+        "head_digest": "52df4ec4abc7"
+      },
+      "final": {
+        "listed_offices": 20,
+        "unlisted_offices": 4,
+        "roster_terms": 28,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-27",
+        "head_terms": 2,
+        "head_digest": "52df4ec4abc7"
+      }
+    },
+    "uganda": {
+      "restored": {
+        "listed_offices": 29,
+        "unlisted_offices": 0,
+        "roster_terms": 28,
+        "current_terms": 28,
+        "current_on_unlisted": 0,
+        "dated_terms": 28,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "fe0d72a1b707"
+      },
+      "afterRefresh": {
+        "listed_offices": 29,
+        "unlisted_offices": 1,
+        "roster_terms": 30,
+        "current_terms": 29,
+        "current_on_unlisted": 0,
+        "dated_terms": 28,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-20",
+        "head_terms": 2,
+        "head_digest": "fe0d72a1b707"
+      },
+      "final": {
+        "listed_offices": 29,
+        "unlisted_offices": 1,
+        "roster_terms": 30,
+        "current_terms": 29,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-20",
+        "head_terms": 2,
+        "head_digest": "fe0d72a1b707"
+      }
+    },
+    "ukraine": {
+      "restored": {
+        "listed_offices": 26,
+        "unlisted_offices": 0,
+        "roster_terms": 25,
+        "current_terms": 25,
+        "current_on_unlisted": 0,
+        "dated_terms": 25,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "1c6992595b6e"
+      },
+      "afterRefresh": {
+        "listed_offices": 24,
+        "unlisted_offices": 11,
+        "roster_terms": 42,
+        "current_terms": 24,
+        "current_on_unlisted": 0,
+        "dated_terms": 25,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-09-04",
+        "head_terms": 2,
+        "head_digest": "1c6992595b6e"
+      },
+      "final": {
+        "listed_offices": 24,
+        "unlisted_offices": 11,
+        "roster_terms": 42,
+        "current_terms": 24,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-09-04",
+        "head_terms": 2,
+        "head_digest": "1c6992595b6e"
+      }
+    },
+    "united-kingdom": {
+      "restored": {
+        "listed_offices": 25,
+        "unlisted_offices": 3,
+        "roster_terms": 28,
+        "current_terms": 28,
+        "current_on_unlisted": 3,
+        "dated_terms": 28,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 3,
+        "current_older_stamp": 3,
+        "roster_date": null,
+        "head_terms": 3,
+        "head_digest": "38c4c0a3c72c"
+      },
+      "afterRefresh": {
+        "listed_offices": 29,
+        "unlisted_offices": 10,
+        "roster_terms": 52,
+        "current_terms": 31,
+        "current_on_unlisted": 2,
+        "dated_terms": 28,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 2,
+        "current_older_stamp": 2,
+        "roster_date": "2026-07-23",
+        "head_terms": 3,
+        "head_digest": "38c4c0a3c72c"
+      },
+      "final": {
+        "listed_offices": 29,
+        "unlisted_offices": 10,
+        "roster_terms": 52,
+        "current_terms": 29,
+        "current_on_unlisted": 0,
+        "dated_terms": 2,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-07-23",
+        "head_terms": 3,
+        "head_digest": "38c4c0a3c72c"
+      }
+    },
+    "united-arab-emirates": {
+      "restored": {
+        "listed_offices": 37,
+        "unlisted_offices": 0,
+        "roster_terms": 48,
+        "current_terms": 37,
+        "current_on_unlisted": 0,
+        "dated_terms": 48,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "50eb5c5cdbf0"
+      },
+      "afterRefresh": {
+        "listed_offices": 37,
+        "unlisted_offices": 0,
+        "roster_terms": 48,
+        "current_terms": 48,
+        "current_on_unlisted": 0,
+        "dated_terms": 48,
+        "dup_pairs": 0,
+        "multi_holder_offices": 4,
+        "max_on_one_office": 7,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2025-06-25",
+        "head_terms": 2,
+        "head_digest": "50eb5c5cdbf0"
+      },
+      "final": {
+        "listed_offices": 37,
+        "unlisted_offices": 0,
+        "roster_terms": 48,
+        "current_terms": 48,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 4,
+        "max_on_one_office": 7,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2025-06-25",
+        "head_terms": 2,
+        "head_digest": "50eb5c5cdbf0"
+      }
+    },
+    "belgium": {
+      "restored": {
+        "listed_offices": 16,
+        "unlisted_offices": 0,
+        "roster_terms": 20,
+        "current_terms": 16,
+        "current_on_unlisted": 0,
+        "dated_terms": 20,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 2,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "1645bdd5db3b"
+      },
+      "afterRefresh": {
+        "listed_offices": 16,
+        "unlisted_offices": 0,
+        "roster_terms": 20,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 20,
+        "dup_pairs": 0,
+        "multi_holder_offices": 1,
+        "max_on_one_office": 5,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-05-08",
+        "head_terms": 2,
+        "head_digest": "1645bdd5db3b"
+      },
+      "final": {
+        "listed_offices": 16,
+        "unlisted_offices": 0,
+        "roster_terms": 20,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 1,
+        "max_on_one_office": 5,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-05-08",
+        "head_terms": 2,
+        "head_digest": "1645bdd5db3b"
+      }
+    },
+    "sri-lanka": {
+      "restored": {
+        "listed_offices": 26,
+        "unlisted_offices": 0,
+        "roster_terms": 30,
+        "current_terms": 26,
+        "current_on_unlisted": 0,
+        "dated_terms": 30,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "82c4983df8f9"
+      },
+      "afterRefresh": {
+        "listed_offices": 26,
+        "unlisted_offices": 0,
+        "roster_terms": 30,
+        "current_terms": 26,
+        "current_on_unlisted": 0,
+        "dated_terms": 30,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-04-23",
+        "head_terms": 2,
+        "head_digest": "82c4983df8f9"
+      },
+      "final": {
+        "listed_offices": 26,
+        "unlisted_offices": 0,
+        "roster_terms": 30,
+        "current_terms": 26,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-04-23",
+        "head_terms": 2,
+        "head_digest": "82c4983df8f9"
+      }
+    },
+    "iraq": {
+      "restored": {
+        "listed_offices": 26,
+        "unlisted_offices": 0,
+        "roster_terms": 26,
+        "current_terms": 26,
+        "current_on_unlisted": 0,
+        "dated_terms": 26,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 10,
+        "current_no_cia_stmt": 9,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "971dd5fc8736"
+      },
+      "afterRefresh": {
+        "listed_offices": 26,
+        "unlisted_offices": 0,
+        "roster_terms": 31,
+        "current_terms": 16,
+        "current_on_unlisted": 0,
+        "dated_terms": 26,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 10,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-09-02",
+        "head_terms": 2,
+        "head_digest": "971dd5fc8736"
+      },
+      "final": {
+        "listed_offices": 26,
+        "unlisted_offices": 0,
+        "roster_terms": 21,
+        "current_terms": 16,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-09-02",
+        "head_terms": 2,
+        "head_digest": "971dd5fc8736"
+      }
+    },
+    "taiwan": {
+      "restored": {
+        "listed_offices": 42,
+        "unlisted_offices": 0,
+        "roster_terms": 71,
+        "current_terms": 42,
+        "current_on_unlisted": 0,
+        "dated_terms": 71,
+        "dup_pairs": 24,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 5,
+        "roster_date": null,
+        "head_terms": 5,
+        "head_digest": "f5e44df651b7"
+      },
+      "afterRefresh": {
+        "listed_offices": 37,
+        "unlisted_offices": 5,
+        "roster_terms": 71,
+        "current_terms": 42,
+        "current_on_unlisted": 0,
+        "dated_terms": 71,
+        "dup_pairs": 24,
+        "multi_holder_offices": 2,
+        "max_on_one_office": 5,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-07-14",
+        "head_terms": 5,
+        "head_digest": "f5e44df651b7"
+      },
+      "final": {
+        "listed_offices": 37,
+        "unlisted_offices": 5,
+        "roster_terms": 47,
+        "current_terms": 42,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 2,
+        "max_on_one_office": 5,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-07-14",
+        "head_terms": 5,
+        "head_digest": "f5e44df651b7"
+      }
+    },
+    "north-korea": {
+      "restored": null,
+      "afterRefresh": {
+        "listed_offices": 58,
+        "unlisted_offices": 0,
+        "roster_terms": 79,
+        "current_terms": 79,
+        "current_on_unlisted": 0,
+        "dated_terms": 79,
+        "dup_pairs": 0,
+        "multi_holder_offices": 4,
+        "max_on_one_office": 10,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2023-01-04",
+        "head_terms": 2,
+        "head_digest": "d3a9e2d7babe"
+      },
+      "final": {
+        "listed_offices": 58,
+        "unlisted_offices": 0,
+        "roster_terms": 79,
+        "current_terms": 79,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 4,
+        "max_on_one_office": 10,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2023-01-04",
+        "head_terms": 2,
+        "head_digest": "d3a9e2d7babe"
+      }
+    },
+    "thailand": {
+      "restored": null,
+      "afterRefresh": {
+        "listed_offices": 22,
+        "unlisted_offices": 0,
+        "roster_terms": 31,
+        "current_terms": 31,
+        "current_on_unlisted": 0,
+        "dated_terms": 31,
+        "dup_pairs": 0,
+        "multi_holder_offices": 2,
+        "max_on_one_office": 7,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-04-07",
+        "head_terms": 3,
+        "head_digest": "708ff7026fa9"
+      },
+      "final": {
+        "listed_offices": 22,
+        "unlisted_offices": 0,
+        "roster_terms": 31,
+        "current_terms": 31,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 2,
+        "max_on_one_office": 7,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-04-07",
+        "head_terms": 3,
+        "head_digest": "708ff7026fa9"
+      }
+    },
+    "peru": {
+      "restored": {
+        "listed_offices": 20,
+        "unlisted_offices": 0,
+        "roster_terms": 39,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 39,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 1,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 1,
+        "roster_date": null,
+        "head_terms": 3,
+        "head_digest": "458d048c74fc"
+      },
+      "afterRefresh": {
+        "listed_offices": 19,
+        "unlisted_offices": 1,
+        "roster_terms": 39,
+        "current_terms": 19,
+        "current_on_unlisted": 0,
+        "dated_terms": 39,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 1,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-07-29",
+        "head_terms": 3,
+        "head_digest": "458d048c74fc"
+      },
+      "final": {
+        "listed_offices": 19,
+        "unlisted_offices": 1,
+        "roster_terms": 38,
+        "current_terms": 19,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-07-29",
+        "head_terms": 3,
+        "head_digest": "458d048c74fc"
+      }
+    },
+    "venezuela": {
+      "restored": {
+        "listed_offices": 41,
+        "unlisted_offices": 0,
+        "roster_terms": 118,
+        "current_terms": 41,
+        "current_on_unlisted": 0,
+        "dated_terms": 118,
+        "dup_pairs": 39,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 2,
+        "roster_date": null,
+        "head_terms": 1,
+        "head_digest": "bf1c1b5552ab"
+      },
+      "afterRefresh": {
+        "listed_offices": 39,
+        "unlisted_offices": 2,
+        "roster_terms": 118,
+        "current_terms": 39,
+        "current_on_unlisted": 0,
+        "dated_terms": 118,
+        "dup_pairs": 39,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-26",
+        "head_terms": 1,
+        "head_digest": "bf1c1b5552ab"
+      },
+      "final": {
+        "listed_offices": 39,
+        "unlisted_offices": 2,
+        "roster_terms": 46,
+        "current_terms": 39,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-26",
+        "head_terms": 1,
+        "head_digest": "bf1c1b5552ab"
+      }
+    },
+    "france": {
+      "restored": {
+        "listed_offices": 20,
+        "unlisted_offices": 0,
+        "roster_terms": 20,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 20,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "434ebd8e8efa"
+      },
+      "afterRefresh": {
+        "listed_offices": 20,
+        "unlisted_offices": 0,
+        "roster_terms": 20,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 20,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2025-11-18",
+        "head_terms": 2,
+        "head_digest": "434ebd8e8efa"
+      },
+      "final": {
+        "listed_offices": 20,
+        "unlisted_offices": 0,
+        "roster_terms": 20,
+        "current_terms": 20,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2025-11-18",
+        "head_terms": 2,
+        "head_digest": "434ebd8e8efa"
+      }
+    },
+    "kosovo": {
+      "restored": {
+        "listed_offices": 18,
+        "unlisted_offices": 0,
+        "roster_terms": 18,
+        "current_terms": 18,
+        "current_on_unlisted": 0,
+        "dated_terms": 18,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "c01d8bc9c302"
+      },
+      "afterRefresh": {
+        "listed_offices": 23,
+        "unlisted_offices": 17,
+        "roster_terms": 40,
+        "current_terms": 23,
+        "current_on_unlisted": 0,
+        "dated_terms": 18,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-10",
+        "head_terms": 2,
+        "head_digest": "c01d8bc9c302"
+      },
+      "final": {
+        "listed_offices": 23,
+        "unlisted_offices": 17,
+        "roster_terms": 40,
+        "current_terms": 23,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": "2026-08-10",
+        "head_terms": 2,
+        "head_digest": "c01d8bc9c302"
+      }
+    },
+    "united-states": {
+      "restored": {
+        "listed_offices": 0,
+        "unlisted_offices": 5,
+        "roster_terms": 5,
+        "current_terms": 5,
+        "current_on_unlisted": 5,
+        "dated_terms": 5,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 5,
+        "current_older_stamp": 4,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "440f1427c2bc"
+      },
+      "afterRefresh": {
+        "listed_offices": 0,
+        "unlisted_offices": 5,
+        "roster_terms": 5,
+        "current_terms": 5,
+        "current_on_unlisted": 5,
+        "dated_terms": 5,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 5,
+        "current_older_stamp": 4,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "440f1427c2bc"
+      },
+      "final": {
+        "listed_offices": 0,
+        "unlisted_offices": 5,
+        "roster_terms": 5,
+        "current_terms": 5,
+        "current_on_unlisted": 5,
+        "dated_terms": 5,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 1,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 5,
+        "current_older_stamp": 4,
+        "roster_date": null,
+        "head_terms": 2,
+        "head_digest": "440f1427c2bc"
+      }
+    },
+    "bosnia-and-herzegovina": {
+      "restored": null,
+      "afterRefresh": {
+        "listed_offices": 0,
+        "unlisted_offices": 0,
+        "roster_terms": 0,
+        "current_terms": 0,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 0,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 4,
+        "head_digest": "8c0a87df3386"
+      },
+      "final": {
+        "listed_offices": 0,
+        "unlisted_offices": 0,
+        "roster_terms": 0,
+        "current_terms": 0,
+        "current_on_unlisted": 0,
+        "dated_terms": 0,
+        "dup_pairs": 0,
+        "multi_holder_offices": 0,
+        "max_on_one_office": 0,
+        "placeholder_terms": 0,
+        "current_no_cia_stmt": 0,
+        "current_older_stamp": 0,
+        "roster_date": null,
+        "head_terms": 4,
+        "head_digest": "8c0a87df3386"
+      }
+    }
+  },
+  "observations": [
+    "Plan before versus after the refresh: R3 re-homes fell from 54 to 3 because the importer rewrote 51 misplaced CIA statements to name the title of the term they sit on and inserted statements for the other listed terms; R1 lost the Colombia placeholder and R5 lost the Fiji term (the two escaped rows); R4 gained the two United Kingdom legacy retirements; R5 gained one United Kingdom legacy row whose office the importer adopted (same title, a different listed holder), so its hand-entered 2024-07-05 date is cleared while the two R4-retired legacy rows keep theirs. R2 (247 pairs, 280 loser rows) was unchanged.",
+    "The refresh created 209 people without a Wikidata ID for listed names with no exact stored match; these may include respellings or renames of stored people (the known identity-split limit), which this rehearsal did not measure.",
+    "Five retired CIA-owned terms carry no provenance after the repair (P3 disclosure), all DAT-028 fallout.",
+    "bosnia-and-herzegovina failed the page schema and was skipped closed, as before; it has no CIA rows."
+  ],
+  "limitations": [
+    "The refresh ran as one command-line pass over every page; production will run 27 cron shard deliveries of the same core, whose lease, idempotency, and per-shard freshness behaviour were not exercised here.",
+    "CIA pages were read on 2026-09-29 UTC; production counts will differ where pages change before its refresh.",
+    "Neon's HTTP transport was emulated by a loopback wire-protocol adapter (one BEGIN/COMMIT per batch, as Neon does); latency and timeouts differ.",
+    "The copy used PostgreSQL 17.10 with the builtin C.UTF-8 provider and UTC; production is Neon 17.11 with libc C.UTF-8.",
+    "The independent page check covers 18 countries; the other refreshed countries rely on the importer's reconciliation and the repair's postflight.",
+    "Cron jobs do not exist on the copy, so the pause-crons-during-apply step and the old-importer rollback hazard were not rehearsed.",
+    "History actor on the copy is the local role; production records its own role."
+  ],
+  "followUps": [
+    "Fix before production: make the repair's ownership rule, and P1/P5, include roster-typed offices whose list position the importer released (for example via the importer's recorded release event), or otherwise clear page dates and delete placeholder terms on every roster-typed office in a body that has a CIA roster statement, excluding the enumerated unsourced legacy rows; then re-rehearse.",
+    "Owner decision 4: confirm clearing the adopted United Kingdom legacy row's hand-entered date while the two R4-retired legacy rows keep theirs, or treat all three alike."
+  ],
+  "cleanup": {
+    "completedAt": "2026-09-29T02:49:18Z",
+    "clusterStopped": true,
+    "loopbackPortClosed": true,
+    "deleted": [
+      "restored cluster data directory",
+      "custom-format snapshot",
+      "restore and run logs",
+      "repair plan, apply, and verify files",
+      "captured CIA pages",
+      "row-ID working files"
+    ],
+    "rehearsalDirectoryExistsAfterCleanup": false,
+    "worktreeEnvFileRestored": true,
+    "retainedOutsideRepository": "the loopback adapter and query scripts, for the re-rehearsal",
+    "cleanupCorrection": "A later check found data-bearing scratch files from the rehearsals left outside the rehearsal directory; the controller deleted them on 2026-09-29."
+  }
+}

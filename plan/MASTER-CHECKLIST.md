@@ -2,11 +2,11 @@
 
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
-- **Total tasks:** 314
+- **Total tasks:** 315
 - **Completed:** 269
-- **Remaining:** 45
-- **Progress:** 85.7%
-- **Priority mix:** P0 196 · P1 113 · P2 5
+- **Remaining:** 46
+- **Progress:** 85.4%
+- **Priority mix:** P0 197 · P1 113 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
 
@@ -74,6 +74,7 @@ Source: `plan/03-data-provenance-and-reproducibility.md`
 - [ ] **DAT-034** (P1) Run a preregistered random-sample value-fidelity audit of published atlas facts against upstream publisher evidence. _Done when: a seeded, stratified sample of at least 300 published canonical facts spans source families and fact domains; each sampled value is independently re-verified against retained publisher bytes or the current official publisher surface; discrepancies are classified by cause and severity; the protocol, per-fact ledger, and a sampled error rate with an uncertainty interval are published on a methodology surface; and every confirmed defect becomes a tracked repair task._
 - [x] **DAT-036** (P1) Preserve publisher date precision for sampled Wikidata facts. _Done when: Wikidata `point in time` precision is retained as year/month/day rather than manufacturing January 1 or the first day of a month; freshness and public/export projections disclose the honest precision; existing affected rows are repaired append-only under an authorized publisher refresh; and DAT-034's confirmed precision defects re-verify against official entity evidence._
 - [x] **DAT-035** (P0) Reconcile the frozen Index release input and raw-retention metadata after adapter-version drift. _Done when: the checked source-input manifest, raw-retention manifest, release/change-control records, and reproduction validators agree on the exact code version behind `ci-beta-2024-Q4`; the change is classified as semantic or nonsemantic by the adopted control; no publisher bytes, release scores, or historical retrieval fields are invented or mutated._
+- [ ] **DAT-037** (P0) Repair CIA World Leaders cabinet-term integrity in the importer and the stored records. _Done when: the importer identifies cabinet terms by office and person, never stores a page "Last Updated" date as a term start, keeps every holder the latest roster lists current (including multi-seat titles), retires titles and holders the roster no longer lists without blocking on new titles, writes nothing for unchanged rosters, and records each country's roster date as sourced provenance that the Government and Leaders sections credit to CIA World Leaders; after the corrected importer has completed one pass over every country roster, a registered dry-run-by-default repair, rehearsed on an isolated restore and approved by the owner, removes stored start dates, duplicate and placeholder rows, misplaced provenance, and superseded unsourced legacy rows under a public correction record or the owner's recorded prelaunch waiver (APR-D173); and read-only postflight checks plus a zero-change repeat plan pass on production. Evidence: `plan/evidence/DAT-037/`._
 
 ## Area 04 — Civica Index Research Program and Design Tournament
 

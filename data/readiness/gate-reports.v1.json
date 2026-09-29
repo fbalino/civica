@@ -1,12 +1,12 @@
 {
   "schemaVersion": "civica-gate-readiness-report/v1",
   "sourceHashes": {
-    "plan/MASTER-CHECKLIST.md": "a284dfdb595d13ababccdf6b17291aa997ee6d88abe8b71714d9466581cddca1",
+    "plan/MASTER-CHECKLIST.md": "9242fe1acec6c758042eea2b7b719e01ff3add01b6d8be8a4a47ad12ae8b8481",
     "plan/PROGRESS.md": "8c33929c51eb003fcdb356fc6866eb2fb4d08dfde5d4827152a78de4e2349596",
     "plan/MANUAL-CHECKS.md": "95e1a45cdba89cdcd561728bbe59bd013d5f8a8fe1f908b25fde1c5d4790f292",
     "data/readiness/waivers.v1.json": "f6bd21123009530f055ab2be053b4abd87e53120a80971d5349a82ed1fc13a47",
     "plan/02-positioning-claims-and-documentation.md": "b4b998e3f01b16502a7cf7e444e4144e9d4de5aea1b5ea019d5ac3c23da23bce",
-    "plan/03-data-provenance-and-reproducibility.md": "8ce0389812f14fe7a12afd6ca3b0752b53578db2134a99045cd66d42d21bedf6",
+    "plan/03-data-provenance-and-reproducibility.md": "882c22147289abde0ccade5f556f10f78dbf84fba2f1812d4156fa3c3959529f",
     "plan/04-civica-index-research-program.md": "6d879a9fecefeda072af4a41ccde7d8be1b77a555f42f9ebece4c38e01343b4b",
     "plan/05-pulse-event-ledger-and-validation.md": "469c04ca66b439905a60c39c69e1a8e20b55e4d0ec9e6c9482b8987da64d64d7",
     "plan/06-atlas-content-and-research-features.md": "d166432c150d9f12a1168971fc3716aa7354f24f996a88007660b546b4d785f6",
@@ -22,12 +22,12 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 314,
+        "total": 315,
         "completed": 269,
-        "remaining": 45,
+        "remaining": 46,
         "byPriority": {
           "P0": {
-            "total": 196,
+            "total": 197,
             "completed": 175
           },
           "P1": {
@@ -53,7 +53,7 @@
             "completed": 19
           },
           "03-data-provenance-and-reproducibility.md": {
-            "total": 36,
+            "total": 37,
             "completed": 35
           },
           "07-design-system-assets-and-reader-experience.md": {
@@ -88,6 +88,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "DAT-037",
         "EXP-001",
         "EXP-028",
         "GOV-015",
@@ -112,6 +113,7 @@
         "BRD-012",
         "BRD-016",
         "DAT-034",
+        "DAT-037",
         "EXP-001",
         "EXP-016",
         "EXP-025",
@@ -238,7 +240,7 @@
         }
       ],
       "blockers": [
-        "21 unchecked P0 tasks prevent a green report"
+        "22 unchecked P0 tasks prevent a green report"
       ]
     },
     {
@@ -246,12 +248,12 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 314,
+        "total": 315,
         "completed": 269,
-        "remaining": 45,
+        "remaining": 46,
         "byPriority": {
           "P0": {
-            "total": 196,
+            "total": 197,
             "completed": 175
           },
           "P1": {
@@ -277,7 +279,7 @@
             "completed": 19
           },
           "03-data-provenance-and-reproducibility.md": {
-            "total": 36,
+            "total": 37,
             "completed": 35
           },
           "07-design-system-assets-and-reader-experience.md": {
@@ -312,6 +314,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "DAT-037",
         "EXP-001",
         "EXP-028",
         "GOV-015",
@@ -336,6 +339,7 @@
         "BRD-012",
         "BRD-016",
         "DAT-034",
+        "DAT-037",
         "EXP-001",
         "EXP-016",
         "EXP-025",
@@ -469,8 +473,8 @@
         }
       ],
       "blockers": [
-        "21 unchecked P0 tasks prevent a green report",
-        "42 unchecked P0/P1 tasks prevent G4"
+        "22 unchecked P0 tasks prevent a green report",
+        "43 unchecked P0/P1 tasks prevent G4"
       ]
     },
     {
@@ -478,12 +482,12 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 314,
+        "total": 315,
         "completed": 269,
-        "remaining": 45,
+        "remaining": 46,
         "byPriority": {
           "P0": {
-            "total": 196,
+            "total": 197,
             "completed": 175
           },
           "P1": {
@@ -509,7 +513,7 @@
             "completed": 19
           },
           "03-data-provenance-and-reproducibility.md": {
-            "total": 36,
+            "total": 37,
             "completed": 35
           },
           "07-design-system-assets-and-reader-experience.md": {
@@ -544,6 +548,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "DAT-037",
         "EXP-001",
         "EXP-028",
         "GOV-015",
@@ -568,6 +573,7 @@
         "BRD-012",
         "BRD-016",
         "DAT-034",
+        "DAT-037",
         "EXP-001",
         "EXP-016",
         "EXP-025",
@@ -687,7 +693,7 @@
         }
       ],
       "blockers": [
-        "21 unchecked P0 tasks prevent a green report",
+        "22 unchecked P0 tasks prevent a green report",
         "G5 requires an independently recorded external-review resolution"
       ]
     },
@@ -696,12 +702,12 @@
       "status": "blocked",
       "checkedAt": null,
       "taskSummary": {
-        "total": 314,
+        "total": 315,
         "completed": 269,
-        "remaining": 45,
+        "remaining": 46,
         "byPriority": {
           "P0": {
-            "total": 196,
+            "total": 197,
             "completed": 175
           },
           "P1": {
@@ -727,7 +733,7 @@
             "completed": 19
           },
           "03-data-provenance-and-reproducibility.md": {
-            "total": 36,
+            "total": 37,
             "completed": 35
           },
           "07-design-system-assets-and-reader-experience.md": {
@@ -762,6 +768,7 @@
         "BRD-010",
         "BRD-012",
         "BRD-016",
+        "DAT-037",
         "EXP-001",
         "EXP-028",
         "GOV-015",
@@ -786,6 +793,7 @@
         "BRD-012",
         "BRD-016",
         "DAT-034",
+        "DAT-037",
         "EXP-001",
         "EXP-016",
         "EXP-025",
@@ -905,7 +913,7 @@
         }
       ],
       "blockers": [
-        "21 unchecked P0 tasks prevent a green report",
+        "22 unchecked P0 tasks prevent a green report",
         "G6 requires a G5 resolution and a citable public release"
       ]
     }

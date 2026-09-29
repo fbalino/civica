@@ -5,6 +5,11 @@ import type {
   GovRole,
   GovChamber,
 } from "@/lib/factbook/gov-org-chart";
+import {
+  formatRosterDate,
+  getCabinetRosterProvenance,
+} from "@/lib/factbook/cabinet-roster-provenance";
+import { SourceDot } from "@/components/SourceDot";
 import "./gov-chart.css";
 
 /**
@@ -18,7 +23,9 @@ import "./gov-chart.css";
  *
  * Honest-data posture: every card shows only sourced facts. Offices with
  * no current holder render an explicit "Vacant / not recorded" line rather
- * than a fabricated name. Branches with no data are omitted entirely, so a
+ * than a fabricated name. Cabinet offices from the CIA World Leaders roster
+ * carry no "since" year because the roster publishes no appointment dates;
+ * the note credits the roster and its "Last Updated" date instead (DAT-037). Branches with no data are omitted entirely, so a
  * thin country (head of state + head of government + one chamber) reads as a
  * clean two-column layout, and a rich country (United States, United
  * Kingdom) fills out cabinet and chamber-leadership detail.
@@ -38,7 +45,7 @@ const BRANCH_ACCENT: Record<GovBranchKind, string> = {
   other: "var(--color-text-40)",
 };
 
-export function FactbookGovOrgChart({ chart, countryName }: Props) {
+export async function FactbookGovOrgChart({ chart, countryName }: Props) {
   if (!chart || chart.branches.length === 0) {
     return (
       <div className="govstruct govstruct--empty">
@@ -49,6 +56,20 @@ export function FactbookGovOrgChart({ chart, countryName }: Props) {
       </div>
     );
   }
+
+  const roster =
+    chart.hasRosterOffices && chart.executiveBodyId
+      ? await getCabinetRosterProvenance({
+          executiveBodyId: chart.executiveBodyId,
+        })
+      : null;
+  const rosterUpdated = formatRosterDate(roster?.rosterUpdated ?? null);
+  const officeholders =
+    chart.officeholderCount > 0
+      ? `${chart.officeholderCount} current officeholder${
+          chart.officeholderCount === 1 ? "" : "s"
+        }`
+      : null;
 
   return (
     <div className="govstruct">
@@ -72,11 +93,28 @@ export function FactbookGovOrgChart({ chart, countryName }: Props) {
           ))}
         </div>
         <p className="govstruct-note">
-          {chart.officeholderCount > 0
-            ? `${chart.officeholderCount} current officeholder${
-                chart.officeholderCount === 1 ? "" : "s"
-              } · ${chart.source}`
-            : chart.source}
+          {officeholders ? `${officeholders} · ${chart.source}` : chart.source}
+          {roster?.hasRosterRows && (
+            <>
+              <span>
+                {rosterUpdated
+                  ? `· Cabinet roster updated ${rosterUpdated}`
+                  : "· Cabinet roster date not recorded"}
+              </span>
+              <SourceDot
+                source="cia_world_leaders"
+                retrievedAt={roster.retrievedAt}
+                upstreamVintage={
+                  roster.rosterUpdated
+                    ? `Roster last updated ${roster.rosterUpdated}`
+                    : null
+                }
+              />
+            </>
+          )}
+          {chart.hasUnsourcedOffices && (
+            <span>· Some offices are older Civica records without a cited source</span>
+          )}
         </p>
       </div>
     </div>

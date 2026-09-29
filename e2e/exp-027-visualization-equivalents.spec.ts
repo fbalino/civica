@@ -134,7 +134,7 @@ test.describe("EXP-027 — research visualization equivalents", () => {
     await tenure.scrollIntoViewIfNeeded();
     await expect(
       tenure.getByRole("link", {
-        name: "Download current-officeholder rows as JSON",
+        name: "Download officeholder rows, current and former, as JSON",
       }),
     ).toHaveAttribute("href", "/api/countries/france/leaders");
     await tenure.getByText("Show tenure timeline table", { exact: true }).press("Enter");

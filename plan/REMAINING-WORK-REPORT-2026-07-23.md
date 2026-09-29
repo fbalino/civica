@@ -2,14 +2,14 @@
 
 **Reviewed:** 2026-09-18
 
-**Checklist state:** 269 of 314 complete; 45 remain; 85.7%.
+**Checklist state:** 269 of 315 complete; 46 remain; 85.4%.
 
 ## Bottom line
 
 No: the remaining work is not only human review.
 
 Twelve tasks are direct owner, qualified-human, counsel/privacy, or research
-participant work. Two require production, provider, or other external-system
+participant work. Three require production, provider, or other external-system
 authority. One requires unavailable publisher evidence and
 external archive/source cooperation. No compliant calendar-bound observation
 is currently running. Thirty are downstream tasks that cannot honestly start
@@ -71,12 +71,16 @@ run is preserved with a date-correction note, and the exact-candidate
 attempt-07 technical rehearsal through `0051_eminent_jocasta` is complete and
 retained (`plan/evidence/QA-018/`).
 
-### 2. Production, staging, or external-system authority — 2
+### 2. Production, staging, or external-system authority — 3
 
-IDs: PUL-024, PUL-040.
+IDs: DAT-037, PUL-024, PUL-040.
 
 This batch includes:
 
+- the DAT-037 cabinet-roster sequence, approved by the owner on 2026-09-29
+  without a public correction record (APR-D173): the merge, one full
+  corrected CIA World Leaders refresh, the one-time stored-record repair, and
+  the read-only postflight (`plan/evidence/DAT-037/`);
 - an explicit Pulse drift baseline followed by an eligible observation, and
   one complete scheduled locked-method cycle that can establish PUL-040's
   non-backdated start.
@@ -180,7 +184,7 @@ see `plan/evidence/PLT-031/`.
 
 ## Gate status
 
-G4 remains blocked with 21 unchecked P0 tasks and 42 unchecked P0/P1 tasks.
+G4 remains blocked with 22 unchecked P0 tasks and 43 unchecked P0/P1 tasks.
 GOV-003 adds no waiver, checklist/evidence gap, or master/mirror error. The
 aggregate readiness artifact must be regenerated after all active lanes are
 integrated. Successful local tests cannot convert missing human, external,
