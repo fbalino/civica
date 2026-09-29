@@ -34,6 +34,10 @@ const EXCLUDED_RECOVERY_JOBS = new Set([
   // The health monitor must retain enough time to finalize its own ledger row.
   "factbook.wikidata",
   "factbook.officeholders",
+  // The daily page refresh may run for about 11 minutes, which would consume
+  // the health monitor's dispatch window. A missed refresh is covered by the
+  // pages' own 24-hour revalidate backstop (PLT-033).
+  "operations.refresh-pages",
   // Monitors and this dispatcher do not mutate source data and must never
   // recursively retry one another.
   "operations.error-alerts",

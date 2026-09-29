@@ -98,6 +98,36 @@ Dry runs never advance freshness. A monitoring or verification job may expose
 `healthOk: false` separately from its execution outcome so operators can tell
 "the check ran" from "the checked system is healthy."
 
+### Daily page refresh (PLT-033)
+
+Database-backed public pages are served from the page cache and declare a
+24-hour `revalidate` backstop (APR-D177). `operations.refresh-pages` runs at
+10:00 UTC, after the day's bills, factbook, and Pulse jobs. It reads the
+sitemap, calls `revalidatePath("/", "layout")` so every cached page is marked
+for re-rendering, then requests each cacheable sitemap URL: same origin, no
+query string, and not listed in `LIVE_PAGE_ROUTES`.
+
+- Four workers each spend at least two seconds per URL, so at most two page
+  renders start per second. That keeps the database load bounded even though
+  Vercel re-renders an invalidated page in the background, and it stays far
+  below the 600-requests-per-minute firewall ceiling.
+- Each request times out after 45 seconds. No new request starts after 640
+  seconds; a URL left over is still invalidated and renders on its next
+  visit. The response reports `rowsRead` (targets), `rowsWritten` (pages
+  warmed), `rowsRejected` (failed requests), and `pagesSkipped`.
+- A sitemap with no country pages, or a configured database that fails while
+  building it, is a failed run. A run in which no page warms returns
+  `502 warm_unavailable`. Many failed pages make the pipeline row
+  `anomalous`, which `operations.pipeline-alerts` reports.
+- `?dryRun=1` (with an `Idempotency-Key`) lists the targets without
+  invalidating or requesting anything.
+- The job is excluded from automatic recovery because it can run for about
+  eleven minutes. A missed or failed day is covered by the pages' own 24-hour
+  backstop; re-run it manually with a new key after a large manual import.
+
+At 849 sitemap URLs on 2026-09-29, about 830 are warm targets, so a run takes
+roughly seven to nine minutes.
+
 ### Atlas history identity
 
 Scheduled Atlas writers that append public change history require a deliberate

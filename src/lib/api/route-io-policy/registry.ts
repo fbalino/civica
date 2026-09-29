@@ -182,6 +182,7 @@ const DRY_RUN_CRON_ROUTES = [
   "api/cron/operations/error-alerts/route.ts",
   "api/cron/operations/health-alerts/route.ts",
   "api/cron/operations/pipeline-alerts/route.ts",
+  "api/cron/operations/refresh-pages/route.ts",
   "api/cron/factbook/sync-wto-stats/route.ts",
   "api/cron/pulse/v2/classify/route.ts",
   "api/cron/pulse/v2/cluster/route.ts",

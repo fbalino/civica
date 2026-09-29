@@ -320,6 +320,16 @@ export const SCHEDULED_PRODUCTION_ADAPTERS: readonly ScheduledProductionAdapter[
       ],
     },
     {
+      id: "operations.refresh-pages",
+      route: "/api/cron/operations/refresh-pages",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/refresh-pages/route.ts",
+        "src/lib/platform/page-refresh.ts",
+      ],
+    },
+    {
       id: "operations.health-alerts",
       route: "/api/cron/operations/health-alerts",
       inputKind: "derived",

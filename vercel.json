@@ -106,6 +106,10 @@
       "schedule": "55 23 * * *"
     },
     {
+      "path": "/api/cron/operations/refresh-pages",
+      "schedule": "0 10 * * *"
+    },
+    {
       "path": "/api/cron/operations/health-alerts",
       "schedule": "*/15 * * * *"
     }

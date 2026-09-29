@@ -33,6 +33,7 @@ const exactTests = [
   "src/lib/factbook/reconcile/__tests__/classification-freshness.test.ts",
   "src/lib/factbook/reconcile/__tests__/external-sync-freshness-ordering.test.ts",
   "src/lib/factbook/reconcile/__tests__/snapshot-candidate-release-retry.test.ts",
+  "src/lib/platform/page-refresh.test.ts",
   "src/lib/pulse/v1-retirement.test.ts",
   "src/lib/pulse/v2/classification-publication.test.ts",
   "src/lib/pulse/v2/cluster-publish.test.ts",

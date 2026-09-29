@@ -418,6 +418,7 @@ const CRON_ROUTES = [
   "api/cron/operations/error-alerts/route.ts",
   "api/cron/operations/health-alerts/route.ts",
   "api/cron/operations/pipeline-alerts/route.ts",
+  "api/cron/operations/refresh-pages/route.ts",
   "api/cron/pulse/calculate/route.ts",
   "api/cron/pulse/classify/route.ts",
   "api/cron/pulse/ingest/route.ts",

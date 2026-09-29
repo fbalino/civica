@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { indexProtectedFileHash, sha256 } from "./index-change-control";
+import {
+  PLT_032_PAGE_CACHE_EDITS,
+  indexProtectedFileHash,
+  sha256,
+} from "./index-change-control";
 
 const path = "src/lib/db/queries.ts";
 const currentSource = readFileSync(path, "utf8");
@@ -61,6 +65,11 @@ function withoutNonsemanticManifestAdditions(source: string): string {
       "",
     )
     .replace(
+      '  "operations.refresh-pages":\n' +
+        '    "the public sitemap generated from the jurisdiction registry and the closed live-page allowlist",\n',
+      "",
+    )
+    .replace(
       '  "operations.health-alerts":\n' +
         '    "content-free application, database, active-map-asset, scheduled-freshness, and optional-model availability states",\n',
       "",
@@ -81,6 +90,20 @@ function withoutNonsemanticAdapterAdditions(source: string): string {
   return source
     .replace(
       /    \{\n      id: "atlas\.organization-memberships",[\s\S]*?    \},\n/,
+      "",
+    )
+    .replace(
+      `    {
+      id: "operations.refresh-pages",
+      route: "/api/cron/operations/refresh-pages",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/refresh-pages/route.ts",
+        "src/lib/platform/page-refresh.ts",
+      ],
+    },
+`,
       "",
     )
     .replace(
@@ -275,9 +298,12 @@ test("the serverless Index-ingest client is excluded from method drift", () => {
 test("the Atlas-only Bills coverage state is excluded from Index semantic drift", () => {
   const pagePath = "src/app/(reader)/country/[slug]/civica-data/page.tsx";
   const currentPage = readFileSync(pagePath, "utf8");
-  const priorPage = currentPage.replace(
-    '  const hasBills = billsResult.status === "available";\n',
-    "  const hasBills = false;\n",
+  const priorPage = (PLT_032_PAGE_CACHE_EDITS[pagePath] ?? []).reduce(
+    (source, [current, prior]) => source.replace(current, prior),
+    currentPage.replace(
+      '  const hasBills = billsResult.status === "available";\n',
+      "  const hasBills = false;\n",
+    ),
   );
   assert.notEqual(currentPage, priorPage);
   assert.equal(
@@ -290,4 +316,32 @@ test("the Atlas-only Bills coverage state is excluded from Index semantic drift"
     indexProtectedFileHash(pagePath, unrelatedEdit),
     indexProtectedFileHash(pagePath, currentPage),
   );
+});
+
+test("PLT-033 page-cache edits to protected reader pages are excluded from Index semantic drift", () => {
+  for (const [pagePath, edits] of Object.entries(PLT_032_PAGE_CACHE_EDITS)) {
+    const currentPage = readFileSync(pagePath, "utf8");
+    let priorPage = currentPage;
+    for (const [current, prior] of edits) {
+      assert.ok(currentPage.includes(current), `${pagePath} lacks a PLT-033 edit`);
+      priorPage = priorPage.replace(current, prior);
+    }
+    if (pagePath.endsWith("civica-data/page.tsx")) {
+      priorPage = priorPage.replace(
+        '  const hasBills = billsResult.status === "available";\n',
+        "  const hasBills = false;\n",
+      );
+    }
+    assert.notEqual(currentPage, priorPage);
+    assert.equal(indexProtectedFileHash(pagePath, currentPage), sha256(priorPage));
+
+    const unrelatedEdit = currentPage.replace(
+      "export const revalidate = 86400;",
+      "export const revalidate = 3600;",
+    );
+    assert.notEqual(
+      indexProtectedFileHash(pagePath, unrelatedEdit),
+      indexProtectedFileHash(pagePath, currentPage),
+    );
+  }
 });
