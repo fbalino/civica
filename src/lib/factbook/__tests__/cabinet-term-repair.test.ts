@@ -627,7 +627,7 @@ test("a hand-entered legacy row keeps its own date when the importer adopts its 
     ciaStatements: [[R.janeTerm, "Min. of Finance", "2026-07-23 00:00:00"]],
   });
   await fx.query(
-    `UPDATE terms SET party_name = 'Labour', party_color = '#E4003B' WHERE id IN ($1, $2)`,
+    `UPDATE terms SET party_name = 'Labour', party_color = 'fixture-party-color' WHERE id IN ($1, $2)`,
     [R.reevesTerm, R.lammyTerm],
   );
 
