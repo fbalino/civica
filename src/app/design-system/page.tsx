@@ -111,6 +111,10 @@ const DESIGN_TOKEN_GROUPS: DesignTokenGroup[] = [
     "--peer-income-upper-mid",
     "--peer-income-high",
   ]),
+  tokenGroup("legislature", "Legislature seats", [
+    "--color-seat-unattributed",
+    "--color-seat-unattributed-ring",
+  ]),
   tokenGroup("source", "Source provenance", [
     "--color-source-live",
     "--color-source-frozen",
@@ -260,6 +264,7 @@ const COLOR_GROUP_IDS = [
   "gov",
   "branch",
   "peer",
+  "legislature",
   "source",
   "atlas",
 ] as const;
@@ -382,7 +387,9 @@ const SAMPLE_CHAMBER = {
     {
       id: "independents",
       name: "Independents",
-      seats: 19,
+      // 46+38+25+22+15 = 146 of 150: the four remaining seats demonstrate the
+      // unattributed ("No party reported") seat state.
+      seats: 15,
       color: "var(--color-text-40)",
     },
   ],
@@ -1146,6 +1153,13 @@ export default function DesignSystemPage() {
 
             <div className="ds-comp ds-comp--wide">
               <h4>Hemicycle (canonical FactbookLegislatureChart)</h4>
+              <p className="ds-component-note">
+                Seats the composition source does not assign to a party are
+                drawn as open neutral seats and counted in a &ldquo;No party
+                reported&rdquo; key under the chamber. They never take a party
+                colour and are not dimmed with the party rows. This sample
+                reports 146 party seats in a 150-seat chamber.
+              </p>
               <FactbookLegislatureChart
                 chamber={SAMPLE_CHAMBER}
                 houseLabel="Lower house"

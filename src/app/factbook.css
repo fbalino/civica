@@ -1786,6 +1786,37 @@ svg.factbook-legislature-hemi .factbook-legislature-seat:hover {
 svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   opacity: 0.12;
 }
+/* A seat with no reported party: open neutral seat, never a party colour and
+   never dimmed or selected with the party rows. */
+svg.factbook-legislature-hemi .factbook-legislature-seat--unattributed {
+  fill: var(--color-seat-unattributed);
+  stroke: var(--color-seat-unattributed-ring);
+  stroke-width: var(--stroke-seat-unattributed);
+}
+
+/* Hemicycle key for seat states the Party browser does not list. */
+.factbook-legislature-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-snug);
+  color: var(--color-text-60);
+  font-variant-numeric: tabular-nums;
+}
+.factbook-legislature-key-swatch {
+  flex-shrink: 0;
+  width: var(--space-4);
+  height: var(--space-4);
+  border-radius: var(--radius-full);
+}
+.factbook-legislature-key-swatch--unattributed {
+  background: var(--color-seat-unattributed);
+  border: var(--border-hairline) solid var(--color-seat-unattributed-ring);
+}
 
 /* Hover tooltip — positioned via clientX/clientY in the component */
 .factbook-legislature-tip {

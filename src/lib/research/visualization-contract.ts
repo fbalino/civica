@@ -93,7 +93,8 @@ export const RESEARCH_VISUALIZATION_CONTRACT: readonly ResearchVisualizationCont
     routes: ["/country/[slug]/civica-data", "/compare"],
     equivalent: "Party browser with each party's seats, share, rank, and coalition state",
     provenance: "Composition source and captured date supplied by the chamber context",
-    missingness: "No composition is a named ingest gap, never an empty chamber",
+    missingness:
+      "No composition is a named ingest gap, never an empty chamber; seats without a reported party are drawn and counted as unattributed, never in a party colour",
     keyboard: "Party dimming and disclosure controls are native buttons",
     dataAccess: "rights-withheld",
     dataAccessPath: "/licensing#rights-manifest",

@@ -7,6 +7,10 @@ import { SourceDot } from "@/components/SourceDot";
 import { Banner } from "@/components/editorial/Banner";
 import { DataTable } from "@/components/editorial/DataTable";
 import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
+import {
+  attributeSeats,
+  UNATTRIBUTED_SEAT_LABEL,
+} from "@/lib/legislatures/seat-attribution";
 import { FactbookLegislatureChart } from "./FactbookLegislatureChart";
 import "./legislature.css";
 
@@ -260,7 +264,7 @@ export async function FactbookLegislature({
       {data ? (
         <ResearchVisualizationDisclosure
           title="Legislature composition"
-          description="The hemicycle is a visual reading of the exact chamber-party rows in the table below. Party browser controls provide a second native-document route to the same composition."
+          description="The hemicycle is a visual reading of the exact chamber-party rows in the table below. Seats the source does not assign to a party are drawn as open neutral seats and listed as “No party reported”; they never take a party colour. Party browser controls provide a second native-document route to the same composition."
           sources={[
             {
               id: "ipu_parline",
@@ -293,7 +297,11 @@ export async function FactbookLegislature({
                   const coalitionNames = new Set(
                     coalition?.coalitionPartyNames ?? [],
                   );
-                  return chamber.parties.map((party) => (
+                  const { unattributedSeats } = attributeSeats(
+                    chamber.total,
+                    chamber.parties,
+                  );
+                  const partyRows = chamber.parties.map((party) => (
                     <tr key={`${chamber.id}-${party.id}`}>
                       <th scope="row">{chamber.name}</th>
                       <td>{party.name}</td>
@@ -312,6 +320,19 @@ export async function FactbookLegislature({
                       </td>
                     </tr>
                   ));
+                  if (unattributedSeats === 0) return partyRows;
+                  return [
+                    ...partyRows,
+                    <tr key={`${chamber.id}-unattributed`}>
+                      <th scope="row">{chamber.name}</th>
+                      <td>{UNATTRIBUTED_SEAT_LABEL}</td>
+                      <td>{unattributedSeats}</td>
+                      <td>
+                        {`${((unattributedSeats / chamber.total) * 100).toFixed(1)}%`}
+                      </td>
+                      <td>Not recorded</td>
+                    </tr>,
+                  ];
                 },
               )}
             </tbody>
