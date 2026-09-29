@@ -20,7 +20,7 @@ The map is deferred at Fernando's direction. The master checklist is 267/312 com
 - Manual deployed checks should use the documented GET plus stable `Idempotency-Key`: empty POST requests were rejected before execution by the no-body guard. The pipeline monitor deliberately retains HTTP 503 for open findings with `pipeline_alert_*` outcomes; it excludes itself from alert inputs. Diagnose its reported sources, not that monitor record as another failed ingestion.
 - Routine Dependabot version-update PRs are capped and cooled down; security updates retain their separate handling. Vercel pull-request comments were disabled at the project level, while commit-status checks and deployment events remain enabled. Vercel Deployment Failures emails were subsequently disabled at the personal team setting, and GitHub Actions failure notifications moved to on-GitHub-only; web alerts remain on, and billing/domain/security-related settings are unchanged.
 - Read-only mailbox review distinguished cleanup-related messages from unresolved import failures. Private mailbox evidence stays outside Git.
-- The owner chose Codex to investigate sync problems. An hourly local heartbeat continues authorized routine maintenance, with no email or public status-page messages. It requires the local host to be available; unchanged healthy or already-recovering states stay quiet.
+- The owner chose Codex to investigate sync problems. A daily 9 a.m. America/New_York local heartbeat continues authorized routine maintenance, with no email or public status-page messages. It requires the local host to be available; unchanged healthy or already-recovering states stay quiet.
 
 ## Reconciled decisions
 
