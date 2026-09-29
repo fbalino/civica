@@ -120,3 +120,22 @@ gates remain separate.
 The next scheduled cabinet shard found a distinct importer edge: a newly listed office appeared before an unchanged office, so the unchanged office still occupied the new entry's display position. The shared identity guard refused an unproven rename. Current publisher pages parsed successfully, and an isolated restore reproduced the exact failure.
 
 The repair refreshes existing offices by exact title and UUID before inserting unknown titles. It preserves source order and the identity guard; an unexplained title replacement remains a failure. Closed failure categories and numeric partial-run counters now reach the existing cron and pipeline records without raw exceptions or SQL. The [rehearsal evidence](cabinet-roster-insertion-2026-09-19.json) records seven successful available pages, one new office, preserved existing identities, and semantic-row and Atlas entity-change idempotence. It is pre-merge evidence; production recovery requires a separate current deployment and execution check.
+
+
+## September 29 Bosnia national section
+
+The full cabinet refresh exposed a parser boundary failure on Bosnia and
+Herzegovina: its explicit `National Govt.` heading came before the first
+position, where the parser expected only later regional sections. The narrow
+repair reads that unique national block, excludes the Federation and Republika
+Srpska blocks, and keeps the presidency and Council chair outside cabinet
+imports. Existing China regional exclusions and identity guards remain intact.
+
+The [local validation and read-only preview](cabinet-national-section-2026-09-29.json)
+found 18 national positions, including 12 eligible cabinet/deputy/central-bank
+positions. The live preview proposed 47 additive mutations and no releases,
+retirements, or updates; it wrote no rows and advanced no source freshness.
+The publisher's date is December 5, 2023, which remains a source vintage rather
+than an appointment date. This record is pre-merge evidence; current production
+and standard cron verification are recorded in the local monitor's ignored
+`output/data-reliability/latest.json`.

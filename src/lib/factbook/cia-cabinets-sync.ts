@@ -348,19 +348,35 @@ const CABINET_RE =
  */
 const CABINET_CHANCELLOR_RE = /^chancellor of the (exchequer|duchy)\b/i;
 
+// Bosnia and Herzegovina's national block lists its three-member presidency
+// and Council chair with titles that would otherwise look like generic
+// officials. Keep these exceptions scoped to the one publisher page whose
+// structure requires them; matching Council chairs globally would skip valid
+// cabinet and committee roles elsewhere.
+const BOSNIA_SLUG = "bosnia-and-herzegovina";
+const BOSNIA_HEAD_TITLE_RE =
+  /^(?:Presidency Member \((?:Bosniak|Croat|Serb)\)|Chmn\., Council of Ministers)$/i;
+const BOSNIA_DEPUTY_TITLE_RE =
+  /^Dep\. Chmn\., Council of Ministers, and Min\. of (?:Defense|Foreign Trade & Economic Relations)$/i;
+
 /**
  * Classify a CIA position title into a category. Order matters: head first
  * (skip), then the specific non-cabinet buckets (central bank, diplomatic),
  * then deputy, then the broad cabinet catch, then "other".
  */
-export function classifyPosition(title: string): PositionCategory {
+export function classifyPosition(
+  title: string,
+  slug?: string,
+): PositionCategory {
   const t = title.trim();
   // Central bank FIRST — a "Pres., Bundesbank" / "Governor, Bank of X" must not
   // be mistaken for a country president or a minister.
   if (CENTRAL_BANK_RE.test(t)) return "central_bank";
+  if (slug === BOSNIA_SLUG && BOSNIA_HEAD_TITLE_RE.test(t)) return "head";
   if (CABINET_CHANCELLOR_RE.test(t)) return "cabinet";
   if (HEAD_TITLE_RE.test(t)) return "head";
   if (DIPLOMATIC_RE.test(t)) return "diplomatic";
+  if (slug === BOSNIA_SLUG && BOSNIA_DEPUTY_TITLE_RE.test(t)) return "deputy";
   if (DEPUTY_TITLE_RE.test(t)) return "deputy";
   if (CABINET_RE.test(t)) return "cabinet";
   return "other";
@@ -423,8 +439,11 @@ function stripTags(s: string): string {
  *
  * v1 IGNORES sub-national blocks (e.g. China → Hong Kong / Macau): Civica models
  * sovereign jurisdictions here, so attaching HK offices to "China" would be
- * wrong. Those appear after the main list; we cut the segment at the
- * "Explore Foreign Governments" sentinel, which is before them.
+ * wrong. Most pages put the sovereign list before any leaders-section heading,
+ * so the first heading remains the end boundary. Bosnia is the narrow
+ * exception: its sovereign list begins under the explicit National Govt.
+ * heading and ends at the next section. An unrecognized leading heading fails
+ * closed instead of treating an arbitrary first region as national.
  */
 export function parseCountryHtml(slug: string, html: string): ParsedCountry {
   const start = html.indexOf("Leaders and Cabinet Members");
@@ -447,15 +466,50 @@ export function parseCountryHtml(slug: string, html: string): ParsedCountry {
   }
   let seg = html.slice(start, end);
 
-  // Sub-national blocks (e.g. China → Hong Kong / Macau) appear after the main
-  // sovereign list, each introduced by an <h3 class="leaders-section">Region…</h3>.
-  // v1 models sovereign jurisdictions only, so cut the segment at the FIRST such
-  // sub-national header — attaching HK/Macau officials to "China" would be wrong.
-  const subNational = seg.search(/<h3[^>]*class="leaders-section"/i);
-  if (subNational >= 0) seg = seg.slice(0, subNational);
-
+  // The page date belongs to the whole country roster and precedes any optional
+  // section heading. Read it before narrowing the position segment.
   const lu = seg.match(/Last Updated<\/b>\s*:?\s*<span>([^<]*)<\/span>/i);
   if (lu) result.lastUpdated = stripTags(lu[1]) || null;
+
+  const sectionHeaders: Array<{ start: number; end: number; title: string }> = [];
+  const sectionHeaderRe =
+    /<h3\b[^>]*\bclass=(["'])[^"']*\bleaders-section\b[^"']*\1[^>]*>([\s\S]*?)<\/h3>/gi;
+  let sectionMatch: RegExpExecArray | null;
+  while ((sectionMatch = sectionHeaderRe.exec(seg)) !== null) {
+    sectionHeaders.push({
+      start: sectionMatch.index,
+      end: sectionHeaderRe.lastIndex,
+      title: stripTags(sectionMatch[2]),
+    });
+  }
+
+  if (sectionHeaders.length > 0) {
+    const firstPosition = seg.search(/<div class="leader-info"/i);
+    const firstSection = sectionHeaders[0];
+
+    if (firstPosition < 0 || firstSection.start < firstPosition) {
+      const nationalSections = sectionHeaders.filter(
+        ({ title }) => title === "National Govt.",
+      );
+      if (
+        slug !== BOSNIA_SLUG ||
+        firstSection.title !== "National Govt." ||
+        nationalSections.length !== 1
+      ) {
+        result.parseFailed = true;
+        return result;
+      }
+
+      seg = seg.slice(
+        firstSection.end,
+        sectionHeaders[1]?.start ?? seg.length,
+      );
+    } else {
+      // China and similar pages put their sovereign roster before the first
+      // regional heading. Preserve that established boundary.
+      seg = seg.slice(0, firstSection.start);
+    }
+  }
 
   // Each position is a <div class="leader-info"><h4>title</h4><p>name</p></div>.
   const blockRe =
@@ -476,7 +530,7 @@ export function parseCountryHtml(slug: string, html: string): ParsedCountry {
       title,
       rawName,
       order: order++,
-      category: classifyPosition(title),
+      category: classifyPosition(title, slug),
     });
   }
 
