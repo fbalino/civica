@@ -1378,3 +1378,24 @@ the country. No validator compared a displayed number with the publisher's own
 figure. The check fails on the former row and on unregistered readers, but it
 cannot see new arithmetic in a file that reads no registered field, so the
 rule is also a review rule. Durable evidence: `plan/evidence/CLM-020/`.
+
+### APR-D175 — Election-corpus integrity binds source identity and license, not sync time
+
+**Decision:** The election-corpus integrity fingerprint binds every baseline
+election row's complete content plus the identity and license of each
+election-referenced registered source. It does not bind a source's
+`last_sync_at`, and the checked election audit keeps no copy of it. Current
+source freshness stays published through the domain-coverage report.
+`validate:election-corpus-audit` recomputes the checked fingerprint from the
+checked rows and source identities.
+
+**Why:** `sources.last_sync_at` is one row per publisher, advanced by any
+pipeline that commits rows from that publisher. Pulse's daily news ingest
+stamps `ipu_parline` when it stores IPU election items, and the DAT-036
+Wikidata refresh stamped `wikidata`; neither touched an election. Binding
+that column made `audit:source-coverage:live` and `audit:election-corpus:live`
+fail after routine work while all 915 election rows were unchanged, and
+regenerating the audit would only have bound the next timestamp. Qualification
+reads each statement's own retrieval time, so the sync time added no
+protection. A license change still fails the check. Durable evidence:
+`plan/evidence/DAT-038/`.
