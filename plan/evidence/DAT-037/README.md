@@ -1,14 +1,16 @@
 # DAT-037: CIA World Leaders cabinet-term integrity
 
-Status: open, approved by the owner on 2026-09-29, production sequence not yet
-run. The importer, reader, and repair code are implemented and tested on
-branch `claude/fix/cabinet-term-integrity`. Nothing has been written to
-production. The first isolated rehearsal (2026-09-28) found two rows the
+Status: completed on 2026-09-29. The corrected importer and reader shipped in
+PR #43, the owner-approved one-time repair ran on production after a full
+refresh, and every postflight check passed with a zero-change repeat plan
+(see "Production application, 2026-09-29" below and
+[`production-repair-2026-09-29.json`](production-repair-2026-09-29.json)).
+Two isolated rehearsals came first: the first (2026-09-28) found two rows the
 repair did not reach and a hand-entered date it should have kept; the repair
-was fixed, and the second rehearsal (2026-09-29, below) passed every check.
-The owner approved applying the repair as rehearsed, with no public
-correction record: [`OWNER-APPROVAL-2026-09-29.md`](OWNER-APPROVAL-2026-09-29.md)
-and APR-D173 in `plan/DECISIONS.md`.
+was fixed, and the second (2026-09-29) passed every check. The owner approved
+applying the repair as rehearsed, with no public correction record:
+[`OWNER-APPROVAL-2026-09-29.md`](OWNER-APPROVAL-2026-09-29.md) and APR-D173 in
+`plan/DECISIONS.md`.
 
 ## The defect
 
@@ -330,6 +332,77 @@ Disable the cron jobs before any Instant Rollback past this change, and prefer
 a forward fix. Data recovery is the step 3 snapshot or a reviewed forward
 compensation (`data-repair-cabinet-terms-compensation`); every changed row's
 before-state is also in `research_evidence_history`.
+
+## Production application, 2026-09-29
+
+Record: [`production-repair-2026-09-29.json`](production-repair-2026-09-29.json).
+Result: completed. All times are UTC.
+
+- 05:44 PR #43 merged (`085c4e39`); the production deployment was Ready at
+  05:52. From then on the reader showed no stored date on a roster office.
+- 07:40 to 08:16, convergence refresh: 28 sequential authenticated manual
+  deliveries of `factbook.cia-cabinets` (`?shard=0` through `?shard=27`, each
+  with its own `Idempotency-Key`, none retried; shard 27 is empty). Totals:
+  237 pages crawled, 197 countries applied, 2,205 rows written, 148 offices
+  released, 777 terms written, 209 people created without a Wikidata ID, and
+  891 history rows, the same results as both rehearsals. Shard 2 returned 502
+  `cabinet_schema_failure` only because Bosnia and Herzegovina failed the page
+  schema (`upstream_schema_error`); the other 8 countries in that shard
+  applied. The 39 fetch failures are pages absent from the CIA directory, as
+  in the rehearsals. All 197 countries now carry a roster date statement, and
+  CIA source freshness was stamped at 08:16:18.756.
+- 08:18 read-only `pg_dump` recovery point: 226,448,402 bytes, SHA-256
+  `621a095a26aff8183926e8d53f7fcb005d6284319156b6af29b07742f3a4d385`, 104
+  table-data entries. It is stored privately outside the repository and is
+  deleted after closure.
+- 08:19:12 every Vercel cron job disabled in project settings, after
+  confirming no running cron execution and no held cron lease.
+- 08:21 production plan (zero writes): SHA-256
+  `b82142531fd5d81b554eb46949b1634341b9479c90edfbb4b2c8c81480c76daf`.
+  Its categories, observations, target counts, and expected history rows
+  (5,715) are identical to the second rehearsal's. The SHA-256 was appended to
+  the approval file, whose committed copy is byte-identical to the file the
+  apply report pins (`4cc6f8c7b4abc7035b8b9f3bd9c8792d2322d2abc38a7238f0148532bdd0c613`).
+- 08:22:03 apply (release `dat-037-production-repair-2026-09-29`,
+  `--public-correction=waived-prelaunch`) in one transaction: 299 statements
+  deleted, 3 re-homed, 298 terms deleted, 5,115 terms updated; 5,715 rows
+  changed and 5,715 history rows recorded at the transaction start
+  (2026-09-29 08:22:03.013717). Every changed row's before-state is in
+  `research_evidence_history`.
+- 08:22:33 postflight: every check passed (P1 to P8, P10, P11). It disclosed
+  8 legacy hand-entered dated roster terms and 7 retired terms without
+  provenance, as rehearsed. A new plan at 08:22:34 proposed nothing in every
+  category.
+- 08:22:59 cron jobs re-enabled (39 definitions). The pause lasted 3 minutes
+  48 seconds. One scheduled slot fell inside it and was skipped:
+  `pulse.v2.cluster` at 08:20 (no execution row exists for that slot; the
+  next one is 2026-09-30 08:20). The 08:30 health-alert run succeeded,
+  confirming scheduled delivery resumed.
+- Production totals after the repair equal the second rehearsal's final
+  totals: 5,863 terms, 7,837 statements, 5,483 offices, 5,251 people, and
+  194,250 history rows.
+- Live checks: Saudi Arabia's leaders API lists all 12 holders of its 12-seat
+  cabinet title as current and undated. The United Kingdom, Saudi Arabia,
+  Hungary, Samoa, Uganda, Ukraine, Uruguay, Taiwan, and Sri Lanka pages show
+  "Cabinet roster updated <date>" from the CIA page date, and every remaining
+  "Since" year on them belongs to a Wikidata head-of-state or head-of-government
+  term.
+- Read-only live validators against production passed:
+  `validate:statement-provenance:live`,
+  `validate:research-evidence-retention:live`, and
+  `validate:stable-identifiers:live`. `src/lib/provenance/domain-coverage.generated.json`
+  was regenerated (office and people counts and CIA freshness changed; its
+  summary did not) and `validate:source-coverage` passes.
+  `audit:source-coverage:live` stops earlier, on an election corpus
+  fingerprint that no longer matches the 2026-07-12 election audit. DAT-037
+  wrote no election, election statement, or election source row, so that
+  drift is outside this task.
+- The two pending Codex data-reliability monitor incidents,
+  `cabinet-samoa-identity-20260921` (Samoa) and
+  `cabinet-shard24-identity-20260925` (Uganda, Ukraine, and the United
+  Kingdom), are resolved by this change: all four countries applied in the
+  refresh. Those incident records live in the monitor's gitignored local
+  output, not in the repository; this record is their closure evidence.
 
 ## Owner decisions (approved 2026-09-29)
 

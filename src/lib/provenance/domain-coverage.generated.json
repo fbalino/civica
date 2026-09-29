@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas-domain-coverage/v1",
-  "generatedAt": "2026-08-10T02:57:44.972Z",
+  "generatedAt": "2026-09-29T08:27:43.877Z",
   "scope": {
     "jurisdictionTaxonomy": "jurisdiction-status/v1",
     "eligibleClass": "sovereign_state",
@@ -72,29 +72,29 @@
       "id": "facts",
       "label": "Canonical facts",
       "recordLabel": "active source-fact observations",
-      "recordCount": 23987,
+      "recordCount": 24178,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "source_id",
           "label": "Source identifier",
-          "complete": 23987,
-          "total": 23987,
+          "complete": 24178,
+          "total": 24178,
           "percent": 100
         },
         {
           "field": "value_state",
           "label": "Valid value or absence state",
-          "complete": 23987,
-          "total": 23987,
+          "complete": 24178,
+          "total": 24178,
           "percent": 100
         },
         {
           "field": "as_of",
           "label": "Observation/reference date",
           "complete": 15349,
-          "total": 23987,
-          "percent": 64
+          "total": 24178,
+          "percent": 63.5
         }
       ],
       "sources": [
@@ -234,7 +234,7 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Canonical facts: Observation/reference date is 64% complete; alert threshold is 80%."
+          "message": "Canonical facts: Observation/reference date is 63.5% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -282,7 +282,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-29T01:01:52.668Z"
+          "lastSuccessfulRun": "2026-09-29T08:16:18.756Z"
         },
         {
           "id": "wikidata",
@@ -294,10 +294,10 @@
           "id": "ipu_parline",
           "label": "IPU Parline",
           "family": "ipu_parline",
-          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+          "lastSuccessfulRun": "2026-09-25T08:01:11.373Z"
         }
       ],
-      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
+      "lastSuccessfulRun": "2026-09-29T08:16:18.756Z",
       "knownGaps": [
         "Coverage counts any stored body and does not establish that every constitutional branch, subnational body, or reporting relationship is complete."
       ],
@@ -317,29 +317,29 @@
       "id": "offices",
       "label": "Offices",
       "recordLabel": "office records",
-      "recordCount": 5184,
+      "recordCount": 5319,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "name",
           "label": "Office name",
-          "complete": 5184,
-          "total": 5184,
+          "complete": 5319,
+          "total": 5319,
           "percent": 100
         },
         {
           "field": "office_type",
           "label": "Office type",
-          "complete": 5184,
-          "total": 5184,
+          "complete": 5319,
+          "total": 5319,
           "percent": 100
         },
         {
           "field": "wikidata_qid",
           "label": "Wikidata identifier",
           "complete": 346,
-          "total": 5184,
-          "percent": 6.7
+          "total": 5319,
+          "percent": 6.5
         }
       ],
       "sources": [
@@ -347,7 +347,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-29T01:01:52.668Z"
+          "lastSuccessfulRun": "2026-09-29T08:16:18.756Z"
         },
         {
           "id": "wikidata",
@@ -359,10 +359,10 @@
           "id": "ipu_parline",
           "label": "IPU Parline",
           "family": "ipu_parline",
-          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+          "lastSuccessfulRun": "2026-09-25T08:01:11.373Z"
         }
       ],
-      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
+      "lastSuccessfulRun": "2026-09-29T08:16:18.756Z",
       "knownGaps": [
         "Cabinet depth varies by publisher and office identifiers remain incomplete; coverage counts any jurisdiction with at least one office."
       ],
@@ -377,7 +377,7 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Offices: Wikidata identifier is 6.7% complete; alert threshold is 80%."
+          "message": "Offices: Wikidata identifier is 6.5% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -388,22 +388,22 @@
       "id": "people",
       "label": "People",
       "recordLabel": "person records",
-      "recordCount": 4894,
+      "recordCount": 5132,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "wikidata_qid",
           "label": "Wikidata identifier",
           "complete": 2405,
-          "total": 4894,
-          "percent": 49.1
+          "total": 5132,
+          "percent": 46.9
         },
         {
           "field": "date_of_birth",
           "label": "Date of birth",
           "complete": 1833,
-          "total": 4894,
-          "percent": 37.5
+          "total": 5132,
+          "percent": 35.7
         }
       ],
       "sources": [
@@ -411,7 +411,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-29T01:01:52.668Z"
+          "lastSuccessfulRun": "2026-09-29T08:16:18.756Z"
         },
         {
           "id": "wikidata",
@@ -423,10 +423,10 @@
           "id": "ipu_parline",
           "label": "IPU Parline",
           "family": "ipu_parline",
-          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+          "lastSuccessfulRun": "2026-09-25T08:01:11.373Z"
         }
       ],
-      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
+      "lastSuccessfulRun": "2026-09-29T08:16:18.756Z",
       "knownGaps": [
         "The denominator is people linked to an office term, not every politically relevant person; birth dates and stable identifiers are publisher-dependent."
       ],
@@ -441,12 +441,12 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "People: Wikidata identifier is 49.1% complete; alert threshold is 80%."
+          "message": "People: Wikidata identifier is 46.9% complete; alert threshold is 80%."
         },
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "People: Date of birth is 37.5% complete; alert threshold is 80%."
+          "message": "People: Date of birth is 35.7% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -494,7 +494,7 @@
           "id": "ipu_parline",
           "label": "IPU Parline",
           "family": "ipu_parline",
-          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+          "lastSuccessfulRun": "2026-09-25T08:01:11.373Z"
         },
         {
           "id": "wikidata",
@@ -503,7 +503,7 @@
           "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         }
       ],
-      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
+      "lastSuccessfulRun": "2026-09-25T08:01:11.373Z",
       "knownGaps": [
         "A stored legislative body does not guarantee current party composition, electoral-system detail, upper-chamber coverage, or an independently verified total-seat count."
       ],
@@ -552,7 +552,7 @@
           "id": "ipu_parline",
           "label": "IPU Parline",
           "family": "ipu_parline",
-          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+          "lastSuccessfulRun": "2026-09-25T08:01:11.373Z"
         },
         {
           "id": "wikidata",
@@ -567,7 +567,7 @@
           "lastSuccessfulRun": "2026-07-06T20:12:27.185Z"
         }
       ],
-      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
+      "lastSuccessfulRun": "2026-09-25T08:01:11.373Z",
       "knownGaps": [
         "Party rows are legislature snapshots rather than a global party registry; V-Party positions cover only confidently matched parties in its frozen vintage."
       ],
@@ -642,7 +642,7 @@
           "id": "ipu_parline",
           "label": "IPU Parline",
           "family": "ipu_parline",
-          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+          "lastSuccessfulRun": "2026-09-25T08:01:11.373Z"
         },
         {
           "id": "wikidata",
@@ -657,7 +657,7 @@
           "lastSuccessfulRun": "2026-07-05T15:22:35.000Z"
         }
       ],
-      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
+      "lastSuccessfulRun": "2026-09-25T08:01:11.373Z",
       "knownGaps": [
         "The checked 915-row baseline contains 88 quarantined rows and 215 separately labelled term-length projection groups; neither is counted as a qualified event.",
         "21 rows lack retained publisher jurisdiction identity and remain quarantined; no checked publisher jurisdiction mismatch is public.",
@@ -798,29 +798,29 @@
       "id": "bills",
       "label": "Bills",
       "recordLabel": "bill records",
-      "recordCount": 8016,
+      "recordCount": 10420,
       "jurisdictionsCovered": 6,
       "completeness": [
         {
           "field": "url",
           "label": "Source URL",
-          "complete": 8016,
-          "total": 8016,
+          "complete": 10420,
+          "total": 10420,
           "percent": 100
         },
         {
           "field": "raw_status",
           "label": "Publisher status",
-          "complete": 5767,
-          "total": 8016,
-          "percent": 71.9
+          "complete": 7661,
+          "total": 10420,
+          "percent": 73.5
         },
         {
           "field": "introduced_date",
           "label": "Introduction date",
-          "complete": 546,
-          "total": 8016,
-          "percent": 6.8
+          "complete": 2966,
+          "total": 10420,
+          "percent": 28.5
         }
       ],
       "sources": [
@@ -828,52 +828,52 @@
           "id": "bundestag_dip",
           "label": "Bundestag DIP",
           "family": "bundestag_dip",
-          "lastSuccessfulRun": "2026-05-30T05:00:29.087Z"
+          "lastSuccessfulRun": "2026-09-29T05:00:06.824Z"
         },
         {
           "id": "camara_br",
           "label": "Câmara dos Deputados",
           "family": "camara_br",
-          "lastSuccessfulRun": "2026-07-29T04:30:23.664Z"
+          "lastSuccessfulRun": "2026-09-29T05:00:18.406Z"
         },
         {
           "id": "congress_gov",
           "label": "Congress.gov",
           "family": "congress_gov",
-          "lastSuccessfulRun": "2026-07-29T03:01:33.832Z"
+          "lastSuccessfulRun": "2026-09-29T03:00:38.718Z"
         },
         {
           "id": "data_assemblee_fr",
           "label": "Assemblée Nationale",
           "family": "data_assemblee_fr",
-          "lastSuccessfulRun": "2026-07-11T05:30:36.495Z"
+          "lastSuccessfulRun": "2026-09-29T05:30:18.829Z"
         },
         {
           "id": "legisinfo_ca",
           "label": "Parliament of Canada (LEGISinfo)",
           "family": "legisinfo_ca",
-          "lastSuccessfulRun": "2026-07-12T04:01:47.013Z"
+          "lastSuccessfulRun": "2026-09-29T04:00:07.608Z"
         },
         {
           "id": "senado_br",
           "label": "Senado Federal",
           "family": "senado_br",
-          "lastSuccessfulRun": "2026-07-29T04:30:23.664Z"
+          "lastSuccessfulRun": "2026-09-29T05:00:18.406Z"
         },
         {
           "id": "senat_fr",
           "label": "Sénat (France)",
           "family": "senat_fr",
-          "lastSuccessfulRun": "2026-07-11T05:30:36.495Z"
+          "lastSuccessfulRun": "2026-09-26T05:30:20.163Z"
         },
         {
           "id": "uk_parliament",
           "label": "UK Parliament",
           "family": "uk_parliament",
-          "lastSuccessfulRun": "2026-07-25T03:30:50.496Z"
+          "lastSuccessfulRun": "2026-09-29T03:30:17.884Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-29T04:30:23.664Z",
+      "lastSuccessfulRun": "2026-09-29T05:30:18.829Z",
       "knownGaps": [
         "Production bill adapters currently cover six legislatures; summaries and vote fields are not consistently available from publishers."
       ],
@@ -893,12 +893,12 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Publisher status is 71.9% complete; alert threshold is 80%."
+          "message": "Bills: Publisher status is 73.5% complete; alert threshold is 80%."
         },
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Introduction date is 6.8% complete; alert threshold is 80%."
+          "message": "Bills: Introduction date is 28.5% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
@@ -1037,43 +1037,43 @@
       "id": "citations",
       "label": "Statement citations",
       "recordLabel": "statement-level provenance records",
-      "recordCount": 7038,
+      "recordCount": 7593,
       "jurisdictionsCovered": 194,
       "completeness": [
         {
           "field": "source_id",
           "label": "Source identifier",
-          "complete": 7038,
-          "total": 7038,
+          "complete": 7593,
+          "total": 7593,
           "percent": 100
         },
         {
           "field": "source_url",
           "label": "Source URL",
-          "complete": 6847,
-          "total": 7038,
-          "percent": 97.3
+          "complete": 7402,
+          "total": 7593,
+          "percent": 97.5
         },
         {
           "field": "source_license",
           "label": "Captured source license",
-          "complete": 7038,
-          "total": 7038,
+          "complete": 7593,
+          "total": 7593,
           "percent": 100
         },
         {
           "field": "retrieved_at",
           "label": "Retrieval time",
-          "complete": 7038,
-          "total": 7038,
+          "complete": 7593,
+          "total": 7593,
           "percent": 100
         },
         {
           "field": "source_hash",
           "label": "Source hash",
-          "complete": 0,
-          "total": 7038,
-          "percent": 0
+          "complete": 191,
+          "total": 7593,
+          "percent": 2.5
         }
       ],
       "sources": [
@@ -1087,7 +1087,7 @@
           "id": "cia_world_leaders",
           "label": "CIA World Leaders",
           "family": "cia_world_leaders",
-          "lastSuccessfulRun": "2026-07-29T01:01:52.668Z"
+          "lastSuccessfulRun": "2026-09-29T08:16:18.756Z"
         },
         {
           "id": "constitute_project",
@@ -1105,7 +1105,7 @@
           "id": "ipu_parline",
           "label": "IPU Parline",
           "family": "ipu_parline",
-          "lastSuccessfulRun": "2026-07-05T15:26:07.892Z"
+          "lastSuccessfulRun": "2026-09-25T08:01:11.373Z"
         },
         {
           "id": "wikidata",
@@ -1114,7 +1114,7 @@
           "lastSuccessfulRun": "2026-08-10T02:55:00.302Z"
         }
       ],
-      "lastSuccessfulRun": "2026-08-10T02:55:00.302Z",
+      "lastSuccessfulRun": "2026-09-29T08:16:18.756Z",
       "knownGaps": [
         "Statement rows currently cover the closed polymorphic subject set only; canonical country facts use their own row-level provenance and are measured separately rather than being double-counted here."
       ],
@@ -1129,7 +1129,7 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Statement citations: Source hash is 0% complete; alert threshold is 80%."
+          "message": "Statement citations: Source hash is 2.5% complete; alert threshold is 80%."
         }
       ],
       "status": "attention",
