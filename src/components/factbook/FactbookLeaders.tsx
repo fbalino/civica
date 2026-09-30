@@ -17,6 +17,7 @@ import {
 } from "@/components/factbook/LeaderTenureTimeline";
 import { LeaderPortrait } from "@/components/factbook/LeaderPortrait";
 import "./leaders.css";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 /*
  * FactbookLeaders — the Leaders section of the Civica Data tab.
@@ -247,7 +248,9 @@ export async function FactbookLeaders({
   } else {
     try {
       rows = await getLeaderTimeline(jurisdictionId);
-    } catch {
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033).
+      rethrowDatabaseFailure(error);
       return (
         <Banner variant="warn">
           Leadership records are temporarily unavailable. Civica is not

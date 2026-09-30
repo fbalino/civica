@@ -10,8 +10,11 @@ import {
   ELECTION_CORPUS_AUDIT,
   getElectionProjectionDisplayGroupCount,
 } from "@/lib/elections/corpus-audit-runtime";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Cross-national Election Records — Calendar & Results",
@@ -87,6 +90,8 @@ export default async function ElectionsPage() {
     upcoming = upcomingResult.value;
     upcomingDataAvailable = true;
   } else {
+    // A failed read aborts the cached render (PLT-033).
+    rethrowDatabaseFailure(upcomingResult.reason);
     console.error("[elections] future query failed:", upcomingResult.reason);
   }
   if (recentResult.status === "fulfilled") {
@@ -110,11 +115,13 @@ export default async function ElectionsPage() {
       );
     historicalDataAvailable = true;
   } else {
+    rethrowDatabaseFailure(recentResult.reason);
     console.error("[elections] historical query failed:", recentResult.reason);
   }
   if (countryOptionsResult.status === "fulfilled") {
     countryOptions = countryOptionsResult.value;
   } else {
+    rethrowDatabaseFailure(countryOptionsResult.reason);
     console.error(
       "[elections] jurisdiction catalog query failed:",
       countryOptionsResult.reason,

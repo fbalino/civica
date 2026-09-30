@@ -61,6 +61,11 @@ function withoutNonsemanticManifestAdditions(source: string): string {
       "",
     )
     .replace(
+      '  "operations.refresh-pages":\n' +
+        '    "the public sitemap generated from the jurisdiction registry and the closed live-page allowlist",\n',
+      "",
+    )
+    .replace(
       '  "operations.health-alerts":\n' +
         '    "content-free application, database, active-map-asset, scheduled-freshness, and optional-model availability states",\n',
       "",
@@ -81,6 +86,20 @@ function withoutNonsemanticAdapterAdditions(source: string): string {
   return source
     .replace(
       /    \{\n      id: "atlas\.organization-memberships",[\s\S]*?    \},\n/,
+      "",
+    )
+    .replace(
+      `    {
+      id: "operations.refresh-pages",
+      route: "/api/cron/operations/refresh-pages",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/refresh-pages/route.ts",
+        "src/lib/platform/page-refresh.ts",
+      ],
+    },
+`,
       "",
     )
     .replace(
@@ -291,3 +310,4 @@ test("the Atlas-only Bills coverage state is excluded from Index semantic drift"
     indexProtectedFileHash(pagePath, currentPage),
   );
 });
+

@@ -10,6 +10,7 @@ import {
 } from "@/lib/data/production-adapter-registry";
 import { SOURCE_INPUT_SPECS } from "@/lib/data/source-input-manifest";
 import { deploymentReleaseId } from "@/lib/platform/route-performance-telemetry";
+import { latestCronScheduleSlot } from "@/lib/api/cron-schedule";
 
 export const PIPELINE_OBSERVABILITY_VERSION =
   "civica-pipeline-observability/v1" as const;
@@ -468,6 +469,25 @@ export async function finishPipelineRun(
         ),
   });
   return status;
+}
+
+/**
+ * The latest slot of each scheduled job whose missed-run grace has already
+ * elapsed at `now`. Daily monitors run shortly after some of the jobs they
+ * watch; evaluating the slot "as of now" would leave those jobs inside the
+ * grace period on every run, so a missed delivery would never be reported.
+ * A job is instead checked against its previous slot until the new one's
+ * grace has passed.
+ */
+export function expectedPipelineSlotsPastGrace(
+  jobs: ReadonlyArray<{ id: string; schedule: string }>,
+  now: Date,
+  graceMs: number = PIPELINE_MISSED_RUN_GRACE_MS,
+): Map<string, Date> {
+  const boundary = new Date(now.getTime() - graceMs);
+  return new Map(
+    jobs.map((job) => [job.id, latestCronScheduleSlot(job.schedule, boundary)]),
+  );
 }
 
 export function pipelineAlerts(input: {

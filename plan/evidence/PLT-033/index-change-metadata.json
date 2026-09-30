@@ -1,0 +1,24 @@
+{
+  "id": "plt-033-page-cache-2026-09-29",
+  "toVersion": "civica-index-page-cache-v65",
+  "categories": ["input", "presentation"],
+  "evidence": {
+    "documentation": ["plan/evidence/PLT-033/index-change-note.md"],
+    "registry": ["src/lib/platform/cache-consistency.ts"],
+    "release_note": ["plan/evidence/PLT-033/index-change-note.md"],
+    "migration_plan": ["plan/evidence/PLT-033/index-change-note.md"],
+    "golden_test": ["src/lib/platform/cached-render.test.ts"],
+    "contract_test": ["scripts/validate-cache-consistency.test.ts"]
+  },
+  "validations": [
+    "validate:cache-consistency",
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine"
+  ]
+}

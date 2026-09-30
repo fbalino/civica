@@ -36,9 +36,10 @@ record the deployment ID in the release evidence.
 
 ## Alert and response contract
 
-`/api/cron/operations/error-alerts` runs daily at 23:50 UTC. It emits open
-alerts to the Civica Atlas Vercel Runtime Logs, the owned operational channel
-reviewed by Fernando. It returns a successful cron result even with alerts
+`/api/cron/operations/error-alerts` runs daily at 10:20 UTC and reports open
+events seen in the preceding 25 hours, so consecutive daily windows overlap.
+It emits open alerts to the Civica Atlas Vercel Runtime Logs, the owned
+operational channel reviewed by Fernando. It returns a successful cron result even with alerts
 open, so the monitoring job cannot recursively create an alert about itself.
 A Vercel Log Drain may forward the same structured log to another owned
 channel, but must preserve the content-free payload.

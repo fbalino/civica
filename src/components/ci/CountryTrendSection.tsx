@@ -19,6 +19,7 @@ import {
   type TrendSeriesInput,
 } from "./IndicatorTrendChart";
 import type { ReactNode } from "react";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 function historySectionShell(children: ReactNode, embedded: boolean) {
   const Wrapper = embedded ? "div" : "section";
@@ -67,7 +68,9 @@ export async function CountryTrendSection({
   } else {
     try {
       series = await getIndicatorHistoryForCountry(slug);
-    } catch {
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033).
+      rethrowDatabaseFailure(error);
       return historySectionShell(
         <Banner variant="warn">
           Indicator history is temporarily unavailable. Civica has preserved the
@@ -97,7 +100,9 @@ export async function CountryTrendSection({
           ] as const,
       ),
     );
-  } catch {
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033).
+    rethrowDatabaseFailure(error);
     // The observations remain usable. SourceDot renders an explicit unknown
     // retrieval state when source freshness cannot be loaded.
   }

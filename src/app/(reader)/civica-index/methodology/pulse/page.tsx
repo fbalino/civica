@@ -17,8 +17,11 @@ import {
   type PulseFeedCoverage,
   type PulseSourceCoverageReport,
 } from "@/lib/pulse/v2/source-coverage";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Civica Pulse Methodology — Experimental Event Ledger",
@@ -154,6 +157,8 @@ export default async function PulseMethodologyPage() {
   try {
     sourceCoverage = await loadPulseSourceCoverageReport();
   } catch (error) {
+    // Never cache a feed-state block rendered without its data (PLT-033).
+    rethrowDatabaseFailure(error);
     console.error("Pulse methodology source coverage unavailable", error);
   }
   const operatingFeeds =

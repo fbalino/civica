@@ -7,8 +7,8 @@ import {
   postgresCronAlertHistoryStore,
 } from "@/lib/api/cron-alert-transition";
 import { CRON_JOB_DEFINITIONS } from "@/lib/api/cron-job-registry";
-import { latestCronScheduleSlot } from "@/lib/api/cron-schedule";
 import {
+  expectedPipelineSlotsPastGrace,
   loadPipelineAlertRows,
   pipelineAlerts,
 } from "@/lib/platform/pipeline-observability";
@@ -20,13 +20,14 @@ const MONITOR_PIPELINE_ID = "operations.pipeline-alerts";
 
 async function handler() {
   const now = new Date();
-  const expectedSlots = new Map(
+  // The monitor runs at 10:30 UTC, shortly after the Pulse, refresh, and
+  // health jobs, so each job is checked against its latest slot whose
+  // missed-run grace has elapsed.
+  const expectedSlots = expectedPipelineSlotsPastGrace(
     CRON_JOB_DEFINITIONS.filter(
       (definition) => !definition.retired && definition.schedule,
-    ).map((definition) => [
-      definition.id,
-      latestCronScheduleSlot(definition.schedule!, now),
-    ]),
+    ).map((definition) => ({ id: definition.id, schedule: definition.schedule! })),
+    now,
   );
   const alerts = pipelineAlerts({
     now,

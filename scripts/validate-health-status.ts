@@ -92,12 +92,14 @@ if (errors.length === 0) {
   if (!healthMonitorSchedule) {
     errors.push("vercel schedule omits health monitor");
   }
-  if (healthMonitorSchedule?.schedule !== "*/15 * * * *") {
-    errors.push("health monitor must run every 15 minutes");
+  // PLT-033 (APR-D177): the monitor runs once a day, after the daily page
+  // refresh, so it does not keep the scale-to-zero database awake.
+  if (healthMonitorSchedule?.schedule !== "15 10 * * *") {
+    errors.push("health monitor must run daily at 10:15 UTC");
   }
   for (const token of [
     "https://statuspage.incident.io/civica-atlas",
-    "two consecutive 15-minute",
+    "two consecutive daily",
     "/api/health",
     "Fernando Baliño",
     "Incident.io",

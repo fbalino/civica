@@ -17,7 +17,9 @@ import {
 } from "@/lib/api/contract/examples";
 import { ATLAS_CASE_STUDY_REPORT } from "@/lib/atlas/case-studies-runtime";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Public API — Sovereign-State Governance Data",

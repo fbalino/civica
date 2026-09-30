@@ -17,8 +17,17 @@ import {
   captureAtlasSurfaceQuery,
 } from "@/lib/atlas/surface-query-state";
 import "@/app/civica-data.css";
+import { fallbackWithoutDatabase, isCachedRenderFailure } from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
+
+// No paths render at build time. Each one renders on its first visit (or the
+// daily warm-up) and is then served from the page cache.
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return [];
+}
 
 // Per-tab metadata. The shared layout's generateMetadata sets the Factbook
 // title + /country/[slug] canonical (correct for the base tab); metadata
@@ -71,11 +80,14 @@ export default async function CountryConstitutionTab({
   // the rendered state cannot call an outage "not yet indexed". countryOptions
   // feeds the shared <CountryJumpSearch>; it is a non-critical enhancement.
   const [constitutionResult, constituteSource, countryOptions] = await Promise.all([
-    captureAtlasSurfaceQuery(() =>
-      getConstitutionWithArticles(slug, { throwOnError: true }),
+    // Each read aborts the cached render when it fails with a configured
+    // database, so no degraded page is cached (PLT-033).
+    captureAtlasSurfaceQuery(
+      () => getConstitutionWithArticles(slug, { throwOnError: true }),
+      { rethrow: isCachedRenderFailure },
     ),
-    getSource("constitute_project").catch(() => null),
-    getFactbookCountryOptions().catch(() => []),
+    getSource("constitute_project").catch(fallbackWithoutDatabase(() => null)),
+    getFactbookCountryOptions().catch(fallbackWithoutDatabase(() => [])),
   ]);
   const constitution = atlasSurfaceQueryValue(constitutionResult);
 

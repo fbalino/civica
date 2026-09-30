@@ -544,6 +544,8 @@ const DERIVED_INPUTS: Readonly<Record<string, string>> = {
     "open content-free error-monitoring records retained for the active alert window",
   "operations.pipeline-alerts":
     "retained production pipeline-run rows and the registered cron schedule contract",
+  "operations.refresh-pages":
+    "the public sitemap generated from the jurisdiction registry and the closed live-page allowlist",
   "operations.health-alerts":
     "content-free application, database, active-map-asset, scheduled-freshness, and optional-model availability states",
 };

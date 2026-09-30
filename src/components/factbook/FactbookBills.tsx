@@ -12,6 +12,7 @@ import {
   isBillsSupportedSlug,
 } from "@/lib/bills/coverage";
 import { FactbookBillAskButton } from "./FactbookBillAskButton";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 /**
  * Factbook · Bills (ATL-013)
@@ -82,7 +83,9 @@ export async function FactbookBills({
   } else {
     try {
       result = await getBillsForJurisdiction(countrySlug, 20);
-    } catch {
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033).
+      rethrowDatabaseFailure(error);
       return (
         <div className="factbook-bills-list">
           <Banner variant="warn" className="factbook-bill-coverage-note">
@@ -134,7 +137,9 @@ export async function FactbookBills({
       for (const r of rows) {
         sourceMap.set(r.id, r.lastSyncAt ? r.lastSyncAt.toISOString() : null);
       }
-    } catch {
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033).
+      rethrowDatabaseFailure(error);
       /* best-effort */
     }
   }
@@ -165,7 +170,9 @@ export async function FactbookBills({
       for (const r of bodyRows) {
         bodyMap.set(r.id, { name: r.name, chamberType: r.chamberType });
       }
-    } catch {
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033).
+      rethrowDatabaseFailure(error);
       /* best-effort */
     }
   }
@@ -180,7 +187,9 @@ export async function FactbookBills({
       .from(bills)
       .where(eq(bills.jurisdictionId, result.jurisdiction.id));
     totalCount = countRows[0] ? Number(countRows[0].count) : null;
-  } catch {
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033).
+    rethrowDatabaseFailure(error);
     /* best-effort */
   }
 

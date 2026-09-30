@@ -15,8 +15,11 @@ import {
   currentVintage,
   disputeSla,
 } from "@/lib/content/site-state";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 // Worked Example 1 (Argentina inflation) derives its threshold from the
 // fact-keys registry rather than retyping it, so the prose can never drift
@@ -121,7 +124,10 @@ export default async function ReconciliationMethodologyPage() {
   let stats: SiteStats | null = null;
   try {
     stats = await getSiteStats();
-  } catch {
+  } catch (error) {
+    // With a configured database a failed read aborts the cached render so
+    // the last good page stays served (PLT-033).
+    rethrowDatabaseFailure(error);
     stats = null;
   }
 

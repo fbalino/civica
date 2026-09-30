@@ -12,7 +12,9 @@ import { deploymentReleaseId } from "@/lib/platform/route-performance-telemetry"
 export const ERROR_MONITORING_VERSION =
   "civica-error-monitoring/v1" as const;
 export const ERROR_MONITORING_RETENTION_DAYS = 90;
-export const ERROR_MONITORING_ALERT_WINDOW_HOURS = 24;
+// The daily monitor looks back 25 hours so a run that starts a little later
+// than the previous day's cannot leave a gap between windows.
+export const ERROR_MONITORING_ALERT_WINDOW_HOURS = 25;
 
 export type ErrorMonitoringSurface = "server" | "client" | "cron" | "script";
 export type ErrorMonitoringStatus = "open" | "resolved";

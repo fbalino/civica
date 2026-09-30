@@ -19,8 +19,11 @@ import {
   deprecation,
 } from "@/lib/content/site-state";
 import { PROVENANCE_COVERAGE_SUMMARY } from "@/lib/claims/provenance-coverage";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "How We Approach Data — Sources & Reconciliation",
@@ -54,7 +57,10 @@ export default async function ApproachPage() {
   let stats: SiteStats | null = null;
   try {
     stats = await getSiteStats();
-  } catch {
+  } catch (error) {
+    // With a configured database a failed read aborts the cached render so
+    // the last good page stays served (PLT-033).
+    rethrowDatabaseFailure(error);
     stats = null;
   }
 

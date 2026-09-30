@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { IntentLink } from "@/components/IntentLink";
 import { CivicaLogo } from "@/components/CivicaLogo";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { tier1Publishers } from "@/lib/content/site-state";
@@ -132,7 +132,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
   }
   return (
     <li>
-      <Link href={link.href}>{link.label}</Link>
+      <IntentLink href={link.href}>{link.label}</IntentLink>
     </li>
   );
 }
@@ -169,7 +169,7 @@ export function SiteFooter() {
             <h2>Accessible. Traceable. Nonpartisan.</h2>
             <p>
               Civica Atlas is free to access. Reuse terms vary by source; see{" "}
-              <Link href={RIGHTS_REGISTRY_PATH}>Licensing</Link> for the
+              <IntentLink href={RIGHTS_REGISTRY_PATH}>Licensing</IntentLink> for the
               current rights posture.
             </p>
           </div>
@@ -257,11 +257,11 @@ export function SiteFooter() {
             © 2026 Civica Atlas · Source-linked data with per-source reuse terms.
           </p>
           <div className="site-footer__legal">
-            <Link href="/privacy">Privacy</Link>
+            <IntentLink href="/privacy">Privacy</IntentLink>
             <span aria-hidden="true">·</span>
-            <Link href="/terms">Terms</Link>
+            <IntentLink href="/terms">Terms</IntentLink>
             <span aria-hidden="true">·</span>
-            <Link href="/licensing">Licensing</Link>
+            <IntentLink href="/licensing">Licensing</IntentLink>
           </div>
         </div>
       </div>

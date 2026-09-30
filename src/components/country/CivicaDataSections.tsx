@@ -13,12 +13,6 @@ export interface CivicaDataSectionItem {
 interface CivicaDataSectionsProps {
   items: CivicaDataSectionItem[];
   footer?: ReactNode;
-  /**
-   * Deep-link target from the URL (`?section=` / `#hash`), resolved server-side
-   * to a real, visible section id. Used only to scroll to that section on load;
-   * every section is always in the DOM and visible.
-   */
-  defaultId: string;
 }
 
 /**
@@ -39,28 +33,28 @@ interface CivicaDataSectionsProps {
  * Deep-linking: on load, a `#hash` or `?section=` naming a visible section
  * scrolls that section into view after paint (an effect, never during render,
  * so SSR and the first client paint agree and never trip a hydration
- * mismatch), then re-anchors once heavy section bodies finish loading.
+ * mismatch), then re-anchors once heavy section bodies finish loading. Both
+ * are read here in the browser, so the server-rendered page is identical for
+ * every visitor and can be served from the page cache (PLT-033).
  */
 export function CivicaDataSections({
   items,
   footer,
-  defaultId,
 }: CivicaDataSectionsProps) {
   const ids = useMemo(() => items.map((i) => i.id), [items]);
 
-  // On mount, honor a deep link. `?section=` is resolved server-side into
-  // `defaultId`; a `#hash` is client-only (never reaches the server), so read
-  // it here too. An EXPLICIT target — a real `#hash` OR a server-resolved
-  // `?section=` (`defaultId` differs from the first section only when the URL
-  // carried one) — always scrolls, first section included. Governance Evidence
-  // is the first section but sits below a tall hero, so a direct hash must
-  // still land on it. Only a plain load with no explicit target skips scroll.
+  // On mount, honor a deep link. An EXPLICIT target — a real `#hash`, or a
+  // `?section=` naming a visible section other than the first — scrolls. A
+  // hash scrolls even to the first section: Evidence Coverage sits below a
+  // tall hero, so a direct hash must still land on it. `?section=` naming the
+  // first section, an unknown section, or a plain load skips the scroll.
   useEffect(() => {
     const hash = window.location.hash.replace(/^#/, "");
+    const section = new URLSearchParams(window.location.search).get("section");
     const explicitTarget = ids.includes(hash)
       ? hash
-      : defaultId && defaultId !== ids[0]
-        ? defaultId
+      : section && ids.includes(section) && section !== ids[0]
+        ? section
         : null;
     if (!explicitTarget) return;
     const scrollToTarget = (): number | null => {

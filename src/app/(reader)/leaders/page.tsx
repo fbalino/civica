@@ -13,8 +13,11 @@ import {
   leaderDirectoryCountSummary,
   type LeaderDirectoryRow,
 } from "@/lib/leaders/directory";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "World Leaders Directory",
@@ -31,8 +34,10 @@ export default async function WorldLeadersDirectoryPage() {
     try {
       rows = await getWorldLeadersDirectory();
       available = true;
-    } catch {
-      // The shell distinguishes a database outage from a verified zero-row result.
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033). Without a configured
+      // database the shell distinguishes an outage from a zero-row result.
+      rethrowDatabaseFailure(error);
     }
   }
   const counts = leaderDirectoryCountSummary(rows);

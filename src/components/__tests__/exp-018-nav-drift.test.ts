@@ -299,15 +299,16 @@ function extractEnclosingTag(src: string, uniqueMarker: string, tag: string): st
 }
 
 test("Explore item accessible name comes from text content on both surfaces, with no aria-label override", () => {
+  // Shared chrome links are IntentLink (next/link with intent-only prefetch).
   const desktopBlock = extractEnclosingTag(
     explorePanelSrc,
     "{item.label}",
-    "Link",
+    "IntentLink",
   );
   const mobileBlock = extractEnclosingTag(
     mobileNavSrc,
     "mobile-menu__explore-copy",
-    "Link",
+    "IntentLink",
   );
 
   // Desktop dropdown items are plain label links, like the sibling menus.

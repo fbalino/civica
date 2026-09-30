@@ -7,6 +7,7 @@ import {
   FactbookAlmanac,
   type FactbookAlmanacCountry,
 } from "@/components/factbook/FactbookAlmanac";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 // /country landing — a full-bleed engraving hero (homepage style) with a
 // centered typeahead + region quick-filter chips, over a dense alphabetical
@@ -20,7 +21,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://civicaatlas.org/country" },
 };
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export default async function CountryIndexPage() {
   let countries: FactbookAlmanacCountry[] = [];
@@ -49,8 +52,10 @@ export default async function CountryIndexPage() {
       };
     });
     catalogAvailable = true;
-  } catch {
-    // DB not connected — render the shell without claiming a zero-row atlas.
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033). Without a configured
+    // database, render the shell without claiming a zero-row atlas.
+    rethrowDatabaseFailure(error);
   }
 
   // FactbookAlmanac seeds shareable region/filter URL state client-side from

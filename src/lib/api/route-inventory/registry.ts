@@ -766,6 +766,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     note: "Vercel Cron entrypoint; requireCronAuth() protects the content-free health report and owner alert check before any component state is read.",
   },
   {
+    filePath: "api/cron/operations/refresh-pages/route.ts",
+    exposure: "cron",
+    methods: ["GET", "POST"],
+    mutation: true,
+    sensitive: true,
+    controls: ["cron-secret"],
+    note: "Vercel Cron entrypoint; requireCronAuth() protects the daily page-cache invalidation and sitemap warm-up before the sitemap is read.",
+  },
+  {
     filePath: "api/governance-evidence/[slug]/route.ts",
     exposure: "public-read",
     methods: ["GET"],

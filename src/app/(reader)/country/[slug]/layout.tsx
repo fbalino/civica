@@ -33,6 +33,7 @@ import { formatGovernmentType } from "@/lib/text/clean";
 import { getCountryGallery, wikimediaUrl } from "@/lib/data/country-photos";
 import { getCountryBounds } from "@/lib/data/country-bounds";
 import { countryHeroPhoto } from "@/lib/data/country-hero-photos";
+import { fallbackWithoutDatabase, rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 function galleryCaption(p: { caption: string; license?: string }): string {
   const license =
@@ -90,11 +91,14 @@ export default async function CountryLayout({
     "population_total",
     "gdp_ppp_usd_billions",
   ]).catch(
-    () =>
-      ({}) as Record<
-        string,
-        import("@/lib/factbook/reconcile/types").ResolverOutput
-      >,
+    // A failed read aborts the cached render (PLT-033).
+    fallbackWithoutDatabase(
+      () =>
+        ({}) as Record<
+          string,
+          import("@/lib/factbook/reconcile/types").ResolverOutput
+        >,
+    ),
   );
 
   const govLabel =
@@ -205,8 +209,10 @@ export default async function CountryLayout({
     officialNameForms = storedForms
       .filter((form) => form.nameRole === "official")
       .map((form) => ({ value: form.value, languageTag: form.languageTag }));
-  } catch {
-    // An outage renders the masthead without source forms; nothing is implied.
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033). Without a configured
+    // database the masthead renders without source forms; nothing is implied.
+    rethrowDatabaseFailure(error);
   }
 
   const countryPath = `/country/${slug}`;

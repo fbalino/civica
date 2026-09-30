@@ -263,7 +263,8 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     id: "route-performance",
     label: "Self-hosted route performance telemetry",
     audiences: ["ordinary-reader", "voluntary-submitter", "owner-admin", "research-reviewer"],
-    trigger: "A production request or registered job completes.",
+    trigger:
+      "A 1-in-20 sample of requests to database-backed API routes, every server error, and every registered job. Page views are not recorded.",
     data:
       "Route template, method, metric, bounded duration/status, cache profile, release identifier, and telemetry version.",
     purpose: "Measure reliability and performance by route class and release.",
@@ -276,6 +277,7 @@ export const PRIVACY_DATA_FLOWS: readonly PrivacyDataFlow[] = [
     providers: ["Neon", "Vercel"],
     sourcePaths: [
       "src/lib/platform/route-performance-telemetry.ts",
+      "src/proxy.ts",
       "src/lib/db/schema.ts",
       "plan/PLT-016-route-performance-telemetry-2026-07-15.md",
     ],

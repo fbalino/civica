@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { IntentLink } from "@/components/IntentLink";
 import { type ReactNode } from "react";
 import { NavLinks } from "@/components/NavLinks";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -33,7 +33,7 @@ export function SiteHeader({
       }}
     >
       {/* Left: Logo */}
-      <Link
+      <IntentLink
         href="/"
         style={{
           cursor: "pointer",
@@ -60,7 +60,7 @@ export function SiteHeader({
             Civica Atlas
           </span>
         </span>
-      </Link>
+      </IntentLink>
 
       {/* Center: Atlas controls or NavLinks */}
       <div

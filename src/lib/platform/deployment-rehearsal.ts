@@ -136,7 +136,7 @@ export const DEPLOYMENT_REHEARSAL_STEPS: readonly DeploymentRehearsalStep[] =
       covers: ["static-assets", "caches", "old-reader-compatibility"],
       requiredBefore: ["stage-validate-release-data"],
       abort: "Stop if the deployed build identity, static artifact hashes, or immutable release URL headers differ from the recorded candidate.",
-      note: "The Vercel build validates only; it must not run db:migrate. Public live data remains no-store and checked artifacts revalidate rather than serve false freshness.",
+      note: "The Vercel build validates only; it must not run db:migrate. Public live API data remains no-store, database-backed pages are cached for at most 24 hours and refreshed daily, and checked artifacts revalidate rather than serve false freshness.",
     },
     {
       id: "stage-smoke",

@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   estimatedRequestPopulation,
+  isRequestTelemetryEligible,
   jobPerformanceObservation,
   requestPerformanceObservation,
   routePerformanceAlerts,
@@ -169,4 +170,22 @@ test("sampling keeps every duration eligible so the stored p95 stays a percentil
     if (shouldRecordRequestPerformanceSample(() => draw)) selected += 1;
   }
   assert.equal(selected, draws.length * ROUTE_PERFORMANCE_REQUEST_SAMPLE_RATE);
+});
+
+test("only request-live route handlers are eligible for request telemetry", () => {
+  // Request-live handlers already query the database in the same request.
+  assert.equal(isRequestTelemetryEligible("/api/v1/countries/france", "GET"), true);
+  assert.equal(isRequestTelemetryEligible("/api/health", "GET"), true);
+  assert.equal(isRequestTelemetryEligible("/api/cron/operations/refresh-pages", "GET"), true);
+  // Cached page documents never write a sample (PLT-033).
+  for (const pathname of ["/", "/country/france", "/country/france/civica-data", "/leaders"]) {
+    assert.equal(isRequestTelemetryEligible(pathname, "GET"), false, pathname);
+  }
+  // Checked artifacts, immutable releases, and unknown API paths read no database.
+  assert.equal(isRequestTelemetryEligible("/api/rights-manifest", "GET"), false);
+  assert.equal(
+    isRequestTelemetryEligible("/downloads/civica-atlas-2026-07-11.json.gz", "GET"),
+    false,
+  );
+  assert.equal(isRequestTelemetryEligible("/api/not-a-route", "GET"), false);
 });

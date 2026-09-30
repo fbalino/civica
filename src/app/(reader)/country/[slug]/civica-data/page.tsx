@@ -46,8 +46,21 @@ import {
 } from "@/lib/atlas/surface-query-state";
 import type { Metadata } from "next";
 import "@/app/civica-data.css";
+import {
+  databaseFailureAbortsRender,
+  fallbackWithoutDatabase,
+  isCachedRenderFailure,
+} from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
+
+// No paths render at build time. Each one renders on its first visit (or the
+// daily warm-up) and is then served from the page cache.
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return [];
+}
 
 // Per-tab metadata. The shared layout's generateMetadata sets the Factbook
 // title + /country/[slug] canonical (correct for the base tab); metadata
@@ -60,7 +73,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  // A database failure throws (PLT-026) so a cached page never records a
+  // "not found" title for a real country.
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) return { title: "Country Not Found" };
   const title = `${jurisdiction.name} — Governance Evidence & Country Data`;
   const description = `Evidence coverage, source-native governance observations, indicator history, government structure, legislature, leaders, bills, and international memberships for ${jurisdiction.name}.`;
@@ -173,15 +188,15 @@ function SourcesStrip({ sources }: { sources: SectionSource[] }) {
 
 export default async function CountryCivicaDataTab({
   params,
-  searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ section?: string }>;
 }) {
   const { slug } = await params;
-  const { section: sectionParam } = await searchParams;
 
-  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  // getJurisdictionBySlug returns null only for a genuinely absent slug; a
+  // database failure throws to the error boundary (PLT-026), so the page cache
+  // never stores a false 404 for a real country.
+  const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
   // Keep a fulfilled empty result distinct from an unavailable query. The
@@ -201,34 +216,63 @@ export default async function CountryCivicaDataTab({
     countryOptions,
     conditionsReleaseResult,
   ] = await Promise.all([
-    captureAtlasSurfaceQuery(() => getGovernanceEvidence(slug)),
-    captureAtlasSurfaceQuery(() =>
-      getCanonicalFactsForJurisdiction(
-        jurisdiction.id,
-        COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
+    // With a configured database any failed read aborts the cached render,
+    // so the page cache keeps the last good page (PLT-033). The unavailable
+    // states below render only in the credential-free build.
+    captureAtlasSurfaceQuery(() => getGovernanceEvidence(slug), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(
+      () =>
+        getCanonicalFactsForJurisdiction(
+          jurisdiction.id,
+          COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
+        ),
+      { rethrow: isCachedRenderFailure },
+    ),
+    captureAtlasSurfaceQuery(() => getIndicatorHistoryForCountry(slug), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(() => getGovernmentStructure(jurisdiction.id), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(() => getLeaderTimeline(jurisdiction.id), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(() => getBillsForJurisdiction(slug, 20), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(() => getCountryOrganizationsData(jurisdiction.id), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(
+      () =>
+        getScoresForJurisdiction(jurisdiction.id, {
+          throwOnError: databaseFailureAbortsRender(),
+        }),
+      {
+        rethrow: (error) =>
+          isCiReleaseConsistencyError(error) || isCachedRenderFailure(error),
+      },
+    ),
+    getSource("wikidata").catch(fallbackWithoutDatabase(() => null)),
+    // Whole sources table → real `last_sync_at` dates for the per-section
+    // Sources strips.
+    getAllSources().catch(
+      fallbackWithoutDatabase(
+        () => [] as Awaited<ReturnType<typeof getAllSources>>,
       ),
     ),
-    captureAtlasSurfaceQuery(() => getIndicatorHistoryForCountry(slug)),
-    captureAtlasSurfaceQuery(() => getGovernmentStructure(jurisdiction.id)),
-    captureAtlasSurfaceQuery(() => getLeaderTimeline(jurisdiction.id)),
-    captureAtlasSurfaceQuery(() => getBillsForJurisdiction(slug, 20)),
-    captureAtlasSurfaceQuery(() => getCountryOrganizationsData(jurisdiction.id)),
-    captureAtlasSurfaceQuery(() => getScoresForJurisdiction(jurisdiction.id), {
-      rethrow: isCiReleaseConsistencyError,
-    }),
-    getSource("wikidata").catch(() => null),
-    // Whole sources table → real `last_sync_at` dates for the per-section
-    // Sources strips. Soft-fails to [] so a Neon hiccup just drops the
-    // dates, never the page.
-    getAllSources().catch(
-      () => [] as Awaited<ReturnType<typeof getAllSources>>,
-    ),
     // Country list for the "Jump to country…" search at the top of the
-    // section nav. Soft-fails to [] so a Neon hiccup just hides the search.
+    // section nav.
     getFactbookCountryOptions().catch(
-      () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>,
+      fallbackWithoutDatabase(
+        () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>,
+      ),
     ),
-    captureAtlasSurfaceQuery(() => getConditionsPublicRelease()),
+    captureAtlasSurfaceQuery(() => getConditionsPublicRelease(), {
+      rethrow: isCachedRenderFailure,
+    }),
   ]);
 
   const governanceEvidence = atlasSurfaceQueryValue(governanceEvidenceResult);
@@ -453,17 +497,6 @@ export default async function CountryCivicaDataTab({
     content: contentById[s.id],
   }));
 
-  // Default to the deep-linked section when it names a visible section, else
-  // Evidence coverage. SSR
-  // paints this section's body.
-  const requestedDefault =
-    sectionParam && visibleSections.some((s) => s.id === sectionParam)
-      ? sectionParam
-      : "evidence-coverage";
-  const defaultId = visibleSections.some((s) => s.id === requestedDefault)
-    ? requestedDefault
-    : visibleSections[0].id;
-
   // --- Citation footer ----------------------------------------------------
   // "Cite this page" box for the Civica Data tab. The data's vintage is the
   // source-native evidence reference year. Source names are deduped across every visible section's
@@ -513,7 +546,6 @@ export default async function CountryCivicaDataTab({
 
         <CivicaDataSections
           items={items}
-          defaultId={defaultId}
           footer={
             <section
               id="cite"

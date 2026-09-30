@@ -1418,3 +1418,33 @@ there retrieved 250 articles). The Mac already runs Pulse clustering and
 classification, so GDELT now depends on the same machine being awake; a
 missed day stays visible in the run ledger and the public source-coverage
 state rather than being backfilled. Durable evidence: `plan/evidence/PUL-044/`.
+
+### APR-D177 — Public pages are cached for a day and refreshed after the daily imports
+
+**Decision:** Owner decision of 2026-09-29, superseding the PLT-014 page rule
+that every database-backed page render per request. Every database-backed
+public page declares `revalidate = 86400` and is served from the page cache.
+The daily `operations.refresh-pages` job (10:00 UTC, after the bills,
+factbook, and Pulse jobs) invalidates every page and re-renders the cacheable
+sitemap URLs. A page stays request-live only when it is listed in
+`LIVE_PAGE_ROUTES` (`src/lib/platform/cache-consistency.ts`): admin and
+coding workspaces behind a signed session, and pages that read per-request
+input such as the query string. API route handlers are unchanged and remain
+`no-store`. Request telemetry is recorded only for request-live API routes,
+and the health monitor runs once a day. `npm run validate:cache-consistency`
+enforces the page rule, the allowlist, and static params under dynamic
+segments.
+
+**Why:** The production database scales to zero after five idle minutes, but
+it was awake every hour of every day: crawlers rendered pages from the
+database several times a minute, the proxy wrote a telemetry row for a 5%
+sample of all requests, and the health monitor ran every 15 minutes. Real
+readers are a few dozen a day. Serving pages from a cache refreshed after the
+day's imports keeps each page at most one day older than the database, which
+is within the correction policy's timelines, and confines database work to a
+few scheduled windows. Accepted consequences: a correction or manual import
+reaches readers at the next daily refresh unless that job is run by hand; a
+render that fails outright keeps the last good page, while a page that
+catches a database error and renders a degraded state can cache that state
+until the next refresh; and a database outage is reported by the owner
+monitor at its next daily run. Durable evidence: `plan/evidence/PLT-033/`.

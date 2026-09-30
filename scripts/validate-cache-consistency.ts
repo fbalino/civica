@@ -8,10 +8,15 @@
  *   4. every App Router page, including its implicit ancestor layouts.
  *
  * Mutable database dependencies are discovered through a cross-file runtime
- * import graph. A database-dependent page route must resolve to an effective
- * literal `revalidate = 0`. Build-only pages remain eligible for static or
- * time-revalidated output. Persistent cache APIs are forbidden in DB query
- * modules, while React's render-pass-only `cache()` remains allowed.
+ * import graph. PLT-033 (APR-D177): a database-dependent page route must
+ * resolve to the effective literal `revalidate = 86400` (the daily cache
+ * backstop behind `operations.refresh-pages`), must not read per-request
+ * input, and must export `generateStaticParams` under a dynamic segment so
+ * Next.js can cache it. The only exceptions are the closed `LIVE_PAGE_ROUTES`
+ * allowlist, whose modules must declare `revalidate = 0`. Build-only pages
+ * remain eligible for static or time-revalidated output. Persistent cache
+ * APIs are forbidden in DB query modules, while React's render-pass-only
+ * `cache()` remains allowed.
  */
 
 import { promises as fs } from "node:fs";
@@ -22,11 +27,16 @@ import ts from "typescript";
 import {
   CACHE_PROFILES,
   EXPORT_FRESHNESS_POLICY,
+  LIVE_PAGE_ROUTES,
+  PAGE_CACHE_REVALIDATE_SECONDS,
   ROUTE_FRESHNESS_POLICY,
   cacheProfileErrors,
   exportFreshnessPolicyErrors,
+  livePageRouteErrors,
   routeFreshnessPolicyErrors,
+  routePathForModule,
   type ExportFreshnessPolicy,
+  type LivePageRoute,
   type RouteFreshnessPolicy,
 } from "../src/lib/platform/cache-consistency";
 import {
@@ -86,6 +96,10 @@ export interface SourceModuleFacts {
   exportedHttpMethods: string[];
   revalidate: RevalidateValue;
   persistentCacheApis: string[];
+  /** Request-time APIs that force a route to render per request. */
+  requestApis: string[];
+  /** True when the module names `searchParams` in code (not comments). */
+  mentionsSearchParams: boolean;
   source: string;
 }
 
@@ -99,6 +113,12 @@ export interface PageRouteObservation {
   routeModules: string[];
   dependencyPath: string[] | null;
   effectiveRevalidate: number | null;
+  /** Witness that the route reads per-request input, or null. */
+  requestInput?: string[] | null;
+  /** The route has a `[param]` segment. */
+  dynamicSegment?: boolean;
+  /** A route module exports `generateStaticParams`. */
+  generatesStaticParams?: boolean;
 }
 
 function posixPath(value: string): string {
@@ -190,6 +210,8 @@ export function inspectSourceModule(
   const exportedAsyncFunctions = new Set<string>();
   const exportedHttpMethods = new Set<string>();
   const persistentCacheApis = new Set<string>();
+  const requestApis = new Set<string>();
+  let mentionsSearchParams = false;
   let revalidate: RevalidateValue = null;
   let revalidateDeclarations = 0;
 
@@ -209,6 +231,22 @@ export function inspectSourceModule(
       const specifier = statement.moduleSpecifier.text;
       if (importHasRuntimeValue(statement)) runtimeImports.add(specifier);
       if (specifier === "next/cache") persistentCacheApis.add("import:next/cache");
+      if (specifier === "next/headers" && importHasRuntimeValue(statement)) {
+        requestApis.add("next/headers");
+      }
+      const bindings = statement.importClause?.namedBindings;
+      if (
+        specifier === "next/server" &&
+        bindings &&
+        ts.isNamedImports(bindings) &&
+        bindings.elements.some(
+          (element) =>
+            !element.isTypeOnly &&
+            (element.propertyName ?? element.name).text === "connection",
+        )
+      ) {
+        requestApis.add("next/server:connection");
+      }
     }
 
     if (
@@ -241,6 +279,15 @@ export function inspectSourceModule(
           exportedAsyncFunctions.add(name);
         }
         if (HTTP_METHODS.has(name)) exportedHttpMethods.add(name);
+        if (
+          name === "dynamic" &&
+          declaration.initializer &&
+          ts.isStringLiteralLike(unwrapExpression(declaration.initializer)) &&
+          (unwrapExpression(declaration.initializer) as ts.StringLiteralLike)
+            .text === "force-dynamic"
+        ) {
+          requestApis.add("dynamic:force-dynamic");
+        }
         if (name === "revalidate") {
           revalidateDeclarations += 1;
           revalidate = declaration.initializer
@@ -268,6 +315,9 @@ export function inspectSourceModule(
   if (revalidateDeclarations > 1) revalidate = "non-literal";
 
   const visit = (node: ts.Node): void => {
+    if (ts.isIdentifier(node) && node.text === "searchParams") {
+      mentionsSearchParams = true;
+    }
     if (
       ts.isCallExpression(node) &&
       node.expression.kind === ts.SyntaxKind.ImportKeyword &&
@@ -318,6 +368,8 @@ export function inspectSourceModule(
     exportedHttpMethods: [...exportedHttpMethods].sort(),
     revalidate,
     persistentCacheApis: [...persistentCacheApis].sort(),
+    requestApis: [...requestApis].sort(),
+    mentionsSearchParams,
     source,
   };
 }
@@ -374,22 +426,108 @@ export function shortestDependencyPath(
   return null;
 }
 
-/** DB-dependent routes must have an effective literal zero revalidation. */
+function liveRouteFor(
+  routeModules: readonly string[],
+  liveRoutes: readonly LivePageRoute[],
+): LivePageRoute | null {
+  return liveRoutes.find((route) => routeModules.includes(route.file)) ?? null;
+}
+
+/**
+ * PLT-033 — a DB-dependent page is either cached (effective literal
+ * revalidate=86400, no request input, static params under a dynamic segment)
+ * or listed in `LIVE_PAGE_ROUTES` and request-live (effective revalidate=0).
+ */
 export function pageRevalidationErrors(
   observations: readonly PageRouteObservation[],
+  liveRoutes: readonly LivePageRoute[] = LIVE_PAGE_ROUTES,
 ): string[] {
   const errors: string[] = [];
   for (const observation of observations) {
     if (!observation.dependencyPath) continue;
-    if (observation.effectiveRevalidate === 0) continue;
+    const dependency = `dependency: ${observation.dependencyPath.join(" -> ")}`;
     const actual =
       observation.effectiveRevalidate === null
         ? "no literal route-level revalidate"
         : `effective revalidate=${observation.effectiveRevalidate}`;
-    errors.push(
-      `${observation.pageFile}: reaches mutable DB data but has ${actual}; ` +
-        `require an effective literal revalidate=0; dependency: ${observation.dependencyPath.join(" -> ")}`,
+    const live = liveRouteFor(observation.routeModules, liveRoutes);
+    if (live) {
+      if (observation.effectiveRevalidate !== 0) {
+        errors.push(
+          `${observation.pageFile}: listed live by ${live.file} but has ${actual}; ` +
+            `require an effective literal revalidate=0; ${dependency}`,
+        );
+      }
+      continue;
+    }
+    if (observation.effectiveRevalidate !== PAGE_CACHE_REVALIDATE_SECONDS) {
+      errors.push(
+        `${observation.pageFile}: reaches mutable DB data but has ${actual}; ` +
+          `require an effective literal revalidate=${PAGE_CACHE_REVALIDATE_SECONDS} ` +
+          `or a LIVE_PAGE_ROUTES entry; ${dependency}`,
+      );
+    }
+    if (observation.requestInput) {
+      errors.push(
+        `${observation.pageFile}: declared cached but reads per-request input, so Next.js renders it on every request; ` +
+          `move the input to the client or add a LIVE_PAGE_ROUTES entry; request input: ${observation.requestInput.join(" -> ")}`,
+      );
+    }
+    if (observation.dynamicSegment && !observation.generatesStaticParams) {
+      errors.push(
+        `${observation.pageFile}: cached page under a dynamic segment must export generateStaticParams ` +
+          `(an empty list renders each path on first visit and caches it)`,
+      );
+    }
+  }
+  return errors.sort();
+}
+
+/**
+ * Close the live-page allowlist against the observed pages: every entry
+ * must declare revalidate=0 itself, wrap at least one DB-dependent page,
+ * stay inside its declared path, and (for request-input entries) still read
+ * request input on every page it covers.
+ */
+export function livePageCoverageErrors(
+  observations: readonly PageRouteObservation[],
+  factsByFile: ReadonlyMap<string, Pick<SourceModuleFacts, "revalidate">>,
+  liveRoutes: readonly LivePageRoute[] = LIVE_PAGE_ROUTES,
+): string[] {
+  const errors: string[] = [];
+  for (const route of liveRoutes) {
+    const facts = factsByFile.get(route.file);
+    if (!facts) {
+      errors.push(`${route.file}: live page entry has no module on disk`);
+      continue;
+    }
+    if (facts.revalidate !== 0) {
+      errors.push(`${route.file}: live page entry must declare revalidate = 0`);
+    }
+    const covered = observations.filter(
+      (observation) =>
+        observation.dependencyPath &&
+        observation.routeModules.includes(route.file),
     );
+    if (covered.length === 0) {
+      errors.push(`${route.file}: stale live page entry wraps no DB-dependent page`);
+    }
+    for (const observation of covered) {
+      const pagePath = routePathForModule(observation.pageFile);
+      if (
+        pagePath !== route.routePath &&
+        !pagePath.startsWith(`${route.routePath}/`)
+      ) {
+        errors.push(
+          `${route.file}: wraps ${pagePath}, outside its declared ${route.routePath}`,
+        );
+      }
+      if (route.reason === "request-input" && !observation.requestInput) {
+        errors.push(
+          `${observation.pageFile}: live for request input but reads none; cache it with revalidate=${PAGE_CACHE_REVALIDATE_SECONDS}`,
+        );
+      }
+    }
   }
   return errors.sort();
 }
@@ -1277,19 +1415,46 @@ async function main(): Promise<void> {
     }
   }
 
+  const requestApiRoots = new Set(
+    facts
+      .filter((item) => item.requestApis.length > 0)
+      .map((item) => item.filePath),
+  );
   const pageFiles = pageSurfaceFiles(files);
   const pageObservations = pageFiles.map((pageFile) => {
     const routeModules = routeModulesForPage(pageFile, files);
+    const pageFacts = factsByFile.get(pageFile);
+    const requestInput = pageFacts?.mentionsSearchParams
+      ? [`${pageFile} (searchParams)`]
+      : shortestDependencyPath(graph.edges, routeModules, requestApiRoots)?.map(
+          (file, index, witness) =>
+            index === witness.length - 1
+              ? `${file} (${factsByFile.get(file)?.requestApis.join(", ")})`
+              : file,
+        ) ?? null;
     return {
       pageFile,
       routeModules,
       dependencyPath: shortestDependencyPath(graph.edges, routeModules, dbRoots),
       effectiveRevalidate: effectiveRevalidate(routeModules, factsByFile),
+      requestInput,
+      dynamicSegment: /\[[^\]]+\]/.test(pageFile),
+      generatesStaticParams: routeModules.some((file) =>
+        factsByFile.get(file)?.exportedValueNames.includes("generateStaticParams"),
+      ),
     } satisfies PageRouteObservation;
   });
   errors.push(
+    ...livePageRouteErrors().map((error) => `[live-pages] ${error}`),
+  );
+  errors.push(
     ...pageRevalidationErrors(pageObservations).map(
       (error) => `[pages] ${error}`,
+    ),
+  );
+  errors.push(
+    ...livePageCoverageErrors(pageObservations, factsByFile).map(
+      (error) => `[live-pages] ${error}`,
     ),
   );
 
@@ -1297,8 +1462,11 @@ async function main(): Promise<void> {
     (observation) => observation.dependencyPath,
   );
   const buildOnlyPages = pageObservations.length - dbDependentPages.length;
+  const livePages = dbDependentPages.filter((observation) =>
+    liveRouteFor(observation.routeModules, LIVE_PAGE_ROUTES),
+  );
 
-  console.log("=== Civica cache consistency validation (PLT-014) ===\n");
+  console.log("=== Civica cache consistency validation (PLT-014, PLT-033) ===\n");
   console.log(
     `API methods: ${diskMethodKeys.length} repository-owned; ${ROUTE_FRESHNESS_POLICY.length} declared`,
   );
@@ -1307,7 +1475,7 @@ async function main(): Promise<void> {
     `DB query functions: ${queryFunctions.length} across ${queryModules.length} module(s); persistent caching forbidden`,
   );
   console.log(
-    `Page surfaces: ${pageObservations.length}; ${dbDependentPages.length} DB-dependent; ${buildOnlyPages} build-only`,
+    `Page surfaces: ${pageObservations.length}; ${dbDependentPages.length} DB-dependent (${dbDependentPages.length - livePages.length} cached at revalidate=${PAGE_CACHE_REVALIDATE_SECONDS}, ${livePages.length} request-live); ${buildOnlyPages} build-only`,
   );
   console.log(`Mutable DB roots: ${[...dbRoots].sort().join(", ")}`);
 

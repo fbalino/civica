@@ -3,10 +3,10 @@ import { sql } from "drizzle-orm";
 import {
   CRON_JOB_DEFINITIONS,
 } from "@/lib/api/cron-job-registry";
-import { latestCronScheduleSlot } from "@/lib/api/cron-schedule";
 import { db } from "@/lib/db";
 import { CIVICA_MAP_BASE_STYLE } from "@/lib/map/civica-map-style";
 import {
+  expectedPipelineSlotsPastGrace,
   loadPipelineAlertRows,
   pipelineAlerts,
   type PipelineAlert,
@@ -87,16 +87,14 @@ function isConfigured(value: string | undefined): boolean {
 }
 
 function expectedPipelineSlots(now: Date): ReadonlyMap<string, Date> {
-  return new Map(
+  return expectedPipelineSlotsPastGrace(
     CRON_JOB_DEFINITIONS.filter(
       (definition) =>
         !definition.retired &&
         definition.schedule &&
         !definition.id.startsWith("operations."),
-    ).map((definition) => [
-      definition.id,
-      latestCronScheduleSlot(definition.schedule!, now),
-    ]),
+    ).map((definition) => ({ id: definition.id, schedule: definition.schedule! })),
+    now,
   );
 }
 
@@ -320,7 +318,7 @@ export function healthHttpStatus(report: HealthStatusReport): 200 | 503 {
 /**
  * Translate a health report into the manual Incident.io publish decision.
  * A core application/database failure publishes immediately. Other reader
- * impact must appear in two consecutive 15-minute monitor executions before
+ * impact must appear in two consecutive daily monitor executions before
  * publication, avoiding an incident for a single transient probe failure.
  */
 export function statusPageDecision(

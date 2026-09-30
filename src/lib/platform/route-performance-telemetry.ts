@@ -250,6 +250,22 @@ export function requestPerformanceObservation(
 }
 
 /**
+ * PLT-033 — only request-live route handlers (`public-live` or
+ * `private-live`) are eligible for request telemetry. Those handlers already
+ * query the database in the same request, so the sampled write never wakes an
+ * idle database. Page documents are served from the page cache and are never
+ * recorded; neither are checked artifacts, immutable downloads, or unknown
+ * API paths, none of which read the database.
+ */
+export function isRequestTelemetryEligible(
+  pathname: string,
+  method: string,
+): boolean {
+  const { cacheProfile } = classifyRoutePerformanceRequest(pathname, method);
+  return cacheProfile === "public-live" || cacheProfile === "private-live";
+}
+
+/**
  * Decide whether one request contributes a stored observation. The random
  * source is injected so the decision is exercisable without stubbing globals,
  * and an unusable draw fails closed rather than becoming a write.

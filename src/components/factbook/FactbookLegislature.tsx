@@ -13,6 +13,7 @@ import {
 } from "@/lib/legislatures/seat-attribution";
 import { FactbookLegislatureChart } from "./FactbookLegislatureChart";
 import "./legislature.css";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 export interface FactbookLegislatureProps {
   jurisdictionId: string;
@@ -47,6 +48,12 @@ export async function FactbookLegislature({
     getLegislatureForJurisdiction(jurisdictionId),
     getLegislatureContext(jurisdictionId),
   ]);
+  // A failed read aborts the cached render (PLT-033); the unavailable states
+  // below render only without a configured database.
+  if (dataResult.status === "rejected") rethrowDatabaseFailure(dataResult.reason);
+  if (contextResult.status === "rejected") {
+    rethrowDatabaseFailure(contextResult.reason);
+  }
   const compositionUnavailable = dataResult.status === "rejected";
   const electionContextUnavailable = contextResult.status === "rejected";
   const data = dataResult.status === "fulfilled" ? dataResult.value : null;

@@ -250,7 +250,7 @@ export function ciScriptGraphErrors(scripts: PackageScripts): string[] {
     "build:ci": "npm run --ignore-scripts build",
     "validate:claims-docs": "tsx scripts/validate-claims-docs.ts",
     "validate:cache-consistency":
-      "node --import tsx --test src/lib/platform/cache-consistency.test.ts src/lib/api/response-cache.test.ts src/lib/api/problem-response.test.ts scripts/validate-cache-consistency.test.ts && tsx scripts/validate-cache-consistency.ts",
+      "node --import tsx --test src/lib/platform/cache-consistency.test.ts src/lib/platform/cached-render.test.ts src/lib/api/response-cache.test.ts src/lib/api/problem-response.test.ts scripts/validate-cache-consistency.test.ts && tsx scripts/validate-cache-consistency.ts",
     "validate:release-consistency":
       "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts && npm run validate:deployment-rehearsal",
     "validate:query-budgets":

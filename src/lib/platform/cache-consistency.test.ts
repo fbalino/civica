@@ -5,12 +5,16 @@ import type { RouteInventoryEntry } from "@/lib/api/route-inventory/registry";
 import {
   CACHE_PROFILES,
   EXPORT_FRESHNESS_POLICY,
+  PAGE_CACHE_REVALIDATE_SECONDS,
   ROUTE_FRESHNESS_POLICY,
   buildRouteFreshnessPolicy,
   cacheControlFor,
   cacheProfileErrors,
   exportFreshnessPolicyErrors,
+  isLivePagePath,
+  livePageRouteErrors,
   routeFreshnessPolicyErrors,
+  routePathForModule,
   type CacheProfile,
   type CacheProfileId,
   type ExportFreshnessPolicy,
@@ -166,4 +170,53 @@ test("canonical export policies are closed and seeded release drift is rejected"
   ]);
   assert.ok(errors.some((error) => /duplicate export id/.test(error)));
   assert.ok(errors.some((error) => /a release export must be immutable/.test(error)));
+});
+
+test("page module paths drop route groups and map to their URL path", () => {
+  assert.equal(routePathForModule("src/app/page.tsx"), "/");
+  assert.equal(
+    routePathForModule("src/app/(reader)/country/[slug]/civica-data/page.tsx"),
+    "/country/[slug]/civica-data",
+  );
+  assert.equal(routePathForModule("src/app/(admin)/layout.tsx"), "/");
+  assert.equal(routePathForModule("src/app/sitemap.ts"), "/");
+});
+
+test("live page paths cover a layout subtree but only the exact page path", () => {
+  assert.equal(isLivePagePath("/admin/messages/42"), true);
+  assert.equal(isLivePagePath("/compare"), true);
+  assert.equal(isLivePagePath("/compare/"), true);
+  assert.equal(isLivePagePath("/constitution"), true);
+  assert.equal(isLivePagePath("/country/france/constitution"), false);
+  assert.equal(isLivePagePath("/country/france"), false);
+  assert.equal(isLivePagePath("/"), false);
+});
+
+test("the checked live-page allowlist is internally consistent", () => {
+  assert.deepEqual(livePageRouteErrors(), []);
+  assert.equal(PAGE_CACHE_REVALIDATE_SECONDS, 86400);
+});
+
+test("seeded live-page allowlist defects fail closed", () => {
+  assert.deepEqual(
+    livePageRouteErrors([
+      {
+        file: "src/app/rankings/page.tsx",
+        routePath: "/rankings/all",
+        reason: "request-input",
+        note: "Filters.",
+      },
+      {
+        file: "src/app/about/page.tsx",
+        routePath: "/about",
+        reason: "private-session",
+        note: " ",
+      },
+    ]),
+    [
+      "src/app/rankings/page.tsx: routePath /rankings/all does not match /rankings",
+      "src/app/about/page.tsx: private-session pages must live under /admin",
+      "src/app/about/page.tsx: live page entry needs a note",
+    ],
+  );
 });

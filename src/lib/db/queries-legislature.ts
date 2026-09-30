@@ -16,6 +16,7 @@ import {
   isPrimaryElectionEvent,
 } from "@/lib/elections/corpus-audit-runtime";
 import { loadLiveElectionContentFingerprints } from "@/lib/elections/corpus-audit-live";
+import { fallbackWithoutDatabase } from "@/lib/platform/cached-render";
 
 /**
  * Section-scoped queries for the deepened Civica Data → Legislature section.
@@ -109,9 +110,9 @@ function yearOf(value: unknown): string | null {
 /**
  * Loads the supplementary legislature context for one jurisdiction.
  *
- * Always returns a well-formed object (never throws to the caller — callers
- * should still `.catch(() => null)` defensively). Every field can be null /
- * empty, which the UI renders as an absent cell rather than a placeholder.
+ * Returns a well-formed object in which every field can be null / empty,
+ * which the UI renders as an absent cell rather than a placeholder. A failed
+ * database read throws when a database is configured (PLT-033).
  */
 export async function getLegislatureContext(
   jurisdictionId: string,
@@ -257,7 +258,11 @@ export async function getLegislatureContext(
     }
   });
 
-  const partySyncAt = await getPartySourceSyncAt().catch(() => null);
+  // A failed read throws when a database is configured, so a cached country
+  // page never stores a legislature without its sync date (PLT-033).
+  const partySyncAt = await getPartySourceSyncAt().catch(
+    fallbackWithoutDatabase(() => null),
+  );
 
   return {
     keyFacts: {

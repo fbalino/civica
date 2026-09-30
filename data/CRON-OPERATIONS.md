@@ -98,6 +98,73 @@ Dry runs never advance freshness. A monitoring or verification job may expose
 `healthOk: false` separately from its execution outcome so operators can tell
 "the check ran" from "the checked system is healthy."
 
+### Daily operations window (PLT-033)
+
+Reader-facing jobs and monitors that run every day share one morning window
+so the production database is busy once and can suspend the rest of the day:
+
+| UTC | Job |
+| --- | --- |
+| 08:00–09:00 | Pulse ingest (every connector except GDELT), cluster, classify (locked on Vercel), score |
+| 09:15 | `pulse.v2.review-sla` |
+| 10:00 | `operations.refresh-pages` |
+| 10:15 | `operations.health-alerts` (also dispatches recoveries) |
+| 10:20 | `operations.error-alerts` (open events seen in the last 25 hours) |
+| 10:30 | `operations.pipeline-alerts` |
+
+The data imports keep their own earlier slots (01:00–06:30 UTC daily, plus
+monthly and quarterly publisher syncs). The owner-Mac Pulse runner (APR-D176) is not a
+Vercel job: it retrieves GDELT, clusters, classifies, and calls the score
+route later in the day, so it wakes the database once more, and the Pulse
+results it produces reach the cached pages at the next day's 10:00 refresh
+unless `operations.refresh-pages` is run by hand after it. The review-SLA deadlines themselves
+are timestamps and are evaluated exactly on every read; the daily monitor
+records escalation events and logs alerts once a day, so an item queued after
+09:15 is first flagged the next morning. A critical item (24-hour deadline)
+queued after 09:15 can therefore be past its deadline when first flagged.
+
+### Daily page refresh (PLT-033)
+
+Database-backed public pages are served from the page cache and declare a
+24-hour `revalidate` backstop (APR-D177). `operations.refresh-pages` runs at
+10:00 UTC, after the day's bills, factbook, and Pulse jobs. It reads the
+sitemap, calls `revalidatePath("/", "layout")` so every cached page is marked
+for re-rendering, then requests each cacheable sitemap URL: same origin, no
+query string, and not listed in `LIVE_PAGE_ROUTES`.
+
+- Four workers each spend at least two seconds per URL, so at most two page
+  renders start per second. That keeps the database load bounded even though
+  Vercel re-renders an invalidated page in the background, and it stays far
+  below the 600-requests-per-minute firewall ceiling.
+- Each request times out after 45 seconds. No warm request starts after 560
+  seconds; a URL left over is still invalidated and renders on its next
+  visit.
+- A cached page rethrows a failed database read whenever a database is
+  configured (`src/lib/platform/cached-render.ts`), so a failed render never
+  replaces the cached page with an "unavailable" state; Next.js keeps serving
+  the previous good copy. Because Vercel re-renders an invalidated page in
+  the background after answering with the stale copy, every page answered
+  `STALE` is requested again after the first pass (250 ms pacing, nothing new
+  after 640 seconds). A second `STALE` means its re-render failed.
+- Every non-200 response, timeout, network error, and page still `STALE` is
+  a failed page. The response reports `rowsRead` (targets), `rowsWritten`
+  (pages refreshed), `rowsRejected` (failed pages), `pagesStaleAfterRefresh`,
+  `pagesSkipped`, `pagesUnverified`, the failure counts by status, and up to
+  25 failed paths, which are also written to the runtime log.
+- The run fails with `502 pages_not_refreshed` when more than 1% of attempted
+  pages failed, and with `502 warm_unavailable` when none refreshed; a
+  sitemap with no country pages, or a configured database that fails while
+  building it, is also a failed run. `operations.pipeline-alerts` reports a
+  failed run.
+- `?dryRun=1` (with an `Idempotency-Key`) lists the targets without
+  invalidating or requesting anything.
+- The job is excluded from automatic recovery because it can run for about
+  eleven minutes. A missed or failed day is covered by the pages' own 24-hour
+  backstop; re-run it manually with a new key after a large manual import.
+
+At 849 sitemap URLs on 2026-09-29, about 830 are warm targets, so a run takes
+roughly seven to nine minutes.
+
 ### Atlas history identity
 
 Scheduled Atlas writers that append public change history require a deliberate
@@ -190,14 +257,18 @@ and truncate operations are rejected.
 
 ## Automatic scheduled recovery
 
-The existing `operations.health-alerts` run also checks for bounded recovery
-work every 15 minutes. It re-delivers only an existing scheduled execution that
+The daily `operations.health-alerts` run (10:15 UTC) also checks for bounded
+recovery work. It re-delivers only an existing scheduled execution that
 is still within 48 hours, has attempts remaining, and is either an expired
 running attempt or a failed attempt with a closed transient outcome
 (`upstream_timeout`, `upstream_rate_limited`, `upstream_unavailable`,
 `upstream_network_error`, or `pipeline_observability_unavailable`). The first
-retry waits 15 minutes and the second waits 60 minutes; the shared three-attempt
-cap remains authoritative. Each health run dispatches at most four executions.
+retry waits at least 15 minutes and the second at least 60 minutes; because the
+monitor runs daily, each retry in practice happens at the next 10:15 UTC run.
+The shared three-attempt cap remains authoritative, and the 48-hour window
+leaves room for two daily retries. Each health run dispatches at most four
+executions, so after a broad overnight outage some jobs wait a further day or
+simply recover at their own next scheduled slot.
 
 Before acquiring a target, the destination route reads the retained row again
 and rejects a missing, repaired, capped, non-transient, or currently leased
@@ -227,8 +298,9 @@ release-quality validator or any publication gate.
 
 The health and pipeline monitors also use existing cron execution outcomes as
 a content-free transition ledger. Health incidents open after two consecutive
-non-core observations (core application/database outages open immediately),
-repeat at most once per 24 hours while unchanged, and emit one recovery line.
+daily non-core observations (core application/database outages open on the
+first run), repeat on each daily run while unchanged, and emit one recovery
+line.
 Pipeline alert sets open immediately, repeat after 72 hours while unchanged,
 and emit one recovery line. These transitions suppress duplicate Runtime Log
 lines without hiding current health payloads or changing pipeline-alert HTTP

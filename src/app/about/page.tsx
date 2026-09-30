@@ -14,8 +14,11 @@ import {
   PROJECT_DISCLOSURE_ARTIFACT_PATH,
   PROJECT_DISCLOSURE_PUBLIC_SECTIONS,
 } from "@/lib/research/project-disclosure";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "About — A Provenance-First Reference Atlas",
@@ -90,9 +93,10 @@ export default async function AboutPage() {
   let dbSources: Awaited<ReturnType<typeof getAllSources>> = [];
   try {
     dbSources = await getAllSources();
-  } catch {
-    // Keep the institutional/about copy available when the database is down.
-    // The source roster and its count are omitted rather than rendered as zero.
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033). Without a configured
+    // database the source roster and its count are omitted, not shown as zero.
+    rethrowDatabaseFailure(error);
   }
   const sourcesForDisplay = dbSources.map((source) => ({
     id: source.id,

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { IntentLink } from "@/components/IntentLink";
 
 import {
   EXPLORE_NAV_GROUPS,
@@ -39,7 +39,7 @@ export function ExploreMenuPanel({
               {group.label}
             </p>
             {group.items.map((item) => (
-              <Link
+              <IntentLink
                 key={item.href}
                 href={item.href}
                 className={`nav-dropdown-item explore-item ${
@@ -48,7 +48,7 @@ export function ExploreMenuPanel({
                 onClick={onNavigate}
               >
                 {item.label}
-              </Link>
+              </IntentLink>
             ))}
           </div>
         );

@@ -6,8 +6,11 @@ import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 import "./not-found.css";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
-export const revalidate = 0;
+// Cached for a day; the daily operations.refresh-pages job re-renders it
+// after the day's imports (PLT-033).
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "Page Not Found — 404",
@@ -84,7 +87,9 @@ export default async function NotFound() {
       iso3: c.iso3,
       capital: readCachedFieldFromRow(c, "capital"),
     }));
-  } catch {
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033).
+    rethrowDatabaseFailure(error);
     countries = [];
   }
 

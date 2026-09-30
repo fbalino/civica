@@ -1,12 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import type { RouteFreshnessPolicy } from "../src/lib/platform/cache-consistency";
+import type {
+  LivePageRoute,
+  RouteFreshnessPolicy,
+} from "../src/lib/platform/cache-consistency";
 import {
   buildImportGraph,
   exportModuleCoverageErrors,
   inspectSourceModule,
   inspectHandlerCacheProfile,
+  livePageCoverageErrors,
   pageRevalidationErrors,
   routeMethodCoverageErrors,
   shortestDependencyPath,
@@ -139,50 +143,187 @@ test("import graph terminates cycles and reports unresolved local runtime edges"
   );
 });
 
-test("only DB-dependent pages require effective revalidate zero", () => {
+const LIVE_FIXTURES: LivePageRoute[] = [
+  {
+    file: "src/app/(admin)/layout.tsx",
+    routePath: "/admin",
+    reason: "private-session",
+    note: "Admin workspace.",
+  },
+  {
+    file: "src/app/filtered/page.tsx",
+    routePath: "/filtered",
+    reason: "request-input",
+    note: "Filters come from the query string.",
+  },
+];
+
+function dbPage(
+  pageFile: string,
+  overrides: Partial<PageRouteObservation> = {},
+): PageRouteObservation {
+  return {
+    pageFile,
+    routeModules: [pageFile],
+    dependencyPath: [pageFile, "src/lib/db/index.ts"],
+    effectiveRevalidate: 86400,
+    requestInput: null,
+    dynamicSegment: false,
+    generatesStaticParams: false,
+    ...overrides,
+  };
+}
+
+test("DB-dependent pages require the daily cache literal unless listed live", () => {
   const observations: PageRouteObservation[] = [
-    {
-      pageFile: "src/app/live/page.tsx",
-      routeModules: ["src/app/live/page.tsx"],
-      dependencyPath: ["src/app/live/page.tsx", "src/lib/db/index.ts"],
-      effectiveRevalidate: 3600,
-    },
-    {
-      pageFile: "src/app/live-zero/page.tsx",
-      routeModules: ["src/app/live-zero/page.tsx"],
-      dependencyPath: ["src/app/live-zero/page.tsx", "src/lib/db/index.ts"],
+    dbPage("src/app/hourly/page.tsx", { effectiveRevalidate: 3600 }),
+    dbPage("src/app/still-zero/page.tsx", { effectiveRevalidate: 0 }),
+    dbPage("src/app/cached/page.tsx"),
+    dbPage("src/app/(admin)/admin/page.tsx", {
+      routeModules: ["src/app/(admin)/admin/page.tsx", "src/app/(admin)/layout.tsx"],
       effectiveRevalidate: 0,
-    },
+    }),
     {
       pageFile: "src/app/static/page.tsx",
       routeModules: ["src/app/static/page.tsx"],
       dependencyPath: null,
-      effectiveRevalidate: 86400,
-    },
-  ];
-
-  const errors = pageRevalidationErrors(observations);
-  assert.equal(errors.length, 1);
-  assert.match(errors[0], /src\/app\/live\/page\.tsx/);
-  assert.match(errors[0], /effective revalidate=3600/);
-  assert.doesNotMatch(errors[0], /static/);
-});
-
-test("a newly discovered DB-backed page without a freshness declaration fails closed", () => {
-  const observations: PageRouteObservation[] = [
-    {
-      pageFile: "src/app/new-live-page/page.tsx",
-      routeModules: ["src/app/new-live-page/page.tsx"],
-      dependencyPath: [
-        "src/app/new-live-page/page.tsx",
-        "src/lib/db/index.ts",
-      ],
       effectiveRevalidate: null,
     },
   ];
 
-  assert.deepEqual(pageRevalidationErrors(observations), [
-    "src/app/new-live-page/page.tsx: reaches mutable DB data but has no literal route-level revalidate; require an effective literal revalidate=0; dependency: src/app/new-live-page/page.tsx -> src/lib/db/index.ts",
+  const errors = pageRevalidationErrors(observations, LIVE_FIXTURES);
+  assert.equal(errors.length, 2);
+  assert.match(errors[0], /src\/app\/hourly\/page\.tsx/);
+  assert.match(errors[0], /effective revalidate=3600/);
+  assert.match(errors[1], /src\/app\/still-zero\/page\.tsx/);
+  assert.match(errors[1], /require an effective literal revalidate=86400/);
+});
+
+test("a listed live page must stay request-live", () => {
+  assert.deepEqual(
+    pageRevalidationErrors(
+      [
+        dbPage("src/app/(admin)/admin/page.tsx", {
+          routeModules: [
+            "src/app/(admin)/admin/page.tsx",
+            "src/app/(admin)/layout.tsx",
+          ],
+        }),
+      ],
+      LIVE_FIXTURES,
+    ).map((error) => error.split(";")[0]),
+    [
+      "src/app/(admin)/admin/page.tsx: listed live by src/app/(admin)/layout.tsx but has effective revalidate=86400",
+    ],
+  );
+});
+
+test("a cached page that reads request input fails closed", () => {
+  const errors = pageRevalidationErrors(
+    [
+      dbPage("src/app/quietly-dynamic/page.tsx", {
+        requestInput: ["src/app/quietly-dynamic/page.tsx (searchParams)"],
+      }),
+    ],
+    LIVE_FIXTURES,
+  );
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /declared cached but reads per-request input/);
+});
+
+test("a cached page under a dynamic segment must export generateStaticParams", () => {
+  const errors = pageRevalidationErrors(
+    [
+      dbPage("src/app/things/[slug]/page.tsx", { dynamicSegment: true }),
+      dbPage("src/app/others/[slug]/page.tsx", {
+        dynamicSegment: true,
+        generatesStaticParams: true,
+      }),
+    ],
+    LIVE_FIXTURES,
+  );
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /things\/\[slug\].*must export generateStaticParams/);
+});
+
+test("a newly discovered DB-backed page without a freshness declaration fails closed", () => {
+  assert.deepEqual(
+    pageRevalidationErrors(
+      [dbPage("src/app/new-live-page/page.tsx", { effectiveRevalidate: null })],
+      LIVE_FIXTURES,
+    ),
+    [
+      "src/app/new-live-page/page.tsx: reaches mutable DB data but has no literal route-level revalidate; require an effective literal revalidate=86400 or a LIVE_PAGE_ROUTES entry; dependency: src/app/new-live-page/page.tsx -> src/lib/db/index.ts",
+    ],
+  );
+});
+
+test("the live-page allowlist rejects stale, undeclared, and no-longer-dynamic entries", () => {
+  const facts = new Map([
+    ["src/app/(admin)/layout.tsx", { revalidate: 0 as const }],
+    ["src/app/filtered/page.tsx", { revalidate: 86400 }],
+  ]);
+  const errors = livePageCoverageErrors(
+    [dbPage("src/app/filtered/page.tsx", { effectiveRevalidate: 86400 })],
+    facts,
+    LIVE_FIXTURES,
+  );
+  assert.deepEqual(errors, [
+    "src/app/(admin)/layout.tsx: stale live page entry wraps no DB-dependent page",
+    "src/app/filtered/page.tsx: live for request input but reads none; cache it with revalidate=86400",
+    "src/app/filtered/page.tsx: live page entry must declare revalidate = 0",
+  ]);
+});
+
+test("a live layout may not wrap a page outside its declared subtree", () => {
+  const errors = livePageCoverageErrors(
+    [
+      dbPage("src/app/(admin)/public-leak/page.tsx", {
+        routeModules: [
+          "src/app/(admin)/public-leak/page.tsx",
+          "src/app/(admin)/layout.tsx",
+        ],
+        effectiveRevalidate: 0,
+      }),
+    ],
+    new Map([["src/app/(admin)/layout.tsx", { revalidate: 0 as const }]]),
+    [LIVE_FIXTURES[0]],
+  );
+  assert.deepEqual(errors, [
+    "src/app/(admin)/layout.tsx: wraps /public-leak, outside its declared /admin",
+  ]);
+});
+
+test("source inspection records request-time APIs but not comments or type-only imports", () => {
+  const page = inspectSourceModule(
+    "src/app/example/page.tsx",
+    `
+      // searchParams used to live here.
+      import type { cookies } from "next/headers";
+      export default async function Page() { return null; }
+    `,
+  );
+  assert.equal(page.mentionsSearchParams, false);
+  assert.deepEqual(page.requestApis, []);
+
+  const live = inspectSourceModule(
+    "src/app/live/layout.tsx",
+    `
+      import { connection } from "next/server";
+      import { headers } from "next/headers";
+      export const dynamic = "force-dynamic";
+      export default async function Layout({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+        await connection();
+        await headers();
+        return (await searchParams).q;
+      }
+    `,
+  );
+  assert.equal(live.mentionsSearchParams, true);
+  assert.deepEqual(live.requestApis, [
+    "dynamic:force-dynamic",
+    "next/headers",
+    "next/server:connection",
   ]);
 });
 

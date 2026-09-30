@@ -16,6 +16,7 @@ import {
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { Banner } from "@/components/editorial/Banner";
 import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 const countryEngravingDir = join(process.cwd(), "public", "engravings", "countries");
 
@@ -89,7 +90,9 @@ export async function HomeGrid() {
       }).value,
       status: c.jurisdictionStatus,
     }));
-  } catch {
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033).
+    rethrowDatabaseFailure(error);
     catalogAvailable = false;
   }
 
@@ -115,7 +118,10 @@ export async function HomeGrid() {
         incomeByJur[id] =
           resolved[id]?.["world_bank_income_group"]?.canonical?.factValue ?? null;
       }
-    } catch {}
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033).
+      rethrowDatabaseFailure(error);
+    }
   }
 
   const catalogCount = countries.length || null;

@@ -8,7 +8,7 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
+import { IntentLink } from "@/components/IntentLink";
 import { ArrowUpRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -171,10 +171,10 @@ function MenuOverlay({
       <div className="mobile-menu__wash" aria-hidden="true" />
 
       <header className="mobile-menu__header">
-        <Link className="mobile-menu__brand" href="/">
+        <IntentLink className="mobile-menu__brand" href="/">
           {logoSlot}
           <span>Civica Atlas</span>
-        </Link>
+        </IntentLink>
         <span className="mobile-menu__folio">Navigation · Reference atlas</span>
         <div className="mobile-menu__header-actions">
           <ThemeToggle />
@@ -244,14 +244,14 @@ function MenuOverlay({
           />
           <nav className="mobile-menu__editorial-links" aria-label="Editorial">
             {EDITORIAL_NAV_ITEMS.map((item) => (
-              <Link
+              <IntentLink
                 key={item.href}
                 href={item.href}
                 className={isActive(item.href) ? "is-active" : ""}
               >
                 <span>{item.label}</span>
                 <small>{item.descriptor}</small>
-              </Link>
+              </IntentLink>
             ))}
           </nav>
         </aside>
@@ -269,7 +269,7 @@ function MenuOverlay({
         </a>
         <nav className="mobile-menu__utility" aria-label="Reference and legal">
           {UTILITY_LINKS.map((item) => (
-            <Link key={item.href} href={item.href}>{item.label}</Link>
+            <IntentLink key={item.href} href={item.href}>{item.label}</IntentLink>
           ))}
         </nav>
         <span className="mobile-menu__edition">Civica Atlas · 2026 edition</span>
@@ -286,7 +286,7 @@ function ExploreLink({
   active: boolean;
 }) {
   return (
-    <Link
+    <IntentLink
       href={item.href}
       className={`mobile-menu__explore-link${active ? " is-active" : ""}`}
     >
@@ -299,7 +299,7 @@ function ExploreLink({
         aria-hidden="true"
         focusable="false"
       />
-    </Link>
+    </IntentLink>
   );
 }
 
@@ -318,22 +318,22 @@ function MenuLinkGroup({
 }) {
   return (
     <section className="mobile-menu__link-group mobile-menu__reveal">
-      <Link
+      <IntentLink
         className={`mobile-menu__link-group-title${groupActive ? " is-active" : ""}`}
         href={href}
       >
         {title}<span aria-hidden="true">→</span>
-      </Link>
+      </IntentLink>
       <nav aria-label={title}>
         {items.map((item) => (
-          <Link
+          <IntentLink
             key={item.href}
             href={item.href}
             className={isActive(item.href) ? "is-active" : ""}
           >
             <span>{item.label}</span>
             <small>{item.descriptor}</small>
-          </Link>
+          </IntentLink>
         ))}
       </nav>
     </section>

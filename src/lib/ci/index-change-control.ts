@@ -458,6 +458,12 @@ export function indexProtectedFileHash(
         '    "content-free application, database, active-map-asset, scheduled-freshness, and optional-model availability states",\n',
       "",
     );
+    // PLT-033 adds the daily page-cache refresh job; it reads no Index input.
+    normalized = normalized.replace(
+      '  "operations.refresh-pages":\n' +
+        '    "the public sitemap generated from the jurisdiction registry and the closed live-page allowlist",\n',
+      "",
+    );
     normalized = normalized
       .replace(
         '  "operations.error-alerts":\n' +
@@ -473,6 +479,21 @@ export function indexProtectedFileHash(
   if (path === "src/lib/data/production-adapter-registry.ts") {
     normalized = normalized.replace(
       /    \{\n      id: "atlas\.organization-memberships",\n      product: "atlas",\n      sources: \["civica_organization_roster_v1"\],\n      canonicalNpmScript: "sync:organization-memberships",\n      entrypoint: "scripts\/sync-organization-memberships\.ts",\n      implementationPaths: \[\n        "scripts\/sync-organization-memberships\.ts",\n        "src\/lib\/organizations\/membership-release\.ts",\n      \],\n    \},\n/g,
+      "",
+    );
+    // PLT-033 adds the daily page-cache refresh job; it reads no Index input.
+    normalized = normalized.replace(
+      `    {
+      id: "operations.refresh-pages",
+      route: "/api/cron/operations/refresh-pages",
+      inputKind: "derived",
+      sources: [],
+      implementationPaths: [
+        "src/app/api/cron/operations/refresh-pages/route.ts",
+        "src/lib/platform/page-refresh.ts",
+      ],
+    },
+`,
       "",
     );
     normalized = normalized.replace(
