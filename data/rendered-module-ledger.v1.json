@@ -437,6 +437,35 @@
       }
     },
     {
+      "id": "src/app/(admin)/admin/advisory-applications/[id]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/advisory-applications/[id]",
+      "routeSource": "src/app/(admin)/admin/advisory-applications/[id]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(admin)/admin/advisory-applications/[id]/page.tsx:src/components/MobileNav.tsx",
       "route": "/admin/advisory-applications/[id]",
       "routeSource": "src/app/(admin)/admin/advisory-applications/[id]/page.tsx",
@@ -1133,6 +1162,35 @@
       }
     },
     {
+      "id": "src/app/(admin)/admin/advisory-applications/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/advisory-applications",
+      "routeSource": "src/app/(admin)/admin/advisory-applications/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(admin)/admin/advisory-applications/page.tsx:src/components/MobileNav.tsx",
       "route": "/admin/advisory-applications",
       "routeSource": "src/app/(admin)/admin/advisory-applications/page.tsx",
@@ -1746,6 +1804,35 @@
       "route": "/admin/corrections/[id]",
       "routeSource": "src/app/(admin)/admin/corrections/[id]/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(admin)/admin/corrections/[id]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/corrections/[id]",
+      "routeSource": "src/app/(admin)/admin/corrections/[id]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -2467,6 +2554,35 @@
       }
     },
     {
+      "id": "src/app/(admin)/admin/corrections/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/corrections",
+      "routeSource": "src/app/(admin)/admin/corrections/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(admin)/admin/corrections/page.tsx:src/components/MobileNav.tsx",
       "route": "/admin/corrections",
       "routeSource": "src/app/(admin)/admin/corrections/page.tsx",
@@ -3105,6 +3221,35 @@
       }
     },
     {
+      "id": "src/app/(admin)/admin/data-disputes/[id]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/data-disputes/[id]",
+      "routeSource": "src/app/(admin)/admin/data-disputes/[id]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(admin)/admin/data-disputes/[id]/page.tsx:src/components/MobileNav.tsx",
       "route": "/admin/data-disputes/[id]",
       "routeSource": "src/app/(admin)/admin/data-disputes/[id]/page.tsx",
@@ -3718,6 +3863,35 @@
       "route": "/admin/data-disputes/audit",
       "routeSource": "src/app/(admin)/admin/data-disputes/audit/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(admin)/admin/data-disputes/audit/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/data-disputes/audit",
+      "routeSource": "src/app/(admin)/admin/data-disputes/audit/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -4439,6 +4613,35 @@
       }
     },
     {
+      "id": "src/app/(admin)/admin/data-disputes/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/data-disputes",
+      "routeSource": "src/app/(admin)/admin/data-disputes/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(admin)/admin/data-disputes/page.tsx:src/components/MobileNav.tsx",
       "route": "/admin/data-disputes",
       "routeSource": "src/app/(admin)/admin/data-disputes/page.tsx",
@@ -5052,6 +5255,35 @@
       "route": "/admin/messages/[id]",
       "routeSource": "src/app/(admin)/admin/messages/[id]/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(admin)/admin/messages/[id]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/messages/[id]",
+      "routeSource": "src/app/(admin)/admin/messages/[id]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -5773,6 +6005,35 @@
       }
     },
     {
+      "id": "src/app/(admin)/admin/messages/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/messages",
+      "routeSource": "src/app/(admin)/admin/messages/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(admin)/admin/messages/page.tsx:src/components/MobileNav.tsx",
       "route": "/admin/messages",
       "routeSource": "src/app/(admin)/admin/messages/page.tsx",
@@ -6357,6 +6618,35 @@
       "route": "/admin",
       "routeSource": "src/app/(admin)/admin/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(admin)/admin/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin",
+      "routeSource": "src/app/(admin)/admin/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -7024,6 +7314,35 @@
       "route": "/admin/pulse-review/[id]",
       "routeSource": "src/app/(admin)/admin/pulse-review/[id]/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(admin)/admin/pulse-review/[id]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/pulse-review/[id]",
+      "routeSource": "src/app/(admin)/admin/pulse-review/[id]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -7774,6 +8093,35 @@
       }
     },
     {
+      "id": "src/app/(admin)/admin/pulse-review/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/pulse-review",
+      "routeSource": "src/app/(admin)/admin/pulse-review/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(admin)/admin/pulse-review/page.tsx:src/components/MobileNav.tsx",
       "route": "/admin/pulse-review",
       "routeSource": "src/app/(admin)/admin/pulse-review/page.tsx",
@@ -8358,6 +8706,35 @@
       "route": "/admin/pulse-coding/sign-in",
       "routeSource": "src/app/(coding-auth)/admin/pulse-coding/sign-in/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(coding-auth)/admin/pulse-coding/sign-in/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/pulse-coding/sign-in",
+      "routeSource": "src/app/(coding-auth)/admin/pulse-coding/sign-in/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -9108,6 +9485,35 @@
       }
     },
     {
+      "id": "src/app/(coding)/admin/pulse-coding/assignments/[id]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/pulse-coding/assignments/[id]",
+      "routeSource": "src/app/(coding)/admin/pulse-coding/assignments/[id]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(coding)/admin/pulse-coding/assignments/[id]/page.tsx:src/components/MobileNav.tsx",
       "route": "/admin/pulse-coding/assignments/[id]",
       "routeSource": "src/app/(coding)/admin/pulse-coding/assignments/[id]/page.tsx",
@@ -9721,6 +10127,35 @@
       "route": "/admin/pulse-coding/exports",
       "routeSource": "src/app/(coding)/admin/pulse-coding/exports/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(coding)/admin/pulse-coding/exports/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/pulse-coding/exports",
+      "routeSource": "src/app/(coding)/admin/pulse-coding/exports/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -10388,6 +10823,35 @@
       "route": "/admin/pulse-coding",
       "routeSource": "src/app/(coding)/admin/pulse-coding/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(coding)/admin/pulse-coding/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/pulse-coding",
+      "routeSource": "src/app/(coding)/admin/pulse-coding/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -11084,6 +11548,35 @@
       "route": "/admin/pulse-coding/participants",
       "routeSource": "src/app/(coding)/admin/pulse-coding/participants/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(coding)/admin/pulse-coding/participants/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/pulse-coding/participants",
+      "routeSource": "src/app/(coding)/admin/pulse-coding/participants/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -11809,6 +12302,35 @@
       "route": "/atlas",
       "routeSource": "src/app/(reader)/atlas/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/atlas/page.tsx:src/components/IntentLink.tsx",
+      "route": "/atlas",
+      "routeSource": "src/app/(reader)/atlas/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -12675,6 +13197,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-conditions/methodology/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-conditions/methodology",
+      "routeSource": "src/app/(reader)/civica-conditions/methodology/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-conditions/methodology/page.tsx:src/components/MobileNav.tsx",
       "route": "/civica-conditions/methodology",
       "routeSource": "src/app/(reader)/civica-conditions/methodology/page.tsx",
@@ -13313,6 +13864,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-index/corrections/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/corrections",
+      "routeSource": "src/app/(reader)/civica-index/corrections/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-index/corrections/page.tsx:src/components/MobileNav.tsx",
       "route": "/civica-index/corrections",
       "routeSource": "src/app/(reader)/civica-index/corrections/page.tsx",
@@ -13839,6 +14419,35 @@
       "route": "/civica-index/government-types",
       "routeSource": "src/app/(reader)/civica-index/government-types/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/civica-index/government-types/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/government-types",
+      "routeSource": "src/app/(reader)/civica-index/government-types/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -14593,6 +15202,35 @@
       "route": "/civica-index/methodology",
       "routeSource": "src/app/(reader)/civica-index/methodology/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/civica-index/methodology/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/methodology",
+      "routeSource": "src/app/(reader)/civica-index/methodology/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -15488,6 +16126,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/methodology/pca-appendix",
+      "routeSource": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx:src/components/methodology/EigenvalueChart.tsx",
       "route": "/civica-index/methodology/pca-appendix",
       "routeSource": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
@@ -16358,6 +17025,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-index/methodology/peer-grouping/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/methodology/peer-grouping",
+      "routeSource": "src/app/(reader)/civica-index/methodology/peer-grouping/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-index/methodology/peer-grouping/page.tsx:src/components/MobileNav.tsx",
       "route": "/civica-index/methodology/peer-grouping",
       "routeSource": "src/app/(reader)/civica-index/methodology/peer-grouping/page.tsx",
@@ -17116,6 +17812,35 @@
       "route": "/civica-index/methodology/power-transfer-ledger",
       "routeSource": "src/app/(reader)/civica-index/methodology/power-transfer-ledger/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/civica-index/methodology/power-transfer-ledger/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/methodology/power-transfer-ledger",
+      "routeSource": "src/app/(reader)/civica-index/methodology/power-transfer-ledger/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -17928,6 +18653,35 @@
       "route": "/civica-index/methodology/pulse/backtest",
       "routeSource": "src/app/(reader)/civica-index/methodology/pulse/backtest/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/civica-index/methodology/pulse/backtest/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/methodology/pulse/backtest",
+      "routeSource": "src/app/(reader)/civica-index/methodology/pulse/backtest/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -18852,6 +19606,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-index/methodology/pulse/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/methodology/pulse",
+      "routeSource": "src/app/(reader)/civica-index/methodology/pulse/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-index/methodology/pulse/page.tsx:src/components/MobileNav.tsx",
       "route": "/civica-index/methodology/pulse",
       "routeSource": "src/app/(reader)/civica-index/methodology/pulse/page.tsx",
@@ -19577,6 +20360,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-index/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index",
+      "routeSource": "src/app/(reader)/civica-index/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/civica-index-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/civica-index-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/civica-index-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/civica-index-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-index/page.tsx:src/components/MobileNav.tsx",
       "route": "/civica-index",
       "routeSource": "src/app/(reader)/civica-index/page.tsx",
@@ -20219,6 +21031,35 @@
       "route": "/civica-index/pulse-changelog",
       "routeSource": "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/civica-index/pulse-changelog/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/pulse-changelog",
+      "routeSource": "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -21172,6 +22013,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-index/replication/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/replication",
+      "routeSource": "src/app/(reader)/civica-index/replication/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-index/replication/page.tsx:src/components/MobileNav.tsx",
       "route": "/civica-index/replication",
       "routeSource": "src/app/(reader)/civica-index/replication/page.tsx",
@@ -21698,6 +22568,35 @@
       "route": "/civica-index/widget",
       "routeSource": "src/app/(reader)/civica-index/widget/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/civica-index/widget/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-index/widget",
+      "routeSource": "src/app/(reader)/civica-index/widget/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -23492,6 +24391,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/country/[slug]/civica-data/page.tsx:src/components/IntentLink.tsx",
+      "route": "/country/[slug]/civica-data",
+      "routeSource": "src/app/(reader)/country/[slug]/civica-data/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/country/[slug]/civica-data/page.tsx:src/components/jurisdiction/JurisdictionStatusDisclosure.tsx",
       "route": "/country/[slug]/civica-data",
       "routeSource": "src/app/(reader)/country/[slug]/civica-data/page.tsx",
@@ -24971,6 +25899,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/country/[slug]/constitution/page.tsx:src/components/IntentLink.tsx",
+      "route": "/country/[slug]/constitution",
+      "routeSource": "src/app/(reader)/country/[slug]/constitution/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/country/[slug]/constitution/page.tsx:src/components/jurisdiction/JurisdictionStatusDisclosure.tsx",
       "route": "/country/[slug]/constitution",
       "routeSource": "src/app/(reader)/country/[slug]/constitution/page.tsx",
@@ -26421,6 +27378,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/country/[slug]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/country/[slug]",
+      "routeSource": "src/app/(reader)/country/[slug]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/country/[slug]/page.tsx:src/components/jurisdiction/JurisdictionStatusDisclosure.tsx",
       "route": "/country/[slug]",
       "routeSource": "src/app/(reader)/country/[slug]/page.tsx",
@@ -27291,6 +28277,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/country/methodology/reconciliation/disputes/page.tsx:src/components/IntentLink.tsx",
+      "route": "/country/methodology/reconciliation/disputes",
+      "routeSource": "src/app/(reader)/country/methodology/reconciliation/disputes/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/country/methodology/reconciliation/disputes/page.tsx:src/components/MobileNav.tsx",
       "route": "/country/methodology/reconciliation/disputes",
       "routeSource": "src/app/(reader)/country/methodology/reconciliation/disputes/page.tsx",
@@ -28074,6 +29089,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/country/methodology/reconciliation/page.tsx:src/components/IntentLink.tsx",
+      "route": "/country/methodology/reconciliation",
+      "routeSource": "src/app/(reader)/country/methodology/reconciliation/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/country/methodology/reconciliation/page.tsx:src/components/MobileNav.tsx",
       "route": "/country/methodology/reconciliation",
       "routeSource": "src/app/(reader)/country/methodology/reconciliation/page.tsx",
@@ -28687,6 +29731,35 @@
       "route": "/country",
       "routeSource": "src/app/(reader)/country/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/country/page.tsx:src/components/IntentLink.tsx",
+      "route": "/country",
+      "routeSource": "src/app/(reader)/country/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -29495,6 +30568,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/governance-change/page.tsx:src/components/IntentLink.tsx",
+      "route": "/governance-change",
+      "routeSource": "src/app/(reader)/governance-change/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/governance-change/page.tsx:src/components/MobileNav.tsx",
       "route": "/governance-change",
       "routeSource": "src/app/(reader)/governance-change/page.tsx",
@@ -30278,6 +31380,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/leaders/page.tsx:src/components/IntentLink.tsx",
+      "route": "/leaders",
+      "routeSource": "src/app/(reader)/leaders/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/leaders/page.tsx:src/components/leaders/WorldLeadersDirectoryClient.tsx",
       "route": "/leaders",
       "routeSource": "src/app/(reader)/leaders/page.tsx",
@@ -31036,6 +32167,35 @@
       "route": "/methodology/approach",
       "routeSource": "src/app/(reader)/methodology/approach/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/methodology/approach/page.tsx:src/components/IntentLink.tsx",
+      "route": "/methodology/approach",
+      "routeSource": "src/app/(reader)/methodology/approach/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -31873,6 +33033,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/methodology/case-studies/page.tsx:src/components/IntentLink.tsx",
+      "route": "/methodology/case-studies",
+      "routeSource": "src/app/(reader)/methodology/case-studies/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/methodology/case-studies/page.tsx:src/components/MobileNav.tsx",
       "route": "/methodology/case-studies",
       "routeSource": "src/app/(reader)/methodology/case-studies/page.tsx",
@@ -32656,6 +33845,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/methodology/page.tsx:src/components/IntentLink.tsx",
+      "route": "/methodology",
+      "routeSource": "src/app/(reader)/methodology/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/methodology-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/methodology-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/methodology-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/methodology-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/methodology/page.tsx:src/components/MobileNav.tsx",
       "route": "/methodology",
       "routeSource": "src/app/(reader)/methodology/page.tsx",
@@ -33385,6 +34603,35 @@
       "route": "/methodology/provenance-coverage",
       "routeSource": "src/app/(reader)/methodology/provenance-coverage/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/methodology/provenance-coverage/page.tsx:src/components/IntentLink.tsx",
+      "route": "/methodology/provenance-coverage",
+      "routeSource": "src/app/(reader)/methodology/provenance-coverage/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -34164,6 +35411,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/methodology/source-coverage/page.tsx:src/components/IntentLink.tsx",
+      "route": "/methodology/source-coverage",
+      "routeSource": "src/app/(reader)/methodology/source-coverage/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/methodology/source-coverage/page.tsx:src/components/MobileNav.tsx",
       "route": "/methodology/source-coverage",
       "routeSource": "src/app/(reader)/methodology/source-coverage/page.tsx",
@@ -34748,6 +36024,35 @@
       "route": "/organizations/[slug]",
       "routeSource": "src/app/(reader)/organizations/[slug]/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/organizations/[slug]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/organizations/[slug]",
+      "routeSource": "src/app/(reader)/organizations/[slug]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -35386,6 +36691,35 @@
       "route": "/organizations",
       "routeSource": "src/app/(reader)/organizations/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/organizations/page.tsx:src/components/IntentLink.tsx",
+      "route": "/organizations",
+      "routeSource": "src/app/(reader)/organizations/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -36165,6 +37499,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/policies/page.tsx:src/components/IntentLink.tsx",
+      "route": "/policies",
+      "routeSource": "src/app/(reader)/policies/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/policies/page.tsx:src/components/MobileNav.tsx",
       "route": "/policies",
       "routeSource": "src/app/(reader)/policies/page.tsx",
@@ -36861,6 +38224,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/report-data-issue/page.tsx:src/components/IntentLink.tsx",
+      "route": "/report-data-issue",
+      "routeSource": "src/app/(reader)/report-data-issue/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/report-data-issue/page.tsx:src/components/MobileNav.tsx",
       "route": "/report-data-issue",
       "routeSource": "src/app/(reader)/report-data-issue/page.tsx",
@@ -37503,6 +38895,35 @@
       "route": "/about/advisory-board/apply",
       "routeSource": "src/app/about/advisory-board/apply/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/about/advisory-board/apply/page.tsx:src/components/IntentLink.tsx",
+      "route": "/about/advisory-board/apply",
+      "routeSource": "src/app/about/advisory-board/apply/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -38282,6 +39703,35 @@
       }
     },
     {
+      "id": "src/app/about/advisory-board/page.tsx:src/components/IntentLink.tsx",
+      "route": "/about/advisory-board",
+      "routeSource": "src/app/about/advisory-board/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/advisory-board-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/advisory-board-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/advisory-board-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/advisory-board-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/about/advisory-board/page.tsx:src/components/MobileNav.tsx",
       "route": "/about/advisory-board",
       "routeSource": "src/app/about/advisory-board/page.tsx",
@@ -38837,6 +40287,35 @@
       "route": "/about",
       "routeSource": "src/app/about/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/about/page.tsx:src/components/IntentLink.tsx",
+      "route": "/about",
+      "routeSource": "src/app/about/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -39529,6 +41008,35 @@
       }
     },
     {
+      "id": "src/app/accessibility/page.tsx:src/components/IntentLink.tsx",
+      "route": "/accessibility",
+      "routeSource": "src/app/accessibility/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/accessibility/page.tsx:src/components/MobileNav.tsx",
       "route": "/accessibility",
       "routeSource": "src/app/accessibility/page.tsx",
@@ -40171,6 +41679,35 @@
       "route": "/admin/sign-in",
       "routeSource": "src/app/admin/sign-in/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/admin/sign-in/page.tsx:src/components/IntentLink.tsx",
+      "route": "/admin/sign-in",
+      "routeSource": "src/app/admin/sign-in/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -40892,6 +42429,35 @@
       }
     },
     {
+      "id": "src/app/api-docs/page.tsx:src/components/IntentLink.tsx",
+      "route": "/api-docs",
+      "routeSource": "src/app/api-docs/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/api-docs-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/api-docs-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/api-docs-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/api-docs-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/api-docs/page.tsx:src/components/MobileNav.tsx",
       "route": "/api-docs",
       "routeSource": "src/app/api-docs/page.tsx",
@@ -41559,6 +43125,35 @@
       }
     },
     {
+      "id": "src/app/blog/[slug]/page.tsx:src/components/IntentLink.tsx",
+      "route": "/blog/[slug]",
+      "routeSource": "src/app/blog/[slug]/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/blog/[slug]/page.tsx:src/components/MobileNav.tsx",
       "route": "/blog/[slug]",
       "routeSource": "src/app/blog/[slug]/page.tsx",
@@ -42143,6 +43738,35 @@
       "route": "/blog",
       "routeSource": "src/app/blog/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/record-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/record-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/record-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/record-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/blog/page.tsx:src/components/IntentLink.tsx",
+      "route": "/blog",
+      "routeSource": "src/app/blog/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -42868,6 +44492,35 @@
       "route": "/civica-conditions",
       "routeSource": "src/app/civica-conditions/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/civica-conditions/page.tsx:src/components/IntentLink.tsx",
+      "route": "/civica-conditions",
+      "routeSource": "src/app/civica-conditions/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -44198,6 +45851,35 @@
       }
     },
     {
+      "id": "src/app/compare/page.tsx:src/components/IntentLink.tsx",
+      "route": "/compare",
+      "routeSource": "src/app/compare/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/compare/page.tsx:src/components/jurisdiction/JurisdictionStatusDisclosure.tsx",
       "route": "/compare",
       "routeSource": "src/app/compare/page.tsx",
@@ -45271,6 +46953,35 @@
       }
     },
     {
+      "id": "src/app/constitution/page.tsx:src/components/IntentLink.tsx",
+      "route": "/constitution",
+      "routeSource": "src/app/constitution/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/constitution/page.tsx:src/components/MobileNav.tsx",
       "route": "/constitution",
       "routeSource": "src/app/constitution/page.tsx",
@@ -46112,6 +47823,35 @@
       }
     },
     {
+      "id": "src/app/constitution/search/page.tsx:src/components/IntentLink.tsx",
+      "route": "/constitution/search",
+      "routeSource": "src/app/constitution/search/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/constitution/search/page.tsx:src/components/MobileNav.tsx",
       "route": "/constitution/search",
       "routeSource": "src/app/constitution/search/page.tsx",
@@ -46783,6 +48523,35 @@
       "route": "/contact",
       "routeSource": "src/app/contact/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/contact/page.tsx:src/components/IntentLink.tsx",
+      "route": "/contact",
+      "routeSource": "src/app/contact/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -47910,6 +49679,35 @@
       }
     },
     {
+      "id": "src/app/design-system/page.tsx:src/components/IntentLink.tsx",
+      "route": "/design-system",
+      "routeSource": "src/app/design-system/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/design-system/page.tsx:src/components/MobileNav.tsx",
       "route": "/design-system",
       "routeSource": "src/app/design-system/page.tsx",
@@ -48639,6 +50437,35 @@
       "route": "/elections",
       "routeSource": "src/app/elections/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/elections/page.tsx:src/components/IntentLink.tsx",
+      "route": "/elections",
+      "routeSource": "src/app/elections/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -49418,6 +51245,35 @@
       }
     },
     {
+      "id": "src/app/elections/systems/page.tsx:src/components/IntentLink.tsx",
+      "route": "/elections/systems",
+      "routeSource": "src/app/elections/systems/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/elections/systems/page.tsx:src/components/MobileNav.tsx",
       "route": "/elections/systems",
       "routeSource": "src/app/elections/systems/page.tsx",
@@ -50114,6 +51970,35 @@
       }
     },
     {
+      "id": "src/app/error.tsx:src/components/IntentLink.tsx",
+      "route": "/__error__",
+      "routeSource": "src/app/error.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/error.tsx:src/components/MobileNav.tsx",
       "route": "/__error__",
       "routeSource": "src/app/error.tsx",
@@ -50640,6 +52525,35 @@
       "route": "/__global_error__",
       "routeSource": "src/app/global-error.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/global-error.tsx:src/components/IntentLink.tsx",
+      "route": "/__global_error__",
+      "routeSource": "src/app/global-error.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -51220,6 +53134,35 @@
       "route": "/glossary",
       "routeSource": "src/app/glossary/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/glossary/page.tsx:src/components/IntentLink.tsx",
+      "route": "/glossary",
+      "routeSource": "src/app/glossary/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -52086,6 +54029,35 @@
       }
     },
     {
+      "id": "src/app/governance-evidence/page.tsx:src/components/IntentLink.tsx",
+      "route": "/governance-evidence",
+      "routeSource": "src/app/governance-evidence/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/governance-evidence/page.tsx:src/components/MobileNav.tsx",
       "route": "/governance-evidence",
       "routeSource": "src/app/governance-evidence/page.tsx",
@@ -52898,6 +54870,35 @@
       }
     },
     {
+      "id": "src/app/licensing/page.tsx:src/components/IntentLink.tsx",
+      "route": "/licensing",
+      "routeSource": "src/app/licensing/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/licensing/page.tsx:src/components/MobileNav.tsx",
       "route": "/licensing",
       "routeSource": "src/app/licensing/page.tsx",
@@ -53424,6 +55425,35 @@
       "route": "/__not_found__",
       "routeSource": "src/app/not-found.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/error-404-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/error-404-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/error-404-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/error-404-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/not-found.tsx:src/components/IntentLink.tsx",
+      "route": "/__not_found__",
+      "routeSource": "src/app/not-found.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -54120,6 +56150,35 @@
       "route": "/",
       "routeSource": "src/app/page.tsx",
       "moduleSource": "src/components/home/HomeGrid.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/home-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/home-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/home-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/home-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/page.tsx:src/components/IntentLink.tsx",
+      "route": "/",
+      "routeSource": "src/app/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -54874,6 +56933,35 @@
       "route": "/parties",
       "routeSource": "src/app/parties/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/parties/page.tsx:src/components/IntentLink.tsx",
+      "route": "/parties",
+      "routeSource": "src/app/parties/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -55885,6 +57973,35 @@
       }
     },
     {
+      "id": "src/app/privacy/page.tsx:src/components/IntentLink.tsx",
+      "route": "/privacy",
+      "routeSource": "src/app/privacy/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/privacy/page.tsx:src/components/MobileNav.tsx",
       "route": "/privacy",
       "routeSource": "src/app/privacy/page.tsx",
@@ -56498,6 +58615,35 @@
       "route": "/rankings",
       "routeSource": "src/app/rankings/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/rankings/page.tsx:src/components/IntentLink.tsx",
+      "route": "/rankings",
+      "routeSource": "src/app/rankings/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -57339,6 +59485,35 @@
       "route": "/terms",
       "routeSource": "src/app/terms/page.tsx",
       "moduleSource": "src/components/GlobalSearchWrapper.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/terms/page.tsx:src/components/IntentLink.tsx",
+      "route": "/terms",
+      "routeSource": "src/app/terms/page.tsx",
+      "moduleSource": "src/components/IntentLink.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
