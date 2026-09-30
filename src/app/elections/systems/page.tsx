@@ -6,6 +6,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { PageHero } from "@/components/PageHero";
 import ElectoralSystemsClient from "./ElectoralSystemsClient";
 import type { SystemKey, SystemCountry } from "@/lib/elections/electoral-systems";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
@@ -41,6 +42,8 @@ export default async function ElectoralSystemsPage() {
     buckets = await getElectoralSystemBuckets();
     dataAvailable = true;
   } catch (err) {
+    // A failed read aborts the cached render (PLT-033).
+    rethrowDatabaseFailure(err);
     dataError =
       "Electoral-system classifications are temporarily unavailable. The explanatory material remains available below.";
     console.error("[elections/systems] classification query failed:", err);
@@ -53,6 +56,7 @@ export default async function ElectoralSystemsPage() {
         ? source.lastSyncAt.toISOString()
         : null;
     } catch (err) {
+      rethrowDatabaseFailure(err);
       console.error("[elections/systems] source freshness query failed:", err);
     }
   }

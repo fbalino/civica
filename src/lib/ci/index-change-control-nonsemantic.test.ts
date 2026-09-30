@@ -2,11 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import {
-  PLT_032_PAGE_CACHE_EDITS,
-  indexProtectedFileHash,
-  sha256,
-} from "./index-change-control";
+import { indexProtectedFileHash, sha256 } from "./index-change-control";
 
 const path = "src/lib/db/queries.ts";
 const currentSource = readFileSync(path, "utf8");
@@ -298,12 +294,9 @@ test("the serverless Index-ingest client is excluded from method drift", () => {
 test("the Atlas-only Bills coverage state is excluded from Index semantic drift", () => {
   const pagePath = "src/app/(reader)/country/[slug]/civica-data/page.tsx";
   const currentPage = readFileSync(pagePath, "utf8");
-  const priorPage = (PLT_032_PAGE_CACHE_EDITS[pagePath] ?? []).reduce(
-    (source, [current, prior]) => source.replace(current, prior),
-    currentPage.replace(
-      '  const hasBills = billsResult.status === "available";\n',
-      "  const hasBills = false;\n",
-    ),
+  const priorPage = currentPage.replace(
+    '  const hasBills = billsResult.status === "available";\n',
+    "  const hasBills = false;\n",
   );
   assert.notEqual(currentPage, priorPage);
   assert.equal(
@@ -318,30 +311,3 @@ test("the Atlas-only Bills coverage state is excluded from Index semantic drift"
   );
 });
 
-test("PLT-033 page-cache edits to protected reader pages are excluded from Index semantic drift", () => {
-  for (const [pagePath, edits] of Object.entries(PLT_032_PAGE_CACHE_EDITS)) {
-    const currentPage = readFileSync(pagePath, "utf8");
-    let priorPage = currentPage;
-    for (const [current, prior] of edits) {
-      assert.ok(currentPage.includes(current), `${pagePath} lacks a PLT-033 edit`);
-      priorPage = priorPage.replace(current, prior);
-    }
-    if (pagePath.endsWith("civica-data/page.tsx")) {
-      priorPage = priorPage.replace(
-        '  const hasBills = billsResult.status === "available";\n',
-        "  const hasBills = false;\n",
-      );
-    }
-    assert.notEqual(currentPage, priorPage);
-    assert.equal(indexProtectedFileHash(pagePath, currentPage), sha256(priorPage));
-
-    const unrelatedEdit = currentPage.replace(
-      "export const revalidate = 86400;",
-      "export const revalidate = 3600;",
-    );
-    assert.notEqual(
-      indexProtectedFileHash(pagePath, unrelatedEdit),
-      indexProtectedFileHash(pagePath, currentPage),
-    );
-  }
-});

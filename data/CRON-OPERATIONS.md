@@ -111,14 +111,26 @@ query string, and not listed in `LIVE_PAGE_ROUTES`.
   renders start per second. That keeps the database load bounded even though
   Vercel re-renders an invalidated page in the background, and it stays far
   below the 600-requests-per-minute firewall ceiling.
-- Each request times out after 45 seconds. No new request starts after 640
+- Each request times out after 45 seconds. No warm request starts after 560
   seconds; a URL left over is still invalidated and renders on its next
-  visit. The response reports `rowsRead` (targets), `rowsWritten` (pages
-  warmed), `rowsRejected` (failed requests), and `pagesSkipped`.
-- A sitemap with no country pages, or a configured database that fails while
-  building it, is a failed run. A run in which no page warms returns
-  `502 warm_unavailable`. Many failed pages make the pipeline row
-  `anomalous`, which `operations.pipeline-alerts` reports.
+  visit.
+- A cached page rethrows a failed database read whenever a database is
+  configured (`src/lib/platform/cached-render.ts`), so a failed render never
+  replaces the cached page with an "unavailable" state; Next.js keeps serving
+  the previous good copy. Because Vercel re-renders an invalidated page in
+  the background after answering with the stale copy, every page answered
+  `STALE` is requested again after the first pass (250 ms pacing, nothing new
+  after 640 seconds). A second `STALE` means its re-render failed.
+- Every non-200 response, timeout, network error, and page still `STALE` is
+  a failed page. The response reports `rowsRead` (targets), `rowsWritten`
+  (pages refreshed), `rowsRejected` (failed pages), `pagesStaleAfterRefresh`,
+  `pagesSkipped`, `pagesUnverified`, the failure counts by status, and up to
+  25 failed paths, which are also written to the runtime log.
+- The run fails with `502 pages_not_refreshed` when more than 1% of attempted
+  pages failed, and with `502 warm_unavailable` when none refreshed; a
+  sitemap with no country pages, or a configured database that fails while
+  building it, is also a failed run. `operations.pipeline-alerts` reports a
+  failed run.
 - `?dryRun=1` (with an `Idempotency-Key`) lists the targets without
   invalidating or requesting anything.
 - The job is excluded from automatic recovery because it can run for about

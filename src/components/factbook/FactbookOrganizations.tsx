@@ -7,6 +7,7 @@ import {
 import { SourceDot } from "@/components/SourceDot";
 import { Banner } from "@/components/editorial/Banner";
 import "@/app/organizations-section.css";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 interface FactbookOrganizationsProps {
   jurisdictionId: string;
@@ -118,7 +119,9 @@ export async function FactbookOrganizations({
   } else {
     try {
       data = await getCountryOrganizationsData(jurisdictionId);
-    } catch {
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033).
+      rethrowDatabaseFailure(error);
       return (
         <Banner variant="warn">
           International-organization memberships are temporarily unavailable.

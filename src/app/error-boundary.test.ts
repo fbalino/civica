@@ -30,19 +30,8 @@ const IDENTITY_RESOLVERS = [
   "getPostBySlug",
 ];
 
-/**
- * `civica-data/page.tsx` is an Index-change-control-protected presentation
- * file, so its identity resolver is not edited here; its route is backstopped
- * by the shared `country/[slug]/layout.tsx`, which resolves the same identity
- * first and (post-PLT-026) bubbles a DB failure to the error boundary before
- * the page body runs. If it is ever de-protected, remove this exception.
- */
-const EXCEPTED = new Set(["src/app/(reader)/country/[slug]/civica-data/page.tsx"]);
-
 test("identity resolvers do not swallow DB errors into a 404", () => {
-  const files = walkFiles("src/app", [".tsx"]).filter(
-    (file) => !EXCEPTED.has(file),
-  );
+  const files = walkFiles("src/app", [".tsx"]);
   const offenders: string[] = [];
   for (const file of files) {
     const src = readFileSync(file, "utf8");

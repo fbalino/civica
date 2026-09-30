@@ -4,14 +4,16 @@ import { NextResponse } from "next/server";
 import sitemap from "@/app/sitemap";
 import { withCronJob } from "@/lib/api/cron-job";
 import {
+  pageRefreshOutcome,
   pageWarmTargets,
-  warmPages,
+  refreshPages,
 } from "@/lib/platform/page-refresh";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// The warm-up stops starting requests after PAGE_WARM_BUDGET_MS (640s), and a
-// request times out after 45s, which leaves the cron boundary time to finalize.
+// No warm request starts after 560s and no verification request after 640s;
+// a request times out after 45s, which leaves the cron boundary time to
+// finalize.
 export const maxDuration = 800;
 
 /**
@@ -54,30 +56,44 @@ async function handler(request: Request) {
   }
 
   revalidatePath("/", "layout");
-  const result = await warmPages(targets);
+  const result = await refreshPages(targets);
+  const outcome = pageRefreshOutcome(result);
   if (result.skipped > 0) {
     console.warn(
       "[refresh-pages] warm-up budget reached " +
         JSON.stringify({ skipped: result.skipped, attempted: result.attempted }),
     );
   }
-  const ok = result.attempted === 0 || result.warmed > 0;
+  if (outcome.pagesFailed > 0) {
+    // Public URLs only; a failed page keeps serving its previous good copy.
+    console.error(
+      "[refresh-pages] pages not refreshed " +
+        JSON.stringify({
+          pagesFailed: outcome.pagesFailed,
+          failureStatuses: result.failureStatuses,
+          failedPaths: result.failedPaths,
+        }),
+    );
+  }
   return NextResponse.json(
     {
-      ok,
-      outcome: ok ? undefined : "warm_unavailable",
+      ok: outcome.ok,
+      outcome: outcome.ok ? undefined : outcome.outcome,
       step: "operations.refresh-pages",
       dryRun,
       invalidated: "all-pages",
       rowsRead: result.targets,
       rowsWritten: result.warmed,
-      rowsRejected: result.failed,
+      rowsRejected: outcome.pagesFailed,
+      pagesStaleAfterRefresh: result.staleAfterRefresh,
       pagesSkipped: result.skipped,
+      pagesUnverified: result.unverified,
       countryTargets,
       failureStatuses: result.failureStatuses,
+      failedPaths: result.failedPaths,
       durationSec: Math.round(result.durationMs / 1000),
     },
-    { status: ok ? 200 : 502 },
+    { status: outcome.httpStatus },
   );
 }
 

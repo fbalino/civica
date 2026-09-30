@@ -11,6 +11,7 @@ import { Button } from "@/components/editorial/Button";
 import { Chip } from "@/components/editorial/Pill";
 import { advisoryBoard } from "@/lib/content/site-state";
 import { ADVISORY_BOARD_CHARTER } from "@/lib/research/advisory-board-charter";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
@@ -59,8 +60,10 @@ export default async function AdvisoryBoardPage() {
       .from(advisoryBoardMembers)
       .where(eq(advisoryBoardMembers.isActive, true))
       .orderBy(asc(advisoryBoardMembers.displayOrder), asc(advisoryBoardMembers.name));
-  } catch {
-    // The public charter remains readable when the roster database is unavailable.
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033); without a configured
+    // database the public charter remains readable.
+    rethrowDatabaseFailure(error);
   }
 
   const charter = ADVISORY_BOARD_CHARTER;

@@ -12,6 +12,7 @@ import {
   CIA_ROSTER_SOURCE_ID,
   timestampEpoch,
 } from "@/lib/factbook/cabinet-roster";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 export interface CabinetRosterProvenance {
   /** True when at least one executive term cites the CIA roster. */
@@ -85,7 +86,10 @@ export async function getCabinetRosterProvenance(
         retrievedEpoch === null ? null : new Date(retrievedEpoch).toISOString(),
       sourceUrl: typeof row.source_url === "string" ? row.source_url : null,
     };
-  } catch {
+  } catch (error) {
+    // Its only readers are cached country pages: a failed read aborts the
+    // render rather than caching a roster without provenance (PLT-033).
+    rethrowDatabaseFailure(error);
     return null;
   }
 }

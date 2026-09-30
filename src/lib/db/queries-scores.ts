@@ -62,11 +62,12 @@ async function resolveJurisdiction(
 
 async function softFailOptionalScore(
   promise: Promise<ScoreRow | null>,
+  throwOnError: boolean,
 ): Promise<ScoreRow | null> {
   try {
     return await promise;
   } catch (error) {
-    if (isCiReleaseConsistencyError(error)) throw error;
+    if (throwOnError || isCiReleaseConsistencyError(error)) throw error;
     return null;
   }
 }
@@ -121,9 +122,16 @@ async function fetchReleaseRawValue(
 
 // ---- Public entry point ----------------------------------------------------
 
+/**
+ * `throwOnError` makes a failed optional-score read throw instead of dropping
+ * that row; cached pages pass it so a database failure is never cached as a
+ * missing measure (PLT-033).
+ */
 export async function getScoresForJurisdiction(
   jurisdictionIdOrSlug: string,
+  options: { throwOnError?: boolean } = {},
 ): Promise<ScoreRow[]> {
+  const throwOnError = options.throwOnError ?? false;
   const jur = await resolveJurisdiction(jurisdictionIdOrSlug);
   if (!jur) return [];
 
@@ -137,11 +145,13 @@ export async function getScoresForJurisdiction(
       fetchReleaseRawValue(jur.id, "democratic_quality", "vdem").then((raw) =>
         raw == null ? null : shapeVdemScoreRow(raw),
       ),
+      throwOnError,
     ),
     softFailOptionalScore(
       fetchReleaseRawValue(jur.id, "freedom_rights", "freedom_house").then(
         (raw) => (raw == null ? null : shapeFreedomHouseScoreRow(raw)),
       ),
+      throwOnError,
     ),
   ]);
   return [vdem, freedomHouse].filter((row): row is ScoreRow => row != null);

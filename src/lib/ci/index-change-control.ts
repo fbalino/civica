@@ -342,95 +342,6 @@ export function sha256(value: string | Buffer): string {
  * adjacent to an excluded block, still changes the protected hash and requires
  * a record.
  */
-const PLT_032_CACHE_DECLARATION = [
-  "// Cached for a day; the daily operations.refresh-pages job re-renders it\n" +
-    "// after the day's imports (PLT-033).\n" +
-    "export const revalidate = 86400;\n",
-  "export const revalidate = 0;\n",
-] as const;
-
-/**
- * PLT-033 (APR-D177) changes how two protected reader pages are cached and
- * how the Civica Data tab reads its `?section=` deep link and treats a
- * database failure. None of it touches an Index input, transform, weight, or
- * presented value, so the snapshot maps these exact edits back to the prior
- * text. Any further edit to either file remains protected drift.
- */
-export const PLT_032_PAGE_CACHE_EDITS: Readonly<
-  Record<string, ReadonlyArray<readonly [string, string]>>
-> = {
-  "src/app/(reader)/civica-index/methodology/page.tsx": [
-    PLT_032_CACHE_DECLARATION,
-  ],
-  "src/app/(reader)/country/[slug]/civica-data/page.tsx": [
-    [
-      PLT_032_CACHE_DECLARATION[0] +
-        "\n" +
-        "// No paths render at build time. Each one renders on its first visit (or the\n" +
-        "// daily warm-up) and is then served from the page cache.\n" +
-        "export async function generateStaticParams(): Promise<{ slug: string }[]> {\n" +
-        "  return [];\n" +
-        "}\n",
-      PLT_032_CACHE_DECLARATION[1],
-    ],
-    [
-      "  // A database failure throws (PLT-026) so a cached page never records a\n" +
-        '  // "not found" title for a real country.\n' +
-        "  const jurisdiction = await getJurisdictionBySlug(slug);\n" +
-        '  if (!jurisdiction) return { title: "Country Not Found" };\n',
-      "  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);\n" +
-        '  if (!jurisdiction) return { title: "Country Not Found" };\n',
-    ],
-    [
-      "  params,\n" +
-        "}: {\n" +
-        "  params: Promise<{ slug: string }>;\n" +
-        "}) {\n" +
-        "  const { slug } = await params;\n" +
-        "\n" +
-        "  // getJurisdictionBySlug returns null only for a genuinely absent slug; a\n" +
-        "  // database failure throws to the error boundary (PLT-026), so the page cache\n" +
-        "  // never stores a false 404 for a real country.\n" +
-        "  const jurisdiction = await getJurisdictionBySlug(slug);\n",
-      "  params,\n" +
-        "  searchParams,\n" +
-        "}: {\n" +
-        "  params: Promise<{ slug: string }>;\n" +
-        "  searchParams: Promise<{ section?: string }>;\n" +
-        "}) {\n" +
-        "  const { slug } = await params;\n" +
-        "  const { section: sectionParam } = await searchParams;\n" +
-        "\n" +
-        "  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);\n",
-    ],
-    [
-      "    content: contentById[s.id],\n" +
-        "  }));\n" +
-        "\n" +
-        "  // --- Citation footer",
-      "    content: contentById[s.id],\n" +
-        "  }));\n" +
-        "\n" +
-        "  // Default to the deep-linked section when it names a visible section, else\n" +
-        "  // Evidence coverage. SSR\n" +
-        "  // paints this section's body.\n" +
-        "  const requestedDefault =\n" +
-        "    sectionParam && visibleSections.some((s) => s.id === sectionParam)\n" +
-        "      ? sectionParam\n" +
-        '      : "evidence-coverage";\n' +
-        "  const defaultId = visibleSections.some((s) => s.id === requestedDefault)\n" +
-        "    ? requestedDefault\n" +
-        "    : visibleSections[0].id;\n" +
-        "\n" +
-        "  // --- Citation footer",
-    ],
-    [
-      "          items={items}\n          footer={",
-      "          items={items}\n          defaultId={defaultId}\n          footer={",
-    ],
-  ],
-};
-
 export function indexProtectedFileHash(
   path: string,
   source: string | Buffer,
@@ -652,9 +563,6 @@ export function indexProtectedFileHash(
       '  const hasBills = billsResult.status === "available";\n',
       "  const hasBills = false;\n",
     );
-  }
-  for (const [current, prior] of PLT_032_PAGE_CACHE_EDITS[path] ?? []) {
-    normalized = normalized.replace(current, prior);
   }
   return sha256(normalized);
 }

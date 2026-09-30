@@ -15,6 +15,7 @@ import {
   type BacktestSnapshotCase,
 } from "@/lib/db/queries-backtest";
 import { pulse } from "@/lib/content/site-state";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
@@ -411,8 +412,10 @@ export default async function BacktestReportPage() {
       getBacktestSnapshot(),
       getBacktestStats(),
     ]);
-  } catch {
-    // Keep methodology readable when Neon is unavailable.
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033); the credential-free
+    // build keeps the methodology readable without Neon.
+    rethrowDatabaseFailure(error);
   }
 
   const sidebarItems = [

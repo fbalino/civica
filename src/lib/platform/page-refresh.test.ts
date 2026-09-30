@@ -2,11 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  PAGE_REFRESH_TOTAL_BUDGET_MS,
   PAGE_WARM_BUDGET_MS,
   PAGE_WARM_CONCURRENCY,
   PAGE_WARM_MIN_SLOT_MS,
   PAGE_WARM_REQUEST_TIMEOUT_MS,
+  pageRefreshOutcome,
   pageWarmTargets,
+  refreshPages,
   warmPages,
   type PageWarmTarget,
 } from "./page-refresh";
@@ -93,7 +96,7 @@ test("warm-up bounds concurrency, paces each slot, and counts outcomes", async (
   assert.equal(maxInFlight, 2);
   assert.deepEqual(seen.sort(), ["/a", "/b", "/c", "/d", "/e", "/f"]);
   assert.deepEqual(
-    { ...result, durationMs: undefined },
+    { ...result, durationMs: undefined, failedPaths: [...result.failedPaths].sort() },
     {
       targets: 6,
       attempted: 6,
@@ -102,6 +105,8 @@ test("warm-up bounds concurrency, paces each slot, and counts outcomes", async (
       skipped: 0,
       durationMs: undefined,
       failureStatuses: { "404": 1, "308": 1, network: 1 },
+      staleTargets: [],
+      failedPaths: ["/b", "/d", "/f"],
     },
   );
   // Six one-second slots over two workers.
@@ -146,7 +151,84 @@ test("a timed-out request is a failure, not a crash", async () => {
 
 test("the production warm-up fits its function limit with room to finalize", () => {
   // maxDuration is 800s; the last request may start just before the budget.
-  assert.ok(PAGE_WARM_BUDGET_MS + PAGE_WARM_REQUEST_TIMEOUT_MS <= 700_000);
+  assert.ok(PAGE_WARM_BUDGET_MS < PAGE_REFRESH_TOTAL_BUDGET_MS);
+  assert.ok(PAGE_REFRESH_TOTAL_BUDGET_MS + PAGE_WARM_REQUEST_TIMEOUT_MS <= 700_000);
   // At most two renders start per second: well under the 600/minute firewall.
   assert.ok((PAGE_WARM_CONCURRENCY * 1_000) / PAGE_WARM_MIN_SLOT_MS <= 2);
+});
+
+test("a page still stale after the refresh is a reported failure", async () => {
+  const clock = fakeClock();
+  const calls = new Map<string, number>();
+  // "/broken" keeps failing its background re-render, so the cache answers
+  // STALE on both passes; "/slow" re-renders in the background and is a HIT
+  // on the verification pass; "/fresh" rendered in the foreground.
+  const fetcher = (async (url: string | URL) => {
+    const path = new URL(String(url)).pathname;
+    const call = (calls.get(path) ?? 0) + 1;
+    calls.set(path, call);
+    clock.advance(50);
+    const status =
+      path === "/broken" ? "STALE" : path === "/slow" && call === 1 ? "STALE" : "HIT";
+    return new Response("ok", { status: 200, headers: { "x-vercel-cache": status } });
+  }) as typeof fetch;
+
+  const report = await refreshPages(["/fresh", "/slow", "/broken"].map(target), {
+    fetcher,
+    now: clock.now,
+    sleep: clock.sleep,
+    concurrency: 1,
+    minSlotMs: 100,
+  });
+  assert.equal(calls.get("/fresh"), 1);
+  assert.equal(calls.get("/slow"), 2);
+  assert.equal(calls.get("/broken"), 2);
+  assert.equal(report.staleAfterRefresh, 1);
+  assert.equal(report.warmed, 2);
+  assert.deepEqual(report.failedPaths, ["/broken"]);
+  assert.equal(report.failureStatuses.stale, 1);
+});
+
+test("a server error during warm-up is counted, reported, and can fail the run", async () => {
+  const fetcher = (async (url: string | URL) =>
+    new Response("error", {
+      status: new URL(String(url)).pathname === "/down" ? 503 : 200,
+    })) as typeof fetch;
+  const report = await refreshPages(["/a", "/down"].map(target), {
+    fetcher,
+    sleep: async () => {},
+  });
+  assert.equal(report.failed, 1);
+  assert.deepEqual(report.failureStatuses, { "503": 1 });
+  assert.deepEqual(report.failedPaths, ["/down"]);
+  assert.deepEqual(pageRefreshOutcome(report), {
+    ok: false,
+    outcome: "pages_not_refreshed",
+    httpStatus: 502,
+    pagesFailed: 1,
+  });
+});
+
+test("the run succeeds while failures stay within 1% of attempted pages", () => {
+  const base = {
+    targets: 829,
+    attempted: 829,
+    skipped: 0,
+    unverified: 0,
+    durationMs: 1,
+    failureStatuses: {},
+    failedPaths: [],
+  };
+  assert.equal(
+    pageRefreshOutcome({ ...base, warmed: 821, failed: 6, staleAfterRefresh: 2 }).ok,
+    true,
+  );
+  assert.equal(
+    pageRefreshOutcome({ ...base, warmed: 820, failed: 6, staleAfterRefresh: 3 }).outcome,
+    "pages_not_refreshed",
+  );
+  assert.equal(
+    pageRefreshOutcome({ ...base, warmed: 0, failed: 829, staleAfterRefresh: 0 }).outcome,
+    "warm_unavailable",
+  );
 });

@@ -351,7 +351,7 @@
     "validate:atlas-change-history-writers": "node --import tsx scripts/validate-atlas-change-history-writers.ts",
     "validate:production-adapters": "tsx scripts/validate-production-adapters.ts && npm run validate:ingestion-contract-fixtures",
     "validate:cron-safety": "tsx scripts/validate-cron-safety.ts && tsx scripts/run-cron-safety-tests.ts",
-    "validate:cache-consistency": "node --import tsx --test src/lib/platform/cache-consistency.test.ts src/lib/api/response-cache.test.ts src/lib/api/problem-response.test.ts scripts/validate-cache-consistency.test.ts && tsx scripts/validate-cache-consistency.ts",
+    "validate:cache-consistency": "node --import tsx --test src/lib/platform/cache-consistency.test.ts src/lib/platform/cached-render.test.ts src/lib/api/response-cache.test.ts src/lib/api/problem-response.test.ts scripts/validate-cache-consistency.test.ts && tsx scripts/validate-cache-consistency.ts",
     "validate:deployment-rehearsal": "node --import tsx --test src/lib/platform/deployment-rehearsal.test.ts && tsx scripts/validate-deployment-rehearsal.ts",
     "validate:release-consistency": "node --import tsx --test src/lib/ci/release-publication.test.ts src/lib/exports/atlas-release.test.ts src/lib/pulse/v2/publication-consistency.test.ts scripts/validate-release-consistency.test.ts && tsx scripts/validate-release-consistency.ts && npm run validate:deployment-rehearsal",
     "validate:query-budgets": "node --import tsx --test src/lib/platform/query-budget.test.ts scripts/validate-query-budgets.test.ts && tsx scripts/validate-query-budgets.ts",

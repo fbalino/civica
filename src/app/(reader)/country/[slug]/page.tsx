@@ -29,6 +29,7 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
 import { captureAtlasSurfaceQuery } from "@/lib/atlas/surface-query-state";
+import { fallbackWithoutDatabase, isCachedRenderFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
@@ -83,8 +84,12 @@ export default async function CountryFactbookTab({
 
   const [sectionsResult, countryOptions, headerFacts, citeSources, allSources] =
     await Promise.all([
-      captureAtlasSurfaceQuery(() => getFactbookSections(jurisdiction.id)),
-      getFactbookCountryOptions().catch(() => []),
+      // Every read below aborts the cached render when it fails with a
+      // configured database, so no degraded page is cached (PLT-033).
+      captureAtlasSurfaceQuery(() => getFactbookSections(jurisdiction.id), {
+        rethrow: isCachedRenderFailure,
+      }),
+      getFactbookCountryOptions().catch(fallbackWithoutDatabase(() => [])),
       // Resolver batch feeding FactbookSection LeafRow (single-shot leaves
       // keyed off LABEL_TO_FACT_KEY + multi-year groups keyed off
       // MULTI_YEAR_GROUP_TO_FACT_KEY, augmented with the reconciled
@@ -111,19 +116,21 @@ export default async function CountryFactbookTab({
         "imports_goods_services_usd",
         "military_expenditure_pct_gdp",
       ]).catch(
-        () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>
+        fallbackWithoutDatabase(
+          () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>,
+        ),
       ),
       // Per-country distinct active sources for the page-bottom
-      // <CiteAccordion>. Soft-fail to [] so a Neon hiccup doesn't 500
-      // the whole page; the accordion renders fine without source names.
+      // <CiteAccordion>.
       getDistinctActiveSourcesForJurisdiction(jurisdiction.id).catch(
-        () => [] as Array<{ id: string; name: string }>
+        fallbackWithoutDatabase(() => [] as Array<{ id: string; name: string }>),
       ),
       // Whole sources table → real `last_sync_at` dates for the right-rail
-      // "Sources on this page" list. Soft-fails to [] so a Neon hiccup just
-      // drops the dates, never the page.
+      // "Sources on this page" list.
       getAllSources().catch(
-        () => [] as Awaited<ReturnType<typeof getAllSources>>
+        fallbackWithoutDatabase(
+          () => [] as Awaited<ReturnType<typeof getAllSources>>,
+        ),
       ),
     ]);
 

@@ -10,6 +10,7 @@ import {
   atlasSurfaceQueryValue,
   captureAtlasSurfaceQuery,
 } from "@/lib/atlas/surface-query-state";
+import { isCachedRenderFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
@@ -29,7 +30,11 @@ export const metadata: Metadata = {
 };
 
 export default async function RankingsPage() {
-  const rankingsResult = await captureAtlasSurfaceQuery(getRankingsMatrix);
+  // A failed read aborts the cached render instead of caching an unavailable
+  // table (PLT-033).
+  const rankingsResult = await captureAtlasSurfaceQuery(getRankingsMatrix, {
+    rethrow: isCachedRenderFailure,
+  });
   const rows = atlasSurfaceQueryValue(rankingsResult) ?? [];
 
   return (

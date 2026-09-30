@@ -46,6 +46,11 @@ import {
 } from "@/lib/atlas/surface-query-state";
 import type { Metadata } from "next";
 import "@/app/civica-data.css";
+import {
+  databaseFailureAbortsRender,
+  fallbackWithoutDatabase,
+  isCachedRenderFailure,
+} from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
@@ -211,34 +216,63 @@ export default async function CountryCivicaDataTab({
     countryOptions,
     conditionsReleaseResult,
   ] = await Promise.all([
-    captureAtlasSurfaceQuery(() => getGovernanceEvidence(slug)),
-    captureAtlasSurfaceQuery(() =>
-      getCanonicalFactsForJurisdiction(
-        jurisdiction.id,
-        COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
+    // With a configured database any failed read aborts the cached render,
+    // so the page cache keeps the last good page (PLT-033). The unavailable
+    // states below render only in the credential-free build.
+    captureAtlasSurfaceQuery(() => getGovernanceEvidence(slug), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(
+      () =>
+        getCanonicalFactsForJurisdiction(
+          jurisdiction.id,
+          COUNTRY_EVIDENCE_SUPPORTED_FACT_KEYS,
+        ),
+      { rethrow: isCachedRenderFailure },
+    ),
+    captureAtlasSurfaceQuery(() => getIndicatorHistoryForCountry(slug), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(() => getGovernmentStructure(jurisdiction.id), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(() => getLeaderTimeline(jurisdiction.id), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(() => getBillsForJurisdiction(slug, 20), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(() => getCountryOrganizationsData(jurisdiction.id), {
+      rethrow: isCachedRenderFailure,
+    }),
+    captureAtlasSurfaceQuery(
+      () =>
+        getScoresForJurisdiction(jurisdiction.id, {
+          throwOnError: databaseFailureAbortsRender(),
+        }),
+      {
+        rethrow: (error) =>
+          isCiReleaseConsistencyError(error) || isCachedRenderFailure(error),
+      },
+    ),
+    getSource("wikidata").catch(fallbackWithoutDatabase(() => null)),
+    // Whole sources table → real `last_sync_at` dates for the per-section
+    // Sources strips.
+    getAllSources().catch(
+      fallbackWithoutDatabase(
+        () => [] as Awaited<ReturnType<typeof getAllSources>>,
       ),
     ),
-    captureAtlasSurfaceQuery(() => getIndicatorHistoryForCountry(slug)),
-    captureAtlasSurfaceQuery(() => getGovernmentStructure(jurisdiction.id)),
-    captureAtlasSurfaceQuery(() => getLeaderTimeline(jurisdiction.id)),
-    captureAtlasSurfaceQuery(() => getBillsForJurisdiction(slug, 20)),
-    captureAtlasSurfaceQuery(() => getCountryOrganizationsData(jurisdiction.id)),
-    captureAtlasSurfaceQuery(() => getScoresForJurisdiction(jurisdiction.id), {
-      rethrow: isCiReleaseConsistencyError,
-    }),
-    getSource("wikidata").catch(() => null),
-    // Whole sources table → real `last_sync_at` dates for the per-section
-    // Sources strips. Soft-fails to [] so a Neon hiccup just drops the
-    // dates, never the page.
-    getAllSources().catch(
-      () => [] as Awaited<ReturnType<typeof getAllSources>>,
-    ),
     // Country list for the "Jump to country…" search at the top of the
-    // section nav. Soft-fails to [] so a Neon hiccup just hides the search.
+    // section nav.
     getFactbookCountryOptions().catch(
-      () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>,
+      fallbackWithoutDatabase(
+        () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>,
+      ),
     ),
-    captureAtlasSurfaceQuery(() => getConditionsPublicRelease()),
+    captureAtlasSurfaceQuery(() => getConditionsPublicRelease(), {
+      rethrow: isCachedRenderFailure,
+    }),
   ]);
 
   const governanceEvidence = atlasSurfaceQueryValue(governanceEvidenceResult);

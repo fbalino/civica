@@ -14,6 +14,7 @@ import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { civicaIndex, disputeSla, pulse } from "@/lib/content/site-state";
 import { dimensionColorVar } from "@/lib/ci/dimension-colors";
 import { INDEX_DISPOSITION } from "@/lib/ci/index-disposition";
+import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
@@ -100,8 +101,10 @@ export default async function MethodologyPage() {
   let methodology: Awaited<ReturnType<typeof getCIMethodology>> | null = null;
   try {
     methodology = await getCIMethodology();
-  } catch {
-    // DB not seeded
+  } catch (error) {
+    // A failed read aborts the cached render (PLT-033); without a configured
+    // database the page keeps its checked fallback revision.
+    rethrowDatabaseFailure(error);
   }
 
   const lastRevision = methodology?.publishedAt

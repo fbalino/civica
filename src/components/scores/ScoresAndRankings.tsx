@@ -28,6 +28,10 @@ import { ValueOriginNote } from "@/components/provenance/ValueOriginNote";
 import { scoreFreshnessPresentation } from "@/components/scores/freshness-label";
 import type { ScoreRow } from "@/lib/ci/publisher-scores";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
+import {
+  databaseFailureAbortsRender,
+  rethrowDatabaseFailure,
+} from "@/lib/platform/cached-render";
 
 export interface ScoresAndRankingsProps {
   /** UUID jurisdictionId or slug. */
@@ -57,8 +61,12 @@ export async function ScoresAndRankings({
     rows = prefetched;
   } else {
     try {
-      rows = await getScoresForJurisdiction(jurisdictionId);
-    } catch {
+      rows = await getScoresForJurisdiction(jurisdictionId, {
+        throwOnError: databaseFailureAbortsRender(),
+      });
+    } catch (error) {
+      // A failed read aborts the cached render (PLT-033).
+      rethrowDatabaseFailure(error);
       return (
         <Banner variant="warn">
           Source-native score records are temporarily unavailable. Civica is
