@@ -42551,7 +42551,7 @@
       "fromVersion": "civica-index-publisher-attribution-v64",
       "toVersion": "civica-index-page-cache-v65",
       "parentSnapshotSha256": "9cea95b9d5fbf82d339dfc5670c9356c7be4e77471081286eb135970c977c2e3",
-      "snapshotSha256": "3f44e37da36f9816f6a9866aaaace89d5e137cfd2c99911cc79e30a6cf576802",
+      "snapshotSha256": "563812496e63a191a35fb69559cd3850c0ecf6ad009fcfa4d634e4f11b9d01a8",
       "categories": [
         "input",
         "presentation"
@@ -42560,7 +42560,8 @@
         "src/lib/db/queries-scores.ts",
         "src/components/scores/ScoresAndRankings.tsx",
         "src/app/(reader)/civica-index/methodology/page.tsx",
-        "src/app/(reader)/country/[slug]/civica-data/page.tsx"
+        "src/app/(reader)/country/[slug]/civica-data/page.tsx",
+        "src/lib/pulse/v2/runtime-contract.ts"
       ],
       "protectedFiles": [
         {
@@ -42656,7 +42657,7 @@
         {
           "path": "src/lib/db/queries-scores.ts",
           "category": "input",
-          "sha256": "1036f3f6d60c7a72ee60d466f7b68d60cad36fc6679c4f64ad43825237f5723d"
+          "sha256": "6f1165013ba5da687950da94be1271b75ec1fa4840b5f5ed2ee3332ca5b8b43b"
         },
         {
           "path": "src/lib/db/queries-governance-evidence.ts",
@@ -42991,7 +42992,7 @@
         {
           "path": "src/components/scores/ScoresAndRankings.tsx",
           "category": "presentation",
-          "sha256": "15e5b8509e87c62bc3ea37b467c06d588792ce1c015dde5f670d1cc8bed4cbc9"
+          "sha256": "a9c4ed812f69b1efbea689863e62283dfb700d3ac072ff9dc3a8545e8d1a775f"
         },
         {
           "path": "src/components/governance-evidence/GovernanceEvidenceTable.tsx",
@@ -43021,7 +43022,7 @@
         {
           "path": "src/app/(reader)/civica-index/methodology/page.tsx",
           "category": "presentation",
-          "sha256": "96a437f9e5bd79520a96951a8c7598c7e9d04b0070aab2a09de2e2cb3e582cbf"
+          "sha256": "4d7714a4417d4f95b3cd2b9e3f4d1028f62e1a65ddec9f90e0e1a179fae02674"
         },
         {
           "path": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
@@ -43031,7 +43032,7 @@
         {
           "path": "src/app/(reader)/country/[slug]/civica-data/page.tsx",
           "category": "presentation",
-          "sha256": "2de7c79aa512dc51a127d005befe7ed296745cd774416fa3ef8952803f8d658c"
+          "sha256": "a6d043a1361373d6725b6f747a299de006ad8703fbcb33df0aa11941e1025f1d"
         },
         {
           "path": "src/app/compare/page.tsx",
@@ -43126,7 +43127,7 @@
         {
           "path": "src/lib/pulse/v2/runtime-contract.ts",
           "category": "presentation",
-          "sha256": "ac80962f9b728a47930431177e8c0e20e27720c8be71cd34aa473fb3d0f5f31d"
+          "sha256": "62e799b745c61eb474c113ac3adcf70f58ebe6da42ea2883f380785446283df1"
         },
         {
           "path": "src/lib/pulse/v2/observability-live.ts",
@@ -43158,25 +43159,25 @@
         "documentation": [
           {
             "path": "plan/evidence/PLT-033/index-change-note.md",
-            "sha256": "cd70d7878b33ba1784e5aeb994bde3e0e87d69d033e305ba066733e611e623ce"
+            "sha256": "8d7160202cbebf7404424f2e5744f7a4e77873421d7f75c5ed224017d16b5a08"
           }
         ],
         "registry": [
           {
             "path": "src/lib/platform/cache-consistency.ts",
-            "sha256": "0f31d49a5c35dc072a5f0cb15f57c3f852a1b7486ec9f0282ce4dd4b632ad6c0"
+            "sha256": "991883911cbf9f48e2516ffdec156c57540786e9e584ac9cc5ce5c4b653f7ea0"
           }
         ],
         "release_note": [
           {
             "path": "plan/evidence/PLT-033/index-change-note.md",
-            "sha256": "cd70d7878b33ba1784e5aeb994bde3e0e87d69d033e305ba066733e611e623ce"
+            "sha256": "8d7160202cbebf7404424f2e5744f7a4e77873421d7f75c5ed224017d16b5a08"
           }
         ],
         "migration_plan": [
           {
             "path": "plan/evidence/PLT-033/index-change-note.md",
-            "sha256": "cd70d7878b33ba1784e5aeb994bde3e0e87d69d033e305ba066733e611e623ce"
+            "sha256": "8d7160202cbebf7404424f2e5744f7a4e77873421d7f75c5ed224017d16b5a08"
           }
         ],
         "golden_test": [
@@ -43205,5 +43206,5 @@
       ]
     }
   ],
-  "currentSnapshotSha256": "3f44e37da36f9816f6a9866aaaace89d5e137cfd2c99911cc79e30a6cf576802"
+  "currentSnapshotSha256": "563812496e63a191a35fb69559cd3850c0ecf6ad009fcfa4d634e4f11b9d01a8"
 }

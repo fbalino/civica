@@ -24,8 +24,10 @@ to fail rather than claim an unobserved successful source run.
 
 ## Alerts and response
 
-The daily `operations.pipeline-alerts` Vercel Cron evaluates the most recent
-expected UTC slot after a two-hour grace period for a missed run, plus the most
+The daily `operations.pipeline-alerts` Vercel Cron (10:30 UTC) evaluates, for
+each job, the most recent expected UTC slot whose two-hour grace period has
+elapsed, so a job that ran shortly before the monitor is checked against its
+previous slot rather than skipped. It also reports the most
 recent failed, empty, or rejection-rate-anomalous runs. Open alerts produce a content-free
 structured Vercel Cron log and a non-success job response. The cron ledger
 retains a content-free signature, emits immediately when the alert set opens or

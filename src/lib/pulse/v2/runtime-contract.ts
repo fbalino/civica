@@ -498,7 +498,7 @@ export interface PulseRuntimeMethodContract {
     queueOrder: "priority_then_due_then_queued_then_id";
     monitor: {
       route: "/api/cron/pulse/v2/review-sla";
-      cron: "10 */6 * * *";
+      cron: "15 9 * * *";
       delivery: "persisted_idempotent_event_plus_structured_server_log";
     };
     exceptionRule: "append_only_bounded_explanation_never_restores_completeness";
@@ -927,7 +927,7 @@ export function buildPulseRuntimeMethod(
       queueOrder: "priority_then_due_then_queued_then_id",
       monitor: {
         route: "/api/cron/pulse/v2/review-sla",
-        cron: "10 */6 * * *",
+        cron: "15 9 * * *",
         delivery: "persisted_idempotent_event_plus_structured_server_log",
       },
       exceptionRule:

@@ -62,8 +62,8 @@ not re-rendered per request.
 
 - After deployment, observe the Neon compute graph for at least one full day
   and record whether the database suspends outside the scheduled windows
-  (01:00–06:30 imports, 08:00–09:00 Pulse, 10:00–10:20 refresh and health,
-  the 6-hourly Pulse review check, and 23:50–23:55 monitors).
+  (01:00–06:30 daily imports and 08:00–10:30 Pulse, review-SLA, page
+  refresh, health, and monitors).
 - Confirm on the first production run that `operations.refresh-pages`
   completes inside its budget and that `x-vercel-cache` reports `HIT` for a
   country page after it.

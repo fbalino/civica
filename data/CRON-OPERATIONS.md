@@ -98,6 +98,31 @@ Dry runs never advance freshness. A monitoring or verification job may expose
 `healthOk: false` separately from its execution outcome so operators can tell
 "the check ran" from "the checked system is healthy."
 
+### Daily operations window (PLT-033)
+
+Reader-facing jobs and monitors that run every day share one morning window
+so the production database is busy once and can suspend the rest of the day:
+
+| UTC | Job |
+| --- | --- |
+| 08:00–09:00 | Pulse ingest (every connector except GDELT), cluster, classify (locked on Vercel), score |
+| 09:15 | `pulse.v2.review-sla` |
+| 10:00 | `operations.refresh-pages` |
+| 10:15 | `operations.health-alerts` (also dispatches recoveries) |
+| 10:20 | `operations.error-alerts` (open events seen in the last 25 hours) |
+| 10:30 | `operations.pipeline-alerts` |
+
+The data imports keep their own earlier slots (01:00–06:30 UTC daily, plus
+monthly and quarterly publisher syncs). The owner-Mac Pulse runner (APR-D176) is not a
+Vercel job: it retrieves GDELT, clusters, classifies, and calls the score
+route later in the day, so it wakes the database once more, and the Pulse
+results it produces reach the cached pages at the next day's 10:00 refresh
+unless `operations.refresh-pages` is run by hand after it. The review-SLA deadlines themselves
+are timestamps and are evaluated exactly on every read; the daily monitor
+records escalation events and logs alerts once a day, so an item queued after
+09:15 is first flagged the next morning. A critical item (24-hour deadline)
+queued after 09:15 can therefore be past its deadline when first flagged.
+
 ### Daily page refresh (PLT-033)
 
 Database-backed public pages are served from the page cache and declare a

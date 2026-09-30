@@ -4,8 +4,10 @@ import test from "node:test";
 import { summarizeCronReports } from "@/lib/api/cron-output";
 import { pulseV2IngestCronOutcome } from "@/lib/pulse/v2/cron-outcomes";
 import type { IngestSummary } from "@/lib/pulse/v2/ingest";
+import vercelConfig from "../../../vercel.json";
 
 import {
+  expectedPipelineSlotsPastGrace,
   finishPipelineRun,
   pipelineAlerts,
   sourceVersionsForPipeline,
@@ -356,4 +358,52 @@ test("a successful run checks registered and reported sources together", async (
   ]);
   assert.deepEqual(finishes[0].freshnessSourceIds, ["gdelt", "ipu_parline"]);
   assert.equal(finishes[0].errorSummary, null);
+});
+
+test("a daily monitor checks jobs that ran shortly before it on their last graced slot", () => {
+  // The 10:30 UTC monitor runs 75 minutes after the 09:15 review-SLA job and
+  // 30 minutes after the 10:00 page refresh, both inside the 2-hour grace.
+  const now = new Date("2026-09-30T10:30:00.000Z");
+  const slots = expectedPipelineSlotsPastGrace(
+    [
+      { id: "pulse.v2.review-sla", schedule: "15 9 * * *" },
+      { id: "operations.refresh-pages", schedule: "0 10 * * *" },
+      { id: "factbook.refresh-cache", schedule: "30 6 * * *" },
+    ],
+    now,
+  );
+  assert.equal(slots.get("pulse.v2.review-sla")?.toISOString(), "2026-09-29T09:15:00.000Z");
+  assert.equal(slots.get("operations.refresh-pages")?.toISOString(), "2026-09-29T10:00:00.000Z");
+  assert.equal(slots.get("factbook.refresh-cache")?.toISOString(), "2026-09-30T06:30:00.000Z");
+
+  // Yesterday's refresh left no run record: it is reported as missed rather
+  // than skipped for being inside today's grace period.
+  const alerts = pipelineAlerts({ now, expectedSlots: slots, rows: [] });
+  assert.deepEqual(
+    alerts.filter(({ id }) => id === "missed").map(({ pipelineId }) => pipelineId).sort(),
+    ["factbook.refresh-cache", "operations.refresh-pages", "pulse.v2.review-sla"],
+  );
+});
+
+test("daily operations run in dependency order inside the 08:00–10:30 UTC window", () => {
+  const schedule = new Map(
+    (vercelConfig.crons as Array<{ path: string; schedule: string }>).map(
+      ({ path, schedule }) => [path, schedule],
+    ),
+  );
+  const minuteOf = (path: string) => {
+    const [minute, hour, ...rest] = schedule.get(path)!.split(" ");
+    assert.deepEqual(rest, ["*", "*", "*"], `${path} must run daily`);
+    return Number(hour) * 60 + Number(minute);
+  };
+  const order = [
+    "/api/cron/pulse/v2/score",
+    "/api/cron/pulse/v2/review-sla",
+    "/api/cron/operations/refresh-pages",
+    "/api/cron/operations/health-alerts",
+    "/api/cron/operations/error-alerts",
+    "/api/cron/operations/pipeline-alerts",
+  ].map(minuteOf);
+  assert.deepEqual([...order].sort((a, b) => a - b), order);
+  assert.ok(order.every((minute) => minute >= 8 * 60 && minute <= 10 * 60 + 30));
 });

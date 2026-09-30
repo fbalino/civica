@@ -17,6 +17,11 @@ Change record: `plt-033-page-cache-2026-09-29` (APR-D177).
   404. `getScoresForJurisdiction` in `src/lib/db/queries-scores.ts` gains an
   opt-in `throwOnError` option that the cached callers pass; its default and
   the scores API are unchanged.
+- `src/lib/pulse/v2/runtime-contract.ts` records the review-SLA monitor's new
+  schedule, `15 9 * * *` (daily at 09:15 UTC, after the Pulse score job),
+  instead of every six hours; the generated runtime-method snapshot follows.
+  The SLA version, priorities, and deadlines are unchanged; only how often
+  the monitor records escalations and logs alerts changed.
 
 ## What did not change
 

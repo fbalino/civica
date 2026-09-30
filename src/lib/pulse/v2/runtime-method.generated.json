@@ -69,7 +69,7 @@
     },
     "strategy": "stable_incident_resolution"
   },
-  "contractHash": "1c89a6bc5778583901cbe023755dcb0df0ea640ba08b1227c585f6866a7ee8e8",
+  "contractHash": "b16b33430a076f15b3d8c078df8efa319c74cb7a30177467307ff4a77cfdf150",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -624,7 +624,7 @@
     ],
     "legacyRule": "Pre-contract pending items remain unpublished in legacy quarantine and are not counted as reviewed, approved, rejected, or SLA-compliant.",
     "monitor": {
-      "cron": "10 */6 * * *",
+      "cron": "15 9 * * *",
       "delivery": "persisted_idempotent_event_plus_structured_server_log",
       "route": "/api/cron/pulse/v2/review-sla"
     },
