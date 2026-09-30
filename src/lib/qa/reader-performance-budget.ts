@@ -76,6 +76,10 @@ export interface ReaderPerformanceFixture {
  *   the measurement window is ~800 kB of RSC on a fast machine. The prior
  *   500 kB cap only passed when a slow runner finished fewer prefetches
  *   before the observation window closed.
+ *   PLT-033 made the database-backed pages cached routes too; the shared
+ *   chrome therefore prefetches through `IntentLink` (on hover, focus, or
+ *   touch only), which keeps viewport prefetch to page-body links. The
+ *   Record article measured 343,641 B of RSC on 2026-09-30 with that rule.
  * - `fontBytes` moved to per-fixture caps. The owner-approved 2026-07-26
  *   Newsreader/Archivo self-hosted faces have a hard floor of 222,104 bytes
  *   (both upright Latin subsets) that the original 200 kB cap predated.

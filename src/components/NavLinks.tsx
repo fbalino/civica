@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { IntentLink } from "@/components/IntentLink";
 import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { INDEX_NAV_ITEMS } from "@/components/indexNavItems";
@@ -134,7 +134,7 @@ export function NavLinks() {
       </div>
 
       <div className="nav-dropdown">
-        <Link
+        <IntentLink
           href="/governance-evidence"
           className={`tab-nav nav-dropdown-trigger ${
             indexActive ? "tab-nav--active" : ""
@@ -147,22 +147,22 @@ export function NavLinks() {
             aria-hidden="true"
             focusable="false"
           />
-        </Link>
+        </IntentLink>
         <div className="nav-dropdown-menu" aria-label="Governance evidence and research sections">
           {INDEX_NAV_ITEMS.map((item) => (
-            <Link
+            <IntentLink
               key={item.href}
               href={item.href}
               className="nav-dropdown-item"
             >
               {item.label}
-            </Link>
+            </IntentLink>
           ))}
         </div>
       </div>
 
       <div className="nav-dropdown">
-        <Link
+        <IntentLink
           href="/methodology"
           className={`tab-nav nav-dropdown-trigger ${
             methodologyActive ? "tab-nav--active" : ""
@@ -175,29 +175,29 @@ export function NavLinks() {
             aria-hidden="true"
             focusable="false"
           />
-        </Link>
+        </IntentLink>
         <div className="nav-dropdown-menu" aria-label="Methodology sections">
           {METHODOLOGY_NAV_ITEMS.map((item) => (
-            <Link
+            <IntentLink
               key={item.href}
               href={item.href}
               className="nav-dropdown-item"
             >
               {item.label}
-            </Link>
+            </IntentLink>
           ))}
         </div>
       </div>
 
       {EDITORIAL_NAV_ITEMS.map(({ href, label }) => (
-        <Link
+        <IntentLink
           key={href}
           href={href}
           className={`tab-nav ${isActiveHref(href) ? "tab-nav--active" : ""}`}
           style={{ textDecoration: "none" }}
         >
           {label}
-        </Link>
+        </IntentLink>
       ))}
     </nav>
   );
