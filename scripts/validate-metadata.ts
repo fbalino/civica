@@ -28,6 +28,9 @@
  *      redirect-only `/organizations` landing,
  *      and still emits all three per-country tabs (base, Civica Data,
  *      Constitution) — removing an indexable route family is a regression.
+ *   6. The generated sitemap (rendered by Next's own serializer, with no
+ *      database) is well-formed XML: every `<loc>` escapes `&`, which the
+ *      multi-parameter compare canonicals require.
  *
  * Exit 0 + summary on success; exit 1 + a listed failure per line on
  * failure.
@@ -45,6 +48,7 @@ import {
   findForbiddenHostPatternsInSource,
   validateDatasetNode,
 } from "../src/lib/seo/metadata-contract";
+import { sitemapXmlErrors } from "../src/lib/seo/sitemap-xml";
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 
@@ -234,6 +238,33 @@ async function checkRequiredSitemapRoutes(): Promise<string[]> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Check 6 — the rendered sitemap is well-formed XML
+// ─────────────────────────────────────────────────────────────────────────
+
+async function checkSitemapXmlIsWellFormed(): Promise<string[]> {
+  const prior = process.env.DATABASE_URL;
+  // DB-free by contract: without a database the sitemap still emits every
+  // static route and the multi-parameter compare canonicals.
+  delete process.env.DATABASE_URL;
+  try {
+    const { default: sitemap } = await import("../src/app/sitemap");
+    const { resolveSitemap } = await import(
+      "next/dist/build/webpack/loaders/metadata/resolve-route-data"
+    );
+    const xml = resolveSitemap(await sitemap());
+    const failures = sitemapXmlErrors(xml).map(
+      (error) => `sitemap.xml is not well-formed XML: ${error}`,
+    );
+    if (!/<loc>[^<]*\?c=[^<]*&amp;c=[^<]*<\/loc>/.test(xml)) {
+      failures.push("sitemap.xml no longer emits an escaped multi-parameter compare URL");
+    }
+    return failures;
+  } finally {
+    if (prior !== undefined) process.env.DATABASE_URL = prior;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Main
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -246,6 +277,7 @@ async function main(): Promise<void> {
     Promise.resolve(checkSampleDatasetNode()),
     checkSharedConstantsAndRootOg(),
     checkRequiredSitemapRoutes(),
+    checkSitemapXmlIsWellFormed(),
   ]);
 
   const labels = [
@@ -254,6 +286,7 @@ async function main(): Promise<void> {
     "sample buildDataset() node",
     "shared constants + root OG contract",
     "required sitemap route families",
+    "sitemap.xml is well-formed XML",
   ];
 
   let totalFailures = 0;

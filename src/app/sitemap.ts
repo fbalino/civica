@@ -3,6 +3,7 @@ import { getAllReferenceJurisdictions } from "@/lib/db/queries";
 import { getAllPosts } from "@/lib/blog";
 import { ORGANIZATIONS } from "@/lib/data/international-organizations";
 import { absoluteUrl, METADATA_CONTENT_RELEASE_DATE } from "@/lib/site";
+import { escapeSitemapUrl } from "@/lib/seo/sitemap-xml";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
@@ -173,11 +174,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
+  // Next.js writes each url into <loc> verbatim, so escape it here: the
+  // compare canonicals carry `&` between their query parameters.
   return [
     ...staticPages,
     ...comparisonPages,
     ...countryPages,
     ...organizationPages,
     ...blogPages,
-  ];
+  ].map((entry) => ({ ...entry, url: escapeSitemapUrl(entry.url) }));
 }

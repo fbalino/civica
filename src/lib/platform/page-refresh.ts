@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { isLivePagePath } from "@/lib/platform/cache-consistency";
 import { SITE_URL } from "@/lib/site";
+import { unescapeSitemapUrl } from "@/lib/seo/sitemap-xml";
 
 /**
  * PLT-033 — daily page refresh.
@@ -81,7 +82,8 @@ export function pageWarmTargets(
   for (const entry of entries) {
     let url: URL;
     try {
-      url = new URL(entry.url);
+      // The sitemap escapes its URLs for XML; request the real URL.
+      url = new URL(unescapeSitemapUrl(entry.url));
     } catch {
       continue;
     }
