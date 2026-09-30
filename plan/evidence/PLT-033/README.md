@@ -58,6 +58,28 @@ not re-rendered per request.
   (11 seconds for `/elections`), so a refresh run is estimated at seven to
   nine minutes.
 
+## Follow-ups approved with the change (2026-09-29)
+
+- Failed reads never become cached pages: every cached page, and the
+  components and helpers only they render, rethrow a failed database read
+  when a database is configured (`src/lib/platform/cached-render.ts`). The
+  static guard in `src/lib/platform/cached-render.test.ts` fails on a new
+  catch in those files that does not rethrow. The credential-free build
+  still renders the existing unavailable states and passed again.
+- The refresh job requests every page answered `STALE` a second time; a
+  second `STALE`, a non-200, a timeout, or a network error is a failed page
+  that is counted and logged with its path. More than 1% failed pages fails
+  the run (`502 pages_not_refreshed`).
+- The sitemap XML-escapes its URLs. The build's `sitemap.xml` has 849
+  `<loc>` entries and passes the well-formedness check; the production
+  sitemap fetched on 2026-09-29 fails it at line 256 (raw `&` in a compare
+  URL). `validate:metadata` now renders and checks the sitemap.
+- The review-SLA monitor (09:15), error monitor (10:20), and pipeline
+  monitor (10:30) joined the daily 08:00–10:30 UTC window. The pipeline and
+  health monitors check each job's latest slot whose grace has elapsed.
+- Full `npm run build` and `npm test` (2,388 tests) passed after these
+  changes; the page routes in the build output are unchanged.
+
 ## Still open (task remains unchecked)
 
 - After deployment, observe the Neon compute graph for at least one full day
