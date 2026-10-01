@@ -524,7 +524,7 @@
     "lucide-react": "^1.11.0",
     "mapbox-gl": "^3.25.0",
     "maplibre-gl": "6.10.0",
-    "motion": "^12.42.0",
+    "motion": "^13.4.3",
     "next": "16.3.6",
     "next-mdx-remote": "^6.0.0",
     "node-html-parser": "^8.0.4",
