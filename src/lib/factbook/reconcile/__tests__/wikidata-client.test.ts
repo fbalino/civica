@@ -17,6 +17,57 @@ function binding(
   );
 }
 
+test("Factbook default allows a 30-second response while the acquisition deadline still caps it", async (context) => {
+  context.mock.timers.enable({
+    apis: ["setTimeout", "Date"],
+    now: 1_000_000,
+  });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async (_input, init) => {
+    return await new Promise<Response>((resolve, reject) => {
+      const responseTimer = setTimeout(() => {
+        resolve(new Response(JSON.stringify({
+          head: { vars: [] },
+          results: { bindings: [] },
+        }), { status: 200 }));
+      }, 30_000);
+      init?.signal?.addEventListener("abort", () => {
+        clearTimeout(responseTimer);
+        reject(init.signal?.reason);
+      }, { once: true });
+    });
+  }) as typeof fetch;
+  const flush = async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  };
+
+  try {
+    const normalResponse = getClaimsForEntityBatch("Q30", ["P1082"]);
+    await flush();
+    context.mock.timers.tick(30_000);
+    await flush();
+    context.mock.timers.runAll();
+    await flush();
+    context.mock.timers.runAll();
+    await flush();
+    assert.deepEqual(await normalResponse, { P1082: [] });
+
+    context.mock.timers.setTime(Date.now() + 1_000);
+    const deadlineResponse = getClaimsForEntityBatch(
+      "Q30",
+      ["P1082"],
+      { deadlineAtMs: Date.now() + 10_000 },
+    );
+    await flush();
+    context.mock.timers.tick(10_000);
+    await flush();
+    await assert.rejects(deadlineResponse, /acquisition deadline exceeded/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("Wikidata deadline prevents a retry after the remaining budget is spent", async () => {
   const originalFetch = globalThis.fetch;
   let calls = 0;

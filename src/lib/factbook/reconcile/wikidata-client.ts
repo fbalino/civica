@@ -26,8 +26,8 @@ const USER_AGENT =
 /** Wikidata politeness floor: 5 req/s. We clamp to 4 to leave headroom. */
 const MIN_INTERVAL_MS = 250;
 
-/** Factbook requests are bounded; unrelated runSparql callers retain legacy behavior. */
-const FACTBOOK_ATTEMPT_TIMEOUT_MS = 15_000;
+/** WDQS allows 60s per query; add 5s transport margin for Factbook calls only. */
+const FACTBOOK_ATTEMPT_TIMEOUT_MS = 65_000;
 
 /** Last-request timestamp; module-level state, fine for a single-
  *  process sync run. */
