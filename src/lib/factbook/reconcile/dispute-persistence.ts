@@ -47,6 +47,8 @@ export interface PersistDisputesOptions {
   /** When true, log + count but don't write. */
   dryRun?: boolean;
   onProgress?: (line: string) => void;
+  /** Absolute cutoff for bounded route callers. Omitted elsewhere. */
+  deadlineAtMs?: number;
 }
 
 interface DisputeIdentity {
@@ -79,6 +81,20 @@ export async function persistProposedDisputes(
     skippedNoFactGroup: 0,
     errors: [],
   };
+  const deadlineExceeded = (phase: string): boolean => {
+    if (
+      options.deadlineAtMs === undefined ||
+      Date.now() < options.deadlineAtMs
+    ) {
+      return false;
+    }
+    const message = `dispute persistence terminal deadline exhausted before ${phase}`;
+    if (!summary.errors.some((error) => error.includes("terminal deadline exhausted"))) {
+      summary.errors.push(message);
+      log(`! ${message}`);
+    }
+    return true;
+  };
 
   // Group by jurisdiction so the resolver runs once per jurisdiction.
   const byJurisdiction = new Map<string, Set<string>>();
@@ -90,11 +106,11 @@ export async function persistProposedDisputes(
     }
     s.add(factKey);
   }
-  summary.jurisdictionsScanned = byJurisdiction.size;
-  summary.pairsScanned = touched.length;
-
-  for (const [jurisdictionId, factKeysSet] of byJurisdiction) {
+  jurisdictionLoop: for (const [jurisdictionId, factKeysSet] of byJurisdiction) {
+    if (deadlineExceeded(`resolver read for ${jurisdictionId}`)) break;
     const factKeys = [...factKeysSet];
+    summary.jurisdictionsScanned++;
+    summary.pairsScanned += factKeys.length;
     let resolverOutputs: Awaited<
       ReturnType<typeof getCanonicalFactsForJurisdiction>
     > = {};
@@ -111,6 +127,7 @@ export async function persistProposedDisputes(
       );
       continue;
     }
+    if (deadlineExceeded(`dispute lookup for ${jurisdictionId}`)) break;
 
     // Pre-load existing OPEN/IN-REVIEW disputes for these (j, k) pairs
     // in one query; build a Set keyed by (kind|factIdA|factIdB).
@@ -145,6 +162,7 @@ export async function persistProposedDisputes(
       );
       continue;
     }
+    if (deadlineExceeded(`proposal processing for ${jurisdictionId}`)) break;
 
     const existingByKey = new Map<string, Set<string>>();
     for (const r of existingRows) {
@@ -182,6 +200,9 @@ export async function persistProposedDisputes(
       const seen = existingByKey.get(factKey) ?? new Set<string>();
 
       for (const p of proposed) {
+        if (deadlineExceeded(`dispute mutation for ${jurisdictionId}`)) {
+          break jurisdictionLoop;
+        }
         const key = identityKey({
           disputeKind: p.kind,
           factIdA: p.factIdA,
@@ -221,6 +242,9 @@ export async function persistProposedDisputes(
             isPublic: true,
           });
           summary.inserted++;
+          if (deadlineExceeded(`post-mutation bookkeeping for ${jurisdictionId}`)) {
+            break jurisdictionLoop;
+          }
         } catch (err) {
           summary.errors.push(
             `${jurisdictionId} ${factKey} ${p.kind}: ${

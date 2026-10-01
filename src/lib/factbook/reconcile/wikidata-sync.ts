@@ -27,8 +27,10 @@ import {
 } from "@/lib/factbook/country-fact-history-writer";
 import {
   getClaimsForEntity,
+  getClaimsForEntityBatch,
   groupClaimsByStatement,
   type GroupedClaim,
+  type WikidataClaimRow,
 } from "./wikidata-client";
 import {
   WIKIDATA_FACT_MAPPING,
@@ -63,6 +65,17 @@ export interface WikidataSyncOptions {
   factMappings?: readonly WikidataFactConfig[];
   atlasReleaseId?: string;
   writeFact?: CountryFactHistoryWriter;
+  /**
+   * Stop starting upstream acquisition work after this many milliseconds,
+   * then finish dispute persistence and freshness bookkeeping. Omitted by the
+   * CLI; the bounded cron supplies this explicitly.
+   */
+  acquisitionBudgetMs?: number;
+  /**
+   * Stop all sync work after this many milliseconds so the route wrapper can
+   * record its terminal outcome before the platform limit. Omitted by CLI.
+   */
+  terminalBudgetMs?: number;
 }
 
 export interface WikidataJurisdiction {
@@ -103,6 +116,11 @@ export interface WikidataSyncSummary {
   disputes: PersistDisputeSummary | null;
   errors: string[];
   dryRun: boolean;
+  phaseTiming: {
+    acquisitionAndWriteMs: number;
+    disputePersistenceMs: number;
+    freshnessMs: number;
+  };
 }
 
 type Db = typeof import("@/lib/db").db;
@@ -296,6 +314,20 @@ function payloadHash(payload: object): string {
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
 
+function canonicalizeReferences(
+  references: GroupedClaim["references"],
+): GroupedClaim["references"] {
+  return [...references].sort((a, b) => {
+    const aKey = [a.statedInQid ?? "", a.statedInLabel ?? "", a.url ?? ""];
+    const bKey = [b.statedInQid ?? "", b.statedInLabel ?? "", b.url ?? ""];
+    for (let i = 0; i < aKey.length; i++) {
+      if (aKey[i]! < bKey[i]!) return -1;
+      if (aKey[i]! > bKey[i]!) return 1;
+    }
+    return 0;
+  });
+}
+
 export async function syncFactbookWikidata(
   db: Db,
   options: WikidataSyncOptions = {}
@@ -304,6 +336,17 @@ export async function syncFactbookWikidata(
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
   const errors: string[] = [];
+  const terminalDeadlineAtMs = options.terminalBudgetMs === undefined
+    ? undefined
+    : startedAtMs + Math.max(0, options.terminalBudgetMs);
+  const configuredAcquisitionDeadlineAtMs = options.acquisitionBudgetMs === undefined
+    ? undefined
+    : startedAtMs + Math.max(0, options.acquisitionBudgetMs);
+  const acquisitionDeadlineAtMs = configuredAcquisitionDeadlineAtMs === undefined
+    ? terminalDeadlineAtMs
+    : terminalDeadlineAtMs === undefined
+      ? configuredAcquisitionDeadlineAtMs
+      : Math.min(configuredAcquisitionDeadlineAtMs, terminalDeadlineAtMs);
   const atlasReleaseId = options.dryRun
     ? null
     : resolveAtlasReleaseId(options.atlasReleaseId);
@@ -351,18 +394,84 @@ export async function syncFactbookWikidata(
   // and we can persist any disputes after the loop. See comment in
   // sync-wdi.ts for the same pattern.
   const touchedPairs = new Set<string>();
+  let jurisdictionsProcessed = 0;
+  const terminalDeadlineExceeded = (phase: string): boolean => {
+    if (
+      terminalDeadlineAtMs === undefined ||
+      Date.now() < terminalDeadlineAtMs
+    ) {
+      return false;
+    }
+    const message =
+      `Wikidata terminal budget exhausted before ${phase} after ` +
+      `${jurisdictionsProcessed} of ${allJurisdictions.length} jurisdictions`;
+    if (!errors.some((error) => error.includes("terminal budget exhausted"))) {
+      errors.push(message);
+      log(`! ${message}`);
+    }
+    return true;
+  };
 
-  for (const j of allJurisdictions) {
+  jurisdictionLoop: for (const j of allJurisdictions) {
     if (!j.wikidataQid) continue;
 
+    if (terminalDeadlineExceeded(`acquisition for ${j.slug}`)) break;
+
+    if (
+      acquisitionDeadlineAtMs !== undefined &&
+      Date.now() >= acquisitionDeadlineAtMs
+    ) {
+      const message =
+        `Wikidata acquisition budget exhausted after ${jurisdictionsProcessed}` +
+        ` of ${allJurisdictions.length} jurisdictions`;
+      errors.push(message);
+      log(`! ${message}`);
+      break;
+    }
+
+    let batchRows: Record<string, WikidataClaimRow[]> | null = null;
+    if (!options.getClaims) {
+      try {
+        batchRows = await getClaimsForEntityBatch(
+          j.wikidataQid,
+          targetConfigs.map((config) => config.pid),
+          { deadlineAtMs: acquisitionDeadlineAtMs },
+        );
+      } catch (err) {
+        const message = `${j.slug}: SPARQL batch failure — ${
+          err instanceof Error ? err.message : String(err)
+        }`;
+        errors.push(message);
+        log(`! ${message}`);
+        jurisdictionsProcessed++;
+        if (
+          acquisitionDeadlineAtMs !== undefined &&
+          Date.now() >= acquisitionDeadlineAtMs
+        ) {
+          const deadlineMessage =
+            `Wikidata acquisition budget exhausted after ${jurisdictionsProcessed}` +
+            ` of ${allJurisdictions.length} jurisdictions`;
+          errors.push(deadlineMessage);
+          log(`! ${deadlineMessage}`);
+          break;
+        }
+        continue;
+      }
+    }
+
     for (const config of targetConfigs) {
+      if (terminalDeadlineExceeded(`fact processing for ${j.slug}`)) {
+        break jurisdictionLoop;
+      }
       const counters = factCounters.get(config.factKey)!;
       const factKeyDef = factDefinitions.get(config.factKey);
       if (!factKeyDef) continue;
 
       let groupedClaims: GroupedClaim[] = [];
       try {
-        const rows = await (options.getClaims ?? getClaimsForEntity)(j.wikidataQid, config.pid);
+        const rows = options.getClaims
+          ? await options.getClaims(j.wikidataQid, config.pid)
+          : batchRows?.[config.pid] ?? [];
         groupedClaims = groupClaimsByStatement(rows);
       } catch (err) {
         const message = `${j.slug} ${config.factKey}: SPARQL failure — ${
@@ -389,7 +498,14 @@ export async function syncFactbookWikidata(
         chosen.pointInTimePrecision,
       );
 
-      const allowedRefsPayload = chosen.references
+      // SPARQL does not guarantee reference-row order. Canonical ordering keeps
+      // the normalized source hash stable across the single-property fixture
+      // seam and the production batch path. Duplicates remain evidence and are
+      // deliberately retained. The existing history writer records the first
+      // transition from the legacy order-dependent hash.
+      const canonicalReferences = canonicalizeReferences(chosen.references);
+
+      const allowedRefsPayload = canonicalReferences
         .filter((ref) =>
           isAllowedReference({ qid: ref.statedInQid, url: ref.url })
         )
@@ -416,7 +532,7 @@ export async function syncFactbookWikidata(
         valueUnitQid: chosen.valueUnitQid,
         pointInTime: chosen.pointInTime,
         pointInTimePrecision: chosen.pointInTimePrecision,
-        references: chosen.references,
+        references: canonicalReferences,
       };
       const hash = payloadHash(upstreamPayload);
 
@@ -429,6 +545,10 @@ export async function syncFactbookWikidata(
         counters.admitted++;
         touchedPairs.add(`${j.id}|${config.factKey}`);
         continue;
+      }
+
+      if (terminalDeadlineExceeded(`snapshot insert for ${j.slug} ${config.factKey}`)) {
+        break jurisdictionLoop;
       }
 
       let snapshotIdRow: { id: string }[] = [];
@@ -459,6 +579,9 @@ export async function syncFactbookWikidata(
 
       let snapshotId: string | null = snapshotIdRow[0]?.id ?? null;
       if (!snapshotId) {
+        if (terminalDeadlineExceeded(`snapshot lookup for ${j.slug} ${config.factKey}`)) {
+          break jurisdictionLoop;
+        }
         const existing = await db
           .select({ id: factSnapshots.id })
           .from(factSnapshots)
@@ -467,6 +590,10 @@ export async function syncFactbookWikidata(
           )
           .limit(1);
         snapshotId = existing[0]?.id ?? null;
+      }
+
+      if (terminalDeadlineExceeded(`fact write for ${j.slug} ${config.factKey}`)) {
+        break jurisdictionLoop;
       }
 
       const factRow = {
@@ -503,13 +630,20 @@ export async function syncFactbookWikidata(
 
       counters.admitted++;
       touchedPairs.add(`${j.id}|${config.factKey}`);
+      if (terminalDeadlineExceeded(`post-write processing for ${j.slug}`)) {
+        break jurisdictionLoop;
+      }
     }
+    jurisdictionsProcessed++;
   }
+
+  const acquisitionFinishedAtMs = Date.now();
 
   // Phase F.6.1 — persist resolver-proposed disputes for every pair
   // we touched. Same dedup contract as the WB WDI sync.
   let disputes: PersistDisputeSummary | null = null;
-  if (touchedPairs.size > 0) {
+  const disputeStartedAtMs = Date.now();
+  if (touchedPairs.size > 0 && !terminalDeadlineExceeded("dispute persistence")) {
     const touched = [...touchedPairs].map((s) => {
       const [jurisdictionId, factKey] = s.split("|");
       return { jurisdictionId, factKey };
@@ -520,6 +654,7 @@ export async function syncFactbookWikidata(
     try {
       disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
+        deadlineAtMs: terminalDeadlineAtMs,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;
           log(`  ${line}`);
@@ -536,7 +671,10 @@ export async function syncFactbookWikidata(
       log(`! ${message}`);
     }
   }
+  const disputeFinishedAtMs = Date.now();
 
+  const freshnessStartedAtMs = Date.now();
+  terminalDeadlineExceeded("source freshness bookkeeping");
   await markExternalSourceSyncedAfterAggregateSuccess({
     sourceIds: "wikidata",
     rowsWritten: touchedPairs.size,
@@ -545,6 +683,7 @@ export async function syncFactbookWikidata(
     errors,
     markSynced: options.markSynced ?? markSourcesSynced,
   });
+  const freshnessFinishedAtMs = Date.now();
 
   const finishedAtMs = Date.now();
   const factCountersByKey: Record<string, PerFactCounters> = {};
@@ -558,11 +697,16 @@ export async function syncFactbookWikidata(
     startedAt,
     finishedAt: new Date(finishedAtMs).toISOString(),
     durationMs: finishedAtMs - startedAtMs,
-    jurisdictionsProcessed: allJurisdictions.length,
+    jurisdictionsProcessed,
     factCountersByKey,
     totalAdmitted,
     disputes,
     errors,
     dryRun: options.dryRun ?? false,
+    phaseTiming: {
+      acquisitionAndWriteMs: acquisitionFinishedAtMs - startedAtMs,
+      disputePersistenceMs: disputeFinishedAtMs - disputeStartedAtMs,
+      freshnessMs: freshnessFinishedAtMs - freshnessStartedAtMs,
+    },
   };
 }
