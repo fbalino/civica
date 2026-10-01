@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "taskId": "PLT-031",
+  "recordedAt": "2026-10-01T14:59:18.220117+00:00",
+  "state": "locally-tested-before-merge",
+  "observed": "PR #54 deployed dry run succeeded for 197 jurisdictions and 1,270 observations. Apply finished in 465 seconds but retained five 15-second upstream timeouts, 1,238 admissions, and no source freshness.",
+  "primarySource": {
+    "url": "https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual/en",
+    "verifiedOn": "2026-10-01",
+    "publishedQueryTimeoutSeconds": 60
+  },
+  "fix": "Allow 65 seconds per Factbook source attempt: 60 seconds of documented query time plus 5 seconds transport. Each attempt is still capped by the remaining 600-second acquisition budget.",
+  "unchanged": [
+    "730-second terminal cutoff",
+    "800-second hosting cap",
+    "two attempts per source request",
+    "four requests per second",
+    "bare runSparql callers",
+    "all source/admission/rights/writer semantics",
+    "leases and idempotency",
+    "no freshness after incomplete work"
+  ],
+  "regression": "The fake-time fixture fails under 15 seconds, accepts an otherwise-valid 30-second response under 65 seconds, and still aborts at a 10-second remaining acquisition deadline.",
+  "validation": {
+    "clientTestsPassed": 5,
+    "typecheck": "passed",
+    "focusedLint": "passed",
+    "fullBuild": "passed; complete credential-free production build and all build gates",
+    "dependencyAudit": "passed at unchanged critical threshold",
+    "lint": "passed",
+    "moduleCoverage": "all nine registered modules passed"
+  },
+  "productionRecovery": "Requires all configured checks and normal merge/deployment, then reuse the same retained failed apply key (attempt2 of3) after backoff; verify real terminal state and source freshness.",
+  "evidencePointers": [
+    "output/data-reliability/wikidata-2026-10-01/attempt1-terminal-readonly.json",
+    "output/data-reliability/2026-10-01-wikidata-recovery-source-probe.json"
+  ]
+}
