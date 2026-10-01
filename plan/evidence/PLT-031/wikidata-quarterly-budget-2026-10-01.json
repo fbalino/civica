@@ -220,7 +220,14 @@
       "rendered-module ledger",
       "module coverage"
     ],
-    "dependencyGate": "A newly published critical Next.js advisory blocks the current dependency pin; a separate minimal patched-version prerequisite is being validated. No gate was bypassed."
+    "dependencyGate": "Passed locally with the minimal Next16.3.6 prerequisite prepared in PR53; every configured remote check and normal merge remain required.",
+    "combinedPatchedRuntimeBuild": {
+      "result": "passed",
+      "nextVersion": "16.3.6",
+      "unitPassed": 2404,
+      "unitSkipped": 3,
+      "unitFailed": 0
+    }
   },
   "deployment": {
     "actual": "Not merged or deployed when recorded.",
