@@ -26,6 +26,9 @@ const USER_AGENT =
 /** Wikidata politeness floor: 5 req/s. We clamp to 4 to leave headroom. */
 const MIN_INTERVAL_MS = 250;
 
+/** Factbook requests are bounded; unrelated runSparql callers retain legacy behavior. */
+const FACTBOOK_ATTEMPT_TIMEOUT_MS = 15_000;
+
 /** Last-request timestamp; module-level state, fine for a single-
  *  process sync run. */
 let lastRequestAt = 0;
@@ -43,6 +46,13 @@ export interface SparqlBinding {
 export interface SparqlResult {
   head: { vars: string[] };
   results: { bindings: SparqlBinding[] };
+}
+
+export interface RunSparqlOptions {
+  attemptTimeoutMs?: number;
+  retryDelayMs?: number;
+  /** Absolute wall-clock cutoff supplied by a bounded caller. */
+  deadlineAtMs?: number;
 }
 
 async function throttle(): Promise<void> {
@@ -63,7 +73,10 @@ async function throttle(): Promise<void> {
  * On HTTP 429 / 503 / 504, retries once after a short backoff.
  * On any other error, throws.
  */
-export async function runSparql(query: string): Promise<SparqlResult> {
+export async function runSparql(
+  query: string,
+  options: RunSparqlOptions = {},
+): Promise<SparqlResult> {
   await throttle();
 
   const url = new URL(SPARQL_ENDPOINT);
@@ -76,12 +89,52 @@ export async function runSparql(query: string): Promise<SparqlResult> {
 
   let lastErr: unknown = null;
   for (let attempt = 0; attempt < 2; attempt++) {
+    const remainingMs = options.deadlineAtMs === undefined
+      ? Number.POSITIVE_INFINITY
+      : options.deadlineAtMs - Date.now();
+    if (remainingMs <= 0) {
+      lastErr = new Error("SPARQL acquisition deadline exceeded");
+      break;
+    }
+
+    const configuredTimeoutMs = options.attemptTimeoutMs;
+    const attemptTimeoutMs = configuredTimeoutMs === undefined &&
+      !Number.isFinite(remainingMs)
+      ? undefined
+      : Math.max(
+        1,
+        Math.min(configuredTimeoutMs ?? remainingMs, remainingMs),
+      );
+    const controller = attemptTimeoutMs === undefined
+      ? undefined
+      : new AbortController();
+    const timeout = controller && attemptTimeoutMs !== undefined
+      ? setTimeout(() => {
+        controller.abort(
+          new Error(`SPARQL request timed out after ${attemptTimeoutMs}ms`),
+        );
+      }, attemptTimeoutMs)
+      : undefined;
+
     try {
-      const res = await fetch(url.toString(), { headers });
+      const res = await fetch(url.toString(), {
+        headers,
+        ...(controller ? { signal: controller.signal } : {}),
+      });
 
       if (res.status === 429 || res.status === 503 || res.status === 504) {
-        // back off a bit, retry once
-        await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+        lastErr = new Error(`SPARQL ${res.status} ${res.statusText}`);
+        if (attempt === 0) {
+          const retryDelayMs = Math.min(
+            (options.retryDelayMs ?? 1000) * 2,
+            options.deadlineAtMs === undefined
+              ? Number.POSITIVE_INFINITY
+              : Math.max(0, options.deadlineAtMs - Date.now()),
+          );
+          if (retryDelayMs > 0) {
+            await new Promise((r) => setTimeout(r, retryDelayMs));
+          }
+        }
         continue;
       }
 
@@ -98,9 +151,19 @@ export async function runSparql(query: string): Promise<SparqlResult> {
       lastErr = err;
       // network error — retry once
       if (attempt === 0) {
-        await new Promise((r) => setTimeout(r, 1000));
+        const retryDelayMs = Math.min(
+          options.retryDelayMs ?? 1000,
+          options.deadlineAtMs === undefined
+            ? Number.POSITIVE_INFINITY
+            : Math.max(0, options.deadlineAtMs - Date.now()),
+        );
+        if (retryDelayMs > 0) {
+          await new Promise((r) => setTimeout(r, retryDelayMs));
+        }
         continue;
       }
+    } finally {
+      if (timeout !== undefined) clearTimeout(timeout);
     }
   }
 
@@ -155,6 +218,138 @@ export interface WikidataClaimRow {
   refUrl: string | undefined;
 }
 
+function decodeClaimBinding(b: SparqlBinding): WikidataClaimRow {
+  const statementIri = b.stmt?.value ?? "";
+  const valueRaw = b.value?.value ?? "";
+  const unitFull = b.unit?.value;
+  const valueUnitQid = unitFull
+    ? unitFull.split("/").pop()
+    : undefined;
+  const pit = b.pit?.value;
+  const start = b.startTime?.value;
+  const pointInTime = pit ?? start;
+  const pointInTimePrecision = Number(
+    b.pitPrecision?.value ?? b.startPrecision?.value,
+  );
+  const rankRaw = b.rank?.value ?? "";
+  const rank: "preferred" | "normal" = rankRaw.endsWith("PreferredRank")
+    ? "preferred"
+    : "normal";
+  const refStatedInFull = b.refStatedIn?.value ?? b.refPublisher?.value;
+  const refStatedInQid = refStatedInFull
+    ? refStatedInFull.split("/").pop()
+    : undefined;
+  const refStatedInLabel =
+    b.refStatedInLabel?.value ?? b.refPublisherLabel?.value;
+  const refUrl = b.refUrl?.value;
+
+  return {
+    statementIri,
+    valueRaw,
+    valueUnitQid,
+    pointInTime,
+    pointInTimePrecision: Number.isFinite(pointInTimePrecision)
+      ? pointInTimePrecision
+      : undefined,
+    rank,
+    refStatedInQid,
+    refStatedInLabel,
+    refUrl,
+  };
+}
+
+function assertWikidataId(value: string, pattern: RegExp, kind: string): void {
+  if (!pattern.test(value)) {
+    throw new Error(`Invalid Wikidata ${kind}: ${value}`);
+  }
+}
+
+/**
+ * Pull all configured properties for one entity in a single SPARQL request.
+ * Tuple VALUES keeps each property's p:/ps:/psv: predicates paired, while the
+ * decoder returns the same rows as the established single-property API.
+ */
+export async function getClaimsForEntityBatch(
+  entityQid: string,
+  propertyPids: readonly string[],
+  options: RunSparqlOptions = {},
+): Promise<Record<string, WikidataClaimRow[]>> {
+  assertWikidataId(entityQid, /^Q\d+$/, "entity ID");
+  const uniquePids = [...new Set(propertyPids)];
+  for (const pid of uniquePids) {
+    assertWikidataId(pid, /^P\d+$/, "property ID");
+  }
+
+  const byProperty = Object.fromEntries(
+    uniquePids.map((pid) => [pid, [] as WikidataClaimRow[]]),
+  );
+  if (uniquePids.length === 0) return byProperty;
+
+  const propertyTuples = uniquePids
+    .map((pid) => `(wd:${pid} p:${pid} ps:${pid} psv:${pid})`)
+    .join("\n        ");
+  const query = `
+    SELECT
+      ?property ?stmt ?value ?unit ?pit ?pitPrecision ?startTime ?startPrecision ?rank
+      ?refStatedIn ?refStatedInLabel ?refPublisher ?refPublisherLabel ?refUrl
+    WHERE {
+      VALUES (?property ?claimPredicate ?statementPredicate ?statementValuePredicate) {
+        ${propertyTuples}
+      }
+      wd:${entityQid} ?claimPredicate ?stmt.
+      ?stmt ?statementPredicate ?value.
+      ?stmt wikibase:rank ?rank.
+      FILTER(?rank != wikibase:DeprecatedRank)
+
+      OPTIONAL {
+        ?stmt ?statementValuePredicate ?vNode.
+        ?vNode wikibase:quantityUnit ?unit.
+      }
+      OPTIONAL {
+        ?stmt pq:P585 ?pit;
+              pqv:P585 ?pitNode.
+        ?pitNode wikibase:timePrecision ?pitPrecision.
+      }
+      OPTIONAL {
+        ?stmt pq:P580 ?startTime;
+              pqv:P580 ?startNode.
+        ?startNode wikibase:timePrecision ?startPrecision.
+      }
+
+      OPTIONAL {
+        ?stmt prov:wasDerivedFrom ?ref.
+        OPTIONAL {
+          ?ref pr:P248 ?refStatedIn.
+          OPTIONAL {
+            ?refStatedIn rdfs:label ?refStatedInLabel.
+            FILTER(LANG(?refStatedInLabel) = 'en')
+          }
+        }
+        OPTIONAL {
+          ?ref pr:P123 ?refPublisher.
+          OPTIONAL {
+            ?refPublisher rdfs:label ?refPublisherLabel.
+            FILTER(LANG(?refPublisherLabel) = 'en')
+          }
+        }
+        OPTIONAL { ?ref pr:P854 ?refUrl. }
+      }
+    }
+    ORDER BY ?property DESC(?pit) DESC(?startTime)
+  `;
+
+  const json = await runSparql(query, {
+    ...options,
+    attemptTimeoutMs: options.attemptTimeoutMs ?? FACTBOOK_ATTEMPT_TIMEOUT_MS,
+  });
+  for (const binding of json.results.bindings) {
+    const propertyPid = binding.property?.value.split("/").pop();
+    if (!propertyPid || !Object.hasOwn(byProperty, propertyPid)) continue;
+    byProperty[propertyPid]!.push(decodeClaimBinding(binding));
+  }
+  return byProperty;
+}
+
 export async function getClaimsForEntity(
   entityQid: string,
   propertyPid: string
@@ -190,98 +385,8 @@ export async function getClaimsForEntity(
   // allowlist gate (`isAllowedReference`) sort tier-1 from
   // junk in the consumer. P248 still takes precedence when
   // present; P123 is the fallback.
-  const query = `
-    SELECT
-      ?stmt ?value ?unit ?pit ?pitPrecision ?startTime ?startPrecision ?rank
-      ?refStatedIn ?refStatedInLabel ?refPublisher ?refPublisherLabel ?refUrl
-    WHERE {
-      wd:${entityQid} p:${propertyPid} ?stmt.
-      ?stmt ps:${propertyPid} ?value.
-      ?stmt wikibase:rank ?rank.
-      FILTER(?rank != wikibase:DeprecatedRank)
-
-      OPTIONAL {
-        ?stmt psv:${propertyPid} ?vNode.
-        ?vNode wikibase:quantityUnit ?unit.
-      }
-      OPTIONAL {
-        ?stmt pq:P585 ?pit;
-              pqv:P585 ?pitNode.
-        ?pitNode wikibase:timePrecision ?pitPrecision.
-      }
-      OPTIONAL {
-        ?stmt pq:P580 ?startTime;
-              pqv:P580 ?startNode.
-        ?startNode wikibase:timePrecision ?startPrecision.
-      }
-
-      OPTIONAL {
-        ?stmt prov:wasDerivedFrom ?ref.
-        OPTIONAL {
-          ?ref pr:P248 ?refStatedIn.
-          OPTIONAL {
-            ?refStatedIn rdfs:label ?refStatedInLabel.
-            FILTER(LANG(?refStatedInLabel) = 'en')
-          }
-        }
-        OPTIONAL {
-          ?ref pr:P123 ?refPublisher.
-          OPTIONAL {
-            ?refPublisher rdfs:label ?refPublisherLabel.
-            FILTER(LANG(?refPublisherLabel) = 'en')
-          }
-        }
-        OPTIONAL { ?ref pr:P854 ?refUrl. }
-      }
-    }
-    ORDER BY DESC(?pit) DESC(?startTime)
-  `;
-
-  const json = await runSparql(query);
-
-  return json.results.bindings.map((b): WikidataClaimRow => {
-    const statementIri = b.stmt?.value ?? "";
-    const valueRaw = b.value?.value ?? "";
-    const unitFull = b.unit?.value;
-    const valueUnitQid = unitFull
-      ? unitFull.split("/").pop() // e.g. "Q4917"
-      : undefined;
-    const pit = b.pit?.value;
-    const start = b.startTime?.value;
-    const pointInTime = pit ?? start;
-    const pointInTimePrecision = Number(
-      b.pitPrecision?.value ?? b.startPrecision?.value,
-    );
-    const rankRaw = b.rank?.value ?? "";
-    const rank: "preferred" | "normal" = rankRaw.endsWith("PreferredRank")
-      ? "preferred"
-      : "normal";
-    // R.0 / 2026-05-03: prefer P248 (stated in) when present,
-    // fall back to P123 (publisher). Both are Q-IDs naming the
-    // upstream source entity; the allowlist treats them
-    // identically. See the SPARQL comment block above.
-    const refStatedInFull = b.refStatedIn?.value ?? b.refPublisher?.value;
-    const refStatedInQid = refStatedInFull
-      ? refStatedInFull.split("/").pop()
-      : undefined;
-    const refStatedInLabel =
-      b.refStatedInLabel?.value ?? b.refPublisherLabel?.value;
-    const refUrl = b.refUrl?.value;
-
-    return {
-      statementIri,
-      valueRaw,
-      valueUnitQid,
-      pointInTime,
-      pointInTimePrecision: Number.isFinite(pointInTimePrecision)
-        ? pointInTimePrecision
-        : undefined,
-      rank,
-      refStatedInQid,
-      refStatedInLabel,
-      refUrl,
-    };
-  });
+  const claims = await getClaimsForEntityBatch(entityQid, [propertyPid]);
+  return claims[propertyPid] ?? [];
 }
 
 /**

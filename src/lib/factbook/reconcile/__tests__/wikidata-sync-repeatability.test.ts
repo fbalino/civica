@@ -205,3 +205,218 @@ test("Wikidata registry drift makes a mixed write partial and withholds freshnes
   assert.equal(state.facts.size, 1);
   assert.equal(stampCalls, 0);
 });
+
+test("Wikidata default sync fetches all configured properties once per jurisdiction", async () => {
+  const state = harness();
+  const originalFetch = globalThis.fetch;
+  let fetchCalls = 0;
+  globalThis.fetch = (async () => {
+    fetchCalls++;
+    return new Response(JSON.stringify({
+      head: { vars: [] },
+      results: {
+        bindings: [
+          {
+            property: { type: "uri", value: "http://www.wikidata.org/entity/P1082" },
+            stmt: { type: "uri", value: claim.statementIri },
+            value: { type: "literal", value: claim.valueRaw },
+            unit: { type: "uri", value: "http://www.wikidata.org/entity/Q199" },
+            pit: { type: "literal", value: claim.pointInTime },
+            pitPrecision: { type: "literal", value: "9" },
+            rank: { type: "uri", value: "http://wikiba.se/ontology#PreferredRank" },
+            refStatedIn: { type: "uri", value: "http://www.wikidata.org/entity/Q21540096" },
+            refStatedInLabel: { type: "literal", value: "World Bank" },
+            refUrl: { type: "uri", value: claim.refUrl },
+          },
+          {
+            property: { type: "uri", value: "http://www.wikidata.org/entity/P2131" },
+            stmt: { type: "uri", value: "http://www.wikidata.org/entity/statement/Q16-gdp" },
+            value: { type: "literal", value: "2200000000000" },
+            unit: { type: "uri", value: "http://www.wikidata.org/entity/Q4917" },
+            pit: { type: "literal", value: "2025-01-01T00:00:00Z" },
+            pitPrecision: { type: "literal", value: "9" },
+            rank: { type: "uri", value: "http://wikiba.se/ontology#NormalRank" },
+            refStatedIn: { type: "uri", value: "http://www.wikidata.org/entity/Q21540096" },
+            refStatedInLabel: { type: "literal", value: "World Bank" },
+          },
+        ],
+      },
+    }), { status: 200 });
+  }) as typeof fetch;
+
+  try {
+    const factMappings = WIKIDATA_FACT_MAPPING.filter(({ factKey }) =>
+      factKey === "population_total" || factKey === "gdp_nominal_usd_billions"
+    );
+    const result = await syncFactbookWikidata(state.db, {
+      dryRun: true,
+      jurisdictions: [jurisdiction],
+      factMappings,
+      persistDisputes: noDisputes as never,
+      markSynced: (async () => []) as never,
+      writeFact: state.writeFact,
+    });
+
+    assert.equal(fetchCalls, 1);
+    assert.equal(result.totalAdmitted, 2);
+    assert.deepEqual(result.errors, []);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Wikidata acquisition deadline stops remaining jurisdictions and withholds freshness", async () => {
+  const state = harness();
+  let claimCalls = 0;
+  let stampCalls = 0;
+  const result = await syncFactbookWikidata(state.db, {
+    ...fixtureOptions(state.writeFact),
+    jurisdictions: [
+      jurisdiction,
+      {
+        ...jurisdiction,
+        id: "22222222-2222-4222-8222-222222222222",
+        slug: "uruguay",
+        name: "Uruguay",
+        wikidataQid: "Q77",
+      },
+    ],
+    acquisitionBudgetMs: 5,
+    getClaims: async () => {
+      claimCalls++;
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      return [claim];
+    },
+    markSynced: (async () => {
+      stampCalls++;
+      return ["wikidata"];
+    }) as never,
+  });
+
+  assert.equal(claimCalls, 1);
+  assert.equal(result.jurisdictionsProcessed, 1);
+  assert.match(result.errors.join(" "), /acquisition budget exhausted/);
+  assert.equal(state.facts.size, 1);
+  assert.equal(stampCalls, 0);
+});
+
+test("Wikidata reference row order does not change the normalized source hash", async () => {
+  const state = harness();
+  const referenceRows = [
+    {
+      ...claim,
+      refUrl: "https://data.worldbank.org/indicator/SP.POP.TOTL",
+    },
+    {
+      ...claim,
+      refStatedInLabel: "World Bank DataBank",
+      refUrl: "https://api.worldbank.org/v2/country/CAN/indicator/SP.POP.TOTL",
+    },
+    {
+      ...claim,
+      refUrl: "https://data.worldbank.org/indicator/SP.POP.TOTL",
+    },
+  ];
+  let reverse = false;
+  const options = {
+    ...fixtureOptions(state.writeFact),
+    getClaims: async () => reverse ? [...referenceRows].reverse() : referenceRows,
+  };
+
+  await syncFactbookWikidata(state.db, options);
+  const firstHash = state.facts.values().next().value?.sourceHash;
+  reverse = true;
+  await syncFactbookWikidata(state.db, options);
+  const secondHash = state.facts.values().next().value?.sourceHash;
+
+  assert.equal(secondHash, firstHash);
+  assert.equal(
+    (state.facts.values().next().value?.references as unknown[]).length,
+    3,
+  );
+});
+
+test("Wikidata batch failure after a successful jurisdiction retains partial counts and withholds freshness", async () => {
+  const state = harness();
+  const originalFetch = globalThis.fetch;
+  let fetchCalls = 0;
+  let stampCalls = 0;
+  globalThis.fetch = (async () => {
+    fetchCalls++;
+    if (fetchCalls > 1) throw new Error("upstream connection closed");
+    return new Response(JSON.stringify({
+      head: { vars: [] },
+      results: {
+        bindings: [{
+          property: { type: "uri", value: "http://www.wikidata.org/entity/P1082" },
+          stmt: { type: "uri", value: claim.statementIri },
+          value: { type: "literal", value: claim.valueRaw },
+          unit: { type: "uri", value: "http://www.wikidata.org/entity/Q199" },
+          pit: { type: "literal", value: claim.pointInTime },
+          pitPrecision: { type: "literal", value: "9" },
+          rank: { type: "uri", value: "http://wikiba.se/ontology#PreferredRank" },
+          refStatedIn: { type: "uri", value: "http://www.wikidata.org/entity/Q21540096" },
+          refStatedInLabel: { type: "literal", value: "World Bank" },
+          refUrl: { type: "uri", value: claim.refUrl },
+        }],
+      },
+    }), { status: 200 });
+  }) as typeof fetch;
+
+  try {
+    const result = await syncFactbookWikidata(state.db, {
+      ...fixtureOptions(state.writeFact),
+      getClaims: undefined,
+      jurisdictions: [
+        jurisdiction,
+        {
+          ...jurisdiction,
+          id: "22222222-2222-4222-8222-222222222222",
+          slug: "uruguay",
+          name: "Uruguay",
+          wikidataQid: "Q77",
+        },
+      ],
+      markSynced: (async () => {
+        stampCalls++;
+        return ["wikidata"];
+      }) as never,
+    });
+
+    assert.equal(fetchCalls, 3);
+    assert.equal(result.jurisdictionsProcessed, 2);
+    assert.equal(result.totalAdmitted, 1);
+    assert.match(result.errors.join(" "), /uruguay: SPARQL batch failure/);
+    assert.equal(state.facts.size, 1);
+    assert.equal(stampCalls, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Wikidata terminal deadline stops late writes and dispute work", async () => {
+  const state = harness();
+  let persistCalls = 0;
+  let stampCalls = 0;
+  const result = await syncFactbookWikidata(state.db, {
+    ...fixtureOptions(state.writeFact),
+    terminalBudgetMs: 5,
+    getClaims: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      return [claim];
+    },
+    persistDisputes: (async () => {
+      persistCalls++;
+      return noDisputes();
+    }) as never,
+    markSynced: (async () => {
+      stampCalls++;
+      return ["wikidata"];
+    }) as never,
+  });
+
+  assert.match(result.errors.join(" "), /terminal budget exhausted/);
+  assert.equal(state.facts.size, 0);
+  assert.equal(persistCalls, 0);
+  assert.equal(stampCalls, 0);
+});

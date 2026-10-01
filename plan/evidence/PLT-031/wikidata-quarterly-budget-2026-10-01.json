@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "taskId": "PLT-031",
+  "recordedAt": "2026-10-01T13:33:32.855050+00:00",
+  "state": "local-validated-not-yet-deployed",
+  "incident": {
+    "job": "factbook.wikidata",
+    "scheduledAt": "2026-10-01T06:00:00Z",
+    "productionVersion": "ad95a1f7d60ea8dea4ed8a709d150dda752bf772",
+    "hostingResult": "HTTP504 after800seconds",
+    "retainedState": "Execution and pipeline running; lease expired06:30:31; no current lease",
+    "partialWrites": {
+      "facts": 1214,
+      "jurisdictions": 187,
+      "eligibleJurisdictions": 197
+    },
+    "sourceFreshness": "2026-08-10T02:55:00.302Z",
+    "rootCause": "Sequential per-property requests exhausted the hosting duration before finishing the country set and dispute/freshness phase. The endpoint remained responsive; current sampled calls and ongoing final-millisecond writes contradict a blanket upstream-outage diagnosis."
+  },
+  "repair": {
+    "scope": "One correlated SPARQL VALUES query per jurisdiction for the seven existing properties; preserve statement nodes, rank, qualifiers/precision, units, references and admission rules.",
+    "requestsBefore": 1379,
+    "requestsAfter": 197,
+    "factbookAttemptTimeoutMs": 15000,
+    "attempts": 2,
+    "acquisitionBudgetMs": 600000,
+    "terminalBudgetMs": 730000,
+    "neonHttpTimeoutMs": 10000,
+    "freshnessRule": "Incomplete/error/deadline runs never advance aggregate source freshness; existing history and dispute writers retained.",
+    "sharedCompatibility": "Bare runSparql used by entity-name-form sync retains its previous default; factbook calls alone opt into request timeout.",
+    "referenceOrdering": "Canonical order without deduplication stabilizes normalized reference hashes. The first ordinary successful import can retain a history transition from a legacy order-dependent hash; no direct data migration or deletion."
+  },
+  "validation": {
+    "focusedTests": 17,
+    "independentReview": "No remaining blocking findings after terminal-deadline and shared-caller fixes.",
+    "liveOfficialParity": {
+      "checkedAt": "2026-10-01T13:15:14.509Z",
+      "endpoint": "https://query.wikidata.org/sparql",
+      "productionDatabaseUsed": false,
+      "productionWrites": false,
+      "referenceComparison": "unordered multiset; duplicates retained",
+      "results": [
+        {
+          "qid": "Q30",
+          "properties": 7,
+          "rawRows": 122,
+          "admitted": 6,
+          "legacyMs": 4234,
+          "batchMs": 1345,
+          "rowsAndAdmittedProvenanceEqual": true
+        },
+        {
+          "qid": "Q77",
+          "properties": 7,
+          "rawRows": 107,
+          "admitted": 5,
+          "legacyMs": 10515,
+          "batchMs": 922,
+          "rowsAndAdmittedProvenanceEqual": true
+        },
+        {
+          "qid": "Q183",
+          "properties": 7,
+          "rawRows": 115,
+          "admitted": 6,
+          "legacyMs": 13378,
+          "batchMs": 615,
+          "rowsAndAdmittedProvenanceEqual": true
+        },
+        {
+          "qid": "Q225",
+          "properties": 7,
+          "rawRows": 86,
+          "admitted": 7,
+          "legacyMs": 15822,
+          "batchMs": 3319,
+          "rowsAndAdmittedProvenanceEqual": true
+        }
+      ]
+    },
+    "fullReadOnlyRehearsal": {
+      "checkedAt": "2026-10-01T13:27:45.288Z",
+      "databaseReadOnlyVerified": true,
+      "productionWrites": false,
+      "sourceFreshnessBefore": [
+        {
+          "stamp": "2026-08-10 02:55:00.302"
+        }
+      ],
+      "sourceFreshnessAfter": [
+        {
+          "stamp": "2026-08-10 02:55:00.302"
+        }
+      ],
+      "result": {
+        "startedAt": "2026-10-01T13:25:52.614Z",
+        "finishedAt": "2026-10-01T13:27:45.271Z",
+        "durationMs": 112657,
+        "jurisdictionsProcessed": 197,
+        "factCountersByKey": {
+          "population_total": {
+            "factKey": "population_total",
+            "considered": 9843,
+            "admitted": 181,
+            "rejected_no_value": 0,
+            "rejected_no_reference": 346,
+            "rejected_allowlist": 673,
+            "rejected_envelope": 0,
+            "unit_mismatch": 0,
+            "floor_displaced_preferred": 2
+          },
+          "gdp_nominal_usd_billions": {
+            "factKey": "gdp_nominal_usd_billions",
+            "considered": 1393,
+            "admitted": 184,
+            "rejected_no_value": 0,
+            "rejected_no_reference": 3,
+            "rejected_allowlist": 1,
+            "rejected_envelope": 11,
+            "unit_mismatch": 917,
+            "floor_displaced_preferred": 0
+          },
+          "unemployment_rate_pct": {
+            "factKey": "unemployment_rate_pct",
+            "considered": 333,
+            "admitted": 143,
+            "rejected_no_value": 0,
+            "rejected_no_reference": 3,
+            "rejected_allowlist": 82,
+            "rejected_envelope": 0,
+            "unit_mismatch": 25,
+            "floor_displaced_preferred": 0
+          },
+          "life_expectancy_years": {
+            "factKey": "life_expectancy_years",
+            "considered": 3979,
+            "admitted": 190,
+            "rejected_no_value": 0,
+            "rejected_no_reference": 19,
+            "rejected_allowlist": 131,
+            "rejected_envelope": 0,
+            "unit_mismatch": 0,
+            "floor_displaced_preferred": 53
+          },
+          "birth_rate": {
+            "factKey": "birth_rate",
+            "considered": 757,
+            "admitted": 190,
+            "rejected_no_value": 0,
+            "rejected_no_reference": 0,
+            "rejected_allowlist": 1,
+            "rejected_envelope": 0,
+            "unit_mismatch": 0,
+            "floor_displaced_preferred": 0
+          },
+          "death_rate": {
+            "factKey": "death_rate",
+            "considered": 758,
+            "admitted": 190,
+            "rejected_no_value": 0,
+            "rejected_no_reference": 0,
+            "rejected_allowlist": 3,
+            "rejected_envelope": 0,
+            "unit_mismatch": 0,
+            "floor_displaced_preferred": 0
+          },
+          "fertility_rate": {
+            "factKey": "fertility_rate",
+            "considered": 3055,
+            "admitted": 192,
+            "rejected_no_value": 0,
+            "rejected_no_reference": 40,
+            "rejected_allowlist": 24,
+            "rejected_envelope": 0,
+            "unit_mismatch": 0,
+            "floor_displaced_preferred": 2
+          }
+        },
+        "totalAdmitted": 1270,
+        "disputes": {
+          "jurisdictionsScanned": 195,
+          "pairsScanned": 1270,
+          "proposedTotal": 0,
+          "inserted": 0,
+          "skippedDuplicate": 0,
+          "skippedNoFactGroup": 0,
+          "errors": []
+        },
+        "errors": [],
+        "dryRun": true,
+        "phaseTiming": {
+          "acquisitionAndWriteMs": 98639,
+          "disputePersistenceMs": 14018,
+          "freshnessMs": 0
+        }
+      }
+    },
+    "earlierTransientRehearsal": {
+      "durationMs": 355100,
+      "errors": [
+        "georgia: SPARQL batch failure \u2014 SPARQL query failed after retries: SPARQL request timed out after 15000ms"
+      ],
+      "freshnessUnchanged": true,
+      "interpretation": "One Georgia timeout was retained honestly, without freshness. A later official batch probe succeeded in558ms; final full rehearsal succeeded."
+    },
+    "credentialFreeBuildBeforeDependencyPrerequisite": {
+      "result": "passed",
+      "unitPassed": 2404,
+      "unitSkipped": 3
+    },
+    "otherLocalChecks": [
+      "TypeScript",
+      "lint",
+      "cron-safety",
+      "sync-freshness",
+      "Atlas history writer",
+      "production adapters",
+      "Wikidata date precision",
+      "master plan",
+      "rendered-module ledger",
+      "module coverage"
+    ],
+    "dependencyGate": "Passed locally with the minimal Next16.3.6 prerequisite prepared in PR53; every configured remote check and normal merge remain required.",
+    "combinedPatchedRuntimeBuild": {
+      "result": "passed",
+      "nextVersion": "16.3.6",
+      "unitPassed": 2404,
+      "unitSkipped": 3,
+      "unitFailed": 0
+    }
+  },
+  "deployment": {
+    "actual": "Not merged or deployed when recorded.",
+    "required": "All configured checks, normal PR merge, canonical deployment, then a stable-key standard dry run and complete source-backed application with terminal execution/pipeline and freshness proof."
+  },
+  "rollback": "Forward-fix or revert code through a checked PR; preserve retained source facts, snapshots, disputes and history. Do not delete or mark the interrupted historical run healthy.",
+  "primaryReferences": [
+    {
+      "url": "https://www.w3.org/TR/sparql11-query/#inline-data",
+      "checkedOn": "2026-10-01"
+    },
+    {
+      "url": "https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/queries",
+      "checkedOn": "2026-10-01"
+    },
+    {
+      "url": "https://vercel.com/docs/functions/configuring-functions/duration",
+      "checkedOn": "2026-10-01"
+    }
+  ]
+}

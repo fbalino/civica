@@ -2,9 +2,10 @@
  * Phase F.2 — Wikidata sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET`
- * (per the shared cron boundary). The full 270-jurisdiction × 8-fact-key
- * pass takes roughly 10 minutes at Wikidata's 4 req/s politeness
- * floor; allow 540s.
+ * (per the shared cron boundary). The full 197-jurisdiction × 7-fact-key
+ * pass uses one batched request per jurisdiction. Upstream acquisition stops
+ * at 600s so dispute persistence and terminal bookkeeping retain 200s of the
+ * Vercel execution window.
  *
  * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §2
  * Implementation plan: F.2.
@@ -16,8 +17,8 @@ import { syncFactbookWikidata } from "@/lib/factbook/reconcile/wikidata-sync";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// Quarterly full pass: ~270 jurisdictions × 8 fact-keys × ~250ms
-// throttle ~= 540s. Vercel max for cron is 800s on Pro.
+// Vercel max for cron is 800s on Pro. The sync's acquisition budget below
+// intentionally leaves the final 200s for disputes and job bookkeeping.
 export const maxDuration = 800;
 
 async function handler(request: Request) {
@@ -33,6 +34,10 @@ async function handler(request: Request) {
       if (line.startsWith("!")) console.error(line);
     },
     dryRun,
+    acquisitionBudgetMs: 600_000,
+    // Every Neon HTTP operation is bounded at 10s. A 730s terminal cutoff
+    // leaves at least 70s for the cron wrapper's terminal DB outcome writes.
+    terminalBudgetMs: 730_000,
   });
 
   if (summary.errors.length > 0 || summary.totalAdmitted === 0) {
@@ -43,6 +48,9 @@ async function handler(request: Request) {
         step: "factbook.wikidata.sync",
         dryRun,
         errorCount: Math.max(1, summary.errors.length),
+        jurisdictionsProcessed: summary.jurisdictionsProcessed,
+        totalAdmitted: summary.totalAdmitted,
+        phaseTiming: summary.phaseTiming,
       },
       { status: 502 },
     );
@@ -57,6 +65,7 @@ async function handler(request: Request) {
     jurisdictionsProcessed: summary.jurisdictionsProcessed,
     totalAdmitted: summary.totalAdmitted,
     perFact: summary.factCountersByKey,
+    phaseTiming: summary.phaseTiming,
     dryRun,
   });
 }

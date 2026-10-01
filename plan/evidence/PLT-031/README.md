@@ -139,3 +139,23 @@ The publisher's date is December 5, 2023, which remains a source vintage rather
 than an appointment date. This record is pre-merge evidence; current production
 and standard cron verification are recorded in the local monitor's ignored
 `output/data-reliability/latest.json`.
+
+
+## October 1 quarterly Wikidata request budget
+
+The quarterly factbook refresh reached the 800-second hosting limit after
+writing 1,214 sourced facts for 187 of 197 eligible jurisdictions. Its expired
+execution was not a still-active worker, and source freshness correctly
+remained unchanged. The repair batches the same seven properties per country
+into one statement-preserving SPARQL query, with bounded requests and explicit
+acquisition/finalization budgets. Partial work keeps its evidence and cannot
+claim a fresh complete run.
+
+[Local validation and source parity](wikidata-quarterly-budget-2026-10-01.json)
+confirm matching values and provenance across 430 official-source rows, plus
+a complete database-enforced read-only pass across all 197 jurisdictions in
+113 seconds with no errors or source stamp. This is pre-merge evidence; current
+normal-merge, deployment and recovery proof belongs in the local monitor's
+ignored `output/data-reliability/latest.json`. Reference order is normalized
+without dropping duplicates; a first successful import can therefore retain
+a change from an older order-dependent source hash.
