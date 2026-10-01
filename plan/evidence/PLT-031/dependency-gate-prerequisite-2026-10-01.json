@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T13:35:52.342845+00:00",
+  "taskId": "PLT-031",
+  "purpose": "Restore the existing mandatory dependency gate before delivering the quarterly Wikidata repair.",
+  "advisory": {
+    "id": "GHSA-vcvr-r3jv-pc5j",
+    "source": "https://github.com/advisories/GHSA-vcvr-r3jv-pc5j",
+    "publisherSource": "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j",
+    "verifiedOn": "2026-10-01",
+    "affectedRange": ">=16.2.0 <16.3.6",
+    "patchedVersion": "16.3.6",
+    "impactScope": "The advisory concerns Node.js next/og ImageResponse with attacker-controlled SVG content/attributes/styles. This record establishes a blocked package gate, not a finding that Civica is exploitable or has been compromised."
+  },
+  "change": {
+    "next": {
+      "from": "16.3.5",
+      "to": "16.3.6"
+    },
+    "eslint-config-next": {
+      "from": "16.3.5",
+      "to": "16.3.6"
+    },
+    "lockfilePackageRecordsChanged": 12,
+    "unrelatedLockRecordsPreserved": true,
+    "unrelatedDependencyRangesPreserved": true,
+    "majorVersionChange": false
+  },
+  "installation": {
+    "constraint": "The host refuses direct-URL dependencies, and a full lock refresh tried to inspect an unrelated existing optional Tailwind tarball.",
+    "safeMethod": "Generate and install a minimal temporary npm project using registry-name/version dependencies only. Verify unchanged non-Next dependency/peer ranges; copy only Next-family package records into the real lock. Reuse already installed unrelated modules for local validation; install only the new Next family from the allowed registry project.",
+    "sourceRestrictionChanged": false,
+    "auditThresholdChanged": false,
+    "forceInstallUsed": false,
+    "integritySource": "Official npm registry dist.integrity metadata."
+  },
+  "validation": {
+    "lockScopeAndDependencyRangeAssertions": "passed",
+    "installedVersionsAndNpmLs": "passed",
+    "criticalDependencyAudit": "passed; lower-severity pre-existing findings remain",
+    "fullBuild": "passed; Next16.3.6 production compilation and full build gates",
+    "packetReproduction": "passed",
+    "authorshipAndReplication": "passed",
+    "historicalG2ValidationAndReproduction": "passed",
+    "readOnlySourceFixture": "970 source-native cells and existing rights-safe fixture passed with server-enforced read-only queries",
+    "unitTests": {
+      "passed": 2394,
+      "skipped": 3,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "renderedModuleLedger": "passed"
+  },
+  "deployment": "Normal separate prerequisite PR, all configured checks, normal squash merge. No data/schema/provider-setting change.",
+  "rollback": "Reverting the pins would restore the critical package advisory and failing gate; prefer an upstream patched forward version if a regression appears.",
+  "currentEnvironmentPacket": {
+    "id": "governance-evidence-review-packet-2026-10-v1",
+    "reason": "Canonical packet binds the current root lockfile in its artifact inventory; new version follows PR29 instead of rewriting September. The distinct historical tournament environment remains unchanged.",
+    "historicalReleasesUnchanged": true,
+    "changedManifestSections": [
+      "citation",
+      "inventory",
+      "releaseId",
+      "bundleSemanticSha256"
+    ],
+    "substantiveResearchFieldsUnchanged": true,
+    "externalReviewStatusUnchanged": true
+  }
+}
