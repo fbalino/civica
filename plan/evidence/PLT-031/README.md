@@ -159,3 +159,26 @@ normal-merge, deployment and recovery proof belongs in the local monitor's
 ignored `output/data-reliability/latest.json`. Reference order is normalized
 without dropping duplicates; a first successful import can therefore retain
 a change from an older order-dependent source hash.
+
+
+## October 3 UN WPP source migration
+
+The quarterly UN import failed before writing because the retired UNdata
+exporter now returns application HTML. The replacement reads the documented
+WPP 2024 Medium bulk gzip CSV once, validates its schema, and retains the
+actual publisher column and input-byte hash. It preserves the existing year,
+units, admission rules, source rights, history writer, and freshness guard.
+The `LEx` mapping also corrects the existing both-sex life-expectancy field,
+which previously contained male-only values.
+
+[Pre-merge source and isolated-write evidence](un-wpp-bulk-source-2026-10-03.json)
+records a fresh restored snapshot, 1,372 source-backed observations, 24,692
+unchanged non-target facts, and no new semantic/history/snapshot/dispute
+changes on repeat. The shared source-specification change is recorded through
+the existing [change-control process](un-wpp-source-change-note.md). The frozen
+G2 rights check now compares current permissions only for its actual release
+sources and policies, while retaining bundle checksums and internal rights
+agreement; unrelated UN endpoint metadata no longer invalidates that archive.
+No frozen package or rights grant changed. Current production recovery, after
+normal merge and all configured checks, belongs in the ignored local monitor
+evidence.

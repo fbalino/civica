@@ -5,6 +5,7 @@ import { join, resolve } from "node:path";
 import { gunzipSync } from "node:zlib";
 import YAML from "yaml";
 import { buildAtlasExport, serializeAtlasExport } from "../src/lib/exports/atlas-release";
+import { validateG2ReleaseRights } from "../src/lib/rights/g2-release-validation";
 import { buildRightsManifest } from "../src/lib/rights/manifest";
 
 const dir = resolve("data/releases/atlas-2026-07-11/g2-rc1");
@@ -49,9 +50,16 @@ if (JSON.stringify(rebuilt.counts) !== JSON.stringify(bom.rowCounts)) fail("rebu
 const codebook = JSON.parse(readFileSync(join(dir, "codebook.v1.json"), "utf8"));
 if (JSON.stringify(codebook.codebook) !== JSON.stringify(original.codebook)) fail("standalone codebook differs from export");
 const rights = JSON.parse(readFileSync(join(dir, "rights-manifest.v1.json"), "utf8"));
-if (JSON.stringify(rights) !== JSON.stringify(buildRightsManifest())) fail("rights manifest drift");
 const inputs = JSON.parse(readFileSync(join(dir, "source-input-manifest.v1.json"), "utf8"));
 if (inputs.captureLevel !== "immutable-civica-vintage-rows" || inputs.upstreamPublisherBytesRetained !== false) fail("input reconstruction boundary drift");
+for (const problem of validateG2ReleaseRights({
+  releaseId: bom.releaseId,
+  productId: "atlas-reference-export-v1",
+  bomSourceIds: bom.sourceInputs.map((source: { sourceId: string }) => source.sourceId),
+  bundledManifest: rights,
+  bundledInputs: inputs.inputs,
+  currentManifest: buildRightsManifest(),
+})) fail(problem);
 if (inputs.inputs.length !== bom.sourceInputs.length) fail("source-input inventory drift");
 for (const source of bom.sourceInputs) {
   const input = inputs.inputs.find((row: { sourceId: string }) => row.sourceId === source.sourceId);

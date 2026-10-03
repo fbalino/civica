@@ -1,33 +1,19 @@
 /**
  * Phase R.3 — UN Population Division (WPP 2024) sync orchestrator.
  *
- * Direct sync from the legacy UNData portal at
- * `http://data.un.org/Handlers/DownloadHandler.ashx`. Mirrors the
- * F.6 / R.1 World Bank WDI pattern at `sync-wdi.ts` and the R.2 IMF
- * WEO pattern at `sync-imf-weo.ts`. Ingests 7 demographic indicators
- * that map cleanly to declared Civica fact-keys.
- *
- * Why the legacy UNData portal and not the modern UN DESA Data
- * Portal API: the modern API at `population.un.org/dataportalapi/`
- * requires a Bearer token requested via email + Cloudflare Turnstile
- * CAPTCHA, incompatible with Civica's keyless cron architecture. The
- * legacy portal returns the same WPP 2024 Revision data with
- * bit-exact value match (verified Nigeria 2024 population:
- * 232,679,478 from both UN and the WB row that republishes UN data).
- * See `~/civica/plan/un-data-resolution-v1.md` §2a.
+ * Direct sync from the official UN Population Division WPP 2024 bulk
+ * download. The former UNData DownloadHandler now serves the UN Data
+ * Commons application HTML instead of ZIP-CSV data, so it is not a valid
+ * source endpoint. The replacement gzip CSV carries all seven demographic
+ * indicators in one publisher row per country/year/variant.
  *
  * Key architectural differences from `sync-wdi.ts` / `sync-imf-weo.ts`:
- *   - UNData ships ZIP-wrapped CSV (text/csv inside a ZIP archive).
- *     Use `adm-zip` (already a project dep from Phase H.2) to
- *     decompress in memory, parse with a small CSV reader.
- *   - One round-trip per (variableID, timeID=75 for year 2024) pair
- *     returns ALL 237+ countries' values for that indicator/year.
- *     Cheaper than IMF WEO (one fetch per indicator) and WB WDI
- *     (multiple paginated fetches per indicator).
+ *   - One bounded, timed gzip-CSV download supplies all seven indicators.
+ *   - The parser requires the official WPP columns and rejects malformed or
+ *     duplicate 2024 country rows before any fact write begins.
  *   - Country join uses UN M49 numeric codes via a hard-coded
- *     `m49ToIso3` map. UN's CSV ships a numeric code column when
- *     the URL includes `c=1,2,4,6,7`. Falls back to country name
- *     if the M49 code isn't recognized.
+ *     `m49ToIso3` map. The bulk CSV's `LocID` is the M49 code; its
+ *     `ISO3_code` is cross-checked when the M49 map has an entry.
  *   - One indicator (population_total) needs a unit transform:
  *     UNData ships population in thousands; multiply by 1000.
  *   - Population growth_rate (variableID 47) is in percent — same
@@ -56,11 +42,13 @@
  * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.3
  * Resolution:  ~/civica/plan/un-data-resolution-v1.md
  */
+import { createHash } from "node:crypto";
+import { gunzipSync } from "node:zlib";
 import { sql } from "drizzle-orm";
-import AdmZip from "adm-zip";
 
 import { factSnapshots, jurisdictions } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import { fetchPublicHttpBytes } from "@/lib/net/public-http";
 import {
   resolveAtlasReleaseId,
   routineCountryFactHistory,
@@ -81,9 +69,27 @@ import {
 
 type Db = typeof import("@/lib/db").db;
 
-const UNDATA_BASE_URL = "http://data.un.org/Handlers/DownloadHandler.ashx";
-const UN_DATA_PORTAL_DOC_URL = "https://population.un.org/wpp/";
+export const UN_WPP_BULK_URL =
+  "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz";
+const UN_DATA_PORTAL_DOC_URL =
+  "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=CSV%20format";
 const UN_USER_AGENT = "Civica/0.1 (https://civicaatlas.org; fbalino@gmail.com)";
+const UN_WPP_OBSERVATION_YEAR = 2024;
+const UN_WPP_REQUEST_TIMEOUT_MS = 45_000;
+const UN_WPP_MAX_COMPRESSED_BYTES = 32 * 1024 * 1024;
+const UN_WPP_MAX_DECOMPRESSED_BYTES = 64 * 1024 * 1024;
+
+const UN_WPP_VALUE_COLUMNS = [
+  "TPopulation1July",
+  "PopGrowthRate",
+  "TFR",
+  "CBR",
+  "CDR",
+  "LEx",
+  "IMR",
+] as const;
+
+type UnWppValueColumn = (typeof UN_WPP_VALUE_COLUMNS)[number];
 
 /**
  * Vintage label for the current WPP revision. WPP releases biennially
@@ -94,30 +100,19 @@ const UN_USER_AGENT = "Civica/0.1 (https://civicaatlas.org; fbalino@gmail.com)";
 const UN_WPP_VINTAGE = "UN WPP 2024 Revision";
 
 /**
- * UNData PopDiv timeID corresponding to year 2024. The legacy portal
- * uses opaque integer time IDs (timeID=75 = year 2024 confirmed by
- * live probe 2026-05-04). Each new year of UN WPP data bumps the
- * timeID by 1, so the next vintage cut needs to update this:
- *   - timeID 75 → 2024 (current)
- *   - timeID 76 → 2025 (when WPP 2025 lands; revisions are biennial,
- *                       but the dataset can backfill years between
- *                       revisions)
- *
- * For now, hard-coded to 75. When a new vintage cut lands, one of
- * two things happens:
- *   (a) WPP 2026 Revision: the data re-baselines with new estimates;
- *       use timeID for 2025 or 2026 as appropriate.
- *   (b) Within the 2024 Revision, additional years (2025) become
- *       available; we fetch the most recent year's timeID.
+ * Former UNData time identifier for 2024. Production no longer sends it to
+ * the retired endpoint; it remains only in the legacy injected fixture seam.
  */
-const UN_WPP_TIME_ID = 75;
+const LEGACY_UNDATA_TIME_ID = 75;
 
 /**
- * One UNData PopDiv indicator we care about.
+ * One WPP bulk-file indicator we care about.
  */
 export interface UnDataIndicatorConfig {
-  /** UNData PopDiv variableID (e.g. 12 for total population). */
+  /** Legacy UNData variableID retained for CLI/filter compatibility. */
   unVarId: number;
+  /** Exact WPP 2024 bulk CSV column. */
+  sourceColumn: UnWppValueColumn;
   /** Civica fact-key the resulting row writes to. */
   factKey: string;
   /** Human-readable indicator label for log lines. */
@@ -148,6 +143,7 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
   //     → 232,679,478 ✓ matches WB exactly (WB republishes UN). ───
   {
     unVarId: 12,
+    sourceColumn: "TPopulation1July",
     factKey: "population_total",
     label: "Total population, both sexes (Medium variant)",
     docUrl: UN_DATA_PORTAL_DOC_URL,
@@ -163,6 +159,7 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
   //     republishes UN. ───
   {
     unVarId: 47,
+    sourceColumn: "PopGrowthRate",
     factKey: "population_growth_rate",
     label: "Population annual growth rate (per cent)",
     docUrl: UN_DATA_PORTAL_DOC_URL,
@@ -170,6 +167,7 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
   },
   {
     unVarId: 54,
+    sourceColumn: "TFR",
     factKey: "fertility_rate",
     label: "Total fertility rate (births per woman)",
     docUrl: UN_DATA_PORTAL_DOC_URL,
@@ -177,6 +175,7 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
   },
   {
     unVarId: 53,
+    sourceColumn: "CBR",
     factKey: "birth_rate",
     label: "Crude birth rate (per 1,000 population)",
     docUrl: UN_DATA_PORTAL_DOC_URL,
@@ -184,6 +183,7 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
   },
   {
     unVarId: 65,
+    sourceColumn: "CDR",
     factKey: "death_rate",
     label: "Crude death rate (per 1,000 population)",
     docUrl: UN_DATA_PORTAL_DOC_URL,
@@ -196,6 +196,7 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
   //     civicaRole; R.4 flips by re-sync. ───
   {
     unVarId: 66,
+    sourceColumn: "LEx",
     factKey: "life_expectancy_years",
     label: "Life expectancy at birth, both sexes combined (years)",
     docUrl: UN_DATA_PORTAL_DOC_URL,
@@ -203,26 +204,16 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
   },
   {
     unVarId: 77,
+    sourceColumn: "IMR",
     factKey: "infant_mortality_per_1000",
     label: "Infant mortality rate (per 1,000 live births)",
     docUrl: UN_DATA_PORTAL_DOC_URL,
     civicaRole: "canonical",
   },
 
-  // ─── Median age — DEFERRED 2026-05-03. Q4 sign-off allowed a
-  //     <30 min probe within R.3 implementation. The probe ran
-  //     2026-05-04 against UNData PopDiv variableIDs 1-200 and
-  //     found NO match for median age (Nigeria 2024 expected ~19
-  //     years; no variableID returned a value in that range).
-  //     The legacy UNData portal is a curated subset of the
-  //     modern Data Portal API; median age is in the modern API
-  //     (id 67 = MedianAgePop) but requires the Bearer token. So
-  //     median age stays single-sourced (CIA only) until either
-  //     (a) the Bearer-token integration ships in v1.1+, or
-  //     (b) a future small UN-data probe finds an alternate
-  //     legacy source for median age. NOT routed to R.4 because
-  //     median age is a demographic statistic and WHO doesn't
-  //     carry it. See ~/civica/plan/un-data-resolution-v1.md §6 Q4. ───
+  // ─── Median age remains deferred. The replacement bulk file carries
+  //     `MedianAgePop`, but adding a new UN-backed fact is outside this
+  //     source-repair scope and needs its own source/methodology decision. ───
 ];
 
 /**
@@ -232,8 +223,8 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
  * commonly-recognized territories. Restricted to entities Civica's
  * `jurisdictions` table can plausibly match.
  *
- * UNData CSV ships the M49 numeric code in column 1 when the URL
- * includes `c=1,2,4,6,7`. We use this rather than country-name
+ * The WPP bulk CSV ships the M49 numeric code as `LocID`. We use this rather
+ * than country-name
  * matching because UN's English names sometimes diverge from
  * Civica's slug-derived names (e.g. "Bolivia (Plurinational State
  * of)", "Iran (Islamic Republic of)", "China, Taiwan Province of
@@ -497,13 +488,8 @@ export const M49_TO_ISO3: Record<number, string> = {
 };
 
 /**
- * One UNData CSV row after parsing. UNData ships ZIP-wrapped CSV
- * with these columns when URL has `c=1,2,4,6,7`:
- *   1. "Country or Area Code"  (M49 numeric, e.g. "566" for Nigeria)
- *   2. "Country or Area"       (English name, e.g. "Nigeria")
- *   3. "Year(s)"                 (e.g. "2024")
- *   4. "Variant"                 (e.g. "Medium", "High", "Low", ...)
- *   5. "Value"                   (e.g. "232679.478")
+ * Normalized single-indicator row used by the established sync fixture seam
+ * and derived from one field in a WPP bulk row in production.
  */
 export interface UnDataRow {
   countryCode: number;
@@ -553,6 +539,8 @@ export interface UnDataSyncOptions {
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
   /** Deterministic fixture seams; production callers omit these. */
+  fetchBulk?: () => Promise<Uint8Array>;
+  /** Legacy per-indicator fixture seam retained for existing tests. */
   fetchIndicator?: (unVarId: number, timeId: number) => Promise<UnDataRow[]>;
   jurisdictions?: UnDataJurisdiction[];
   persistDisputes?: typeof persistProposedDisputes;
@@ -582,91 +570,232 @@ function freshCounters(factKey: string, unVarId: number): PerUnDataCounters {
   };
 }
 
-/**
- * Build the UNData download URL for a given (variableID, timeID).
- * `c=1,2,4,6,7` selects columns:
- *   1 = Country or Area Code (M49 numeric)
- *   2 = Country or Area (English name)
- *   4 = Year(s)
- *   6 = Variant
- *   7 = Value
- * Sort by country name ascending, year descending. The legacy portal
- * caps results at ~100,000 rows — well beyond our needs (≤2,500
- * country×variant rows per indicator-year fetch).
- */
-function buildUrl(unVarId: number, timeId: number): string {
-  const filter = `variableID:${unVarId};timeID:${timeId}`;
-  const params = new URLSearchParams({
-    DataFilter: filter,
-    DataMartId: "PopDiv",
-    Format: "csv",
-    c: "1,2,4,6,7",
-    s: "_crEngNameOrderBy:asc,_timeEngNameOrderBy:desc,_varEngNameOrderBy:asc",
-  });
-  return `${UNDATA_BASE_URL}?${params.toString()}`;
+interface UnWppBulkRow {
+  countryCode: number;
+  countryName: string;
+  iso3: string;
+  year: number;
+  variant: "Medium";
+  values: Record<UnWppValueColumn, number>;
 }
 
-/**
- * Fetch a single UNData ZIP-wrapped CSV and return the parsed rows.
- * In-memory unzip via `adm-zip` (already a project dep from H.2).
- *
- * Returns rows of all variants (Medium, High, Low, etc.); the
- * caller filters for `Variant === "Medium"` before writing.
- */
-async function fetchIndicatorYear(
-  unVarId: number,
-  timeId: number,
-): Promise<UnDataRow[]> {
-  const url = buildUrl(unVarId, timeId);
-  const res = await fetch(url, {
-    headers: { "User-Agent": UN_USER_AGENT, Accept: "application/zip" },
-  });
-  if (!res.ok) {
+function* csvRecords(csv: string): Generator<string[]> {
+  let field = "";
+  let record: string[] = [];
+  let quoted = false;
+
+  for (let index = 0; index < csv.length; index++) {
+    const character = csv[index];
+    if (quoted) {
+      if (character === '"') {
+        if (csv[index + 1] === '"') {
+          field += '"';
+          index++;
+        } else {
+          quoted = false;
+        }
+      } else {
+        field += character;
+      }
+      continue;
+    }
+
+    if (character === '"') {
+      if (field.length > 0) {
+        throw new Error("UN WPP CSV contains an unexpected quote");
+      }
+      quoted = true;
+    } else if (character === ",") {
+      record.push(field);
+      field = "";
+    } else if (character === "\n") {
+      record.push(field);
+      field = "";
+      if (record.some((cell) => cell.length > 0)) yield record;
+      record = [];
+    } else if (character !== "\r") {
+      field += character;
+    }
+  }
+
+  if (quoted) throw new Error("UN WPP CSV contains an unterminated quote");
+  if (field.length > 0 || record.length > 0) {
+    record.push(field);
+    if (record.some((cell) => cell.length > 0)) yield record;
+  }
+}
+
+function parseStrictNumber(value: string, label: string): number {
+  const trimmed = value.trim();
+  if (!/^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(trimmed)) {
+    throw new Error(`UN WPP ${label} is not a finite number`);
+  }
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) {
+    throw new Error(`UN WPP ${label} is not a finite number`);
+  }
+  return parsed;
+}
+
+function parseUnWppBulk(archive: Uint8Array): UnWppBulkRow[] {
+  if (archive.byteLength === 0) throw new Error("UN WPP gzip payload is empty");
+  if (archive.byteLength > UN_WPP_MAX_COMPRESSED_BYTES) {
+    throw new Error("UN WPP gzip payload exceeds the compressed-byte limit");
+  }
+  if (archive[0] !== 0x1f || archive[1] !== 0x8b) {
+    throw new Error("UN WPP source did not return a gzip payload");
+  }
+
+  let csv: string;
+  try {
+    csv = gunzipSync(Buffer.from(archive), {
+      maxOutputLength: UN_WPP_MAX_DECOMPRESSED_BYTES,
+    }).toString("utf8");
+  } catch (error) {
     throw new Error(
-      `UN PopDiv variableID ${unVarId} timeID ${timeId}: ${res.status} ${res.statusText}`,
+      `UN WPP gzip decode failed: ${error instanceof Error ? error.message : error}`,
     );
   }
-  const buffer = Buffer.from(await res.arrayBuffer());
 
-  // UNData wraps in ZIP — extract the single CSV entry.
-  const zip = new AdmZip(buffer);
-  const entries = zip.getEntries();
-  if (entries.length === 0) {
-    throw new Error(`UN PopDiv variableID ${unVarId}: ZIP archive empty`);
+  const records = csvRecords(csv);
+  const headerRecord = records.next();
+  if (headerRecord.done) throw new Error("UN WPP CSV is empty");
+  const headers = headerRecord.value.map((header, index) =>
+    index === 0 ? header.replace(/^\uFEFF/, "") : header,
+  );
+  if (new Set(headers).size !== headers.length) {
+    throw new Error("UN WPP CSV contains duplicate headers");
   }
-  const csvEntry = entries[0];
-  const csvText = csvEntry.getData().toString("utf-8");
+  const headerIndex = new Map(headers.map((header, index) => [header, index]));
+  const requiredHeaders = [
+    "LocID",
+    "ISO3_code",
+    "Location",
+    "Variant",
+    "Time",
+    ...UN_WPP_VALUE_COLUMNS,
+  ];
+  const missingHeaders = requiredHeaders.filter(
+    (header) => !headerIndex.has(header),
+  );
+  if (missingHeaders.length > 0) {
+    throw new Error(
+      `UN WPP CSV is missing required headers: ${missingHeaders.join(", ")}`,
+    );
+  }
 
-  // Parse CSV — UNData uses double-quoted strings with a header row.
-  // Simple line-split + regex; values are simple (no embedded commas
-  // in country names that aren't quoted).
-  const rows: UnDataRow[] = [];
-  const lines = csvText.split(/\r?\n/);
-  // Skip header (line 0) and trailing blanks.
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-    // Match "code","name","year","variant","value"
-    // Names can have commas inside quotes (e.g. "Bolivia (Plurinational State of)"
-    // is a single quoted field). Use a regex that pairs quotes.
-    const cells = line.match(/"((?:[^"\\]|\\.)*)"/g);
-    if (!cells || cells.length < 5) continue;
-    const stripped = cells.map((c) => c.slice(1, -1));
-    const [codeStr, nameStr, yearStr, variantStr, valueStr] = stripped;
-    const code = parseInt(codeStr, 10);
-    const year = parseInt(yearStr, 10);
-    const value = parseFloat(valueStr);
-    if (!Number.isFinite(code) || !Number.isFinite(year)) continue;
-    if (!Number.isFinite(value)) continue; // skips empty values
+  const valueAt = (record: string[], header: string) =>
+    record[headerIndex.get(header)!];
+  const seenCountryYears = new Set<string>();
+  const rows: UnWppBulkRow[] = [];
+  let recordNumber = 1;
+  for (const record of records) {
+    recordNumber++;
+    if (record.length !== headers.length) {
+      throw new Error(
+        `UN WPP CSV row ${recordNumber} has ${record.length} columns; expected ${headers.length}`,
+      );
+    }
+
+    const iso3 = valueAt(record, "ISO3_code").trim().toUpperCase();
+    if (!iso3) continue;
+    if (!/^[A-Z]{3}$/.test(iso3)) {
+      throw new Error(`UN WPP row ${recordNumber} has an invalid ISO3 code`);
+    }
+
+    const year = parseStrictNumber(
+      valueAt(record, "Time"),
+      `row ${recordNumber} Time`,
+    );
+    if (!Number.isInteger(year)) {
+      throw new Error(`UN WPP row ${recordNumber} Time is not an integer year`);
+    }
+    if (year !== UN_WPP_OBSERVATION_YEAR) continue;
+
+    const variant = valueAt(record, "Variant").trim();
+    if (variant !== "Medium") {
+      throw new Error(
+        `UN WPP row ${recordNumber} has unexpected variant '${variant}'`,
+      );
+    }
+    const countryCode = parseStrictNumber(
+      valueAt(record, "LocID"),
+      `row ${recordNumber} LocID`,
+    );
+    if (!Number.isInteger(countryCode) || countryCode < 1) {
+      throw new Error(`UN WPP row ${recordNumber} LocID is not a positive integer`);
+    }
+    const countryName = valueAt(record, "Location").trim();
+    if (!countryName) {
+      throw new Error(`UN WPP row ${recordNumber} has an empty Location`);
+    }
+    const expectedIso3 = M49_TO_ISO3[countryCode];
+    if (expectedIso3 && expectedIso3 !== iso3) {
+      throw new Error(
+        `UN WPP row ${recordNumber} ISO3 does not match its LocID`,
+      );
+    }
+
+    const duplicateKey = `${iso3}:${year}`;
+    if (seenCountryYears.has(duplicateKey)) {
+      throw new Error(`UN WPP CSV contains duplicate country-year ${duplicateKey}`);
+    }
+    seenCountryYears.add(duplicateKey);
+
+    const values = Object.fromEntries(
+      UN_WPP_VALUE_COLUMNS.map((column) => [
+        column,
+        parseStrictNumber(
+          valueAt(record, column),
+          `row ${recordNumber} ${column}`,
+        ),
+      ]),
+    ) as Record<UnWppValueColumn, number>;
     rows.push({
-      countryCode: code,
-      countryName: nameStr,
+      countryCode,
+      countryName,
+      iso3,
       year,
-      variant: variantStr,
-      value,
+      variant: "Medium",
+      values,
     });
   }
+
+  if (rows.length === 0) {
+    throw new Error(
+      `UN WPP CSV has no ISO3 country observations for ${UN_WPP_OBSERVATION_YEAR}`,
+    );
+  }
   return rows;
+}
+
+async function fetchUnWppBulk(): Promise<Uint8Array> {
+  const response = await fetchPublicHttpBytes(UN_WPP_BULK_URL, {
+    headers: {
+      "User-Agent": UN_USER_AGENT,
+      Accept: "application/gzip, application/octet-stream",
+    },
+    maxBodyBytes: UN_WPP_MAX_COMPRESSED_BYTES,
+    maxWireBytes: UN_WPP_MAX_COMPRESSED_BYTES,
+    signal: AbortSignal.timeout(UN_WPP_REQUEST_TIMEOUT_MS),
+  });
+  if (!response.ok) {
+    throw new Error(`UN WPP bulk download failed with HTTP ${response.status}`);
+  }
+  return response.body;
+}
+
+function rowsForIndicator(
+  bulkRows: readonly UnWppBulkRow[],
+  config: UnDataIndicatorConfig,
+): UnDataRow[] {
+  return bulkRows.map((row) => ({
+    countryCode: row.countryCode,
+    countryName: row.countryName,
+    year: row.year,
+    variant: row.variant,
+    value: row.values[config.sourceColumn],
+  }));
 }
 
 /**
@@ -752,6 +881,25 @@ export async function syncUnData(
     counters.set(c.factKey, freshCounters(c.factKey, c.unVarId));
   }
 
+  let bulkRows: UnWppBulkRow[] | null = null;
+  let bulkInputSha256: string | null = null;
+  let bulkCompressedBytes: number | null = null;
+  if (!options.fetchIndicator) {
+    try {
+      const archive = await (options.fetchBulk ?? fetchUnWppBulk)();
+      bulkInputSha256 = createHash("sha256").update(archive).digest("hex");
+      bulkCompressedBytes = archive.byteLength;
+      bulkRows = parseUnWppBulk(archive);
+      log(
+        `Fetched one WPP 2024 bulk file with ${bulkRows.length} ISO3 country rows.`,
+      );
+    } catch (error) {
+      errors.push(
+        `UN WPP bulk fetch failed: ${error instanceof Error ? error.message : error}`,
+      );
+    }
+  }
+
   let totalWritten = 0;
   // Phase F.6.1 — track every (jurisdictionId, factKey) pair we
   // upserted so the resolver can re-evaluate them and we can persist
@@ -769,21 +917,39 @@ export async function syncUnData(
     }
 
     log(
-      `→ ${config.factKey} (UN vid=${config.unVarId}) "${config.label}" — fetching timeID=${UN_WPP_TIME_ID}…`,
+      `→ ${config.factKey} (UN vid=${config.unVarId}) "${config.label}" — reading ${config.sourceColumn}…`,
     );
 
     let rows: UnDataRow[];
-    try {
-      rows = await (options.fetchIndicator ?? fetchIndicatorYear)(
-        config.unVarId,
-        UN_WPP_TIME_ID,
-      );
-    } catch (err) {
-      errors.push(
-        `UN vid ${config.unVarId} fetch failed: ${
-          err instanceof Error ? err.message : err
-        }`,
-      );
+    if (options.fetchIndicator) {
+      try {
+        rows = await options.fetchIndicator(
+          config.unVarId,
+          LEGACY_UNDATA_TIME_ID,
+        );
+      } catch (err) {
+        errors.push(
+          `UN vid ${config.unVarId} fetch failed: ${
+            err instanceof Error ? err.message : err
+          }`,
+        );
+        recordRequiredSubfeedOutcome({
+          errors,
+          source: "UN Data",
+          target: `${config.factKey} (variable ${config.unVarId})`,
+          rowsWritten: 0,
+        });
+        continue;
+      }
+    } else if (bulkRows) {
+      rows = rowsForIndicator(bulkRows, config);
+    } else {
+      recordRequiredSubfeedOutcome({
+        errors,
+        source: "UN Data",
+        target: `${config.factKey} (column ${config.sourceColumn})`,
+        rowsWritten: 0,
+      });
       continue;
     }
     counter.observations = rows.length;
@@ -845,9 +1011,12 @@ export async function syncUnData(
 
       const upstreamPayload = {
         source: "un_data",
-        endpoint: buildUrl(config.unVarId, UN_WPP_TIME_ID),
+        endpoint: UN_WPP_BULK_URL,
+        inputSha256: bulkInputSha256,
+        inputCompressedBytes: bulkCompressedBytes,
         iso3: j.iso3,
-        unVarId: config.unVarId,
+        legacyUnDataVariableId: config.unVarId,
+        sourceColumn: config.sourceColumn,
         m49Code: dp.countryCode,
         countryName: dp.countryName,
         year: factYear,
@@ -912,7 +1081,7 @@ export async function syncUnData(
           factGroup: factKeyDef.group,
           category: factKeyDef.category,
           sourceId: "un_data",
-          sourceUrl: config.docUrl,
+          sourceUrl: UN_WPP_BULK_URL,
           references: referencesPayload,
           sourceHash: hash,
           factValue: String(numericValue),

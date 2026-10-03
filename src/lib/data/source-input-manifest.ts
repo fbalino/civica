@@ -25,6 +25,7 @@ export type AccessMethod =
 export type InputFormat =
   | "json"
   | "csv"
+  | "gzip-csv"
   | "xlsx"
   | "zip-csv"
   | "xml"
@@ -397,12 +398,12 @@ export const SOURCE_INPUT_SPECS: readonly SourceInputSpec[] = [
   ),
   spec(
     "un_data",
-    "https://data.un.org/Handlers/DownloadHandler.ashx",
+    "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz",
     "bulk-download",
-    "csv",
-    "UNdata export response at retrieval",
-    "observation year retained per value",
-    "configured UNdata indicators and available countries",
+    "gzip-csv",
+    "WPP 2024 Demographic Indicators Medium bulk file",
+    "WPP 2024 Revision; 2024 observation year retained per value",
+    "seven configured demographic fields for WPP country/area rows matched through UN M49",
     "open-with-attribution",
   ),
   spec(

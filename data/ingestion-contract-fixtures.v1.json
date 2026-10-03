@@ -4296,11 +4296,11 @@
       "pipelineId": "factbook.un-data",
       "sourceId": "un_data",
       "source": {
-        "canonicalUrl": "https://data.un.org/Handlers/DownloadHandler.ashx",
-        "format": "csv",
-        "upstreamVersion": "UNdata export response at retrieval",
-        "upstreamVintage": "observation year retained per value",
-        "expectedCoverage": "configured UNdata indicators and available countries",
+        "canonicalUrl": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz",
+        "format": "gzip-csv",
+        "upstreamVersion": "WPP 2024 Demographic Indicators Medium bulk file",
+        "upstreamVintage": "WPP 2024 Revision; 2024 observation year retained per value",
+        "expectedCoverage": "seven configured demographic fields for WPP country/area rows matched through UN M49",
         "redistributionPosture": "open-with-attribution"
       },
       "publicExport": "pending-review",
