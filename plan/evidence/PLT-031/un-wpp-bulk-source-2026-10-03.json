@@ -1,0 +1,100 @@
+{
+  "taskId": "PLT-031",
+  "scope": "Pre-merge UN source adapter repair evidence; not a production deployment or recovery claim",
+  "verifiedAt": "2026-10-03T13:29:46.982Z",
+  "incident": {
+    "scheduledAt": "2026-10-03T11:00:00Z",
+    "recordedOutcome": "500 handler_exception",
+    "legacyResponse": "HTTP200 HTML for UN System Data Commons rather than ZIP",
+    "realAdapterReproduction": "Captured publisher response raises ADM-ZIP invalid format before any fact write",
+    "automaticRetryEligible": false,
+    "existingFactsPreserved": 1371
+  },
+  "source": {
+    "publisher": "UN Population Division",
+    "revision": "WPP2024",
+    "variant": "Medium",
+    "observationYear": 2024,
+    "documentationUrl": "https://population.un.org/wpp/downloads?folder=Standard%20Projections&group=CSV%20format",
+    "accessUrl": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz",
+    "retrievedAt": "2026-10-03T13:08:47.309801Z",
+    "sha256": "286ac36bb1415e2e1ade03acfef0a29f0e4c087e2f78e38c48f50c5df89082bc",
+    "compressedBytes": 16557272,
+    "decompressedBytes": 40819701,
+    "inputFormat": "gzip-csv"
+  },
+  "semanticComparison": {
+    "existingSourceFacts": 1371,
+    "newlyAvailableFacts": 1,
+    "newFact": "Vatican City population_total = 496 people, published2024, admitted by unchanged existing envelope",
+    "lifeExpectancyCorrection": {
+      "rows": 196,
+      "before": "All retained UN life_expectancy_years exactly matched LExMale despite existing both-sex label",
+      "after": "Map intended both-sex field to publisher LEx",
+      "uruguayBefore": 74.3838,
+      "uruguayAfter": 78.2865
+    },
+    "populationSourceStringChanges": {
+      "rows": 17,
+      "maxDifferencePeople": 1
+    },
+    "otherSourceValuesUnchanged": 1158,
+    "numericStorageLimit": "Existing PostgreSQL real numeric cache can round larger populations; exact source string and snapshot payload remain retained. No schema change.",
+    "knownCoverageGap": "Existing M49 mapping omits upstream XKX/Civica XKS (Kosovo); no new admission mapping introduced."
+  },
+  "localVerification": {
+    "sourceOnlyLiveDryRun": {
+      "proposedRows": 1372,
+      "databaseOperations": 0,
+      "disputeExecution": false,
+      "result": "passed"
+    },
+    "freshBackupRestored": true,
+    "allTargetAndNonTargetFactHashesMatchedBeforeRehearsal": true,
+    "backupSha256": "c615863270b5a60ce835fac354b411e9ee46fd1d32394912348fafca6b674cea",
+    "schemaComparison": "All visible schema components match. Exact physical fingerprint differs only for dropped-column tombstones/ordinal positions in an unrelated Pulse table; no production schema change.",
+    "dryRunDatabaseUnchanged": true,
+    "firstApplyObservations": 1372,
+    "firstApplyHistoryEvents": 1372,
+    "nonTargetFactsUnchanged": 24692,
+    "invalidProvenance": 0,
+    "duplicateKeys": 0,
+    "secondApplySemanticDigestUnchanged": true,
+    "secondApplyNewSnapshots": 0,
+    "secondApplyNewHistoryEvents": 0,
+    "secondApplyNewDisputes": 0,
+    "newDisputesFirstApply": 1,
+    "freshnessAfterSuccessfulAggregateOnly": true,
+    "rightsGate": {
+      "originalFailure": "Historical full global rights equality incorrectly included unrelated UN source metadata",
+      "repair": "Compare the frozen BOM/input source inventory and embedded rights; require current equality for actual released sources and exact Atlas product/release policies",
+      "regressionTestsPassed": 9,
+      "fullCurrentRightsValidationPreserved": true,
+      "frozenBundleFilesUnchanged": 16,
+      "frozenArchiveUnchanged": true
+    },
+    "completeCredentialFreeBuild": "passed",
+    "additionalGates": [
+      "owned-source lint",
+      "module coverage",
+      "source-input manifest",
+      "ingestion fixtures",
+      "cron safety",
+      "sync freshness",
+      "research retention",
+      "rights manifest",
+      "rights claims",
+      "master plan",
+      "secrets scan",
+      "staged Index change-control",
+      "CI contract"
+    ],
+    "independentReview": "No blocking finding; existing Kosovo gap remains documented"
+  },
+  "delivery": {
+    "status": "Local build, required local gates, source probe, isolated rehearsal, and independent review passed; hosted PR checks and production recovery not yet performed",
+    "required": "Normal PR with every configured check, deployed dry run, stable-key apply, read-only outcome and provenance verification",
+    "privateEvidence": "output/data-reliability/un-data-2026-10-03/",
+    "productionWritesByThisEvidence": false
+  }
+}
