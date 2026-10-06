@@ -138,7 +138,8 @@ async function collect(generatedAt: string) {
           AND om.source_id='civica_organization_roster_v1'`,
     sql`SELECT COUNT(*)::int records, COUNT(DISTINCT b.jurisdiction_id)::int jurisdictions,
                COUNT(b.url)::int urls, COUNT(b.raw_status)::int statuses,
-               COUNT(b.introduced_date)::int introduced
+               COUNT(b.introduced_date)::int introduced,
+               COUNT(b.last_action_date)::int action_dates
         FROM bills b JOIN jurisdictions j ON j.id=b.jurisdiction_id WHERE j.type='sovereign_state'`,
     sql`WITH observations AS (
           SELECT jurisdiction_id, source_id, value, value_status FROM country_metrics
@@ -668,6 +669,14 @@ async function collect(generatedAt: string) {
           field: "introduced_date",
           label: "Introduction date",
           complete: n(b, "introduced"),
+          total: n(b, "records"),
+        },
+        {
+          // DAT-038: a publisher date for a legislative step; never
+          // retrieval or record-modified time.
+          field: "last_action_date",
+          label: "Legislative action date",
+          complete: n(b, "action_dates"),
           total: n(b, "records"),
         },
       ],

@@ -4,13 +4,16 @@ import { bills, governmentBodies, sources } from "@/lib/db/schema";
 import { getBillsForJurisdiction } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
 import { Banner } from "@/components/editorial/Banner";
+import { DataValueState } from "@/components/DataValueState";
 import {
   BILLS_SOURCE_LABELS,
   BILLS_STAGE_LABELS,
   billsCoverageMessage,
+  billsListingNote,
   billsSupportedCoverageNote,
   isBillsSupportedSlug,
 } from "@/lib/bills/coverage";
+import { parseDataValueStatus } from "@/lib/data/value-state";
 import { FactbookBillAskButton } from "./FactbookBillAskButton";
 
 /**
@@ -26,6 +29,11 @@ import { FactbookBillAskButton } from "./FactbookBillAskButton";
  * unsupported country receives the shared coverage explanation; a supported
  * country with zero rows receives a source-availability warning. Neither
  * state can be mistaken for an absence of legislative activity.
+ *
+ * Dates (DAT-038): "Last action" is only ever the publisher's date for a
+ * legislative step. When the source feed gives none, the row shows the shared
+ * `DataValueState` chip with its reason instead of a date, and the banner
+ * never calls undated bills recent.
  *
  * Provenance: each row carries a SourceDot tied to the bill's
  * `sourceId` plus the matching `sources.last_sync_at` timestamp. A
@@ -184,15 +192,19 @@ export async function FactbookBills({
     /* best-effort */
   }
 
+  const datedCount = result.rows.filter((b) => b.lastActionDate).length;
+
   return (
     <div className="factbook-bills-list">
       <Banner variant="info" className="factbook-bill-coverage-note">
-        {billsSupportedCoverageNote()} Showing the {result.rows.length} most
-        recent
-        {totalCount != null && totalCount > result.rows.length
-          ? ` of ${totalCount.toLocaleString("en-US")} tracked ${countryName} bills`
-          : ` tracked ${countryName} bills`}
-        . See the{" "}
+        {billsSupportedCoverageNote()}{" "}
+        {billsListingNote({
+          countryName,
+          shown: result.rows.length,
+          dated: datedCount,
+          total: totalCount,
+        })}{" "}
+        See the{" "}
         <a href="/methodology/source-coverage#bills">source coverage report</a>{" "}
         for per-jurisdiction freshness.
       </Banner>
@@ -239,9 +251,17 @@ export async function FactbookBills({
                     Introduced {b.introducedDate}
                   </span>
                 )}
-                {b.lastActionDate && (
+                {b.lastActionDate ? (
                   <span className="factbook-bill-meta">
                     Last action {b.lastActionDate}
+                  </span>
+                ) : (
+                  <span className="factbook-bill-meta">
+                    Last action{" "}
+                    <DataValueState
+                      status={parseDataValueStatus(b.lastActionDateStatus)}
+                      reason={b.lastActionDateReason}
+                    />
                   </span>
                 )}
                 {b.rawStatus && (

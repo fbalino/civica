@@ -375,6 +375,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0052_bill_last_action_date_state",
+    "drizzle/authoritative/0052_bill_last_action_date_state.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-canonical-capitals",
     "backfill-cia-vintage",
@@ -387,6 +393,7 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "bridge-cia-legacy-to-canonical",
     "cleanup-bad-offices",
     "create-rate-limits-table",
+    "repair-bill-last-action-dates",
     "repair-cabinet-terms",
     "repair-pulse-agreement",
     "reseed-bug3-corrupted",

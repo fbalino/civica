@@ -243,6 +243,7 @@
     "pulse:absorption:apply": "tsx scripts/apply-pulse-absorptions.ts --apply",
     "pulse:information-environment:plan": "tsx scripts/apply-pulse-information-environment.ts",
     "pulse:information-environment:apply": "tsx scripts/apply-pulse-information-environment.ts --apply",
+    "repair:bill-last-action-dates": "tsx scripts/repair-bill-last-action-dates.ts",
     "repair:cabinet-terms": "tsx scripts/repair-cabinet-terms.ts",
     "repair:pulse-incidents": "tsx scripts/repair-pulse-incidents.ts",
     "pulse:reenrich-articles": "tsx scripts/reenrich-pulse-articles.ts",

@@ -1,3 +1,5 @@
+import type { BillLastActionStatus } from "./last-action";
+
 /**
  * The canonical pre-DB shape every source adapter targets. Each adapter
  * (us-congress, uk-parliament, etc.) maps the source's payload to one or
@@ -10,9 +12,12 @@
  *   re-syncs idempotent.
  * - `stage` is the 0-4 normalised value the BillsTab UI consumes. The
  *   `rawStatus` text is preserved verbatim for citation.
- * - `lastActionDate` is required because it drives the
- *   "10 most recent bills" query. If the source only exposes
- *   `updateDate`, fall back to that.
+ * - `lastActionDate` is a publisher date for a legislative step, under
+ *   `bill-last-action-date/v1` (`src/lib/bills/last-action.ts`). It is never
+ *   retrieval time or a record-modified date (`updateDate`, `lastUpdate`,
+ *   `aktualisiert`, ...). When the feed has no such date it is null, and
+ *   `lastActionDateStatus` / `lastActionDateReason` carry a typed
+ *   `data-value-state/v1` absence instead.
  * - `raw` keeps the full source payload so we can extract more fields
  *   later without re-syncing.
  */
@@ -27,7 +32,9 @@ export interface BillIngest {
   stage: number;
   rawStatus: string | null;
   introducedDate: string | null;
-  lastActionDate: string;
+  lastActionDate: string | null;
+  lastActionDateStatus: BillLastActionStatus;
+  lastActionDateReason: string | null;
   lastActionText: string | null;
   sponsorName: string | null;
   sponsorParty: string | null;

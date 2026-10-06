@@ -18,6 +18,7 @@ import {
   billsCoverageMessage,
   isBillsSupportedSlug,
 } from "@/lib/bills/coverage";
+import { parseDataValueStatus } from "@/lib/data/value-state";
 
 const SOURCE_TAG = BILLS_SOURCE_LABELS;
 
@@ -140,7 +141,12 @@ async function handleBills(
       status: b.rawStatus ?? undefined,
       sponsor: b.sponsorName ?? undefined,
       introducedDate: b.introducedDate ?? null,
-      date: b.lastActionDate,
+      // DAT-038 `bill-last-action-date/v1`: the publisher's date for the
+      // latest legislative step, or null with a typed absence and reason.
+      // Never retrieval time or a record-modified date.
+      date: b.lastActionDate ?? null,
+      dateStatus: parseDataValueStatus(b.lastActionDateStatus),
+      dateStatusReason: b.lastActionDateReason ?? null,
       sourceId: b.sourceId,
       sourceLastSyncAt: sourceMap.get(b.sourceId) ?? null,
     };

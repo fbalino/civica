@@ -1,14 +1,14 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-26T19:11:34.993Z",
+  "generatedAt": "2026-09-29T14:05:03.138Z",
   "authoritativeManifest": {
     "head": {
-      "id": "0051_eminent_jocasta",
-      "sha256": "ab936e48585ed6e5facd3588fcbbeddc8e7c815df86661aaf7202769de008ca6"
+      "id": "0052_bill_last_action_date_state",
+      "sha256": "344b30c0b8f59c1219fef94e4ad680fc8e5c412b4290cb07ad714760f4d47314"
     },
-    "sha256": "874884467f8c4af02d34a4af6e8437b574685c75974675711eaa134ad63342d7"
+    "sha256": "55ef99dec120fb0d175e7c62410f636042237b825add9659de3f28d3a6a3cc24"
   },
-  "sha256": "5b4e4b180158b583e4db879b4ecfcaae6c3ca81caaeea28118cd0f83b3c6bd3b",
+  "sha256": "8bdb1e68d2776942ff0e318a67a83076898ac713112fcf9af465d23e1cedd8ae",
   "schema": {
     "columns": [
       {
@@ -872,7 +872,7 @@
         "type": "date",
         "table": "bills",
         "default": null,
-        "nullable": "NO",
+        "nullable": "YES",
         "position": 12
       },
       {
@@ -973,6 +973,24 @@
         "default": "now()",
         "nullable": "NO",
         "position": 23
+      },
+      {
+        "udt": "text",
+        "name": "last_action_date_status",
+        "type": "text",
+        "table": "bills",
+        "default": "'observed'::text",
+        "nullable": "NO",
+        "position": 24
+      },
+      {
+        "udt": "text",
+        "name": "last_action_date_reason",
+        "type": "text",
+        "table": "bills",
+        "default": null,
+        "nullable": "YES",
+        "position": 25
       },
       {
         "udt": "uuid",
@@ -13197,7 +13215,7 @@
       {
         "name": "bills_jurisdiction_last_action_idx",
         "table": "bills",
-        "definition": "CREATE INDEX bills_jurisdiction_last_action_idx ON public.bills USING btree (jurisdiction_id, last_action_date)"
+        "definition": "CREATE INDEX bills_jurisdiction_last_action_idx ON public.bills USING btree (jurisdiction_id, last_action_date DESC NULLS LAST)"
       },
       {
         "name": "bills_pkey",
@@ -16618,6 +16636,24 @@
         "type": "f",
         "table": "bills",
         "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
+      },
+      {
+        "name": "bills_last_action_date_status_allowed",
+        "type": "c",
+        "table": "bills",
+        "definition": "CHECK (last_action_date_status = ANY (ARRAY['observed'::text, 'missing'::text, 'unknown'::text, 'not_applicable'::text, 'not_observed'::text, 'disputed'::text, 'withheld'::text]))"
+      },
+      {
+        "name": "bills_last_action_date_status_reason",
+        "type": "c",
+        "table": "bills",
+        "definition": "CHECK (last_action_date_status = 'observed'::text AND last_action_date_reason IS NULL OR last_action_date_status <> 'observed'::text AND last_action_date_reason IS NOT NULL AND length(btrim(last_action_date_reason)) > 0)"
+      },
+      {
+        "name": "bills_last_action_date_status_shape",
+        "type": "c",
+        "table": "bills",
+        "definition": "CHECK ((last_action_date_status = ANY (ARRAY['observed'::text, 'disputed'::text])) AND last_action_date IS NOT NULL OR (last_action_date_status = ANY (ARRAY['missing'::text, 'unknown'::text, 'not_applicable'::text, 'not_observed'::text, 'withheld'::text])) AND last_action_date IS NULL)"
       },
       {
         "name": "bills_pkey",

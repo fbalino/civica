@@ -1,6 +1,14 @@
 import type { Bill as LegacyBill } from "@/lib/data/parliament-feeds";
 import type { BillIngestDraft } from "../types";
 import { statusToStage } from "../stage";
+import {
+  BILL_LAST_ACTION_REASONS,
+  absentLastAction,
+  lastActionFields,
+  latestPublisherActionDate,
+  observedLastAction,
+  type BillLastAction,
+} from "../last-action";
 
 const SOURCE_ID = "uk_parliament";
 
@@ -10,12 +18,33 @@ interface RawBill {
   longTitle?: string;
   lastUpdate?: string;
   introducedSittingDate?: string;
-  currentStage?: { description?: string };
+  currentStage?: {
+    description?: string;
+    stageSittings?: Array<{ date?: string | null } | null> | null;
+  };
   currentHouse?: string;
 }
 
 interface UKApiResponse {
   items?: RawBill[];
+}
+
+/**
+ * The Bills API `BillSummary.lastUpdate` is the record's update time (the list
+ * is sorted by it as `DateUpdatedDescending`), not a sitting date. The dated
+ * legislative step in the same record is `currentStage.stageSittings[].date`:
+ * the sittings of the bill's current stage. The latest sitting on or before
+ * retrieval is the last action; a later one is scheduled, not taken.
+ */
+export function ukLastAction(raw: unknown, retrievedAt: Date): BillLastAction {
+  const sittings = (raw as RawBill | null)?.currentStage?.stageSittings;
+  const date = latestPublisherActionDate(
+    Array.isArray(sittings) ? sittings.map((sitting) => sitting?.date) : [],
+    retrievedAt,
+  );
+  return date
+    ? observedLastAction(date)
+    : absentLastAction("not_observed", BILL_LAST_ACTION_REASONS.ukNoSitting);
 }
 
 async function fetchRaw(take = 5, cache = true): Promise<RawBill[]> {
@@ -34,6 +63,7 @@ async function fetchRaw(take = 5, cache = true): Promise<RawBill[]> {
 /** Legacy live-fetch shape — used by `parliament-feeds.ts.fetchParliamentBills`. */
 export async function fetchUKBillsLive(): Promise<LegacyBill[]> {
   const raw = await fetchRaw(5, true);
+  const retrievedAt = new Date();
   return raw.map((b) => ({
     title: b.shortTitle ?? b.longTitle ?? "Untitled",
     summary:
@@ -41,7 +71,7 @@ export async function fetchUKBillsLive(): Promise<LegacyBill[]> {
         ? b.longTitle
         : undefined,
     status: b.currentStage?.description ?? "In Parliament",
-    date: b.lastUpdate ?? "",
+    date: ukLastAction(b, retrievedAt).date ?? "",
     url: `https://bills.parliament.uk/bills/${b.billId}`,
     source: SOURCE_ID,
     identifier: b.billId != null ? String(b.billId) : undefined,
@@ -53,12 +83,12 @@ export async function fetchUKBillsForSync(opts: {
   jurisdictionId: string;
   /** UK API caps at 100 per page; default 100. */
   limit?: number;
+  /** Retrieval time; fixtures pin it. Defaults to now. */
+  retrievedAt?: Date;
 }): Promise<BillIngestDraft[]> {
   const raw = await fetchRaw(opts.limit ?? 100, false);
+  const retrievedAt = opts.retrievedAt ?? new Date();
   return raw.map((b) => {
-    const lastAction = b.lastUpdate
-      ? b.lastUpdate.slice(0, 10)
-      : new Date().toISOString().slice(0, 10);
     return {
       jurisdictionId: opts.jurisdictionId,
       bodyId: null,
@@ -74,7 +104,7 @@ export async function fetchUKBillsForSync(opts: {
       introducedDate: b.introducedSittingDate
         ? b.introducedSittingDate.slice(0, 10)
         : null,
-      lastActionDate: lastAction,
+      ...lastActionFields(ukLastAction(b, retrievedAt)),
       lastActionText: b.currentStage?.description ?? null,
       sponsorName: null,
       sponsorParty: null,

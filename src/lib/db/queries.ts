@@ -2092,8 +2092,11 @@ export async function getInternationalMembershipsBySlugs(
 }
 
 /**
- * Phase H.1 — read the most recent bills for a country, ordered by
- * last-action date desc. The route at
+ * Phase H.1 — read the most recent bills for a country, ordered by the
+ * publisher's last-action date desc. Bills whose feed carries no action date
+ * (`bill-last-action-date/v1`, DAT-038) sort after every dated bill, newest
+ * introduction first, then by Civica's first-seen time and id so the order is
+ * deterministic; they are never ranked as recent. The route at
  * `src/app/api/countries/[slug]/bills/route.ts` calls this and shapes
  * the result for the UI.
  */
@@ -2113,7 +2116,12 @@ export async function getBillsForJurisdiction(slug: string, limit = 10) {
     .select()
     .from(bills)
     .where(eq(bills.jurisdictionId, j[0].id))
-    .orderBy(desc(bills.lastActionDate))
+    .orderBy(
+      sql`${bills.lastActionDate} DESC NULLS LAST`,
+      sql`${bills.introducedDate} DESC NULLS LAST`,
+      desc(bills.createdAt),
+      asc(bills.id),
+    )
     .limit(limit);
 
   return { jurisdiction: j[0], rows };

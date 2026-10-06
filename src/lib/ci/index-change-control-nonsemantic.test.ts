@@ -2,11 +2,15 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { indexProtectedFileHash, sha256 } from "./index-change-control";
+import {
+  indexProtectedFileHash,
+  sha256,
+  withoutBillLastActionOrdering,
+} from "./index-change-control";
 
 const path = "src/lib/db/queries.ts";
 const currentSource = readFileSync(path, "utf8");
-const priorSource = currentSource
+const priorSource = withoutBillLastActionOrdering(currentSource)
   .replace(
     /\.where\(\n      sql`\$\{legislatureParties\.bodyId\} IN \$\{bodyIds\}\n        AND \$\{legislatureParties\.isCurrent\} = true`,\n    \)/g,
     ".where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)",
@@ -289,5 +293,23 @@ test("the Atlas-only Bills coverage state is excluded from Index semantic drift"
   assert.notEqual(
     indexProtectedFileHash(pagePath, unrelatedEdit),
     indexProtectedFileHash(pagePath, currentPage),
+  );
+});
+
+test("DAT-038 bills last-action ordering is excluded from Index semantic drift", () => {
+  assert.match(currentSource, /\$\{bills\.lastActionDate\} DESC NULLS LAST/);
+  const restored = withoutBillLastActionOrdering(currentSource);
+  assert.notEqual(restored, currentSource);
+  assert.match(restored, /    \.orderBy\(desc\(bills\.lastActionDate\)\)\n/);
+  assert.doesNotMatch(restored, /DESC NULLS LAST`,\n      sql`\$\{bills\.introducedDate\}/);
+  // An adjacent edit to the same reader is still protected drift.
+  const adjacent = currentSource.replace(
+    "      asc(bills.id),\n    )\n    .limit(limit);",
+    "      asc(bills.id),\n    )\n    .limit(limit + 1);",
+  );
+  assert.notEqual(adjacent, currentSource);
+  assert.notEqual(
+    indexProtectedFileHash(path, adjacent),
+    indexProtectedFileHash(path, currentSource),
   );
 });

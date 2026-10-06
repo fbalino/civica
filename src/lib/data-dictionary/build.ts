@@ -260,6 +260,12 @@ function nullableMeaningFor(table: string, column: string) {
   if (stateful.has(table) && column === "value_status_reason") {
     return "Null is permitted only when value_status is observed; every other state requires a non-empty reason.";
   }
+  if (table === "bills" && column === "last_action_date") {
+    return "Null is interpreted through last_action_date_status and last_action_date_reason (bill-last-action-date/v1); it is never a retrieval or record-modified date substitute.";
+  }
+  if (table === "bills" && column === "last_action_date_reason") {
+    return "Null is permitted only when last_action_date_status is observed; every other state requires a non-empty reason.";
+  }
   return "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.";
 }
 
@@ -537,7 +543,7 @@ export function buildSchemaDataDictionary(): SchemaDataDictionary {
       ).length,
     },
     nullSemanticsLimitation:
-      "Country facts, indicator history, and country metrics use the closed value_status/value_status_reason contract. Other nullable fields retain field-specific meanings and must not be inferred as zero, unknown, or not applicable without an explicit companion contract.",
+      "Country facts, indicator history, and country metrics use the closed value_status/value_status_reason contract, and bills.last_action_date uses the same states through last_action_date_status/last_action_date_reason. Other nullable fields retain field-specific meanings and must not be inferred as zero, unknown, or not applicable without an explicit companion contract.",
     tables,
   };
 }

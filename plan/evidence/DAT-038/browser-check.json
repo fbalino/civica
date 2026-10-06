@@ -1,0 +1,416 @@
+{
+  "task": "DAT-038",
+  "ranAt": "2026-10-06",
+  "server": "next dev on loopback against the repaired synthetic rehearsal database (Neon HTTP adapter)",
+  "checks": [
+    {
+      "slug": "brazil",
+      "theme": "light",
+      "w": 1440,
+      "h": 1000,
+      "screenshot": "brazil-bills-desktop-light.webp",
+      "banner": "Civica's bills and legislative-activity tracking currently covers six jurisdictions: United States, United Kingdom, Canada, Germany, France, Brazil. Showing 20 of 28 tracked Brazil bills. None of these records carries a legislative action date from its source feed, so they are not ordered by recent activity. See the source coverage report for per-jurisdiction freshness.",
+      "rowCount": 20,
+      "rows": [
+        {
+          "title": "PL 2004/2026 - Fixture matéria 5 do Senado.",
+          "metas": [
+            "Introduced 2026-07-14",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2003/2026 - Fixture matéria 4 do Senado.",
+          "metas": [
+            "Introduced 2026-06-13",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2002/2026 - Fixture matéria 3 do Senado.",
+          "metas": [
+            "Introduced 2026-05-12",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2001/2026 - Fixture matéria 2 do Senado.",
+          "metas": [
+            "Introduced 2026-04-11",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2005/2026 - Fixture matéria 6 do Senado.",
+          "metas": [
+            "Introduced 2026-03-15",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2000/2026 - Fixture matéria 1 do Senado.",
+          "metas": [
+            "Introduced 2026-03-10",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        }
+      ],
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=YqgsP2LPa-GPeIoM809aJ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=YqgsP2LPa-GPeIoM809aJ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "failedRequests": [
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://commons.wikimedia.org/wiki/Special:FilePath/Christ_the_Redeemer_-_Cristo_Redentor.jpg?width=1200",
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://flagcdn.com/br.svg"
+      ],
+      "consoleErrorsNote": "Only environmental: blocked external images (flagcdn.com, commons.wikimedia.org) and dev-mode hot-reload websockets."
+    },
+    {
+      "slug": "brazil",
+      "theme": "dark",
+      "w": 1440,
+      "h": 1000,
+      "screenshot": "brazil-bills-desktop-dark.webp",
+      "banner": "Civica's bills and legislative-activity tracking currently covers six jurisdictions: United States, United Kingdom, Canada, Germany, France, Brazil. Showing 20 of 28 tracked Brazil bills. None of these records carries a legislative action date from its source feed, so they are not ordered by recent activity. See the source coverage report for per-jurisdiction freshness.",
+      "rowCount": 20,
+      "rows": [
+        {
+          "title": "PL 2004/2026 - Fixture matéria 5 do Senado.",
+          "metas": [
+            "Introduced 2026-07-14",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2003/2026 - Fixture matéria 4 do Senado.",
+          "metas": [
+            "Introduced 2026-06-13",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2002/2026 - Fixture matéria 3 do Senado.",
+          "metas": [
+            "Introduced 2026-05-12",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2001/2026 - Fixture matéria 2 do Senado.",
+          "metas": [
+            "Introduced 2026-04-11",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2005/2026 - Fixture matéria 6 do Senado.",
+          "metas": [
+            "Introduced 2026-03-15",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2000/2026 - Fixture matéria 1 do Senado.",
+          "metas": [
+            "Introduced 2026-03-10",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        }
+      ],
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=jqGgi0s_xdfa_vN6nTKH6' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=jqGgi0s_xdfa_vN6nTKH6' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "failedRequests": [
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://commons.wikimedia.org/wiki/Special:FilePath/Christ_the_Redeemer_-_Cristo_Redentor.jpg?width=1200",
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://flagcdn.com/br.svg"
+      ],
+      "consoleErrorsNote": "Only environmental: blocked external images (flagcdn.com, commons.wikimedia.org) and dev-mode hot-reload websockets."
+    },
+    {
+      "slug": "brazil",
+      "theme": "light",
+      "w": 390,
+      "h": 844,
+      "screenshot": "brazil-bills-mobile-light.webp",
+      "banner": "Civica's bills and legislative-activity tracking currently covers six jurisdictions: United States, United Kingdom, Canada, Germany, France, Brazil. Showing 20 of 28 tracked Brazil bills. None of these records carries a legislative action date from its source feed, so they are not ordered by recent activity. See the source coverage report for per-jurisdiction freshness.",
+      "rowCount": 20,
+      "rows": [
+        {
+          "title": "PL 2004/2026 - Fixture matéria 5 do Senado.",
+          "metas": [
+            "Introduced 2026-07-14",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2003/2026 - Fixture matéria 4 do Senado.",
+          "metas": [
+            "Introduced 2026-06-13",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2002/2026 - Fixture matéria 3 do Senado.",
+          "metas": [
+            "Introduced 2026-05-12",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2001/2026 - Fixture matéria 2 do Senado.",
+          "metas": [
+            "Introduced 2026-04-11",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2005/2026 - Fixture matéria 6 do Senado.",
+          "metas": [
+            "Introduced 2026-03-15",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2000/2026 - Fixture matéria 1 do Senado.",
+          "metas": [
+            "Introduced 2026-03-10",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        }
+      ],
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=UjanZi0K_J1VTnwppASq7' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=UjanZi0K_J1VTnwppASq7' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "failedRequests": [
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://flagcdn.com/br.svg",
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://commons.wikimedia.org/wiki/Special:FilePath/Christ_the_Redeemer_-_Cristo_Redentor.jpg?width=1200"
+      ],
+      "consoleErrorsNote": "Only environmental: blocked external images (flagcdn.com, commons.wikimedia.org) and dev-mode hot-reload websockets."
+    },
+    {
+      "slug": "brazil",
+      "theme": "dark",
+      "w": 390,
+      "h": 844,
+      "screenshot": "brazil-bills-mobile-dark.webp",
+      "banner": "Civica's bills and legislative-activity tracking currently covers six jurisdictions: United States, United Kingdom, Canada, Germany, France, Brazil. Showing 20 of 28 tracked Brazil bills. None of these records carries a legislative action date from its source feed, so they are not ordered by recent activity. See the source coverage report for per-jurisdiction freshness.",
+      "rowCount": 20,
+      "rows": [
+        {
+          "title": "PL 2004/2026 - Fixture matéria 5 do Senado.",
+          "metas": [
+            "Introduced 2026-07-14",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2003/2026 - Fixture matéria 4 do Senado.",
+          "metas": [
+            "Introduced 2026-06-13",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2002/2026 - Fixture matéria 3 do Senado.",
+          "metas": [
+            "Introduced 2026-05-12",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2001/2026 - Fixture matéria 2 do Senado.",
+          "metas": [
+            "Introduced 2026-04-11",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2005/2026 - Fixture matéria 6 do Senado.",
+          "metas": [
+            "Introduced 2026-03-15",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        },
+        {
+          "title": "PL 2000/2026 - Fixture matéria 1 do Senado.",
+          "metas": [
+            "Introduced 2026-03-10",
+            "Last action Missing"
+          ],
+          "chipName": "Missing. The Senado Federal updated-matters feed reports only record-update times (DataUltimaAtualizacao), not legislative action dates."
+        }
+      ],
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=vOylvhUcWsPBY6pVT1XUj' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=vOylvhUcWsPBY6pVT1XUj' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "failedRequests": [
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://flagcdn.com/br.svg",
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://commons.wikimedia.org/wiki/Special:FilePath/Christ_the_Redeemer_-_Cristo_Redentor.jpg?width=1200"
+      ],
+      "consoleErrorsNote": "Only environmental: blocked external images (flagcdn.com, commons.wikimedia.org) and dev-mode hot-reload websockets."
+    },
+    {
+      "slug": "united-kingdom",
+      "theme": "light",
+      "w": 1440,
+      "h": 1000,
+      "screenshot": "united-kingdom-bills-desktop-light.webp",
+      "banner": "Civica's bills and legislative-activity tracking currently covers six jurisdictions: United States, United Kingdom, Canada, Germany, France, Brazil. Showing the 3 most recent tracked United Kingdom bills by the publisher's latest action date, then 1 whose source feed gives no action date. See the source coverage report for per-jurisdiction freshness.",
+      "rowCount": 4,
+      "rows": [
+        {
+          "title": "Fixture Bill 3903",
+          "metas": [
+            "Last action 2026-09-16",
+            "Status: Report stage"
+          ],
+          "chipName": null
+        },
+        {
+          "title": "Fixture Bill 3901",
+          "metas": [
+            "Last action 2026-07-08",
+            "Status: Committee stage"
+          ],
+          "chipName": null
+        },
+        {
+          "title": "Fixture Bill 3904",
+          "metas": [
+            "Last action 2026-07-01",
+            "Status: 3rd reading"
+          ],
+          "chipName": null
+        },
+        {
+          "title": "Fixture Bill 3902",
+          "metas": [
+            "Last action Not observed",
+            "Status: 2nd reading"
+          ],
+          "chipName": "Not observed. The UK Bills API record's current stage has no sitting dated on or before retrieval."
+        }
+      ],
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=MpNBbBX76RmDCryMFsgNl' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=MpNBbBX76RmDCryMFsgNl' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "failedRequests": [
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://commons.wikimedia.org/wiki/Special:FilePath/Houses_of_Parliament_in_2022_(cropped).jpg?width=1200",
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://flagcdn.com/gb.svg"
+      ],
+      "consoleErrorsNote": "Only environmental: blocked external images (flagcdn.com, commons.wikimedia.org) and dev-mode hot-reload websockets."
+    },
+    {
+      "slug": "france",
+      "theme": "dark",
+      "w": 1440,
+      "h": 1000,
+      "screenshot": "france-bills-desktop-dark.webp",
+      "banner": "Civica's bills and legislative-activity tracking currently covers six jurisdictions: United States, United Kingdom, Canada, Germany, France, Brazil. Showing the 4 most recent tracked France bills by the publisher's latest action date, then 2 whose source feed gives no action date. See the source coverage report for per-jurisdiction freshness.",
+      "rowCount": 6,
+      "rows": [
+        {
+          "title": "Projet de loi 90 - Fixture dossier 1",
+          "metas": [
+            "Last action 2026-09-28",
+            "Status: Commission"
+          ],
+          "chipName": null
+        },
+        {
+          "title": "Projet de loi 92 - Fixture dossier 3",
+          "metas": [
+            "Last action 2026-07-02",
+            "Status: Commission"
+          ],
+          "chipName": null
+        },
+        {
+          "title": "PPL25-91 - Fixture dossier Sénat 2",
+          "metas": [
+            "Introduced 2026-02-02",
+            "Last action 2026-03-20"
+          ],
+          "chipName": null
+        },
+        {
+          "title": "PPL25-90 - Fixture dossier Sénat 1",
+          "metas": [
+            "Introduced 2026-02-01",
+            "Last action 2026-03-14"
+          ],
+          "chipName": null
+        },
+        {
+          "title": "PPL25-92 - Fixture dossier Sénat 3",
+          "metas": [
+            "Introduced 2026-02-03",
+            "Last action Not observed"
+          ],
+          "chipName": "Not observed. The Sénat dossier export dates only deposit, Constitutional Council decision, and promulgation; this dossier has no dated decision or promulgation."
+        },
+        {
+          "title": "Projet de loi 91 - Fixture dossier 2",
+          "metas": [
+            "Last action Not observed"
+          ],
+          "chipName": "Not observed. The Assemblée nationale dossier records no dated legislative act on or before retrieval."
+        }
+      ],
+      "horizontalOverflowPx": 0,
+      "consoleErrors": [
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=DAPeS_SU6Tp2jSqXS4d0X' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3038/_next/hmr?id=DAPeS_SU6Tp2jSqXS4d0X' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "failedRequests": [
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://commons.wikimedia.org/wiki/Special:FilePath/Tour_Eiffel_Wikimedia_Commons_(cropped).jpg?width=1200",
+        "net::ERR_TUNNEL_CONNECTION_FAILED https://flagcdn.com/fr.svg"
+      ],
+      "consoleErrorsNote": "Only environmental: blocked external images (flagcdn.com, commons.wikimedia.org) and dev-mode hot-reload websockets."
+    }
+  ]
+}

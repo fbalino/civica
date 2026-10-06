@@ -312,4 +312,11 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
       "ab936e48585ed6e5facd3588fcbbeddc8e7c815df86661aaf7202769de008ca6",
     baseline: false,
   },
+  {
+    id: "0052_bill_last_action_date_state",
+    path: "drizzle/authoritative/0052_bill_last_action_date_state.sql",
+    sha256:
+      "344b30c0b8f59c1219fef94e4ad680fc8e5c412b4290cb07ad714760f4d47314",
+    baseline: false,
+  },
 ] as const;

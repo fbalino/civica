@@ -18,6 +18,8 @@ const draft: BillIngestDraft = {
   rawStatus: "In committee",
   introducedDate: "2026-07-01",
   lastActionDate: "2026-07-10",
+  lastActionDateStatus: "observed",
+  lastActionDateReason: null,
   lastActionText: null,
   sponsorName: null,
   sponsorParty: null,

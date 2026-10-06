@@ -327,12 +327,48 @@ export function sha256(value: string | Buffer): string {
 }
 
 /**
+ * DAT-038 orders bills with no publisher action date last
+ * (`bill-last-action-date/v1`). `getBillsForJurisdiction` has no Index caller;
+ * restore its exact prior comment and ordering before hashing.
+ */
+export function withoutBillLastActionOrdering(source: string): string {
+  return source
+    .replace(
+      `/**
+ * Phase H.1 — read the most recent bills for a country, ordered by the
+ * publisher's last-action date desc. Bills whose feed carries no action date
+ * (\`bill-last-action-date/v1\`, DAT-038) sort after every dated bill, newest
+ * introduction first, then by Civica's first-seen time and id so the order is
+ * deterministic; they are never ranked as recent. The route at
+ * \`src/app/api/countries/[slug]/bills/route.ts\` calls this and shapes
+ * the result for the UI.
+ */`,
+      `/**
+ * Phase H.1 — read the most recent bills for a country, ordered by
+ * last-action date desc. The route at
+ * \`src/app/api/countries/[slug]/bills/route.ts\` calls this and shapes
+ * the result for the UI.
+ */`,
+    )
+    .replace(
+      `    .orderBy(
+      sql\`\${bills.lastActionDate} DESC NULLS LAST\`,
+      sql\`\${bills.introducedDate} DESC NULLS LAST\`,
+      desc(bills.createdAt),
+      asc(bills.id),
+    )
+`,
+      "    .orderBy(desc(bills.lastActionDate))\n",
+    );
+}
+
+/**
  * Some protected shared files contain both Index behavior and unrelated Atlas
  * readers. Keep the Index snapshot sensitive to every byte except exact,
  * enumerated Atlas-only changes: ATL-011/012 relationship guards in
  * `queries.ts`, ATL-012 source/adapter registrations, ATL-013's Bills section
- * visibility line, and PLT-023's serverless SQL-client centralization in the
- * Index ingest adapter. None changes an Index input, transform, weight,
+ * visibility line, DAT-038's bills last-action ordering in `queries.ts`, and
+ * PLT-023's serverless SQL-client centralization in the Index ingest adapter. None changes an Index input, transform, weight,
  * missingness rule, rank, or Index presentation.
  *
  * This deliberately narrow compatibility normalization restores the prior
@@ -400,6 +436,7 @@ export function indexProtectedFileHash(
 
   let normalized = source.toString();
   if (path === "src/lib/db/queries.ts") {
+    normalized = withoutBillLastActionOrdering(normalized);
     normalized = normalized.replace(
       /\.where\(\n      sql`\$\{legislatureParties\.bodyId\} IN \$\{bodyIds\}\n        AND \$\{legislatureParties\.isCurrent\} = true`,\n    \)/g,
       ".where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)",

@@ -335,6 +335,20 @@ drops and recreates only that check constraint; it does not rewrite the
 historical `0042` migration or any retained release row. Recovery is a reviewed
 forward correction or isolated pre-change backup.
 
+`0052_bill_last_action_date_state` (DAT-038) makes `bills.last_action_date`
+nullable and adds `last_action_date_status` (default `observed`) and
+`last_action_date_reason` under `bill-last-action-date/v1`: a last-action date
+is a publisher date for a legislative step, and a feed without one stores a
+typed `data-value-state/v1` absence with a reason instead of retrieval time or
+a record-modified date. Three CHECK constraints close the state set, tie a
+date to the observed state, and require a non-empty reason for every other
+state (the reason check tests `IS NOT NULL` explicitly so a NULL reason cannot
+pass). The last-action index becomes `DESC NULLS LAST`. The migration is
+schema-only: every existing row keeps its stored date as `observed`, so the
+wrong stored dates remain until `data-repair-bill-last-action-dates` runs.
+Fresh and 0051-upgrade builds produce the same schema fingerprint. Recovery is
+a reviewed forward compensation or isolated pre-change backup.
+
 ## Operational data changes
 
 data-backfill-canonical-capitals · data-backfill-cia-vintage ·
@@ -343,9 +357,32 @@ data-backfill-growth-methodology · data-backfill-methodology-version ·
 data-backfill-territory-iso2 · data-backfill-upstream-vintage-labels ·
 data-bridge-cia-legacy-to-canonical · data-cleanup-bad-offices ·
 data-backfill-jurisdiction-capitals · data-create-rate-limits-table ·
-data-repair-cabinet-terms ·
+data-repair-bill-last-action-dates · data-repair-cabinet-terms ·
 data-repair-pulse-agreement · data-reseed-bug3-corrupted ·
 data-restore-overdemoted-disputes
+
+`data-repair-bill-last-action-dates` (DAT-038) corrects stored bill
+last-action dates that the former adapters took from retrieval time or a
+record-modified field (Câmara: the sync day; Senado `DataUltimaAtualizacao`;
+Bundestag DIP `aktualisiert`; UK Bills API `lastUpdate`; Congress.gov
+`updateDate`; Assemblée and Sénat: the sync day or the deposit date). It
+re-derives each row from its retained `raw` publisher payload with the
+corrected adapter functions, using `updated_at` (the payload's write time) as
+the retrieval time, and also clears Bundestag DIP introduction dates, which
+were the latest document's date. It infers nothing the payload does not say,
+changes no other column (not `updated_at`), and fails closed on an unknown
+source or a missing payload. The default mode writes nothing and emits a
+deterministic plan holding every target's before- and after-state, payload
+guards, per-source counts, and a non-target fingerprint; `bills` has no
+history trigger, so that plan file is the compensation input and is retained
+with the recovery snapshot. Apply runs that exact plan in one transaction that
+locks `bills`, refuses any drift, and asserts the after-state; it requires
+authoritative migration 0052, an explicit public-correction choice, and an
+owner-approval file naming the method and the plan's SHA-256, never stamps
+source freshness, and a replay changes nothing. Recovery is the isolated
+pre-apply snapshot or a reviewed forward compensation named
+`data-repair-bill-last-action-dates-compensation` built from the plan's
+before-states.
 
 `data-repair-cabinet-terms` (DAT-037) removes the invariant defects the former
 CIA World Leaders importer left in cabinet terms: terms held by CIA's

@@ -1,0 +1,8 @@
+DROP INDEX "bills_jurisdiction_last_action_idx";--> statement-breakpoint
+ALTER TABLE "bills" ALTER COLUMN "last_action_date" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "bills" ADD COLUMN "last_action_date_status" text DEFAULT 'observed' NOT NULL;--> statement-breakpoint
+ALTER TABLE "bills" ADD COLUMN "last_action_date_reason" text;--> statement-breakpoint
+CREATE INDEX "bills_jurisdiction_last_action_idx" ON "bills" USING btree ("jurisdiction_id","last_action_date" DESC NULLS LAST);--> statement-breakpoint
+ALTER TABLE "bills" ADD CONSTRAINT "bills_last_action_date_status_allowed" CHECK ("bills"."last_action_date_status" IN ('observed', 'missing', 'unknown', 'not_applicable', 'not_observed', 'disputed', 'withheld'));--> statement-breakpoint
+ALTER TABLE "bills" ADD CONSTRAINT "bills_last_action_date_status_shape" CHECK (("bills"."last_action_date_status" IN ('observed', 'disputed') AND "bills"."last_action_date" IS NOT NULL) OR ("bills"."last_action_date_status" IN ('missing', 'unknown', 'not_applicable', 'not_observed', 'withheld') AND "bills"."last_action_date" IS NULL));--> statement-breakpoint
+ALTER TABLE "bills" ADD CONSTRAINT "bills_last_action_date_status_reason" CHECK (("bills"."last_action_date_status" = 'observed' AND "bills"."last_action_date_reason" IS NULL) OR ("bills"."last_action_date_status" <> 'observed' AND "bills"."last_action_date_reason" IS NOT NULL AND length(btrim("bills"."last_action_date_reason")) > 0));

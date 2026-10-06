@@ -1,0 +1,199 @@
+TAP version 13
+# Subtest: Congress.gov: latestAction.actionDate only, never updateDate
+not ok 1 - Congress.gov: latestAction.actionDate only, never updateDate
+  ---
+  duration_ms: 63.416261
+  type: 'test'
+  location: 'src/lib/bills/sources/last-action-dates.test.ts:2:3732'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        '119-hr-1': '2026-07-10',
+    +   '119-s-2': '2026-09-28'
+    -   '119-s-2': null
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    119-hr-1: '2026-07-10'
+    119-s-2: ~
+  actual:
+    119-hr-1: '2026-07-10'
+    119-s-2: '2026-09-28'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDates (src/lib/bills/sources/last-action-dates.test.ts:80:10)
+  ...
+# Subtest: UK Bills API: latest past sitting of the current stage, never lastUpdate
+not ok 2 - UK Bills API: latest past sitting of the current stage, never lastUpdate
+  ---
+  duration_ms: 1.439623
+  type: 'test'
+  location: 'src/lib/bills/sources/last-action-dates.test.ts:2:4487'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   '101': '2026-09-28',
+    +   '102': '2026-09-28'
+    -   '101': '2026-07-08',
+    -   '102': null
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    101: '2026-07-08'
+    102: ~
+  actual:
+    101: '2026-09-28'
+    102: '2026-09-28'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDates (src/lib/bills/sources/last-action-dates.test.ts:80:10)
+  ...
+# Subtest: Bundestag DIP: datum (latest document), never aktualisiert; no introduced date
+not ok 3 - Bundestag DIP: datum (latest document), never aktualisiert; no introduced date
+  ---
+  duration_ms: 2.404276
+  type: 'test'
+  location: 'src/lib/bills/sources/last-action-dates.test.ts:2:5360'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   '301': '2026-09-28',
+    +   '302': '2026-09-28'
+    -   '301': '2026-06-30',
+    -   '302': null
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    301: '2026-06-30'
+    302: ~
+  actual:
+    301: '2026-09-28'
+    302: '2026-09-28'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDates (src/lib/bills/sources/last-action-dates.test.ts:80:10)
+  ...
+# Subtest: LEGISinfo: latest dated bill event; an undated bill stays as a typed absence
+not ok 4 - LEGISinfo: latest dated bill event; an undated bill stays as a typed absence
+  ---
+  duration_ms: 20.565093
+  type: 'test'
+  location: 'src/lib/bills/sources/last-action-dates.test.ts:2:6557'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        '201': '2026-06-12',
+    -   '202': null
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    201: '2026-06-12'
+    202: ~
+  actual:
+    201: '2026-06-12'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDates (src/lib/bills/sources/last-action-dates.test.ts:80:10)
+  ...
+# Subtest: Câmara and Senado: no action date in either feed, never today or DataUltimaAtualizacao
+not ok 5 - Câmara and Senado: no action date in either feed, never today or DataUltimaAtualizacao
+  ---
+  duration_ms: 3.031068
+  type: 'test'
+  location: 'src/lib/bills/sources/last-action-dates.test.ts:2:7499'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   'cd-401': '2026-09-29',
+    +   'sf-402': '2026-09-28'
+    -   'cd-401': null,
+    -   'sf-402': null
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    cd-401: ~
+    sf-402: ~
+  actual:
+    cd-401: '2026-09-29'
+    sf-402: '2026-09-28'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDates (src/lib/bills/sources/last-action-dates.test.ts:80:10)
+  ...
+# Subtest: Assemblée and Sénat: dated acts and final steps only, never today or the deposit date
+not ok 6 - Assemblée and Sénat: dated acts and final steps only, never today or the deposit date
+  ---
+  duration_ms: 24.008908
+  type: 'test'
+  location: 'src/lib/bills/sources/last-action-dates.test.ts:2:9375'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        'pjl25-1': '2026-03-14',
+        'pjl25-2': '2026-03-20',
+    +   'ppl25-3': '2026-02-03',
+    -   'ppl25-3': null,
+        DLR5L17N1: '2026-07-10',
+    +   DLR5L17N2: '2026-09-29',
+    +   DLR5L17N3: '2026-12-01'
+    -   DLR5L17N2: null,
+    -   DLR5L17N3: '2026-06-01'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    DLR5L17N1: '2026-07-10'
+    DLR5L17N2: ~
+    DLR5L17N3: '2026-06-01'
+    pjl25-1: '2026-03-14'
+    pjl25-2: '2026-03-20'
+    ppl25-3: ~
+  actual:
+    DLR5L17N3: '2026-12-01'
+    DLR5L17N1: '2026-07-10'
+    DLR5L17N2: '2026-09-29'
+    ppl25-3: '2026-02-03'
+    pjl25-2: '2026-03-20'
+    pjl25-1: '2026-03-14'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDates (src/lib/bills/sources/last-action-dates.test.ts:80:10)
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 0
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 978.866619

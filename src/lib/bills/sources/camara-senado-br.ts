@@ -37,6 +37,12 @@ import {
   finalizeBillSourceMapping,
 } from "../source-outcome";
 import { statusToStage } from "../stage";
+import {
+  BILL_LAST_ACTION_REASONS,
+  absentLastAction,
+  lastActionFields,
+  type BillLastAction,
+} from "../last-action";
 
 const CAMARA_SOURCE_ID = "camara_br";
 const SENADO_SOURCE_ID = "senado_br";
@@ -209,6 +215,32 @@ async function fetchSenado(): Promise<ChamberFetchResult<SenadoMateria>> {
   }
 }
 
+/* ---------- last-action dates ---------- */
+
+/**
+ * The Câmara `/proposicoes` list items carry id, uri, siglaTipo, codTipo,
+ * numero, ano, and ementa, and no date. The publisher dates the latest
+ * procedural step as `statusProposicao.dataHora` on `/proposicoes/{id}`,
+ * which this adapter does not read yet (DAT-039), so the date is missing.
+ */
+export function camaraLastAction(): BillLastAction {
+  return absentLastAction("missing", BILL_LAST_ACTION_REASONS.camaraListFeed);
+}
+
+/**
+ * The Senado `/materia/atualizadas` feed lists matters whose data changed,
+ * each with `AtualizacoesRecentes.Atualizacao[].DataUltimaAtualizacao`: when
+ * the Senado's systems last updated that information, not when a legislative
+ * step happened. `DataApresentacao` is the presentation (introduction) date.
+ * The latest tramitação date is on the per-matter endpoints (DAT-039).
+ */
+export function senadoLastAction(): BillLastAction {
+  return absentLastAction(
+    "missing",
+    BILL_LAST_ACTION_REASONS.senadoUpdatedFeed,
+  );
+}
+
 /* ---------- shape helpers ---------- */
 
 function camaraDraft(
@@ -222,7 +254,6 @@ function camaraDraft(
       ? `${b.siglaTipo} ${b.numero}/${b.ano}`
       : `Proposição ${b.id}`;
   const formal = b.ementa?.trim() || identifier;
-  const today = new Date().toISOString().slice(0, 10);
   return {
     jurisdictionId,
     bodyId,
@@ -233,9 +264,7 @@ function camaraDraft(
     stage: statusToStage(null),
     rawStatus: null,
     introducedDate: null,
-    // Câmara list endpoint doesn't expose a "last update" field; use
-    // today as a conservative ceiling so the row sorts to the top.
-    lastActionDate: today,
+    ...lastActionFields(camaraLastAction()),
     lastActionText: null,
     sponsorName: null,
     sponsorParty: null,
@@ -264,17 +293,6 @@ function senadoDraft(
       : `${sub} ${id}`);
   const formal = m.DadosBasicosMateria?.EmentaMateria?.trim() || identifier;
 
-  const updates = m.AtualizacoesRecentes?.Atualizacao ?? [];
-  const lastUpdate = updates
-    .map((u) => u.DataUltimaAtualizacao ?? "")
-    .filter(Boolean)
-    .sort()
-    .pop();
-  const lastAction =
-    (lastUpdate ?? "").slice(0, 10) ||
-    m.DadosBasicosMateria?.DataApresentacao?.slice(0, 10) ||
-    new Date().toISOString().slice(0, 10);
-
   return {
     jurisdictionId,
     bodyId,
@@ -286,7 +304,7 @@ function senadoDraft(
     rawStatus: null,
     introducedDate:
       m.DadosBasicosMateria?.DataApresentacao?.slice(0, 10) ?? null,
-    lastActionDate: lastAction,
+    ...lastActionFields(senadoLastAction()),
     lastActionText: null,
     sponsorName: null,
     sponsorParty: null,

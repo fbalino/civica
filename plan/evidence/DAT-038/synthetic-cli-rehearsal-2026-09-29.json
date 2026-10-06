@@ -1,0 +1,269 @@
+{
+  "task": "DAT-038",
+  "kind": "synthetic_cli_rehearsal",
+  "ranAt": "2026-09-29",
+  "productionTouched": false,
+  "scope": "Synthetic local rehearsal of the repair CLI on real PostgreSQL. It proves the mechanics and guards; it is NOT the production-copy rehearsal the task requires, which needs read-only production access this session did not have.",
+  "environment": {
+    "database": "PostgreSQL 16.13, loopback-only cluster (127.0.0.1), created from the authoritative history 0000-0051 then 0052",
+    "transport": "the repair CLI's own Neon HTTP client, routed to a loopback-only Neon /sql adapter outside the repository",
+    "schemaFingerprintAfter0052": "8bdb1e68d2776942ff0e318a67a83076898ac713112fcf9af465d23e1cedd8ae"
+  },
+  "seed": {
+    "rows": 46,
+    "shape": "Rows stored exactly as the former adapters wrote them: Câmara sync day; Senado DataUltimaAtualizacao; DIP aktualisiert and datum-as-introduced; UK lastUpdate; Congress.gov updateDate fallback; Assemblée sync-day fallback and a genuine same-day act; Sénat deposit date; LEGISinfo genuine dates including a same-day event.",
+    "seedScriptSha256": "40e138439b32f9b7319cb6a54d1e53cb76f4b76fc4dd7cacaa8b61386e1888ba"
+  },
+  "guards": [
+    {
+      "case": "plan on a 0051 database",
+      "result": "REFUSED: bills lacks the typed last-action columns; apply authoritative migration 0052 first"
+    },
+    {
+      "case": "non-loopback host without --production-host",
+      "result": "REFUSED"
+    },
+    {
+      "case": "apply without --approval-evidence",
+      "result": "REFUSED: --approval-evidence must name the owner's written approval record"
+    },
+    {
+      "case": "approval file without the plan SHA-256",
+      "result": "REFUSED: the approval evidence does not contain this plan's SHA-256"
+    },
+    {
+      "case": "wrong --confirm token",
+      "result": "REFUSED: --confirm must equal APPLY-<first 12 of plan SHA>"
+    }
+  ],
+  "plan": {
+    "planSha256": "021c54234f42f5f12a3c33fb4243991da4e32c4f0f13293710eaced805edfa4d",
+    "totals": {
+      "targets": 38,
+      "dateCleared": 33,
+      "dateReplaced": 5,
+      "absenceRelabelled": 0,
+      "introducedCleared": 2
+    },
+    "bySource": {
+      "bundestag_dip": {
+        "rows": 3,
+        "unchanged": 0,
+        "targets": 3,
+        "dateCleared": 1,
+        "dateReplaced": 2,
+        "absenceRelabelled": 0,
+        "introducedCleared": 2,
+        "storedDateWasWriteDay": 2,
+        "writeDayConfirmedByPayload": 0,
+        "after": {
+          "observed": 2,
+          "missing": 0,
+          "not_observed": 1
+        }
+      },
+      "camara_br": {
+        "rows": 22,
+        "unchanged": 0,
+        "targets": 22,
+        "dateCleared": 22,
+        "dateReplaced": 0,
+        "absenceRelabelled": 0,
+        "introducedCleared": 0,
+        "storedDateWasWriteDay": 22,
+        "writeDayConfirmedByPayload": 0,
+        "after": {
+          "observed": 0,
+          "missing": 22,
+          "not_observed": 0
+        }
+      },
+      "congress_gov": {
+        "rows": 3,
+        "unchanged": 2,
+        "targets": 1,
+        "dateCleared": 1,
+        "dateReplaced": 0,
+        "absenceRelabelled": 0,
+        "introducedCleared": 0,
+        "storedDateWasWriteDay": 1,
+        "writeDayConfirmedByPayload": 0,
+        "after": {
+          "observed": 2,
+          "missing": 1,
+          "not_observed": 0
+        }
+      },
+      "data_assemblee_fr": {
+        "rows": 3,
+        "unchanged": 2,
+        "targets": 1,
+        "dateCleared": 1,
+        "dateReplaced": 0,
+        "absenceRelabelled": 0,
+        "introducedCleared": 0,
+        "storedDateWasWriteDay": 2,
+        "writeDayConfirmedByPayload": 1,
+        "after": {
+          "observed": 2,
+          "missing": 0,
+          "not_observed": 1
+        }
+      },
+      "legisinfo_ca": {
+        "rows": 2,
+        "unchanged": 2,
+        "targets": 0,
+        "dateCleared": 0,
+        "dateReplaced": 0,
+        "absenceRelabelled": 0,
+        "introducedCleared": 0,
+        "storedDateWasWriteDay": 1,
+        "writeDayConfirmedByPayload": 1,
+        "after": {
+          "observed": 2,
+          "missing": 0,
+          "not_observed": 0
+        }
+      },
+      "senado_br": {
+        "rows": 6,
+        "unchanged": 0,
+        "targets": 6,
+        "dateCleared": 6,
+        "dateReplaced": 0,
+        "absenceRelabelled": 0,
+        "introducedCleared": 0,
+        "storedDateWasWriteDay": 0,
+        "writeDayConfirmedByPayload": 0,
+        "after": {
+          "observed": 0,
+          "missing": 6,
+          "not_observed": 0
+        }
+      },
+      "senat_fr": {
+        "rows": 3,
+        "unchanged": 2,
+        "targets": 1,
+        "dateCleared": 1,
+        "dateReplaced": 0,
+        "absenceRelabelled": 0,
+        "introducedCleared": 0,
+        "storedDateWasWriteDay": 0,
+        "writeDayConfirmedByPayload": 0,
+        "after": {
+          "observed": 2,
+          "missing": 0,
+          "not_observed": 1
+        }
+      },
+      "uk_parliament": {
+        "rows": 4,
+        "unchanged": 0,
+        "targets": 4,
+        "dateCleared": 1,
+        "dateReplaced": 3,
+        "absenceRelabelled": 0,
+        "introducedCleared": 0,
+        "storedDateWasWriteDay": 1,
+        "writeDayConfirmedByPayload": 0,
+        "after": {
+          "observed": 3,
+          "missing": 0,
+          "not_observed": 1
+        }
+      }
+    }
+  },
+  "apply": {
+    "rowsUpdated": 38,
+    "targetsAlreadyRepaired": 0
+  },
+  "verify": {
+    "pass": true,
+    "checks": {
+      "V1_contract": {
+        "pass": true,
+        "detail": "0 row(s) violate bill-last-action-date/v1"
+      },
+      "V2_no_future_dates": {
+        "pass": true,
+        "detail": "0 observed date(s) after the payload write day + 1"
+      },
+      "V3_zero_replan": {
+        "pass": true,
+        "detail": "a new plan proposes 0 change(s)"
+      },
+      "V4_plan_applied": {
+        "pass": true,
+        "detail": "0 planned target(s) not in their after-state"
+      },
+      "V5_freshness_unchanged": {
+        "pass": true,
+        "detail": "no bill source's last_sync_at changed since the plan"
+      }
+    },
+    "statusBySource": {
+      "bundestag_dip": {
+        "not_observed": 1,
+        "observed": 2
+      },
+      "camara_br": {
+        "missing": 22
+      },
+      "congress_gov": {
+        "missing": 1,
+        "observed": 2
+      },
+      "data_assemblee_fr": {
+        "not_observed": 1,
+        "observed": 2
+      },
+      "legisinfo_ca": {
+        "observed": 2
+      },
+      "senado_br": {
+        "missing": 6
+      },
+      "senat_fr": {
+        "not_observed": 1,
+        "observed": 2
+      },
+      "uk_parliament": {
+        "not_observed": 1,
+        "observed": 3
+      }
+    }
+  },
+  "repeatPlanTotals": {
+    "targets": 0,
+    "dateCleared": 0,
+    "dateReplaced": 0,
+    "absenceRelabelled": 0,
+    "introducedCleared": 0
+  },
+  "replayApply": {
+    "rowsUpdated": 0,
+    "targetsAlreadyRepaired": 38
+  },
+  "untouched": "updated_at unchanged on all 46 rows; sources.last_sync_at unchanged (V5).",
+  "approvalFileUsed": "a file labelled 'LOCAL SYNTHETIC REHEARSAL ONLY - not an owner approval'",
+  "cleanup": "The loopback cluster, plan/apply/verify files, adapter, and seed are deleted after the session; none entered the repository.",
+  "secondRun": {
+    "ranAt": "2026-10-06",
+    "why": "After the first run, the plan's payload load was paged (100 rows per read) and apply now sends its targets once into a transaction-scoped temp table, so neither depends on one large Neon HTTP request or response. Re-run on a fresh database built and seeded the same way.",
+    "planSha256": "021c54234f42f5f12a3c33fb4243991da4e32c4f0f13293710eaced805edfa4d",
+    "samePlanAsFirstRun": true,
+    "apply": {
+      "rowsUpdated": 38,
+      "targetsAlreadyRepaired": 0
+    },
+    "verifyPass": true,
+    "repeatPlanTargets": 0,
+    "replayApply": {
+      "rowsUpdated": 0,
+      "targetsAlreadyRepaired": 38
+    }
+  }
+}

@@ -42,6 +42,15 @@ import {
   finalizeBillSourceMapping,
 } from "../source-outcome";
 import { statusToStage } from "../stage";
+import {
+  BILL_LAST_ACTION_REASONS,
+  absentLastAction,
+  lastActionFields,
+  latestPublisherActionDate,
+  observedLastAction,
+  publisherActionDate,
+  type BillLastAction,
+} from "../last-action";
 
 const AN_SOURCE_ID = "data_assemblee_fr";
 const SENAT_SOURCE_ID = "senat_fr";
@@ -98,9 +107,13 @@ function successfulFetch<T>(
 }
 
 /** Walk the recursive `actesLegislatifs` tree and return the latest
- * concrete act (datedActe + libelleActe) so we can populate
- * lastActionDate / lastActionText / stage. */
-function walkLatestAct(node: unknown): ExtractedAct | null {
+ * concrete act (dateActe + libelleActe) dated on or before retrieval, so we
+ * can populate lastActionDate / lastActionText / stage. `dateActe` is the
+ * date of the legislative act itself. */
+function walkLatestAct(
+  node: unknown,
+  retrievedAt: Date,
+): ExtractedAct | null {
   let best: ExtractedAct | null = null;
   const visit = (n: unknown) => {
     if (!n) return;
@@ -110,8 +123,11 @@ function walkLatestAct(node: unknown): ExtractedAct | null {
     }
     if (typeof n !== "object") return;
     const obj = n as Record<string, unknown>;
-    if (typeof obj.dateActe === "string" && obj.dateActe.length >= 10) {
-      const date = obj.dateActe.slice(0, 10);
+    const date =
+      typeof obj.dateActe === "string"
+        ? publisherActionDate(obj.dateActe, retrievedAt)
+        : null;
+    if (date) {
       const lib =
         (obj.libelleActe as { libelleCourt?: string; nomCanonique?: string })
           ?.libelleCourt ||
@@ -128,7 +144,20 @@ function walkLatestAct(node: unknown): ExtractedAct | null {
   return best;
 }
 
-async function fetchAN(limit: number): Promise<ChamberFetchResult<AnDossier>> {
+export function anLastAction(raw: unknown, retrievedAt: Date): BillLastAction {
+  const latest = walkLatestAct(
+    (raw as AnDossier | null)?.actesLegislatifs,
+    retrievedAt,
+  );
+  return latest
+    ? observedLastAction(latest.date)
+    : absentLastAction("not_observed", BILL_LAST_ACTION_REASONS.anNoAct);
+}
+
+async function fetchAN(
+  limit: number,
+  retrievedAt: Date,
+): Promise<ChamberFetchResult<AnDossier>> {
   // adm-zip is a CommonJS module imported only at runtime — keeps it
   // out of the Next.js client bundle.
   let AdmZip: typeof import("adm-zip");
@@ -194,7 +223,10 @@ async function fetchAN(limit: number): Promise<ChamberFetchResult<AnDossier>> {
         };
         const j = json.dossierParlementaire;
         if (!j || j["@xsi:type"] !== "DossierLegislatif_Type") continue;
-        out.push({ dossier: j, latest: walkLatestAct(j.actesLegislatifs) });
+        out.push({
+          dossier: j,
+          latest: walkLatestAct(j.actesLegislatifs, retrievedAt),
+        });
       } catch {
         malformedEntries++;
       }
@@ -231,12 +263,12 @@ function anDraft(
   d: AnDossier,
   jurisdictionId: string,
   bodyId: string | null,
+  retrievedAt: Date,
 ): BillIngestDraft | null {
   if (!d.uid) return null;
   const titre = d.titreDossier?.titre?.trim() || "Untitled";
   const procedure = d.procedureParlementaire?.libelle?.trim() || "Dossier";
-  const latest = walkLatestAct(d.actesLegislatifs);
-  const lastAction = latest?.date ?? new Date().toISOString().slice(0, 10);
+  const latest = walkLatestAct(d.actesLegislatifs, retrievedAt);
   const lastText = latest?.libelle ?? null;
   // Build a friendly identifier from the procedure code + legislative
   // dossier number (last numeric chunk of the uid, e.g. DLR5L17N54085 → 54085).
@@ -255,7 +287,7 @@ function anDraft(
     stage: statusToStage(lastText),
     rawStatus: lastText,
     introducedDate: null,
-    lastActionDate: lastAction,
+    ...lastActionFields(anLastAction(d, retrievedAt)),
     lastActionText: lastText,
     sponsorName: null,
     sponsorParty: null,
@@ -321,6 +353,33 @@ function ddmmyyyyToIso(value: string): string | null {
   return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
 }
 
+/**
+ * The Sénat dossier export dates three steps: deposit (`dateInitiale`), the
+ * Constitutional Council decision (`dateDecision`), and promulgation
+ * (`datePromulgation`). Decision and promulgation are the dossier's last
+ * steps, so either is its last action. The deposit date is the introduction
+ * date; a dossier with only a deposit has had later steps the export does
+ * not date, so its last action is not observed rather than the deposit.
+ */
+export function senatLastAction(
+  raw: unknown,
+  retrievedAt: Date,
+): BillLastAction {
+  const r = (raw ?? {}) as Partial<SenatRow>;
+  const date = latestPublisherActionDate(
+    [r.datePromulgation, r.dateDecision].map((value) =>
+      typeof value === "string" ? ddmmyyyyToIso(value) : null,
+    ),
+    retrievedAt,
+  );
+  return date
+    ? observedLastAction(date)
+    : absentLastAction(
+        "not_observed",
+        BILL_LAST_ACTION_REASONS.senatNoLaterStep,
+      );
+}
+
 async function fetchSenat(
   limit: number,
 ): Promise<ChamberFetchResult<SenatRow>> {
@@ -384,6 +443,7 @@ function senatDraft(
   r: SenatRow,
   jurisdictionId: string,
   bodyId: string | null,
+  retrievedAt: Date,
 ): BillIngestDraft | null {
   // External id derived from the dossier URL slug, which is stable
   // across re-syncs — e.g. "ppl25-563.html" → "ppl25-563".
@@ -392,11 +452,6 @@ function senatDraft(
   const url = senatPublicUrl(r.url);
   if (!url) return null;
   const introduced = ddmmyyyyToIso(r.dateInitiale);
-  const lastAction =
-    ddmmyyyyToIso(r.datePromulgation) ??
-    ddmmyyyyToIso(r.dateDecision) ??
-    introduced ??
-    new Date().toISOString().slice(0, 10);
   // Status precedence: promulgué > état > "Première lecture (Sénat)"
   const status = r.datePromulgation ? "Promulgué" : r.etat || "Déposée";
   return {
@@ -409,7 +464,7 @@ function senatDraft(
     stage: statusToStage(status),
     rawStatus: status,
     introducedDate: introduced,
-    lastActionDate: lastAction,
+    ...lastActionFields(senatLastAction(r, retrievedAt)),
     lastActionText: status,
     sponsorName: null,
     sponsorParty: null,
@@ -441,8 +496,11 @@ export async function fetchFRBillsForSync(opts: {
   db: NeonHttpDatabase<typeof schema>;
   /** Per-chamber cap. Total returned ≤ 2 × limit. Default 50/each. */
   limit?: number;
+  /** Retrieval time; fixtures pin it. Defaults to now. */
+  retrievedAt?: Date;
 }): Promise<BillFetchBatch> {
   const limit = opts.limit ?? 50;
+  const retrievedAt = opts.retrievedAt ?? new Date();
 
   const bodies = await opts.db
     .select({
@@ -458,13 +516,16 @@ export async function fetchFRBillsForSync(opts: {
   const lowerBodyId = bodyByChamber.get("lower") ?? null;
   const upperBodyId = bodyByChamber.get("upper") ?? null;
 
-  const [an, senat] = await Promise.all([fetchAN(limit), fetchSenat(limit)]);
+  const [an, senat] = await Promise.all([
+    fetchAN(limit, retrievedAt),
+    fetchSenat(limit),
+  ]);
 
   const anDrafts = an.rows
-    .map((d) => anDraft(d, opts.jurisdictionId, lowerBodyId))
+    .map((d) => anDraft(d, opts.jurisdictionId, lowerBodyId, retrievedAt))
     .filter((d): d is BillIngestDraft => d !== null);
   const senatDrafts = senat.rows
-    .map((r) => senatDraft(r, opts.jurisdictionId, upperBodyId))
+    .map((r) => senatDraft(r, opts.jurisdictionId, upperBodyId, retrievedAt))
     .filter((d): d is BillIngestDraft => d !== null);
 
   const seen = new Set<string>();

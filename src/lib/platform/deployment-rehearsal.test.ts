@@ -59,6 +59,7 @@ test("migration compatibility allows old readers but rejects destructive DDL/dat
     "0049_curvy_shen": "ALTER TABLE civica_conditions_scores ALTER COLUMN normalized_score SET DATA TYPE double precision;",
     "0050_index_release_header_contract": "UPDATE ci_index_releases SET input_manifest_sha256 = 'checked';",
     "0051_eminent_jocasta": "ALTER TABLE civica_conditions_normalization_parameters DROP CONSTRAINT conditions_normalization_parameter_shape_check; ALTER TABLE civica_conditions_normalization_parameters ADD CONSTRAINT conditions_normalization_parameter_shape_check CHECK (direction IN ('higher_is_better', 'lower_is_better', 'not_ranked'));",
+    "0052_bill_last_action_date_state": "ALTER TABLE bills ALTER COLUMN last_action_date DROP NOT NULL; ALTER TABLE bills ADD COLUMN last_action_date_status text DEFAULT 'observed' NOT NULL;",
   };
   assert.deepEqual(stagedMigrationCompatibilityErrors(source), []);
   assert.ok(stagedMigrationCompatibilityErrors({ ...source, "0038_heavy_slyde": "DROP TABLE production_pipeline_runs;" }).some((error) => /drops a table/.test(error)));

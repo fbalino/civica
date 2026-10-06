@@ -4,6 +4,7 @@ import { bills } from "@/lib/db/schema";
 import { markSourcesSyncedFromInsertedRowsCte } from "@/lib/db/source-freshness";
 import type * as schema from "@/lib/db/schema";
 import type { BillIngest } from "./types";
+import { billLastActionErrors } from "./last-action";
 
 type Db = NeonHttpDatabase<typeof schema>;
 type AtomicExecutor = Pick<Db, "execute">;
@@ -57,8 +58,7 @@ export function billIngestErrors(row: BillIngest): string[] {
   if (!row.title.trim()) errors.push("title is required");
   if (!Number.isSafeInteger(row.stage) || row.stage < 0 || row.stage > 4)
     errors.push("stage must be an integer from 0 to 4");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(row.lastActionDate))
-    errors.push("lastActionDate must use YYYY-MM-DD");
+  errors.push(...billLastActionErrors(row));
   if (row.introducedDate && !/^\d{4}-\d{2}-\d{2}$/.test(row.introducedDate))
     errors.push("introducedDate must use YYYY-MM-DD");
   try {
@@ -224,6 +224,8 @@ export const executeAtomicBillWrites: AtomicBillWriter = async (
         "rawStatus" text,
         "introducedDate" date,
         "lastActionDate" date,
+        "lastActionDateStatus" text,
+        "lastActionDateReason" text,
         "lastActionText" text,
         "sponsorName" text,
         "sponsorParty" text,
@@ -247,6 +249,8 @@ export const executeAtomicBillWrites: AtomicBillWriter = async (
         raw_status,
         introduced_date,
         last_action_date,
+        last_action_date_status,
+        last_action_date_reason,
         last_action_text,
         sponsor_name,
         sponsor_party,
@@ -269,6 +273,8 @@ export const executeAtomicBillWrites: AtomicBillWriter = async (
         input."rawStatus",
         input."introducedDate",
         input."lastActionDate",
+        input."lastActionDateStatus",
+        input."lastActionDateReason",
         input."lastActionText",
         input."sponsorName",
         input."sponsorParty",
@@ -294,6 +300,8 @@ export const executeAtomicBillWrites: AtomicBillWriter = async (
         raw_status = input."rawStatus",
         introduced_date = input."introducedDate",
         last_action_date = input."lastActionDate",
+        last_action_date_status = input."lastActionDateStatus",
+        last_action_date_reason = input."lastActionDateReason",
         last_action_text = input."lastActionText",
         sponsor_name = input."sponsorName",
         sponsor_party = input."sponsorParty",
@@ -388,6 +396,8 @@ function billMatches(
     existing.rawStatus === row.rawStatus &&
     existing.introducedDate === row.introducedDate &&
     existing.lastActionDate === row.lastActionDate &&
+    existing.lastActionDateStatus === row.lastActionDateStatus &&
+    existing.lastActionDateReason === row.lastActionDateReason &&
     existing.lastActionText === row.lastActionText &&
     existing.sponsorName === row.sponsorName &&
     existing.sponsorParty === row.sponsorParty &&

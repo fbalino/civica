@@ -122,3 +122,29 @@ export function billsSupportedCoverageNote(): string {
   const names = BILLS_SUPPORTED_JURISDICTION_NAMES.join(", ");
   return `Civica's bills and legislative-activity tracking currently covers six jurisdictions: ${names}.`;
 }
+
+/**
+ * DAT-038 — how the shown bills are ordered. Only bills with a publisher
+ * action date (`bill-last-action-date/v1`) are called recent; bills whose
+ * source feed gives no action date are listed after them and never ranked by
+ * activity. Shared by the Civica Data Bills section and its tests.
+ */
+export function billsListingNote(input: {
+  countryName: string;
+  shown: number;
+  dated: number;
+  total: number | null;
+}): string {
+  const { countryName, shown, dated, total } = input;
+  const undated = shown - dated;
+  const tracked =
+    total != null && total > shown
+      ? ` of ${total.toLocaleString("en-US")} tracked ${countryName} bills`
+      : ` tracked ${countryName} bills`;
+  if (dated === 0) {
+    return `Showing ${shown}${tracked}. None of these records carries a legislative action date from its source feed, so they are not ordered by recent activity.`;
+  }
+  const lead = `Showing the ${dated} most recent${tracked} by the publisher's latest action date`;
+  if (undated === 0) return `${lead}.`;
+  return `${lead}, then ${undated} whose source feed gives no action date.`;
+}

@@ -7,8 +7,8 @@
 This is the mandatory order for schema, data release, application deployment,
 and recovery. It closes the gap between the configured production database,
 whose authoritative ledger ends at `0032_sparkling_genesis`, and the additive
-PLT/ATL/Pulse/Explore migrations `0033`–`0040` and `0042`–`0051`. There is no
-authoritative `0041` migration.
+PLT/ATL/Pulse/Explore/DAT migrations `0033`–`0040` and `0042`–`0052`. There is
+no authoritative `0041` migration.
 
 ## Non-negotiable boundaries
 
@@ -27,8 +27,10 @@ authoritative `0041` migration.
   releases use a new versioned URL instead of a purge or overwrite.
 - The staged migrations retain existing reader columns and do not delete rows,
   tables, or columns. The PLT-014 release migration changes named-score writer
-  rules, so an old deployment is read-compatible only. Do not re-enable old
-  writers after a code rollback; ship a forward fix first.
+  rules, so an old deployment is read-compatible only. DAT-038's `0052` makes
+  `bills.last_action_date` nullable: once a row stores a typed absence, an old
+  bills writer fails closed on it and an old reader sorts undated bills first.
+  Do not re-enable old writers after a code rollback; ship a forward fix first.
 
 ## Staging rehearsal
 

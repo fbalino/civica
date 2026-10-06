@@ -29,6 +29,14 @@ import {
   finalizeBillSourceMapping,
 } from "../source-outcome";
 import { statusToStage } from "../stage";
+import {
+  BILL_LAST_ACTION_REASONS,
+  absentLastAction,
+  lastActionFields,
+  observedLastAction,
+  publisherActionDate,
+  type BillLastAction,
+} from "../last-action";
 
 const SOURCE_ID = "bundestag_dip";
 const DIP_VORGANG_URL = "https://search.dip.bundestag.de/api/v1/vorgang";
@@ -168,6 +176,20 @@ function isDipResponse(
   );
 }
 
+/**
+ * The DIP OpenAPI schema defines `Vorgang.datum` as "Datierung des letzten
+ * zugehörigen Dokuments" (the date of the proceeding's latest document: a
+ * Drucksache or Plenarprotokoll, each tied to a procedural step) and
+ * `Vorgang.aktualisiert` as "Letzte Aktualisierung der Entität" (the record's
+ * last modification). Only `datum` dates a legislative step.
+ */
+export function dipLastAction(raw: unknown, retrievedAt: Date): BillLastAction {
+  const date = publisherActionDate((raw as DipDoc | null)?.datum, retrievedAt);
+  return date
+    ? observedLastAction(date)
+    : absentLastAction("not_observed", BILL_LAST_ACTION_REASONS.dipNoDocument);
+}
+
 /** Build a stable, human-readable identifier from the gesta number
  * (e.g. "Gesta C064") if present, otherwise fall back to the DIP id. */
 function pickIdentifier(d: DipDoc): string {
@@ -186,8 +208,11 @@ export async function fetchDEBillsForSync(opts: {
   db: NeonHttpDatabase<typeof schema>;
   /** Default 100 (DIP page size). */
   limit?: number;
+  /** Retrieval time; fixtures pin it. Defaults to now. */
+  retrievedAt?: Date;
 }): Promise<BillFetchBatch> {
   const fetched = await fetchRaw(opts.limit ?? 100);
+  const retrievedAt = opts.retrievedAt ?? new Date();
   if (fetched.outcome.status === "failed") {
     return { drafts: [], sourceOutcomes: [fetched.outcome] };
   }
@@ -207,9 +232,6 @@ export async function fetchDEBillsForSync(opts: {
     .map((d) => {
       const identifier = pickIdentifier(d);
       const formal = d.titel?.trim() || identifier;
-      const lastAction =
-        (d.aktualisiert ?? d.datum ?? "").slice(0, 10) ||
-        new Date().toISOString().slice(0, 10);
       return {
         jurisdictionId: opts.jurisdictionId,
         bodyId,
@@ -219,8 +241,10 @@ export async function fetchDEBillsForSync(opts: {
         longTitle: formal !== identifier ? formal : null,
         stage: statusToStage(d.beratungsstand),
         rawStatus: d.beratungsstand ?? null,
-        introducedDate: d.datum ?? null,
-        lastActionDate: lastAction,
+        // The `vorgang` list carries no introduction date, and `datum` is the
+        // latest document's date, so it is not one.
+        introducedDate: null,
+        ...lastActionFields(dipLastAction(d, retrievedAt)),
         lastActionText: d.beratungsstand ?? null,
         sponsorName: d.initiative?.[0] ?? null,
         sponsorParty: null,

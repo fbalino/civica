@@ -215,6 +215,8 @@ export async function runBillsSync(
     rawStatus: d.rawStatus,
     introducedDate: d.introducedDate,
     lastActionDate: d.lastActionDate,
+    lastActionDateStatus: d.lastActionDateStatus,
+    lastActionDateReason: d.lastActionDateReason,
     lastActionText: d.lastActionText,
     sponsorName: d.sponsorName,
     sponsorParty: d.sponsorParty,

@@ -28,6 +28,7 @@ export const STAGED_MIGRATION_IDS = [
   "0049_curvy_shen",
   "0050_index_release_header_contract",
   "0051_eminent_jocasta",
+  "0052_bill_last_action_date_state",
 ] as const;
 
 export type DeploymentScope = "staging" | "production" | "recovery";

@@ -466,7 +466,7 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Official legislature APIs/pages normalized by country-specific adapters.",
     cadence: "Scheduled source sync, generally daily.",
     vintageSemantics:
-      "introduced/updated/status dates describe the bill; last_synced_at is Civica retrieval time.",
+      "introduced_date and last_action_date are publisher dates for legislative steps; last_action_date is never retrieval or record-modified time and is null with a typed last_action_date_status when the feed has none (bill-last-action-date/v1); created_at/updated_at are Civica write times.",
     rights:
       "Source-specific government terms; export requires source-level rights resolution.",
     deprecation: active,

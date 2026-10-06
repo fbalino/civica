@@ -1511,7 +1511,16 @@ export const bills = pgTable(
     /** The raw status string from the source — kept verbatim for citation. */
     rawStatus: text("raw_status"),
     introducedDate: date("introduced_date"),
-    lastActionDate: date("last_action_date").notNull(),
+    /** Publisher date of the latest legislative step, never retrieval time
+     *  or a record-modified date (`bill-last-action-date/v1`, DAT-038). Null
+     *  when the source feed carries none; the status/reason pair then
+     *  records a `data-value-state/v1` absence. */
+    lastActionDate: date("last_action_date"),
+    /** observed | missing | not_observed — see src/lib/bills/last-action.ts. */
+    lastActionDateStatus: text("last_action_date_status")
+      .notNull()
+      .default("observed"),
+    lastActionDateReason: text("last_action_date_reason"),
     lastActionText: text("last_action_text"),
     sponsorName: text("sponsor_name"),
     sponsorParty: text("sponsor_party"),
@@ -1529,13 +1538,27 @@ export const bills = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (t) => [
-    // Drives the 10-most-recent-bills query.
+    // Drives the most-recent-bills query; undated bills sort last.
     index("bills_jurisdiction_last_action_idx").on(
       t.jurisdictionId,
-      t.lastActionDate,
+      t.lastActionDate.desc().nullsLast(),
     ),
     // Idempotent upserts.
     uniqueIndex("bills_source_external_idx").on(t.sourceId, t.externalId),
+    check(
+      "bills_last_action_date_status_allowed",
+      dsql`${t.lastActionDateStatus} IN ('observed', 'missing', 'unknown', 'not_applicable', 'not_observed', 'disputed', 'withheld')`,
+    ),
+    check(
+      "bills_last_action_date_status_shape",
+      dsql`(${t.lastActionDateStatus} IN ('observed', 'disputed') AND ${t.lastActionDate} IS NOT NULL) OR (${t.lastActionDateStatus} IN ('missing', 'unknown', 'not_applicable', 'not_observed', 'withheld') AND ${t.lastActionDate} IS NULL)`,
+    ),
+    check(
+      "bills_last_action_date_status_reason",
+      // IS NOT NULL keeps the check false (not NULL, which CHECK accepts)
+      // when a non-observed row has no reason.
+      dsql`(${t.lastActionDateStatus} = 'observed' AND ${t.lastActionDateReason} IS NULL) OR (${t.lastActionDateStatus} <> 'observed' AND ${t.lastActionDateReason} IS NOT NULL AND length(btrim(${t.lastActionDateReason})) > 0)`,
+    ),
   ],
 );
 

@@ -1378,3 +1378,31 @@ the country. No validator compared a displayed number with the publisher's own
 figure. The check fails on the former row and on unregistered readers, but it
 cannot see new arithmetic in a file that reads no registered field, so the
 rule is also a review rule. Durable evidence: `plan/evidence/CLM-020/`.
+
+### APR-D175 — A bill's last-action date is a publisher's date for a legislative step, or a typed absence
+
+**Decision:** Under `bill-last-action-date/v1` (DAT-038), `bills.last_action_date`
+holds only a date the publisher gives to a legislative step: a recorded action
+(Congress.gov `latestAction.actionDate`), a sitting of the bill's current stage
+(UK Bills API `currentStage.stageSittings[].date`, on or before retrieval), the
+latest associated document (Bundestag DIP `datum`), a dated act (Assemblée
+nationale `dateActe`), a Constitutional Council decision or promulgation (Sénat
+export), or a bill event (LEGISinfo). It is never retrieval time or a
+record-modified field (`updateDate`, `lastUpdate`, `aktualisiert`,
+`DataUltimaAtualizacao`), and never an introduction date standing in for later
+steps. When the feed Civica reads carries no such date, the row stores no date
+and a `data-value-state/v1` status with a reason: `missing` when the publisher
+dates the step elsewhere but Civica's feed lacks it (Câmara, Senado), and
+`not_observed` when the record has no dated step on or before retrieval. The
+reader shows the shared `DataValueState` chip instead of a date, the public
+bills API publishes `date`, `dateStatus`, and `dateStatusReason`, and undated
+bills sort after every dated bill and are never called recent. Stored rows are
+corrected only by the registered `data-repair-bill-last-action-dates` tool,
+which re-derives each row from its retained publisher payload.
+
+**Why:** The Câmara adapter stored the sync day on every run ("use today as a
+conservative ceiling"), so the live Brazil page showed "Last action <today>"
+for every bill; the Senado, DIP, and UK adapters stored record-modified times;
+the Congress.gov and Assemblée adapters fell back to them or to the sync day;
+and the Sénat adapter offered the deposit date as the last action. The
+`NOT NULL` column forced a substitute. Durable evidence: `plan/evidence/DAT-038/`.

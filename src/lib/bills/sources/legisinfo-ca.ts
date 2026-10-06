@@ -10,6 +10,14 @@ import {
   finalizeBillSourceMapping,
 } from "../source-outcome";
 import { statusToStage } from "../stage";
+import {
+  BILL_LAST_ACTION_REASONS,
+  absentLastAction,
+  lastActionFields,
+  latestPublisherActionDate,
+  observedLastAction,
+  type BillLastAction,
+} from "../last-action";
 
 const SOURCE_ID = "legisinfo_ca";
 
@@ -177,7 +185,10 @@ export async function fetchCABillsForSync(opts: {
   db: NeonHttpDatabase<typeof schema>;
   /** How many of the most-recently-active bills to keep. Default 100. */
   limit?: number;
+  /** Retrieval time; fixtures pin it. Defaults to now. */
+  retrievedAt?: Date;
 }): Promise<BillFetchBatch> {
+  const retrievedAt = opts.retrievedAt ?? new Date();
   const fetched = await fetchRaw();
   if (fetched.outcome.status === "failed") {
     return { drafts: [], sourceOutcomes: [fetched.outcome] };
@@ -197,8 +208,8 @@ export async function fetchCABillsForSync(opts: {
 
   // Sort by latest activity desc, slice to limit.
   const sorted = [...fetched.rows].sort((a, b) => {
-    const da = latestActionDate(a) ?? "";
-    const db = latestActionDate(b) ?? "";
+    const da = legisinfoLastAction(a, retrievedAt).date ?? "";
+    const db = legisinfoLastAction(b, retrievedAt).date ?? "";
     return db.localeCompare(da);
   });
   const limited = sorted.slice(0, opts.limit ?? 100);
@@ -215,8 +226,6 @@ export async function fetchCABillsForSync(opts: {
       return [];
     }
     const { title, longTitle } = pickTitle(b);
-    const lastAction = latestActionDate(b);
-    if (!lastAction) return [];
     const introduced =
       isoDate(b.PassedHouseFirstReadingDateTime) ??
       isoDate(b.PassedSenateFirstReadingDateTime);
@@ -235,7 +244,7 @@ export async function fetchCABillsForSync(opts: {
         stage: structuralStage(b),
         rawStatus: b.StatusNameEn ?? null,
         introducedDate: introduced,
-        lastActionDate: lastAction,
+        ...lastActionFields(legisinfoLastAction(b, retrievedAt)),
         lastActionText: b.LatestBillEventTypeNameEn ?? b.StatusNameEn ?? null,
         sponsorName: b.SponsorPersonName?.trim() || null,
         sponsorParty: null,
@@ -260,19 +269,34 @@ export async function fetchCABillsForSync(opts: {
   return { drafts, sourceOutcomes: [outcome] };
 }
 
-function latestActionDate(b: RawBill): string | null {
-  const dates = [
-    b.LatestBillEventDateTime,
+/**
+ * Every LEGISinfo field read here dates a bill event or reading; the feed has
+ * no record-modified field in this list. The latest on or before retrieval is
+ * the last action.
+ */
+export function legisinfoLastAction(
+  raw: unknown,
+  retrievedAt: Date,
+): BillLastAction {
+  const b = (raw ?? {}) as RawBill;
+  const date = latestPublisherActionDate(
+    [
+      b.LatestBillEventDateTime,
     b.LatestCompletedMajorStageDateTime,
     b.ReceivedRoyalAssentDateTime,
     b.PassedHouseThirdReadingDateTime,
     b.PassedSenateThirdReadingDateTime,
     b.PassedHouseSecondReadingDateTime,
     b.PassedSenateSecondReadingDateTime,
-    b.PassedHouseFirstReadingDateTime,
-    b.PassedSenateFirstReadingDateTime,
-  ]
-    .map(isoDate)
-    .filter((date): date is string => date !== null);
-  return dates.sort().at(-1) ?? null;
+      b.PassedHouseFirstReadingDateTime,
+      b.PassedSenateFirstReadingDateTime,
+    ].map(isoDate),
+    retrievedAt,
+  );
+  return date
+    ? observedLastAction(date)
+    : absentLastAction(
+        "not_observed",
+        BILL_LAST_ACTION_REASONS.legisinfoNoEvent,
+      );
 }
