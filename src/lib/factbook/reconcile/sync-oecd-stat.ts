@@ -353,7 +353,7 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
     // publishers compute SHA-2011 joint methodology and converge
     // to ~0.1pp.
     //
-    // Filter dimension positions for DSD_SHA@DF_SHA/1.0:
+    // Filter dimension positions for DSD_SHA@DF_SHA/1.1:
     //   0.  REF_AREA (wildcard)
     //   1.  FREQ (A = annual)
     //   2.  MEASURE (EXP_HEALTH = health expenditure)
@@ -377,7 +377,8 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
     // members + WHO covers ~190 ISO3 globally.
     agency: "OECD.ELS.HD",
     dataflowId: "DSD_SHA@DF_SHA",
-    dataflowVersion: "1.0",
+    // OECD retired the populated 1.0 edition; 1.1 preserves these dimensions.
+    dataflowVersion: "1.1",
     dimensionFilter: ".A.EXP_HEALTH.PT_B1GQ._T.._T._T._T...",
     factKey: "health_expenditure_pct_gdp",
     label: "Current health expenditure (% of GDP), SHA-2011",
