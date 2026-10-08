@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-08T13:12:00Z",
+  "officialMetadataUrl": "https://sdmx.oecd.org/public/rest/dataflow/OECD.ELS.HD/DSD_SHA@DF_SHA/all?references=all",
+  "metadataSha256": "f7217b8b29601e6b09fdeb3be0b342d5b779ceefd48649e96a99b39e6a8ee319",
+  "metadataAvailableObservations": {
+    "1.0": "0",
+    "1.1": "13296298"
+  },
+  "oldEditionResult": {
+    "version": "1.0",
+    "httpStatus": 404
+  },
+  "replacementResult": {
+    "version": "1.1",
+    "httpStatus": 200,
+    "bytes": 48614,
+    "sha256": "35e180719b0b2d46a85aca810ffbeea7eb06d1fd2b7121dc656f2b574071437a"
+  },
+  "preserved": [
+    "measure EXP_HEALTH",
+    "unit PT_B1GQ",
+    "aggregate financing/function/mode/provider filter",
+    "native partner-country admission",
+    "latest non-null year",
+    "history/provenance writer",
+    "aggregate success freshness gate"
+  ],
+  "originalFailedRun": "2026-10-07T14:00:19.468Z; 159 other-indicator facts retained, freshness unchanged",
+  "redRegression": "Retired edition causes 404 and expected successful health result assertion fails",
+  "greenRegression": "4/4 adapter tests pass",
+  "localRehearsal": {
+    "passed": true,
+    "admittedRows": 219,
+    "fetches": 15,
+    "dryRunNoChanges": true,
+    "unrelatedFactsUnchanged": true,
+    "repeatNoAdditionalSnapshotsHistoryOrDisputes": true,
+    "badProvenance": 0,
+    "duplicates": 0
+  },
+  "recoveryPoint": {
+    "readOnly": "on",
+    "dumpSha256": "88f5bec9ef972105792f4f362004a6005218baee5b410dd72ac5d35ce22674ad",
+    "dumpBytes": 256080048,
+    "restoredRowHashesMatch": true,
+    "privateArtifactsOnly": true
+  }
+}

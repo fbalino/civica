@@ -90,3 +90,37 @@ test("OECD upstream failure cannot stamp freshness", async () => {
   assert.deepEqual(stampedRows, []);
   assert.equal(state.writes(), 0);
 });
+
+test("OECD health uses populated SHA 1.1 while retaining GDP units and partner coverage", async (t) => {
+  // OECD metadata retrieved 2026-10-08: SHA 1.0 has zero observations;
+  // SHA 1.1 retains the same dimensions. Values below are its USA/BRA rows.
+  const state = harness();
+  const requested: URL[] = [];
+  t.mock.method(globalThis, "fetch", async (input: string | URL | Request) => {
+    const url = new URL(String(input));
+    requested.push(url);
+    if (!url.pathname.includes(",DSD_SHA@DF_SHA,1.1/")) {
+      return new Response("No Records Found", { status: 404 });
+    }
+    return Response.json({ data: {
+      structure: { dimensions: { observation: [
+        { id: "REF_AREA", values: [{ id: "USA" }, { id: "BRA" }] },
+        { id: "TIME_PERIOD", values: [{ id: "2022" }, { id: "2024" }] },
+      ] } },
+      dataSets: [{ observations: { "0:0": [16.744], "0:1": [17.202], "1:0": [9.387] } }],
+    } });
+  });
+  const result = await syncOecdStat(state.db, {
+    ...historyOptions, factKey: "health_expenditure_pct_gdp",
+    jurisdictions: [jurisdiction, { id: "22222222-2222-4222-8222-222222222222", slug: "brazil", iso3: "BRA" }],
+    persistDisputes: noDisputes as never, markSynced: (async () => []) as never,
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal(requested.length, 1);
+  assert.equal(requested[0].pathname.split("/").at(-1), ".A.EXP_HEALTH.PT_B1GQ._T.._T._T._T...");
+  assert.equal(requested[0].searchParams.get("dimensionAtObservation"), "AllDimensions");
+  assert.equal(result.countersByFactKey.health_expenditure_pct_gdp.jurisdictions_with_value, 2);
+  const values = [...state.facts.values()];
+  assert.equal(values.find(row => row.jurisdictionId === jurisdiction.id)?.factValue, "17.202");
+  assert.equal(values.find(row => row.jurisdictionId !== jurisdiction.id)?.factValue, "9.387");
+});
