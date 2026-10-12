@@ -221,3 +221,47 @@ test("Census transport failures cannot expose authenticated URLs", async (t) => 
   assert.doesNotMatch(JSON.stringify(result), /fixture-private-key|key=/);
   assert.equal(state.writes(), 0);
 });
+
+test("Census urbanization uses the urban-and-total population cells and retains both inputs", async (t) => {
+  // Publisher dictionary: 2020 DHC P2_002N is urban; P2_001N is total.
+  // Counts are deliberately synthetic, with an independent 80% ratio oracle.
+  const state = harness();
+  const prior = process.env.CENSUS_API_KEY;
+  process.env.CENSUS_API_KEY = "fixture-key";
+  t.after(() => { if (prior === undefined) delete process.env.CENSUS_API_KEY; else process.env.CENSUS_API_KEY = prior; });
+  t.mock.method(globalThis, "fetch", async () => Response.json([
+    ["NAME", "P2_002N", "P2_001N", "us"], ["United States", "40", "50", "1"],
+  ]));
+  const result = await syncUsCensus(state.db, {
+    factKey: "urbanization_rate", jurisdiction, atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact, persistDisputes: noDisputes as never,
+    markSynced: (async () => ["us_census"]) as never,
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal([...state.facts.values()][0].factValue, "80");
+  const payload = [...state.snapshots.values()][0].payload as { rawCells: number[]; variables: string[]; dataset: string; vintage: number };
+  assert.equal(payload.dataset, "dec/dhc");
+  assert.equal(payload.vintage, 2020);
+  assert.deepEqual(payload.rawCells, [40, 50]);
+  assert.deepEqual(payload.variables, ["P2_002N", "P2_001N"]);
+});
+
+test("Census broadband uses subscription, not computer-ownership percentage", async (t) => {
+  // Official ACS2024 dictionary identifies DP02_0154PE as broadband.
+  const state = harness();
+  const prior = process.env.CENSUS_API_KEY;
+  process.env.CENSUS_API_KEY = "fixture-key";
+  t.after(() => { if (prior === undefined) delete process.env.CENSUS_API_KEY; else process.env.CENSUS_API_KEY = prior; });
+  t.mock.method(globalThis, "fetch", async () => Response.json([
+    ["NAME", "DP02_0154PE", "us"], ["United States", "85", "1"],
+  ]));
+  const result = await syncUsCensus(state.db, {
+    factKey: "internet_users_pct", jurisdiction, atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact, persistDisputes: noDisputes as never,
+    markSynced: (async () => ["us_census"]) as never,
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal([...state.facts.values()][0].factValue, "85");
+  const payload = [...state.snapshots.values()][0].payload as { variables: string[] };
+  assert.deepEqual(payload.variables, ["DP02_0154PE"]);
+});
