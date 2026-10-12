@@ -982,7 +982,11 @@ async function extractFromPdf(
  * Returns true when the value is locatable in the quote; false
  * otherwise (caller treats as extraction failure → skip).
  */
-function quoteContainsValue(value: number, rawQuote: string): boolean {
+function quoteContainsValue(
+  value: number,
+  rawQuote: string,
+  pCode?: string,
+): boolean {
   // Generate candidate string representations of the value:
   //   - bare numeric ("3.1", "31.4", "0.4", "63100000")
   //   - comma-decimal ("3,1", "31,4", "0,4")
@@ -1031,6 +1035,24 @@ function quoteContainsValue(value: number, rawQuote: string): boolean {
 
   for (const c of candidates) {
     if (rawQuote.includes(c)) return true;
+  }
+
+  // P0441 sometimes expresses negative production GDP through direction prose
+  // rather than a printed minus sign. Keep this exception scoped to the exact
+  // publisher headline so CPI and GDP-component decreases cannot validate the
+  // extracted overall GDP rate.
+  if (value < 0 && pCode === "P0441") {
+    const productionGdpDecrease =
+      /\breal\s+gross\s+domestic\s+product\s+\(gdp\)\s+measured\s+by\s+production\s+decreased\s+by\s+([0-9]+(?:[.,][0-9]+)?)\s*%/gi;
+    for (const match of rawQuote.matchAll(productionGdpDecrease)) {
+      const statedMagnitude = Number(match[1].replace(",", "."));
+      if (
+        Number.isFinite(statedMagnitude) &&
+        statedMagnitude === Math.abs(value)
+      ) {
+        return true;
+      }
+    }
   }
   return false;
 }
@@ -1343,7 +1365,7 @@ export async function syncStatsSa(
     // 5. Verbatim-quote substring check — catches hallucinations
     //    even when tool-use enforces JSON shape (the model could
     //    invent both the value AND a fake quote).
-    if (!quoteContainsValue(numericValue, ext.rawQuote)) {
+    if (!quoteContainsValue(numericValue, ext.rawQuote, config.pCode)) {
       counter.rejected_quote_mismatch++;
       errors.push(
         `${config.pCode} ${config.factKey}: QUOTE MISMATCH — value ${numericValue} ` +
