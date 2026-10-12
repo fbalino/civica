@@ -272,14 +272,26 @@ test("quoteContainsValue: matches negative GDP growth stated as a decrease", () 
   // The actual P0441 Q2 2026 quote on page 2. Stats SA states the
   // direction in prose and prints the magnitude without a minus sign.
   const quote =
-    "Production GDP decreased by 0,2% in the second quarter of 2026, following an increase of 0,4% in the first quarter of 2026.";
-  assert.equal(quoteContainsValue(-0.2, quote), true);
+    "Real gross domestic product (GDP) measured by production decreased by 0,2% in the second quarter of 2026, following an increase of 0,4% in the first quarter of 2026.";
+  assert.equal(quoteContainsValue(-0.2, quote, "P0441"), true);
 });
 
 test("quoteContainsValue: rejects an unsigned negative magnitude governed by increased", () => {
   const quote =
     "Production GDP increased by 0,2% in the second quarter of 2026.";
-  assert.equal(quoteContainsValue(-0.2, quote), false);
+  assert.equal(quoteContainsValue(-0.2, quote, "P0441"), false);
+});
+
+test("quoteContainsValue: rejects component decreases inside a GDP release", () => {
+  const quote =
+    "The manufacturing industry decreased by 0,2% in the second quarter of 2026.";
+  assert.equal(quoteContainsValue(-0.2, quote, "P0441"), false);
+});
+
+test("quoteContainsValue: rejects decrease prose for non-GDP Stats SA indicators", () => {
+  const quote =
+    "The consumer price index decreased by 0,2% in September 2026.";
+  assert.equal(quoteContainsValue(-0.2, quote, "P0141"), false);
 });
 
 test("quoteContainsValue: rejects an unrelated matching contribution", () => {
@@ -289,13 +301,15 @@ test("quoteContainsValue: rejects an unrelated matching contribution", () => {
 });
 
 test("quoteContainsValue: rejects a different decrease magnitude", () => {
-  const quote = "Production GDP decreased by 0,3% in the quarter.";
-  assert.equal(quoteContainsValue(-0.2, quote), false);
+  const quote =
+    "Real gross domestic product (GDP) measured by production decreased by 0,3% in the quarter.";
+  assert.equal(quoteContainsValue(-0.2, quote, "P0441"), false);
 });
 
 test("quoteContainsValue: does not round a negative value to the printed magnitude", () => {
-  const quote = "Production GDP decreased by 0,2% in the quarter.";
-  assert.equal(quoteContainsValue(-0.24, quote), false);
+  const quote =
+    "Real gross domestic product (GDP) measured by production decreased by 0,2% in the quarter.";
+  assert.equal(quoteContainsValue(-0.24, quote, "P0441"), false);
 });
 
 test("quoteContainsValue: preserves literal signed-value validation", () => {
