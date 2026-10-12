@@ -1032,6 +1032,24 @@ function quoteContainsValue(value: number, rawQuote: string): boolean {
   for (const c of candidates) {
     if (rawQuote.includes(c)) return true;
   }
+
+  // Stats SA sometimes expresses a negative change through direction prose
+  // rather than a printed minus sign (for example, "decreased by 0,2%").
+  // Keep this exception narrow: the exact magnitude must immediately follow
+  // "decreased by" and must be presented as a percentage.
+  if (value < 0) {
+    const decreasedByPercentage =
+      /\bdecreased\s+by\s+([0-9]+(?:[.,][0-9]+)?)\s*%/gi;
+    for (const match of rawQuote.matchAll(decreasedByPercentage)) {
+      const statedMagnitude = Number(match[1].replace(",", "."));
+      if (
+        Number.isFinite(statedMagnitude) &&
+        statedMagnitude === Math.abs(value)
+      ) {
+        return true;
+      }
+    }
+  }
   return false;
 }
 

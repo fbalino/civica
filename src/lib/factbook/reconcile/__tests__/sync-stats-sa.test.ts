@@ -268,6 +268,41 @@ test("quoteContainsValue: matches GDP QoQ growth rate as comma-decimal", () => {
   assert.equal(quoteContainsValue(0.4, quote), true);
 });
 
+test("quoteContainsValue: matches negative GDP growth stated as a decrease", () => {
+  // The actual P0441 Q2 2026 quote on page 2. Stats SA states the
+  // direction in prose and prints the magnitude without a minus sign.
+  const quote =
+    "Production GDP decreased by 0,2% in the second quarter of 2026, following an increase of 0,4% in the first quarter of 2026.";
+  assert.equal(quoteContainsValue(-0.2, quote), true);
+});
+
+test("quoteContainsValue: rejects an unsigned negative magnitude governed by increased", () => {
+  const quote =
+    "Production GDP increased by 0,2% in the second quarter of 2026.";
+  assert.equal(quoteContainsValue(-0.2, quote), false);
+});
+
+test("quoteContainsValue: rejects an unrelated matching contribution", () => {
+  const quote =
+    "Production GDP decreased by 0,3% in the quarter, with agriculture contributing 0,2%.";
+  assert.equal(quoteContainsValue(-0.2, quote), false);
+});
+
+test("quoteContainsValue: rejects a different decrease magnitude", () => {
+  const quote = "Production GDP decreased by 0,3% in the quarter.";
+  assert.equal(quoteContainsValue(-0.2, quote), false);
+});
+
+test("quoteContainsValue: does not round a negative value to the printed magnitude", () => {
+  const quote = "Production GDP decreased by 0,2% in the quarter.";
+  assert.equal(quoteContainsValue(-0.24, quote), false);
+});
+
+test("quoteContainsValue: preserves literal signed-value validation", () => {
+  const quote = "The quarter-on-quarter rate was -0,2%.";
+  assert.equal(quoteContainsValue(-0.2, quote), true);
+});
+
 test("quoteContainsValue: matches population in millions form", () => {
   // The actual P0302 Summary 2025 quote.
   const quote =

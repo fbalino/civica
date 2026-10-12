@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-10-12T13:20:00Z",
+  "scope": "Pre-merge validation of the Stats SA negative GDP prose guard",
+  "officialSource": "https://www.statssa.gov.za/publications/P0441/P04412ndQuarter2026.pdf",
+  "sourcePage": 2,
+  "publisherStatement": "Production GDP decreased by 0,2% in the second quarter of 2026.",
+  "observedFailure": "The extracted value -0.2 was rejected because the publisher expressed the sign as 'decreased by' and printed only the unsigned magnitude.",
+  "repairBoundary": "For negative values only, accept the exact magnitude when it immediately follows 'decreased by' and is presented as a percentage.",
+  "preserved": [
+    "literal signed-value validation",
+    "positive-value validation",
+    "writer and history behavior",
+    "source freshness gate",
+    "all existing sanity and provenance checks"
+  ],
+  "negativeCases": [
+    "increased by the same unsigned magnitude",
+    "the magnitude appears only in an unrelated contribution",
+    "decreased by a different magnitude",
+    "a nearby value that would match only after decimal rounding"
+  ],
+  "redRegression": "The publisher sentence returned false for -0.2 before the repair; review then proved -0.24 incorrectly matched 0.2 when the prose exception rounded candidates.",
+  "validation": {
+    "quoteAndAdapterHelpers": "34 passed",
+    "repeatabilityAndFreshness": "3 passed",
+    "typecheck": "passed"
+  },
+  "notPerformed": [
+    "production writes",
+    "cron invocation",
+    "paid model calls",
+    "commit",
+    "push",
+    "merge"
+  ]
+}
