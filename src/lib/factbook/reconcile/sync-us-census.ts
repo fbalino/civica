@@ -2,10 +2,9 @@
  * Phase R.13 — US Census Bureau sync orchestrator.
  *
  * NSO Wave 1, first phase. Direct sync from the US Census Bureau's
- * REST API at `https://api.census.gov/data/`. The Census API is
- * keyless for our quarterly query volume (7 fetches per cron run,
- * well under the 500/day anonymous limit) and serves data as JSON
- * arrays with a header row.
+ * REST API at `https://api.census.gov/data/`. The Census API requires
+ * CENSUS_API_KEY and serves data as JSON arrays with a header row.
+ * Credentials are attached only at retrieval, never to retained source URLs.
  *
  * Ships 7 indicators across 6 existing fact-keys + 1 new
  * fact-key declared at R.13:
@@ -419,8 +418,8 @@ function freshCounters(
  *
  * Pattern: `<BASE>/<vintage>/<dataset>?get=NAME,<vars>&for=us:1`
  *
- * No API key required at our query volume (≤500 requests/day per
- * anonymous IP; we ship 7 fetches per quarterly cron run).
+ * This is the credential-free provenance URL. Authentication is attached
+ * only by the fetcher, so keys cannot enter snapshots or public references.
  */
 function buildDataUrl(
   dataset: string,
@@ -452,19 +451,35 @@ async function fetchIndicatorValues(
   vintage: number,
   variables: readonly string[],
 ): Promise<number[]> {
-  const url = buildDataUrl(dataset, vintage, variables);
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": CENSUS_USER_AGENT,
-      Accept: "application/json",
-    },
-  });
+  const key = process.env.CENSUS_API_KEY?.trim();
+  if (!key) throw new Error("US Census requires CENSUS_API_KEY");
+  const url = new URL(buildDataUrl(dataset, vintage, variables));
+  url.searchParams.set("key", key);
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { "User-Agent": CENSUS_USER_AGENT, Accept: "application/json" },
+      redirect: "error",
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch {
+    // Fetch diagnostics can include the authenticated URL.
+    throw new Error("US Census source request failed");
+  }
   if (!res.ok) {
     throw new Error(
-      `US Census ${dataset} ${variables.join(",")} (${vintage}): ${res.status} ${res.statusText}`,
+      `US Census ${dataset} ${variables.join(",")} (${vintage}): ${res.status}`,
     );
   }
-  const body = (await res.json()) as unknown;
+  if (!res.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("US Census returned non-JSON content; check Census API credentials");
+  }
+  let body: unknown;
+  try {
+    body = await res.json();
+  } catch {
+    throw new Error("US Census returned invalid JSON");
+  }
   if (!Array.isArray(body) || body.length < 2) {
     throw new Error(
       `US Census ${dataset} ${variables.join(",")} (${vintage}): unexpected response shape`,

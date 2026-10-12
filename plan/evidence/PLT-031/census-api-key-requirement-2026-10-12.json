@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-10-12T13:01:18.712Z",
+  "officialRequirementUrl": "https://api.census.gov/data/missing_key.html",
+  "officialSignupUrl": "https://api.census.gov/data/key_signup.html",
+  "requestCount": 7,
+  "allRequestsRedirectedToMissingKey": true,
+  "noDomainWrites": true,
+  "configuredKeyAbsent": true,
+  "existingSourceFreshnessRetained": "2026-05-05T04:47:39.950Z",
+  "regressionRed": "Without key attachment, the publisher-contract fixture returned403 and the successful-application assertion failed",
+  "regressionGreen": "Seven focused Census adapter tests passed with key attachment and safe failure handling",
+  "authenticatedLiveVerification": "blocked until owner supplies an activated Census key",
+  "sourceScopeUnchanged": [
+    "USA only",
+    "ACS2024",
+    "Decennial2020",
+    "six fact keys",
+    "existing publisher units and transforms"
+  ],
+  "retainedPayloadPolicy": "Key attached only to outgoing publisher request; retained URLs and diagnostics never contain it"
+}

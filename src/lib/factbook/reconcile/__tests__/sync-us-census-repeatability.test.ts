@@ -59,6 +59,7 @@ function harness() {
   return {
     db: db as never,
     facts,
+    snapshots,
     writeFact,
     writes: () => writes,
   };
@@ -160,4 +161,63 @@ test("US Census sibling output cannot hide an unusable required target", async (
   assert.equal(result.totalWritten, 1);
   assert.ok(result.errors.some((error) => error.includes(emptyTarget.factKey)));
   assert.equal(stampCalls, 0);
+});
+
+test("Census sends its configured key only to the publisher, never retained provenance", async (t) => {
+  const state = harness();
+  const key = "fixture-census-credential";
+  const prior = process.env.CENSUS_API_KEY;
+  process.env.CENSUS_API_KEY = key;
+  t.after(() => { if (prior === undefined) delete process.env.CENSUS_API_KEY; else process.env.CENSUS_API_KEY = prior; });
+  const urls: URL[] = [];
+  t.mock.method(globalThis, "fetch", async (input: string | URL | Request) => {
+    const url = new URL(String(input));
+    urls.push(url);
+    if (url.searchParams.get("key") !== key) return new Response("Missing Key", { status: 403 });
+    return Response.json([["NAME", "DP05_0001E", "us"], ["United States", "340110988", "1"]]);
+  });
+  const result = await syncUsCensus(state.db, {
+    factKey: "population_total", jurisdiction, atlasReleaseId: "atlas-test",
+    writeFact: state.writeFact, persistDisputes: noDisputes as never,
+    markSynced: (async () => ["us_census"]) as never,
+  });
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.totalWritten, 1);
+  assert.equal(urls.length, 1);
+  assert.equal(urls[0].origin, "https://api.census.gov");
+  assert.doesNotMatch(JSON.stringify({ facts: [...state.facts.values()], snapshots: [...state.snapshots.values()] }), /fixture-census-credential/);
+});
+
+test("Census missing credentials fail without network requests or freshness", async (t) => {
+  const state = harness();
+  const prior = process.env.CENSUS_API_KEY;
+  delete process.env.CENSUS_API_KEY;
+  t.after(() => { if (prior !== undefined) process.env.CENSUS_API_KEY = prior; });
+  let fetches = 0;
+  let stamps = 0;
+  t.mock.method(globalThis, "fetch", async () => { fetches++; throw new Error("network must not run"); });
+  const result = await syncUsCensus(state.db, {
+    factKey: "population_total", jurisdiction, dryRun: true,
+    markSynced: (async () => { stamps++; return []; }) as never,
+  });
+  assert.match(result.errors.join(" "), /requires CENSUS_API_KEY/);
+  assert.equal(fetches, 0);
+  assert.equal(stamps, 0);
+  assert.equal(state.writes(), 0);
+});
+
+test("Census transport failures cannot expose authenticated URLs", async (t) => {
+  const state = harness();
+  const prior = process.env.CENSUS_API_KEY;
+  process.env.CENSUS_API_KEY = "fixture-private-key";
+  t.after(() => { if (prior === undefined) delete process.env.CENSUS_API_KEY; else process.env.CENSUS_API_KEY = prior; });
+  t.mock.method(globalThis, "fetch", async (input: unknown, options: RequestInit) => {
+    assert.equal(options.redirect, "error");
+    assert.ok(options.signal);
+    throw new Error(`provider echoed ${String(input)}`);
+  });
+  const result = await syncUsCensus(state.db, { factKey: "population_total", jurisdiction, dryRun: true });
+  assert.match(result.errors.join(" "), /US Census source request failed/);
+  assert.doesNotMatch(JSON.stringify(result), /fixture-private-key|key=/);
+  assert.equal(state.writes(), 0);
 });
