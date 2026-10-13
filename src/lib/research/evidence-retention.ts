@@ -116,6 +116,12 @@ export const DESTRUCTIVE_WRITE_PATHS = [
     exemption:
       "short-lived scrubbed operational error signatures are not research evidence",
   },
+  {
+    path: "src/lib/platform/page-fingerprints.ts",
+    relations: ["page_cache_fingerprints"],
+    exemption:
+      "ephemeral page-cache bookkeeping for retired country slugs is not research evidence",
+  },
 ] as const;
 
 export interface EvaluationEvidenceRow {

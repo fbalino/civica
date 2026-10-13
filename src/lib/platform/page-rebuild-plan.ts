@@ -28,8 +28,14 @@ export const PAGE_FINGERPRINT_VERSION = "page-fingerprint/v1";
 
 export const SITE_PAGE_KEY = "site";
 
-export function countryPageKey(jurisdictionId: string): string {
-  return `country:${jurisdictionId}`;
+const COUNTRY_PAGE_KEY_PREFIX = "country:";
+
+/**
+ * Keyed by slug, not jurisdiction id, so a slug that disappears (renamed,
+ * hidden, or removed) is detectable and its old URLs can be invalidated.
+ */
+export function countryPageKey(slug: string): string {
+  return `${COUNTRY_PAGE_KEY_PREFIX}${slug}`;
 }
 
 export interface CountryFingerprint {
@@ -75,6 +81,11 @@ export interface PageRebuildPlan {
   site: { pageKey: string; reason: "nightly" | "forced" } | null;
   /** Forced slugs that match no country. */
   unknownSlugs: string[];
+  /**
+   * Slugs rebuilt in an earlier run that no current country has. Their old
+   * URLs are invalidated and their stored fingerprints forgotten.
+   */
+  retiredSlugs: string[];
 }
 
 function sha256(parts: readonly string[]): string {
@@ -124,7 +135,7 @@ export function planPageRebuild(
   for (const row of [...current.countries].sort((left, right) =>
     left.slug.localeCompare(right.slug),
   )) {
-    const pageKey = countryPageKey(row.jurisdictionId);
+    const pageKey = countryPageKey(row.slug);
     const fingerprint = combinedCountryFingerprint(
       current.global,
       row.fingerprint,
@@ -148,6 +159,11 @@ export function planPageRebuild(
             reason: force.kind === "all" ? "forced" : "nightly",
           },
     unknownSlugs: [...forcedSlugs].filter((slug) => !knownSlugs.has(slug)).sort(),
+    retiredSlugs: [...stored.keys()]
+      .filter((key) => key.startsWith(COUNTRY_PAGE_KEY_PREFIX))
+      .map((key) => key.slice(COUNTRY_PAGE_KEY_PREFIX.length))
+      .filter((slug) => !knownSlugs.has(slug))
+      .sort(),
   };
 }
 

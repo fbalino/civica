@@ -117,7 +117,7 @@ test("a fingerprint is stored only for countries whose pages all refreshed", () 
   );
   assert.deepEqual(
     stored.map(({ pageKey }) => pageKey).sort(),
-    [countryPageKey(JAPAN)],
+    [countryPageKey("japan")],
   );
 
   // The failed country is retried on the next run; the others are not.

@@ -4,6 +4,7 @@ import {
   type PageWarmTarget,
 } from "@/lib/platform/page-refresh";
 import {
+  countryPageKey,
   countryPagePaths,
   fingerprintsToStore,
   isCountryPagePath,
@@ -28,6 +29,8 @@ export interface PageRebuildDeps {
   readCurrent: () => Promise<CurrentFingerprints>;
   readStored: () => Promise<Map<string, StoredFingerprint>>;
   store: (entries: readonly PageRebuildEntry[]) => Promise<void>;
+  /** Drop stored fingerprints for page groups that no longer exist. */
+  forget: (pageKeys: readonly string[]) => Promise<void>;
   revalidate: (path: string) => void;
   refresh: (targets: readonly PageWarmTarget[]) => Promise<PageRefreshReport>;
   now?: () => number;
@@ -133,11 +136,21 @@ export async function runPageRebuild(input: {
         ...summary,
         rowsRead: targets.length,
         rebuildCountries: plan.countries.map(({ slug, reason }) => ({ slug, reason })),
+        retiredCountries: plan.retiredSlugs,
         sitePagesReason: plan.site?.reason ?? null,
         pagesToRefresh: selected.length,
       },
     };
   }
+  // A slug that no longer exists keeps serving its old cached pages until
+  // invalidated; the next visit then renders the current 404 or redirect.
+  if (plan.retiredSlugs.length > 0) {
+    for (const slug of plan.retiredSlugs) {
+      for (const path of countryPagePaths(slug)) deps.revalidate(path);
+    }
+    await deps.forget(plan.retiredSlugs.map(countryPageKey));
+  }
+
   if (selected.length === 0) {
     return {
       status: 200,

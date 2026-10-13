@@ -75,12 +75,16 @@ function harness(options: {
     revalidated: [] as string[],
     warmed: [] as string[],
     stored: [] as PageRebuildEntry[],
+    forgotten: [] as string[],
   };
   const deps = {
     readCurrent: async () => options.current,
     readStored: async () => options.stored,
     store: async (entries: readonly PageRebuildEntry[]) => {
       calls.stored.push(...entries);
+    },
+    forget: async (pageKeys: readonly string[]) => {
+      calls.forgotten.push(...pageKeys);
     },
     revalidate: (path: string) => {
       calls.revalidated.push(path);
@@ -151,7 +155,7 @@ test("one changed country rebuilds only its three tabs plus the non-country page
   assert.ok(!calls.warmed.some((path) => path.startsWith("/country/japan")));
   assert.deepEqual(
     calls.stored.map(({ pageKey }) => pageKey).sort(),
-    [countryPageKey(FRANCE)],
+    [countryPageKey("france")],
   );
 });
 
@@ -238,4 +242,34 @@ test("a sitemap without country pages is a failed run", async () => {
   });
   assert.equal(run.status, 500);
   assert.equal(run.body.outcome, "empty_result");
+});
+
+test("a slug that disappears has its old pages invalidated and its fingerprint forgotten", async () => {
+  // France was rebuilt earlier under the slug "france"; it is now "republic-of-france".
+  const before = fingerprints();
+  const stored = storedAfter(before);
+  const after: CurrentFingerprints = {
+    global: "g1",
+    countries: [
+      { jurisdictionId: JAPAN, slug: "japan", fingerprint: "j1" },
+      { jurisdictionId: FRANCE, slug: "republic-of-france", fingerprint: "f1" },
+    ],
+  };
+  const { calls, deps } = harness({ current: after, stored });
+  await runPageRebuild({
+    targets: TARGETS,
+    origin: ORIGIN,
+    dryRun: false,
+    force: { kind: "none" },
+    deps,
+  });
+  for (const path of [
+    "/country/france",
+    "/country/france/civica-data",
+    "/country/france/constitution",
+  ]) {
+    assert.ok(calls.revalidated.includes(path), `${path} invalidated`);
+  }
+  assert.deepEqual(calls.forgotten, [countryPageKey("france")]);
+  assert.ok(!calls.revalidated.includes("/country/japan"));
 });

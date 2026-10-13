@@ -268,3 +268,20 @@ export async function storePageFingerprints(
       rebuilt_at = EXCLUDED.rebuilt_at
   `);
 }
+
+/**
+ * Forget the stored fingerprints of page groups that no longer exist (a
+ * retired country slug). The table is an internal cache bookkeeping store,
+ * not research evidence.
+ */
+export async function forgetPageFingerprints(
+  pageKeys: readonly string[],
+): Promise<void> {
+  if (pageKeys.length === 0) return;
+  await db.execute(sql`
+    DELETE FROM page_cache_fingerprints
+    WHERE page_key IN (
+      SELECT jsonb_array_elements_text(${JSON.stringify(pageKeys)}::jsonb)
+    )
+  `);
+}

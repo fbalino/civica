@@ -11,6 +11,7 @@ import {
 import {
   readCurrentPageFingerprints,
   readStoredPageFingerprints,
+  forgetPageFingerprints,
   storePageFingerprints,
 } from "@/lib/platform/page-fingerprints";
 import { SITE_URL } from "@/lib/site";
@@ -52,6 +53,7 @@ async function handler(request: Request) {
       readCurrent: readCurrentPageFingerprints,
       readStored: readStoredPageFingerprints,
       store: storePageFingerprints,
+      forget: forgetPageFingerprints,
       revalidate: (path) => revalidatePath(path),
       refresh: (selected) => refreshPages(selected),
     },
