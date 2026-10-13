@@ -335,6 +335,13 @@ drops and recreates only that check constraint; it does not rewrite the
 historical `0042` migration or any retained release row. Recovery is a reviewed
 forward correction or isolated pre-change backup.
 
+`0052_page_cache_fingerprints` adds the internal operational table in which
+`operations.refresh-pages` stores each cached page group's content fingerprint
+after a successful rebuild (APR-D179). It creates one empty table with a
+shape check and touches no existing relation. The first run after deploy finds
+no stored rows and rebuilds every page once. Recovery is dropping the table
+after reverting the job; losing its rows only causes one full rebuild.
+
 ## Operational data changes
 
 data-backfill-canonical-capitals · data-backfill-cia-vintage ·

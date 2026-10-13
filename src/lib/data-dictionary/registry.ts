@@ -1374,6 +1374,22 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Private internal operational evidence; excluded from public release and not a source-data rights grant.",
     deprecation: active,
   },
+  page_cache_fingerprints: {
+    definition:
+      "Content fingerprint of each country's cached pages at their last successful scheduled rebuild (APR-D179).",
+    rowGrain:
+      "One country page group: the Factbook, Civica Data, and Constitution tabs of one jurisdiction.",
+    releaseScope: "internal_operational",
+    sourceOrDerivation:
+      "Written only by operations.refresh-pages after the group's pages were re-rendered and verified: a SHA-256 over MD5 digests of the database rows those pages render. No row content is stored.",
+    cadence:
+      "Upserted nightly for countries whose content changed and rebuilt successfully; unchanged or failed countries keep their previous row.",
+    vintageSemantics:
+      "rebuilt_at is the time the pages were last rebuilt; fingerprint_version names the dependency map that produced the fingerprint and is not a source-data vintage.",
+    rights:
+      "Private internal operational state; excluded from public release and not a source-data rights grant.",
+    deprecation: active,
+  },
   pulse_classification_delivery_bindings: {
     definition:
       "Immutable handoff from one authenticated cron delivery to the Pulse classification run that owns its work.",

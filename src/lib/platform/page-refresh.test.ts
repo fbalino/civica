@@ -96,7 +96,12 @@ test("warm-up bounds concurrency, paces each slot, and counts outcomes", async (
   assert.equal(maxInFlight, 2);
   assert.deepEqual(seen.sort(), ["/a", "/b", "/c", "/d", "/e", "/f"]);
   assert.deepEqual(
-    { ...result, durationMs: undefined, failedPaths: [...result.failedPaths].sort() },
+    {
+      ...result,
+      durationMs: undefined,
+      failedPaths: [...result.failedPaths].sort(),
+      unrefreshedPaths: [...result.unrefreshedPaths].sort(),
+    },
     {
       targets: 6,
       attempted: 6,
@@ -107,6 +112,7 @@ test("warm-up bounds concurrency, paces each slot, and counts outcomes", async (
       failureStatuses: { "404": 1, "308": 1, network: 1 },
       staleTargets: [],
       failedPaths: ["/b", "/d", "/f"],
+      unrefreshedPaths: ["/b", "/d", "/f"],
     },
   );
   // Six one-second slots over two workers.
@@ -133,6 +139,9 @@ test("warm-up stops starting requests once the budget is spent", async () => {
   assert.equal(result.attempted, 3);
   assert.equal(result.warmed, 3);
   assert.equal(result.skipped, 2);
+  // Never-attempted pages were not refreshed (APR-D179 keeps their
+  // fingerprints unstored).
+  assert.deepEqual(result.unrefreshedPaths, ["/d", "/e"]);
 });
 
 test("a timed-out request is a failure, not a crash", async () => {
@@ -186,6 +195,7 @@ test("a page still stale after the refresh is a reported failure", async () => {
   assert.equal(report.staleAfterRefresh, 1);
   assert.equal(report.warmed, 2);
   assert.deepEqual(report.failedPaths, ["/broken"]);
+  assert.deepEqual(report.unrefreshedPaths, ["/broken"]);
   assert.equal(report.failureStatuses.stale, 1);
 });
 
@@ -218,6 +228,7 @@ test("the run succeeds while failures stay within 1% of attempted pages", () => 
     durationMs: 1,
     failureStatuses: {},
     failedPaths: [],
+    unrefreshedPaths: [],
   };
   assert.equal(
     pageRefreshOutcome({ ...base, warmed: 821, failed: 6, staleAfterRefresh: 2 }).ok,

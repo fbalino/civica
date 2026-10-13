@@ -7,7 +7,7 @@ import { escapeSitemapUrl } from "@/lib/seo/sitemap-xml";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
-export const revalidate = 259200;
+export const revalidate = 2592000;
 
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 

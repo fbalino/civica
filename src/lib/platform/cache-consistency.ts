@@ -14,11 +14,11 @@ import { ROUTE_INVENTORY } from "@/lib/api/route-inventory/registry";
  * never opt into stale-while-revalidate/stale-if-error. Frozen release URLs are
  * immutable and are replaced by a new URL rather than overwritten.
  *
- * PLT-033 (APR-D177, APR-D178) — database-backed public pages are always
- * served from the page cache. `operations.refresh-pages` rebuilds them every
- * other day at 07:00 UTC (04:00 in Uruguay), when traffic is lowest; each page
- * declares the literal `revalidate = 259200` (three days) only as a backstop
- * should that job fail. A page stays request-live only when it is
+ * PLT-033 (APR-D177, APR-D178, APR-D179) — database-backed public pages are
+ * always served from the page cache. `operations.refresh-pages` runs nightly
+ * at 07:00 UTC (04:00 in Uruguay) and rebuilds only the pages whose data
+ * changed; each page declares the literal `revalidate = 2592000` (30 days)
+ * only as a backstop should that job stop running. A page stays request-live only when it is
  * listed in `LIVE_PAGE_ROUTES`: it is private to a signed-in session, or it
  * reads per-request input (`searchParams`, headers, cookies) that Next.js
  * cannot serve from a shared page cache.
@@ -28,12 +28,13 @@ export const CACHE_CONSISTENCY_SCHEMA_VERSION =
 
 /**
  * The only revalidate literal a cached database-backed page may declare
- * (72 hours). It must stay longer than the 48-hour `operations.refresh-pages`
- * cadence, so pages are rebuilt by that job and never by a crawler's visit.
- * Next.js requires a statically analyzable literal, so pages write
- * `export const revalidate = 259200;` and the cache gate checks the value.
+ * (30 days). An unchanged page is never rebuilt by `operations.refresh-pages`
+ * (APR-D179), so a short backstop would let a crawler's visit rebuild it; 30
+ * days keeps rebuilds with the job. Next.js requires a statically analyzable
+ * literal, so pages write `export const revalidate = 2592000;` and the cache
+ * gate checks the value.
  */
-export const PAGE_CACHE_REVALIDATE_SECONDS = 259200 as const;
+export const PAGE_CACHE_REVALIDATE_SECONDS = 2592000 as const;
 
 export type LivePageReason = "private-session" | "request-input";
 

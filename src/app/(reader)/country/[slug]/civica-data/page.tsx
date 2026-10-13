@@ -3,13 +3,16 @@ import {
   getJurisdictionBySlug,
   getGovernmentStructure,
   getLeaderTimeline,
-  getSource,
   getAllSources,
   getBillsForJurisdiction,
   getIndicatorHistoryForCountry,
   getConditionsPublicRelease,
 } from "@/lib/db/queries";
 import { getCountryOrganizationsData } from "@/lib/db/queries-organizations";
+import {
+  getCountrySourceDates,
+  withCountrySourceDates,
+} from "@/lib/db/queries-country-source-dates";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
 import { isCiReleaseConsistencyError } from "@/lib/ci/release-selection";
 import { getGovernanceEvidence } from "@/lib/db/queries-governance-evidence";
@@ -53,7 +56,7 @@ import {
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
-export const revalidate = 259200;
+export const revalidate = 2592000;
 
 // No paths render at build time. Each one renders on its first visit (or the
 // daily warm-up) and is then served from the page cache.
@@ -158,7 +161,8 @@ interface SectionSource {
 /**
  * Compact, full-width provenance strip at the foot of a section. Replaces the
  * old right-rail "Sources on this page" block — each section now carries only
- * the sources it actually renders, with Civica's `last_sync_at` date for the
+ * the sources it actually renders, with the date Civica last recorded this
+ * country's rows from that
  * source (a Civica retrieval clock, not a publisher vintage) and a
  * `<SourceDot>` (green=live, amber=frozen vintage).
  */
@@ -210,9 +214,9 @@ export default async function CountryCivicaDataTab({
     billsResult,
     organizationsResult,
     scoresRowsResult,
-    wikidataSource,
-    allSources,
+    sourceRows,
     conditionsReleaseResult,
+    countrySourceDates,
   ] = await Promise.all([
     // With a configured database any failed read aborts the cached render,
     // so the page cache keeps the last good page (PLT-033). The unavailable
@@ -253,9 +257,7 @@ export default async function CountryCivicaDataTab({
           isCiReleaseConsistencyError(error) || isCachedRenderFailure(error),
       },
     ),
-    getSource("wikidata").catch(fallbackWithoutDatabase(() => null)),
-    // Whole sources table → real `last_sync_at` dates for the per-section
-    // Sources strips.
+    // Whole sources table for the per-section Sources strips.
     getAllSources().catch(
       fallbackWithoutDatabase(
         () => [] as Awaited<ReturnType<typeof getAllSources>>,
@@ -264,9 +266,28 @@ export default async function CountryCivicaDataTab({
     captureAtlasSurfaceQuery(() => getConditionsPublicRelease(), {
       rethrow: isCachedRenderFailure,
     }),
+    // This country's own latest retrieval per source (APR-D179).
+    getCountrySourceDates(jurisdiction.id).catch(
+      fallbackWithoutDatabase(() => new Map<string, Date>()),
+    ),
   ]);
+  // APR-D179: every date on this tab is the country's own latest record from
+  // that source, not the source-wide sync time, so the cached page changes
+  // only when this country's data does.
+  const allSources = withCountrySourceDates(sourceRows, countrySourceDates);
+  const wikidataSource = allSources.find((s) => s.id === "wikidata") ?? null;
 
-  const governanceEvidence = atlasSurfaceQueryValue(governanceEvidenceResult);
+  const governanceEvidenceRaw = atlasSurfaceQueryValue(governanceEvidenceResult);
+  const governanceEvidence = governanceEvidenceRaw
+    ? {
+        ...governanceEvidenceRaw,
+        rows: governanceEvidenceRaw.rows.map((row) => ({
+          ...row,
+          lastSyncAt:
+            countrySourceDates.get(row.sourceId)?.toISOString() ?? null,
+        })),
+      }
+    : null;
   const resolverFacts = atlasSurfaceQueryValue(resolverFactsResult);
   const indicatorHistory = atlasSurfaceQueryValue(indicatorHistoryResult);
   const govStructure = atlasSurfaceQueryValue(govStructureResult);
@@ -289,9 +310,9 @@ export default async function CountryCivicaDataTab({
 
   // --- Per-section provenance --------------------------------------------
   // Each section's Sources strip lists ONLY the sources that section renders,
-  // with the real `last_sync_at` from the sources table. The <SourceDot>
-  // reads green/amber off the source id; the date column shows Civica's last
-  // sync of that source, not a publisher vintage.
+  // with the date Civica last recorded this country's rows from that source
+  // (APR-D179). The <SourceDot> reads green/amber off the source id; the date
+  // is a Civica retrieval clock, not a publisher vintage.
   const sourceById = new Map(allSources.map((s) => [s.id, s]));
   const syncDate = (id: string): string => {
     const d = sourceById.get(id)?.lastSyncAt ?? null;

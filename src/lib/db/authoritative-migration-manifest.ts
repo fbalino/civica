@@ -312,4 +312,11 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
       "ab936e48585ed6e5facd3588fcbbeddc8e7c815df86661aaf7202769de008ca6",
     baseline: false,
   },
+  {
+    id: "0052_page_cache_fingerprints",
+    path: "drizzle/authoritative/0052_page_cache_fingerprints.sql",
+    sha256:
+      "bad400ac2352368d5e446f30da2a36de6fc2f41e2d6450c8b200cb87a884b896",
+    baseline: false,
+  },
 ] as const;

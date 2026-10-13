@@ -9,7 +9,7 @@
  *
  * Mutable database dependencies are discovered through a cross-file runtime
  * import graph. PLT-033 (APR-D177): a database-dependent page route must
- * resolve to the effective literal `revalidate = 259200` (the three-day cache
+ * resolve to the effective literal `revalidate = 2592000` (the 30-day cache
  * backstop behind `operations.refresh-pages`), must not read per-request
  * input, and must export `generateStaticParams` under a dynamic segment so
  * Next.js can cache it. The only exceptions are the closed `LIVE_PAGE_ROUTES`
@@ -435,7 +435,7 @@ function liveRouteFor(
 
 /**
  * PLT-033 — a DB-dependent page is either cached (effective literal
- * revalidate=259200, no request input, static params under a dynamic segment)
+ * revalidate=2592000, no request input, static params under a dynamic segment)
  * or listed in `LIVE_PAGE_ROUTES` and request-live (effective revalidate=0).
  */
 export function pageRevalidationErrors(

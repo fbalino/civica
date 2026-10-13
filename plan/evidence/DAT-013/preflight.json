@@ -1424,6 +1424,25 @@
       "writesPerformed": 0
     },
     {
+      "id": "0052_page_cache_fingerprints",
+      "artifact": "drizzle/authoritative/0052_page_cache_fingerprints.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "bad400ac2352368d5e446f30da2a36de6fc2f41e2d6450c8b200cb87a884b896",
+      "affectedRelations": [
+        "page_cache_fingerprints"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0052_page_cache_fingerprints-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0052_page_cache_fingerprints --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "page_cache_fingerprints": "missing"
+      },
+      "writesPerformed": 0
+    },
+    {
       "id": "data-backfill-cia-vintage",
       "artifact": "scripts/backfill-cia-vintage.ts",
       "kind": "data",

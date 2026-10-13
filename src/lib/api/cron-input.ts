@@ -79,6 +79,19 @@ const SPECIAL_SCHEMAS: Readonly<Record<string, CronInputSchema>> = {
       shard: (value) => /^(?:[0-9]|1[0-9]|2[0-7])$/.test(value),
     },
   },
+  // APR-D179: rebuild every page group, or up to 20 named countries, even
+  // when their content fingerprint is unchanged.
+  "operations.refresh-pages": {
+    query: {
+      dryRun,
+      force: (value) =>
+        value === "all" ||
+        (value.length <= 600 &&
+          /^[a-z0-9]+(?:-[a-z0-9]+)*(?:,[a-z0-9]+(?:-[a-z0-9]+)*){0,19}$/.test(
+            value,
+          )),
+    },
+  },
   "factbook.verify-reconciliation": {
     query: {
       dryRun,

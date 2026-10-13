@@ -3,11 +3,18 @@ import { NextResponse } from "next/server";
 
 import sitemap from "@/app/sitemap";
 import { withCronJob } from "@/lib/api/cron-job";
+import { pageWarmTargets, refreshPages } from "@/lib/platform/page-refresh";
 import {
-  pageRefreshOutcome,
-  pageWarmTargets,
-  refreshPages,
-} from "@/lib/platform/page-refresh";
+  parsePageRebuildForce,
+  runPageRebuild,
+} from "@/lib/platform/page-rebuild";
+import {
+  readCurrentPageFingerprints,
+  readStoredPageFingerprints,
+  forgetPageFingerprints,
+  storePageFingerprints,
+} from "@/lib/platform/page-fingerprints";
+import { SITE_URL } from "@/lib/site";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,84 +24,41 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 800;
 
 /**
- * PLT-033 / APR-D178 — runs every other day at 07:00 UTC (04:00 in Uruguay),
- * the owner's chosen quiet hour. It marks every cached page for re-rendering,
- * then requests each cacheable sitemap URL so the pages are rebuilt now
- * rather than on a crawler's first visit. Pages are never rebuilt per visit.
+ * PLT-033 / APR-D179 — runs nightly at 07:00 UTC (04:00 in Uruguay), after
+ * the nightly imports. It fingerprints the database content each country's
+ * three tabs render, compares it with the fingerprint stored at that
+ * country's last successful rebuild, and rebuilds only the countries that
+ * changed. The roughly 70 non-country pages read too many tables to
+ * fingerprint safely, so they are rebuilt every night. Pages are never
+ * rebuilt per visit, and unchanged country pages are never rewritten into
+ * the page cache.
  *
- * Invalidation is repeatable, so a retry or duplicate run is harmless. A dry
- * run lists the warm-up targets without invalidating or requesting anything.
+ * A country's new fingerprint is stored only after all of its pages were
+ * re-rendered and verified, so a failed country is retried the next night.
+ * `?dryRun=1` lists what would be rebuilt without invalidating, requesting,
+ * or storing anything. `?force=all` rebuilds every page;
+ * `?force=<slug>[,<slug>]` rebuilds only those countries.
  */
 async function handler(request: Request) {
-  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
+  const params = new URL(request.url).searchParams;
   // The sitemap throws when the configured database fails, so a missing
   // country list becomes a failed run rather than a partial warm-up.
   const targets = pageWarmTargets(await sitemap());
-  const countryTargets = targets.filter((target) =>
-    target.path.startsWith("/country/"),
-  ).length;
-  if (countryTargets === 0) {
-    return NextResponse.json(
-      {
-        ok: false,
-        outcome: "empty_result",
-        step: "operations.refresh-pages",
-        dryRun,
-        rowsRead: targets.length,
-      },
-      { status: 500 },
-    );
-  }
-  if (dryRun) {
-    return NextResponse.json({
-      ok: true,
-      step: "operations.refresh-pages",
-      dryRun,
-      rowsRead: targets.length,
-      countryTargets,
-    });
-  }
-
-  revalidatePath("/", "layout");
-  const result = await refreshPages(targets);
-  const outcome = pageRefreshOutcome(result);
-  if (result.skipped > 0) {
-    console.warn(
-      "[refresh-pages] warm-up budget reached " +
-        JSON.stringify({ skipped: result.skipped, attempted: result.attempted }),
-    );
-  }
-  if (outcome.pagesFailed > 0) {
-    // Public URLs only; a failed page keeps serving its previous good copy.
-    console.error(
-      "[refresh-pages] pages not refreshed " +
-        JSON.stringify({
-          pagesFailed: outcome.pagesFailed,
-          failureStatuses: result.failureStatuses,
-          failedPaths: result.failedPaths,
-        }),
-    );
-  }
-  return NextResponse.json(
-    {
-      ok: outcome.ok,
-      outcome: outcome.ok ? undefined : outcome.outcome,
-      step: "operations.refresh-pages",
-      dryRun,
-      invalidated: "all-pages",
-      rowsRead: result.targets,
-      rowsWritten: result.warmed,
-      rowsRejected: outcome.pagesFailed,
-      pagesStaleAfterRefresh: result.staleAfterRefresh,
-      pagesSkipped: result.skipped,
-      pagesUnverified: result.unverified,
-      countryTargets,
-      failureStatuses: result.failureStatuses,
-      failedPaths: result.failedPaths,
-      durationSec: Math.round(result.durationMs / 1000),
+  const run = await runPageRebuild({
+    targets,
+    origin: new URL(SITE_URL).origin,
+    dryRun: params.get("dryRun") === "1",
+    force: parsePageRebuildForce(params.get("force")),
+    deps: {
+      readCurrent: readCurrentPageFingerprints,
+      readStored: readStoredPageFingerprints,
+      store: storePageFingerprints,
+      forget: forgetPageFingerprints,
+      revalidate: (path) => revalidatePath(path),
+      refresh: (selected) => refreshPages(selected),
     },
-    { status: outcome.httpStatus },
-  );
+  });
+  return NextResponse.json(run.body, { status: run.status });
 }
 
 const cronHandler = withCronJob("operations.refresh-pages", handler);

@@ -375,6 +375,12 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
     "schema",
     "journaled",
   ),
+  shared(
+    "0052_page_cache_fingerprints",
+    "drizzle/authoritative/0052_page_cache_fingerprints.sql",
+    "schema",
+    "journaled",
+  ),
   ...[
     "backfill-canonical-capitals",
     "backfill-cia-vintage",

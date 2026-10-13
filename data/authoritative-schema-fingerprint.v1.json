@@ -1,14 +1,14 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-26T19:11:34.993Z",
+  "generatedAt": "2026-10-13T03:10:28.685Z",
   "authoritativeManifest": {
     "head": {
-      "id": "0051_eminent_jocasta",
-      "sha256": "ab936e48585ed6e5facd3588fcbbeddc8e7c815df86661aaf7202769de008ca6"
+      "id": "0052_page_cache_fingerprints",
+      "sha256": "bad400ac2352368d5e446f30da2a36de6fc2f41e2d6450c8b200cb87a884b896"
     },
-    "sha256": "874884467f8c4af02d34a4af6e8437b574685c75974675711eaa134ad63342d7"
+    "sha256": "bb06470f0c2bfe7006b11cb04a6ce9be325bcd326f40b2cad23a6beec2693bb5"
   },
-  "sha256": "5b4e4b180158b583e4db879b4ecfcaae6c3ca81caaeea28118cd0f83b3c6bd3b",
+  "sha256": "06f2107456f3242210988c2e86ba565500e69004bec285f315078b260c344677",
   "schema": {
     "columns": [
       {
@@ -7212,6 +7212,42 @@
         "position": 17
       },
       {
+        "udt": "text",
+        "name": "page_key",
+        "type": "text",
+        "table": "page_cache_fingerprints",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "fingerprint",
+        "type": "text",
+        "table": "page_cache_fingerprints",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "fingerprint_version",
+        "type": "text",
+        "table": "page_cache_fingerprints",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "timestamptz",
+        "name": "rebuilt_at",
+        "type": "timestamp with time zone",
+        "table": "page_cache_fingerprints",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 4
+      },
+      {
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
@@ -13930,6 +13966,11 @@
         "definition": "CREATE UNIQUE INDEX organizations_slug_unique ON public.organizations USING btree (slug)"
       },
       {
+        "name": "page_cache_fingerprints_pkey",
+        "table": "page_cache_fingerprints",
+        "definition": "CREATE UNIQUE INDEX page_cache_fingerprints_pkey ON public.page_cache_fingerprints USING btree (page_key)"
+      },
+      {
         "name": "party_composition_runs_body_recorded_idx",
         "table": "party_composition_runs",
         "definition": "CREATE INDEX party_composition_runs_body_recorded_idx ON public.party_composition_runs USING btree (body_id, recorded_at)"
@@ -16207,6 +16248,11 @@
       },
       {
         "kind": "r",
+        "name": "page_cache_fingerprints",
+        "definition": null
+      },
+      {
+        "kind": "r",
         "name": "party_composition_runs",
         "definition": null
       },
@@ -17842,6 +17888,18 @@
         "type": "f",
         "table": "organizations",
         "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "page_cache_fingerprint_shape_check",
+        "type": "c",
+        "table": "page_cache_fingerprints",
+        "definition": "CHECK ((page_key = 'site'::text OR length(page_key) <= 208 AND page_key ~ '^country:[a-z0-9]+(-[a-z0-9]+)*$'::text) AND fingerprint ~ '^[a-f0-9]{64}$'::text AND length(fingerprint_version) >= 1 AND length(fingerprint_version) <= 64 AND fingerprint_version ~ '^[a-z0-9./-]+$'::text)"
+      },
+      {
+        "name": "page_cache_fingerprints_pkey",
+        "type": "p",
+        "table": "page_cache_fingerprints",
+        "definition": "PRIMARY KEY (page_key)"
       },
       {
         "name": "party_composition_runs_body_id_government_bodies_id_fk",

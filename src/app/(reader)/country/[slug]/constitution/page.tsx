@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
   getJurisdictionBySlug,
-  getSource,
 } from "@/lib/db/queries";
 import { getConstitutionWithArticles } from "@/lib/db/queries-constitution";
 import {
@@ -23,7 +22,7 @@ import { fallbackWithoutDatabase, isCachedRenderFailure } from "@/lib/platform/c
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
-export const revalidate = 259200;
+export const revalidate = 2592000;
 
 // No paths render at build time. Each one renders on its first visit (or the
 // daily warm-up) and is then served from the page cache.
@@ -80,20 +79,19 @@ export default async function CountryConstitutionTab({
 
   // The country reader asks the query layer to preserve a database failure so
   // the rendered state cannot call an outage "not yet indexed".
-  const [constitutionResult, constituteSource] = await Promise.all([
+  const [constitutionResult] = await Promise.all([
     // Each read aborts the cached render when it fails with a configured
     // database, so no degraded page is cached (PLT-033).
     captureAtlasSurfaceQuery(
       () => getConstitutionWithArticles(slug, { throwOnError: true }),
       { rethrow: isCachedRenderFailure },
     ),
-    getSource("constitute_project").catch(fallbackWithoutDatabase(() => null)),
   ]);
   const constitution = atlasSurfaceQueryValue(constitutionResult);
 
-  const sourceRetrievedAt = constituteSource?.lastSyncAt
-    ? constituteSource.lastSyncAt.toISOString()
-    : null;
+  // APR-D179: the date Civica last fetched THIS country's text from the
+  // Constitute Project, not the source-wide sync time.
+  const sourceRetrievedAt = constitution?.lastFetched ?? null;
 
   // Shared country search — identical position/component to the Factbook and
   // Civica Data tabs (owner mandate 2026-07-05: the country tabs must not

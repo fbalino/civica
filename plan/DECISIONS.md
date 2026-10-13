@@ -1473,3 +1473,47 @@ and in `AGENTS.md` so later work does not reverse it. Accepted consequence:
 a correction, a manual import, or data from jobs that finish after 07:00 UTC
 (Pulse) reaches readers at the next rebuild, up
 to two days later, unless the job is run by hand.
+
+### APR-D179 — Cached pages are rebuilt nightly, and only when their data changed
+
+**Decision:** Owner decision of 2026-10-12, amending APR-D178. A cached page
+is rebuilt only when the data it renders actually changed. Every night at
+07:00 UTC (04:00 in Uruguay, schedule `0 7 * * *`), after the nightly
+imports, `operations.refresh-pages` computes a content fingerprint per
+country over exactly the rows its layout and three tabs render, and a global
+fingerprint over inputs every country page reads (country list, source
+metadata without sync times, Index and Conditions releases including their rows). Fingerprints hash row content, never
+`updated_at`-style bookkeeping, because many tables lack reliable timestamps
+and some writers bump them on no-op upserts. Only a country whose
+fingerprint differs from the one stored at its last successful rebuild has
+its three tabs invalidated (by literal path) and warmed; a global change
+rebuilds every country. The roughly 70 non-country pages (home, rankings,
+leaders, organizations, methodology, the sitemap, and the rest) are rebuilt
+every night without a fingerprint: they read many tables across the site,
+and a missed dependency would leave a page stale until the 30-day backstop.
+They are under a tenth of the cached URLs, so rebuilding them nightly costs
+little. A country's new fingerprint is stored in `page_cache_fingerprints`
+only after its pages all re-rendered and verified, so a failure is retried
+the next night. `?force=<slug>` or `?force=all` rebuilds on demand.
+
+Two consequences are part of the decision:
+
+- Country pages show, per source, the date Civica last recorded that
+  country's own rows from it (for example, the latest retrieval of its World
+  Bank facts), not the source-wide `sources.last_sync_at`. A source-wide time
+  changes nightly for every country and would force every page to be rebuilt.
+  The date remains a Civica retrieval clock, separate from the publisher
+  vintage (APR-D058).
+- The per-page `revalidate` backstop becomes 30 days (`2592000`). Unchanged
+  pages are deliberately not rebuilt by the job, so the former 72-hour
+  backstop would let crawler visits rebuild them, which the owner's rule
+  forbids. If the job stops, `operations.pipeline-alerts` reports it the same
+  morning; the backstop only guarantees a dead job cannot freeze pages
+  forever.
+
+**Why:** Each rebuild rewrites heavy pages (1–2 MB of HTML plus page data)
+into Vercel's page cache, billed per 8 KB written, which became the main
+Vercel cost after APR-D177/D178. Most countries' data does not change on a
+given night, so rewriting them is pure cost. Accepted consequence: data that
+lands after 07:00 UTC (Pulse) reaches pages the next night unless the job is
+forced by hand.
