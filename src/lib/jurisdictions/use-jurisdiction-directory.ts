@@ -35,6 +35,10 @@ const EMPTY: ReadonlyArray<DirectoryCountry> = Object.freeze([]);
 
 let snapshot: Snapshot = null;
 let inflight: Promise<void> | null = null;
+let failedAttempts = 0;
+// After a failed fetch the store retries on its own, so a search field that
+// stays focused does not stay silently empty after one transient failure.
+const RETRY_DELAYS_MS = [1_000, 3_000, 9_000] as const;
 // An array filtered on unsubscribe (not Set#delete): the DAT-016 retention
 // scanner treats every `.delete(` call as a possible evidence deletion.
 let listeners: Array<() => void> = [];
@@ -76,11 +80,20 @@ export function loadJurisdictionDirectory(): Promise<void> {
       }));
       const sovereign = all.filter((_, index) => asset.rows[index].sovereign);
       snapshot = { all, sovereign };
+      failedAttempts = 0;
       for (const listener of listeners) listener();
     })
     .catch((error: unknown) => {
-      // Leave the store empty so the next interaction retries.
+      // Leave the store empty; retry automatically a few times, and any
+      // later interaction can still retry after that.
       console.error(error);
+      const delay = RETRY_DELAYS_MS[failedAttempts];
+      failedAttempts += 1;
+      if (delay !== undefined) {
+        setTimeout(() => {
+          void loadJurisdictionDirectory();
+        }, delay);
+      }
     })
     .finally(() => {
       inflight = null;
