@@ -498,7 +498,6 @@
 
   /* --- Logo tokens (dark mode defaults) --- */
   --logo-fg: var(--color-text-primary); /* cream on dark */
-  --logo-bg: var(--color-bg); /* dark field */
 
   /* --- Scrollbar defaults --- */
   --scrollbar-size: var(--space-3);
@@ -673,7 +672,6 @@ html:root {
   --shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.55);
 
   --logo-fg: var(--color-text-primary);
-  --logo-bg: var(--color-bg);
 }
 
 /* ============================================================
@@ -693,6 +691,34 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
+}
+
+/* Civica mark (<CivicaLogo>). One static, browser-cached mask file painted in
+   the logo token, so pages never inline the mark's geometry and the mark
+   follows the light/dark theme. Size comes from the component's `size` prop. */
+.civica-logo {
+  display: inline-block;
+  flex-shrink: 0;
+  line-height: 0;
+  background-color: var(--logo-fg);
+  -webkit-mask: url("/brand/civica-logo-mask.svg") center / contain no-repeat;
+  mask: url("/brand/civica-logo-mask.svg") center / contain no-repeat;
+}
+
+@media (forced-colors: active) {
+  .civica-logo {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
+}
+
+/* The mark is painted as a background, which browsers drop from print by
+   default; keep it in printed pages and PDFs. */
+@media print {
+  .civica-logo {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 
 body {
@@ -898,6 +924,22 @@ a {
 .source-dot:hover::after,
 .source-dot:focus-visible::after {
   display: block;
+}
+
+/* A legend-scoped dot gets its tooltip attributes once the page's script
+   runs; until then, show no empty tooltip. */
+.source-dot:not([data-source]):hover::after,
+.source-dot:not([data-source]):focus-visible::after {
+  display: none;
+}
+
+/* Visible provenance list for legend-scoped dots when JavaScript is off. */
+.source-dot-legend-noscript {
+  display: block;
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
 }
 
 .source-dot:focus-visible {
