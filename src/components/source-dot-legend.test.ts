@@ -80,3 +80,18 @@ test("distinct disclosures and scopes get distinct descriptions", () => {
   assert.equal(ids.length, 3);
   assert.equal(new Set(ids).size, 3);
 });
+
+test("a legend lists its provenance visibly when JavaScript is off", () => {
+  const input = { source: "cia_factbook", retrievedAt: "2026-01-23" };
+  const html = renderToStaticMarkup(
+    createElement(SourceDotLegend, { scope: "nojs", dots: [input, input] }),
+  );
+  // Parsers treat <noscript> content as text, so parse its inner markup.
+  const noscript = parse(html).querySelector("noscript");
+  assert.ok(noscript, "legend renders a <noscript> fallback");
+  const fallback = parse(noscript.innerHTML).querySelectorAll(
+    ".source-dot-legend-noscript",
+  );
+  assert.equal(fallback.length, 1);
+  assert.match(fallback[0].text, /Source: CIA World Factbook/);
+});

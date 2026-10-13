@@ -142,6 +142,15 @@ export function SourceDotLegend({
           {disclosureAriaLabel(disclosure)}
         </span>
       ))}
+      {/* Without JavaScript the dots cannot borrow these attributes for their
+          tooltip, so list the section's provenance visibly instead. */}
+      <noscript>
+        {entries.map(({ id, disclosure }) => (
+          <span key={id} className="source-dot-legend-noscript">
+            {disclosureAriaLabel(disclosure)}
+          </span>
+        ))}
+      </noscript>
       <SourceDotLegendTooltips />
     </>
   );

@@ -35,7 +35,6 @@ const EXPECTED_HTML_SINKS = new Map<string, readonly string[]>([
     "src/components/constitution/ConstitutionReader.tsx",
     ["Sanitized", "constitution-html/v1"],
   ],
-  ["src/components/CivicaLogo.tsx", ["symbol"]],
   ["src/lib/seo/json-ld.tsx", ["serialize(node)"]],
 ]);
 
