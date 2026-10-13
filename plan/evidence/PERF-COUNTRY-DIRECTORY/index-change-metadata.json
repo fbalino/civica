@@ -1,0 +1,38 @@
+{
+  "id": "perf-country-directory-2026-10-12",
+  "toVersion": "civica-index-country-directory-v68",
+  "categories": [
+    "presentation"
+  ],
+  "evidence": {
+    "documentation": [
+      "plan/evidence/PERF-COUNTRY-DIRECTORY/index-change-note.md"
+    ],
+    "registry": [
+      "src/lib/jurisdictions/directory-asset.ts"
+    ],
+    "release_note": [
+      "plan/evidence/PERF-COUNTRY-DIRECTORY/index-change-note.md"
+    ],
+    "migration_plan": [
+      "plan/evidence/PERF-COUNTRY-DIRECTORY/index-change-note.md"
+    ],
+    "golden_test": [
+      "src/lib/jurisdictions/directory-asset.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/factbook/reconcile/__tests__/cache-read-freshness.test.ts"
+    ]
+  },
+  "validations": [
+    "validate:cache-consistency",
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine"
+  ]
+}

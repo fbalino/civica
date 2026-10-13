@@ -1,13 +1,14 @@
 {
   "schemaVersion": "jurisdiction-directory/v1",
-  "generatedAt": "2026-08-17T14:35:03.240Z",
+  "generatedAt": "2026-10-13T01:28:29.926Z",
   "rowCount": 253,
-  "rowsSha256": "c12edf5eee090812088cffba4faf3c593bcb644fc249ca290a5fbfda6f32432f",
+  "rowsSha256": "11c11426d91d2b24f5bbf4fc4dd6c090deb3d9a6c48aba22596ca6fbd533a9c7",
   "rows": [
     {
       "slug": "afghanistan",
       "name": "Afghanistan",
       "iso2": "AF",
+      "iso3": "AFG",
       "capital": "Kabul",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -16,6 +17,7 @@
       "slug": "akrotiri",
       "name": "Akrotiri",
       "iso2": null,
+      "iso3": null,
       "capital": "Episkopi Cantonment (base administrative center for Akrotiri and Dhekelia)",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -24,6 +26,7 @@
       "slug": "albania",
       "name": "Albania",
       "iso2": "AL",
+      "iso3": "ALB",
       "capital": "Tirana (Tirane)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -32,6 +35,7 @@
       "slug": "algeria",
       "name": "Algeria",
       "iso2": "DZ",
+      "iso3": "DZA",
       "capital": "Algiers",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -40,6 +44,7 @@
       "slug": "american-samoa",
       "name": "American Samoa",
       "iso2": "AS",
+      "iso3": null,
       "capital": "Pago Pago",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -48,6 +53,7 @@
       "slug": "andorra",
       "name": "Andorra",
       "iso2": "AD",
+      "iso3": "AND",
       "capital": "Andorra la Vella",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -56,6 +62,7 @@
       "slug": "angola",
       "name": "Angola",
       "iso2": "AO",
+      "iso3": "AGO",
       "capital": "Luanda",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -64,6 +71,7 @@
       "slug": "anguilla",
       "name": "Anguilla",
       "iso2": "AI",
+      "iso3": null,
       "capital": "The Valley",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -72,6 +80,7 @@
       "slug": "antarctica",
       "name": "Antarctica",
       "iso2": "AQ",
+      "iso3": null,
       "capital": null,
       "statusType": "aggregate_or_special_area",
       "statusLabel": "Special treaty area"
@@ -80,6 +89,7 @@
       "slug": "antigua-and-barbuda",
       "name": "Antigua and Barbuda",
       "iso2": "AG",
+      "iso3": "ATG",
       "capital": "Saint John's",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -88,6 +98,7 @@
       "slug": "argentina",
       "name": "Argentina",
       "iso2": "AR",
+      "iso3": "ARG",
       "capital": "Buenos Aires",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -96,6 +107,7 @@
       "slug": "armenia",
       "name": "Armenia",
       "iso2": "AM",
+      "iso3": "ARM",
       "capital": "Yerevan",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -104,6 +116,7 @@
       "slug": "aruba",
       "name": "Aruba",
       "iso2": "AW",
+      "iso3": null,
       "capital": "Oranjestad",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -112,6 +125,7 @@
       "slug": "ashmore-and-cartier-islands",
       "name": "Ashmore and Cartier Islands",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -120,6 +134,7 @@
       "slug": "australia",
       "name": "Australia",
       "iso2": "AU",
+      "iso3": "AUS",
       "capital": "Canberra",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -128,6 +143,7 @@
       "slug": "austria",
       "name": "Austria",
       "iso2": "AT",
+      "iso3": "AUT",
       "capital": "Vienna",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -136,6 +152,7 @@
       "slug": "azerbaijan",
       "name": "Azerbaijan",
       "iso2": "AZ",
+      "iso3": "AZE",
       "capital": "Baku (Baki, Baky)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -144,6 +161,7 @@
       "slug": "bahrain",
       "name": "Bahrain",
       "iso2": "BH",
+      "iso3": "BHR",
       "capital": "Manama",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -152,6 +170,7 @@
       "slug": "baker-island-howland-island-jarvis-island-johnston-atoll-kingman-reef-midway-islands-palmyra-atoll",
       "name": "Baker Island, Howland Island, Jarvis Island, Johnston Atoll, Kingman Reef, Midway Islands, Palmyra Atoll",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "aggregate_or_special_area",
       "statusLabel": "Grouped territorial entry"
@@ -160,6 +179,7 @@
       "slug": "bangladesh",
       "name": "Bangladesh",
       "iso2": "BD",
+      "iso3": "BGD",
       "capital": "Dhaka",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -168,6 +188,7 @@
       "slug": "barbados",
       "name": "Barbados",
       "iso2": "BB",
+      "iso3": "BRB",
       "capital": "Bridgetown",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -176,6 +197,7 @@
       "slug": "belarus",
       "name": "Belarus",
       "iso2": "BY",
+      "iso3": "BLR",
       "capital": "Minsk",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -184,6 +206,7 @@
       "slug": "belgium",
       "name": "Belgium",
       "iso2": "BE",
+      "iso3": "BEL",
       "capital": "Brussels",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -192,6 +215,7 @@
       "slug": "belize",
       "name": "Belize",
       "iso2": "BZ",
+      "iso3": "BLZ",
       "capital": "Belmopan",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -200,6 +224,7 @@
       "slug": "benin",
       "name": "Benin",
       "iso2": "BJ",
+      "iso3": "BEN",
       "capital": "Porto-Novo (constitutional capital); Cotonou (seat of government)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -208,6 +233,7 @@
       "slug": "bermuda",
       "name": "Bermuda",
       "iso2": "BM",
+      "iso3": null,
       "capital": "Hamilton",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -216,6 +242,7 @@
       "slug": "bhutan",
       "name": "Bhutan",
       "iso2": "BT",
+      "iso3": "BTN",
       "capital": "Thimphu",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -224,6 +251,7 @@
       "slug": "bolivia",
       "name": "Bolivia",
       "iso2": "BO",
+      "iso3": "BOL",
       "capital": "La Paz (administrative capital); Sucre (constitutional [legislative and judicial] capital)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -232,6 +260,7 @@
       "slug": "bosnia-and-herzegovina",
       "name": "Bosnia and Herzegovina",
       "iso2": "BA",
+      "iso3": "BIH",
       "capital": "Sarajevo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -240,6 +269,7 @@
       "slug": "botswana",
       "name": "Botswana",
       "iso2": "BW",
+      "iso3": "BWA",
       "capital": "Gaborone",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -248,6 +278,7 @@
       "slug": "bouvet-island",
       "name": "Bouvet Island",
       "iso2": "BV",
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -256,6 +287,7 @@
       "slug": "brazil",
       "name": "Brazil",
       "iso2": "BR",
+      "iso3": "BRA",
       "capital": "Brasília",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -264,6 +296,7 @@
       "slug": "british-virgin-islands",
       "name": "British Virgin Islands",
       "iso2": "VG",
+      "iso3": null,
       "capital": "Road Town",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -272,6 +305,7 @@
       "slug": "brunei",
       "name": "Brunei",
       "iso2": "BN",
+      "iso3": "BRN",
       "capital": "Bandar Seri Begawan",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -280,6 +314,7 @@
       "slug": "bulgaria",
       "name": "Bulgaria",
       "iso2": "BG",
+      "iso3": "BGR",
       "capital": "Sofia",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -288,6 +323,7 @@
       "slug": "burkina-faso",
       "name": "Burkina Faso",
       "iso2": "BF",
+      "iso3": "BFA",
       "capital": "Ouagadougou",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -296,6 +332,7 @@
       "slug": "burma",
       "name": "Burma",
       "iso2": "MM",
+      "iso3": "MMR",
       "capital": "Rangoon (aka Yangon, continues to be recognized as the primary Burmese capital by the US Government); Nay Pyi Taw is the administrative capital",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -304,6 +341,7 @@
       "slug": "burundi",
       "name": "Burundi",
       "iso2": "BI",
+      "iso3": "BDI",
       "capital": "Gitega (political capital), Bujumbura (commercial capital)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -312,6 +350,7 @@
       "slug": "cabo-verde",
       "name": "Cabo Verde",
       "iso2": "CV",
+      "iso3": "CPV",
       "capital": "Praia",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -320,6 +359,7 @@
       "slug": "cambodia",
       "name": "Cambodia",
       "iso2": "KH",
+      "iso3": "KHM",
       "capital": "Phnom Penh",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -328,6 +368,7 @@
       "slug": "cameroon",
       "name": "Cameroon",
       "iso2": "CM",
+      "iso3": "CMR",
       "capital": "Yaounde",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -336,6 +377,7 @@
       "slug": "canada",
       "name": "Canada",
       "iso2": "CA",
+      "iso3": "CAN",
       "capital": "Ottawa",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -344,6 +386,7 @@
       "slug": "cayman-islands",
       "name": "Cayman Islands",
       "iso2": "KY",
+      "iso3": null,
       "capital": "George Town (on Grand Cayman)",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -352,6 +395,7 @@
       "slug": "central-african-republic",
       "name": "Central African Republic",
       "iso2": "CF",
+      "iso3": "CAF",
       "capital": null,
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -360,6 +404,7 @@
       "slug": "chad",
       "name": "Chad",
       "iso2": "TD",
+      "iso3": "TCD",
       "capital": "N'Djamena",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -368,6 +413,7 @@
       "slug": "chile",
       "name": "Chile",
       "iso2": "CL",
+      "iso3": "CHL",
       "capital": "Santiago; note - Valparaiso is the seat of the national legislature",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -376,6 +422,7 @@
       "slug": "china",
       "name": "China",
       "iso2": "CN",
+      "iso3": "CHN",
       "capital": "Beijing",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -384,6 +431,7 @@
       "slug": "christmas-island",
       "name": "Christmas Island",
       "iso2": "CX",
+      "iso3": null,
       "capital": "The Settlement (Flying Fish Cove)",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -392,6 +440,7 @@
       "slug": "clipperton-island",
       "name": "Clipperton Island",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -400,6 +449,7 @@
       "slug": "cocos-keeling-islands",
       "name": "Cocos (Keeling) Islands",
       "iso2": "CC",
+      "iso3": null,
       "capital": "West Island",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -408,6 +458,7 @@
       "slug": "colombia",
       "name": "Colombia",
       "iso2": "CO",
+      "iso3": "COL",
       "capital": "Bogotá",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -416,6 +467,7 @@
       "slug": "comoros",
       "name": "Comoros",
       "iso2": "KM",
+      "iso3": "COM",
       "capital": "Moroni",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -424,6 +476,7 @@
       "slug": "congo-brazzaville",
       "name": "Congo (Brazzaville)",
       "iso2": "CG",
+      "iso3": "COG",
       "capital": "Brazzaville",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -432,6 +485,7 @@
       "slug": "cook-islands",
       "name": "Cook Islands",
       "iso2": "CK",
+      "iso3": null,
       "capital": "Avarua",
       "statusType": "associated_state",
       "statusLabel": "Self-governing state in free association"
@@ -440,6 +494,7 @@
       "slug": "coral-sea-islands",
       "name": "Coral Sea Islands",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -448,6 +503,7 @@
       "slug": "costa-rica",
       "name": "Costa Rica",
       "iso2": "CR",
+      "iso3": "CRI",
       "capital": "San José",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -456,6 +512,7 @@
       "slug": "croatia",
       "name": "Croatia",
       "iso2": "HR",
+      "iso3": "HRV",
       "capital": "Zagreb",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -464,6 +521,7 @@
       "slug": "cuba",
       "name": "Cuba",
       "iso2": "CU",
+      "iso3": "CUB",
       "capital": "Havana",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -472,6 +530,7 @@
       "slug": "curacao",
       "name": "Curacao",
       "iso2": "CW",
+      "iso3": null,
       "capital": "Willemstad",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -480,6 +539,7 @@
       "slug": "cyprus",
       "name": "Cyprus",
       "iso2": "CY",
+      "iso3": "CYP",
       "capital": "Nicosia (Lefkosia/Lefkosa)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -488,6 +548,7 @@
       "slug": "czechia",
       "name": "Czechia",
       "iso2": "CZ",
+      "iso3": "CZE",
       "capital": "Prague",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -496,6 +557,7 @@
       "slug": "c-te-d-ivoire",
       "name": "Côte d'Ivoire",
       "iso2": "CI",
+      "iso3": "CIV",
       "capital": "Yamoussoukro (legislative capital), Abidjan (administrative and economic capital); note - the US Embassy is in Abidjan",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -504,6 +566,7 @@
       "slug": "drc",
       "name": "DRC",
       "iso2": "CD",
+      "iso3": "COD",
       "capital": "Kinshasa",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -512,6 +575,7 @@
       "slug": "denmark",
       "name": "Denmark",
       "iso2": "DK",
+      "iso3": "DNK",
       "capital": "Copenhagen",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -520,6 +584,7 @@
       "slug": "dhekelia",
       "name": "Dhekelia",
       "iso2": null,
+      "iso3": null,
       "capital": "Episkopi Cantonment (base administrative center for Akrotiri and Dhekelia); located in Akrotiri",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -528,6 +593,7 @@
       "slug": "djibouti",
       "name": "Djibouti",
       "iso2": "DJ",
+      "iso3": "DJI",
       "capital": "Djibouti",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -536,6 +602,7 @@
       "slug": "dominica",
       "name": "Dominica",
       "iso2": "DM",
+      "iso3": "DMA",
       "capital": "Roseau",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -544,6 +611,7 @@
       "slug": "ecuador",
       "name": "Ecuador",
       "iso2": "EC",
+      "iso3": "ECU",
       "capital": "Quito",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -552,6 +620,7 @@
       "slug": "egypt",
       "name": "Egypt",
       "iso2": "EG",
+      "iso3": "EGY",
       "capital": "Cairo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -560,6 +629,7 @@
       "slug": "el-salvador",
       "name": "El Salvador",
       "iso2": "SV",
+      "iso3": "SLV",
       "capital": "San Salvador",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -568,6 +638,7 @@
       "slug": "equatorial-guinea",
       "name": "Equatorial Guinea",
       "iso2": "GQ",
+      "iso3": "GNQ",
       "capital": "Malabo; note - Malabo is on the island of Bioko; some months of the year, the government operates out of Bata on the mainland region.",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -576,6 +647,7 @@
       "slug": "eritrea",
       "name": "Eritrea",
       "iso2": "ER",
+      "iso3": "ERI",
       "capital": "Asmara",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -584,6 +656,7 @@
       "slug": "estonia",
       "name": "Estonia",
       "iso2": "EE",
+      "iso3": "EST",
       "capital": "Tallinn",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -592,6 +665,7 @@
       "slug": "eswatini",
       "name": "Eswatini",
       "iso2": "SZ",
+      "iso3": "SWZ",
       "capital": "Mbabane (administrative capital); Lobamba (royal and legislative capital)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -600,6 +674,7 @@
       "slug": "ethiopia",
       "name": "Ethiopia",
       "iso2": "ET",
+      "iso3": "ETH",
       "capital": "Addis Ababa",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -608,6 +683,7 @@
       "slug": "falkland-islands-islas-malvinas",
       "name": "Falkland Islands (Islas Malvinas)",
       "iso2": "FK",
+      "iso3": null,
       "capital": "Stanley",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -616,6 +692,7 @@
       "slug": "faroe-islands",
       "name": "Faroe Islands",
       "iso2": "FO",
+      "iso3": null,
       "capital": "Torshavn",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -624,6 +701,7 @@
       "slug": "fiji",
       "name": "Fiji",
       "iso2": "FJ",
+      "iso3": "FJI",
       "capital": "Suva (on Viti Levu)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -632,6 +710,7 @@
       "slug": "finland",
       "name": "Finland",
       "iso2": "FI",
+      "iso3": "FIN",
       "capital": "Helsinki",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -640,6 +719,7 @@
       "slug": "france",
       "name": "France",
       "iso2": "FR",
+      "iso3": "FRA",
       "capital": "Paris",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -648,6 +728,7 @@
       "slug": "french-polynesia",
       "name": "French Polynesia",
       "iso2": "PF",
+      "iso3": null,
       "capital": "Papeete (located on Tahiti)",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -656,6 +737,7 @@
       "slug": "french-southern-and-antarctic-lands",
       "name": "French Southern and Antarctic Lands",
       "iso2": "TF",
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -664,6 +746,7 @@
       "slug": "gabon",
       "name": "Gabon",
       "iso2": "GA",
+      "iso3": "GAB",
       "capital": "Libreville",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -672,6 +755,7 @@
       "slug": "gaza-gaza-strip",
       "name": "Gaza, Gaza Strip",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "disputed_or_limited_recognition",
       "statusLabel": "Disputed or separately profiled area"
@@ -680,6 +764,7 @@
       "slug": "georgia",
       "name": "Georgia",
       "iso2": "GE",
+      "iso3": "GEO",
       "capital": "Tbilisi",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -688,6 +773,7 @@
       "slug": "germany",
       "name": "Germany",
       "iso2": "DE",
+      "iso3": "DEU",
       "capital": "Berlin",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -696,6 +782,7 @@
       "slug": "ghana",
       "name": "Ghana",
       "iso2": "GH",
+      "iso3": "GHA",
       "capital": "Accra",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -704,6 +791,7 @@
       "slug": "gibraltar",
       "name": "Gibraltar",
       "iso2": "GI",
+      "iso3": null,
       "capital": "Gibraltar",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -712,6 +800,7 @@
       "slug": "greece",
       "name": "Greece",
       "iso2": "GR",
+      "iso3": "GRC",
       "capital": "Athens",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -720,6 +809,7 @@
       "slug": "greenland",
       "name": "Greenland",
       "iso2": "GL",
+      "iso3": null,
       "capital": "Nuuk",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -728,6 +818,7 @@
       "slug": "grenada",
       "name": "Grenada",
       "iso2": "GD",
+      "iso3": "GRD",
       "capital": "Saint George's",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -736,6 +827,7 @@
       "slug": "guam",
       "name": "Guam",
       "iso2": "GU",
+      "iso3": null,
       "capital": "Hagatna (Agana)",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -744,6 +836,7 @@
       "slug": "guatemala",
       "name": "Guatemala",
       "iso2": "GT",
+      "iso3": "GTM",
       "capital": "Guatemala City",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -752,6 +845,7 @@
       "slug": "guernsey",
       "name": "Guernsey",
       "iso2": "GG",
+      "iso3": null,
       "capital": "Saint Peter Port",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -760,6 +854,7 @@
       "slug": "guinea",
       "name": "Guinea",
       "iso2": "GN",
+      "iso3": "GIN",
       "capital": "Conakry",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -768,6 +863,7 @@
       "slug": "guinea-bissau",
       "name": "Guinea-Bissau",
       "iso2": "GW",
+      "iso3": "GNB",
       "capital": "Bissau",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -776,6 +872,7 @@
       "slug": "guyana",
       "name": "Guyana",
       "iso2": "GY",
+      "iso3": "GUY",
       "capital": "Georgetown",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -784,6 +881,7 @@
       "slug": "haiti",
       "name": "Haiti",
       "iso2": "HT",
+      "iso3": "HTI",
       "capital": "Port-au-Prince",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -792,6 +890,7 @@
       "slug": "heard-island-and-mcdonald-islands",
       "name": "Heard Island and McDonald Islands",
       "iso2": "HM",
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -800,6 +899,7 @@
       "slug": "holy-see-vatican-city",
       "name": "Holy See (Vatican City)",
       "iso2": "VA",
+      "iso3": "VAT",
       "capital": "Vatican City",
       "statusType": "sovereign_state",
       "statusLabel": "Sovereign observer state"
@@ -808,6 +908,7 @@
       "slug": "honduras",
       "name": "Honduras",
       "iso2": "HN",
+      "iso3": "HND",
       "capital": "Tegucigalpa",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -816,6 +917,7 @@
       "slug": "hong-kong",
       "name": "Hong Kong",
       "iso2": "HK",
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -824,6 +926,7 @@
       "slug": "hungary",
       "name": "Hungary",
       "iso2": "HU",
+      "iso3": "HUN",
       "capital": "Budapest",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -832,6 +935,7 @@
       "slug": "iceland",
       "name": "Iceland",
       "iso2": "IS",
+      "iso3": "ISL",
       "capital": "Reykjavik",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -840,6 +944,7 @@
       "slug": "india",
       "name": "India",
       "iso2": "IN",
+      "iso3": "IND",
       "capital": "New Delhi",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -848,6 +953,7 @@
       "slug": "indonesia",
       "name": "Indonesia",
       "iso2": "ID",
+      "iso3": "IDN",
       "capital": "Jakarta",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -856,6 +962,7 @@
       "slug": "iran",
       "name": "Iran",
       "iso2": "IR",
+      "iso3": "IRN",
       "capital": "Tehran",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -864,6 +971,7 @@
       "slug": "iraq",
       "name": "Iraq",
       "iso2": "IQ",
+      "iso3": "IRQ",
       "capital": "Baghdad",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -872,6 +980,7 @@
       "slug": "ireland",
       "name": "Ireland",
       "iso2": "IE",
+      "iso3": "IRL",
       "capital": "Dublin",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -880,6 +989,7 @@
       "slug": "isle-of-man",
       "name": "Isle of Man",
       "iso2": "IM",
+      "iso3": null,
       "capital": "Douglas",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -888,6 +998,7 @@
       "slug": "israel",
       "name": "Israel",
       "iso2": "IL",
+      "iso3": "ISR",
       "capital": "Jerusalem",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -896,6 +1007,7 @@
       "slug": "italy",
       "name": "Italy",
       "iso2": "IT",
+      "iso3": "ITA",
       "capital": "Rome",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -904,6 +1016,7 @@
       "slug": "jamaica",
       "name": "Jamaica",
       "iso2": "JM",
+      "iso3": "JAM",
       "capital": "Kingston",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -912,6 +1025,7 @@
       "slug": "jan-mayen",
       "name": "Jan Mayen",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -920,6 +1034,7 @@
       "slug": "japan",
       "name": "Japan",
       "iso2": "JP",
+      "iso3": "JPN",
       "capital": "Tokyo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -928,6 +1043,7 @@
       "slug": "jersey",
       "name": "Jersey",
       "iso2": "JE",
+      "iso3": null,
       "capital": "Saint Helier",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -936,6 +1052,7 @@
       "slug": "jordan",
       "name": "Jordan",
       "iso2": "JO",
+      "iso3": "JOR",
       "capital": "Amman",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -944,6 +1061,7 @@
       "slug": "kazakhstan",
       "name": "Kazakhstan",
       "iso2": "KZ",
+      "iso3": "KAZ",
       "capital": "Astana",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -952,6 +1070,7 @@
       "slug": "kenya",
       "name": "Kenya",
       "iso2": "KE",
+      "iso3": "KEN",
       "capital": "Nairobi",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -960,6 +1079,7 @@
       "slug": "kiribati",
       "name": "Kiribati",
       "iso2": "KI",
+      "iso3": "KIR",
       "capital": "Tarawa",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -968,6 +1088,7 @@
       "slug": "kosovo",
       "name": "Kosovo",
       "iso2": "XK",
+      "iso3": "XKS",
       "capital": "Pristina (Prishtine, Prishtina)",
       "statusType": "disputed_or_limited_recognition",
       "statusLabel": "Limited-recognition entity"
@@ -976,6 +1097,7 @@
       "slug": "kuwait",
       "name": "Kuwait",
       "iso2": "KW",
+      "iso3": "KWT",
       "capital": "Kuwait City",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -984,6 +1106,7 @@
       "slug": "kyrgyzstan",
       "name": "Kyrgyzstan",
       "iso2": "KG",
+      "iso3": "KGZ",
       "capital": "Bishkek",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -992,6 +1115,7 @@
       "slug": "laos",
       "name": "Laos",
       "iso2": "LA",
+      "iso3": "LAO",
       "capital": "Vientiane (Viangchan)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1000,6 +1124,7 @@
       "slug": "latvia",
       "name": "Latvia",
       "iso2": "LV",
+      "iso3": "LVA",
       "capital": "Riga",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1008,6 +1133,7 @@
       "slug": "lebanon",
       "name": "Lebanon",
       "iso2": "LB",
+      "iso3": "LBN",
       "capital": "Beirut",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1016,6 +1142,7 @@
       "slug": "lesotho",
       "name": "Lesotho",
       "iso2": "LS",
+      "iso3": "LSO",
       "capital": "Maseru",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1024,6 +1151,7 @@
       "slug": "liberia",
       "name": "Liberia",
       "iso2": "LR",
+      "iso3": "LBR",
       "capital": "Monrovia",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1032,6 +1160,7 @@
       "slug": "libya",
       "name": "Libya",
       "iso2": "LY",
+      "iso3": "LBY",
       "capital": "Tripoli (Tarabulus)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1040,6 +1169,7 @@
       "slug": "liechtenstein",
       "name": "Liechtenstein",
       "iso2": "LI",
+      "iso3": "LIE",
       "capital": "Vaduz",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1048,6 +1178,7 @@
       "slug": "lithuania",
       "name": "Lithuania",
       "iso2": "LT",
+      "iso3": "LTU",
       "capital": "Vilnius",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1056,6 +1187,7 @@
       "slug": "luxembourg",
       "name": "Luxembourg",
       "iso2": "LU",
+      "iso3": "LUX",
       "capital": "Luxembourg",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1064,6 +1196,7 @@
       "slug": "macau",
       "name": "Macau",
       "iso2": "MO",
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1072,6 +1205,7 @@
       "slug": "madagascar",
       "name": "Madagascar",
       "iso2": "MG",
+      "iso3": "MDG",
       "capital": "Antananarivo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1080,6 +1214,7 @@
       "slug": "malawi",
       "name": "Malawi",
       "iso2": "MW",
+      "iso3": "MWI",
       "capital": "Lilongwe",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1088,6 +1223,7 @@
       "slug": "malaysia",
       "name": "Malaysia",
       "iso2": "MY",
+      "iso3": "MYS",
       "capital": "Kuala Lumpur",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1096,6 +1232,7 @@
       "slug": "maldives",
       "name": "Maldives",
       "iso2": "MV",
+      "iso3": "MDV",
       "capital": "Malé",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1104,6 +1241,7 @@
       "slug": "mali",
       "name": "Mali",
       "iso2": "ML",
+      "iso3": "MLI",
       "capital": "Bamako",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1112,6 +1250,7 @@
       "slug": "malta",
       "name": "Malta",
       "iso2": "MT",
+      "iso3": "MLT",
       "capital": "Valletta",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1120,6 +1259,7 @@
       "slug": "marshall-islands",
       "name": "Marshall Islands",
       "iso2": "MH",
+      "iso3": "MHL",
       "capital": "Majuro",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1128,6 +1268,7 @@
       "slug": "mauritania",
       "name": "Mauritania",
       "iso2": "MR",
+      "iso3": "MRT",
       "capital": "Nouakchott",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1136,6 +1277,7 @@
       "slug": "mauritius",
       "name": "Mauritius",
       "iso2": "MU",
+      "iso3": "MUS",
       "capital": "Port Louis",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1144,6 +1286,7 @@
       "slug": "mexico",
       "name": "Mexico",
       "iso2": "MX",
+      "iso3": "MEX",
       "capital": "Mexico City (Ciudad de Mexico)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1152,6 +1295,7 @@
       "slug": "micronesia",
       "name": "Micronesia",
       "iso2": "FM",
+      "iso3": "FSM",
       "capital": null,
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1160,6 +1304,7 @@
       "slug": "moldova",
       "name": "Moldova",
       "iso2": "MD",
+      "iso3": "MDA",
       "capital": "Chisinau in Romanian (Kishinev in Russian)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1168,6 +1313,7 @@
       "slug": "monaco",
       "name": "Monaco",
       "iso2": "MC",
+      "iso3": "MCO",
       "capital": "Monaco",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1176,6 +1322,7 @@
       "slug": "mongolia",
       "name": "Mongolia",
       "iso2": "MN",
+      "iso3": "MNG",
       "capital": "Ulaanbaatar",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1184,6 +1331,7 @@
       "slug": "montenegro",
       "name": "Montenegro",
       "iso2": "ME",
+      "iso3": "MNE",
       "capital": "Podgorica",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1192,6 +1340,7 @@
       "slug": "montserrat",
       "name": "Montserrat",
       "iso2": "MS",
+      "iso3": null,
       "capital": "Plymouth",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1200,6 +1349,7 @@
       "slug": "morocco",
       "name": "Morocco",
       "iso2": "MA",
+      "iso3": "MAR",
       "capital": "Rabat",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1208,6 +1358,7 @@
       "slug": "mozambique",
       "name": "Mozambique",
       "iso2": "MZ",
+      "iso3": "MOZ",
       "capital": "Maputo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1216,6 +1367,7 @@
       "slug": "namibia",
       "name": "Namibia",
       "iso2": "NA",
+      "iso3": "NAM",
       "capital": "Windhoek",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1224,6 +1376,7 @@
       "slug": "nauru",
       "name": "Nauru",
       "iso2": "NR",
+      "iso3": "NRU",
       "capital": "no official capital; government offices in the Yaren District",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1232,6 +1385,7 @@
       "slug": "navassa-island",
       "name": "Navassa Island",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1240,6 +1394,7 @@
       "slug": "nepal",
       "name": "Nepal",
       "iso2": "NP",
+      "iso3": "NPL",
       "capital": "Kathmandu",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1248,6 +1403,7 @@
       "slug": "netherlands",
       "name": "Netherlands",
       "iso2": "NL",
+      "iso3": "NLD",
       "capital": "Amsterdam",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1256,6 +1412,7 @@
       "slug": "new-caledonia",
       "name": "New Caledonia",
       "iso2": "NC",
+      "iso3": null,
       "capital": "Noumea",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1264,6 +1421,7 @@
       "slug": "new-zealand",
       "name": "New Zealand",
       "iso2": "NZ",
+      "iso3": "NZL",
       "capital": "Wellington",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1272,6 +1430,7 @@
       "slug": "nicaragua",
       "name": "Nicaragua",
       "iso2": "NI",
+      "iso3": "NIC",
       "capital": "Managua",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1280,6 +1439,7 @@
       "slug": "niger",
       "name": "Niger",
       "iso2": "NE",
+      "iso3": "NER",
       "capital": "Niamey",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1288,6 +1448,7 @@
       "slug": "nigeria",
       "name": "Nigeria",
       "iso2": "NG",
+      "iso3": "NGA",
       "capital": "Abuja",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1296,6 +1457,7 @@
       "slug": "niue",
       "name": "Niue",
       "iso2": "NU",
+      "iso3": null,
       "capital": "Alofi",
       "statusType": "associated_state",
       "statusLabel": "Self-governing state in free association"
@@ -1304,6 +1466,7 @@
       "slug": "norfolk-island",
       "name": "Norfolk Island",
       "iso2": "NF",
+      "iso3": null,
       "capital": "Kingston",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1312,6 +1475,7 @@
       "slug": "north-korea",
       "name": "North Korea",
       "iso2": "KP",
+      "iso3": "PRK",
       "capital": "Pyongyang",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1320,6 +1484,7 @@
       "slug": "north-macedonia",
       "name": "North Macedonia",
       "iso2": "MK",
+      "iso3": "MKD",
       "capital": "Skopje",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1328,6 +1493,7 @@
       "slug": "northern-mariana-islands",
       "name": "Northern Mariana Islands",
       "iso2": "MP",
+      "iso3": null,
       "capital": "Saipan",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1336,6 +1502,7 @@
       "slug": "norway",
       "name": "Norway",
       "iso2": "NO",
+      "iso3": "NOR",
       "capital": "Oslo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1344,6 +1511,7 @@
       "slug": "oman",
       "name": "Oman",
       "iso2": "OM",
+      "iso3": "OMN",
       "capital": "Muscat",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1352,6 +1520,7 @@
       "slug": "pakistan",
       "name": "Pakistan",
       "iso2": "PK",
+      "iso3": "PAK",
       "capital": "Islamabad",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1360,6 +1529,7 @@
       "slug": "palau",
       "name": "Palau",
       "iso2": "PW",
+      "iso3": "PLW",
       "capital": "Ngerulmud",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1368,6 +1538,7 @@
       "slug": "palestine",
       "name": "Palestine",
       "iso2": "PS",
+      "iso3": "PSE",
       "capital": null,
       "statusType": "disputed_or_limited_recognition",
       "statusLabel": "UN observer state"
@@ -1376,6 +1547,7 @@
       "slug": "panama",
       "name": "Panama",
       "iso2": "PA",
+      "iso3": "PAN",
       "capital": "Panama City",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1384,6 +1556,7 @@
       "slug": "papua-new-guinea",
       "name": "Papua New Guinea",
       "iso2": "PG",
+      "iso3": "PNG",
       "capital": "Port Moresby",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1392,6 +1565,7 @@
       "slug": "paracel-islands",
       "name": "Paracel Islands",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "disputed_or_limited_recognition",
       "statusLabel": "Disputed or separately profiled area"
@@ -1400,6 +1574,7 @@
       "slug": "paraguay",
       "name": "Paraguay",
       "iso2": "PY",
+      "iso3": "PRY",
       "capital": "Asunción",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1408,6 +1583,7 @@
       "slug": "peru",
       "name": "Peru",
       "iso2": "PE",
+      "iso3": "PER",
       "capital": "Lima",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1416,6 +1592,7 @@
       "slug": "philippines",
       "name": "Philippines",
       "iso2": "PH",
+      "iso3": "PHL",
       "capital": "Manila",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1424,6 +1601,7 @@
       "slug": "pitcairn-islands",
       "name": "Pitcairn Islands",
       "iso2": "PN",
+      "iso3": null,
       "capital": "Adamstown",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1432,6 +1610,7 @@
       "slug": "poland",
       "name": "Poland",
       "iso2": "PL",
+      "iso3": "POL",
       "capital": "Warsaw",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1440,6 +1619,7 @@
       "slug": "portugal",
       "name": "Portugal",
       "iso2": "PT",
+      "iso3": "PRT",
       "capital": "Lisbon",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1448,6 +1628,7 @@
       "slug": "puerto-rico",
       "name": "Puerto Rico",
       "iso2": "PR",
+      "iso3": null,
       "capital": "San Juan",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1456,6 +1637,7 @@
       "slug": "qatar",
       "name": "Qatar",
       "iso2": "QA",
+      "iso3": "QAT",
       "capital": "Doha",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1464,6 +1646,7 @@
       "slug": "romania",
       "name": "Romania",
       "iso2": "RO",
+      "iso3": "ROU",
       "capital": "Bucharest",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1472,6 +1655,7 @@
       "slug": "russia",
       "name": "Russia",
       "iso2": "RU",
+      "iso3": "RUS",
       "capital": "Moscow",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1480,6 +1664,7 @@
       "slug": "rwanda",
       "name": "Rwanda",
       "iso2": "RW",
+      "iso3": "RWA",
       "capital": "Kigali",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1488,6 +1673,7 @@
       "slug": "saint-barthelemy",
       "name": "Saint Barthelemy",
       "iso2": "BL",
+      "iso3": null,
       "capital": "Gustavia",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1496,6 +1682,7 @@
       "slug": "saint-kitts-and-nevis",
       "name": "Saint Kitts and Nevis",
       "iso2": "KN",
+      "iso3": "KNA",
       "capital": "Basseterre",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1504,6 +1691,7 @@
       "slug": "saint-lucia",
       "name": "Saint Lucia",
       "iso2": "LC",
+      "iso3": "LCA",
       "capital": "Castries",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1512,6 +1700,7 @@
       "slug": "saint-martin",
       "name": "Saint Martin",
       "iso2": "MF",
+      "iso3": null,
       "capital": "Marigot",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1520,6 +1709,7 @@
       "slug": "saint-pierre-and-miquelon",
       "name": "Saint Pierre and Miquelon",
       "iso2": "PM",
+      "iso3": null,
       "capital": "Saint-Pierre",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1528,6 +1718,7 @@
       "slug": "saint-vincent-and-the-grenadines",
       "name": "Saint Vincent and the Grenadines",
       "iso2": "VC",
+      "iso3": "VCT",
       "capital": "Kingstown",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1536,6 +1727,7 @@
       "slug": "samoa",
       "name": "Samoa",
       "iso2": "WS",
+      "iso3": "WSM",
       "capital": "Apia",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1544,6 +1736,7 @@
       "slug": "san-marino",
       "name": "San Marino",
       "iso2": "SM",
+      "iso3": "SMR",
       "capital": "San Marino (city)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1552,6 +1745,7 @@
       "slug": "sao-tome-and-principe",
       "name": "Sao Tome and Principe",
       "iso2": "ST",
+      "iso3": "STP",
       "capital": "Sao Tome",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1560,6 +1754,7 @@
       "slug": "saudi-arabia",
       "name": "Saudi Arabia",
       "iso2": "SA",
+      "iso3": "SAU",
       "capital": "Riyadh",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1568,6 +1763,7 @@
       "slug": "senegal",
       "name": "Senegal",
       "iso2": "SN",
+      "iso3": "SEN",
       "capital": "Dakar",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1576,6 +1772,7 @@
       "slug": "serbia",
       "name": "Serbia",
       "iso2": "RS",
+      "iso3": "SRB",
       "capital": "Belgrade (Beograd)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1584,6 +1781,7 @@
       "slug": "seychelles",
       "name": "Seychelles",
       "iso2": "SC",
+      "iso3": "SYC",
       "capital": "Victoria",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1592,6 +1790,7 @@
       "slug": "sierra-leone",
       "name": "Sierra Leone",
       "iso2": "SL",
+      "iso3": "SLE",
       "capital": "Freetown",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1600,6 +1799,7 @@
       "slug": "singapore",
       "name": "Singapore",
       "iso2": "SG",
+      "iso3": "SGP",
       "capital": "Singapore",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1608,6 +1808,7 @@
       "slug": "sint-maarten",
       "name": "Sint Maarten",
       "iso2": "SX",
+      "iso3": null,
       "capital": "Philipsburg",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1616,6 +1817,7 @@
       "slug": "slovakia",
       "name": "Slovakia",
       "iso2": "SK",
+      "iso3": "SVK",
       "capital": "Bratislava",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1624,6 +1826,7 @@
       "slug": "slovenia",
       "name": "Slovenia",
       "iso2": "SI",
+      "iso3": "SVN",
       "capital": "Ljubljana",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1632,6 +1835,7 @@
       "slug": "solomon-islands",
       "name": "Solomon Islands",
       "iso2": "SB",
+      "iso3": "SLB",
       "capital": "Honiara",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1640,6 +1844,7 @@
       "slug": "somalia",
       "name": "Somalia",
       "iso2": "SO",
+      "iso3": "SOM",
       "capital": "Mogadishu",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1648,6 +1853,7 @@
       "slug": "south-africa",
       "name": "South Africa",
       "iso2": "ZA",
+      "iso3": "ZAF",
       "capital": "Pretoria (administrative capital); Cape Town (legislative capital); Bloemfontein (judicial capital)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1656,6 +1862,7 @@
       "slug": "south-georgia-and-south-sandwich-islands",
       "name": "South Georgia and South Sandwich Islands",
       "iso2": "GS",
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1664,6 +1871,7 @@
       "slug": "south-korea",
       "name": "South Korea",
       "iso2": "KR",
+      "iso3": "KOR",
       "capital": "Seoul",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1672,6 +1880,7 @@
       "slug": "south-sudan",
       "name": "South Sudan",
       "iso2": "SS",
+      "iso3": "SSD",
       "capital": "Juba",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1680,6 +1889,7 @@
       "slug": "spain",
       "name": "Spain",
       "iso2": "ES",
+      "iso3": "ESP",
       "capital": "Madrid",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1688,6 +1898,7 @@
       "slug": "spratly-islands",
       "name": "Spratly Islands",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "disputed_or_limited_recognition",
       "statusLabel": "Disputed or separately profiled area"
@@ -1696,6 +1907,7 @@
       "slug": "sri-lanka",
       "name": "Sri Lanka",
       "iso2": "LK",
+      "iso3": "LKA",
       "capital": "Colombo (commercial capital); Sri Jayewardenepura Kotte (legislative capital)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1704,6 +1916,7 @@
       "slug": "sudan",
       "name": "Sudan",
       "iso2": "SD",
+      "iso3": "SDN",
       "capital": "Khartoum",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1712,6 +1925,7 @@
       "slug": "suriname",
       "name": "Suriname",
       "iso2": "SR",
+      "iso3": "SUR",
       "capital": "Paramaribo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1720,6 +1934,7 @@
       "slug": "svalbard-sometimes-referred-to-as-spitsbergen-the-largest-island-in-the-archipelago",
       "name": "Svalbard (sometimes referred to as Spitsbergen, the largest island in the archipelago)",
       "iso2": null,
+      "iso3": null,
       "capital": "Longyearbyen",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1728,6 +1943,7 @@
       "slug": "sweden",
       "name": "Sweden",
       "iso2": "SE",
+      "iso3": "SWE",
       "capital": "Stockholm",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1736,6 +1952,7 @@
       "slug": "switzerland",
       "name": "Switzerland",
       "iso2": "CH",
+      "iso3": "CHE",
       "capital": "Bern",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1744,6 +1961,7 @@
       "slug": "syria",
       "name": "Syria",
       "iso2": "SY",
+      "iso3": "SYR",
       "capital": "Damascus",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1752,6 +1970,7 @@
       "slug": "taiwan",
       "name": "Taiwan",
       "iso2": "TW",
+      "iso3": "TWN",
       "capital": "Taipei",
       "statusType": "disputed_or_limited_recognition",
       "statusLabel": "Limited-recognition entity"
@@ -1760,6 +1979,7 @@
       "slug": "tajikistan",
       "name": "Tajikistan",
       "iso2": "TJ",
+      "iso3": "TJK",
       "capital": "Dushanbe",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1768,6 +1988,7 @@
       "slug": "tanzania",
       "name": "Tanzania",
       "iso2": "TZ",
+      "iso3": "TZA",
       "capital": "Dodoma",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1776,6 +1997,7 @@
       "slug": "thailand",
       "name": "Thailand",
       "iso2": "TH",
+      "iso3": "THA",
       "capital": "Bangkok",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1784,6 +2006,7 @@
       "slug": "the-bahamas",
       "name": "The Bahamas",
       "iso2": "BS",
+      "iso3": "BHS",
       "capital": "Nassau",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1792,6 +2015,7 @@
       "slug": "the-dominican",
       "name": "The Dominican",
       "iso2": "DO",
+      "iso3": "DOM",
       "capital": "Santo Domingo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1800,6 +2024,7 @@
       "slug": "the-gambia",
       "name": "The Gambia",
       "iso2": "GM",
+      "iso3": "GMB",
       "capital": "Banjul",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1808,6 +2033,7 @@
       "slug": "timor-leste",
       "name": "Timor-Leste",
       "iso2": "TL",
+      "iso3": "TLS",
       "capital": "Dili",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1816,6 +2042,7 @@
       "slug": "togo",
       "name": "Togo",
       "iso2": "TG",
+      "iso3": "TGO",
       "capital": "Lome",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1824,6 +2051,7 @@
       "slug": "tokelau",
       "name": "Tokelau",
       "iso2": "TK",
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1832,6 +2060,7 @@
       "slug": "tonga",
       "name": "Tonga",
       "iso2": "TO",
+      "iso3": "TON",
       "capital": "Nuku'alofa",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1840,6 +2069,7 @@
       "slug": "trinidad-and-tobago",
       "name": "Trinidad and Tobago",
       "iso2": "TT",
+      "iso3": "TTO",
       "capital": "Port of Spain",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1848,6 +2078,7 @@
       "slug": "tunisia",
       "name": "Tunisia",
       "iso2": "TN",
+      "iso3": "TUN",
       "capital": "Tunis",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1856,6 +2087,7 @@
       "slug": "turkey",
       "name": "Turkey",
       "iso2": "TR",
+      "iso3": "TUR",
       "capital": "Ankara",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1864,6 +2096,7 @@
       "slug": "turkmenistan",
       "name": "Turkmenistan",
       "iso2": "TM",
+      "iso3": "TKM",
       "capital": "Ashgabat (Ashkhabad)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1872,6 +2105,7 @@
       "slug": "turks-and-caicos-islands",
       "name": "Turks and Caicos Islands",
       "iso2": "TC",
+      "iso3": null,
       "capital": "Grand Turk (Cockburn Town)",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1880,6 +2114,7 @@
       "slug": "tuvalu",
       "name": "Tuvalu",
       "iso2": "TV",
+      "iso3": "TUV",
       "capital": "Funafuti",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1888,6 +2123,7 @@
       "slug": "uganda",
       "name": "Uganda",
       "iso2": "UG",
+      "iso3": "UGA",
       "capital": "Kampala",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1896,6 +2132,7 @@
       "slug": "ukraine",
       "name": "Ukraine",
       "iso2": "UA",
+      "iso3": "UKR",
       "capital": "Kyiv (Kiev is the transliteration from Russian)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1904,6 +2141,7 @@
       "slug": "united-arab-emirates",
       "name": "United Arab Emirates",
       "iso2": "AE",
+      "iso3": "ARE",
       "capital": null,
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1912,6 +2150,7 @@
       "slug": "united-kingdom",
       "name": "United Kingdom",
       "iso2": "GB",
+      "iso3": "GBR",
       "capital": "London",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1920,6 +2159,7 @@
       "slug": "united-states",
       "name": "United States",
       "iso2": "US",
+      "iso3": "USA",
       "capital": "Washington, D.C.",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1928,6 +2168,7 @@
       "slug": "uruguay",
       "name": "Uruguay",
       "iso2": "UY",
+      "iso3": "URY",
       "capital": "Montevideo",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1936,6 +2177,7 @@
       "slug": "uzbekistan",
       "name": "Uzbekistan",
       "iso2": "UZ",
+      "iso3": "UZB",
       "capital": "Tashkent (Toshkent)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1944,6 +2186,7 @@
       "slug": "vanuatu",
       "name": "Vanuatu",
       "iso2": "VU",
+      "iso3": "VUT",
       "capital": "Port-Vila (on Efate)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1952,6 +2195,7 @@
       "slug": "venezuela",
       "name": "Venezuela",
       "iso2": "VE",
+      "iso3": "VEN",
       "capital": "Caracas",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1960,6 +2204,7 @@
       "slug": "vietnam",
       "name": "Vietnam",
       "iso2": "VN",
+      "iso3": "VNM",
       "capital": "Hanoi (Ha Noi)",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -1968,6 +2213,7 @@
       "slug": "virgin-islands",
       "name": "Virgin Islands",
       "iso2": "VI",
+      "iso3": null,
       "capital": "Charlotte Amalie",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1976,6 +2222,7 @@
       "slug": "wake-island",
       "name": "Wake Island",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1984,6 +2231,7 @@
       "slug": "wallis-and-futuna",
       "name": "Wallis and Futuna",
       "iso2": "WF",
+      "iso3": null,
       "capital": "Mata-Utu (on Ile Uvea)",
       "statusType": "dependency_or_territory",
       "statusLabel": "Dependency or territory"
@@ -1992,6 +2240,7 @@
       "slug": "west-bank",
       "name": "West Bank",
       "iso2": null,
+      "iso3": null,
       "capital": null,
       "statusType": "disputed_or_limited_recognition",
       "statusLabel": "Disputed or separately profiled area"
@@ -2000,6 +2249,7 @@
       "slug": "western-sahara",
       "name": "Western Sahara",
       "iso2": "EH",
+      "iso3": null,
       "capital": null,
       "statusType": "disputed_or_limited_recognition",
       "statusLabel": "Disputed or separately profiled area"
@@ -2008,6 +2258,7 @@
       "slug": "yemen",
       "name": "Yemen",
       "iso2": "YE",
+      "iso3": "YEM",
       "capital": "Sanaa",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -2016,6 +2267,7 @@
       "slug": "zambia",
       "name": "Zambia",
       "iso2": "ZM",
+      "iso3": "ZMB",
       "capital": "Lusaka",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"
@@ -2024,6 +2276,7 @@
       "slug": "zimbabwe",
       "name": "Zimbabwe",
       "iso2": "ZW",
+      "iso3": "ZWE",
       "capital": "Harare",
       "statusType": "sovereign_state",
       "statusLabel": "UN member state"

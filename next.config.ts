@@ -106,6 +106,19 @@ const nextConfig: NextConfig = {
         source: "/((?!embed/).*)",
         headers: FRAME_PROTECTION_HEADERS,
       },
+      // The shared jurisdiction directory asset is content-addressed (its
+      // filename embeds the checked artifact's hash), so a changed list is
+      // always a new URL and browsers may keep each file forever.
+      // See src/lib/jurisdictions/directory-asset.ts.
+      {
+        source: "/data/jurisdiction-directory.:version.json",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
     ];
   },
   async redirects() {

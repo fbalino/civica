@@ -2,18 +2,11 @@
 
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 
-interface Country {
-  slug: string;
-  name: string;
-  iso2: string | null;
-  capital: string | null;
-  status: { label: string };
-}
-
-export function GlobalSearch({ countries }: { countries: Country[] }) {
+// Searches the shared site-wide jurisdiction directory, fetched once on first
+// use (src/lib/jurisdictions/use-jurisdiction-directory.ts).
+export function GlobalSearch() {
   return (
     <CountrySearchCombobox
-      countries={countries}
       countryPathPrefix="/country"
       placeholder="Search countries and areas..."
       ariaLabel="Search countries and areas"

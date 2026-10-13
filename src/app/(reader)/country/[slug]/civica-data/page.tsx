@@ -5,7 +5,6 @@ import {
   getLeaderTimeline,
   getAllSources,
   getBillsForJurisdiction,
-  getFactbookCountryOptions,
   getIndicatorHistoryForCountry,
   getConditionsPublicRelease,
 } from "@/lib/db/queries";
@@ -216,7 +215,6 @@ export default async function CountryCivicaDataTab({
     organizationsResult,
     scoresRowsResult,
     sourceRows,
-    countryOptions,
     conditionsReleaseResult,
     countrySourceDates,
   ] = await Promise.all([
@@ -263,13 +261,6 @@ export default async function CountryCivicaDataTab({
     getAllSources().catch(
       fallbackWithoutDatabase(
         () => [] as Awaited<ReturnType<typeof getAllSources>>,
-      ),
-    ),
-    // Country list for the "Jump to country…" search at the top of the
-    // section nav.
-    getFactbookCountryOptions().catch(
-      fallbackWithoutDatabase(
-        () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>,
       ),
     ),
     captureAtlasSurfaceQuery(() => getConditionsPublicRelease(), {
@@ -560,7 +551,6 @@ export default async function CountryCivicaDataTab({
         <div className="factbook-left-rail">
           <CountryJumpSearch
             country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
-            countries={countryOptions}
           />
           <FactbookSidebar items={sidebarItems} />
         </div>

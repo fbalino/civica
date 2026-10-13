@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import {
   getJurisdictionBySlug,
   getFactbookSections,
-  getFactbookCountryOptions,
   getAllSources,
 } from "@/lib/db/queries";
 import { reconciliation } from "@/lib/content/site-state";
@@ -88,7 +87,6 @@ export default async function CountryFactbookTab({
 
   const [
     sectionsResult,
-    countryOptions,
     headerFacts,
     citeSources,
     allSources,
@@ -100,7 +98,6 @@ export default async function CountryFactbookTab({
       captureAtlasSurfaceQuery(() => getFactbookSections(jurisdiction.id), {
         rethrow: isCachedRenderFailure,
       }),
-      getFactbookCountryOptions().catch(fallbackWithoutDatabase(() => [])),
       // Resolver batch feeding FactbookSection LeafRow (single-shot leaves
       // keyed off LABEL_TO_FACT_KEY + multi-year groups keyed off
       // MULTI_YEAR_GROUP_TO_FACT_KEY, augmented with the reconciled
@@ -220,7 +217,6 @@ export default async function CountryFactbookTab({
         <div className="factbook-left-rail">
           <CountryJumpSearch
             country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
-            countries={countryOptions}
           />
           <FactbookSidebar items={sidebarItems} />
         </div>

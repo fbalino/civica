@@ -111,7 +111,9 @@ test("HomeGrid and the countries API cannot bypass the timestamp-aware reader", 
     resolve(process.cwd(), "src/components/home/HomeGrid.tsx"),
     "utf8",
   );
-  assert.match(homeGrid, /readFreshCachedFieldFromRow\(c, "capital"/);
+  // The hero search reads the shared checked jurisdiction directory asset
+  // (deploy-frozen, like the header search); HomeGrid ships no capital list.
+  assert.doesNotMatch(homeGrid, /<GlobalSearch countries=/);
   assert.match(
     homeGrid,
     /readFreshCachedFieldFromRow\(row, "population_total"/,
