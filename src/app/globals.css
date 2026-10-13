@@ -712,6 +712,15 @@ html {
   }
 }
 
+/* The mark is painted as a background, which browsers drop from print by
+   default; keep it in printed pages and PDFs. */
+@media print {
+  .civica-logo {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text-primary);
