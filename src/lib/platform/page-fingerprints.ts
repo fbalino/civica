@@ -67,7 +67,9 @@ function rowsOf(result: unknown): Array<Record<string, unknown>> {
 export function countryFingerprintQuery(): SQL {
   return sql`
     WITH j AS (
-      SELECT id, slug FROM jurisdictions
+      -- Same publication rule as the sitemap: a hidden jurisdiction is not a
+      -- current country, so its slug is retired and its old URLs invalidated.
+      SELECT id, slug FROM jurisdictions WHERE lower(name) <> 'none'
     ),
     bodies AS (
       SELECT b.* FROM government_bodies b
