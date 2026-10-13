@@ -136,7 +136,7 @@ rebuilds only the pages whose data changed.
   ordered JSON text of the rows) for each country, covering exactly the
   tables its layout and three tabs render (`src/lib/platform/page-fingerprints.ts`
   lists them), plus a global fingerprint (country list, source metadata
-  without sync times, Index and Conditions release headers). Bookkeeping
+  without sync times, Index and Conditions releases including their rows). Bookkeeping
   columns that no page shows (`updated_at`, `created_at`,
   `fact_cache_refreshed_at`, and similar) are left out; timestamps a page
   does show stay in. Two read-only statements take about 4 seconds on

@@ -1482,7 +1482,7 @@ is rebuilt only when the data it renders actually changed. Every night at
 imports, `operations.refresh-pages` computes a content fingerprint per
 country over exactly the rows its layout and three tabs render, and a global
 fingerprint over inputs every country page reads (country list, source
-metadata without sync times, Index and Conditions release headers). Fingerprints hash row content, never
+metadata without sync times, Index and Conditions releases including their rows). Fingerprints hash row content, never
 `updated_at`-style bookkeeping, because many tables lack reliable timestamps
 and some writers bump them on no-op upserts. Only a country whose
 fingerprint differs from the one stored at its last successful rebuild has

@@ -40,7 +40,7 @@ import {
  *
  * Global (every country page): the country list, the `sources` rows without
  * `last_sync_at` (no country page shows it), the Index release header and
- * pointers, and the Conditions release headers.
+ * pointers, and the Conditions release headers and their rendered rows.
  *
  * Non-country pages have no fingerprint: they read many tables across the
  * site, so they are rebuilt on every nightly run instead.
@@ -207,7 +207,15 @@ export function globalFingerprintQuery(): SQL {
         FROM ci_index_release_pointers p),
       (SELECT md5(coalesce(string_agg(concat_ws(':', c.id, c.methodology_version,
           c.manifest_sha256, c.created_at), '|' ORDER BY c.created_at, c.id), ''))
-        FROM civica_conditions_releases c)
+        FROM civica_conditions_releases c),
+      -- The country Conditions panel renders these rows of the public
+      -- release; a correction inside a release must rebuild the pages.
+      (SELECT md5(coalesce(string_agg(${rowText("cc", ["created_at"])}, '|' ORDER BY cc::text), ''))
+        FROM civica_conditions_calculations cc),
+      (SELECT md5(coalesce(string_agg(${rowText("cs", ["created_at"])}, '|' ORDER BY cs::text), ''))
+        FROM civica_conditions_scores cs),
+      (SELECT md5(coalesce(string_agg(${rowText("cm", ["created_at"])}, '|' ORDER BY cm::text), ''))
+        FROM civica_conditions_components cm)
     )) AS fingerprint
   `;
 }
