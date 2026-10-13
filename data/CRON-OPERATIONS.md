@@ -113,7 +113,7 @@ so the production database is busy once and can suspend the rest of the day:
 
 The data imports keep their own earlier slots (01:00–06:30 UTC daily, plus
 monthly and quarterly publisher syncs). The page rebuild,
-`operations.refresh-pages`, runs inside that import window at 06:00 UTC on
+`operations.refresh-pages`, runs inside that import window at 07:00 UTC on
 odd-numbered days (see below). The owner-Mac Pulse runner (APR-D176) is not a
 Vercel job: it retrieves GDELT, clusters, classifies, and calls the score
 route later in the day, so it wakes the database once more, and the Pulse
@@ -127,13 +127,12 @@ queued after 09:15 can therefore be past its deadline when first flagged.
 ### Page rebuild every two days (PLT-033, APR-D178)
 
 Database-backed public pages are always served from the page cache. Owner
-rule (2026-10-12): pages are rebuilt every other day at 03:00 Uruguay time
-(06:00 UTC, schedule `0 6 */2 * *`), when the site is quietest, and never
+rule (2026-10-12): pages are rebuilt every other day at 04:00 Uruguay time
+(07:00 UTC, schedule `0 7 */2 * *`), when the site is quietest, and never
 because a visitor or crawler arrived. Each page declares a 72-hour
 `revalidate` backstop that only takes effect if this job stops running; do
 not shorten it below the 48-hour cadence and do not return pages to
-`revalidate = 0`. Data from jobs that finish after 06:00 UTC (the 06:30 cache
-refresh and Pulse) reaches pages at the next rebuild. The day-of-month step
+`revalidate = 0`. Data from jobs that finish after 07:00 UTC (Pulse) reaches pages at the next rebuild. The day-of-month step
 restarts each month, so a 31-day month rebuilds on the 31st and again on the
 1st. The job reads the
 sitemap, calls `revalidatePath("/", "layout")` so every cached page is marked

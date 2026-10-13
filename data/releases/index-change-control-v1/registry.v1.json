@@ -44465,25 +44465,25 @@
         "documentation": [
           {
             "path": "plan/evidence/APR-D178/index-change-note.md",
-            "sha256": "036d766b34c8f97e9ca199d109cecdb8995adbad219739b12f6eafe8e1f9130c"
+            "sha256": "ea66fbcbb12fa4fcaf6507bd1f58942db977d74a0383096d6b5fd65926cbc5af"
           }
         ],
         "registry": [
           {
             "path": "src/lib/platform/cache-consistency.ts",
-            "sha256": "e4f116e3cfdd371803ee60c7b18da9a33753f9010a2bd9d4ed03950cdf1803d2"
+            "sha256": "2fdf7998e0c5b905ff0bdfd761dbb1f2a58691dee34e32d0ac834826326777a9"
           }
         ],
         "release_note": [
           {
             "path": "plan/evidence/APR-D178/index-change-note.md",
-            "sha256": "036d766b34c8f97e9ca199d109cecdb8995adbad219739b12f6eafe8e1f9130c"
+            "sha256": "ea66fbcbb12fa4fcaf6507bd1f58942db977d74a0383096d6b5fd65926cbc5af"
           }
         ],
         "migration_plan": [
           {
             "path": "plan/evidence/APR-D178/index-change-note.md",
-            "sha256": "036d766b34c8f97e9ca199d109cecdb8995adbad219739b12f6eafe8e1f9130c"
+            "sha256": "ea66fbcbb12fa4fcaf6507bd1f58942db977d74a0383096d6b5fd65926cbc5af"
           }
         ],
         "golden_test": [

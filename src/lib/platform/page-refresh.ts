@@ -8,7 +8,7 @@ import { unescapeSitemapUrl } from "@/lib/seo/sitemap-xml";
  * PLT-033 / APR-D178 — scheduled page rebuild.
  *
  * `operations.refresh-pages` invalidates the whole page cache every other day
- * at 06:00 UTC, then requests every cacheable sitemap URL so the
+ * at 07:00 UTC, then requests every cacheable sitemap URL so the
  * database does its rendering in one bounded window instead of whenever a
  * crawler first arrives.
  *

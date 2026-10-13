@@ -407,9 +407,9 @@ test("daily operations run in dependency order inside the 08:00–10:30 UTC wind
   assert.ok(order.every((minute) => minute >= 8 * 60 && minute <= 10 * 60 + 30));
 });
 
-test("pages are rebuilt every other day at 03:00 Uruguay time (APR-D178)", () => {
+test("pages are rebuilt every other day at 04:00 Uruguay time (APR-D178)", () => {
   const refresh = (
     vercelConfig.crons as Array<{ path: string; schedule: string }>
   ).find(({ path }) => path === "/api/cron/operations/refresh-pages");
-  assert.equal(refresh?.schedule, "0 6 */2 * *");
+  assert.equal(refresh?.schedule, "0 7 */2 * *");
 });

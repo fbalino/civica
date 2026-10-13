@@ -7,8 +7,8 @@ Change record: `apr-d178-page-rebuild-2026-10-12` (APR-D178, amending APR-D177).
 - Every cached database-backed page, including the protected Index pages,
   declares `revalidate = 259200` (72 hours) instead of `revalidate = 86400`.
   The value is only a backstop; pages are rebuilt by the scheduled job.
-- `operations.refresh-pages` runs every other day at 06:00 UTC
-  (`0 6 */2 * *`, 03:00 in Uruguay) instead of daily at 10:00 UTC. Its
+- `operations.refresh-pages` runs every other day at 07:00 UTC
+  (`0 7 */2 * *`, 04:00 in Uruguay) instead of daily at 10:00 UTC. Its
   comments and the cache-consistency constant follow.
 
 ## What did not change
@@ -16,8 +16,8 @@ Change record: `apr-d178-page-rebuild-2026-10-12` (APR-D178, amending APR-D177).
 No Index input selection, transform, weight, model, release, or presented
 value changed. The same rows render with the same labels. The only
 reader-visible difference is when a page is rebuilt: every other day at
-06:00 UTC instead of daily at 10:00 UTC. Data that lands after 06:00 UTC
-(the 06:30 cache refresh and Pulse) reaches pages at the next rebuild.
+07:00 UTC instead of daily at 10:00 UTC. Data that lands after 07:00 UTC
+(Pulse) reaches pages at the next rebuild.
 
 ## Release and migration
 

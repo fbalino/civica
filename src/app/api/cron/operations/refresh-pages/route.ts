@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 800;
 
 /**
- * PLT-033 / APR-D178 — runs every other day at 06:00 UTC (03:00 in Uruguay),
+ * PLT-033 / APR-D178 — runs every other day at 07:00 UTC (04:00 in Uruguay),
  * the owner's chosen quiet hour. It marks every cached page for re-rendering,
  * then requests each cacheable sitemap URL so the pages are rebuilt now
  * rather than on a crawler's first visit. Pages are never rebuilt per visit.

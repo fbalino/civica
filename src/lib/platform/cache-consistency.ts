@@ -16,7 +16,7 @@ import { ROUTE_INVENTORY } from "@/lib/api/route-inventory/registry";
  *
  * PLT-033 (APR-D177, APR-D178) — database-backed public pages are always
  * served from the page cache. `operations.refresh-pages` rebuilds them every
- * other day at 06:00 UTC (03:00 in Uruguay), when traffic is lowest; each page
+ * other day at 07:00 UTC (04:00 in Uruguay), when traffic is lowest; each page
  * declares the literal `revalidate = 259200` (three days) only as a backstop
  * should that job fail. A page stays request-live only when it is
  * listed in `LIVE_PAGE_ROUTES`: it is private to a signed-in session, or it
