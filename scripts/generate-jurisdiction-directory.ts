@@ -58,6 +58,9 @@ async function main() {
       console.log(
         `${JURISDICTION_DIRECTORY_VERSION}: unchanged (${rows.length} rows, sha ${rowsSha256.slice(0, 12)}…); no write.`,
       );
+      // The artifact is unchanged, but the public asset may be missing or
+      // its projection may have changed; regenerating it is idempotent.
+      generatePublicAsset();
       return;
     }
   }
@@ -74,6 +77,10 @@ async function main() {
     `Wrote ${JURISDICTION_DIRECTORY_VERSION}: ${rows.length} rows, sha ${rowsSha256.slice(0, 12)}….`,
   );
   // Keep the public, content-addressed asset in step with the artifact.
+  generatePublicAsset();
+}
+
+function generatePublicAsset(): void {
   execFileSync("npx", ["tsx", "scripts/generate-jurisdiction-directory-asset.ts"], {
     stdio: "inherit",
   });
