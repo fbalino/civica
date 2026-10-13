@@ -2,7 +2,7 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { bills, governmentBodies } from "@/lib/db/schema";
 import { getBillsForJurisdiction } from "@/lib/db/queries";
-import { SourceDot } from "@/components/SourceDot";
+import { SourceDot, SourceDotLegend } from "@/components/SourceDot";
 import { Banner } from "@/components/editorial/Banner";
 import {
   BILLS_SOURCE_LABELS,
@@ -205,6 +205,8 @@ export async function FactbookBills({
     /* best-effort */
   }
 
+  const legendScope = `bills-${countrySlug}`;
+
   return (
     <div className="factbook-bills-list">
       <Banner variant="info" className="factbook-bill-coverage-note">
@@ -217,6 +219,15 @@ export async function FactbookBills({
         <a href="/methodology/source-coverage#bills">source coverage report</a>{" "}
         for per-jurisdiction freshness.
       </Banner>
+      {/* Every bill's dot repeats its source's disclosure; describe each
+          distinct disclosure once and let the dots reference it. */}
+      <SourceDotLegend
+        scope={legendScope}
+        dots={result.rows.map((b) => ({
+          source: b.sourceId,
+          retrievedAt: sourceMap.get(b.sourceId) ?? null,
+        }))}
+      />
       {result.rows.map((b, i) => {
         const title = b.longTitle ? `${b.title} - ${b.longTitle}` : b.title;
         const tag = SOURCE_TAG[b.sourceId] ?? b.sourceId;
@@ -254,7 +265,11 @@ export async function FactbookBills({
                 {chamberLabel && (
                   <span className="factbook-bill-tag">{chamberLabel}</span>
                 )}
-                <SourceDot source={b.sourceId} retrievedAt={lastSyncAt} />
+                <SourceDot
+                  source={b.sourceId}
+                  retrievedAt={lastSyncAt}
+                  legendScope={legendScope}
+                />
                 {b.introducedDate && (
                   <span className="factbook-bill-meta">
                     Introduced {b.introducedDate}

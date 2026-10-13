@@ -1829,21 +1829,26 @@ svg.factbook-legislature-hemi {
   height: auto;
   display: block;
 }
-svg.factbook-legislature-hemi .factbook-legislature-seat {
+/* Seats are drawn as one group per run of seats sharing a party; the group
+   carries the paint and dim state, each <circle> only its position. */
+svg.factbook-legislature-hemi .factbook-legislature-seat-run > circle {
   cursor: pointer;
-  transition: transform 100ms ease, opacity 120ms ease;
+  transition: transform 100ms ease;
   transform-origin: center;
   transform-box: fill-box;
 }
-svg.factbook-legislature-hemi .factbook-legislature-seat:hover {
+svg.factbook-legislature-hemi .factbook-legislature-seat-run > circle:hover {
   transform: scale(1.9);
 }
-svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
+svg.factbook-legislature-hemi .factbook-legislature-seat-run {
+  transition: opacity 120ms ease;
+}
+svg.factbook-legislature-hemi .factbook-legislature-seat-run.is-dim {
   opacity: 0.12;
 }
 /* A seat with no reported party: open neutral seat, never a party colour and
    never dimmed or selected with the party rows. */
-svg.factbook-legislature-hemi .factbook-legislature-seat--unattributed {
+svg.factbook-legislature-hemi .factbook-legislature-seat-run--unattributed {
   fill: var(--color-seat-unattributed);
   stroke: var(--color-seat-unattributed-ring);
   stroke-width: var(--stroke-seat-unattributed);

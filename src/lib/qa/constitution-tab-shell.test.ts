@@ -13,6 +13,8 @@ import { readFileSync } from "node:fs";
 
 const TAB = "src/app/(reader)/country/[slug]/constitution/page.tsx";
 const READER = "src/components/constitution/ConstitutionReadingColumn.tsx";
+const BODY = "src/components/constitution/ConstitutionReader.tsx";
+const ISLAND = "src/components/constitution/ConstitutionHashFocus.tsx";
 
 test("the constitution tab composes the shared country-tab shell", () => {
   const src = readFileSync(TAB, "utf8");
@@ -30,8 +32,12 @@ test("the constitution tab composes the shared country-tab shell", () => {
 
 test("the tab renders the reading body with the outline in the shared sidebar", () => {
   const src = readFileSync(TAB, "utf8");
-  // The in-column outline is suppressed; the shared FactbookSidebar owns nav.
-  assert.match(src, /showOutline=\{false\}/);
+  // The text renders on the server with no in-column outline; the shared
+  // FactbookSidebar owns nav. The interactive Explorer column is not used, so
+  // the full text never crosses into a client component as a prop.
+  assert.match(src, /constitution-reader-layout--no-outline/);
+  assert.match(src, /<ConstitutionReaderBody sections=\{sections\} \/>/);
+  assert.doesNotMatch(src, /ConstitutionReadingColumn/);
 });
 
 test("the tab does not reintroduce the bespoke constitution shell", () => {
@@ -48,9 +54,15 @@ test("no heading duplicates the country name", () => {
   assert.doesNotMatch(src, /available for \{jurisdiction\.name\}/);
 });
 
-test("the reading column defaults showOutline to true (standalone Explorer safe)", () => {
+test("the Explorer reading column keeps its own outline", () => {
   const src = readFileSync(READER, "utf8");
-  assert.match(src, /showOutline = true/);
-  // The no-outline layout variant exists for the country tab.
-  assert.match(src, /constitution-reader-layout--no-outline/);
+  assert.match(src, /className="constitution-reader-nav"/);
+  assert.match(src, /<ConstitutionReaderBody /);
+});
+
+test("the shared body is server-safe and its island takes no props", () => {
+  const body = readFileSync(BODY, "utf8");
+  assert.doesNotMatch(body, /^"use client"/);
+  const island = readFileSync(ISLAND, "utf8");
+  assert.match(island, /export function ConstitutionHashFocus\(\)/);
 });

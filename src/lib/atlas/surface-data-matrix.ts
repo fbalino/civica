@@ -1173,7 +1173,7 @@ countryRows.push(
     id: "country.constitution.reader",
     kind: "country_module",
     route: "/country/[slug]/constitution",
-    renderer: "src/components/constitution/ConstitutionReadingColumn.tsx",
+    renderer: "src/components/constitution/ConstitutionReader.tsx",
     dataAccess: [
       {
         symbol: "getConstitutionWithArticles",

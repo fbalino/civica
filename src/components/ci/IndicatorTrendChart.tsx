@@ -387,9 +387,7 @@ export function IndicatorTrendChart({
                   y={y + 3.5}
                   textAnchor="end"
                   fontSize={11}
-                  fontFamily="var(--font-body)"
-                  fill="var(--color-text-50)"
-                  style={{ fontVariantNumeric: "tabular-nums" }}
+                  className="indicator-trend-tick"
                 >
                   {t}
                 </text>
@@ -496,9 +494,7 @@ export function IndicatorTrendChart({
               y={PLOT_Y + PLOT_H + 18}
               textAnchor="middle"
               fontSize={11}
-              fontFamily="var(--font-body)"
-              fill="var(--color-text-50)"
-              style={{ fontVariantNumeric: "tabular-nums" }}
+              className="indicator-trend-tick"
             >
               {year}
             </text>

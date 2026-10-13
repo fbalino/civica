@@ -552,7 +552,7 @@ export const PROVENANCE_RENDERERS: readonly ProvenanceRenderer[] = [
     note: "Constitution search passages.",
   },
   {
-    file: "src/components/constitution/ConstitutionReadingColumn.tsx",
+    file: "src/components/constitution/ConstitutionReader.tsx",
     class: "records_only",
     note: "Constitution text and its year.",
   },
