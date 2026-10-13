@@ -1,14 +1,14 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-10-13T00:45:20.282Z",
+  "generatedAt": "2026-10-13T03:10:28.685Z",
   "authoritativeManifest": {
     "head": {
       "id": "0052_page_cache_fingerprints",
-      "sha256": "d798b168bbec052c26b0045a52d45412b803c174dd0556c57a02bd3074893491"
+      "sha256": "bad400ac2352368d5e446f30da2a36de6fc2f41e2d6450c8b200cb87a884b896"
     },
-    "sha256": "1b7a3ffc91f754fad154dae1b3f7cd35f395c0dde897d44883abc2cfef4a1734"
+    "sha256": "bb06470f0c2bfe7006b11cb04a6ce9be325bcd326f40b2cad23a6beec2693bb5"
   },
-  "sha256": "ad0aa74c154a63e31bd5f891398b3fc075c6bfa901cc0bac25691a172360048f",
+  "sha256": "06f2107456f3242210988c2e86ba565500e69004bec285f315078b260c344677",
   "schema": {
     "columns": [
       {
@@ -17893,7 +17893,7 @@
         "name": "page_cache_fingerprint_shape_check",
         "type": "c",
         "table": "page_cache_fingerprints",
-        "definition": "CHECK ((page_key = 'site'::text OR page_key ~ '^country:[0-9a-f-]{36}$'::text) AND fingerprint ~ '^[a-f0-9]{64}$'::text AND length(fingerprint_version) >= 1 AND length(fingerprint_version) <= 64 AND fingerprint_version ~ '^[a-z0-9./-]+$'::text)"
+        "definition": "CHECK ((page_key = 'site'::text OR length(page_key) <= 208 AND page_key ~ '^country:[a-z0-9]+(-[a-z0-9]+)*$'::text) AND fingerprint ~ '^[a-f0-9]{64}$'::text AND length(fingerprint_version) >= 1 AND length(fingerprint_version) <= 64 AND fingerprint_version ~ '^[a-z0-9./-]+$'::text)"
       },
       {
         "name": "page_cache_fingerprints_pkey",

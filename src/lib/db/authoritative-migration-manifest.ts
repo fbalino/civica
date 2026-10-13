@@ -316,7 +316,7 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     id: "0052_page_cache_fingerprints",
     path: "drizzle/authoritative/0052_page_cache_fingerprints.sql",
     sha256:
-      "d798b168bbec052c26b0045a52d45412b803c174dd0556c57a02bd3074893491",
+      "bad400ac2352368d5e446f30da2a36de6fc2f41e2d6450c8b200cb87a884b896",
     baseline: false,
   },
 ] as const;
