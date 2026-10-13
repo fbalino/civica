@@ -2,7 +2,7 @@ import { config } from "dotenv";
 config({ path: ".env.local", quiet: true });
 
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
 
@@ -14,7 +14,6 @@ import {
 } from "../src/lib/jurisdictions/directory";
 import {
   JURISDICTION_DIRECTORY_ASSET_DIR,
-  JURISDICTION_DIRECTORY_ASSET_FILE_PATTERN,
   buildJurisdictionDirectoryAsset,
   jurisdictionDirectoryAssetPath,
   renderJurisdictionDirectoryAssetModule,
@@ -80,11 +79,8 @@ for (const row of artifact.rows) {
   ) {
     errors.push(`public asset ${assetPath} does not match the checked artifact`);
   }
-  for (const existing of existsSync(dir) ? readdirSync(dir) : []) {
-    if (JURISDICTION_DIRECTORY_ASSET_FILE_PATTERN.test(existing) && existing !== fileName) {
-      errors.push(`superseded public asset ${existing} is still present`);
-    }
-  }
+  // Superseded hashed assets stay published so pages loaded before a
+  // deployment can still fetch the list they reference.
   const modulePath = resolve(
     process.cwd(),
     "src/lib/jurisdictions/directory-asset.generated.ts",

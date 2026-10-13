@@ -1,8 +1,6 @@
 import {
   mkdirSync,
   readFileSync,
-  readdirSync,
-  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { resolve } from "node:path";
@@ -10,7 +8,6 @@ import { resolve } from "node:path";
 import type { JurisdictionDirectoryArtifact } from "../src/lib/jurisdictions/directory";
 import {
   JURISDICTION_DIRECTORY_ASSET_DIR,
-  JURISDICTION_DIRECTORY_ASSET_FILE_PATTERN,
   buildJurisdictionDirectoryAsset,
   jurisdictionDirectoryAssetPath,
   renderJurisdictionDirectoryAssetModule,
@@ -36,15 +33,9 @@ const path = jurisdictionDirectoryAssetPath(artifact.rowsSha256);
 const fileName = path.split("/").pop()!;
 
 mkdirSync(DIR, { recursive: true });
-for (const existing of readdirSync(DIR)) {
-  if (
-    JURISDICTION_DIRECTORY_ASSET_FILE_PATTERN.test(existing) &&
-    existing !== fileName
-  ) {
-    unlinkSync(resolve(DIR, existing));
-    console.log(`Removed superseded asset ${existing}.`);
-  }
-}
+// Superseded hashed assets are kept, not removed: a page loaded before a
+// deployment still holds the old URL and fetches it on first search focus.
+// The directory changes a few times a year and each file is ~33 KB.
 writeFileSync(
   resolve(DIR, fileName),
   serializeJurisdictionDirectoryAsset(buildJurisdictionDirectoryAsset(artifact)),
