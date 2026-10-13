@@ -13,6 +13,11 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CountryFlag } from "@/components/CountryFlag";
 import {
+  clampSelectedIndex,
+  filterCountryOptions,
+  nextSelectedIndex,
+} from "@/components/country-search-model";
+import {
   useJurisdictionDirectory,
   type DirectoryScope,
 } from "@/lib/jurisdictions/use-jurisdiction-directory";
@@ -85,20 +90,13 @@ export function CountrySearchCombobox({
     explicitCountries ?? directory.countries;
   const loadDirectory = directory.load;
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return countries
-      .filter((country) => {
-        return (
-          country.name.toLowerCase().includes(q) ||
-          country.capital?.toLowerCase().includes(q) ||
-          country.iso2?.toLowerCase().includes(q) ||
-          country.iso3?.toLowerCase().includes(q)
-        );
-      })
-      .slice(0, 8);
-  }, [countries, query]);
+  const filtered = useMemo(
+    () => filterCountryOptions(countries, query),
+    [countries, query],
+  );
+  // The shared directory can arrive (or the list shrink) after a key press;
+  // always read the selection through the clamp so Enter acts on a real row.
+  const activeIdx = clampSelectedIndex(selectedIdx, filtered.length);
 
   useEffect(() => {
     if (!autoFocus) return;
@@ -159,13 +157,13 @@ export function CountrySearchCombobox({
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      setSelectedIdx((idx) => Math.min(idx + 1, filtered.length - 1));
+      setSelectedIdx((idx) => nextSelectedIndex(idx, 1, filtered.length));
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
-      setSelectedIdx((idx) => Math.max(idx - 1, 0));
-    } else if (event.key === "Enter" && filtered[selectedIdx]) {
+      setSelectedIdx((idx) => nextSelectedIndex(idx, -1, filtered.length));
+    } else if (event.key === "Enter" && filtered[activeIdx]) {
       event.preventDefault();
-      selectCountry(filtered[selectedIdx]);
+      selectCountry(filtered[activeIdx]);
     } else if (event.key === "Escape") {
       setOpen(false);
       inputRef.current?.blur();
@@ -237,9 +235,9 @@ export function CountrySearchCombobox({
               key={country.slug}
               type="button"
               role="option"
-              aria-selected={index === selectedIdx}
+              aria-selected={index === activeIdx}
               className={`country-search__result${
-                index === selectedIdx ? " is-selected" : ""
+                index === activeIdx ? " is-selected" : ""
               }`}
               onMouseEnter={() => setSelectedIdx(index)}
               onClick={() => selectCountry(country)}

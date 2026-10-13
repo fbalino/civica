@@ -26,6 +26,7 @@ export type JurisdictionDirectoryAssetRow = {
   slug: string;
   name: string;
   iso2: string | null;
+  iso3: string | null;
   capital: string | null;
   statusLabel: string;
   /** True only for `sovereign_state` rows (the footer's search universe). */
@@ -59,6 +60,7 @@ export function buildJurisdictionDirectoryAsset(
       slug: row.slug,
       name: row.name,
       iso2: row.iso2,
+      iso3: row.iso3,
       capital: row.capital,
       statusLabel: row.statusLabel,
       sovereign: row.statusType === "sovereign_state",

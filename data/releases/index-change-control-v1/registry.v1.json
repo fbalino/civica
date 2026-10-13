@@ -45125,7 +45125,7 @@
         "registry": [
           {
             "path": "src/lib/jurisdictions/directory-asset.ts",
-            "sha256": "89fbe1bba3131592907fd3f11ed31d28885b48cf15b6401a688fdfc65edd6167"
+            "sha256": "709d2b95cc194d06023221bf52a8fb3a7a4c301d88fad33e24b890871694af7e"
           }
         ],
         "release_note": [
@@ -45143,7 +45143,7 @@
         "golden_test": [
           {
             "path": "src/lib/jurisdictions/directory-asset.test.ts",
-            "sha256": "1387168057843f1cd0b40433043aca62c721d62e24729fb74dcd0c3c2c0a98fe"
+            "sha256": "6aeec03422795462d50010db342b508f2e7aa464b5d8ff7d12837c60f8457ecc"
           }
         ],
         "contract_test": [

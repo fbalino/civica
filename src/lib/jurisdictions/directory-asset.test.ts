@@ -38,6 +38,7 @@ test("the asset carries only displayed fields and marks the sovereign universe",
   assert.deepEqual(Object.keys(asset.rows[0]).sort(), [
     "capital",
     "iso2",
+    "iso3",
     "name",
     "slug",
     "sovereign",
