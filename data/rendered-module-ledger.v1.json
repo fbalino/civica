@@ -7513,6 +7513,35 @@
       }
     },
     {
+      "id": "src/app/(admin)/admin/pulse-review/[id]/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/admin/pulse-review/[id]",
+      "routeSource": "src/app/(admin)/admin/pulse-review/[id]/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(admin)/admin/pulse-review/[id]/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/admin/pulse-review/[id]",
       "routeSource": "src/app/(admin)/admin/pulse-review/[id]/page.tsx",
@@ -8242,6 +8271,35 @@
       "route": "/admin/pulse-review",
       "routeSource": "src/app/(admin)/admin/pulse-review/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(admin)/admin/pulse-review/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/admin/pulse-review",
+      "routeSource": "src/app/(admin)/admin/pulse-review/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -12530,6 +12588,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/atlas/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/atlas",
+      "routeSource": "src/app/(reader)/atlas/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/atlas-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/atlas/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/atlas",
       "routeSource": "src/app/(reader)/atlas/page.tsx",
@@ -15459,6 +15546,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-index/methodology/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/civica-index/methodology",
+      "routeSource": "src/app/(reader)/civica-index/methodology/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-index/methodology/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/civica-index/methodology",
       "routeSource": "src/app/(reader)/civica-index/methodology/page.tsx",
@@ -16362,6 +16478,35 @@
       "route": "/civica-index/methodology/pca-appendix",
       "routeSource": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/civica-index/methodology/pca-appendix",
+      "routeSource": "src/app/(reader)/civica-index/methodology/pca-appendix/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -18910,6 +19055,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/civica-index/methodology/pulse/backtest/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/civica-index/methodology/pulse/backtest",
+      "routeSource": "src/app/(reader)/civica-index/methodology/pulse/backtest/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/civica-index/methodology/pulse/backtest/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/civica-index/methodology/pulse/backtest",
       "routeSource": "src/app/(reader)/civica-index/methodology/pulse/backtest/page.tsx",
@@ -21321,6 +21495,35 @@
       "route": "/civica-index/pulse-changelog",
       "routeSource": "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/pulse-ledger-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/civica-index/pulse-changelog/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/civica-index/pulse-changelog",
+      "routeSource": "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -24739,6 +24942,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/country/[slug]/civica-data/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/country/[slug]/civica-data",
+      "routeSource": "src/app/(reader)/country/[slug]/civica-data/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-civica-data-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/country/[slug]/civica-data/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/country/[slug]/civica-data",
       "routeSource": "src/app/(reader)/country/[slug]/civica-data/page.tsx",
@@ -26106,6 +26338,35 @@
       "route": "/country/[slug]/constitution",
       "routeSource": "src/app/(reader)/country/[slug]/constitution/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/country/[slug]/constitution/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/country/[slug]/constitution",
+      "routeSource": "src/app/(reader)/country/[slug]/constitution/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -27585,6 +27846,35 @@
       "route": "/country/[slug]",
       "routeSource": "src/app/(reader)/country/[slug]/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/country-factbook-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/country/[slug]/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/country/[slug]",
+      "routeSource": "src/app/(reader)/country/[slug]/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -30742,6 +31032,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/governance-change/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/governance-change",
+      "routeSource": "src/app/(reader)/governance-change/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/governance-change/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/governance-change",
       "routeSource": "src/app/(reader)/governance-change/page.tsx",
@@ -31558,6 +31877,35 @@
       "route": "/leaders",
       "routeSource": "src/app/(reader)/leaders/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/leaders/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/leaders",
+      "routeSource": "src/app/(reader)/leaders/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -36281,6 +36629,35 @@
       }
     },
     {
+      "id": "src/app/(reader)/organizations/[slug]/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/organizations/[slug]",
+      "routeSource": "src/app/(reader)/organizations/[slug]/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/(reader)/organizations/[slug]/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/organizations/[slug]",
       "routeSource": "src/app/(reader)/organizations/[slug]/page.tsx",
@@ -40548,6 +40925,35 @@
       "route": "/about",
       "routeSource": "src/app/about/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/about/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/about",
+      "routeSource": "src/app/about/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -46199,6 +46605,35 @@
       }
     },
     {
+      "id": "src/app/compare/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/compare",
+      "routeSource": "src/app/compare/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/compare-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/compare/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/compare",
       "routeSource": "src/app/compare/page.tsx",
@@ -47214,6 +47649,35 @@
       }
     },
     {
+      "id": "src/app/constitution/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/constitution",
+      "routeSource": "src/app/constitution/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/constitution/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/constitution",
       "routeSource": "src/app/constitution/page.tsx",
@@ -47972,6 +48436,35 @@
       "route": "/constitution/search",
       "routeSource": "src/app/constitution/search/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/constitution/search/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/constitution/search",
+      "routeSource": "src/app/constitution/search/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -49998,6 +50491,35 @@
       }
     },
     {
+      "id": "src/app/design-system/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/design-system",
+      "routeSource": "src/app/design-system/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/design-system-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/design-system/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/design-system",
       "routeSource": "src/app/design-system/page.tsx",
@@ -50698,6 +51220,35 @@
       "route": "/elections",
       "routeSource": "src/app/elections/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/elections-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/elections/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/elections",
+      "routeSource": "src/app/elections/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -51481,6 +52032,35 @@
       "route": "/elections/systems",
       "routeSource": "src/app/elections/systems/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/elections/systems/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/elections/systems",
+      "routeSource": "src/app/elections/systems/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -54265,6 +54845,35 @@
       "route": "/governance-evidence",
       "routeSource": "src/app/governance-evidence/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/governance-evidence/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/governance-evidence",
+      "routeSource": "src/app/governance-evidence/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -57306,6 +57915,35 @@
       }
     },
     {
+      "id": "src/app/parties/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/parties",
+      "routeSource": "src/app/parties/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
       "id": "src/app/parties/page.tsx:src/components/ThemedDecorativeImage.tsx",
       "route": "/parties",
       "routeSource": "src/app/parties/page.tsx",
@@ -58876,6 +59514,35 @@
       "route": "/rankings",
       "routeSource": "src/app/rankings/page.tsx",
       "moduleSource": "src/components/SourceDot.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/rankings/page.tsx:src/components/SourceDotLegendTooltips.tsx",
+      "route": "/rankings",
+      "routeSource": "src/app/rankings/page.tsx",
+      "moduleSource": "src/components/SourceDotLegendTooltips.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
