@@ -19,7 +19,7 @@ import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
-export const revalidate = 259200;
+export const revalidate = 2592000;
 
 // Worked Example 1 (Argentina inflation) derives its threshold from the
 // fact-keys registry rather than retyping it, so the prose can never drift

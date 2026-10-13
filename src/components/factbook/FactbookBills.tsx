@@ -1,6 +1,6 @@
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { bills, governmentBodies, sources } from "@/lib/db/schema";
+import { bills, governmentBodies } from "@/lib/db/schema";
 import { getBillsForJurisdiction } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
 import { Banner } from "@/components/editorial/Banner";
@@ -29,7 +29,7 @@ import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
  * state can be mistaken for an absence of legislative activity.
  *
  * Provenance: each row carries a SourceDot tied to the bill's
- * `sourceId` plus the matching `sources.last_sync_at` timestamp. A
+ * `sourceId` plus this country's latest bill record from that source. A
  * coverage banner names the six supported jurisdictions and links to the
  * generated domain-coverage report (source, freshness, jurisdiction count).
  *
@@ -124,18 +124,30 @@ export async function FactbookBills({
     );
   }
 
-  // Look up sources.last_sync_at once for the distinct sources in
-  // the result so each bill row carries its own provenance dot.
+  // APR-D179: each source's date is this country's own latest bill record
+  // from that source, not the source-wide sync time, so the cached page
+  // changes only when this country's bills change.
   const sourceIds = Array.from(new Set(result.rows.map((b) => b.sourceId)));
   const sourceMap = new Map<string, string | null>();
   if (sourceIds.length > 0) {
     try {
       const rows = await db
-        .select({ id: sources.id, lastSyncAt: sources.lastSyncAt })
-        .from(sources)
-        .where(inArray(sources.id, sourceIds));
+        .select({
+          id: bills.sourceId,
+          latest: sql<Date | null>`max(${bills.updatedAt})`.mapWith(
+            bills.updatedAt,
+          ),
+        })
+        .from(bills)
+        .where(
+          and(
+            eq(bills.jurisdictionId, result.jurisdiction.id),
+            inArray(bills.sourceId, sourceIds),
+          ),
+        )
+        .groupBy(bills.sourceId);
       for (const r of rows) {
-        sourceMap.set(r.id, r.lastSyncAt ? r.lastSyncAt.toISOString() : null);
+        sourceMap.set(r.id, r.latest ? r.latest.toISOString() : null);
       }
     } catch (error) {
       // A failed read aborts the cached render (PLT-033).

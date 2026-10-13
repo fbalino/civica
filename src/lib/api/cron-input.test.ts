@@ -128,3 +128,25 @@ test("cron bodies and retired-route inputs are rejected", () => {
     { ok: false, problem: "unknown_query_parameter" },
   );
 });
+
+test("the page rebuild accepts force=all or a short list of country slugs", () => {
+  const check = (query: string) =>
+    validateCronInput(
+      "operations.refresh-pages",
+      request(`/api/cron/operations/refresh-pages?${query}`),
+    );
+  assert.deepEqual(check("force=all"), { ok: true });
+  assert.deepEqual(check("force=japan,united-states&dryRun=1"), { ok: true });
+  assert.deepEqual(check("force=Japan"), {
+    ok: false,
+    problem: "invalid_query_parameter",
+  });
+  assert.deepEqual(check("force=japan,,france"), {
+    ok: false,
+    problem: "invalid_query_parameter",
+  });
+  assert.deepEqual(
+    check(`force=${Array.from({ length: 21 }, (_, i) => `c${i}`).join(",")}`),
+    { ok: false, problem: "invalid_query_parameter" },
+  );
+});

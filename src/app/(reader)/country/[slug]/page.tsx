@@ -30,10 +30,14 @@ import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
 import { captureAtlasSurfaceQuery } from "@/lib/atlas/surface-query-state";
 import { fallbackWithoutDatabase, isCachedRenderFailure } from "@/lib/platform/cached-render";
+import {
+  getCountrySourceDates,
+  withCountrySourceDates,
+} from "@/lib/db/queries-country-source-dates";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
-export const revalidate = 259200;
+export const revalidate = 2592000;
 
 // No paths render at build time. Each one renders on its first visit (or the
 // daily warm-up) and is then served from the page cache.
@@ -82,7 +86,14 @@ export default async function CountryFactbookTab({
   const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
-  const [sectionsResult, countryOptions, headerFacts, citeSources, allSources] =
+  const [
+    sectionsResult,
+    countryOptions,
+    headerFacts,
+    citeSources,
+    allSources,
+    countrySourceDates,
+  ] =
     await Promise.all([
       // Every read below aborts the cached render when it fails with a
       // configured database, so no degraded page is cached (PLT-033).
@@ -125,12 +136,15 @@ export default async function CountryFactbookTab({
       getDistinctActiveSourcesForJurisdiction(jurisdiction.id).catch(
         fallbackWithoutDatabase(() => [] as Array<{ id: string; name: string }>),
       ),
-      // Whole sources table → real `last_sync_at` dates for the right-rail
-      // "Sources on this page" list.
+      // Whole sources table for the right-rail "Sources on this page" list.
       getAllSources().catch(
         fallbackWithoutDatabase(
           () => [] as Awaited<ReturnType<typeof getAllSources>>,
         ),
+      ),
+      // This country's own latest retrieval per source (APR-D179).
+      getCountrySourceDates(jurisdiction.id).catch(
+        fallbackWithoutDatabase(() => new Map<string, Date>()),
       ),
     ]);
 
@@ -174,9 +188,11 @@ export default async function CountryFactbookTab({
   // Bank, IMF, national statistics offices, Wikidata, …). Derived from the
   // distinct-active-sources query rather than a static list, so a country
   // with 13 contributing sources shows 13, not a stub. Each entry carries
-  // its real source id (→ correct green/amber <SourceDot>) and real
-  // `last_sync_at` date.
-  const sourceById = new Map(allSources.map((s) => [s.id, s]));
+  // its real source id (→ correct green/amber <SourceDot>) and the date
+  // Civica last retrieved this country's rows from that source (APR-D179).
+  const sourceById = new Map(
+    withCountrySourceDates(allSources, countrySourceDates).map((s) => [s.id, s]),
+  );
   const formatSyncDate = (id: string, fallback: string): string => {
     const d = sourceById.get(id)?.lastSyncAt ?? null;
     return d ? d.toISOString().slice(0, 10) : fallback;

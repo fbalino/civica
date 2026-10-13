@@ -19,7 +19,7 @@ import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
-export const revalidate = 259200;
+export const revalidate = 2592000;
 
 export const metadata: Metadata = {
   title: "Civica Pulse Backtest Report (Beta)",

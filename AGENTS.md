@@ -51,20 +51,17 @@ unless it has been imported into the master checklist with a stable task ID.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
-## Next.js 16 Rules
+# This is NOT the Next.js you know
 
-This version has breaking changes. Read `node_modules/next/dist/docs/` before writing code.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
-- `params` and `searchParams` MUST be awaited (async)
-- `middleware.ts` is deprecated — use `proxy.ts`
-- Turbopack is default — config goes at top level of nextConfig
-- When cacheComponents is enabled, use `use cache` directive instead of `export const dynamic`
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
 
 ## Database
 
-- Schema: `src/lib/db/schema.ts` — **103 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **104 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
@@ -185,14 +182,23 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 ## Page caching (owner rule — do not reverse)
 
 - Public pages are ALWAYS served from the page cache. They are rebuilt only by
-  `operations.refresh-pages`, every other day at 07:00 UTC (04:00 in Uruguay).
-  A visit or crawler must never trigger a rebuild (APR-D177, APR-D178). The
-  one exception is a safety net: if that job has not run for 72 hours, the
-  next visit rebuilds the page, so a dead job cannot freeze the site.
-- Database-backed pages declare `export const revalidate = 259200;` (that
-  72-hour safety net). Never set a public page to `revalidate = 0` or shorten the window
-  to make data fresher; run `operations.refresh-pages` by hand instead.
+  `operations.refresh-pages`, nightly at 07:00 UTC (04:00 in Uruguay), and
+  only when the data they render changed: each country's three tabs are
+  rebuilt when that country's content fingerprint changes, and the other
+  pages when anything changed (APR-D177, APR-D178, APR-D179). A visit or
+  crawler must never trigger a rebuild. The one exception is a safety net: a
+  page not rebuilt for 30 days is rebuilt on its next visit, so a dead job
+  cannot freeze the site forever; `operations.pipeline-alerts` reports a
+  failed or missed run long before that.
+- Database-backed pages declare `export const revalidate = 2592000;` (that
+  30-day safety net). Never set a public page to `revalidate = 0` or shorten the window
+  to make data fresher; run `operations.refresh-pages` by hand instead
+  (`?force=<slug>` or `?force=all`, with an `Idempotency-Key`).
   `npm run validate:cache-consistency` enforces this.
+- Country pages show, per source, the date Civica last recorded that
+  country's own rows from it (`src/lib/db/queries-country-source-dates.ts`),
+  never the source-wide `sources.last_sync_at`, so a nightly import for one
+  country does not change every country page.
 
 ## Atlas bulk export
 

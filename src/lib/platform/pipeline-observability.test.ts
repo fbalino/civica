@@ -407,9 +407,20 @@ test("daily operations run in dependency order inside the 08:00–10:30 UTC wind
   assert.ok(order.every((minute) => minute >= 8 * 60 && minute <= 10 * 60 + 30));
 });
 
-test("pages are rebuilt every other day at 04:00 Uruguay time (APR-D178)", () => {
-  const refresh = (
-    vercelConfig.crons as Array<{ path: string; schedule: string }>
-  ).find(({ path }) => path === "/api/cron/operations/refresh-pages");
-  assert.equal(refresh?.schedule, "0 7 */2 * *");
+test("changed pages are rebuilt nightly at 04:00 Uruguay time, after the imports (APR-D179)", () => {
+  const crons = vercelConfig.crons as Array<{ path: string; schedule: string }>;
+  const refresh = crons.find(
+    ({ path }) => path === "/api/cron/operations/refresh-pages",
+  );
+  assert.equal(refresh?.schedule, "0 7 * * *");
+  // Every daily data import finishes its slot before the 07:00 UTC rebuild.
+  for (const { path, schedule } of crons) {
+    const [minute, hour, dayOfMonth, month, dayOfWeek] = schedule.split(" ");
+    const daily = dayOfMonth === "*" && month === "*" && dayOfWeek === "*";
+    if (!daily || !/^\/api\/cron\/(bills|factbook)\//.test(path)) continue;
+    assert.ok(
+      Number(hour) * 60 + Number(minute) < 7 * 60,
+      `${path} must run before the 07:00 UTC page rebuild`,
+    );
+  }
 });

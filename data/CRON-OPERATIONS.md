@@ -113,64 +113,98 @@ so the production database is busy once and can suspend the rest of the day:
 
 The data imports keep their own earlier slots (01:00–06:30 UTC daily, plus
 monthly and quarterly publisher syncs). The page rebuild,
-`operations.refresh-pages`, runs inside that import window at 07:00 UTC on
-odd-numbered days (see below). The owner-Mac Pulse runner (APR-D176) is not a
+`operations.refresh-pages`, runs nightly at 07:00 UTC, after that import
+window (see below). The owner-Mac Pulse runner (APR-D176) is not a
 Vercel job: it retrieves GDELT, clusters, classifies, and calls the score
 route later in the day, so it wakes the database once more, and the Pulse
-results it produces reach the cached pages at the next scheduled rebuild
+results it produces reach the cached pages at the next nightly rebuild
 unless `operations.refresh-pages` is run by hand after it. The review-SLA deadlines themselves
 are timestamps and are evaluated exactly on every read; the daily monitor
 records escalation events and logs alerts once a day, so an item queued after
 09:15 is first flagged the next morning. A critical item (24-hour deadline)
 queued after 09:15 can therefore be past its deadline when first flagged.
 
-### Page rebuild every two days (PLT-033, APR-D178)
+### Nightly rebuild of changed pages (PLT-033, APR-D179)
 
-Database-backed public pages are always served from the page cache. Owner
-rule (2026-10-12): pages are rebuilt every other day at 04:00 Uruguay time
-(07:00 UTC, schedule `0 7 */2 * *`), when the site is quietest, and never
-because a visitor or crawler arrived. Each page declares a 72-hour
-`revalidate` backstop that only takes effect if this job stops running; do
-not shorten it below the 48-hour cadence and do not return pages to
-`revalidate = 0`. Data from jobs that finish after 07:00 UTC (Pulse) reaches pages at the next rebuild. The day-of-month step
-restarts each month, so a 31-day month rebuilds on the 31st and again on the
-1st. The job reads the
-sitemap, calls `revalidatePath("/", "layout")` so every cached page is marked
-for re-rendering, then requests each cacheable sitemap URL: same origin, no
-query string, and not listed in `LIVE_PAGE_ROUTES`.
+Database-backed public pages are always served from the page cache and are
+never rebuilt because a visitor or crawler arrived. Owner rule (2026-10-12,
+amending APR-D178): `operations.refresh-pages` runs nightly at 04:00 Uruguay
+time (07:00 UTC, schedule `0 7 * * *`), after every nightly import, and
+rebuilds only the pages whose data changed.
+
+- **Fingerprints.** The job computes a content fingerprint (MD5 over the
+  ordered JSON text of the rows) for each country, covering exactly the
+  tables its layout and three tabs render (`src/lib/platform/page-fingerprints.ts`
+  lists them), plus a global fingerprint (country list, source metadata
+  without sync times, Index and Conditions release headers) and a site
+  fingerprint for the non-country pages. Bookkeeping columns that no page
+  shows (`updated_at`, `created_at`, `fact_cache_refreshed_at`, and similar)
+  are left out; timestamps a page does show stay in. Three read-only
+  statements take about 4 seconds on production.
+- **What rebuilds.** A country whose fingerprint differs from the value
+  stored at its last successful rebuild in `page_cache_fingerprints` has its
+  three tabs (`/country/<slug>`, `/civica-data`, `/constitution`) invalidated
+  by literal path and warmed. A global change rebuilds every country. The
+  non-country pages (home, rankings, leaders, organizations, methodology,
+  the sitemap, and the rest) rebuild when the global, site, or any country
+  fingerprint changed. Unchanged pages are not touched and are never
+  rewritten into the page cache.
+- **Storing.** A group's new fingerprint is stored only after every one of
+  its pages was re-rendered and verified, in one upsert statement. A failed
+  or skipped page leaves its group unstored, so it is retried the next
+  night.
+- **Code changes** need no fingerprint: every deployment starts with an
+  empty page cache.
+- **Backstop.** Each page declares `revalidate = 2592000` (30 days). Because
+  unchanged pages are deliberately not rebuilt, a shorter backstop would let
+  crawler visits rebuild them. The backstop only matters if this job stops
+  for a month; `operations.pipeline-alerts` reports a failed or missed run the
+  same morning. Do not shorten it and do not return pages to
+  `revalidate = 0`.
+- **Dates on country pages.** Each source's date is the latest time Civica
+  recorded that country's own rows from it
+  (`src/lib/db/queries-country-source-dates.ts`), not the source-wide
+  `sources.last_sync_at`, so one country's import does not change every
+  country page.
+
+Warm-up behavior is unchanged:
 
 - Four workers each spend at least two seconds per URL, so at most two page
   renders start per second. That keeps the database load bounded even though
   Vercel re-renders an invalidated page in the background, and it stays far
   below the 600-requests-per-minute firewall ceiling.
 - Each request times out after 45 seconds. No warm request starts after 560
-  seconds; a URL left over is still invalidated and renders on its next
-  visit.
+  seconds; a URL left over is still invalidated, renders on its next visit,
+  and its group is retried the next night.
 - A cached page rethrows a failed database read whenever a database is
   configured (`src/lib/platform/cached-render.ts`), so a failed render never
   replaces the cached page with an "unavailable" state; Next.js keeps serving
-  the previous good copy. Because Vercel re-renders an invalidated page in
-  the background after answering with the stale copy, every page answered
-  `STALE` is requested again after the first pass (250 ms pacing, nothing new
-  after 640 seconds). A second `STALE` means its re-render failed.
+  the previous good copy. Every page answered `STALE` is requested again
+  after the first pass (250 ms pacing, nothing new after 640 seconds). A
+  second `STALE` means its re-render failed.
 - Every non-200 response, timeout, network error, and page still `STALE` is
-  a failed page. The response reports `rowsRead` (targets), `rowsWritten`
-  (pages refreshed), `rowsRejected` (failed pages), `pagesStaleAfterRefresh`,
-  `pagesSkipped`, `pagesUnverified`, the failure counts by status, and up to
-  25 failed paths, which are also written to the runtime log.
+  a failed page. The response reports `countriesChanged`,
+  `countriesUnchanged`, `sitePagesChanged`, `fingerprintMs`, `rowsRead`,
+  `rowsWritten` (pages refreshed), `rowsRejected` (failed pages),
+  `fingerprintsStored`, `pagesStaleAfterRefresh`, `pagesSkipped`,
+  `pagesUnverified`, the failure counts by status, and up to 25 failed paths.
 - The run fails with `502 pages_not_refreshed` when more than 1% of attempted
   pages failed, and with `502 warm_unavailable` when none refreshed; a
   sitemap with no country pages, or a configured database that fails while
-  building it, is also a failed run. `operations.pipeline-alerts` reports a
-  failed run.
-- `?dryRun=1` (with an `Idempotency-Key`) lists the targets without
-  invalidating or requesting anything.
-- The job is excluded from automatic recovery because it can run for about
-  eleven minutes. A missed or failed day is covered by the pages' own 24-hour
-  backstop; re-run it manually with a new key after a large manual import.
+  building it or the fingerprints, is also a failed run.
+- `?dryRun=1` (with an `Idempotency-Key`) lists the countries that would
+  rebuild and why, without invalidating, requesting, or storing anything.
+- `?force=all` rebuilds every page; `?force=<slug>[,<slug>]` (up to 20)
+  rebuilds those countries even when unchanged. An unknown slug fails with
+  `400 unknown_country` before any work. Use this after a manual correction
+  that must reach readers before the next night.
+- The job is excluded from automatic recovery because a full rebuild can run
+  for about eleven minutes.
 
-At 849 sitemap URLs on 2026-09-29, about 830 are warm targets, so a run takes
-roughly seven to nine minutes.
+A night with no data changes rebuilds nothing; a typical night rebuilds the
+handful of countries whose bills or cabinet records changed plus the
+non-country pages. A full rebuild (first run, global change, or `force=all`)
+covers about 830 URLs in seven to nine minutes.
 
 ### Atlas history identity
 

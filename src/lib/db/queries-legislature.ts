@@ -4,7 +4,7 @@ import {
   elections,
   governmentBodies,
   legislatureParties,
-  sources,
+  partyCompositionRuns,
   statements,
 } from "@/lib/db/schema";
 import {
@@ -89,15 +89,28 @@ export interface LegislatureContext {
   } | null;
 }
 
-/** Reads the last sync timestamp for the party-seat source (IPU Parline). */
-export async function getPartySourceSyncAt(): Promise<string | null> {
+/**
+ * When Civica last retrieved THIS legislature's party seats from IPU Parline:
+ * the latest IPU composition run recorded for the given bodies (APR-D179),
+ * not the source-wide sync time.
+ */
+export async function getPartySourceSyncAt(
+  bodyIds: readonly string[],
+): Promise<string | null> {
+  if (bodyIds.length === 0) return null;
   const rows = await db
-    .select({ lastSyncAt: sources.lastSyncAt })
-    .from(sources)
-    .where(eq(sources.id, "ipu_parline"))
-    .limit(1);
-  const v = rows[0]?.lastSyncAt;
-  return v ? new Date(v as unknown as string).toISOString() : null;
+    .select({
+      retrievedAt: sql<Date | null>`max(${partyCompositionRuns.sourceRetrievedAt})`.mapWith(
+        partyCompositionRuns.sourceRetrievedAt,
+      ),
+    })
+    .from(partyCompositionRuns)
+    .where(
+      sql`${partyCompositionRuns.bodyId} IN ${bodyIds}
+        AND ${partyCompositionRuns.sourceId} = 'ipu_parline'`,
+    );
+  const v = rows[0]?.retrievedAt;
+  return v ? v.toISOString() : null;
 }
 
 function yearOf(value: unknown): string | null {
@@ -260,7 +273,7 @@ export async function getLegislatureContext(
 
   // A failed read throws when a database is configured, so a cached country
   // page never stores a legislature without its sync date (PLT-033).
-  const partySyncAt = await getPartySourceSyncAt().catch(
+  const partySyncAt = await getPartySourceSyncAt(bodyIds).catch(
     fallbackWithoutDatabase(() => null),
   );
 

@@ -4,7 +4,7 @@ import { withOg } from "@/lib/og";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
-export const revalidate = 259200;
+export const revalidate = 2592000;
 
 export const metadata: Metadata = {
   // The root layout's `title.template` does not apply to the page of its own

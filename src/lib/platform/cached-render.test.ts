@@ -105,7 +105,7 @@ function walk(dir: string): string[] {
 
 function cachedPageFiles(): string[] {
   return walk("src/app").filter((file) =>
-    /^export const revalidate = 259200;$/m.test(readFileSync(file, "utf8")),
+    /^export const revalidate = 2592000;$/m.test(readFileSync(file, "utf8")),
   );
 }
 

@@ -5,12 +5,12 @@ import { SITE_URL } from "@/lib/site";
 import { unescapeSitemapUrl } from "@/lib/seo/sitemap-xml";
 
 /**
- * PLT-033 / APR-D178 — scheduled page rebuild.
+ * PLT-033 / APR-D179 — scheduled page rebuild.
  *
- * `operations.refresh-pages` invalidates the whole page cache every other day
- * at 07:00 UTC, then requests every cacheable sitemap URL so the
- * database does its rendering in one bounded window instead of whenever a
- * crawler first arrives.
+ * `operations.refresh-pages` runs nightly at 07:00 UTC. It invalidates only
+ * the pages whose data changed (`page-rebuild-plan.ts`), then requests them
+ * so the database does its rendering in one bounded window instead of
+ * whenever a crawler first arrives.
  *
  * Vercel serves an invalidated page stale and re-renders it in the
  * background, so a warm request can return before its render finishes. Each
@@ -56,6 +56,8 @@ export interface PageWarmResult {
   staleTargets: PageWarmTarget[];
   /** Paths of failed requests, bounded for the run report. */
   failedPaths: string[];
+  /** Every target that failed or was never attempted (unbounded). */
+  unrefreshedPaths: string[];
 }
 
 const MAX_REPORTED_PATHS = 25;
@@ -140,6 +142,7 @@ export async function warmPages(
   const failureStatuses: Record<string, number> = {};
   const staleTargets: PageWarmTarget[] = [];
   const failedPaths: string[] = [];
+  const failedAll: string[] = [];
   let next = 0;
   let attempted = 0;
   let warmed = 0;
@@ -148,6 +151,7 @@ export async function warmPages(
   const recordFailure = (target: PageWarmTarget, key: string) => {
     failed += 1;
     failureStatuses[key] = (failureStatuses[key] ?? 0) + 1;
+    failedAll.push(target.path);
     if (failedPaths.length < MAX_REPORTED_PATHS) failedPaths.push(target.path);
   };
 
@@ -198,6 +202,10 @@ export async function warmPages(
     failureStatuses,
     staleTargets,
     failedPaths,
+    unrefreshedPaths: [
+      ...failedAll,
+      ...targets.slice(attempted).map((target) => target.path),
+    ],
   };
 }
 
@@ -214,6 +222,12 @@ export interface PageRefreshReport {
   durationMs: number;
   failureStatuses: Record<string, number>;
   failedPaths: string[];
+  /**
+   * Every target path that was not verifiably refreshed: failed, never
+   * attempted, still stale, or stale and not re-checked. APR-D179 stores a
+   * page group's fingerprint only when none of its paths is listed here.
+   */
+  unrefreshedPaths: string[];
 }
 
 /**
@@ -260,6 +274,17 @@ export async function refreshPages(
     durationMs: now() - startedAt,
     failureStatuses,
     failedPaths,
+    unrefreshedPaths: [
+      ...new Set([
+        ...warm.unrefreshedPaths,
+        ...(verify
+          ? [
+              ...verify.unrefreshedPaths,
+              ...verify.staleTargets.map((target) => target.path),
+            ]
+          : warm.staleTargets.map((target) => target.path)),
+      ]),
+    ],
   };
 }
 

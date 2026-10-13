@@ -4559,6 +4559,31 @@ export const cronJobExecutions = pgTable(
 );
 
 /**
+ * APR-D179 — the content fingerprint each cached page group had when
+ * `operations.refresh-pages` last rebuilt it successfully. One row per country
+ * (`country:<jurisdiction uuid>`) plus one for the non-country pages
+ * (`site`). A row is written only after that group's pages were re-rendered
+ * and verified, so a failed rebuild is retried on the next run.
+ */
+export const pageCacheFingerprints = pgTable(
+  "page_cache_fingerprints",
+  {
+    pageKey: text("page_key").primaryKey(),
+    fingerprint: text("fingerprint").notNull(),
+    fingerprintVersion: text("fingerprint_version").notNull(),
+    rebuiltAt: timestamp("rebuilt_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    check(
+      "page_cache_fingerprint_shape_check",
+      dsql`(${table.pageKey} = 'site' OR ${table.pageKey} ~ '^country:[0-9a-f-]{36}$') AND ${table.fingerprint} ~ '^[a-f0-9]{64}$' AND length(${table.fingerprintVersion}) BETWEEN 1 AND 64 AND ${table.fingerprintVersion} ~ '^[a-z0-9./-]+$'`,
+    ),
+  ],
+);
+
+/**
  * Immutable handoff from an authenticated cron delivery to the classify run
  * that owns its work. A later schedule slot may adopt the sole older running
  * classify run; retaining that binding lets every retry of the later delivery

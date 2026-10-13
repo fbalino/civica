@@ -194,9 +194,11 @@ test("the public bills API route returns an explicit coverage object, not a bare
 
 test("FactbookBills publishes source, chamber, status taxonomy, and both date fields for supported countries", () => {
   const source = read(FACTBOOK_BILLS);
-  // Source + freshness (already honest before this task — locked here too).
+  // Source + freshness: the date is this country's own latest bill record
+  // from the source, never the source-wide sync time (APR-D179).
   assert.match(source, /SourceDot/);
-  assert.match(source, /sources\.lastSyncAt/);
+  assert.match(source, /max\(\$\{bills\.updatedAt\}\)/);
+  assert.doesNotMatch(source, /sources\.lastSyncAt/);
   // Chamber — resolves government_bodies.name for bills with a bodyId.
   assert.match(source, /governmentBodies/);
   assert.match(source, /chamberType/);

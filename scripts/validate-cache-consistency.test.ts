@@ -166,7 +166,7 @@ function dbPage(
     pageFile,
     routeModules: [pageFile],
     dependencyPath: [pageFile, "src/lib/db/index.ts"],
-    effectiveRevalidate: 259200,
+    effectiveRevalidate: 2592000,
     requestInput: null,
     dynamicSegment: false,
     generatesStaticParams: false,
@@ -196,7 +196,7 @@ test("DB-dependent pages require the daily cache literal unless listed live", ()
   assert.match(errors[0], /src\/app\/hourly\/page\.tsx/);
   assert.match(errors[0], /effective revalidate=3600/);
   assert.match(errors[1], /src\/app\/still-zero\/page\.tsx/);
-  assert.match(errors[1], /require an effective literal revalidate=259200/);
+  assert.match(errors[1], /require an effective literal revalidate=2592000/);
 });
 
 test("a listed live page must stay request-live", () => {
@@ -213,7 +213,7 @@ test("a listed live page must stay request-live", () => {
       LIVE_FIXTURES,
     ).map((error) => error.split(";")[0]),
     [
-      "src/app/(admin)/admin/page.tsx: listed live by src/app/(admin)/layout.tsx but has effective revalidate=259200",
+      "src/app/(admin)/admin/page.tsx: listed live by src/app/(admin)/layout.tsx but has effective revalidate=2592000",
     ],
   );
 });
@@ -253,7 +253,7 @@ test("a newly discovered DB-backed page without a freshness declaration fails cl
       LIVE_FIXTURES,
     ),
     [
-      "src/app/new-live-page/page.tsx: reaches mutable DB data but has no literal route-level revalidate; require an effective literal revalidate=259200 or a LIVE_PAGE_ROUTES entry; dependency: src/app/new-live-page/page.tsx -> src/lib/db/index.ts",
+      "src/app/new-live-page/page.tsx: reaches mutable DB data but has no literal route-level revalidate; require an effective literal revalidate=2592000 or a LIVE_PAGE_ROUTES entry; dependency: src/app/new-live-page/page.tsx -> src/lib/db/index.ts",
     ],
   );
 });
@@ -261,16 +261,16 @@ test("a newly discovered DB-backed page without a freshness declaration fails cl
 test("the live-page allowlist rejects stale, undeclared, and no-longer-dynamic entries", () => {
   const facts = new Map([
     ["src/app/(admin)/layout.tsx", { revalidate: 0 as const }],
-    ["src/app/filtered/page.tsx", { revalidate: 259200 }],
+    ["src/app/filtered/page.tsx", { revalidate: 2592000 }],
   ]);
   const errors = livePageCoverageErrors(
-    [dbPage("src/app/filtered/page.tsx", { effectiveRevalidate: 259200 })],
+    [dbPage("src/app/filtered/page.tsx", { effectiveRevalidate: 2592000 })],
     facts,
     LIVE_FIXTURES,
   );
   assert.deepEqual(errors, [
     "src/app/(admin)/layout.tsx: stale live page entry wraps no DB-dependent page",
-    "src/app/filtered/page.tsx: live for request input but reads none; cache it with revalidate=259200",
+    "src/app/filtered/page.tsx: live for request input but reads none; cache it with revalidate=2592000",
     "src/app/filtered/page.tsx: live page entry must declare revalidate = 0",
   ]);
 });
