@@ -32,7 +32,6 @@ import { FactbookStickyCountrySearch } from "@/components/factbook/FactbookStick
  *
  *   <CountryJumpSearch
  *     country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
- *     countries={countryOptions}
  *   />
  *
  * Then render the tab's nav/sidebar + content as usual below it. The sticky bar
@@ -47,8 +46,12 @@ import { FactbookStickyCountrySearch } from "@/components/factbook/FactbookStick
 interface CountryJumpSearchProps {
   /** The country whose page this is — drives the sticky bar's flag + name. */
   country: { name: string; iso2: string | null };
-  /** All selectable countries for the combobox. Empty → nothing renders. */
-  countries: ReadonlyArray<FactbookCountryOption>;
+  /**
+   * Explicit options. Omit (the normal case) to search the shared site-wide
+   * jurisdiction directory, fetched once on first use and never serialized
+   * into the page. An explicit empty list renders nothing.
+   */
+  countries?: ReadonlyArray<FactbookCountryOption>;
   /** Placeholder for both the in-content field and the sticky bar. */
   placeholder?: string;
   /** Accessible label for both fields. */
@@ -69,7 +72,7 @@ export function CountryJumpSearch({
   const reactId = useId();
   const sentinelId = `country-jump-sentinel-${reactId.replace(/:/g, "")}`;
 
-  if (countries.length === 0) return null;
+  if (countries !== undefined && countries.length === 0) return null;
 
   return (
     <>

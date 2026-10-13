@@ -8,7 +8,8 @@ import {
 export type FactbookCountryOption = CountrySearchOption;
 
 interface FactbookCountrySearchProps {
-  countries: ReadonlyArray<FactbookCountryOption>;
+  /** Omit to search the shared site-wide jurisdiction directory. */
+  countries?: ReadonlyArray<FactbookCountryOption>;
   placeholder?: string;
   compact?: boolean;
   autoFocus?: boolean;

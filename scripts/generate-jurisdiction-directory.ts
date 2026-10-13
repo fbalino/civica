@@ -2,6 +2,7 @@ import { config } from "dotenv";
 config({ path: ".env.local", quiet: true });
 
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
@@ -72,6 +73,10 @@ async function main() {
   console.log(
     `Wrote ${JURISDICTION_DIRECTORY_VERSION}: ${rows.length} rows, sha ${rowsSha256.slice(0, 12)}….`,
   );
+  // Keep the public, content-addressed asset in step with the artifact.
+  execFileSync("npx", ["tsx", "scripts/generate-jurisdiction-directory-asset.ts"], {
+    stdio: "inherit",
+  });
 }
 
 main().catch((error) => {

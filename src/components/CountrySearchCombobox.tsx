@@ -12,6 +12,10 @@ import {
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CountryFlag } from "@/components/CountryFlag";
+import {
+  useJurisdictionDirectory,
+  type DirectoryScope,
+} from "@/lib/jurisdictions/use-jurisdiction-directory";
 
 export interface CountrySearchOption {
   slug: string;
@@ -26,7 +30,14 @@ export interface CountrySearchOption {
 }
 
 interface CountrySearchComboboxProps {
-  countries: ReadonlyArray<CountrySearchOption>;
+  /**
+   * Explicit options. Omit to search the shared site-wide jurisdiction
+   * directory, which is fetched once (lazily, on first use) and never
+   * serialized into the page. Pass a list only for a page-specific subset.
+   */
+  countries?: ReadonlyArray<CountrySearchOption>;
+  /** Directory universe when `countries` is omitted. Defaults to "all". */
+  directoryScope?: DirectoryScope;
   placeholder?: string;
   ariaLabel?: string;
   countryPathPrefix?: string;
@@ -44,7 +55,8 @@ interface CountrySearchComboboxProps {
 }
 
 export function CountrySearchCombobox({
-  countries,
+  countries: explicitCountries,
+  directoryScope = "all",
   placeholder = "Search countries...",
   ariaLabel = "Search countries",
   countryPathPrefix = "/country",
@@ -65,6 +77,13 @@ export function CountrySearchCombobox({
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const directory = useJurisdictionDirectory(
+    directoryScope,
+    explicitCountries === undefined,
+  );
+  const countries: ReadonlyArray<CountrySearchOption> =
+    explicitCountries ?? directory.countries;
+  const loadDirectory = directory.load;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -84,7 +103,8 @@ export function CountrySearchCombobox({
   useEffect(() => {
     if (!autoFocus) return;
     inputRef.current?.focus();
-  }, [autoFocus]);
+    loadDirectory();
+  }, [autoFocus, loadDirectory]);
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
@@ -110,11 +130,12 @@ export function CountrySearchCombobox({
       event.preventDefault();
       inputRef.current?.focus();
       setOpen(true);
+      loadDirectory();
     }
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [enableShortcut]);
+  }, [enableShortcut, loadDirectory]);
 
   const selectCountry = useCallback(
     (country: CountrySearchOption) => {
@@ -164,6 +185,7 @@ export function CountrySearchCombobox({
     >
       <div
         className="country-search__field"
+        onPointerEnter={loadDirectory}
         onClick={() => {
           inputRef.current?.focus();
           setOpen(true);
@@ -180,7 +202,10 @@ export function CountrySearchCombobox({
             setSelectedIdx(0);
             setOpen(true);
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            setOpen(true);
+            loadDirectory();
+          }}
           onKeyDown={handleKeyDown}
           role="combobox"
           aria-expanded={open && filtered.length > 0}
