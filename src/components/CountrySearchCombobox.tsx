@@ -12,6 +12,15 @@ import {
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CountryFlag } from "@/components/CountryFlag";
+import {
+  clampSelectedIndex,
+  filterCountryOptions,
+  nextSelectedIndex,
+} from "@/components/country-search-model";
+import {
+  useJurisdictionDirectory,
+  type DirectoryScope,
+} from "@/lib/jurisdictions/use-jurisdiction-directory";
 
 export interface CountrySearchOption {
   slug: string;
@@ -26,7 +35,14 @@ export interface CountrySearchOption {
 }
 
 interface CountrySearchComboboxProps {
-  countries: ReadonlyArray<CountrySearchOption>;
+  /**
+   * Explicit options. Omit to search the shared site-wide jurisdiction
+   * directory, which is fetched once (lazily, on first use) and never
+   * serialized into the page. Pass a list only for a page-specific subset.
+   */
+  countries?: ReadonlyArray<CountrySearchOption>;
+  /** Directory universe when `countries` is omitted. Defaults to "all". */
+  directoryScope?: DirectoryScope;
   placeholder?: string;
   ariaLabel?: string;
   countryPathPrefix?: string;
@@ -44,7 +60,8 @@ interface CountrySearchComboboxProps {
 }
 
 export function CountrySearchCombobox({
-  countries,
+  countries: explicitCountries,
+  directoryScope = "all",
   placeholder = "Search countries...",
   ariaLabel = "Search countries",
   countryPathPrefix = "/country",
@@ -65,26 +82,27 @@ export function CountrySearchCombobox({
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const directory = useJurisdictionDirectory(
+    directoryScope,
+    explicitCountries === undefined,
+  );
+  const countries: ReadonlyArray<CountrySearchOption> =
+    explicitCountries ?? directory.countries;
+  const loadDirectory = directory.load;
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return countries
-      .filter((country) => {
-        return (
-          country.name.toLowerCase().includes(q) ||
-          country.capital?.toLowerCase().includes(q) ||
-          country.iso2?.toLowerCase().includes(q) ||
-          country.iso3?.toLowerCase().includes(q)
-        );
-      })
-      .slice(0, 8);
-  }, [countries, query]);
+  const filtered = useMemo(
+    () => filterCountryOptions(countries, query),
+    [countries, query],
+  );
+  // The shared directory can arrive (or the list shrink) after a key press;
+  // always read the selection through the clamp so Enter acts on a real row.
+  const activeIdx = clampSelectedIndex(selectedIdx, filtered.length);
 
   useEffect(() => {
     if (!autoFocus) return;
     inputRef.current?.focus();
-  }, [autoFocus]);
+    loadDirectory();
+  }, [autoFocus, loadDirectory]);
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
@@ -110,11 +128,12 @@ export function CountrySearchCombobox({
       event.preventDefault();
       inputRef.current?.focus();
       setOpen(true);
+      loadDirectory();
     }
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [enableShortcut]);
+  }, [enableShortcut, loadDirectory]);
 
   const selectCountry = useCallback(
     (country: CountrySearchOption) => {
@@ -138,13 +157,13 @@ export function CountrySearchCombobox({
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      setSelectedIdx((idx) => Math.min(idx + 1, filtered.length - 1));
+      setSelectedIdx((idx) => nextSelectedIndex(idx, 1, filtered.length));
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
-      setSelectedIdx((idx) => Math.max(idx - 1, 0));
-    } else if (event.key === "Enter" && filtered[selectedIdx]) {
+      setSelectedIdx((idx) => nextSelectedIndex(idx, -1, filtered.length));
+    } else if (event.key === "Enter" && filtered[activeIdx]) {
       event.preventDefault();
-      selectCountry(filtered[selectedIdx]);
+      selectCountry(filtered[activeIdx]);
     } else if (event.key === "Escape") {
       setOpen(false);
       inputRef.current?.blur();
@@ -164,6 +183,7 @@ export function CountrySearchCombobox({
     >
       <div
         className="country-search__field"
+        onPointerEnter={loadDirectory}
         onClick={() => {
           inputRef.current?.focus();
           setOpen(true);
@@ -180,7 +200,10 @@ export function CountrySearchCombobox({
             setSelectedIdx(0);
             setOpen(true);
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            setOpen(true);
+            loadDirectory();
+          }}
           onKeyDown={handleKeyDown}
           role="combobox"
           aria-expanded={open && filtered.length > 0}
@@ -212,9 +235,9 @@ export function CountrySearchCombobox({
               key={country.slug}
               type="button"
               role="option"
-              aria-selected={index === selectedIdx}
+              aria-selected={index === activeIdx}
               className={`country-search__result${
-                index === selectedIdx ? " is-selected" : ""
+                index === activeIdx ? " is-selected" : ""
               }`}
               onMouseEnter={() => setSelectedIdx(index)}
               onClick={() => selectCountry(country)}

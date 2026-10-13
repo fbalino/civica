@@ -74,22 +74,12 @@ function buildCardStats(
 
 export async function HomeGrid() {
   const cacheReadAt = new Date();
-  // Country list for the hero search (graceful empty on DB error).
-  let countries: Parameters<typeof GlobalSearch>[0]["countries"] = [];
+  // The hero search reads the shared jurisdiction directory on first use; the
+  // catalog read here only feeds the count and the featured cards.
   let allJurisdictions: Awaited<ReturnType<typeof getAllReferenceJurisdictions>> = [];
   let catalogAvailable = true;
   try {
     allJurisdictions = await getAllReferenceJurisdictions();
-    const all = allJurisdictions;
-    countries = all.map((c) => ({
-      slug: c.slug,
-      name: c.name,
-      iso2: c.iso2,
-      capital: readFreshCachedFieldFromRow(c, "capital", {
-        now: cacheReadAt,
-      }).value,
-      status: c.jurisdictionStatus,
-    }));
   } catch (error) {
     // A failed read aborts the cached render (PLT-033).
     rethrowDatabaseFailure(error);
@@ -124,7 +114,7 @@ export async function HomeGrid() {
     }
   }
 
-  const catalogCount = countries.length || null;
+  const catalogCount = allJurisdictions.length || null;
   const japanDarkEngraving = countryDarkEngravingSrc("jpn");
   const estoniaDarkEngraving = countryDarkEngravingSrc("est");
 
@@ -150,7 +140,7 @@ export async function HomeGrid() {
               governed.
             </HeroRevealItem>
             <HeroRevealItem className="home-hero-search">
-              <GlobalSearch countries={countries} />
+              <GlobalSearch />
             </HeroRevealItem>
             {!catalogAvailable ? (
               <Banner variant="warn">

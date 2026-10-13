@@ -2,7 +2,7 @@ import { config } from "dotenv";
 config({ path: ".env.local", quiet: true });
 
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { neon } from "@neondatabase/serverless";
 
@@ -12,6 +12,13 @@ import {
   type JurisdictionDirectoryArtifact,
   type JurisdictionDirectorySourceRow,
 } from "../src/lib/jurisdictions/directory";
+import {
+  JURISDICTION_DIRECTORY_ASSET_DIR,
+  buildJurisdictionDirectoryAsset,
+  jurisdictionDirectoryAssetPath,
+  renderJurisdictionDirectoryAssetModule,
+  serializeJurisdictionDirectoryAsset,
+} from "../src/lib/jurisdictions/directory-asset";
 import { JURISDICTION_STATUS_TYPES } from "../src/lib/jurisdictions/status-taxonomy";
 import { stableStringify } from "../src/lib/data/frozen-vintage";
 
@@ -53,6 +60,37 @@ for (const row of artifact.rows) {
   }
   if (!(JURISDICTION_STATUS_TYPES as readonly string[]).includes(row.statusType)) {
     errors.push(`row ${row.slug} has unknown statusType ${row.statusType}`);
+  }
+}
+
+// ── Public directory asset (the one list every country search fetches) ─────
+{
+  const assetPath = jurisdictionDirectoryAssetPath(artifact.rowsSha256);
+  const fileName = assetPath.split("/").pop()!;
+  const dir = resolve(process.cwd(), JURISDICTION_DIRECTORY_ASSET_DIR);
+  const file = resolve(dir, fileName);
+  if (!existsSync(file)) {
+    errors.push(
+      `public asset ${assetPath} is missing; run \`npm run generate:jurisdiction-directory-asset\``,
+    );
+  } else if (
+    readFileSync(file, "utf8") !==
+    serializeJurisdictionDirectoryAsset(buildJurisdictionDirectoryAsset(artifact))
+  ) {
+    errors.push(`public asset ${assetPath} does not match the checked artifact`);
+  }
+  // Superseded hashed assets stay published so pages loaded before a
+  // deployment can still fetch the list they reference.
+  const modulePath = resolve(
+    process.cwd(),
+    "src/lib/jurisdictions/directory-asset.generated.ts",
+  );
+  if (
+    !existsSync(modulePath) ||
+    readFileSync(modulePath, "utf8") !==
+      renderJurisdictionDirectoryAssetModule(assetPath)
+  ) {
+    errors.push("directory-asset.generated.ts does not point at the current asset");
   }
 }
 

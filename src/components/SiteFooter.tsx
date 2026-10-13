@@ -4,7 +4,6 @@ import { CivicaLogo } from "@/components/CivicaLogo";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { tier1Publishers } from "@/lib/content/site-state";
 import { RIGHTS_REGISTRY_PATH } from "@/lib/claims/reuse-rights";
-import directory from "@/lib/jurisdictions/directory.generated.json";
 
 // Sources NOT covered by `tier1Publishers` — supporting feeds,
 // governance specialists, and indices. Update by hand when a major
@@ -146,18 +145,6 @@ export function SiteFooter() {
     ...tier1ShippedShortNames,
   ].join(", ");
 
-  // Real, working country search — fed by the checked jurisdiction directory
-  // artifact (CAC-003), the same deploy-frozen list the header search uses.
-  // Sovereign states only, matching the legacy footer query's universe.
-  const countries = directory.rows
-    .filter((row) => row.statusType === "sovereign_state")
-    .map((row) => ({
-      slug: row.slug,
-      name: row.name,
-      iso2: row.iso2,
-      capital: row.capital,
-    }));
-
   return (
     <footer className="site-footer">
       <section
@@ -211,8 +198,12 @@ export function SiteFooter() {
             </p>
 
             <div className="site-footer__search">
+              {/* Real, working country search over the shared jurisdiction
+                  directory (fetched once on first use, never serialized into
+                  the page). Sovereign states only, matching the legacy
+                  footer universe. */}
               <CountrySearchCombobox
-                countries={countries}
+                directoryScope="sovereign"
                 countryPathPrefix="/country"
                 placeholder="Find a country…"
                 ariaLabel="Find a country"

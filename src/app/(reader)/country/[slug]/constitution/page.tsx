@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import {
   getJurisdictionBySlug,
   getSource,
-  getFactbookCountryOptions,
 } from "@/lib/db/queries";
 import { getConstitutionWithArticles } from "@/lib/db/queries-constitution";
 import {
@@ -80,9 +79,8 @@ export default async function CountryConstitutionTab({
   if (!jurisdiction) notFound();
 
   // The country reader asks the query layer to preserve a database failure so
-  // the rendered state cannot call an outage "not yet indexed". countryOptions
-  // feeds the shared <CountryJumpSearch>; it is a non-critical enhancement.
-  const [constitutionResult, constituteSource, countryOptions] = await Promise.all([
+  // the rendered state cannot call an outage "not yet indexed".
+  const [constitutionResult, constituteSource] = await Promise.all([
     // Each read aborts the cached render when it fails with a configured
     // database, so no degraded page is cached (PLT-033).
     captureAtlasSurfaceQuery(
@@ -90,7 +88,6 @@ export default async function CountryConstitutionTab({
       { rethrow: isCachedRenderFailure },
     ),
     getSource("constitute_project").catch(fallbackWithoutDatabase(() => null)),
-    getFactbookCountryOptions().catch(fallbackWithoutDatabase(() => [])),
   ]);
   const constitution = atlasSurfaceQueryValue(constitutionResult);
 
@@ -105,7 +102,6 @@ export default async function CountryConstitutionTab({
   const jumpSearch = (
     <CountryJumpSearch
       country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
-      countries={countryOptions}
     />
   );
 

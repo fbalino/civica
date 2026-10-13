@@ -22,12 +22,17 @@ const errors: string[] = [];
 
 const surfaceContracts: Array<[string, string[]]> = [
   ["src/app/(reader)/country/page.tsx", ["getAllReferenceJurisdictions"]],
-  // The header search reads the checked jurisdiction-directory artifact
-  // (CAC-003/CAC-004), which is derived from and validated against the full
-  // 253-entry reference catalog by validate:jurisdiction-directory.
+  // Every country search (header, footer, home hero, 404, country jump) reads
+  // the public directory asset derived from the checked jurisdiction-directory
+  // artifact (CAC-003/CAC-004), which validate:jurisdiction-directory checks
+  // against the full 253-entry reference catalog.
   [
-    "src/components/GlobalSearchWrapper.tsx",
-    ["jurisdictions/directory.generated.json", "statusLabel"],
+    "src/lib/jurisdictions/directory-asset.ts",
+    ["JurisdictionDirectoryArtifact", "statusLabel"],
+  ],
+  [
+    "src/lib/jurisdictions/use-jurisdiction-directory.ts",
+    ["JURISDICTION_DIRECTORY_ASSET_PATH", "statusLabel"],
   ],
   ["src/components/home/HomeGrid.tsx", ["getAllReferenceJurisdictions"]],
   ["src/app/compare/page.tsx", ["getAllReferenceJurisdictions"]],

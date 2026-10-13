@@ -20,6 +20,7 @@ export type JurisdictionDirectoryRow = {
   slug: string;
   name: string;
   iso2: string | null;
+  iso3: string | null;
   capital: string | null;
   statusType: JurisdictionStatusType;
   statusLabel: string;
@@ -57,6 +58,7 @@ export function buildJurisdictionDirectoryRows(
         slug: row.slug,
         name: row.name,
         iso2: row.iso2,
+        iso3: row.iso3,
         capital: row.capital,
         statusType: status.type,
         statusLabel: status.label,

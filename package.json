@@ -405,6 +405,7 @@
     "validate:rights-manifest": "tsx scripts/validate-rights-manifest.ts",
     "validate:jurisdiction-status": "tsx scripts/validate-jurisdiction-status.ts",
     "validate:jurisdiction-directory": "tsx scripts/validate-jurisdiction-directory.ts",
+    "generate:jurisdiction-directory-asset": "tsx scripts/generate-jurisdiction-directory-asset.ts",
     "validate:fact-coverage": "tsx scripts/validate-fact-coverage-report.ts",
     "audit:atlas-value-fidelity": "tsx scripts/audit-atlas-value-fidelity.ts --capture",
     "validate:atlas-value-fidelity": "tsx scripts/audit-atlas-value-fidelity.ts",
