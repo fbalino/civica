@@ -7,7 +7,7 @@ import { Pill } from "@/components/editorial/Pill";
 import { StatusDot } from "@/components/editorial/StatusDot";
 import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
 import { ScorePosition } from "@/components/editorial/ScorePosition";
-import { SourceDot } from "@/components/SourceDot";
+import { SourceDot, SourceDotLegend } from "@/components/SourceDot";
 import { ValueOriginNote } from "@/components/provenance/ValueOriginNote";
 import { shapeFreedomHouseScoreRow } from "@/lib/ci/publisher-scores";
 import { DataValueState } from "@/components/DataValueState";
@@ -870,6 +870,34 @@ export default function DesignSystemPage() {
                   />
                 </span>
               </div>
+            </div>
+
+            <div className="ds-comp">
+              <h4>Provenance — SourceDot with a shared legend (real)</h4>
+              <p className="ds-component-note">
+                For long lists that repeat one disclosure: one{" "}
+                <code>SourceDotLegend</code> describes it once and each dot
+                references it, with the same tooltip and accessible name.
+              </p>
+              <SourceDotLegend
+                scope="ds-demo"
+                dots={[{ source: "world_bank", retrievedAt: "2026-06-01" }]}
+              />
+              <dl className="factbook-fact-list">
+                {["Land", "Water"].map((label) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>
+                      Shared provenance
+                      <SourceDot
+                        source="world_bank"
+                        retrievedAt="2026-06-01"
+                        legendScope="ds-demo"
+                      />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
             <div className="ds-comp ds-comp--wide" id="value-origin-note">

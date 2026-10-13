@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from "react";
-import { SourceDot } from "./SourceDot";
+import { SourceDot, SourceDotLegend } from "./SourceDot";
 import type { FactbookField } from "@/lib/data/factbook-fields";
 import { humanizeLabel, humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
@@ -195,9 +195,7 @@ function renderInlineHtml(raw: string): ReactNode {
       const k = `${tag}-${key++}`;
       if (tag === "strong" || tag === "b") {
         parent.children.push(
-          <strong key={k} style={{ color: "var(--color-text-primary)" }}>
-            {top.children}
-          </strong>
+          <strong key={k}>{top.children}</strong>
         );
       } else if (tag === "em" || tag === "i") {
         parent.children.push(<em key={k}>{top.children}</em>);
@@ -274,11 +272,15 @@ function LeafRow({
   field,
   source,
   retrievedAt,
+  legendScope,
   resolverFacts,
 }: {
   field: LeafField;
   source?: string;
   retrievedAt?: string;
+  /** Scope of the section's `<SourceDotLegend>`; every plain leaf shares
+   *  one disclosure, so it is described once per section. */
+  legendScope: string;
   resolverFacts?: Record<string, ResolverOutput>;
 }) {
   const humanLabel = humanizeLabel(field.label);
@@ -299,36 +301,19 @@ function LeafRow({
         ariaLabel={`${humanLabel}, see sources`}
       />
     ) : source && retrievedAt ? (
-      <SourceDot source={source} retrievedAt={retrievedAt} />
+      <SourceDot
+        source={source}
+        retrievedAt={retrievedAt}
+        legendScope={legendScope}
+      />
     ) : null;
 
   return (
-    <div
-      style={{
-        padding: "10px 0",
-        borderBottom: "1px solid var(--color-stat-border)",
-      }}
-    >
-      <dt
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-13)",
-          color: "var(--color-text-40)",
-          marginBottom: 4,
-        }}
-      >
+    <div>
+      <dt>
         {humanLabel}
       </dt>
-      <dd
-        style={{
-          fontFamily: "var(--font-body)",
-          fontSize: "var(--text-15)",
-          lineHeight: "var(--leading-relaxed)",
-          color: "var(--color-text-85)",
-          margin: 0,
-        }}
-      >
+      <dd>
         {sourceNode
           ? renderValueWithSource(field.value, sourceNode)
           : renderInlineHtml(field.value)}
@@ -385,32 +370,11 @@ function CanonicalLeafRow({
     : null;
 
   return (
-    <div
-      style={{
-        padding: "10px 0",
-        borderBottom: "1px solid var(--color-stat-border)",
-      }}
-    >
-      <dt
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-13)",
-          color: "var(--color-text-40)",
-          marginBottom: 4,
-        }}
-      >
+    <div>
+      <dt>
         {eyebrowLabel ?? "Civica canonical (reconciled)"}
       </dt>
-      <dd
-        style={{
-          fontFamily: "var(--font-body)",
-          fontSize: "var(--text-15)",
-          lineHeight: "var(--leading-relaxed)",
-          color: "var(--color-text-85)",
-          margin: 0,
-        }}
-      >
+      <dd>
         {renderValueWithSource(
           value,
           <FactValueDot
@@ -451,8 +415,6 @@ function GroupBlock({
   resolverFacts?: Record<string, ResolverOutput>;
 }) {
   const HeadingTag = depth === 0 ? "h3" : "h4";
-  const headingFontSize = depth === 0 ? "var(--text-20)" : "var(--text-16)";
-  const blockMarginTop = depth === 0 ? "var(--space-7)" : "var(--space-5)";
   // Subsection headings use title case ("Capital", "Independence",
   // "Country Name") — matches the convention for headings + TOC items.
   // Slug ids stay derived from the same string so anchors are stable.
@@ -513,23 +475,12 @@ function GroupBlock({
     );
 
   return (
-    <div style={{ marginTop: blockMarginTop, scrollMarginTop: "calc(56px + var(--space-5))" }}>
-      <HeadingTag
-        id={headingId}
-        className="factbook-subsection-title"
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: headingFontSize,
-          fontWeight: 400,
-          margin: "0 0 var(--space-3)",
-          color: "var(--color-text-primary)",
-          letterSpacing: "var(--tracking-tighter)",
-        }}
-      >
+    <div className={depth === 0 ? "factbook-group" : "factbook-group factbook-group--nested"}>
+      <HeadingTag id={headingId} className="factbook-subsection-title">
         {headingText}
       </HeadingTag>
       {(renderCanonicalRow || auxRows.length > 0) && (
-        <dl style={{ margin: 0 }}>
+        <dl className="factbook-fact-list">
           {renderCanonicalRow && canonicalFactKey && canonicalResolverOutput && (
             <CanonicalLeafRow
               factKey={canonicalFactKey}
@@ -573,13 +524,14 @@ function renderFields(
     const buf = leafBuffer;
     leafBuffer = [];
     out.push(
-      <dl key={`dl-${dlIndex++}`} style={{ margin: 0 }}>
+      <dl key={`dl-${dlIndex++}`} className="factbook-fact-list">
         {buf.map((leaf) => (
           <LeafRow
             key={leaf.label}
             field={leaf}
             source={source}
             retrievedAt={retrievedAt}
+            legendScope={legendScopeFor(idPrefix)}
             resolverFacts={resolverFacts}
           />
         ))}
@@ -609,6 +561,10 @@ function renderFields(
   return out;
 }
 
+function legendScopeFor(idPrefix: string | undefined): string {
+  return idPrefix ?? "factbook";
+}
+
 export function FactbookSection({
   sectionName,
   fields,
@@ -619,15 +575,7 @@ export function FactbookSection({
 }: FactbookSectionProps) {
   if (fields.length === 0) {
     return (
-      <div
-        style={{
-          padding: "var(--spacing-content-top) 0",
-          textAlign: "center",
-          fontFamily: "var(--font-body)",
-          fontSize: "var(--text-15)",
-          color: "var(--color-text-40)",
-        }}
-      >
+      <div className="factbook-section-empty">
         No data available for this section.
       </div>
     );
@@ -635,6 +583,12 @@ export function FactbookSection({
 
   return (
     <section aria-label={sectionName}>
+      {source && retrievedAt ? (
+        <SourceDotLegend
+          scope={legendScopeFor(idPrefix)}
+          dots={[{ source, retrievedAt }]}
+        />
+      ) : null}
       {renderFields(fields, source, retrievedAt, 0, idPrefix, resolverFacts)}
     </section>
   );

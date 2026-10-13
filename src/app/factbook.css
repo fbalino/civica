@@ -903,6 +903,61 @@
   margin: 0;
   letter-spacing: var(--tracking-tighter);
 }
+/* Factbook section facts (FactbookSection): subsection groups, their
+   headings, and the label/value rows. */
+.factbook-group {
+  margin-top: var(--space-7);
+  scroll-margin-top: calc(56px + var(--space-5));
+}
+.factbook-group--nested {
+  margin-top: var(--space-5);
+}
+.factbook-subsection-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: var(--font-weight-regular);
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-primary);
+  letter-spacing: var(--tracking-tighter);
+}
+.factbook-group--nested > .factbook-subsection-title {
+  font-size: var(--text-16);
+}
+/* Rows are bare <div><dt/><dd/></div> children of the list: a Factbook tab
+   renders hundreds of them, so the list owns their styling instead of
+   repeating a class on every element. */
+.factbook-fact-list {
+  margin: 0;
+}
+.factbook-fact-list > div {
+  padding: calc(var(--space-3) + var(--space-1)) 0;
+  border-bottom: 1px solid var(--color-stat-border);
+}
+.factbook-fact-list dt {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  margin-bottom: var(--space-2);
+}
+.factbook-fact-list dd {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-85);
+  margin: 0;
+}
+.factbook-fact-list dd strong {
+  color: var(--color-text-primary);
+}
+.factbook-section-empty {
+  padding: var(--spacing-content-top) 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  color: var(--color-text-40);
+}
+
 .factbook-value-source-lock {
   display: inline-flex;
   align-items: center;
