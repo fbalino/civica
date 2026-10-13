@@ -24,18 +24,19 @@ export const maxDuration = 800;
 
 /**
  * PLT-033 / APR-D179 — runs nightly at 07:00 UTC (04:00 in Uruguay), after
- * the nightly imports. It fingerprints the database content each cached page
- * group renders, compares it with the fingerprint stored at that group's
- * last successful rebuild, and rebuilds only the groups that changed: a
- * changed country's three tabs, and the non-country pages when anything
- * changed. Pages are never rebuilt per visit, and unchanged pages are never
- * rewritten into the page cache.
+ * the nightly imports. It fingerprints the database content each country's
+ * three tabs render, compares it with the fingerprint stored at that
+ * country's last successful rebuild, and rebuilds only the countries that
+ * changed. The roughly 70 non-country pages read too many tables to
+ * fingerprint safely, so they are rebuilt every night. Pages are never
+ * rebuilt per visit, and unchanged country pages are never rewritten into
+ * the page cache.
  *
- * A group's new fingerprint is stored only after all of its pages were
- * re-rendered and verified, so a failed group is retried the next night.
+ * A country's new fingerprint is stored only after all of its pages were
+ * re-rendered and verified, so a failed country is retried the next night.
  * `?dryRun=1` lists what would be rebuilt without invalidating, requesting,
- * or storing anything. `?force=all` or `?force=<slug>[,<slug>]` rebuilds
- * those groups even when unchanged.
+ * or storing anything. `?force=all` rebuilds every page;
+ * `?force=<slug>[,<slug>]` rebuilds only those countries.
  */
 async function handler(request: Request) {
   const params = new URL(request.url).searchParams;

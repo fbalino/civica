@@ -10,16 +10,17 @@ import { createHash } from "node:crypto";
  *
  * Page groups:
  * - one per country: `/country/<slug>`, `/civica-data`, and `/constitution`
- *   (the three tabs share one layout and are rebuilt together);
+ *   (the three tabs share one layout and are rebuilt together). These are
+ *   fingerprinted, about 760 of the roughly 830 cached URLs;
  * - one `site` group: every other cached page (home, rankings, leaders,
- *   organizations, methodology, the sitemap, and so on).
+ *   organizations, methodology, the sitemap, and so on). It is rebuilt every
+ *   night without a fingerprint: those pages read many tables across the
+ *   site, and an incomplete dependency list would leave one stale for up to
+ *   the 30-day backstop.
  *
  * Each stored country value combines the global fingerprint (the country
  * list, source metadata, and release pointers every country page reads) with
  * that country's own fingerprint, so a global change rebuilds every country.
- * The site value combines the global fingerprint, every country's
- * fingerprint, and the site-only inputs, so any change anywhere rebuilds the
- * non-country pages.
  */
 
 /** Names the dependency map. Changing it rebuilds every page once. */
@@ -39,10 +40,8 @@ export interface CountryFingerprint {
 }
 
 export interface CurrentFingerprints {
-  /** Inputs every page reads (country list, sources, release pointers). */
+  /** Inputs every country page reads (country list, sources, releases). */
   global: string;
-  /** Inputs only non-country pages read. */
-  site: string;
   countries: readonly CountryFingerprint[];
 }
 
@@ -69,8 +68,11 @@ export interface CountryRebuild extends PageRebuildEntry {
 export interface PageRebuildPlan {
   countries: CountryRebuild[];
   unchangedCountries: number;
-  /** Null when the non-country pages are unchanged. */
-  site: (PageRebuildEntry & { reason: "new" | "changed" | "forced" }) | null;
+  /**
+   * The non-country pages, rebuilt on every scheduled run and `force=all`.
+   * Null only for a run forced for named countries.
+   */
+  site: { pageKey: string; reason: "nightly" | "forced" } | null;
   /** Forced slugs that match no country. */
   unknownSlugs: string[];
 }
@@ -90,22 +92,6 @@ export function combinedCountryFingerprint(
   country: string,
 ): string {
   return sha256([PAGE_FINGERPRINT_VERSION, "country", global, country]);
-}
-
-/** Stored value for the non-country pages. */
-export function combinedSiteFingerprint(current: CurrentFingerprints): string {
-  const countries = [...current.countries]
-    .sort((left, right) =>
-      left.jurisdictionId.localeCompare(right.jurisdictionId),
-    )
-    .map((row) => `${row.jurisdictionId}=${row.fingerprint}`);
-  return sha256([
-    PAGE_FINGERPRINT_VERSION,
-    "site",
-    current.global,
-    current.site,
-    ...countries,
-  ]);
 }
 
 function changeReason(
@@ -151,18 +137,16 @@ export function planPageRebuild(
     else unchangedCountries += 1;
   }
 
-  const siteFingerprint = combinedSiteFingerprint(current);
-  const siteReason =
-    force.kind === "all"
-      ? "forced"
-      : changeReason(stored.get(SITE_PAGE_KEY), siteFingerprint);
-
   return {
     countries,
     unchangedCountries,
-    site: siteReason
-      ? { pageKey: SITE_PAGE_KEY, fingerprint: siteFingerprint, reason: siteReason }
-      : null,
+    site:
+      force.kind === "countries"
+        ? null
+        : {
+            pageKey: SITE_PAGE_KEY,
+            reason: force.kind === "all" ? "forced" : "nightly",
+          },
     unknownSlugs: [...forcedSlugs].filter((slug) => !knownSlugs.has(slug)).sort(),
   };
 }
@@ -183,19 +167,16 @@ export function isCountryPagePath(path: string): boolean {
 }
 
 /**
- * Fingerprints to store after the warm-up: a group is stored only when none
- * of its warmed paths failed, so a failed group is retried on the next run.
+ * Country fingerprints to store after the warm-up: a country is stored only
+ * when none of its warmed paths failed, so a failed country is retried on
+ * the next run. The site group has no fingerprint.
  */
 export function fingerprintsToStore(
   plan: PageRebuildPlan,
   warmedPathsByGroup: ReadonlyMap<string, readonly string[]>,
   unrefreshedPaths: ReadonlySet<string>,
 ): PageRebuildEntry[] {
-  const groups: PageRebuildEntry[] = [
-    ...plan.countries,
-    ...(plan.site ? [plan.site] : []),
-  ];
-  return groups
+  return plan.countries
     .filter((group) => {
       const paths = warmedPathsByGroup.get(group.pageKey);
       // A group with no warm targets (for example, a country absent from the

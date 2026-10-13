@@ -21405,11 +21405,11 @@
     {
       "name": "page_cache_fingerprints",
       "exportName": "pageCacheFingerprints",
-      "definition": "Content fingerprint of each cached page group at its last successful scheduled rebuild (APR-D179).",
-      "rowGrain": "One country page group (Factbook, Civica Data, and Constitution tabs) or the single non-country page group.",
+      "definition": "Content fingerprint of each country's cached pages at their last successful scheduled rebuild (APR-D179).",
+      "rowGrain": "One country page group: the Factbook, Civica Data, and Constitution tabs of one jurisdiction.",
       "releaseScope": "internal_operational",
       "sourceOrDerivation": "Written only by operations.refresh-pages after the group's pages were re-rendered and verified: a SHA-256 over MD5 digests of the database rows those pages render. No row content is stored.",
-      "cadence": "Upserted nightly for groups whose content changed and rebuilt successfully; unchanged or failed groups keep their previous row.",
+      "cadence": "Upserted nightly for countries whose content changed and rebuilt successfully; unchanged or failed countries keep their previous row.",
       "vintageSemantics": "rebuilt_at is the time the pages were last rebuilt; fingerprint_version names the dependency map that produced the fingerprint and is not a source-data vintage.",
       "rights": "Private internal operational state; excluded from public release and not a source-data rights grant.",
       "deprecation": {
@@ -21419,7 +21419,7 @@
         {
           "name": "fingerprint",
           "propertyName": "fingerprint",
-          "definition": "Fingerprint recorded for the country page group (Factbook, Civica Data, and Constitution tabs) or the single non-country page group.",
+          "definition": "Fingerprint recorded for the country page group: the Factbook, Civica Data, and Constitution tabs of one jurisdiction.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -21434,7 +21434,7 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Written only by operations.refresh-pages after the group's pages were re-rendered and verified: a SHA-256 over MD5 digests of the database rows those pages render. No row content is stored.",
-          "cadence": "Upserted nightly for groups whose content changed and rebuilt successfully; unchanged or failed groups keep their previous row.",
+          "cadence": "Upserted nightly for countries whose content changed and rebuilt successfully; unchanged or failed countries keep their previous row.",
           "vintageSemantics": "rebuilt_at is the time the pages were last rebuilt; fingerprint_version names the dependency map that produced the fingerprint and is not a source-data vintage.",
           "rights": "Private internal operational state; excluded from public release and not a source-data rights grant.",
           "deprecation": {
@@ -21444,7 +21444,7 @@
         {
           "name": "fingerprint_version",
           "propertyName": "fingerprintVersion",
-          "definition": "Fingerprint version recorded for the country page group (Factbook, Civica Data, and Constitution tabs) or the single non-country page group.",
+          "definition": "Fingerprint version recorded for the country page group: the Factbook, Civica Data, and Constitution tabs of one jurisdiction.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -21459,7 +21459,7 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Written only by operations.refresh-pages after the group's pages were re-rendered and verified: a SHA-256 over MD5 digests of the database rows those pages render. No row content is stored.",
-          "cadence": "Upserted nightly for groups whose content changed and rebuilt successfully; unchanged or failed groups keep their previous row.",
+          "cadence": "Upserted nightly for countries whose content changed and rebuilt successfully; unchanged or failed countries keep their previous row.",
           "vintageSemantics": "rebuilt_at is the time the pages were last rebuilt; fingerprint_version names the dependency map that produced the fingerprint and is not a source-data vintage.",
           "rights": "Private internal operational state; excluded from public release and not a source-data rights grant.",
           "deprecation": {
@@ -21469,7 +21469,7 @@
         {
           "name": "page_key",
           "propertyName": "pageKey",
-          "definition": "Page key recorded for the country page group (Factbook, Civica Data, and Constitution tabs) or the single non-country page group.",
+          "definition": "Page key recorded for the country page group: the Factbook, Civica Data, and Constitution tabs of one jurisdiction.",
           "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -21484,7 +21484,7 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Written only by operations.refresh-pages after the group's pages were re-rendered and verified: a SHA-256 over MD5 digests of the database rows those pages render. No row content is stored.",
-          "cadence": "Upserted nightly for groups whose content changed and rebuilt successfully; unchanged or failed groups keep their previous row.",
+          "cadence": "Upserted nightly for countries whose content changed and rebuilt successfully; unchanged or failed countries keep their previous row.",
           "vintageSemantics": "rebuilt_at is the time the pages were last rebuilt; fingerprint_version names the dependency map that produced the fingerprint and is not a source-data vintage.",
           "rights": "Private internal operational state; excluded from public release and not a source-data rights grant.",
           "deprecation": {
@@ -21494,7 +21494,7 @@
         {
           "name": "rebuilt_at",
           "propertyName": "rebuiltAt",
-          "definition": "Rebuilt at recorded for the country page group (Factbook, Civica Data, and Constitution tabs) or the single non-country page group.",
+          "definition": "Rebuilt at recorded for the country page group: the Factbook, Civica Data, and Constitution tabs of one jurisdiction.",
           "sqlType": "timestamp with time zone",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
@@ -21509,7 +21509,7 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Written only by operations.refresh-pages after the group's pages were re-rendered and verified: a SHA-256 over MD5 digests of the database rows those pages render. No row content is stored.",
-          "cadence": "Upserted nightly for groups whose content changed and rebuilt successfully; unchanged or failed groups keep their previous row.",
+          "cadence": "Upserted nightly for countries whose content changed and rebuilt successfully; unchanged or failed countries keep their previous row.",
           "vintageSemantics": "Rebuilt at follows this table contract. rebuilt_at is the time the pages were last rebuilt; fingerprint_version names the dependency map that produced the fingerprint and is not a source-data vintage.",
           "rights": "Private internal operational state; excluded from public release and not a source-data rights grant.",
           "deprecation": {

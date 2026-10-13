@@ -25,7 +25,6 @@ function current(
 ): CurrentFingerprints {
   return {
     global: overrides.global ?? "g1",
-    site: overrides.site ?? "s1",
     countries: overrides.countries ?? [
       { jurisdictionId: JAPAN, slug: "japan", fingerprint: overrides.japan ?? "j1" },
       { jurisdictionId: FRANCE, slug: "france", fingerprint: overrides.france ?? "f1" },
@@ -37,18 +36,18 @@ function current(
 function storedAfter(state: CurrentFingerprints): Map<string, StoredFingerprint> {
   const plan = planPageRebuild(state, new Map(), { kind: "all" });
   return new Map(
-    [...plan.countries, ...(plan.site ? [plan.site] : [])].map((row) => [
+    plan.countries.map((row) => [
       row.pageKey,
       { fingerprint: row.fingerprint, fingerprintVersion: PAGE_FINGERPRINT_VERSION },
     ]),
   );
 }
 
-test("unchanged content rebuilds nothing", () => {
+test("unchanged content rebuilds no country but still rebuilds the non-country pages", () => {
   const plan = planPageRebuild(current(), storedAfter(current()));
   assert.deepEqual(plan.countries, []);
   assert.equal(plan.unchangedCountries, 2);
-  assert.equal(plan.site, null);
+  assert.deepEqual(plan.site, { pageKey: SITE_PAGE_KEY, reason: "nightly" });
 });
 
 test("one changed country rebuilds only that country and the non-country pages", () => {
@@ -58,25 +57,19 @@ test("one changed country rebuilds only that country and the non-country pages",
     [["france", "changed"]],
   );
   assert.equal(plan.unchangedCountries, 1);
-  assert.equal(plan.site?.reason, "changed");
+  assert.equal(plan.site?.reason, "nightly");
 });
 
 test("a global change rebuilds every country and the non-country pages", () => {
   const plan = planPageRebuild(current({ global: "g2" }), storedAfter(current()));
   assert.deepEqual(plan.countries.map(({ slug }) => slug), ["france", "japan"]);
-  assert.equal(plan.site?.reason, "changed");
-});
-
-test("a site-only change rebuilds only the non-country pages", () => {
-  const plan = planPageRebuild(current({ site: "s2" }), storedAfter(current()));
-  assert.deepEqual(plan.countries, []);
-  assert.equal(plan.site?.pageKey, SITE_PAGE_KEY);
+  assert.equal(plan.site?.reason, "nightly");
 });
 
 test("the first run and a new dependency map rebuild everything", () => {
   const first = planPageRebuild(current(), new Map());
   assert.deepEqual(first.countries.map(({ reason }) => reason), ["new", "new"]);
-  assert.equal(first.site?.reason, "new");
+  assert.equal(first.site?.reason, "nightly");
 
   const oldVersion = new Map(
     [...storedAfter(current())].map(([key, row]) => [
@@ -115,7 +108,7 @@ function groups(plan: PageRebuildPlan): Map<string, string[]> {
   return map;
 }
 
-test("a fingerprint is stored only for groups whose pages all refreshed", () => {
+test("a fingerprint is stored only for countries whose pages all refreshed", () => {
   const plan = planPageRebuild(current({ global: "g2" }), storedAfter(current()));
   const stored = fingerprintsToStore(
     plan,
@@ -124,7 +117,7 @@ test("a fingerprint is stored only for groups whose pages all refreshed", () => 
   );
   assert.deepEqual(
     stored.map(({ pageKey }) => pageKey).sort(),
-    [SITE_PAGE_KEY, countryPageKey(JAPAN)].sort(),
+    [countryPageKey(JAPAN)],
   );
 
   // The failed country is retried on the next run; the others are not.
@@ -137,7 +130,7 @@ test("a fingerprint is stored only for groups whose pages all refreshed", () => 
   }
   const retry = planPageRebuild(current({ global: "g2" }), next);
   assert.deepEqual(retry.countries.map(({ slug }) => slug), ["france"]);
-  assert.equal(retry.site, null);
+  assert.equal(retry.site?.reason, "nightly");
 });
 
 test("a failed warm-up stores nothing", () => {

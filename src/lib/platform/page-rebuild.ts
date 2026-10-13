@@ -109,7 +109,7 @@ export async function runPageRebuild(input: {
     countryTargets,
     countriesChanged: plan.countries.length,
     countriesUnchanged: plan.unchangedCountries,
-    sitePagesChanged: plan.site !== null,
+    sitePagesRebuilt: plan.site !== null,
     fingerprintMs,
   };
 
@@ -133,7 +133,7 @@ export async function runPageRebuild(input: {
         ...summary,
         rowsRead: targets.length,
         rebuildCountries: plan.countries.map(({ slug, reason }) => ({ slug, reason })),
-        siteReason: plan.site?.reason ?? null,
+        sitePagesReason: plan.site?.reason ?? null,
         pagesToRefresh: selected.length,
       },
     };

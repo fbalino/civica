@@ -4559,10 +4559,11 @@ export const cronJobExecutions = pgTable(
 );
 
 /**
- * APR-D179 — the content fingerprint each cached page group had when
- * `operations.refresh-pages` last rebuilt it successfully. One row per country
- * (`country:<jurisdiction uuid>`) plus one for the non-country pages
- * (`site`). A row is written only after that group's pages were re-rendered
+ * APR-D179 — the content fingerprint each country's cached pages had when
+ * `operations.refresh-pages` last rebuilt them successfully, one row per
+ * country (`country:<jurisdiction uuid>`). The non-country pages are rebuilt
+ * nightly without a fingerprint; the `site` key the shape check admits is
+ * unused. A row is written only after that country's pages were re-rendered
  * and verified, so a failed rebuild is retried on the next run.
  */
 export const pageCacheFingerprints = pgTable(

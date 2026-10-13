@@ -136,23 +136,25 @@ rebuilds only the pages whose data changed.
   ordered JSON text of the rows) for each country, covering exactly the
   tables its layout and three tabs render (`src/lib/platform/page-fingerprints.ts`
   lists them), plus a global fingerprint (country list, source metadata
-  without sync times, Index and Conditions release headers) and a site
-  fingerprint for the non-country pages. Bookkeeping columns that no page
-  shows (`updated_at`, `created_at`, `fact_cache_refreshed_at`, and similar)
-  are left out; timestamps a page does show stay in. Three read-only
-  statements take about 4 seconds on production.
+  without sync times, Index and Conditions release headers). Bookkeeping
+  columns that no page shows (`updated_at`, `created_at`,
+  `fact_cache_refreshed_at`, and similar) are left out; timestamps a page
+  does show stay in. Two read-only statements take about 4 seconds on
+  production.
 - **What rebuilds.** A country whose fingerprint differs from the value
   stored at its last successful rebuild in `page_cache_fingerprints` has its
   three tabs (`/country/<slug>`, `/civica-data`, `/constitution`) invalidated
-  by literal path and warmed. A global change rebuilds every country. The
-  non-country pages (home, rankings, leaders, organizations, methodology,
-  the sitemap, and the rest) rebuild when the global, site, or any country
-  fingerprint changed. Unchanged pages are not touched and are never
-  rewritten into the page cache.
-- **Storing.** A group's new fingerprint is stored only after every one of
-  its pages was re-rendered and verified, in one upsert statement. A failed
-  or skipped page leaves its group unstored, so it is retried the next
-  night.
+  by literal path and warmed. A global change rebuilds every country.
+  Unchanged country pages are not touched and are never rewritten into the
+  page cache. The non-country pages (home, rankings, leaders,
+  organizations, methodology, the sitemap, and the rest, about 70 URLs) are
+  rebuilt every night without a fingerprint, because they read many tables
+  across the site and a missed dependency would leave a page stale until
+  the 30-day backstop.
+- **Storing.** A country's new fingerprint is stored only after every one
+  of its pages was re-rendered and verified, in one upsert statement. A
+  failed or skipped page leaves that country unstored, so it is retried the
+  next night.
 - **Code changes** need no fingerprint: every deployment starts with an
   empty page cache.
 - **Backstop.** Each page declares `revalidate = 2592000` (30 days). Because
@@ -184,7 +186,7 @@ Warm-up behavior is unchanged:
   second `STALE` means its re-render failed.
 - Every non-200 response, timeout, network error, and page still `STALE` is
   a failed page. The response reports `countriesChanged`,
-  `countriesUnchanged`, `sitePagesChanged`, `fingerprintMs`, `rowsRead`,
+  `countriesUnchanged`, `sitePagesRebuilt`, `fingerprintMs`, `rowsRead`,
   `rowsWritten` (pages refreshed), `rowsRejected` (failed pages),
   `fingerprintsStored`, `pagesStaleAfterRefresh`, `pagesSkipped`,
   `pagesUnverified`, the failure counts by status, and up to 25 failed paths.
@@ -193,17 +195,18 @@ Warm-up behavior is unchanged:
   sitemap with no country pages, or a configured database that fails while
   building it or the fingerprints, is also a failed run.
 - `?dryRun=1` (with an `Idempotency-Key`) lists the countries that would
-  rebuild and why, without invalidating, requesting, or storing anything.
+  rebuild and why, and the number of pages to refresh, without
+  invalidating, requesting, or storing anything.
 - `?force=all` rebuilds every page; `?force=<slug>[,<slug>]` (up to 20)
-  rebuilds those countries even when unchanged. An unknown slug fails with
+  rebuilds only those countries, even when unchanged, and skips the
+  non-country pages. An unknown slug fails with
   `400 unknown_country` before any work. Use this after a manual correction
   that must reach readers before the next night.
 - The job is excluded from automatic recovery because a full rebuild can run
   for about eleven minutes.
 
-A night with no data changes rebuilds nothing; a typical night rebuilds the
-handful of countries whose bills or cabinet records changed plus the
-non-country pages. A full rebuild (first run, global change, or `force=all`)
+A night with no data changes rebuilds only the non-country pages; a typical
+night adds the handful of countries whose bills or cabinet records changed. A full rebuild (first run, global change, or `force=all`)
 covers about 830 URLs in seven to nine minutes.
 
 ### Atlas history identity

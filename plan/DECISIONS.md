@@ -1480,18 +1480,21 @@ to two days later, unless the job is run by hand.
 is rebuilt only when the data it renders actually changed. Every night at
 07:00 UTC (04:00 in Uruguay, schedule `0 7 * * *`), after the nightly
 imports, `operations.refresh-pages` computes a content fingerprint per
-country over exactly the rows its layout and three tabs render, a global
-fingerprint over inputs every page reads (country list, source metadata
-without sync times, Index and Conditions release headers), and a site
-fingerprint for the non-country pages. Fingerprints hash row content, never
+country over exactly the rows its layout and three tabs render, and a global
+fingerprint over inputs every country page reads (country list, source
+metadata without sync times, Index and Conditions release headers). Fingerprints hash row content, never
 `updated_at`-style bookkeeping, because many tables lack reliable timestamps
 and some writers bump them on no-op upserts. Only a country whose
 fingerprint differs from the one stored at its last successful rebuild has
 its three tabs invalidated (by literal path) and warmed; a global change
-rebuilds every country; the non-country pages rebuild when anything changed.
-The new fingerprint is stored in `page_cache_fingerprints` only after the
-group's pages all re-rendered and verified, so a failure is retried the next
-night. `?force=<slug>` or `?force=all` rebuilds on demand.
+rebuilds every country. The roughly 70 non-country pages (home, rankings,
+leaders, organizations, methodology, the sitemap, and the rest) are rebuilt
+every night without a fingerprint: they read many tables across the site,
+and a missed dependency would leave a page stale until the 30-day backstop.
+They are under a tenth of the cached URLs, so rebuilding them nightly costs
+little. A country's new fingerprint is stored in `page_cache_fingerprints`
+only after its pages all re-rendered and verified, so a failure is retried
+the next night. `?force=<slug>` or `?force=all` rebuilds on demand.
 
 Two consequences are part of the decision:
 

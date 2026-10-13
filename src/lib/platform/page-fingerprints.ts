@@ -38,14 +38,12 @@ import {
  * ci_dimension_scores, current legislature_parties, party_composition_runs,
  * elections, election_results, and constitutions.
  *
- * Global (every page): the country list, the `sources` rows without
+ * Global (every country page): the country list, the `sources` rows without
  * `last_sync_at` (no country page shows it), the Index release header and
  * pointers, and the Conditions release headers.
  *
- * Site (non-country pages only): full `sources` and `jurisdictions` rows
- * (including sync times and the sitemap's modification dates), political
- * parties, organizations, and the Pulse publication state.
- * Non-country pages also rebuild whenever any country changed.
+ * Non-country pages have no fingerprint: they read many tables across the
+ * site, so they are rebuilt on every nightly run instead.
  */
 
 /** Row text with only never-rendered columns removed. */
@@ -212,37 +210,18 @@ export function globalFingerprintQuery(): SQL {
   `;
 }
 
-export function siteFingerprintQuery(): SQL {
-  const table = (name: string) =>
-    sql`(SELECT md5(coalesce(string_agg(${rowText("t")}, '|' ORDER BY ${sql.raw("t::text")}), '')) FROM ${sql.raw(name)} t)`;
-  return sql`
-    SELECT md5(concat_ws('|',
-      ${table("sources")},
-      ${table("jurisdictions")},
-      ${table("political_parties")},
-      ${table("organizations")},
-      ${table("pulse_score_publication_pointers")},
-      ${table("pulse_events_v2")},
-      ${table("pulse_dimensional_deltas")}
-    )) AS fingerprint
-  `;
-}
-
-/** Compute the current fingerprints (three read-only statements). */
+/** Compute the current fingerprints (two read-only statements). */
 export async function readCurrentPageFingerprints(): Promise<CurrentFingerprints> {
-  const [countries, global, site] = await Promise.all([
+  const [countries, global] = await Promise.all([
     db.execute(countryFingerprintQuery()),
     db.execute(globalFingerprintQuery()),
-    db.execute(siteFingerprintQuery()),
   ]);
   const globalValue = String(rowsOf(global)[0]?.fingerprint ?? "");
-  const siteValue = String(rowsOf(site)[0]?.fingerprint ?? "");
-  if (!globalValue || !siteValue) {
-    throw new Error("page fingerprint query returned no global or site value");
+  if (!globalValue) {
+    throw new Error("page fingerprint query returned no global value");
   }
   return {
     global: globalValue,
-    site: siteValue,
     countries: rowsOf(countries).map((row) => ({
       jurisdictionId: String(row.jurisdiction_id),
       slug: String(row.slug),

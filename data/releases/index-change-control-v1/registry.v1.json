@@ -45120,7 +45120,7 @@
         "documentation": [
           {
             "path": "plan/evidence/APR-D179/index-change-note.md",
-            "sha256": "236b4f0e111eb806c2a2f91200830041f78d0e1c2f8a580700fe666219215bbf"
+            "sha256": "f8d90791074763e74dc51f96dbd052b8fb94f7f6a75834ba0995d85180266262"
           }
         ],
         "registry": [
@@ -45132,13 +45132,13 @@
         "release_note": [
           {
             "path": "plan/evidence/APR-D179/index-change-note.md",
-            "sha256": "236b4f0e111eb806c2a2f91200830041f78d0e1c2f8a580700fe666219215bbf"
+            "sha256": "f8d90791074763e74dc51f96dbd052b8fb94f7f6a75834ba0995d85180266262"
           }
         ],
         "migration_plan": [
           {
             "path": "plan/evidence/APR-D179/index-change-note.md",
-            "sha256": "236b4f0e111eb806c2a2f91200830041f78d0e1c2f8a580700fe666219215bbf"
+            "sha256": "f8d90791074763e74dc51f96dbd052b8fb94f7f6a75834ba0995d85180266262"
           }
         ],
         "golden_test": [

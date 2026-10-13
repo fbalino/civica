@@ -183,9 +183,10 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 
 - Public pages are ALWAYS served from the page cache. They are rebuilt only by
   `operations.refresh-pages`, nightly at 07:00 UTC (04:00 in Uruguay), and
-  only when the data they render changed: each country's three tabs are
-  rebuilt when that country's content fingerprint changes, and the other
-  pages when anything changed (APR-D177, APR-D178, APR-D179). A visit or
+  each country's three tabs only when that country's content fingerprint
+  changed; the roughly 70 non-country pages are rebuilt every night because
+  they read too many tables to fingerprint safely (APR-D177, APR-D178,
+  APR-D179). A visit or
   crawler must never trigger a rebuild. The one exception is a safety net: a
   page not rebuilt for 30 days is rebuilt on its next visit, so a dead job
   cannot freeze the site forever; `operations.pipeline-alerts` reports a

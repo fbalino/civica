@@ -4,7 +4,6 @@ import test from "node:test";
 import type { PageRefreshReport, PageWarmTarget } from "./page-refresh";
 import {
   PAGE_FINGERPRINT_VERSION,
-  SITE_PAGE_KEY,
   countryPageKey,
   planPageRebuild,
   type CurrentFingerprints,
@@ -31,7 +30,6 @@ const TARGETS: PageWarmTarget[] = [
 function fingerprints(france = "f1"): CurrentFingerprints {
   return {
     global: "g1",
-    site: "s1",
     countries: [
       { jurisdictionId: JAPAN, slug: "japan", fingerprint: "j1" },
       { jurisdictionId: FRANCE, slug: "france", fingerprint: france },
@@ -42,7 +40,7 @@ function fingerprints(france = "f1"): CurrentFingerprints {
 function storedAfter(state: CurrentFingerprints): Map<string, StoredFingerprint> {
   const plan = planPageRebuild(state, new Map(), { kind: "all" });
   return new Map(
-    [...plan.countries, ...(plan.site ? [plan.site] : [])].map((row) => [
+    plan.countries.map((row) => [
       row.pageKey,
       { fingerprint: row.fingerprint, fingerprintVersion: PAGE_FINGERPRINT_VERSION },
     ]),
@@ -96,7 +94,7 @@ function harness(options: {
   return { calls, deps };
 }
 
-test("unchanged content rebuilds and stores nothing", async () => {
+test("unchanged fingerprints still rebuild the non-country pages every night", async () => {
   const { calls, deps } = harness({
     current: fingerprints(),
     stored: storedAfter(fingerprints()),
@@ -109,9 +107,23 @@ test("unchanged content rebuilds and stores nothing", async () => {
     deps,
   });
   assert.equal(run.status, 200);
-  assert.equal(run.body.invalidated, "none");
-  assert.deepEqual(calls.revalidated, []);
-  assert.deepEqual(calls.warmed, []);
+  assert.deepEqual(calls.warmed.sort(), ["/", "/rankings", SITEMAP_PATH].sort());
+  assert.ok(!calls.warmed.some((path) => path.startsWith("/country/")));
+});
+
+test("unchanged countries are neither invalidated nor stored again", async () => {
+  const { calls, deps } = harness({
+    current: fingerprints(),
+    stored: storedAfter(fingerprints()),
+  });
+  await runPageRebuild({
+    targets: TARGETS,
+    origin: ORIGIN,
+    dryRun: false,
+    force: { kind: "none" },
+    deps,
+  });
+  assert.ok(!calls.revalidated.some((path) => path.startsWith("/country/")));
   assert.deepEqual(calls.stored, []);
 });
 
@@ -139,7 +151,7 @@ test("one changed country rebuilds only its three tabs plus the non-country page
   assert.ok(!calls.warmed.some((path) => path.startsWith("/country/japan")));
   assert.deepEqual(
     calls.stored.map(({ pageKey }) => pageKey).sort(),
-    [countryPageKey(FRANCE), SITE_PAGE_KEY].sort(),
+    [countryPageKey(FRANCE)],
   );
 });
 
@@ -178,7 +190,7 @@ test("a failed warm-up does not store that group's fingerprint", async () => {
   });
   // One failed page of six exceeds the 1% failure threshold.
   assert.equal(run.status, 502);
-  assert.deepEqual(calls.stored.map(({ pageKey }) => pageKey), [SITE_PAGE_KEY]);
+  assert.deepEqual(calls.stored, []);
 });
 
 test("forcing one country rebuilds it; an unknown slug is rejected before any work", async () => {

@@ -12,8 +12,10 @@ APR-D178).
   not rebuilt by the job; a 72-hour backstop would let crawler visits rebuild
   it. The cache-consistency constant and its tests follow.
 - `operations.refresh-pages` runs nightly at 07:00 UTC (`0 7 * * *`) instead
-  of every other day, and compares per-country content fingerprints stored in
-  the new `page_cache_fingerprints` table.
+  of every other day. It rebuilds a country's tabs only when that country's
+  content fingerprint, stored in the new `page_cache_fingerprints` table,
+  changed, and rebuilds the non-country pages (including the Index pages)
+  every night.
 - The Civica Data tab shows, per source, the date Civica last recorded the
   country's own rows from that source instead of the source-wide
   `sources.last_sync_at`.
