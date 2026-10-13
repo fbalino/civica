@@ -1448,3 +1448,24 @@ render that fails outright keeps the last good page, while a page that
 catches a database error and renders a degraded state can cache that state
 until the next refresh; and a database outage is reported by the owner
 monitor at its next daily run. Durable evidence: `plan/evidence/PLT-033/`.
+
+### APR-D178 — Pages are rebuilt every other day at 03:00 Uruguay time, never per visit
+
+**Decision:** Owner decision of 2026-10-12, amending APR-D177. Every cached
+public page is rebuilt by `operations.refresh-pages` every other day at 06:00
+UTC (03:00 in Uruguay, schedule `0 6 */2 * *`). Readers and crawlers are
+always served the cached copy. Each page declares `revalidate = 259200`
+(72 hours) only as a backstop if the job stops running; it must stay longer
+than the 48-hour cadence. Returning a public page to `revalidate = 0`, or
+shortening the window so visits trigger rebuilds, requires a new owner
+decision.
+
+**Why:** After APR-D177 shipped, Vercel compute fell close to zero but
+cache-write charges rose to about $0.45–0.78 a day, because roughly 830
+heavy pages (1–2 MB of HTML plus 0.6–1.1 MB of page data each) were
+rewritten into the cache once a day. Halving the rebuild frequency halves
+that charge. The owner has stated this rule repeatedly; it is recorded here
+and in `AGENTS.md` so later work does not reverse it. Accepted consequence:
+a correction, a manual import, or data from jobs that finish after 06:00 UTC
+(the 06:30 cache refresh and Pulse) reaches readers at the next rebuild, up
+to two days later, unless the job is run by hand.

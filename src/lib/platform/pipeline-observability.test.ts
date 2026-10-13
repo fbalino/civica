@@ -399,11 +399,17 @@ test("daily operations run in dependency order inside the 08:00–10:30 UTC wind
   const order = [
     "/api/cron/pulse/v2/score",
     "/api/cron/pulse/v2/review-sla",
-    "/api/cron/operations/refresh-pages",
     "/api/cron/operations/health-alerts",
     "/api/cron/operations/error-alerts",
     "/api/cron/operations/pipeline-alerts",
   ].map(minuteOf);
   assert.deepEqual([...order].sort((a, b) => a - b), order);
   assert.ok(order.every((minute) => minute >= 8 * 60 && minute <= 10 * 60 + 30));
+});
+
+test("pages are rebuilt every other day at 03:00 Uruguay time (APR-D178)", () => {
+  const refresh = (
+    vercelConfig.crons as Array<{ path: string; schedule: string }>
+  ).find(({ path }) => path === "/api/cron/operations/refresh-pages");
+  assert.equal(refresh?.schedule, "0 6 */2 * *");
 });

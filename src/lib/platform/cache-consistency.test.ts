@@ -194,7 +194,7 @@ test("live page paths cover a layout subtree but only the exact page path", () =
 
 test("the checked live-page allowlist is internally consistent", () => {
   assert.deepEqual(livePageRouteErrors(), []);
-  assert.equal(PAGE_CACHE_REVALIDATE_SECONDS, 86400);
+  assert.equal(PAGE_CACHE_REVALIDATE_SECONDS, 259200);
 });
 
 test("seeded live-page allowlist defects fail closed", () => {
