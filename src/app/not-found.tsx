@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllReferenceJurisdictions } from "@/lib/db/queries";
-import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { ThemedDecorativeImage } from "@/components/ThemedDecorativeImage";
 import "./not-found.css";
-import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
-
-// Cached for a day; the daily operations.refresh-pages job re-renders it
-// after the day's imports (PLT-033).
-export const revalidate = 259200;
 
 export const metadata: Metadata = {
   title: "Page Not Found — 404",
@@ -68,31 +61,11 @@ function CompassEngraving() {
   );
 }
 
-export default async function NotFound() {
-  // Soft-fail: the search is real when the DB is reachable, and the page still
-  // renders coherently (an empty combobox) when it is not.
-  let countries: {
-    slug: string;
-    name: string;
-    iso2: string | null;
-    iso3: string | null;
-    capital: string | null;
-  }[] = [];
-  try {
-    const all = await getAllReferenceJurisdictions();
-    countries = all.map((c) => ({
-      slug: c.slug,
-      name: c.name,
-      iso2: c.iso2,
-      iso3: c.iso3,
-      capital: readCachedFieldFromRow(c, "capital"),
-    }));
-  } catch (error) {
-    // A failed read aborts the cached render (PLT-033).
-    rethrowDatabaseFailure(error);
-    countries = [];
-  }
-
+// The root not-found boundary is serialized into the RSC payload of every
+// page (Next passes it to the root layout router as the 404 fallback), so it
+// must stay small: the country search reads the shared jurisdiction
+// directory on first use instead of carrying a country list.
+export default function NotFound() {
   return (
     <HeroReveal as="div" className="editorial-page not-found">
       <HeroRevealItem>
@@ -114,7 +87,6 @@ export default async function NotFound() {
 
       <HeroRevealItem className="not-found__search">
         <CountrySearchCombobox
-          countries={countries}
           countryPathPrefix="/country"
           placeholder="Find a country…"
           ariaLabel="Find a country"

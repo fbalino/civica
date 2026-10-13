@@ -12,7 +12,8 @@ interface FactbookStickyCountrySearchProps {
     name: string;
     iso2: string | null;
   };
-  countries: ReadonlyArray<FactbookCountryOption>;
+  /** Omit to search the shared site-wide jurisdiction directory. */
+  countries?: ReadonlyArray<FactbookCountryOption>;
   sentinelId: string;
 }
 

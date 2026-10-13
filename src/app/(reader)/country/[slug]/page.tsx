@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import {
   getJurisdictionBySlug,
   getFactbookSections,
-  getFactbookCountryOptions,
   getAllSources,
 } from "@/lib/db/queries";
 import { reconciliation } from "@/lib/content/site-state";
@@ -82,14 +81,13 @@ export default async function CountryFactbookTab({
   const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) notFound();
 
-  const [sectionsResult, countryOptions, headerFacts, citeSources, allSources] =
+  const [sectionsResult, headerFacts, citeSources, allSources] =
     await Promise.all([
       // Every read below aborts the cached render when it fails with a
       // configured database, so no degraded page is cached (PLT-033).
       captureAtlasSurfaceQuery(() => getFactbookSections(jurisdiction.id), {
         rethrow: isCachedRenderFailure,
       }),
-      getFactbookCountryOptions().catch(fallbackWithoutDatabase(() => [])),
       // Resolver batch feeding FactbookSection LeafRow (single-shot leaves
       // keyed off LABEL_TO_FACT_KEY + multi-year groups keyed off
       // MULTI_YEAR_GROUP_TO_FACT_KEY, augmented with the reconciled
@@ -204,7 +202,6 @@ export default async function CountryFactbookTab({
         <div className="factbook-left-rail">
           <CountryJumpSearch
             country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
-            countries={countryOptions}
           />
           <FactbookSidebar items={sidebarItems} />
         </div>
