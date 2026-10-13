@@ -51,7 +51,7 @@ test("all constitution HTML egress paths use the server boundary", () => {
     "utf8",
   );
   const readerSource = readFileSync(
-    "src/components/constitution/ConstitutionReadingColumn.tsx",
+    "src/components/constitution/ConstitutionReader.tsx",
     "utf8",
   );
   const excerptSource = readFileSync(
@@ -68,7 +68,7 @@ test("all constitution HTML egress paths use the server boundary", () => {
   );
   assert.doesNotMatch(readerSource, /sanitizeConstitutionHtml/);
   assert.doesNotMatch(excerptSource, /sanitizeConstitutionHtml/);
-  assert.match(readerSource, /__html: section[.]html/);
+  assert.match(readerSource, /\$\{section[.]html\}/);
   assert.match(excerptSource, /__html: ex[.]excerptHtml/);
 });
 

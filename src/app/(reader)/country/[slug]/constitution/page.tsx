@@ -6,7 +6,10 @@ import {
   getSource,
 } from "@/lib/db/queries";
 import { getConstitutionWithArticles } from "@/lib/db/queries-constitution";
-import { ConstitutionReadingColumn } from "@/components/constitution/ConstitutionReadingColumn";
+import {
+  ConstitutionReaderBody,
+  ConstitutionReaderHeader,
+} from "@/components/constitution/ConstitutionReader";
 import { CountryJumpSearch } from "@/components/country/CountryJumpSearch";
 import { FactbookSidebar } from "@/components/factbook/FactbookSidebar";
 import { buildArticleNav } from "@/lib/constitution/article-nav";
@@ -160,7 +163,7 @@ export default async function CountryConstitutionTab({
   // is off on the reading column). Sidebar items are the constitution's parts
   // when it has more than one, else its articles — each id is a rendered
   // section domId so the ReaderSidebar scroll-spy aligns.
-  const { groups } = buildArticleNav(constitution.articles);
+  const { sections, groups } = buildArticleNav(constitution.articles);
   const partItems = groups
     .map((g) => ({ id: g.entries[0]?.id ?? "", label: g.label }))
     .filter((i) => i.id);
@@ -192,15 +195,20 @@ export default async function CountryConstitutionTab({
         >
           <span className="editorial-eyebrow">Constitution</span>
           <h2 id="constitution-heading">Full constitutional text</h2>
-          {/* Reading body only — the reading column renders its own year line,
-              SourceDot and Constitute attribution. Outline is off; the shared
-              sidebar owns navigation. */}
-          <ConstitutionReadingColumn
-            constitution={constitution}
-            sourceRetrievedAt={sourceRetrievedAt}
-            explorerHref={`/constitution?c=${encodeURIComponent(slug)}`}
-            showOutline={false}
-          />
+          {/* Rendered on the server: the year line, SourceDot and Constitute
+              attribution, then the full text as one sanitized HTML body. The
+              shared sidebar owns navigation, so there is no in-column outline,
+              and the only client code is the props-free hash-focus island. */}
+          <div className="constitution-reader">
+            <ConstitutionReaderHeader
+              constitution={constitution}
+              sourceRetrievedAt={sourceRetrievedAt}
+              explorerHref={`/constitution?c=${encodeURIComponent(slug)}`}
+            />
+            <div className="constitution-reader-layout constitution-reader-layout--no-outline">
+              <ConstitutionReaderBody sections={sections} />
+            </div>
+          </div>
         </section>
       </div>
     </div>

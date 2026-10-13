@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useId, useMemo, useState } from "react";
-import Link from "next/link";
 import { useActiveSection } from "@/hooks/useActiveSection";
-import { SourceDot } from "@/components/SourceDot";
-import {
-  buildArticleNav,
-  type RenderableSection,
-} from "@/lib/constitution/article-nav";
+import { buildArticleNav } from "@/lib/constitution/article-nav";
 import type { ConstitutionDetail } from "@/lib/db/queries-constitution";
+import {
+  ConstitutionReaderBody,
+  ConstitutionReaderHeader,
+} from "./ConstitutionReader";
+import { focusConstitutionSection } from "./ConstitutionHashFocus";
 
 interface ConstitutionReadingColumnProps {
   constitution: ConstitutionDetail;
@@ -21,25 +21,6 @@ interface ConstitutionReadingColumnProps {
    * cross-reference pane can surface them as one-click chips.
    */
   onActiveTopicsChange?: (topics: string[]) => void;
-  /**
-   * When `false`, the in-column outline nav is suppressed and only the reading
-   * body renders. The `/country/[slug]/constitution` tab sets this so the
-   * outline lives in the shared `<FactbookSidebar>` left rail instead — the
-   * same country search + sidebar + body geometry as the other two country
-   * tabs. Defaults to `true` so the standalone Constitution Explorer keeps its
-   * self-contained outline.
-   */
-  showOutline?: boolean;
-}
-
-/** Human year range for the metadata line. */
-function yearLine(year: number | null, yearUpdated: number | null): string {
-  if (year && yearUpdated && yearUpdated !== year) {
-    return `Enacted ${year} · last amended ${yearUpdated}`;
-  }
-  if (year) return `Enacted ${year}`;
-  if (yearUpdated) return `Last amended ${yearUpdated}`;
-  return "Date unknown";
 }
 
 export function ConstitutionReadingColumn({
@@ -47,7 +28,6 @@ export function ConstitutionReadingColumn({
   sourceRetrievedAt,
   explorerHref,
   onActiveTopicsChange,
-  showOutline = true,
 }: ConstitutionReadingColumnProps) {
   const { sections, groups } = useMemo(
     () => buildArticleNav(constitution.articles),
@@ -83,19 +63,6 @@ export function ConstitutionReadingColumn({
     onActiveTopicsChange(topicsByDomId.get(active) ?? []);
   }, [active, topicsByDomId, onActiveTopicsChange]);
 
-  useEffect(() => {
-    const focusHashTarget = () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
-      if (!id || !sectionIds.includes(id)) return;
-      const target = document.getElementById(id);
-      if (!(target instanceof HTMLElement)) return;
-      target.focus({ preventScroll: true });
-    };
-    focusHashTarget();
-    window.addEventListener("hashchange", focusHashTarget);
-    return () => window.removeEventListener("hashchange", focusHashTarget);
-  }, [sectionIds]);
-
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -105,7 +72,7 @@ export function ConstitutionReadingColumn({
     ).matches;
     window.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
     history.replaceState(null, "", `#${id}`);
-    if (el instanceof HTMLElement) el.focus({ preventScroll: true });
+    if (el instanceof HTMLElement) focusConstitutionSection(el);
     setOutlineOpen(false);
   };
 
@@ -119,148 +86,94 @@ export function ConstitutionReadingColumn({
 
   return (
     <div className="constitution-reader">
-      <div className="constitution-reader-header">
-        <div className="constitution-reader-meta">
-          <span>{yearLine(constitution.year, constitution.yearUpdated)}</span>
-          <SourceDot
-            source="constitute_project"
-            retrievedAt={sourceRetrievedAt}
-          />
-        </div>
-        <div className="constitution-reader-attribution-row">
-          <p className="constitution-reader-attribution">
-            Text from the{" "}
-            <a
-              href={
-                constitution.constituteProjectId
-                  ? `https://www.constituteproject.org/constitution/${encodeURIComponent(constitution.constituteProjectId)}`
-                  : "https://www.constituteproject.org/"
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Constitute Project
-            </a>{" "}
-            (Elkins, Ginsburg &amp; Melton), CC BY-NC 3.0.
-          </p>
-          {explorerHref ? (
-            <Link className="btn btn--secondary btn--sm" href={explorerHref}>
-              Open in the Constitution Explorer
-              <span className="btn__arrow" aria-hidden="true">
-                →
-              </span>
-            </Link>
-          ) : null}
-        </div>
-      </div>
+      <ConstitutionReaderHeader
+        constitution={constitution}
+        sourceRetrievedAt={sourceRetrievedAt}
+        explorerHref={explorerHref}
+      />
 
-      <div
-        className={`constitution-reader-layout${
-          showOutline ? "" : " constitution-reader-layout--no-outline"
-        }`}
-      >
-        {/* In-column article nav — grouped by part where headings allow.
-            Suppressed on the country tab, where the outline lives in the
-            shared <FactbookSidebar> left rail instead. */}
-        {showOutline ? (
-          <nav
-            className="constitution-reader-nav"
-            aria-label={`${constitution.name} constitution outline`}
+      <div className="constitution-reader-layout">
+        {/* In-column article nav — grouped by part where headings allow. */}
+        <nav
+          className="constitution-reader-nav"
+          aria-label={`${constitution.name} constitution outline`}
+        >
+          <div className="constitution-reader-nav-title">Outline</div>
+          <button
+            type="button"
+            className="constitution-reader-nav-toggle"
+            aria-expanded={outlineOpen}
+            aria-controls={outlineId}
+            onClick={() => setOutlineOpen((value) => !value)}
           >
-            <div className="constitution-reader-nav-title">Outline</div>
-            <button
-              type="button"
-              className="constitution-reader-nav-toggle"
-              aria-expanded={outlineOpen}
-              aria-controls={outlineId}
-              onClick={() => setOutlineOpen((value) => !value)}
-            >
-              <span>Outline</span>
-              <span className="constitution-reader-nav-current">
-                {activeLabel}
-              </span>
-              <span className="constitution-reader-nav-toggle-icon" aria-hidden>
-                ↓
-              </span>
-            </button>
-            <ol
-              id={outlineId}
-              className="constitution-reader-nav-list"
-              data-mobile-open={outlineOpen ? "true" : "false"}
-            >
-              {groups.map((group) => {
-                const isSingleGroup = groups.length === 1;
-                const expanded = isSingleGroup || openGroups.has(group.id);
-                const groupActive = group.entries.some((e) => e.id === active);
-                return (
-                  <li key={group.id} className="constitution-reader-nav-group">
-                    <button
-                      type="button"
-                      className={`constitution-reader-nav-part${
-                        active === group.id || groupActive ? " is-active" : ""
-                      }`}
-                      aria-expanded={expanded}
-                      aria-controls={`${outlineId}-${group.id}`}
-                      onClick={() => {
-                        if (isSingleGroup) {
-                          scrollTo(group.entries[0]?.id ?? group.id);
-                        } else {
-                          toggleGroup(group.id);
-                        }
-                      }}
+            <span>Outline</span>
+            <span className="constitution-reader-nav-current">
+              {activeLabel}
+            </span>
+            <span className="constitution-reader-nav-toggle-icon" aria-hidden>
+              ↓
+            </span>
+          </button>
+          <ol
+            id={outlineId}
+            className="constitution-reader-nav-list"
+            data-mobile-open={outlineOpen ? "true" : "false"}
+          >
+            {groups.map((group) => {
+              const isSingleGroup = groups.length === 1;
+              const expanded = isSingleGroup || openGroups.has(group.id);
+              const groupActive = group.entries.some((e) => e.id === active);
+              return (
+                <li key={group.id} className="constitution-reader-nav-group">
+                  <button
+                    type="button"
+                    className={`constitution-reader-nav-part${
+                      active === group.id || groupActive ? " is-active" : ""
+                    }`}
+                    aria-expanded={expanded}
+                    aria-controls={`${outlineId}-${group.id}`}
+                    onClick={() => {
+                      if (isSingleGroup) {
+                        scrollTo(group.entries[0]?.id ?? group.id);
+                      } else {
+                        toggleGroup(group.id);
+                      }
+                    }}
+                  >
+                    {group.label}
+                  </button>
+                  {expanded && group.entries.length > 0 ? (
+                    <ol
+                      id={`${outlineId}-${group.id}`}
+                      className="constitution-reader-nav-articles"
                     >
-                      {group.label}
-                    </button>
-                    {expanded && group.entries.length > 0 ? (
-                      <ol
-                        id={`${outlineId}-${group.id}`}
-                        className="constitution-reader-nav-articles"
-                      >
-                        {group.entries.map((entry) => (
-                          <li key={entry.id}>
-                            <a
-                              href={`#${entry.id}`}
-                              className={`constitution-reader-nav-article${
-                                entry.id === active ? " is-active" : ""
-                              }`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                scrollTo(entry.id);
-                              }}
-                            >
-                              {entry.label}
-                            </a>
-                          </li>
-                        ))}
-                      </ol>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ol>
-          </nav>
-        ) : null}
+                      {group.entries.map((entry) => (
+                        <li key={entry.id}>
+                          <a
+                            href={`#${entry.id}`}
+                            className={`constitution-reader-nav-article${
+                              entry.id === active ? " is-active" : ""
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              scrollTo(entry.id);
+                            }}
+                          >
+                            {entry.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
 
-        {/* The reading column. */}
-        <article className="constitution-reader-body">
-          {sections.map((section: RenderableSection) => (
-            <section
-              key={section.domId}
-              id={section.domId}
-              tabIndex={-1}
-              className={`constitution-section${
-                section.partId ? " constitution-section--part" : ""
-              }`}
-              // `html` crossed the server-side constitution-html/v1 boundary
-              // before this client component received it. DOM ids used for
-              // navigation live on this trusted outer section, not in the
-              // stored fragment.
-              dangerouslySetInnerHTML={{
-                __html: section.html,
-              }}
-            />
-          ))}
-        </article>
+        {/* The reading column; remounts per constitution so a #sec- hash
+            is focused again after the Explorer switches texts. */}
+        <ConstitutionReaderBody key={constitution.slug} sections={sections} />
       </div>
     </div>
   );

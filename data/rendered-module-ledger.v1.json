@@ -25290,10 +25290,39 @@
       }
     },
     {
-      "id": "src/app/(reader)/country/[slug]/constitution/page.tsx:src/components/constitution/ConstitutionReadingColumn.tsx",
+      "id": "src/app/(reader)/country/[slug]/constitution/page.tsx:src/components/constitution/ConstitutionHashFocus.tsx",
       "route": "/country/[slug]/constitution",
       "routeSource": "src/app/(reader)/country/[slug]/constitution/page.tsx",
-      "moduleSource": "src/components/constitution/ConstitutionReadingColumn.tsx",
+      "moduleSource": "src/components/constitution/ConstitutionHashFocus.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": null,
+          "findingId": "EXP-001-NO-BROWSER-EVIDENCE"
+        }
+      }
+    },
+    {
+      "id": "src/app/(reader)/country/[slug]/constitution/page.tsx:src/components/constitution/ConstitutionReader.tsx",
+      "route": "/country/[slug]/constitution",
+      "routeSource": "src/app/(reader)/country/[slug]/constitution/page.tsx",
+      "moduleSource": "src/components/constitution/ConstitutionReader.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {
@@ -46982,6 +47011,35 @@
       }
     },
     {
+      "id": "src/app/constitution/page.tsx:src/components/constitution/ConstitutionHashFocus.tsx",
+      "route": "/constitution",
+      "routeSource": "src/app/constitution/page.tsx",
+      "moduleSource": "src/components/constitution/ConstitutionHashFocus.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
       "id": "src/app/constitution/page.tsx:src/components/constitution/ConstitutionHero.tsx",
       "route": "/constitution",
       "routeSource": "src/app/constitution/page.tsx",
@@ -47015,6 +47073,35 @@
       "route": "/constitution",
       "routeSource": "src/app/constitution/page.tsx",
       "moduleSource": "src/components/constitution/ConstitutionLanding.tsx",
+      "role": "component",
+      "visual": {
+        "desktop_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "desktop_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-desktop-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_light": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-light-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        },
+        "small_mobile_dark": {
+          "disposition": "not_observed",
+          "screenshot": "e2e/qa-013-visual-regression.spec.ts-snapshots/constitution-dark-small-mobile-chromium-darwin.png",
+          "findingId": "EXP-001-CANDIDATE-NOT-REVIEWED"
+        }
+      }
+    },
+    {
+      "id": "src/app/constitution/page.tsx:src/components/constitution/ConstitutionReader.tsx",
+      "route": "/constitution",
+      "routeSource": "src/app/constitution/page.tsx",
+      "moduleSource": "src/components/constitution/ConstitutionReader.tsx",
       "role": "component",
       "visual": {
         "desktop_light": {

@@ -752,6 +752,13 @@
   overflow: visible;
 }
 
+/* Axis tick labels (both axes): set once here instead of per tick. */
+.indicator-trend-svg .indicator-trend-tick {
+  font-family: var(--font-body);
+  fill: var(--color-text-50);
+  font-variant-numeric: tabular-nums;
+}
+
 /* HTML hover overlay laid over the fluid SVG. Each per-year column IS the
    canonical Tooltip trigger wrapper (.editorial-tooltip-trigger), which
    carries its coordinates via the Tooltip `triggerStyle` prop so the

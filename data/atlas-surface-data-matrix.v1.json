@@ -537,7 +537,7 @@
       "id": "country.constitution.reader",
       "kind": "country_module",
       "route": "/country/[slug]/constitution",
-      "renderer": "src/components/constitution/ConstitutionReadingColumn.tsx",
+      "renderer": "src/components/constitution/ConstitutionReader.tsx",
       "dataAccess": [
         {
           "symbol": "getConstitutionWithArticles",
@@ -2161,5 +2161,5 @@
       "releaseReason": "The operational report accompanies the release but is not part of the normalized export tables."
     }
   ],
-  "semanticSha256": "818c6265f0d8019312b6265cd052bbe3a6fd082eff406d1c5d888ab91ffef364"
+  "semanticSha256": "0e1971a061c378a69641e4e84c0c220198d82e354573294f5d7e327b58fa3a69"
 }
