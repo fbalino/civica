@@ -43,14 +43,25 @@ function count(markup: string, pattern: RegExp): number {
   return markup.match(new RegExp(pattern.source, "g"))?.length ?? 0;
 }
 
-// Counted by the painted colour, so a seat painted in a party's colour counts
-// for that party whatever other attributes it carries.
+// Seats are drawn as runs: a <g> carrying the paint (a party colour or the
+// unattributed state) around one bare <circle> per seat. Counted by the
+// painted colour, so a seat painted in a party's colour counts for that party.
+function seatRuns(markup: string): Array<{ attrs: string; seats: number }> {
+  return [
+    ...markup.matchAll(
+      /<g ([^>]*class="factbook-legislature-seat-run[^"]*"[^>]*)>(.*?)<\/g>/g,
+    ),
+  ].map((m) => ({ attrs: m[1], seats: count(m[2], /<circle /) }));
+}
+const seatsWhere = (markup: string, attr: RegExp) =>
+  seatRuns(markup)
+    .filter((run) => attr.test(run.attrs))
+    .reduce((sum, run) => sum + run.seats, 0);
 const partySeats = (markup: string, partyId: string) =>
-  count(markup, new RegExp(`<circle [^>]*fill="var\\(--test-${partyId}\\)"`));
+  seatsWhere(markup, new RegExp(`fill="var\\(--test-${partyId}\\)"`));
 const unattributedSeats = (markup: string) =>
-  count(markup, /data-seat-state="unattributed"/);
-const allSeats = (markup: string) =>
-  count(markup, /<circle [^>]*class="factbook-legislature-seat/);
+  seatsWhere(markup, /data-seat-state="unattributed"/);
+const allSeats = (markup: string) => seatsWhere(markup, /./);
 
 function description(markup: string): string {
   return markup.match(/<desc [^>]*>([^<]*)<\/desc>/)?.[1] ?? "";
@@ -74,7 +85,7 @@ test("an unreported seat is drawn unattributed, not in the smallest party's colo
   // The unattributed seat takes the design-system state class, not a colour.
   assert.match(
     markup,
-    /class="factbook-legislature-seat factbook-legislature-seat--unattributed"/,
+    /class="factbook-legislature-seat-run factbook-legislature-seat-run--unattributed"/,
   );
 });
 

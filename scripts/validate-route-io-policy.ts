@@ -32,7 +32,7 @@ const EXPECTED_HTML_SINKS = new Map<string, readonly string[]>([
     ["Sanitized", "constitution-html/v1"],
   ],
   [
-    "src/components/constitution/ConstitutionReadingColumn.tsx",
+    "src/components/constitution/ConstitutionReader.tsx",
     ["Sanitized", "constitution-html/v1"],
   ],
   ["src/components/CivicaLogo.tsx", ["symbol"]],

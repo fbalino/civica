@@ -2916,23 +2916,26 @@ legend.editorial-filter-label {
   line-height: var(--leading-relaxed);
   color: var(--color-text-primary);
 }
-.constitution-section {
+/* Constitution sections arrive as one server-built HTML body of bare
+   <section id="sec-…"> elements (only parts carry a class), so they are
+   matched structurally; :where() keeps the single-class specificity. */
+.constitution-reader-body > :where(section) {
   scroll-margin-top: 88px;
 }
-.constitution-section:focus {
+.constitution-reader-body > :where(section):focus {
   outline: none;
 }
-.constitution-section:focus-visible {
+.constitution-reader-body > :where(section):focus-visible {
   outline: var(--space-1) solid var(--color-accent);
   outline-offset: var(--space-3);
 }
 .constitution-section--part {
   margin-top: var(--space-7);
 }
-.constitution-section h1,
-.constitution-section h2,
-.constitution-section h3,
-.constitution-section h4 {
+.constitution-reader-body > :where(section) h1,
+.constitution-reader-body > :where(section) h2,
+.constitution-reader-body > :where(section) h3,
+.constitution-reader-body > :where(section) h4 {
   font-family: var(--font-heading);
   font-weight: var(--font-weight-regular);
   line-height: var(--leading-snug);
@@ -2946,21 +2949,21 @@ legend.editorial-filter-label {
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-card-border);
 }
-.constitution-section h3 {
+.constitution-reader-body > :where(section) h3 {
   font-size: var(--text-18);
 }
-.constitution-section p {
+.constitution-reader-body > :where(section) p {
   margin: 0 0 var(--space-4);
 }
-.constitution-section .upper {
+.constitution-reader-body > :where(section) .upper {
   text-transform: none;
 }
-.constitution-section ul,
-.constitution-section ol {
+.constitution-reader-body > :where(section) ul,
+.constitution-reader-body > :where(section) ol {
   margin: 0 0 var(--space-4);
   padding-left: var(--space-6);
 }
-.constitution-section li {
+.constitution-reader-body > :where(section) li {
   margin-bottom: var(--space-2);
 }
 

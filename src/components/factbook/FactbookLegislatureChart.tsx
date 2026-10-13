@@ -46,6 +46,17 @@ interface SeatPos {
   row: number;
 }
 
+interface SeatRun {
+  /** Zero-based index of the run's first seat. */
+  start: number;
+  /** Party id, or null for the unattributed seat state. */
+  partyId: string | null;
+  color: string | null;
+  /** Tooltip label: the party name or "No party reported". */
+  label: string;
+  seats: SeatPos[];
+}
+
 function seatLayout(total: number): SeatPos[] {
   const rows = Math.max(6, Math.round(Math.sqrt(total / 3.1)));
   const seats: SeatPos[] = [];
@@ -116,6 +127,49 @@ export function FactbookLegislatureChart({
   const seatParty = attribution.seats;
   const unattributedSeats = attribution.unattributedSeats;
 
+  // Party rows fill seats in order, so each party (and the unattributed
+  // state) occupies consecutive seats; one run per group of seats.
+  const seatRuns = useMemo(() => {
+    const runs: SeatRun[] = [];
+    seats.forEach((seat, index) => {
+      const p = seatParty[index];
+      if (!p) return;
+      const partyId = p.kind === "party" ? p.id : null;
+      const last = runs[runs.length - 1];
+      if (last && last.partyId === partyId && last.start + last.seats.length === index) {
+        last.seats.push(seat);
+        return;
+      }
+      runs.push({
+        start: index,
+        partyId,
+        color: p.kind === "party" ? p.color : null,
+        label: p.kind === "party" ? p.name : UNATTRIBUTED_SEAT_LABEL,
+        seats: [seat],
+      });
+    });
+    return runs;
+  }, [seats, seatParty]);
+
+  // One delegated handler serves every seat: the seat's group names the
+  // party and its first seat number; the seat's position in the group gives
+  // the rest.
+  function seatHover(e: MouseEvent<SVGSVGElement>) {
+    const seat = e.target;
+    const group = seat instanceof SVGCircleElement ? seat.parentElement : null;
+    if (!group || group.dataset.seatStart == null) {
+      setHover(null);
+      return;
+    }
+    const offset = Array.prototype.indexOf.call(group.children, seat);
+    setHover({
+      partyName: group.dataset.seatLabel ?? "",
+      seatIndex: Number(group.dataset.seatStart) + offset,
+      x: e.clientX,
+      y: e.clientY,
+    });
+  }
+
   const seatGroups = [
     ...chamber.parties.map((party) => `${party.name}, ${party.seats} seats`),
     ...(unattributedSeats > 0
@@ -171,6 +225,9 @@ export function FactbookLegislatureChart({
             preserveAspectRatio="xMidYMid meet"
             role="img"
             aria-labelledby={`${svgTitleId} ${svgDescId}`}
+            onMouseOver={seatHover}
+            onMouseMove={seatHover}
+            onMouseLeave={() => setHover(null)}
           >
             <title id={svgTitleId}>{svgTitle}</title>
             <desc id={svgDescId}>{svgDescription}</desc>
@@ -214,50 +271,36 @@ export function FactbookLegislatureChart({
                 MAJORITY {majorityLine}
               </text>
             )}
-            {/* Seats */}
-            {seats.map((s, i) => {
-              const p = seatParty[i];
-              if (!p) return null;
-              const label =
-                p.kind === "party" ? p.name : UNATTRIBUTED_SEAT_LABEL;
-              const showTip = (e: MouseEvent<SVGCircleElement>) =>
-                setHover({
-                  partyName: label,
-                  seatIndex: i,
-                  x: e.clientX,
-                  y: e.clientY,
-                });
-              if (p.kind === "unattributed") {
-                return (
-                  <circle
-                    key={i}
-                    cx={s.x}
-                    cy={s.y}
-                    r={2.1}
-                    className="factbook-legislature-seat factbook-legislature-seat--unattributed"
-                    data-seat-state="unattributed"
-                    onMouseEnter={showTip}
-                    onMouseMove={showTip}
-                    onMouseLeave={() => setHover(null)}
-                  />
-                );
-              }
-              const isDim = dimmed.has(p.id);
+            {/* Seats — one group per consecutive run of seats sharing a
+                party (or the unattributed state). The group carries the
+                paint, the party id, and the dim state, so each seat is just
+                its position: a 650-seat chamber stays a few kilobytes. */}
+            {seatRuns.map((run) => {
+              const isDim = run.partyId != null && dimmed.has(run.partyId);
               return (
-                <circle
-                  key={i}
-                  cx={s.x}
-                  cy={s.y}
-                  r={2.1}
-                  fill={p.color}
-                  stroke="color-mix(in oklab, currentColor, black 20%)"
-                  strokeWidth="0.2"
-                  className={`factbook-legislature-seat${isDim ? " is-dim" : ""}`}
-                  data-seat-party={p.id}
-                  onMouseEnter={showTip}
-                  onMouseMove={showTip}
-                  onMouseLeave={() => setHover(null)}
-                />
+                <g
+                  key={run.start}
+                  className={
+                    run.partyId == null
+                      ? "factbook-legislature-seat-run factbook-legislature-seat-run--unattributed"
+                      : `factbook-legislature-seat-run${isDim ? " is-dim" : ""}`
+                  }
+                  fill={run.color ?? undefined}
+                  stroke={
+                    run.partyId == null
+                      ? undefined
+                      : "color-mix(in oklab, currentColor, black 20%)"
+                  }
+                  strokeWidth={run.partyId == null ? undefined : "0.2"}
+                  data-seat-party={run.partyId ?? undefined}
+                  data-seat-state={run.partyId == null ? "unattributed" : undefined}
+                  data-seat-start={run.start}
+                  data-seat-label={run.label}
+                >
+                  {run.seats.map((s, i) => (
+                    <circle key={i} cx={s.x} cy={s.y} r={2.1} />
+                  ))}
+                </g>
               );
             })}
           </svg>

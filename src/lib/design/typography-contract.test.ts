@@ -119,7 +119,7 @@ test("large hero titles are Light while lower headings are Regular", () => {
   );
   assert.match(
     editorial,
-    /\.constitution-section h1,[^}]*font-weight:\s*var\(--font-weight-regular\)/,
+    /\.constitution-reader-body > :where\(section\) h1,[^}]*font-weight:\s*var\(--font-weight-regular\)/,
   );
   assert.match(
     designSystem,
