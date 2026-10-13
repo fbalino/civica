@@ -107,27 +107,34 @@ so the production database is busy once and can suspend the rest of the day:
 | --- | --- |
 | 08:00–09:00 | Pulse ingest (every connector except GDELT), cluster, classify (locked on Vercel), score |
 | 09:15 | `pulse.v2.review-sla` |
-| 10:00 | `operations.refresh-pages` |
 | 10:15 | `operations.health-alerts` (also dispatches recoveries) |
 | 10:20 | `operations.error-alerts` (open events seen in the last 25 hours) |
 | 10:30 | `operations.pipeline-alerts` |
 
 The data imports keep their own earlier slots (01:00–06:30 UTC daily, plus
-monthly and quarterly publisher syncs). The owner-Mac Pulse runner (APR-D176) is not a
+monthly and quarterly publisher syncs). The page rebuild,
+`operations.refresh-pages`, runs inside that import window at 07:00 UTC on
+odd-numbered days (see below). The owner-Mac Pulse runner (APR-D176) is not a
 Vercel job: it retrieves GDELT, clusters, classifies, and calls the score
 route later in the day, so it wakes the database once more, and the Pulse
-results it produces reach the cached pages at the next day's 10:00 refresh
+results it produces reach the cached pages at the next scheduled rebuild
 unless `operations.refresh-pages` is run by hand after it. The review-SLA deadlines themselves
 are timestamps and are evaluated exactly on every read; the daily monitor
 records escalation events and logs alerts once a day, so an item queued after
 09:15 is first flagged the next morning. A critical item (24-hour deadline)
 queued after 09:15 can therefore be past its deadline when first flagged.
 
-### Daily page refresh (PLT-033)
+### Page rebuild every two days (PLT-033, APR-D178)
 
-Database-backed public pages are served from the page cache and declare a
-24-hour `revalidate` backstop (APR-D177). `operations.refresh-pages` runs at
-10:00 UTC, after the day's bills, factbook, and Pulse jobs. It reads the
+Database-backed public pages are always served from the page cache. Owner
+rule (2026-10-12): pages are rebuilt every other day at 04:00 Uruguay time
+(07:00 UTC, schedule `0 7 */2 * *`), when the site is quietest, and never
+because a visitor or crawler arrived. Each page declares a 72-hour
+`revalidate` backstop that only takes effect if this job stops running; do
+not shorten it below the 48-hour cadence and do not return pages to
+`revalidate = 0`. Data from jobs that finish after 07:00 UTC (Pulse) reaches pages at the next rebuild. The day-of-month step
+restarts each month, so a 31-day month rebuilds on the 31st and again on the
+1st. The job reads the
 sitemap, calls `revalidatePath("/", "layout")` so every cached page is marked
 for re-rendering, then requests each cacheable sitemap URL: same origin, no
 query string, and not listed in `LIVE_PAGE_ROUTES`.

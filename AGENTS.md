@@ -182,6 +182,18 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   evidence deleted before that point. Full policy:
   `data/RESEARCH-EVIDENCE-RETENTION.md`.
 
+## Page caching (owner rule — do not reverse)
+
+- Public pages are ALWAYS served from the page cache. They are rebuilt only by
+  `operations.refresh-pages`, every other day at 07:00 UTC (04:00 in Uruguay).
+  A visit or crawler must never trigger a rebuild (APR-D177, APR-D178). The
+  one exception is a safety net: if that job has not run for 72 hours, the
+  next visit rebuilds the page, so a dead job cannot freeze the site.
+- Database-backed pages declare `export const revalidate = 259200;` (that
+  72-hour safety net). Never set a public page to `revalidate = 0` or shorten the window
+  to make data fresher; run `operations.refresh-pages` by hand instead.
+  `npm run validate:cache-consistency` enforces this.
+
 ## Atlas bulk export
 
 - DAT-017 publishes the frozen `civica-atlas-export/v1` package linked from

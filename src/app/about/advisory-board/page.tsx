@@ -15,7 +15,7 @@ import { rethrowDatabaseFailure } from "@/lib/platform/cached-render";
 
 // Cached for a day; the daily operations.refresh-pages job re-renders it
 // after the day's imports (PLT-033).
-export const revalidate = 86400;
+export const revalidate = 259200;
 
 const STATUS_LABEL: Record<string, string> = {
   "coming-soon": "Planned — no members appointed",

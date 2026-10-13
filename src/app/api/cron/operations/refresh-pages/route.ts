@@ -17,10 +17,10 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 800;
 
 /**
- * PLT-033 — runs daily at 10:00 UTC, after the bills (03:00–05:30), factbook
- * (01:00–06:30), and Pulse (08:00–09:00) jobs. It marks every cached page for
- * re-rendering, then requests each cacheable sitemap URL so the pages are
- * rebuilt now rather than on a crawler's first visit.
+ * PLT-033 / APR-D178 — runs every other day at 07:00 UTC (04:00 in Uruguay),
+ * the owner's chosen quiet hour. It marks every cached page for re-rendering,
+ * then requests each cacheable sitemap URL so the pages are rebuilt now
+ * rather than on a crawler's first visit. Pages are never rebuilt per visit.
  *
  * Invalidation is repeatable, so a retry or duplicate run is harmless. A dry
  * run lists the warm-up targets without invalidating or requesting anything.

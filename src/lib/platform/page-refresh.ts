@@ -5,10 +5,10 @@ import { SITE_URL } from "@/lib/site";
 import { unescapeSitemapUrl } from "@/lib/seo/sitemap-xml";
 
 /**
- * PLT-033 — daily page refresh.
+ * PLT-033 / APR-D178 — scheduled page rebuild.
  *
- * `operations.refresh-pages` invalidates the whole page cache once the day's
- * imports have finished, then requests every cacheable sitemap URL so the
+ * `operations.refresh-pages` invalidates the whole page cache every other day
+ * at 07:00 UTC, then requests every cacheable sitemap URL so the
  * database does its rendering in one bounded window instead of whenever a
  * crawler first arrives.
  *

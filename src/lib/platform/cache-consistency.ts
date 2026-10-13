@@ -14,10 +14,11 @@ import { ROUTE_INVENTORY } from "@/lib/api/route-inventory/registry";
  * never opt into stale-while-revalidate/stale-if-error. Frozen release URLs are
  * immutable and are replaced by a new URL rather than overwritten.
  *
- * PLT-033 (APR-D177) — database-backed public pages are cached. Each one
- * declares the literal `revalidate = 86400` backstop, and the daily
- * `operations.refresh-pages` job invalidates every page and re-renders the
- * sitemap after the day's imports. A page stays request-live only when it is
+ * PLT-033 (APR-D177, APR-D178) — database-backed public pages are always
+ * served from the page cache. `operations.refresh-pages` rebuilds them every
+ * other day at 07:00 UTC (04:00 in Uruguay), when traffic is lowest; each page
+ * declares the literal `revalidate = 259200` (three days) only as a backstop
+ * should that job fail. A page stays request-live only when it is
  * listed in `LIVE_PAGE_ROUTES`: it is private to a signed-in session, or it
  * reads per-request input (`searchParams`, headers, cookies) that Next.js
  * cannot serve from a shared page cache.
@@ -27,10 +28,12 @@ export const CACHE_CONSISTENCY_SCHEMA_VERSION =
 
 /**
  * The only revalidate literal a cached database-backed page may declare
- * (24 hours). Next.js requires a statically analyzable literal, so pages write
- * `export const revalidate = 86400;` and the cache gate checks the value.
+ * (72 hours). It must stay longer than the 48-hour `operations.refresh-pages`
+ * cadence, so pages are rebuilt by that job and never by a crawler's visit.
+ * Next.js requires a statically analyzable literal, so pages write
+ * `export const revalidate = 259200;` and the cache gate checks the value.
  */
-export const PAGE_CACHE_REVALIDATE_SECONDS = 86400 as const;
+export const PAGE_CACHE_REVALIDATE_SECONDS = 259200 as const;
 
 export type LivePageReason = "private-session" | "request-input";
 

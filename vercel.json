@@ -107,7 +107,7 @@
     },
     {
       "path": "/api/cron/operations/refresh-pages",
-      "schedule": "0 10 * * *"
+      "schedule": "0 7 */2 * *"
     },
     {
       "path": "/api/cron/operations/health-alerts",
