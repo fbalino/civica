@@ -179,6 +179,29 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   evidence deleted before that point. Full policy:
   `data/RESEARCH-EVIDENCE-RETENTION.md`.
 
+## Build and deploy pipeline
+
+- Vercel runs `vercel.json` `buildCommand` = `npm run vercel-build` =
+  `scripts/vercel-build.ts`. **Production** (`VERCEL_ENV` not `preview`) runs
+  `npm run build` exactly as always: `prebuild`, every `build:core` validator,
+  then `next build`.
+- A **pull-request preview** (`VERCEL_GIT_PULL_REQUEST_ID` set; a branch
+  pushed before its PR exists, or a CLI deploy, still gets the full build
+  because `verify` has not covered it) runs only what needs Vercel's environment:
+  `validate:env --context=build`, the `prebuild` gates
+  (`validate:build-prereqs`, which `verify` skips because `build:ci` uses
+  `--ignore-scripts`), `validate:jurisdiction-directory` (live jurisdictions
+  diff), `validate:content-templates` (live site stats), and `next build`.
+  Every other `build:core` validator passes identically without a database
+  and already runs on every pull request in the GitHub `verify` job
+  (`build:ci`), so a preview skips about five minutes of duplicate Build CPU. Put `[full-build]` in the head commit message to force
+  the complete chain on a preview.
+- Add any new validator that reads the live database to `PREVIEW_STEPS` in
+  `scripts/vercel-build.ts`; offline validators belong only in `build:core`.
+- The `main` ruleset requires both `verify` and `Vercel`; previews still build
+  so the `Vercel` status stays real. Do not add an Ignored Build Step without
+  first proving what status Vercel reports for a skipped build.
+
 ## Page caching (owner rule — do not reverse)
 
 - Public pages are ALWAYS served from the page cache. They are rebuilt only by
