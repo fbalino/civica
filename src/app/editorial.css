@@ -1027,6 +1027,67 @@ legend.editorial-filter-label {
   color: var(--color-text-primary);
 }
 
+/* ── Chip component (`<Chip>` / legacy `<Pill>`, editorial/Pill.tsx) ──
+   The canonical tinted chip. Tone modifiers: neutral (default hairline +
+   page tint) and sage / sand / rose / blue / accent (color-mix wash of the
+   status hue on the page background, same-hue 32% border, primary text).
+   `--md` is the larger size; the default is the small chip. Layout modifiers
+   (`--heading-inline`, `--header-tag`) replace one-off inline styles. */
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-page-bg);
+  color: var(--color-text-60);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+.ui-chip--md {
+  padding: 4px 11px;
+  font-size: var(--text-13);
+}
+.ui-chip--sage {
+  --ui-chip-hue: var(--color-status-success);
+}
+.ui-chip--sand {
+  --ui-chip-hue: var(--color-status-warning);
+}
+.ui-chip--rose {
+  --ui-chip-hue: var(--color-status-danger);
+}
+.ui-chip--blue {
+  --ui-chip-hue: var(--color-status-info);
+}
+.ui-chip--accent {
+  --ui-chip-hue: var(--color-accent);
+}
+.ui-chip--sage,
+.ui-chip--sand,
+.ui-chip--rose,
+.ui-chip--blue,
+.ui-chip--accent {
+  background: color-mix(in oklab, var(--ui-chip-hue) 16%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--ui-chip-hue) 32%, transparent);
+  color: var(--color-text-primary);
+}
+/* Inline with a heading (the old `.editorial-beta-tag` placement). */
+.ui-chip--heading-inline {
+  margin-left: var(--space-3);
+  vertical-align: middle;
+}
+/* Beta tag beside the country-header facts. */
+.ui-chip--header-tag {
+  margin-left: var(--space-1);
+  align-self: center;
+  line-height: 1;
+}
+
 /* ── Tonal chip modifiers (component spec v1 §2) ────────────────────
    Subtle wash on the paper bg, same-hue low-alpha border, and the role-text
    foreground. Mirrors the <Chip> recipe so CSS-driven filter chips stay AA

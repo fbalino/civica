@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 /*
  * Chip (component spec v1 §2) — tinted, fully rounded, SANS, MIXED-CASE.
@@ -18,6 +18,9 @@ import type { CSSProperties, ReactNode } from "react";
  *
  * `neutral` is the one exception: it uses the explicit hairline/page tokens
  * rather than a tint, matching the spec's default chip.
+ *
+ * Styling lives in CSS classes (`.ui-chip*` in src/app/editorial.css), never in
+ * inline style objects.
  */
 
 /** Canonical tonal variants from the spec. */
@@ -32,19 +35,6 @@ type LegacyVariant = "default" | "accent" | "success" | "warn" | "danger" | "inf
 
 type ChipVariant = ChipTone | LegacyVariant;
 type ChipSize = "sm" | "md";
-
-/** Map every accepted variant name onto the hue token that drives the tint. */
-const TONE_HUE: Record<ChipTone, string | null> = {
-  // neutral has no single hue — handled explicitly below.
-  neutral: null,
-  sage: "var(--color-status-success)",
-  sand: "var(--color-status-warning)",
-  rose: "var(--color-status-danger)",
-  blue: "var(--color-status-info)",
-  accent: "var(--color-accent)",
-};
-
-const CHIP_FOREGROUND = "var(--color-text-primary)";
 
 /** Normalise legacy variant names to canonical tones. */
 const VARIANT_TONE: Record<ChipVariant, ChipTone> = {
@@ -67,65 +57,34 @@ interface ChipProps {
   children: ReactNode;
   variant?: ChipVariant;
   size?: ChipSize;
+  /** Extra class names (layout modifiers such as `ui-chip--heading-inline`). */
   className?: string;
-  /** Extra inline styles merged after the tonal recipe (e.g. positioning). */
-  style?: CSSProperties;
   /** Accessible label, forwarded to the rendered element. */
   "aria-label"?: string;
   /** Native tooltip, forwarded to the rendered element. */
   title?: string;
 }
 
-function chipStyle(tone: ChipTone, size: ChipSize) {
-  const base = {
-    display: "inline-flex",
-    alignItems: "center",
-    borderRadius: "var(--radius-chip)",
-    padding: size === "sm" ? "3px 9px" : "4px 11px",
-    fontFamily: "var(--font-body)",
-    fontSize: size === "sm" ? "var(--text-12)" : "var(--text-13)",
-    fontWeight: 500,
-    letterSpacing: 0,
-    textTransform: "none" as const,
-    whiteSpace: "nowrap" as const,
-  };
-
-  if (tone === "neutral") {
-    return {
-      ...base,
-      background: "var(--color-page-bg)",
-      border: "1px solid var(--color-card-border)",
-      color: "var(--color-text-60)",
-    };
-  }
-
-  const hue = TONE_HUE[tone]!;
-  return {
-    ...base,
-    background: `color-mix(in oklab, ${hue} 16%, var(--color-page-bg))`,
-    border: `1px solid color-mix(in oklab, ${hue} 32%, transparent)`,
-    color: CHIP_FOREGROUND,
-  };
-}
-
-/** The Chip — canonical export. */
+/**
+ * Class names are the whole styling contract: `.ui-chip` plus a tone modifier
+ * and, for the medium size, `.ui-chip--md` (all in editorial.css). No inline
+ * style is emitted, so repeated chips cost a short class string instead of a
+ * style object in every page's HTML and React payload.
+ */
 export function Chip({
   children,
   variant = "neutral",
   size = "sm",
   className,
-  style,
   "aria-label": ariaLabel,
   title,
 }: ChipProps) {
   const tone = VARIANT_TONE[variant];
+  const classes = ["ui-chip", `ui-chip--${tone}`];
+  if (size === "md") classes.push("ui-chip--md");
+  if (className) classes.push(className);
   return (
-    <span
-      className={className}
-      style={{ ...chipStyle(tone, size), ...style }}
-      aria-label={ariaLabel}
-      title={title}
-    >
+    <span className={classes.join(" ")} aria-label={ariaLabel} title={title}>
       {children}
     </span>
   );
