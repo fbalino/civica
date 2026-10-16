@@ -1674,6 +1674,20 @@ legend.editorial-filter-label {
   white-space: nowrap;
 }
 
+/* Loading and error states while the source detail is fetched on open. */
+.fact-value-panel-status {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-60);
+}
+.fact-value-panel-status p {
+  margin: 0;
+}
+
 .fact-value-disputed-banner {
   display: block;
   margin-bottom: 10px;

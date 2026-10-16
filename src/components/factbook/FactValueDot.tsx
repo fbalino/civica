@@ -25,18 +25,20 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { createPortal } from "react-dom";
 import { SquarePlus } from "lucide-react";
 import { isFrozenSource, sourceLabel } from "@/lib/data/sources";
-import {
-  FactValuePanel,
-  type FactValuePanelProps,
-} from "./FactValuePanel";
+import type { FactSourceRef } from "@/lib/factbook/reconcile/fact-panel-model";
+import { factPanelMatchesPage } from "@/lib/factbook/reconcile/fact-panel-currency";
+import { FactValuePanel } from "./FactValuePanel";
+import { useFactSourcePanel } from "./useFactSourcePanel";
 
 const HOVER_OPEN_DELAY_MS = 80;
 const HOVER_CLOSE_DELAY_MS = 200;
 
-export interface FactValueDotProps extends FactValuePanelProps {
-  /** Source ID of the canonical pick — drives the visual (green
-   *  for live sources, amber for frozen / CIA). */
-  canonicalSourceId: string | null;
+export interface FactValueDotProps {
+  /** Compact source reference: the canonical source drives the visual
+   *  (green for live sources, amber for frozen / CIA) and the disputed
+   *  chip. The full reconciliation detail is fetched when the panel opens. */
+  source: FactSourceRef;
+  factLabel: string;
   /** ARIA label fragment, e.g. "Population, source: CIA Factbook". */
   ariaLabel?: string;
 }
@@ -79,13 +81,11 @@ function computePortalPosition(
 }
 
 export function FactValueDot({
-  factKey,
+  source,
   factLabel,
-  resolverOutput,
-  disputed,
-  canonicalSourceId,
   ariaLabel,
 }: FactValueDotProps) {
+  const { jurisdictionId, factKey, canonicalSourceId } = source;
   const [open, setOpen] = useState(false);
   /** Pinned = opened by click; survives mouse-leave. */
   const [pinned, setPinned] = useState(false);
@@ -99,7 +99,13 @@ export function FactValueDot({
   const isFrozen = canonicalSourceId
     ? isFrozenSource(canonicalSourceId)
     : false;
-  const isDisputed = disputed ?? resolverOutput.isDisputed;
+  const isDisputed = source.isDisputed;
+  const { state: panelState, retry } = useFactSourcePanel({
+    jurisdictionId,
+    factKey,
+    open,
+    pinned,
+  });
   const portalRoot = typeof document === "undefined" ? null : document.body;
 
   // Cleanup any pending timers on unmount.
@@ -139,7 +145,8 @@ export function FactValueDot({
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
     };
-  }, [open]);
+    // The panel changes height when its detail arrives or fails.
+  }, [open, panelState.status]);
 
   // ESC to close.
   useEffect(() => {
@@ -263,8 +270,12 @@ export function FactValueDot({
                 <FactValuePanel
                   factKey={factKey}
                   factLabel={factLabel}
-                  resolverOutput={resolverOutput}
-                  disputed={disputed}
+                  state={panelState}
+                  outdated={
+                    panelState.status === "ready" &&
+                    !factPanelMatchesPage(source, panelState.panel)
+                  }
+                  onRetry={retry}
                 />
               </div>
             </>,
