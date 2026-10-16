@@ -1529,7 +1529,11 @@ alternate, projected and rejected row) is built on the server by
 The route is request-live (`no-store`, shared `public-dynamic-read` budget),
 validated against the strict `zFactSourcePanel` contract, and not part of the
 documented public `/api/v1` surface. The dot keeps its accessible source name;
-the panel shows a loading state and an explicit retry on failure.
+the panel shows a loading state and an explicit retry on failure. The compact
+reference also carries the canonical row id and retrieval time the page
+rendered; if the live panel describes a different row or retrieval, it says the
+record changed after the page was generated rather than silently attributing a
+different value to the one beside the dot.
 
 **Why:** The detail was about 74 KB of client-component props on every country
 Factbook page, written to the page cache on every rebuild (billed per 8 KB)

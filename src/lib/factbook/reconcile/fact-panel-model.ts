@@ -28,6 +28,9 @@ export interface FactSourceRef {
   factKey: string;
   canonicalSourceId: string | null;
   canonicalValueNumeric: number | null;
+  /** The canonical row this page rendered; the panel compares against it. */
+  canonicalRowId: string | null;
+  canonicalRetrievedAt: string | null;
   isDisputed: boolean;
 }
 
@@ -40,6 +43,8 @@ export function factSourceRefOf(
     factKey,
     canonicalSourceId: output.canonical?.sourceId ?? null,
     canonicalValueNumeric: output.canonical?.factValueNumeric ?? null,
+    canonicalRowId: output.canonical?.id ?? null,
+    canonicalRetrievedAt: output.canonical?.retrievedAt ?? null,
     isDisputed: output.isDisputed,
   };
 }
@@ -193,6 +198,7 @@ export function buildFactSourcePanel(
     factKey,
     isDisputed: resolverOutput.isDisputed,
     canonicalId,
+    canonicalRetrievedAt: resolverOutput.canonical?.retrievedAt ?? null,
     evidence: {
       posture: evidence.posture,
       heading: evidence.heading,

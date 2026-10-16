@@ -47,6 +47,7 @@ export const zFactSourcePanel = z
     factKey: z.string(),
     isDisputed: z.boolean(),
     canonicalId: z.string().nullable(),
+    canonicalRetrievedAt: z.string().nullable(),
     evidence: z
       .object({
         posture: z.enum([

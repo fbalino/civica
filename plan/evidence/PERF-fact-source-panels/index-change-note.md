@@ -11,7 +11,10 @@ Change record: `perf-fact-source-panels-2026-10-15` (APR-D180).
 - The source panel behind every value dot now fetches its detail (evidence
   relationship, resolver trace, every source row) from
   `/api/facts/:jurisdictionId/:factKey/panel` when a reader opens it. Pages no
-  longer carry that detail.
+  longer carry that detail. Because pages are cached and the panel is read
+  live, the panel compares the canonical row and retrieval time it returns
+  with those the page rendered, and says so when the record changed after the
+  page was generated.
 
 ## What did not change
 

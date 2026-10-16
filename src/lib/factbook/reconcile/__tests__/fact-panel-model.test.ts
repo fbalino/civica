@@ -6,6 +6,7 @@ import {
   buildFactSourcePanel,
   factSourceRefOf,
 } from "@/lib/factbook/reconcile/fact-panel-model";
+import { factPanelMatchesPage } from "@/lib/factbook/reconcile/fact-panel-currency";
 import type { FactRow, ResolverOutput } from "@/lib/factbook/reconcile/types";
 
 function row(partial: Partial<FactRow> & { id: string }): FactRow {
@@ -80,6 +81,8 @@ function output(): ResolverOutput {
 test("the page-level source reference carries no reconciliation rows", () => {
   const ref = factSourceRefOf(output());
   assert.deepEqual(Object.keys(ref).sort(), [
+    "canonicalRetrievedAt",
+    "canonicalRowId",
     "canonicalSourceId",
     "canonicalValueNumeric",
     "factKey",
@@ -131,6 +134,31 @@ test("the response contract is strict", () => {
   );
   assert.equal(
     zFactSourcePanel.safeParse({ ...panel, schemaVersion: "v0" }).success,
+    false,
+  );
+});
+
+test("a panel is current only when it describes the canonical row the page rendered", () => {
+  const rendered = factSourceRefOf(output());
+  const live = buildFactSourcePanel("population_total", output());
+  assert.equal(factPanelMatchesPage(rendered, live), true);
+
+  // The canonical pick changed after the page was generated.
+  const repicked = output();
+  repicked.canonical = repicked.all.find((r) => r.id === "row-imf") ?? null;
+  assert.equal(
+    factPanelMatchesPage(rendered, buildFactSourcePanel("population_total", repicked)),
+    false,
+  );
+
+  // The same row was refreshed in place.
+  const refreshed = output();
+  refreshed.canonical = {
+    ...(refreshed.canonical as FactRow),
+    retrievedAt: "2026-10-15T00:00:00Z",
+  };
+  assert.equal(
+    factPanelMatchesPage(rendered, buildFactSourcePanel("population_total", refreshed)),
     false,
   );
 });

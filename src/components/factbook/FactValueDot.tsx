@@ -26,6 +26,7 @@ import { createPortal } from "react-dom";
 import { SquarePlus } from "lucide-react";
 import { isFrozenSource, sourceLabel } from "@/lib/data/sources";
 import type { FactSourceRef } from "@/lib/factbook/reconcile/fact-panel-model";
+import { factPanelMatchesPage } from "@/lib/factbook/reconcile/fact-panel-currency";
 import { FactValuePanel } from "./FactValuePanel";
 import { useFactSourcePanel } from "./useFactSourcePanel";
 
@@ -270,6 +271,10 @@ export function FactValueDot({
                   factKey={factKey}
                   factLabel={factLabel}
                   state={panelState}
+                  outdated={
+                    panelState.status === "ready" &&
+                    !factPanelMatchesPage(source, panelState.panel)
+                  }
                   onRetry={retry}
                 />
               </div>

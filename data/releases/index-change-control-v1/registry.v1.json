@@ -46428,7 +46428,7 @@
         "documentation": [
           {
             "path": "plan/evidence/PERF-fact-source-panels/index-change-note.md",
-            "sha256": "e0849d4302b0af7e21858072c0231a5d96a71023f43f4134f420f64a3b148977"
+            "sha256": "4bf7aad639ab07df1e9a437a5848c5f880a99c45eb8da9de2bfdd2eeb1e8666a"
           }
         ],
         "registry": [
@@ -46440,19 +46440,19 @@
         "release_note": [
           {
             "path": "plan/evidence/PERF-fact-source-panels/index-change-note.md",
-            "sha256": "e0849d4302b0af7e21858072c0231a5d96a71023f43f4134f420f64a3b148977"
+            "sha256": "4bf7aad639ab07df1e9a437a5848c5f880a99c45eb8da9de2bfdd2eeb1e8666a"
           }
         ],
         "migration_plan": [
           {
             "path": "plan/evidence/PERF-fact-source-panels/index-change-note.md",
-            "sha256": "e0849d4302b0af7e21858072c0231a5d96a71023f43f4134f420f64a3b148977"
+            "sha256": "4bf7aad639ab07df1e9a437a5848c5f880a99c45eb8da9de2bfdd2eeb1e8666a"
           }
         ],
         "golden_test": [
           {
             "path": "src/lib/factbook/reconcile/__tests__/fact-panel-model.test.ts",
-            "sha256": "1c1263011237530d8d4114877709e3243a90451b4b366aa8e8aa49c2cd393258"
+            "sha256": "63de10c2306fa4dbfe86c5ea6e4bcded9b6d2bf3eb89c9bb90354a1661dd661f"
           }
         ],
         "contract_test": [

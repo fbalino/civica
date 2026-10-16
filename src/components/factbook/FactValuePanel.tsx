@@ -28,6 +28,8 @@ export interface FactValuePanelProps {
   factKey: string;
   factLabel: string;
   state: FactValuePanelState;
+  /** The page was generated before the record below last changed. */
+  outdated?: boolean;
   onRetry: () => void;
 }
 
@@ -35,6 +37,7 @@ export function FactValuePanel({
   factKey,
   factLabel,
   state,
+  outdated = false,
   onRetry,
 }: FactValuePanelProps) {
   const header = (
@@ -75,6 +78,14 @@ export function FactValuePanel({
   return (
     <div className="fact-value-panel" role="dialog" aria-label={`${factLabel} sources`}>
       {header}
+
+      {outdated && (
+        <div className="fact-value-disputed-banner" role="note">
+          <strong>This record changed after the page was generated.</strong>{" "}
+          The sources below are current and may differ from the value shown
+          beside the dot. Reload the page to refresh it.
+        </div>
+      )}
 
       {panel.isDisputed && (
         <div className="fact-value-disputed-banner">
