@@ -1036,9 +1036,9 @@ legend.editorial-filter-label {
 .ui-chip {
   display: inline-flex;
   align-items: center;
-  padding: 3px 9px;
+  padding: var(--chip-pad-y) var(--chip-pad-x);
   border-radius: var(--radius-chip);
-  border: 1px solid var(--color-card-border);
+  border: var(--border-hairline) solid var(--color-card-border);
   background: var(--color-page-bg);
   color: var(--color-text-60);
   font-family: var(--font-body);
@@ -1049,7 +1049,7 @@ legend.editorial-filter-label {
   white-space: nowrap;
 }
 .ui-chip--md {
-  padding: 4px 11px;
+  padding: var(--chip-pad-y-md) var(--chip-pad-x-md);
   font-size: var(--text-13);
 }
 .ui-chip--sage {
