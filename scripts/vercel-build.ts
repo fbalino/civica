@@ -21,11 +21,15 @@ export const FULL_BUILD_TOKEN = "[full-build]";
  * Preview-only steps. Each one either needs Vercel's environment (a database
  * connection or the real env contract) or behaves differently when
  * DATABASE_URL is set, so the credential-free `verify` run cannot cover it.
- * Every other step in `build:core` and `prebuild` passes identically without
- * a database and is covered by `verify`.
+ * The `prebuild` gates also run here because `verify` skips pre-scripts.
+ * Every other step in `build:core` passes identically without a database
+ * and is covered by `verify`.
  */
 export const PREVIEW_STEPS: readonly (readonly string[])[] = [
   ["npm", "run", "validate:env", "--", "--context=build"],
+  // `prebuild` gates: GitHub verify runs `build:ci` with --ignore-scripts,
+  // which skips pre-scripts, so they run here (about 8 seconds).
+  ["npm", "run", "validate:build-prereqs"],
   ["npm", "run", "validate:jurisdiction-directory"],
   ["npm", "run", "validate:content-templates"],
   ["npm", "exec", "--", "next", "build"],

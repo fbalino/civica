@@ -89,3 +89,13 @@ test("vercel-build delegates to this planner and never mutates a database", () =
   };
   assert.equal(vercel.buildCommand, "npm run vercel-build");
 });
+
+test("previews keep every prebuild gate, which verify's --ignore-scripts run skips", () => {
+  const prebuild = packageScripts["prebuild"];
+  const previewScripts = PREVIEW_STEPS.filter(([, sub]) => sub === "run").map(
+    ([, , name]) => name,
+  );
+  for (const match of prebuild.matchAll(/npm run ([\w:-]+)/g)) {
+    assert.ok(previewScripts.includes(match[1]), `preview build skips prebuild gate ${match[1]}`);
+  }
+});
