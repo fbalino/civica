@@ -101,8 +101,8 @@ test("the real registry covers every canonical route+method without structural o
     (total, mapping) => total + mapping.methods.length,
     0,
   );
-  assert.equal(ROUTE_INVENTORY.length, 110);
-  assert.equal(canonicalMethodCount, 175);
+  assert.equal(ROUTE_INVENTORY.length, 111);
+  assert.equal(canonicalMethodCount, 176);
   assert.equal(mappedMethodCount, canonicalMethodCount);
 });
 
@@ -130,7 +130,7 @@ test("the real registry has no planned, partial, or unverified route method", ()
   assert.equal(summary.partial, 0);
   assert.equal(summary["external-required"], 0);
   assert.equal(summary["external-verified"], 6);
-  assert.equal(summary["source-confirmed"], 169);
+  assert.equal(summary["source-confirmed"], 170);
 });
 
 test("real platform policies match the checked all-path Vercel rule", () => {

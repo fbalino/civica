@@ -4,7 +4,10 @@ import type { FactbookField } from "@/lib/data/factbook-fields";
 import { humanizeLabel, humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
-import { formatFactRowValue } from "@/components/factbook/FactValuePanel";
+import {
+  factSourceRefOf,
+  formatFactRowValue,
+} from "@/lib/factbook/reconcile/fact-panel-model";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import { InfoTip } from "@/components/editorial/Tooltip";
 import { growthMethodologyTooltip } from "@/lib/data/growth-methodology";
@@ -294,10 +297,8 @@ function LeafRow({
   const sourceNode =
     hasInteractiveSource ? (
       <FactValueDot
-        factKey={factKey}
+        source={factSourceRefOf(resolverFact, factKey)}
         factLabel={humanLabel}
-        resolverOutput={resolverFact}
-        canonicalSourceId={resolverFact.canonical?.sourceId ?? null}
         ariaLabel={`${humanLabel}, see sources`}
       />
     ) : source && retrievedAt ? (
@@ -378,10 +379,8 @@ function CanonicalLeafRow({
         {renderValueWithSource(
           value,
           <FactValueDot
-            factKey={factKey}
+            source={factSourceRefOf(resolverOutput, factKey)}
             factLabel={factLabel}
-            resolverOutput={resolverOutput}
-            canonicalSourceId={canonical.sourceId ?? null}
             ariaLabel={`${factLabel}, see all sources`}
           />
         )}
