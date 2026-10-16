@@ -229,7 +229,7 @@ any child fails. `npm run build` runs it
 automatically alongside the non-claims guards (sync-freshness, replication
 surface, editorial-illustration disclosure) before `next build`.
 
-Vercel production builds run this whole chain through `npm run build`; pull-request previews run only the Vercel-environment checks plus `next build`, because GitHub `verify` already runs the rest (see "Build and deploy pipeline" in [AGENTS.md](./AGENTS.md)).
+Vercel production builds run this whole chain through `npm run build`; pull-request previews (not bare branch pushes) run only the Vercel-environment checks plus `next build`, because GitHub `verify` already runs the rest (see "Build and deploy pipeline" in [AGENTS.md](./AGENTS.md)).
 
 Full script reference: see [AGENTS.md](./AGENTS.md).
 

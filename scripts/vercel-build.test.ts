@@ -29,14 +29,23 @@ test("anything that is not a preview runs the full build", () => {
 });
 
 test("a preview runs the reduced path", () => {
-  const plan = planBuild({ VERCEL_ENV: "preview" });
+  const plan = planBuild({ VERCEL_ENV: "preview", VERCEL_GIT_PULL_REQUEST_ID: "71" });
   assert.equal(plan.mode, "preview");
   assert.deepEqual(plan.steps, PREVIEW_STEPS);
+});
+
+test("a preview with no pull request keeps the full build", () => {
+  for (const VERCEL_GIT_PULL_REQUEST_ID of [undefined, "", "  "]) {
+    const plan = planBuild({ VERCEL_ENV: "preview", VERCEL_GIT_PULL_REQUEST_ID });
+    assert.equal(plan.mode, "full");
+    assert.deepEqual(plan.steps, FULL_STEPS);
+  }
 });
 
 test("the full-build token restores the complete chain on a preview", () => {
   const plan = planBuild({
     VERCEL_ENV: "preview",
+    VERCEL_GIT_PULL_REQUEST_ID: "71",
     VERCEL_GIT_COMMIT_MESSAGE: `fix: thing ${FULL_BUILD_TOKEN}`,
   });
   assert.equal(plan.mode, "full");

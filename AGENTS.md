@@ -185,7 +185,9 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   `scripts/vercel-build.ts`. **Production** (`VERCEL_ENV` not `preview`) runs
   `npm run build` exactly as always: `prebuild`, every `build:core` validator,
   then `next build`.
-- A **pull-request preview** runs only what needs Vercel's environment:
+- A **pull-request preview** (`VERCEL_GIT_PULL_REQUEST_ID` set; a branch
+  pushed before its PR exists, or a CLI deploy, still gets the full build
+  because `verify` has not covered it) runs only what needs Vercel's environment:
   `validate:env --context=build`, `validate:jurisdiction-directory` (live
   jurisdictions diff), `validate:content-templates` (live site stats), and
   `next build`. Every other `prebuild`/`build:core` validator passes

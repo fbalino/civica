@@ -2,7 +2,7 @@
  * Vercel build entry point (`vercel.json` buildCommand -> `npm run vercel-build`).
  *
  * Production (and anything that is not a pull-request preview) runs the full
- * `npm run build`, exactly as before. A preview build skips the offline
+ * `npm run build`, exactly as before. A pull-request preview build skips the offline
  * validator chain, which GitHub Actions `verify` already runs on every pull
  * request through `npm run build:ci`, and runs only what needs this
  * environment: the Vercel environment contract, the validators that read the
@@ -42,6 +42,17 @@ export function planBuild(
     return {
       mode: "full",
       reason: `VERCEL_ENV=${env.VERCEL_ENV ?? "(unset)"} is not a preview`,
+      steps: FULL_STEPS,
+    };
+  }
+  // GitHub `verify` runs on pull requests (and on main), not on bare branch
+  // pushes. A preview with no pull-request ID (branch pushed before the PR
+  // exists, or a CLI deployment) has no verify run behind it, so it keeps the
+  // complete chain.
+  if (!(env.VERCEL_GIT_PULL_REQUEST_ID ?? "").trim()) {
+    return {
+      mode: "full",
+      reason: "preview is not tied to a pull request, so verify has not covered it",
       steps: FULL_STEPS,
     };
   }

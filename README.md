@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: c5c29e9fc99fdef155f3f849991d34ebba52cec3a695168bf87602d49483070d
-  Generated body SHA-256: cca557f636c81e7b880b663b671f5e97f35dd1bb8025c6517da2cd166a2ce09c
+  Template SHA-256: 9511e799608fac5966137ca102dd5c3e5b3896925701168537317cab11ef9bb9
+  Generated body SHA-256: 7d41c06e68c2e6d2f41b0f99a5d5b94f59e8af89d444bf7637f29375512355ae
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -227,7 +227,7 @@ any child fails. `npm run build` runs it
 automatically alongside the non-claims guards (sync-freshness, replication
 surface, editorial-illustration disclosure) before `next build`.
 
-Vercel production builds run this whole chain through `npm run build`; pull-request previews run only the Vercel-environment checks plus `next build`, because GitHub `verify` already runs the rest (see "Build and deploy pipeline" in [AGENTS.md](./AGENTS.md)).
+Vercel production builds run this whole chain through `npm run build`; pull-request previews (not bare branch pushes) run only the Vercel-environment checks plus `next build`, because GitHub `verify` already runs the rest (see "Build and deploy pipeline" in [AGENTS.md](./AGENTS.md)).
 
 Full script reference: see [AGENTS.md](./AGENTS.md).
 
