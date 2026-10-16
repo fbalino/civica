@@ -1,0 +1,24 @@
+{
+  "id": "perf-fact-source-panels-2026-10-15",
+  "toVersion": "civica-index-fact-source-panels-v70",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["plan/evidence/PERF-fact-source-panels/index-change-note.md"],
+    "registry": ["src/lib/api/route-inventory/registry.ts"],
+    "release_note": ["plan/evidence/PERF-fact-source-panels/index-change-note.md"],
+    "migration_plan": ["plan/evidence/PERF-fact-source-panels/index-change-note.md"],
+    "golden_test": ["src/lib/factbook/reconcile/__tests__/fact-panel-model.test.ts"],
+    "contract_test": ["src/lib/api/request-contract.test.ts"]
+  },
+  "validations": [
+    "validate:cache-consistency",
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-research-panel",
+    "validate:ci-series-provenance",
+    "validate:claims-docs",
+    "validate:governance-evidence-review-packet",
+    "validate:index-disposition",
+    "validate:index-quarantine"
+  ]
+}

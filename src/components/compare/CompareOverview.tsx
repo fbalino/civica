@@ -5,6 +5,7 @@ import type { getGovernmentStructure } from "@/lib/db/queries";
 import type { GovernmentClassification } from "@/lib/government-taxonomy";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
+import { factSourceRefOf } from "@/lib/factbook/reconcile/fact-panel-model";
 import { CompareColumnHeader } from "./CompareColumnHeader";
 
 /**
@@ -251,10 +252,8 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
                   </span>
                   {val && row.factKey && hasCanonical && fact ? (
                     <FactValueDot
-                      factKey={row.factKey}
+                      source={factSourceRefOf(fact, row.factKey)}
                       factLabel={row.label}
-                      resolverOutput={fact}
-                      canonicalSourceId={fact.canonical?.sourceId ?? null}
                       ariaLabel={`${row.label} ${val}, see sources`}
                     />
                   ) : null}

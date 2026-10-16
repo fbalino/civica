@@ -32,7 +32,10 @@
 
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import { FactValueDot } from "./FactValueDot";
-import { formatFactRowValue } from "./FactValuePanel";
+import {
+  factSourceRefOf,
+  formatFactRowValue,
+} from "@/lib/factbook/reconcile/fact-panel-model";
 
 /**
  * Configuration for one row in the Additional Indicators section.
@@ -137,10 +140,8 @@ export function FactbookAdditionalIndicators({
             >
               <span>{value}</span>
               <FactValueDot
-                factKey={row.factKey}
+                source={factSourceRefOf(resolverOutput, row.factKey)}
                 factLabel={row.label}
-                resolverOutput={resolverOutput}
-                canonicalSourceId={canonical.sourceId ?? null}
                 ariaLabel={`${row.label}, see all sources`}
               />
             </dd>

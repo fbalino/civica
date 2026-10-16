@@ -244,6 +244,15 @@ export const ROUTE_INVENTORY: RouteInventoryEntry[] = [
     note: "ATL-021 rights-aware query projection over the checked frozen Atlas release; bounded fields, filters, pagination, and CSV/JSON output.",
   },
   {
+    filePath: "api/facts/[jurisdictionId]/[factKey]/panel/route.ts",
+    exposure: "public-read",
+    methods: ["GET"],
+    mutation: false,
+    sensitive: false,
+    controls: ["rate-limit", "input-validation", "public"],
+    note: "Internal reader endpoint behind the fact source panel: resolver trace, alternates and rejected rows for one jurisdiction and fact key, fetched when a reader opens the panel. Shared public-dynamic-read budget, request-live, no PII or authentication.",
+  },
+  {
     filePath: "api/civica-index/corrections/route.ts",
     exposure: "public-mutation",
     methods: ["POST"],

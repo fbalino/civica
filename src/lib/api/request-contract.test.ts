@@ -301,6 +301,10 @@ test("all path schemas accept their canonical identifier form", async () => {
   const uuid = "123e4567-e89b-42d3-a456-426614174000";
   const cases = [
     ["entity-citation-params/v1", { entityType: "fact", id: uuid }],
+    [
+      "fact-source-panel-params/v1",
+      { jurisdictionId: uuid, factKey: "population_total" },
+    ],
     ["constitution-passage-params/v1", { digest: `sha256:${"a".repeat(64)}` }],
     ["jurisdiction-slug-params/v1", { slug: "cote-divoire" }],
     ["pulse-study-uuid-params/v1", { studyId: uuid }],

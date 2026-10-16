@@ -728,6 +728,11 @@ export default function DesignSystemPage() {
                 <Pill variant="blue">EU Member</Pill>
                 <Pill variant="accent">Accent</Pill>
               </div>
+              <div className="ds-row">
+                <Pill size="md">Neutral md</Pill>
+                <Pill size="md" variant="sage">High income</Pill>
+                <Pill size="md" variant="accent">Accent md</Pill>
+              </div>
             </div>
 
             <div className="ds-comp ds-comp--wide">

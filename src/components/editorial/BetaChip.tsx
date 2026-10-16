@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Chip } from "./Pill";
 
 /*
@@ -25,21 +25,14 @@ interface BetaChipProps {
    */
   inHeading?: boolean;
   className?: string;
-  style?: CSSProperties;
   "aria-label"?: string;
   title?: string;
 }
-
-const HEADING_STYLE: CSSProperties = {
-  marginLeft: "var(--space-3)",
-  verticalAlign: "middle",
-};
 
 export function BetaChip({
   children = "Beta",
   inHeading = false,
   className,
-  style,
   "aria-label": ariaLabel,
   title,
 }: BetaChipProps) {
@@ -47,8 +40,11 @@ export function BetaChip({
     <Chip
       variant="sand"
       size="sm"
-      className={className}
-      style={inHeading ? { ...HEADING_STYLE, ...style } : style}
+      className={
+        [inHeading ? "ui-chip--heading-inline" : null, className]
+          .filter(Boolean)
+          .join(" ") || undefined
+      }
       aria-label={ariaLabel}
       title={title}
     >

@@ -1,8 +1,8 @@
 {
   "schemaVersion": "civica-verification-matrix/v1",
-  "semanticHash": "5a057327dd46538d4695244c48fd88aba226c52758367649546450032c8609e1",
+  "semanticHash": "1b315fc721631cf50fb594fb69f918c22b18c7242ae2d2b0c954d6415e42776f",
   "summary": {
-    "route": 185,
+    "route": 186,
     "pipeline": 52,
     "calculation": 8,
     "data_domain": 14,
@@ -9908,6 +9908,49 @@
           "evidence": [
             "npm run test:qa-011"
           ],
+          "gapTask": null
+        }
+      }
+    },
+    {
+      "id": "route:src/app/api/facts/[jurisdictionId]/[factKey]/panel/route.ts",
+      "kind": "route",
+      "title": "/api/facts/[jurisdictionId]/[factKey]/panel API handler",
+      "source": "src/app/api/facts/[jurisdictionId]/[factKey]/panel/route.ts",
+      "critical": true,
+      "owner": "Public API and platform",
+      "fixture": "public-read route-inventory declaration for GET",
+      "command": "npm run validate:route-inventory && npm run validate:route-io-policy",
+      "coverage": {
+        "unit": {
+          "status": "covered",
+          "evidence": [
+            "src/lib/api/route-inventory/__tests__/route-inventory.test.ts"
+          ],
+          "gapTask": null
+        },
+        "integration": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:route-io-policy"
+          ],
+          "gapTask": null
+        },
+        "database": {
+          "status": "covered",
+          "evidence": [
+            "npm run validate:fixture-database"
+          ],
+          "gapTask": null
+        },
+        "browser": {
+          "status": "not_applicable",
+          "evidence": [],
+          "gapTask": null
+        },
+        "manual": {
+          "status": "not_applicable",
+          "evidence": [],
           "gapTask": null
         }
       }
