@@ -83,7 +83,7 @@ export function FactValuePanel({
         <div className="fact-value-disputed-banner" role="note">
           <strong>This record changed after the page was generated.</strong>{" "}
           The sources below are current and may differ from the value shown
-          beside the dot. Reload the page to refresh it.
+          beside the dot. The page updates with the next nightly refresh.
         </div>
       )}
 
