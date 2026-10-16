@@ -115,7 +115,7 @@ const sourceContracts: Array<[string, string[]]> = [
     ["value_json: row.snapshot_value_json"],
   ],
   [
-    "src/components/factbook/FactValuePanel.tsx",
+    "src/lib/factbook/reconcile/fact-panel-model.ts",
     ["formatPublisherDate", "publisherDate.precision"],
   ],
   [

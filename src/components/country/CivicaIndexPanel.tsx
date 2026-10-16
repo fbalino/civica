@@ -25,6 +25,7 @@ import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { V2_WEIGHTS } from "@/lib/ci/dimensions-v2";
 import { civicaIndex } from "@/lib/content/site-state";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
+import { factSourceRefOf } from "@/lib/factbook/reconcile/fact-panel-model";
 import { DataTable } from "@/components/editorial/DataTable";
 import { ResearchVisualizationDisclosure } from "@/components/research/ResearchVisualizationDisclosure";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
@@ -895,10 +896,8 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
                   <span>{resolvedCapital ?? "—"}</span>
                   {capitalFact?.canonical ? (
                     <FactValueDot
-                      factKey="capital"
+                      source={factSourceRefOf(capitalFact, "capital")}
                       factLabel="Capital"
-                      resolverOutput={capitalFact}
-                      canonicalSourceId={capitalFact.canonical.sourceId ?? null}
                       ariaLabel={`Capital ${resolvedCapital ?? ""}, see sources`}
                     />
                   ) : null}
@@ -916,12 +915,8 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
                   <span>{formatPopulationLong(resolvedPopulation)}</span>
                   {populationFact?.canonical ? (
                     <FactValueDot
-                      factKey="population_total"
+                      source={factSourceRefOf(populationFact, "population_total")}
                       factLabel="Population"
-                      resolverOutput={populationFact}
-                      canonicalSourceId={
-                        populationFact.canonical.sourceId ?? null
-                      }
                       ariaLabel={`Population ${formatPopulationLong(
                         resolvedPopulation
                       )}, see sources`}

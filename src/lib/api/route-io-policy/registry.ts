@@ -290,6 +290,15 @@ export const REQUEST_CONTRACT_MAPPINGS: readonly RequestContractMapping[] = [
     endpoints: [endpoint("api/citations/[entityType]/[id]/route.ts", ["GET"])],
   },
   {
+    contract: pathContract(
+      "path/fact-source-panel-v1",
+      "fact-source-panel-params/v1",
+    ),
+    endpoints: [
+      endpoint("api/facts/[jurisdictionId]/[factKey]/panel/route.ts", ["GET"]),
+    ],
+  },
+  {
     contract: queryContract("entity-citation-history-v1", {
       params: "entity-citation-params/v1",
       query: "atlas-entity-history-query/v1",

@@ -523,6 +523,12 @@ const jurisdictionSlugParamsSchema = z
 
 export const PARAM_CONTRACT_SCHEMAS = {
   "entity-citation-params/v1": entityCitationParamsSchema,
+  "fact-source-panel-params/v1": z
+    .object({
+      jurisdictionId: z.string().regex(ANY_UUID),
+      factKey: text(80, 1).regex(IDENTIFIER),
+    })
+    .strict(),
   "constitution-passage-params/v1": z
     .object({ digest: z.string().regex(SHA256_DIGEST) })
     .strict(),

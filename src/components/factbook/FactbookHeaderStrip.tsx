@@ -10,7 +10,7 @@ import { FactValueDot } from "./FactValueDot";
 import { CountryMapTile } from "./CountryMapTile";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { BetaChip } from "@/components/editorial/BetaChip";
-import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+import type { FactSourceRef } from "@/lib/factbook/reconcile/fact-panel-model";
 import type { CountryBounds } from "@/lib/data/country-bounds";
 import { SourceText } from "@/components/editorial/SourceText";
 import { JurisdictionStatusDisclosure } from "@/components/jurisdiction/JurisdictionStatusDisclosure";
@@ -151,9 +151,9 @@ interface FactbookHeaderStripProps {
    *  provided, the Pop pill renders a `<FactValueDot>` that opens
    *  the alternate-values panel on click. Falls back to plain pill
    *  if absent (no reconciled data yet). */
-  populationResolver?: ResolverOutput | null;
+  populationResolver?: FactSourceRef | null;
   /** Phase F.4 — resolver output for gdp_ppp_usd_billions. */
-  gdpResolver?: ResolverOutput | null;
+  gdpResolver?: FactSourceRef | null;
   /** Whether this jurisdiction is covered by the Atlas (sovereign states only).
    *  Retained for call-site compatibility; no longer toggles any chip. */
   inAtlas?: boolean;
@@ -254,8 +254,8 @@ export function FactbookHeaderStrip({
   // Argentina population will flip from the IMF 2030 forecast (50.4 M) to
   // the UN/WB 2023 measurement (~45.7 M). This component is agnostic to
   // that — it just consumes whatever the resolver returns.
-  const resolvedPop = populationResolver?.canonical?.factValueNumeric ?? null;
-  const resolvedGdpBillions = gdpResolver?.canonical?.factValueNumeric ?? null;
+  const resolvedPop = populationResolver?.canonicalValueNumeric ?? null;
+  const resolvedGdpBillions = gdpResolver?.canonicalValueNumeric ?? null;
 
   const popStr = formatPop(resolvedPop !== null ? resolvedPop : population);
   const gdpStr = formatGdp(
@@ -377,7 +377,7 @@ export function FactbookHeaderStrip({
 
           <div className="factbook-hero-pills">
             {popStr ? (
-              populationResolver?.canonical ? (
+              populationResolver?.canonicalSourceId ? (
                 <span
                   style={{
                     display: "inline-flex",
@@ -400,12 +400,8 @@ export function FactbookHeaderStrip({
                     {popStr}
                   </span>
                   <FactValueDot
-                    factKey="population_total"
+                    source={populationResolver}
                     factLabel="Population"
-                    resolverOutput={populationResolver}
-                    canonicalSourceId={
-                      populationResolver.canonical?.sourceId ?? null
-                    }
                     ariaLabel={`Population ${popStr}, see sources`}
                   />
                 </span>
@@ -418,7 +414,7 @@ export function FactbookHeaderStrip({
               <MetaPill label="Pop" value="No source" />
             )}
             {gdpStr ? (
-              gdpResolver?.canonical ? (
+              gdpResolver?.canonicalSourceId ? (
                 <span
                   style={{
                     display: "inline-flex",
@@ -441,10 +437,8 @@ export function FactbookHeaderStrip({
                     {gdpStr}
                   </span>
                   <FactValueDot
-                    factKey="gdp_ppp_usd_billions"
+                    source={gdpResolver}
                     factLabel="GDP (PPP)"
-                    resolverOutput={gdpResolver}
-                    canonicalSourceId={gdpResolver.canonical?.sourceId ?? null}
                     ariaLabel={`GDP (PPP) ${gdpStr}, see sources`}
                   />
                 </span>

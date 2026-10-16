@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { factSourceRefOf } from "@/lib/factbook/reconcile/fact-panel-model";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { existsSync } from "fs";
@@ -249,8 +250,19 @@ export default async function CountryLayout({
             ? jurisdiction.gdpBillions * 1_000_000_000
             : null
         }
-        populationResolver={headerFacts["population_total"] ?? null}
-        gdpResolver={headerFacts["gdp_ppp_usd_billions"] ?? null}
+        populationResolver={
+          headerFacts["population_total"]
+            ? factSourceRefOf(headerFacts["population_total"], "population_total")
+            : null
+        }
+        gdpResolver={
+          headerFacts["gdp_ppp_usd_billions"]
+            ? factSourceRefOf(
+                headerFacts["gdp_ppp_usd_billions"],
+                "gdp_ppp_usd_billions",
+              )
+            : null
+        }
         mapImages={mapImages}
         photos={photos}
         bounds={bounds}

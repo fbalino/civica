@@ -1517,3 +1517,21 @@ Vercel cost after APR-D177/D178. Most countries' data does not change on a
 given night, so rewriting them is pure cost. Accepted consequence: data that
 lands after 07:00 UTC (Pulse) reaches pages the next night unless the job is
 forced by hand.
+
+### APR-D180 — Fact source panels load their detail when opened
+
+**Decision:** A reconciled value on a country page ships only a compact source
+reference (jurisdiction, fact key, canonical source, disputed flag). The panel
+detail behind its dot (evidence relationship, full resolver trace, every
+alternate, projected and rejected row) is built on the server by
+`src/lib/factbook/reconcile/fact-panel-model.ts` and fetched from
+`GET /api/facts/:jurisdictionId/:factKey/panel` when a reader opens the panel.
+The route is request-live (`no-store`, shared `public-dynamic-read` budget),
+validated against the strict `zFactSourcePanel` contract, and not part of the
+documented public `/api/v1` surface. The dot keeps its accessible source name;
+the panel shows a loading state and an explicit retry on failure.
+
+**Why:** The detail was about 74 KB of client-component props on every country
+Factbook page, written to the page cache on every rebuild (billed per 8 KB)
+for a panel most readers never open. Hover fetches wait 250 ms and abort on
+close so sweeping the pointer does not spend the reader request budget.
