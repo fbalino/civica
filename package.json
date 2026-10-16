@@ -202,7 +202,7 @@
     "validate:research-evidence-retention:live": "tsx scripts/validate-research-evidence-retention.ts --live",
     "validate:constitution-search": "tsx scripts/validate-constitution-search.ts",
     "validate:constitution-search:live": "tsx scripts/validate-constitution-search.ts --live",
-    "vercel-build": "npm run build",
+    "vercel-build": "tsx scripts/vercel-build.ts",
     "generate:atlas-export": "tsx scripts/generate-atlas-export.ts && tsx scripts/generate-atlas-release-regeneration-inputs.ts --write",
     "generate:atlas-case-studies": "tsx scripts/generate-atlas-case-studies.ts",
     "reproduce:atlas-case-studies": "npm run validate:atlas-case-studies",

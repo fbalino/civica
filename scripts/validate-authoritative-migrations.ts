@@ -38,7 +38,7 @@ const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const drizzleConfig = readFileSync("drizzle.config.ts", "utf8");
 if (!drizzleConfig.includes('out: "./drizzle/authoritative"')) errors.push("Drizzle output is not the authoritative directory");
 if (pkg.scripts?.["db:migrate"] !== "tsx scripts/db-migrate.ts") errors.push("db:migrate is absent or redirected");
-if (pkg.scripts?.["vercel-build"] !== "npm run build") {
+if (pkg.scripts?.["vercel-build"] !== "tsx scripts/vercel-build.ts") {
   errors.push("Vercel build must remain validation-only");
 }
 if (process.argv.includes("--live")) {

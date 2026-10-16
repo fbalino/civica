@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: 8755d8ca5838153390e649dd9a5335b5583b53151b66fe7a1c93cd7ee484b483
-  Generated body SHA-256: c20ba7c1b4d38948fbf512c2ca9e410b44b7d8981cf1f05cf3de595f268a9d44
+  Template SHA-256: c5c29e9fc99fdef155f3f849991d34ebba52cec3a695168bf87602d49483070d
+  Generated body SHA-256: cca557f636c81e7b880b663b671f5e97f35dd1bb8025c6517da2cd166a2ce09c
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -53,7 +53,7 @@ Most public country-data sites republish a single upstream source (usually CIA F
 
 Civica's pipeline is built on opposite premises:
 
-- **Multi-source reconciliation.** Currently 20 active source orchestrators (CIA Factbook archive; the eleven Tier-1 publishers — World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats; V-Dem; Wikidata; and six national statistics offices already syncing — US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) writing into a canonical `country_facts` table. About 26,000 reconciled facts across 88 declared fact-keys. v1 target is 11 Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus 30–40 national statistics offices (first wave: 6 in progress; Destatis-DE deferred to v1.1; NBS-Nigeria permanently deferred).
+- **Multi-source reconciliation.** Currently multiple active source orchestrators (CIA Factbook archive; the eleven Tier-1 publishers — World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats; V-Dem; Wikidata; and six national statistics offices already syncing — US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) writing into a canonical `country_facts` table. Many reconciled facts across many declared fact-keys. v1 target is 11 Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus 30–40 national statistics offices (first wave: 6 in progress; Destatis-DE deferred to v1.1; NBS-Nigeria permanently deferred).
 
 - <!-- PUBLIC_CLAIM: readme.per-value-provenance --> **Per-fact provenance where implemented.** Resolver-backed values can render a `<FactValueDot>` chevron showing the selected source, available alternatives, observation dates, and license metadata. Civica does not yet claim universal per-value coverage.
 
@@ -71,10 +71,10 @@ This is a pre-launch project. Honest snapshot:
 
 | Metric                                                              | Status                                                                                                                    |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Active source orchestrators writing facts                           | 20 (11 Tier-1 + CIA archive + Wikidata + V-Dem + 6 NSO Wave 1) — IEA scrapped due to license incompatibility |
-| `country_facts` rows                                                | About 26,000 across 88 declared fact-keys                                   |
-| Multi-sourced fact-keys (two or more sources, at least one country) | 27                                                                                                                                                           |
-| Fact-keys with five or more sources                                 | 5 (population, life expectancy, unemployment, inflation, public debt) |
+| Active source orchestrators writing facts                           | Multiple (11 Tier-1 + CIA archive + Wikidata + V-Dem + 6 NSO Wave 1) — IEA scrapped due to license incompatibility |
+| `country_facts` rows                                                | Many across many declared fact-keys                                   |
+| Multi-sourced fact-keys (two or more sources, at least one country) | Multiple                                                                                                                                                           |
+| Fact-keys with five or more sources                                 | Several (publisher list unavailable while the database is offline) |
 | Adopted methodology resolution docs                                 | 30+                                                                                         |
 | NSO (national statistics office) syncs                              | First wave: 6 in progress (US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA); Destatis-DE deferred to v1.1 (Genesis-Online API requires manual account creation with regulatory review, outside Civica's unattended-cron architecture. Eurostat republishes Destatis figures in the meantime.); NBS-Nigeria permanently deferred (primary data is PDF/Excel; ingestion cost not justified for v1.) |
 | External methodology review                                         | Not yet — planned post-v1                                                                                         |
@@ -226,6 +226,8 @@ stale-copy fixtures live in the focused unit tests and run through the gate's
 any child fails. `npm run build` runs it
 automatically alongside the non-claims guards (sync-freshness, replication
 surface, editorial-illustration disclosure) before `next build`.
+
+Vercel production builds run this whole chain through `npm run build`; pull-request previews run only the Vercel-environment checks plus `next build`, because GitHub `verify` already runs the rest (see "Build and deploy pipeline" in [AGENTS.md](./AGENTS.md)).
 
 Full script reference: see [AGENTS.md](./AGENTS.md).
 

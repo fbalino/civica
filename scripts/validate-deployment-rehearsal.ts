@@ -51,8 +51,8 @@ if ((packageJson.scripts["vercel-build"] ?? "").includes("db:migrate")) {
 }
 
 const vercel = JSON.parse(read("vercel.json")) as { buildCommand?: string };
-if (vercel.buildCommand !== "npm run build") {
-  errors.push("Vercel build command must run the complete validation build");
+if (vercel.buildCommand !== "npm run vercel-build") {
+  errors.push("Vercel build command must run the vercel-build planner (full build for production)");
 }
 
 for (const [path, fragments] of Object.entries({
