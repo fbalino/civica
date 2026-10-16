@@ -6,7 +6,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { BetaChip } from "@/components/editorial/BetaChip";
@@ -29,7 +28,7 @@ test("every tone and legacy variant renders classes only", () => {
     ["accent", "accent"],
   ];
   for (const [variant, tone] of cases) {
-    const html = renderToStaticMarkup(createElement(Chip, { variant, children: "x" }));
+    const html = renderToStaticMarkup(Chip({ variant, children: "x" }));
     assert.equal(html, `<span class="ui-chip ui-chip--${tone}">x</span>`);
     if (tone !== "neutral") {
       assert.match(css, new RegExp(`\\.ui-chip--${tone}\\b`), `${tone} is styled in editorial.css`);
@@ -39,7 +38,7 @@ test("every tone and legacy variant renders classes only", () => {
 
 test("medium size, custom class, and accessible props are forwarded", () => {
   const html = renderToStaticMarkup(
-    createElement(Pill, {
+    Pill({
       size: "md",
       className: "extra",
       title: "t",
@@ -55,11 +54,11 @@ test("medium size, custom class, and accessible props are forwarded", () => {
 
 test("BetaChip uses modifiers instead of style overrides", () => {
   assert.equal(
-    renderToStaticMarkup(createElement(BetaChip, { inHeading: true })),
+    renderToStaticMarkup(BetaChip({ inHeading: true })),
     '<span class="ui-chip ui-chip--sand ui-chip--heading-inline">Beta</span>',
   );
   assert.equal(
-    renderToStaticMarkup(createElement(BetaChip, { className: "ui-chip--header-tag" })),
+    renderToStaticMarkup(BetaChip({ className: "ui-chip--header-tag" })),
     '<span class="ui-chip ui-chip--sand ui-chip--header-tag">Beta</span>',
   );
 });

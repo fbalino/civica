@@ -46452,13 +46452,13 @@
         "golden_test": [
           {
             "path": "src/components/editorial/chip.test.ts",
-            "sha256": "14b98e1ca8c751f2cb3445e5e8f63fa17558484150fb2c9f7b83814b4daa3161"
+            "sha256": "d6e1a26df6723c36ae8744c6afd28b222b779f3326b7f7465ce2c3f171f70bc1"
           }
         ],
         "contract_test": [
           {
             "path": "src/components/editorial/chip.test.ts",
-            "sha256": "14b98e1ca8c751f2cb3445e5e8f63fa17558484150fb2c9f7b83814b4daa3161"
+            "sha256": "d6e1a26df6723c36ae8744c6afd28b222b779f3326b7f7465ce2c3f171f70bc1"
           }
         ]
       },
