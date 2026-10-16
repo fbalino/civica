@@ -116,13 +116,7 @@ function governmentTypeClass(label: string): string {
 
 function BetaTag() {
   return (
-    <BetaChip
-      style={{
-        marginLeft: "var(--space-1)",
-        alignSelf: "center",
-        lineHeight: 1,
-      }}
-    />
+    <BetaChip className="ui-chip--header-tag" />
   );
 }
 

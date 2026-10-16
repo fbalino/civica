@@ -318,6 +318,12 @@
   --radius-full: 9999px;
   --radius-control: var(--radius-full);
   --radius-chip: var(--radius-full);
+
+  /* Chip padding (block / inline) for the small default and `--md` sizes. */
+  --chip-pad-y: 3px;
+  --chip-pad-x: 9px;
+  --chip-pad-y-md: 4px;
+  --chip-pad-x-md: 11px;
   --radius-search: var(--radius-full);
 
   /* --- Surface palette (almanac light) --- */
