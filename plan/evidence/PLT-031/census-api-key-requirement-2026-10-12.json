@@ -1,0 +1,64 @@
+{
+  "checkedAt": "2026-10-12T13:01:18.712Z",
+  "officialRequirementUrl": "https://api.census.gov/data/missing_key.html",
+  "officialSignupUrl": "https://api.census.gov/data/key_signup.html",
+  "requestCount": 7,
+  "allRequestsRedirectedToMissingKey": true,
+  "noDomainWrites": true,
+  "configuredKeyAbsent": true,
+  "existingSourceFreshnessRetained": "2026-05-05T04:47:39.950Z",
+  "regressionRed": "Without key attachment, the publisher-contract fixture returned403 and the successful-application assertion failed",
+  "regressionGreen": "Seven focused Census adapter tests passed with key attachment and safe failure handling",
+  "authenticatedLiveVerification": "blocked until owner supplies an activated Census key",
+  "sourceScopeUnchanged": [
+    "USA only",
+    "ACS2024",
+    "Decennial2020",
+    "six fact keys",
+    "existing publisher units and transforms"
+  ],
+  "retainedPayloadPolicy": "Key attached only to outgoing publisher request; retained URLs and diagnostics never contain it",
+  "selectorCorrections": [
+    {
+      "factKey": "urbanization_rate",
+      "oldVariable": "DP1_0086C",
+      "oldMeaning": "White alone or in combination with other races, not urban population",
+      "newDataset": "2020/dec/dhc",
+      "newVariables": [
+        "P2_002N",
+        "P2_001N"
+      ],
+      "newMeaning": "Urban population divided by total population, same table and vintage; retain both raw cells"
+    },
+    {
+      "factKey": "internet_users_pct",
+      "oldVariable": "DP02_0153PE",
+      "oldMeaning": "Households with a computer, not broadband subscription",
+      "newVariable": "DP02_0154PE",
+      "newMeaning": "Households with broadband Internet subscription, preserving the existing disclosed household proxy"
+    }
+  ],
+  "metadataEvidence": [
+    {
+      "file": "urban-variable-metadata.body",
+      "sha256": "92aef508875ea0bd60e9fc550f58bb735d5ff7b17d9610025ae842c8d59c87b9"
+    },
+    {
+      "file": "urban-corrected-metadata.json",
+      "sha256": "c69f9e4d6eb8d6ca6593c0d834c80030199c603d09022831871f761c1c7f32e1"
+    },
+    {
+      "file": "urban-total-metadata.json",
+      "sha256": "4088f504d01e102e6f6ae9036d4ca537e9efe561ac2a161bb7fdd76ae04d485d"
+    },
+    {
+      "file": "DP02-group-metadata.json",
+      "sha256": "497a2e3b95f454003ddb7e7adae47114a00102acece38c0be3137e2a37a81649"
+    }
+  ],
+  "selectorRegression": "Both synthetic-ratio/header regressions fail with the old selectors and pass with publisher-dictionary selectors. No live replacement value is claimed without the owner key.",
+  "retainedObservationsAwaitingReplacement": [
+    "urbanization_rate",
+    "internet_users_pct"
+  ]
+}
