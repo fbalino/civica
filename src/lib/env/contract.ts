@@ -199,6 +199,11 @@ export const ENV_DEGRADES: Array<{
     note: "US legislative sync; falls back to DEMO_KEY.",
   },
   {
+    name: "CENSUS_API_KEY",
+    secret: true,
+    note: "Required only for the US Census import; absent keeps that source unavailable without preventing other services from starting.",
+  },
+  {
     name: "BUNDESTAG_API_KEY",
     secret: true,
     note: "Required by the German legislative sync; no embedded fallback.",
