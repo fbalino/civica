@@ -36,11 +36,20 @@ const manifest = JSON.parse(
   readFileSync(`${GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR}/manifest.v1.json`, "utf8"),
 ) as Record<string, unknown> & {
   bundleSemanticSha256: string;
+  environment: Record<string, unknown>;
   tournamentWinnerSelected: boolean;
   inventory: Array<{ role: string; path: string }>;
   reviewQuestions: string[];
 };
-assert.deepEqual(manifest, expected.manifest, "manifest drift");
+// Node, npm and platform record the machine that generated the packet and
+// legitimately differ on CI; the lockfile hash is deterministic and must match.
+const { environment: recordedEnvironment, bundleSemanticSha256: _recordedHash, ...recordedRest } = manifest;
+const { environment: expectedEnvironment, bundleSemanticSha256: _expectedHash, ...expectedRest } = expected.manifest;
+assert.deepEqual(recordedRest, expectedRest, "manifest drift");
+assert.equal(recordedEnvironment.packageLockSha256, expectedEnvironment.packageLockSha256, "environment.packageLockSha256 does not match package-lock.json");
+for (const key of ["node", "npm", "platform", "platformRelease", "arch"]) {
+  assert.ok(typeof recordedEnvironment[key] === "string" && recordedEnvironment[key], `environment.${key} is not recorded`);
+}
 assert.equal(manifest.bundleSemanticSha256, reviewBundleSemanticSha256(manifest));
 assert.equal(manifest.tournamentWinnerSelected, false, "a tournament winner was silently asserted");
 assert.ok(manifest.reviewQuestions.length >= 8, "review questions are incomplete");

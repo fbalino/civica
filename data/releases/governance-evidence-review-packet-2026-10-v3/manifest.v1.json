@@ -190,12 +190,12 @@
     }
   ],
   "environment": {
-    "node": "v25.4.0",
-    "npm": "11.7.0",
+    "node": "v24.18.0",
+    "npm": "11.16.0",
     "platform": "darwin",
-    "platformRelease": "25.5.0",
+    "platformRelease": "27.0.0",
     "arch": "arm64",
-    "packageLockSha256": "d71b55dbb2a75caa0c1c7c63cb31382b80dd682f851bbb4495c6704b60d23927"
+    "packageLockSha256": "543cff2c879416aebe61e2b70f1e0f92c6f36108c90052f79c8bf694da751138"
   },
   "tournamentReleaseId": "civica-index-tournament-results-v1",
   "tournamentWinnerSelected": false,
@@ -483,8 +483,8 @@
     {
       "artifactId": "review-packet-validator",
       "role": "selected-product-code",
-      "bytes": 2739,
-      "sha256": "2a1712b13b0fc3e2846549c8c5c5ec7efbf7d968e9c58eec21ebef920a2c1f53",
+      "bytes": 3522,
+      "sha256": "332bb36ad39f7f98f9690096f938c5b85235e3bc54540fa91c90bc98457d689a",
       "path": "scripts/validate-governance-evidence-review-packet.ts"
     },
     {
@@ -511,8 +511,8 @@
     {
       "artifactId": "review-packet-builder",
       "role": "selected-product-code",
-      "bytes": 10893,
-      "sha256": "c1c18bacd0efea6ee175cfb7ae6899a2a0ef072797130b7dda6f1945c07f58c6",
+      "bytes": 11327,
+      "sha256": "cdf826f2849b7b5980ff4f36db5d5858af9f99b09666095cf1bc9ef3458d4045",
       "path": "src/lib/ci/governance-evidence-review-package.ts"
     },
     {
@@ -551,5 +551,5 @@
       "path": "src/lib/rights/manifest.ts"
     }
   ],
-  "bundleSemanticSha256": "a3afbd41e4e1f85f576f60b6a9e02c0aa3a5d938180515b874e75ed7f9991bca"
+  "bundleSemanticSha256": "7781a136830ed0a140be37cec36fe2564f2ff233fa6834434ccb7983cb486568"
 }
