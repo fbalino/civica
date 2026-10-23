@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { arch, platform, release } from "node:os";
 import { PROJECT_DISCLOSURE_ARTIFACT_PATH } from "../research/project-disclosure";
 import { GOVERNANCE_EVIDENCE_REVIEW_PACKET } from "./governance-evidence-review-packet";
 
@@ -173,10 +175,21 @@ function inventoryRow(artifactId: string, role: InventoryRole, path: string, con
   return { artifactId, role, bytes: bytes.byteLength, sha256: sha256(bytes), path };
 }
 
+/** Runtime that generated the packet, plus the exact lockfile it binds. */
+function generationEnvironment() {
+  return {
+    node: process.version,
+    npm: execFileSync("npm", ["--version"], { encoding: "utf8" }).trim(),
+    platform: platform(),
+    platformRelease: release(),
+    arch: arch(),
+    packageLockSha256: sha256(readFileSync("package-lock.json")),
+  };
+}
+
 export function buildGovernanceEvidenceReviewBundle() {
   const tournament = JSON.parse(readFileSync(TOURNAMENT_MANIFEST_PATH, "utf8")) as {
     releaseId: string;
-    environment: Record<string, unknown>;
     artifacts: Array<{ id: string; path: string; sha256: string; bytes: number }>;
     winnerSelected: boolean;
   };
@@ -198,7 +211,7 @@ export function buildGovernanceEvidenceReviewBundle() {
   const inventory = [...byPath.values()].sort((a, b) => a.path.localeCompare(b.path));
   const base = {
     ...GOVERNANCE_EVIDENCE_REVIEW_PACKET,
-    environment: tournament.environment,
+    environment: generationEnvironment(),
     tournamentReleaseId: tournament.releaseId,
     tournamentWinnerSelected: tournament.winnerSelected,
     inventory,
