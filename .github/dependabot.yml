@@ -13,6 +13,17 @@ updates:
       minor-and-patch:
         update-types: ["minor", "patch"]
     labels: ["dependencies"]
+  - package-ecosystem: uv
+    directory: "/analysis/phase-5-3"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+    cooldown:
+      default-days: 7
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    labels: ["dependencies"]
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
