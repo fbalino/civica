@@ -2,8 +2,8 @@
  * Phase R.13 — US Census Bureau sync cron handler.
  *
  * Runs quarterly via Vercel cron. Authenticated by `CRON_SECRET` (per
- * the shared cron boundary). 6 indicators × 1 jurisdiction × ~7 fetches in
- * total (urbanization_rate composes 2 datasets). Total wall time is
+ * the shared cron boundary). 6 indicators × 1 jurisdiction × 6 fetches in
+ * total (urbanization_rate uses urban and total cells from one dataset). Total wall time is
  * dominated by upserts, not fetches; expect ~5–15s on a warm DB.
  *
  * **United-States-only scope.** Per resolution §2d, US Census writes

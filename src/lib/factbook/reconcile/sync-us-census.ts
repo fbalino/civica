@@ -2,19 +2,18 @@
  * Phase R.13 — US Census Bureau sync orchestrator.
  *
  * NSO Wave 1, first phase. Direct sync from the US Census Bureau's
- * REST API at `https://api.census.gov/data/`. The Census API is
- * keyless for our quarterly query volume (7 fetches per cron run,
- * well under the 500/day anonymous limit) and serves data as JSON
- * arrays with a header row.
+ * REST API at `https://api.census.gov/data/`. The Census API requires
+ * CENSUS_API_KEY and serves data as JSON arrays with a header row.
+ * Credentials are attached only at retrieval, never to retained source URLs.
  *
- * Ships 7 indicators across 6 existing fact-keys + 1 new
+ * Ships 6 indicators across 5 existing fact-keys + 1 new
  * fact-key declared at R.13:
  *
  *   1. ACS 1-Year Profile DP05_0001E      → `population_total`
  *   2. ACS 1-Year Profile DP05_0018E      → `median_age`
- *   3. Decennial 2020 DHC P1_001U + P1_001N → `urbanization_rate` (urban / total × 100)
+ *   3. Decennial 2020 DHC P2_002N + P2_001N → `urbanization_rate` (urban / total × 100)
  *   4. ACS 1-Year Subject S2301_C04_001E  → `unemployment_rate_pct`
- *   5. ACS 1-Year Profile DP02_0153PE     → `internet_users_pct`
+ *   5. ACS 1-Year Profile DP02_0154PE     → `internet_users_pct`
  *   6. ACS 1-Year Profile DP03_0062E      → `median_household_income_usd` (NEW)
  *
  * **United-States-only scope.** The Census Bureau is the legal
@@ -207,15 +206,10 @@ export interface UsCensusIndicatorConfig {
  * The 6 US Census indicators in R.13 ship scope. Per
  * `~/civica/plan/us-census-resolution-v1.md` §2b.
  *
- * Live probes verified 2026-05-05:
- *   - DP05_0001E (population_total) ACS 2024 1-Year = 340,110,990
- *   - DP05_0018E (median_age) ACS 2023 1-Year = 39.2
- *   - P1_001N (Decennial 2020 total population) = 331,449,281
- *   - DP1_0086C (Decennial 2020 urban population) = 235,411,507
- *     → urbanization rate = 235.4M / 331.4M × 100 = 71.04%
- *   - S2301_C04_001E (unemployment_rate_pct) ACS 2023 1-Year = 4.3%
- *   - DP02_0153PE (internet_users_pct, broadband subscription) — see Q4
- *   - DP03_0062E (median_household_income_usd) ACS 2023 1-Year = $77,719
+ * Publisher dictionaries verified 2026-10-12: DHC P2_002N is urban
+ * population and P2_001N is total population; ACS DP02_0154PE is
+ * household broadband subscription. Earlier race-count/computer-ownership
+ * selector assumptions are superseded by that dictionary evidence.
  *
  * Note that fertility_rate, life_expectancy_years, and
  * gdp_per_capita_usd are NOT in R.13 scope — see resolution §2c.5,
@@ -245,35 +239,18 @@ export const US_CENSUS_INDICATORS: readonly UsCensusIndicatorConfig[] = [
     civicaRole: "canonical",
   },
   {
-    // Urbanization rate — computed from Decennial 2020 DHC + DP datasets.
-    // Probe results 2026-05-05:
-    //   GET /data/2020/dec/dp?get=NAME,DP1_0086C&for=us:1
-    //     → ["United States","235411507","1"]    (urban population)
-    //   GET /data/2020/dec/dhc?get=NAME,P1_001N&for=us:1
-    //     → ["United States","331449281","1"]    (total population)
-    //   ratio = 235,411,507 / 331,449,281 × 100 = 71.04%
-    //
-    // The 2022 Census urban-area redefinition produces a notably
-    // lower urban share than CIA (83.3%, 2023) and WB (80.1%, 2024),
-    // both of which appear to use the pre-2022 definition. Gap is
-    // ~12 pp — below `materialErrorPpThreshold: 50` so the row
-    // passes. Methodology page (R.23) will explain the redefinition.
-    //
-    // This indicator queries the Decennial DP dataset; the total
-    // population reading comes from the Decennial DHC dataset in a
-    // second fetch. The fetcher handles the two-fetch composition
-    // via the `composeFromDatasets` field below.
-    dataset: "dec/dp",
+    // Both counts come from the same 2020 DHC urban/rural table.
+    // DP1_0086C is a race count and must never be used as urban population.
+    dataset: "dec/dhc",
     vintage: DECENNIAL_VINTAGE_YEAR,
-    variables: ["DP1_0086C"],
+    variables: ["P2_002N", "P2_001N"],
     factKey: "urbanization_rate",
-    label: "Urbanization rate (Decennial 2020, post-2022 definition)",
-    docUrl: "https://api.census.gov/data/2020/dec/dp/variables/DP1_0086C.json",
+    label: "Urbanization rate (Decennial 2020)",
+    docUrl: "https://api.census.gov/data/2020/dec/dhc/variables/P2_002N.json",
     vintageLabel: DECENNIAL_VINTAGE_LABEL,
     civicaRole: "canonical",
-    // valueTransform receives [urbanPop, totalPop] in the order
-    // returned by the composed-dataset fetch (urban first, total
-    // second). Returns urban share as a percentage in [0, 100].
+    // valueTransform receives the publisher urban and total counts
+    // in declared variable order, retaining both raw inputs in provenance. Returns urban share as a percentage in [0, 100].
     valueTransform: (cells: number[]) => {
       const urban = cells[0];
       const total = cells[1];
@@ -294,8 +271,8 @@ export const US_CENSUS_INDICATORS: readonly UsCensusIndicatorConfig[] = [
     civicaRole: "canonical",
   },
   {
-    // DP02_0153PE = "Percent!!HOUSEHOLDS BY TYPE!!Total households!!
-    //                COMPUTERS AND INTERNET USE!!With a broadband
+    // DP02_0154PE = "Percent!!COMPUTERS AND INTERNET USE!!Total
+    //                households!!With a broadband
     //                Internet subscription"
     // ACS measures household-level broadband subscription, which is the
     // closest US-specific analog to the WB `IT.NET.USER.ZS` indicator
@@ -306,12 +283,12 @@ export const US_CENSUS_INDICATORS: readonly UsCensusIndicatorConfig[] = [
     // distinction in the alternates panel.
     dataset: "acs/acs1/profile",
     vintage: ACS_1YEAR_VINTAGE_YEAR,
-    variables: ["DP02_0153PE"],
+    variables: ["DP02_0154PE"],
     factKey: "internet_users_pct",
     label:
       "Households with broadband internet subscription (ACS 1-Year, % of households)",
     docUrl:
-      "https://api.census.gov/data/2024/acs/acs1/profile/variables/DP02_0153PE.json",
+      "https://api.census.gov/data/2024/acs/acs1/profile/variables/DP02_0154PE.json",
     vintageLabel: ACS_1YEAR_VINTAGE_LABEL,
     civicaRole: "canonical",
   },
@@ -381,7 +358,7 @@ export interface UsCensusSyncOptions {
   /** Deterministic fixture seams; production callers omit these. */
   jurisdiction?: UsCensusJurisdiction;
   fetchValues?: typeof fetchIndicatorValues;
-  fetchUrbanization?: typeof fetchUrbanizationRate;
+  fetchUrbanization?: () => Promise<number>;
   persistDisputes?: typeof persistProposedDisputes;
   markSynced?: typeof markSourcesSynced;
   atlasReleaseId?: string;
@@ -419,8 +396,8 @@ function freshCounters(
  *
  * Pattern: `<BASE>/<vintage>/<dataset>?get=NAME,<vars>&for=us:1`
  *
- * No API key required at our query volume (≤500 requests/day per
- * anonymous IP; we ship 7 fetches per quarterly cron run).
+ * This is the credential-free provenance URL. Authentication is attached
+ * only by the fetcher, so keys cannot enter snapshots or public references.
  */
 function buildDataUrl(
   dataset: string,
@@ -452,19 +429,35 @@ async function fetchIndicatorValues(
   vintage: number,
   variables: readonly string[],
 ): Promise<number[]> {
-  const url = buildDataUrl(dataset, vintage, variables);
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": CENSUS_USER_AGENT,
-      Accept: "application/json",
-    },
-  });
+  const key = process.env.CENSUS_API_KEY?.trim();
+  if (!key) throw new Error("US Census requires CENSUS_API_KEY");
+  const url = new URL(buildDataUrl(dataset, vintage, variables));
+  url.searchParams.set("key", key);
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { "User-Agent": CENSUS_USER_AGENT, Accept: "application/json" },
+      redirect: "error",
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch {
+    // Fetch diagnostics can include the authenticated URL.
+    throw new Error("US Census source request failed");
+  }
   if (!res.ok) {
     throw new Error(
-      `US Census ${dataset} ${variables.join(",")} (${vintage}): ${res.status} ${res.statusText}`,
+      `US Census ${dataset} ${variables.join(",")} (${vintage}): ${res.status}`,
     );
   }
-  const body = (await res.json()) as unknown;
+  if (!res.headers.get("content-type")?.includes("application/json")) {
+    throw new Error("US Census returned non-JSON content; check Census API credentials");
+  }
+  let body: unknown;
+  try {
+    body = await res.json();
+  } catch {
+    throw new Error("US Census returned invalid JSON");
+  }
   if (!Array.isArray(body) || body.length < 2) {
     throw new Error(
       `US Census ${dataset} ${variables.join(",")} (${vintage}): unexpected response shape`,
@@ -505,23 +498,6 @@ async function fetchIndicatorValues(
     out.push(parsed);
   }
   return out;
-}
-
-/**
- * Compose the urbanization rate from Decennial 2020 DP (urban
- * population) + DHC (total population) datasets. Returns the urban
- * share as a percentage in [0, 100], or NaN on failure.
- */
-async function fetchUrbanizationRate(): Promise<number> {
-  const [urbanCells, totalCells] = await Promise.all([
-    fetchIndicatorValues("dec/dp", DECENNIAL_VINTAGE_YEAR, ["DP1_0086C"]),
-    fetchIndicatorValues("dec/dhc", DECENNIAL_VINTAGE_YEAR, ["P1_001N"]),
-  ]);
-  const urban = urbanCells[0];
-  const total = totalCells[0];
-  if (!Number.isFinite(urban) || !Number.isFinite(total) || total === 0)
-    return Number.NaN;
-  return (urban / total) * 100;
 }
 
 /**
@@ -619,11 +595,9 @@ export async function syncUsCensus(
     let numericValue: number;
     let rawCells: number[];
     try {
-      if (config.factKey === "urbanization_rate") {
-        // Two-dataset composition for urbanization rate.
-        const composed = await (
-          options.fetchUrbanization ?? fetchUrbanizationRate
-        )();
+      if (config.factKey === "urbanization_rate" && options.fetchUrbanization) {
+        // Explicit fixture seam; production uses the raw-cell transform below.
+        const composed = await options.fetchUrbanization();
         rawCells = [composed];
         numericValue = composed;
       } else {

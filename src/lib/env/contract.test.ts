@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { checkEnv, envCheckErrors, ENV_CONTRACT } from "./contract";
+import { checkEnv, envCheckErrors, ENV_CONTRACT, ENV_DEGRADES } from "./contract";
 
 const FULL = {
   DATABASE_URL: "postgresql://u:p@host/db",
@@ -139,4 +139,17 @@ test("every required var declares at least one context", () => {
       `${spec.name} is neither required nor an explicit opt-in`,
     );
   }
+});
+
+
+test("Census credential is a secret scoped degradation, not a site-wide startup failure", () => {
+  for (const context of ["cron", "production"] as const) {
+    const missing = checkEnv(context, FULL);
+    assert.ok(missing.degradedOff.includes("CENSUS_API_KEY"));
+    assert.deepEqual(envCheckErrors(missing), []);
+    const supplied = checkEnv(context, { ...FULL, CENSUS_API_KEY: "fixture-census-key" });
+    assert.ok(!supplied.degradedOff.includes("CENSUS_API_KEY"));
+    assert.ok(!JSON.stringify(supplied).includes("fixture-census-key"));
+  }
+  assert.equal(ENV_DEGRADES.find(spec => spec.name === "CENSUS_API_KEY")?.secret, true);
 });
